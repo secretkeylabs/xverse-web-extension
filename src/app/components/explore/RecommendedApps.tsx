@@ -1,3 +1,4 @@
+import { trackMixPanel } from '@utils/mixpanel';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -43,7 +44,25 @@ function RecommendedApps({ items }: Props) {
   return (
     <Container>
       {items.map((item) => (
-        <Card to={item.url} key={item.url} target="_blank">
+        <Card
+          onClick={() => {
+            trackMixPanel(
+              'click_app',
+              {
+                title: item.name,
+                link: item.url,
+                section: 'recommended',
+                source: 'web-extension',
+              },
+              undefined,
+              undefined,
+              'explore-app',
+            );
+          }}
+          to={item.url}
+          key={item.url}
+          target="_blank"
+        >
           <CardImage src={item.icon} />
           <div>
             <CardTitle>{item.name}</CardTitle>

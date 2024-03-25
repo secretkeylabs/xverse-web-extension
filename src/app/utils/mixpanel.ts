@@ -1,53 +1,70 @@
 import { AnalyticsEvents } from '@secretkeylabs/xverse-core';
+import { getMixpanelInstance, mixpanelInstances } from 'app/mixpanelSetup';
 import { sha256 } from 'js-sha256';
-import mixpanel from 'mixpanel-browser';
-import { MIX_PANEL_TOKEN } from './constants';
 
-export const isMixPanelInited = () => !!MIX_PANEL_TOKEN && !!mixpanel.config;
-
-export const trackMixPanel = (event: string, properties?: any, options?: any, callback?: any) => {
-  if (!isMixPanelInited()) {
+export const trackMixPanel = (
+  event: string,
+  properties?: any,
+  options?: any,
+  callback?: any,
+  instanceKey: keyof typeof mixpanelInstances = 'web-extension',
+) => {
+  const instance = getMixpanelInstance(instanceKey);
+  if (!instance) {
     return;
   }
 
-  mixpanel.track(event, properties, options, callback);
+  instance.track(event, properties, options, callback);
 };
 
 export const optOutMixPanel = () => {
-  if (!isMixPanelInited()) {
+  const mixpanelInstance = getMixpanelInstance('web-extension');
+  const mixpanelInstanceExploreApp = getMixpanelInstance('explore-app');
+  if (!mixpanelInstance || !mixpanelInstanceExploreApp) {
     return;
   }
 
   trackMixPanel(AnalyticsEvents.OptOut, undefined, { send_immediately: true }, () => {
-    mixpanel.opt_out_tracking();
+    mixpanelInstance.opt_out_tracking();
+    mixpanelInstanceExploreApp.opt_out_tracking();
   });
 };
 
 export const optInMixPanel = (masterPubKey?: string) => {
-  if (!isMixPanelInited()) {
+  const mixpanelInstance = getMixpanelInstance('web-extension');
+  const mixpanelInstanceExploreApp = getMixpanelInstance('explore-app');
+  if (!mixpanelInstance || !mixpanelInstanceExploreApp) {
     return;
   }
 
-  mixpanel.opt_in_tracking();
+  mixpanelInstance.opt_in_tracking();
+  mixpanelInstanceExploreApp.opt_in_tracking();
 
   if (masterPubKey) {
-    mixpanel.identify(sha256(masterPubKey));
+    mixpanelInstance.identify(sha256(masterPubKey));
   }
 };
 
 export const hasOptedInMixPanelTracking = async () => {
-  if (!isMixPanelInited()) {
-    return false;
+  const mixpanelInstance = getMixpanelInstance('web-extension');
+  const mixpanelInstanceExploreApp = getMixpanelInstance('explore-app');
+  if (!mixpanelInstance || !mixpanelInstanceExploreApp) {
+    return;
   }
 
-  const hasOptedIn = await mixpanel.has_opted_in_tracking();
+  const hasOptedIn =
+    (await mixpanelInstance.has_opted_in_tracking()) &&
+    (await mixpanelInstanceExploreApp.has_opted_in_tracking());
   return hasOptedIn;
 };
 
 export const resetMixPanel = () => {
-  if (!isMixPanelInited()) {
+  const mixpanelInstance = getMixpanelInstance('web-extension');
+  const mixpanelInstanceExploreApp = getMixpanelInstance('explore-app');
+  if (!mixpanelInstance || !mixpanelInstanceExploreApp) {
     return;
   }
 
-  mixpanel.reset();
+  mixpanelInstance.reset();
+  mixpanelInstanceExploreApp.reset();
 };
