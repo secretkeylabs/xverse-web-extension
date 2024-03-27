@@ -99,6 +99,7 @@ function ConfirmLedgerTransaction(): JSX.Element {
     ordinalUtxo?: UTXO;
     feeRateInput?: string;
     fee?: BigNumber;
+    messageId?: string;
   } = location.state;
 
   const transition = useTransition(currentStep, DEFAULT_TRANSITION_OPTIONS);
