@@ -1235,13 +1235,16 @@
       "OMEGA": "Omega",
       "FIRST_TRANSACTION": "First transaction",
       "BLOCK9": "Block 9",
+      "BLOCK9_450": "Block 9 450",
       "BLOCK78": "Block 78",
+      "BLOCK286": "Block 286",
       "NAKAMOTO": "Nakamoto",
       "VINTAGE": "Vintage",
       "PIZZA": "Pizza",
       "JPEG": "Jpeg",
       "HITMAN": "Hitman",
-      "SILK_ROAD": "Silkroad"
+      "SILK_ROAD": "Silkroad",
+      "LEGACY": "Legacy Sats"
     },
     "RARITY_DETAIL": {
       "LEARN_MORE": "Learn more",
@@ -1270,13 +1273,16 @@
       "OMEGA": "The last sats in each bitcoin. They always end in at least 8 nines.",
       "FIRST_TRANSACTION": "Sats from the 10 bitcoins Satoshi Nakamoto sent Hal Finney in the first bitcoin transaction.",
       "BLOCK9": "Sats mined in Block 9 (the first block with sats circulating today).",
+      "BLOCK9_450": "Sats in the first bitcoin of the 9th block. All sats from 45,000,000,000 to 45,099,999,999 (included).",
       "BLOCK78": "Sats mined by Hal Finney in Block 78 (the first block mined by someone other than Satoshi).",
+      "BLOCK286": "Sats mined in the second-ever Bitcoin transaction, made and mined by Satoshi Nakamoto.",
       "NAKAMOTO": "Sats mined by Satoshi Nakamoto himself.",
       "VINTAGE": "Sats mined in the first 1000 bitcoin blocks.",
       "PIZZA": "Sats involved in the famous pizza transaction from 2010.",
       "JPEG": "Sats involved in the possible first bitcoin trade for an image on February 24, 2010.",
       "HITMAN": "Sats involved in the transaction made by Ross Ulbricht to hire a hitman.",
-      "SILK_ROAD": "Sats seized from Silk Road and auctioned off on June 27, 2014 by US Marshals."
+      "SILK_ROAD": "Sats seized from Silk Road and auctioned off on June 27, 2014 by US Marshals.",
+      "LEGACY": "Sats that were given out in paper wallets during Casey Rodarmor's Bitcoin workshop back in June 2022."
     },
     "SAT_TYPES": {
       "RARE_SAT": "{{type}} Sat",
