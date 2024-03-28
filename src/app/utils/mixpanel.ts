@@ -9,12 +9,7 @@ export const trackMixPanel = (
   callback?: any,
   instanceKey: keyof typeof mixpanelInstances = 'web-extension',
 ) => {
-  const instance = getMixpanelInstance(instanceKey);
-  if (!instance) {
-    return;
-  }
-
-  instance.track(event, properties, options, callback);
+  getMixpanelInstance(instanceKey).track(event, properties, options, callback);
 };
 
 export const optOutMixPanel = () => {
@@ -42,6 +37,7 @@ export const optInMixPanel = (masterPubKey?: string) => {
 
   if (masterPubKey) {
     mixpanelInstance.identify(sha256(masterPubKey));
+    mixpanelInstanceExploreApp.identify(sha256(masterPubKey));
   }
 };
 

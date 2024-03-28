@@ -1,44 +1,34 @@
 import { MIX_PANEL_EXPLORE_APP_TOKEN, MIX_PANEL_TOKEN } from '@utils/constants';
-import mixpanel from 'mixpanel-browser';
+import mixpanel, { Mixpanel } from 'mixpanel-browser';
 
-const mixpanelInstances = {
+export const mixpanelInstances: Record<string, { token?: string }> = {
   'web-extension': {
     token: MIX_PANEL_TOKEN,
-    instance: undefined,
   },
   'explore-app': {
     token: MIX_PANEL_EXPLORE_APP_TOKEN,
-    instance: undefined,
   },
 };
 
 // lazy load the mixpanel instances
-const getMixpanelInstance = (instanceKey: keyof typeof mixpanelInstances): typeof mixpanel.init => {
-  if (!mixpanelInstances[instanceKey]) {
-    console.error(`Mixpanel instance with key ${instanceKey} not found`);
-    return;
+export const getMixpanelInstance = (instanceKey: keyof typeof mixpanelInstances): Mixpanel => {
+  if (mixpanel[instanceKey]) {
+    return mixpanel[instanceKey];
   }
 
-  if (!mixpanelInstances[instanceKey].token) {
-    console.error(`Mixpanel instance ${instanceKey} token not found`);
-    return;
+const token = mixpanelInstances[instanceKey]?.token;
+  if (!token) {
+    throw new Error(`Mixpanel instance ${instanceKey} token not found`);
   }
 
-  if (!mixpanelInstances[instanceKey].instance) {
-    const instance = mixpanel.init(
-      mixpanelInstances[instanceKey].token,
-      {
-        debug: process.env.NODE_ENV === 'development',
-        ip: false,
-        persistence: 'localStorage',
-      },
-      instanceKey,
-    );
-    mixpanelInstances[instanceKey].instance = instance;
-    return instance;
-  }
-
-  return mixpanelInstances[instanceKey].instance;
+  mixpanel.init(
+    token,
+    {
+      debug: process.env.NODE_ENV === 'development',
+      ip: false,
+      persistence: 'localStorage',
+    },
+    instanceKey,
+  );
+  return mixpanel[instanceKey];
 };
-
-export { getMixpanelInstance, mixpanelInstances };
