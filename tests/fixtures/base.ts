@@ -1,5 +1,6 @@
-import { BrowserContext, Page, test as baseTest, chromium } from '@playwright/test';
 import path from 'path';
+
+import { BrowserContext, Page, test as baseTest, chromium } from '@playwright/test';
 
 export const test = baseTest.extend<{
   context: BrowserContext;
