@@ -1,6 +1,6 @@
+import StxIcon from '@assets/img/dashboard/stx_icon.svg';
 import BtcIcon from '@assets/img/receive_btc_image.svg';
 import OrdinalIcon from '@assets/img/receive_ordinals_image.svg';
-import StxIcon from '@assets/img/receive_stx_image.svg';
 import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import BottomTabBar from '@components/tabBar';
@@ -81,7 +81,7 @@ const QRCodeContainer = styled.div<{ marginBottom: number }>((props) => ({
 
 const AddressText = styled.h1((props) => ({
   ...props.theme.typography.body_m,
-  textAlign: 'center',
+  textAlign: 'left',
   color: props.theme.colors.white_200,
   wordBreak: 'break-all',
 }));
@@ -126,7 +126,7 @@ function Receive() {
       title: t('STX_ADDRESS'),
       desc: t('STX_RECEIVE_MESSAGE'),
       icon: StxIcon,
-      gradient: '#7B61FF',
+      gradient: '#FC6432',
     },
     ORD: {
       address: ordinalsAddress,

@@ -1,8 +1,8 @@
 import dashboardIcon from '@assets/img/dashboard-icon.svg';
-import SIP10Icon from '@assets/img/dashboard/SIP10.svg';
 import BitcoinToken from '@assets/img/dashboard/bitcoin_token.svg';
 import ListDashes from '@assets/img/dashboard/list_dashes.svg';
 import ordinalsIcon from '@assets/img/dashboard/ordinalBRC20.svg';
+import stacksIcon from '@assets/img/dashboard/stx_icon.svg';
 import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
@@ -114,11 +114,6 @@ const Icon = styled.img({
   height: 24,
 });
 
-const MergedIcon = styled.img({
-  width: 40,
-  height: 24,
-});
-
 const MergedOrdinalsIcon = styled.img({
   width: 64,
   height: 24,
@@ -169,6 +164,34 @@ const ModalButtonContainer = styled.div((props) => ({
   '&:first-child': {
     marginRight: props.theme.spacing(6),
   },
+}));
+
+const StacksIcon = styled.img({
+  width: 24,
+  height: 24,
+  position: 'absolute',
+  zIndex: 2,
+  left: 0,
+  top: 0,
+});
+
+const MergedIcon = styled.div((props) => ({
+  position: 'relative',
+  marginBottom: props.theme.spacing(12),
+}));
+
+const IconBackground = styled.div((props) => ({
+  width: 24,
+  height: 24,
+  position: 'absolute',
+  zIndex: 1,
+  left: 20,
+  top: 0,
+  backgroundColor: props.theme.colors.white_900,
+  borderRadius: 30,
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
 }));
 
 function Home() {
@@ -405,7 +428,12 @@ function Home() {
           showVerifyButton={choseToVerifyAddresses}
           currency="STX"
         >
-          <MergedIcon src={SIP10Icon} />
+          <MergedIcon>
+            <StacksIcon src={stacksIcon} />
+            <IconBackground>
+              <Plus weight="bold" size={12} />
+            </IconBackground>
+          </MergedIcon>
         </ReceiveCardComponent>
       )}
 

@@ -4,10 +4,13 @@ import onboarding1 from '@assets/img/landing/onboarding1.svg';
 import onboarding2 from '@assets/img/landing/onboarding2.svg';
 import Steps from '@components/steps';
 import { CaretLeft, CaretRight } from '@phosphor-icons/react';
+import Button from '@ui-library/button';
+import { isInOptions } from '@utils/helper';
 import { getIsTermsAccepted } from '@utils/localStorage';
-import React, { useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Lottie from 'react-lottie';
+import { useNavigate } from 'react-router-dom';
 import styled, { keyframes, useTheme } from 'styled-components';
 
 const slideYAndOpacity = keyframes`
@@ -71,6 +74,7 @@ const Container = styled.div`
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none; /* IE 10 and IE 11 */
   user-select: none; /* Standard syntax */
+  overflow: hidden;
 `;
 
 const AppVersion = styled.p((props) => ({
@@ -94,14 +98,18 @@ const ArrowContainer = styled.div`
   z-index: 1;
 `;
 
-const StyledCaretLeft = styled(CaretLeft)<{ disabled: boolean }>((props) => ({
-  opacity: props.disabled ? '60%' : '100%',
+const CaretButton = styled.button<{ disabled: boolean }>((props) => ({
+  backgroundColor: 'transparent',
   cursor: props.disabled ? 'default' : 'pointer',
-}));
-
-const StyledCaretRight = styled(CaretRight)<{ disabled: boolean }>((props) => ({
-  opacity: props.disabled ? '60%' : '100%',
-  cursor: props.disabled ? 'default' : 'pointer',
+  svg: {
+    opacity: props.disabled ? 0.6 : 1,
+    transition: 'opacity 0.1s ease',
+  },
+  '&:hover, &:focus': {
+    svg: {
+      opacity: 0.8,
+    },
+  },
 }));
 
 const AnimationContainer = styled.div({
@@ -183,48 +191,12 @@ const BottomContainer = styled.div`
   animation: ${() => slideYAndOpacity} 0.2s ease-out;
 `;
 
-const CreateButton = styled.button((props) => ({
-  display: 'flex',
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.elevation0,
-  textAlign: 'center',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: props.theme.colors.action.classic,
+const CreateButton = styled(Button)((props) => ({
   marginTop: props.theme.space.l,
-  width: '100%',
-  height: 44,
-  ':hover': {
-    background: props.theme.colors.action.classicLight,
-  },
-  ':focus': {
-    background: props.theme.colors.action.classicLight,
-    opacity: 0.6,
-  },
 }));
 
-const RestoreButton = styled.button((props) => ({
-  display: 'flex',
+const RestoreButton = styled(Button)((props) => ({
   marginTop: props.theme.space.s,
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_0,
-  textAlign: 'center',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: props.theme.colors.elevation0,
-  border: `0.5px solid ${props.theme.colors.elevation2}`,
-  width: '100%',
-  height: 44,
-  ':hover': {
-    background: props.theme.colors.elevation6_800,
-  },
-  ':focus': {
-    background: props.theme.colors.action.classic800,
-  },
 }));
 
 function Landing() {
@@ -233,6 +205,7 @@ function Landing() {
   const [animationComplete, setAnimationComplete] = useState(false);
   const [slideTransitions, setSlideTransitions] = useState(false);
   const [transitionDirection, setTransitionDirection] = useState<'left' | 'right'>('right');
+  const navigate = useNavigate();
 
   const theme = useTheme();
   const onboardingViews = [
@@ -252,6 +225,21 @@ function Landing() {
 
   const proceedToWallet = useCallback(async (isRestore?: boolean) => {
     const isLegalAccepted = getIsTermsAccepted();
+
+    if (isInOptions()) {
+      if (isLegalAccepted) {
+        if (isRestore) {
+          navigate(`/restoreWallet`);
+        } else {
+          navigate(`/backup`);
+        }
+      } else {
+        const params = isRestore ? '?restore=true' : '';
+        navigate(`/legal${params}`);
+      }
+      return;
+    }
+
     if (isLegalAccepted) {
       if (isRestore) {
         await chrome.tabs.create({
@@ -337,34 +325,37 @@ function Landing() {
 
   return (
     <Container>
-      <AppVersion>Beta</AppVersion>
+      <AppVersion>{t('BETA')}</AppVersion>
       {animationComplete ? (
         <Container>
           <ArrowContainer>
-            <StyledCaretLeft
-              disabled={currentStepIndex <= 0}
-              onClick={handleClickBack}
-              size={theme.space.l}
-              color={theme.colors.white_0}
-              opacity={currentStepIndex > 0 ? '100%' : '60%'}
-            />
-            <StyledCaretRight
+            <CaretButton disabled={currentStepIndex <= 0} onClick={handleClickBack}>
+              <CaretLeft
+                size={theme.space.l}
+                color={theme.colors.white_0}
+                opacity={currentStepIndex > 0 ? '100%' : '60%'}
+              />
+            </CaretButton>
+            <CaretButton
               disabled={currentStepIndex >= onboardingViews.length - 1}
               onClick={handleClickNext}
-              size={theme.space.l}
-              color={theme.colors.white_0}
-              opacity={currentStepIndex < onboardingViews.length - 1 ? '100%' : '60%'}
-            />
+            >
+              <CaretRight
+                size={theme.space.l}
+                color={theme.colors.white_0}
+                opacity={currentStepIndex < onboardingViews.length - 1 ? '100%' : '60%'}
+              />
+            </CaretButton>
           </ArrowContainer>
           {renderTransitions()}
           <BottomContainer>
             <Steps data={onboardingViews} activeIndex={currentStepIndex} dotStrategy="selection" />
-            <CreateButton onClick={() => proceedToWallet()}>
-              {t('CREATE_WALLET_BUTTON')}
-            </CreateButton>
-            <RestoreButton onClick={() => proceedToWallet(true)}>
-              {t('RESTORE_WALLET_BUTTON')}
-            </RestoreButton>
+            <CreateButton onClick={() => proceedToWallet()} title={t('CREATE_WALLET_BUTTON')} />
+            <RestoreButton
+              variant="secondary"
+              onClick={() => proceedToWallet(true)}
+              title={t('RESTORE_WALLET_BUTTON')}
+            />
           </BottomContainer>
         </Container>
       ) : (

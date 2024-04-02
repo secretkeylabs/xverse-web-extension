@@ -55,8 +55,9 @@ export const InfoImage = styled.img({
   height: 64,
 });
 
-export const ConnectLedgerTitle = styled.h1((props) => ({
+export const ConnectLedgerTitle = styled.h1<{ textAlign?: 'left' | 'center' }>((props) => ({
   ...props.theme.headline_s,
+  textAlign: props.textAlign || 'left',
   marginBottom: props.theme.spacing(6),
 }));
 

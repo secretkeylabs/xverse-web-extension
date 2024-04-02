@@ -36,11 +36,11 @@ const OutputTitleText = styled(StyledP)((props) => ({
   marginBottom: props.theme.space.s,
 }));
 
-const ExpandedContainer = styled(animated.div)({
+const ExpandedContainer = styled(animated.div)((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  marginTop: 16,
-});
+  marginTop: props.theme.space.m,
+}));
 
 type Props = {
   inputs: btcTransaction.EnhancedInput[];
@@ -76,7 +76,7 @@ function TxInOutput({ inputs, outputs }: Props) {
             {isExpanded ? t('INPUT') : t('INPUT_AND_OUTPUT')}
           </StyledP>
         </Row>
-        <animated.img style={arrowRotation} src={DropDownIcon} alt="Drop Down" />
+        <animated.img style={arrowRotation} src={DropDownIcon} alt="Dropdown" />
       </Button>
       {isExpanded && (
         <ExpandedContainer style={slideInStyles}>

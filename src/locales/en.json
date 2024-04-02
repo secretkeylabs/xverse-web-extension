@@ -19,6 +19,7 @@
     "SATS_PER_VB": "sats/vByte"
   },
   "LANDING_SCREEN": {
+    "BETA": "Beta",
     "SCREEN_TITLE": "The Bitcoin wallet for everyone",
     "CREATE_WALLET_BUTTON": "Create a new wallet",
     "RESTORE_WALLET_BUTTON": "Restore an existing wallet",
@@ -348,6 +349,8 @@
     "ADDRESS_MISMATCH": "There’s a mismatch between your signing address and the address you’re logged with.",
     "PSBT_NO_BROADCAST_DISCLAIMER": "This transaction will not be broadcasted from your wallet. It may be broadcasted later by a third party.",
     "PSBTS_NO_BROADCAST_DISCLAIMER": "These transactions will not be broadcasted from your wallet. They may be broadcasted later by a third party.",
+    "PSBT_SIG_HASH_NONE_DISCLAIMER_TITLE": "Transaction uses SIGHASH_NONE",
+    "PSBT_SIG_HASH_NONE_DISCLAIMER": "Signing this transaction gives the requester full authority over your funds; they may alter fund destinations. Use with understanding of potential fund loss.",
     "PSBT_CANT_PARSE_ERROR_TITLE": "Transaction Error",
     "PSBT_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction is invalid and cannot be processed. Please contact the developer of the requesting app for support.",
     "PSBT_INDEX_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction at {{index}} index is invalid and cannot be processed. Please contact the developer of the requesting app for support.",
@@ -386,7 +389,13 @@
         "TITLE": "Transaction broadcasted",
         "SUBTITLE": "Your transaction have been successfully broadcasted. You can close this tab."
       },
+      "INPUTS_WARNING": {
+        "EXTERNAL_INPUTS": "External inputs",
+        "NON_DEFAULT_SIGHASH": "Non-default sighash",
+        "SUBTITLE": "Your device may display a warning regarding external inputs and the use of default sighash signature type. This is expected as you'll be signing inputs from two addresses in one transaction, using a non-default signature type."
+      },
       "CONFIRM_BUTTON": "Confirm",
+      "CONTINUE_BUTTON": "Continue",
       "CONNECT_BUTTON": "Connect",
       "CLOSE_BUTTON": "Close",
       "CANCEL_BUTTON": "Cancel",
@@ -1226,13 +1235,16 @@
       "OMEGA": "Omega",
       "FIRST_TRANSACTION": "First transaction",
       "BLOCK9": "Block 9",
+      "BLOCK9_450": "Block 9 450",
       "BLOCK78": "Block 78",
+      "BLOCK286": "Block 286",
       "NAKAMOTO": "Nakamoto",
       "VINTAGE": "Vintage",
       "PIZZA": "Pizza",
       "JPEG": "Jpeg",
       "HITMAN": "Hitman",
-      "SILK_ROAD": "Silkroad"
+      "SILK_ROAD": "Silkroad",
+      "LEGACY": "Legacy Sats"
     },
     "RARITY_DETAIL": {
       "LEARN_MORE": "Learn more",
@@ -1261,13 +1273,16 @@
       "OMEGA": "The last sats in each bitcoin. They always end in at least 8 nines.",
       "FIRST_TRANSACTION": "Sats from the 10 bitcoins Satoshi Nakamoto sent Hal Finney in the first bitcoin transaction.",
       "BLOCK9": "Sats mined in Block 9 (the first block with sats circulating today).",
+      "BLOCK9_450": "Sats in the first bitcoin of the 9th block. All sats from 45,000,000,000 to 45,099,999,999 (included).",
       "BLOCK78": "Sats mined by Hal Finney in Block 78 (the first block mined by someone other than Satoshi).",
+      "BLOCK286": "Sats mined in the second-ever Bitcoin transaction, made and mined by Satoshi Nakamoto.",
       "NAKAMOTO": "Sats mined by Satoshi Nakamoto himself.",
       "VINTAGE": "Sats mined in the first 1000 bitcoin blocks.",
       "PIZZA": "Sats involved in the famous pizza transaction from 2010.",
       "JPEG": "Sats involved in the possible first bitcoin trade for an image on February 24, 2010.",
       "HITMAN": "Sats involved in the transaction made by Ross Ulbricht to hire a hitman.",
-      "SILK_ROAD": "Sats seized from Silk Road and auctioned off on June 27, 2014 by US Marshals."
+      "SILK_ROAD": "Sats seized from Silk Road and auctioned off on June 27, 2014 by US Marshals.",
+      "LEGACY": "Sats that were given out in paper wallets during Casey Rodarmor's Bitcoin workshop back in June 2022."
     },
     "SAT_TYPES": {
       "RARE_SAT": "{{type}} Sat",
@@ -1295,5 +1310,13 @@
     "ERRORS": {
       "FAILED_TO_FETCH": "Failed to fetch data"
     }
+  },
+  "REQUEST_ERRORS": {
+    "INVALID_REQUEST": "Invalid request",
+    "MISSING_ARGUMENTS": "Contract function call missing arguments",
+    "ADDRESS_MISMATCH": "There’s a mismatch between your signing address and the address you’re logged with.",
+    "NETWORK_MISMATCH": "There’s a mismatch between your active network and the network you’re logged with.",
+    "PSBT_CANT_PARSE_ERROR_TITLE": "Transaction Error",
+    "PSBT_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction is invalid and cannot be processed. Please contact the developer of the requesting app for support."
   }
 }

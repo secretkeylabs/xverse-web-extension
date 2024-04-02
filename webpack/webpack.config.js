@@ -11,6 +11,7 @@ const Dotenv = require('dotenv-webpack');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const createStyledComponentsTransformer = require('typescript-plugin-styled-components').default;
 const styledComponentsTransformer = createStyledComponentsTransformer();
+const keysTransformer = require('ts-transformer-keys/transformer').default;
 
 const aliases = {
   // alias stacks.js packages to their esm (default prefers /dist/polyfill)
@@ -69,11 +70,15 @@ var options = {
           {
             loader: 'ts-loader',
             options: {
-              getCustomTransformers: () => ({
+              getCustomTransformers: (program) => ({
                 before:
                   env.NODE_ENV === 'development'
-                    ? [ReactRefreshTypeScript(), styledComponentsTransformer]
-                    : [],
+                    ? [
+                        ReactRefreshTypeScript(),
+                        styledComponentsTransformer,
+                        keysTransformer(program),
+                      ]
+                    : [keysTransformer(program)],
               }),
               transpileOnly: false,
             },

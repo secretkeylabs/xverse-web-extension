@@ -1,4 +1,3 @@
-import useSendBtcRequest from '@hooks/useSendBtcRequest';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ErrorCodes, getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
@@ -8,6 +7,7 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import useSendBtcRequest from './useSendBtcRequest';
 
 const OuterContainer = styled.div`
   display: flex;
@@ -22,55 +22,54 @@ const OuterContainer = styled.div`
 `;
 
 function BtcSendScreen() {
-  const { payload, signedTx, isLoading, tabId, requestToken, error, recipient } =
+  const { payload, signedTx, isLoading, tabId, requestToken, requestId, error, recipient } =
     useSendBtcRequest();
   const navigate = useNavigate();
-  const { btcFiatRate, network, btcAddress } = useWalletSelector();
+  const { btcFiatRate, btcAddress, network } = useWalletSelector();
   const { t } = useTranslation('translation');
 
-  const checkIfMismatch = () => {
-    if (payload.senderAddress !== btcAddress) {
-      navigate('/tx-status', {
-        state: {
-          txid: '',
-          currency: 'STX',
-          error: t('CONFIRM_TRANSACTION.ADDRESS_MISMATCH'),
-          browserTx: true,
-        },
-      });
-    }
-    if (payload.network.type !== network.type) {
-      navigate('/tx-status', {
-        state: {
-          txid: '',
-          currency: 'BTC',
-          error: t('CONFIRM_TRANSACTION.NETWORK_MISMATCH'),
-          browserTx: true,
-        },
-      });
-    }
-  };
-
-  const checkIfValidAmount = () => {
-    recipient.forEach((txRecipient) => {
-      if (txRecipient.amountSats.lt(BITCOIN_DUST_AMOUNT_SATS)) {
+  useEffect(() => {
+    const checkIfMismatch = () => {
+      if (payload.senderAddress !== btcAddress) {
         navigate('/tx-status', {
           state: {
             txid: '',
-            currency: 'BTC',
-            error: t('SEND.ERRORS.BELOW_MINIMUM_AMOUNT'),
+            currency: 'STX',
+            error: t('CONFIRM_TRANSACTION.ADDRESS_MISMATCH'),
             browserTx: true,
           },
         });
       }
-    });
-  };
+      if (payload.network.type !== network.type) {
+        navigate('/tx-status', {
+          state: {
+            txid: '',
+            currency: 'BTC',
+            error: t('CONFIRM_TRANSACTION.NETWORK_MISMATCH'),
+            browserTx: true,
+          },
+        });
+      }
+    };
 
-  useEffect(() => {
     checkIfMismatch();
-  }, []);
+  }, [payload]);
 
   useEffect(() => {
+    const checkIfValidAmount = () => {
+      recipient.forEach((txRecipient) => {
+        if (txRecipient.amountSats.lt(BITCOIN_DUST_AMOUNT_SATS)) {
+          navigate('/tx-status', {
+            state: {
+              txid: '',
+              currency: 'BTC',
+              error: t('SEND.ERRORS.BELOW_MINIMUM_AMOUNT'),
+              browserTx: true,
+            },
+          });
+        }
+      });
+    };
     checkIfValidAmount();
   }, [recipient]);
 
@@ -116,10 +115,12 @@ function BtcSendScreen() {
           btcSendBrowserTx: true,
           requestToken,
           tabId,
+          requestId,
         },
       });
     }
   }, [signedTx]);
+
   return <OuterContainer>{isLoading && <Spinner color="white" size={50} />}</OuterContainer>;
 }
 
