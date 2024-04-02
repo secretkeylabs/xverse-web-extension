@@ -1,0 +1,70 @@
+#! /bin/bash
+
+##
+# merge-to-remote.sh
+#
+# to be run locally from downstream repo, or from GitHub Actions
+
+set -e
+
+if [[ -z $(git status --porcelain) ]]; then
+  echo "Working directory clean. Proceeding with merge."
+else
+  echo "Working directory not clean. Please commit or stash your changes before proceeding."
+  exit 1
+fi
+
+ORIGIN_BRANCH=${ORIGIN_BRANCH:-main} # defaults to main
+REMOTE_REPO=${REMOTE_REPO:-xverse-web-extension} # defaults to xverse-web-extension
+
+echo "Merging $ORIGIN_BRANCH to $REMOTE_REPO"
+
+ORIGIN_NAME="origin"
+REMOTE_URL="git@github.com:secretkeylabs/$REMOTE_REPO.git"
+REMOTE_NAME="public"
+
+## add or set remote
+git remote -v | grep -w $REMOTE_NAME || git remote add $REMOTE_NAME $REMOTE_URL
+git remote set-url $REMOTE_NAME $REMOTE_URL
+
+## fetch from all remotes including tags
+git fetch --all --tags || true # TODO remove || true after fixing tag conflicts
+
+PR_TITLE="merge-$ORIGIN_BRANCH-to-$REMOTE_NAME"
+REMOTE_BRANCH="chore/$PR_TITLE-$(date +%s)"
+REMOTE_BASE=$ORIGIN_BRANCH
+
+## checkout origin branch and push to remote
+echo "Checking out $ORIGIN_NAME/$ORIGIN_BRANCH and pushing to $REMOTE_NAME/$REMOTE_BRANCH"
+git checkout $ORIGIN_NAME/$ORIGIN_BRANCH
+git checkout -B $REMOTE_BRANCH
+git push $REMOTE_NAME $REMOTE_BRANCH
+
+if command -v gh >/dev/null 2>&1; then
+  echo "gh cli installed. Proceeding with PR creation."
+else
+  echo "gh cli not installed. Please install gh cli or create the PR manually."
+  exit 1
+fi
+
+## create PR and assign team review
+gh api \
+  --method POST \
+  -H "Accept: application/vnd.github+json" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  /repos/{owner}/$REMOTE_REPO/pulls \
+  -f title="$PR_TITLE" \
+  -f head="$REMOTE_BRANCH" \
+  -f base="$REMOTE_BASE" \
+  -f body="Created by merge-to-remote.sh" > pr.json
+
+PULL_NUMBER=$(jq -r '.number' pr.json)
+gh api \
+  --method POST \
+  -H "Accept: application/vnd.github+json" \
+  -H "X-GitHub-Api-Version: 2022-11-28" \
+  /repos/{owner}/$REMOTE_REPO/pulls/$PULL_NUMBER/requested_reviewers \
+-f "team_reviewers[]=reviewers-web-extension"
+
+## push tags
+git push $REMOTE_NAME --tags || true # TODO remove || true after fixing tag conflicts

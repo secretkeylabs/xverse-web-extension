@@ -1,0 +1,33 @@
+name: Merge release to develop
+##
+# This workflow triggers on merge of release branch back to develop
+#
+# It should push to public repo
+#
+on:
+  pull_request:
+    branches:
+      - develop
+    types:
+      - closed
+jobs:
+  publish-latest:
+    if: ${{ github.event.pull_request.merged == true && startsWith(github.head_ref, 'release/')}}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: push-to-public
+        name: Push to public remote
+        if: ${{ contains(github.repositoryUrl, 'private' }}
+        run: |
+          # git config
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+          # run shell script
+          cd scripts
+          ORIGIN_BRANCH=develop REMOTE_REPO=xverse-web-extension ./merge-to-remote.sh
