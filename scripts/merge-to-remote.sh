@@ -32,7 +32,8 @@ git remote -v | grep -w $REMOTE_NAME || git remote add $REMOTE_NAME $REMOTE_URL
 git remote set-url $REMOTE_NAME $REMOTE_URL
 
 ## fetch from all remotes including tags
-git fetch --all --tags || true # TODO remove || true after fixing tag conflicts
+git fetch $ORIGIN_NAME $ORIGIN_BRANCH --tags || true # TODO remove || true after fixing tag conflicts
+git fetch $REMOTE_NAME $ORIGIN_BRANCH --tags || true # TODO remove || true after fixing tag conflicts
 
 PR_TITLE="merge-$ORIGIN_BRANCH-to-$REMOTE_NAME"
 REMOTE_BRANCH="chore/$PR_TITLE-$(date +%s)"
@@ -61,14 +62,6 @@ gh api \
   -f head="$REMOTE_BRANCH" \
   -f base="$REMOTE_BASE" \
   -f body="Created by merge-to-remote.sh" > pr.json
-
-PULL_NUMBER=$(jq -r '.number' pr.json)
-gh api \
-  --method POST \
-  -H "Accept: application/vnd.github+json" \
-  -H "X-GitHub-Api-Version: 2022-11-28" \
-  /repos/{owner}/$REMOTE_REPO/pulls/$PULL_NUMBER/requested_reviewers \
--f "team_reviewers[]=reviewers-web-extension"
 
 ## push tags
 git push $REMOTE_NAME --tags || true # TODO remove || true after fixing tag conflicts
