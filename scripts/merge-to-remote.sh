@@ -31,6 +31,9 @@ REMOTE_NAME="public"
 ## add or set remote
 git remote | grep -w $REMOTE_NAME || git remote add $REMOTE_NAME $REMOTE_URL
 git remote set-url $REMOTE_NAME $REMOTE_URL
+git remote -v
+git remote set-url --push $REMOTE_NAME $REMOTE_URL
+git remote -v
 
 ## fetch from all remotes including tags
 git fetch $ORIGIN_NAME $ORIGIN_BRANCH --tags || true # TODO remove || true after fixing tag conflicts
