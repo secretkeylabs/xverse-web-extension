@@ -22,13 +22,12 @@ echo "Merging $ORIGIN_BRANCH to $REMOTE_REPO"
 ORIGIN_NAME="origin"
 REMOTE_URL="git@github.com:secretkeylabs/$REMOTE_REPO.git"
 if [[ $CI == "true" ]]; then
-  REMOTE_URL="https://github.com/secretkeylabs/$REMOTE_REPO"
+  REMOTE_URL="https://x-access-token:${GH_TOKEN}@github.com/secretkeylabs/$REMOTE_REPO"
 fi
 REMOTE_NAME="public"
 
 
 ## add or set remote
-echo Add or set $REMOTE_NAME $REMOTE_URL
 git remote -v | grep -w $REMOTE_NAME || git remote add $REMOTE_NAME $REMOTE_URL
 git remote set-url $REMOTE_NAME $REMOTE_URL
 
