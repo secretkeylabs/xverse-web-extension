@@ -51,6 +51,9 @@ export default function BackupWalletSteps(): JSX.Element {
         navigate('/backup');
       }
     })();
+    return () => {
+      setSeedPhrase('');
+    };
   }, []);
 
   const handleSeedCheckContinue = () => {
@@ -80,7 +83,7 @@ export default function BackupWalletSteps(): JSX.Element {
   const handleConfirmPasswordContinue = async () => {
     if (confirmPassword === password) {
       disableWalletExistsGuard?.();
-      await createWallet(seedPhrase);
+      await createWallet(); // TODO move this somwhere else
       await changePassword('', password);
       navigate('/wallet-success/create', { replace: true });
     } else {
