@@ -88,7 +88,7 @@ jobs:
           asset_content_type: application/zip
       - id: push-to-public
         name: Push to public remote
-        if: ${{ contains(github.repositoryUrl, 'private' }}
+        if: ${{ contains(github.repositoryUrl, 'private') }}
         env:
           REMOTE_REPO: xverse-web-extension
         run: |
@@ -99,7 +99,6 @@ jobs:
           ./merge-to-remote.sh
       - id: copy-release-to-public
         name: Copy release to public remote
-        needs: push-to-public
         env:
           REMOTE_REPO: xverse-web-extension
         run: |
