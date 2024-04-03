@@ -20,7 +20,7 @@ REMOTE_REPO=${REMOTE_REPO:-xverse-web-extension} # defaults to xverse-web-extens
 echo "Merging $ORIGIN_BRANCH to $REMOTE_REPO"
 
 ORIGIN_NAME="origin"
-REMOTE_URL="git@github.com:secretkeylabs/$REMOTE_REPO.git"
+REMOTE_URL=$((CI ? "https://github.com/secretkeylabs/$REMOTE_REPO" : "git@github.com:secretkeylabs/$REMOTE_REPO.git" ))
 REMOTE_NAME="public"
 
 ## add or set remote
