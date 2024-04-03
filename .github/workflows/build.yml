@@ -40,8 +40,8 @@ jobs:
         run: npm run build --if-present
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
-      - name: Run health check
-        run: xvfb-run --auto-servernum --server-args="-screen 0 1024x768x24" npx playwright test tests/specs/healthcheck.spec.ts --reporter=html
+      - name: Run UI test suite
+        run: xvfb-run --auto-servernum --server-args="-screen 0 360x360x24" npx playwright test --reporter=html
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v3
