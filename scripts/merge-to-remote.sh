@@ -22,6 +22,7 @@ echo "Merging $ORIGIN_BRANCH to $REMOTE_REPO"
 ORIGIN_NAME="origin"
 REMOTE_URL="git@github.com:secretkeylabs/$REMOTE_REPO.git"
 if [[ $GITHUB_ACTIONS == "true" ]]; then
+  echo "Running in GitHub Actions. Using GitHub token for authentication."
   REMOTE_URL="https://x-access-token:${GH_TOKEN}@github.com/secretkeylabs/$REMOTE_REPO"
 fi
 REMOTE_NAME="public"
