@@ -23,8 +23,8 @@ jobs:
       - id: run-merge-script
         env:
           ORIGIN_BRANCH: ${{ inputs.branch }}
-          GH_TOKEN: ${{ github.token }}
           REMOTE_REPO: ${{ secrets.REMOTE_REPO }}
+          GH_TOKEN: ${{ secrets.GH_REPOS_RW_PAT }}
         run: |
           # git config
           git config user.name "GitHub Actions Bot"
