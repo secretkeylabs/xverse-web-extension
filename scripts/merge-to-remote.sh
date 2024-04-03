@@ -23,7 +23,7 @@ ORIGIN_NAME="origin"
 REMOTE_URL="git@github.com:secretkeylabs/$REMOTE_REPO.git"
 if [[ $GITHUB_ACTIONS == "true" ]]; then
   echo "Running in GitHub Actions. Using GitHub token for authentication."
-  REMOTE_URL="https://x-access-token:${GH_TOKEN}@github.com/secretkeylabs/$REMOTE_REPO"
+  REMOTE_URL="https://${GH_TOKEN}@github.com/secretkeylabs/$REMOTE_REPO"
 fi
 REMOTE_NAME="public"
 
@@ -31,7 +31,6 @@ REMOTE_NAME="public"
 ## add or set remote
 git remote | grep -w $REMOTE_NAME || git remote add $REMOTE_NAME $REMOTE_URL
 git remote set-url $REMOTE_NAME $REMOTE_URL
-git remote -v
 git remote set-url --push $REMOTE_NAME $REMOTE_URL
 git remote -v
 
@@ -47,7 +46,7 @@ REMOTE_BASE=$ORIGIN_BRANCH
 echo "Checking out $ORIGIN_NAME/$ORIGIN_BRANCH and pushing to $REMOTE_NAME/$REMOTE_BRANCH"
 git checkout $ORIGIN_NAME/$ORIGIN_BRANCH
 git checkout -B $REMOTE_BRANCH
-git push $REMOTE_NAME $REMOTE_BRANCH
+git push -v $REMOTE_NAME $REMOTE_BRANCH
 
 if command -v gh >/dev/null 2>&1; then
   echo "gh cli installed. Proceeding with PR creation."
@@ -56,7 +55,7 @@ else
   exit 1
 fi
 
-## create PR and assign team review
+## create PR
 gh api \
   --method POST \
   -H "Accept: application/vnd.github+json" \
