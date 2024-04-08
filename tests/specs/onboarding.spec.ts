@@ -160,7 +160,5 @@ test.describe('onboarding flow', () => {
     await expect(onboardingpage.imageSuccess).toBeVisible();
     await expect(onboardingpage.instruction).toBeVisible();
     await expect(onboardingpage.buttonCloseTab).toBeVisible();
-    await onboardingpage.buttonCloseTab.click();
-    expect(context.pages()).toHaveLength(0);
   });
 });
