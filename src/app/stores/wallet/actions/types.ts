@@ -21,7 +21,6 @@ export const GetActiveAccountsKey = 'GetActiveAccounts';
 export const FetchStxWalletDataRequestKey = 'FetchStxWalletDataRequest';
 export const SetStxWalletDataKey = 'SetStxWalletDataKey';
 export const SetBtcWalletDataKey = 'SetBtcWalletData';
-export const SetCoinRatesKey = 'SetCoinRatesKey';
 export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
 export const RareSatsNoticeDismissedKey = 'RareSatsNoticeDismissedKey';
 export const ChangeHasActivatedRareSatsKey = 'ChangeHasActivatedRareSatsKey';
@@ -61,8 +60,6 @@ export interface WalletState {
   savedNetworks: SettingsNetwork[]; // previously set network urls for type
   encryptedSeed: string;
   fiatCurrency: SupportedCurrency;
-  btcFiatRate: string;
-  stxBtcRate: string;
   stxBalance: string;
   stxAvailableBalance: string;
   stxLockedBalance: string;
@@ -136,11 +133,6 @@ export interface SelectAccount {
   // stackingState: StackingStateData;
   accountType?: AccountType;
   accountName: string | undefined;
-}
-export interface SetCoinRates {
-  type: typeof SetCoinRatesKey;
-  stxBtcRate: string;
-  btcFiatRate: string;
 }
 
 export interface SetStxWalletData {
@@ -259,7 +251,6 @@ export type WalletActions =
   | SelectAccount
   | StoreEncryptedSeed
   | SetFeeMultiplier
-  | SetCoinRates
   | SetStxWalletData
   | SetBtcWalletData
   | ChangeFiatCurrency
