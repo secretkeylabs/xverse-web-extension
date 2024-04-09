@@ -5,10 +5,7 @@ import {
   fetchBtcToCurrencyRate,
   fetchStxToBtcRate,
 } from '@secretkeylabs/xverse-core';
-import { setCoinRatesAction } from '@stores/wallet/actions/actionCreators';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 
 export const useGetRates = (fiatCurrency: SupportedCurrency, networkType: NetworkType) => {
   const fetchCoinRates = async () => {
@@ -31,16 +28,14 @@ export const useGetRates = (fiatCurrency: SupportedCurrency, networkType: Networ
 };
 
 export const useCoinRates = () => {
-  const dispatch = useDispatch();
   const { fiatCurrency, network } = useWalletSelector();
 
   const { data } = useGetRates(fiatCurrency, network.type);
-  useEffect(() => {
-    if (!data?.btcFiatRate || !data?.stxBtcRate) {
-      return;
-    }
-    dispatch(setCoinRatesAction(data.stxBtcRate, data.btcFiatRate));
-  }, [data?.btcFiatRate]);
+
+  const stxBtcRate = data?.stxBtcRate || '0';
+  const btcFiatRate = data?.btcFiatRate || '0';
+
+  return { stxBtcRate, btcFiatRate };
 };
 
 export default useCoinRates;
