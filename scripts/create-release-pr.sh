@@ -7,6 +7,8 @@
 # Alternatively trigger it from the github action
 #
 
+set -e
+
 if [[ -z "$BUMP" ]]; then
   echo "BUMP is required. major|minor|patch"
   exit 1
@@ -26,7 +28,7 @@ TITLE="release: $TAG"
 
 git checkout -B $BRANCH
 git commit -am "$TITLE"
-git merge origin/main -s ours
+git merge --allow-unrelated-histories origin/main -s ours
 
 git push --set-upstream origin $BRANCH
 

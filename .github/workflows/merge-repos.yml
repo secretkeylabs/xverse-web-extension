@@ -1,0 +1,34 @@
+name: Merge branch to remote
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Merge branch'
+        required: true
+        default: develop
+        type: choice
+        options:
+          - develop
+          - main
+
+jobs:
+  merge-branch-to-remote:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - id: run-merge-script
+        env:
+          ORIGIN_BRANCH: ${{ inputs.branch }}
+          REMOTE_REPO: ${{ secrets.REMOTE_REPO }}
+          GH_TOKEN: ${{ secrets.GH_REPOS_RW_PAT }}
+        run: |
+          # git config
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+          # run shell script
+          cd scripts
+          ORIGIN_BRANCH=$ORIGIN_BRANCH REMOTE_REPO=$REMOTE_REPO ./merge-to-remote.sh

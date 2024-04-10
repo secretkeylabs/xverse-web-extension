@@ -31,5 +31,5 @@
       "@ui-components/*": ["app/ui-components/*"]
     }
   },
-  "include": ["src", "styled.d.ts"]
+  "include": ["src", "tests", "styled.d.ts", "playwright.config.ts"]
 }

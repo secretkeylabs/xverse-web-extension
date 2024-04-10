@@ -1,5 +1,4 @@
 import backup from '@assets/img/backupWallet/backup.svg';
-import ActionButton from '@components/button';
 import useSeedVault from '@hooks/useSeedVault';
 import { generateMnemonic } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
@@ -62,6 +61,7 @@ function BackupWallet(): JSX.Element {
     clearVaultStorage,
   } = useSeedVault();
 
+  // TODO move this to SeedVault?
   const generateAndStoreSeedPhrase = async () => {
     const newSeedPhrase = generateMnemonic();
     await initSeedVault('');
