@@ -1,4 +1,4 @@
-import TokenTicker from '@assets/img/stacking/token_ticker.svg';
+import TokenTicker from '@assets/img/dashboard/stx_icon.svg';
 import useStackingData from '@hooks/queries/useStackingData';
 import { StackingState } from '@secretkeylabs/xverse-core';
 import { XVERSE_WEB_POOL_URL } from '@utils/constants';
@@ -66,6 +66,11 @@ const StatusText = styled.h1((props) => ({
   color: props.theme.colors.white_0,
 }));
 
+const Icon = styled.img({
+  width: 36,
+  height: 36,
+});
+
 function StackingStatusTile() {
   const { t } = useTranslation('translation', { keyPrefix: 'STACKING_SCREEN' });
   const { stackingData } = useStackingData();
@@ -88,7 +93,7 @@ function StackingStatusTile() {
   return (
     <Container onClick={handleOnClick}>
       <TextContainer>
-        <img src={TokenTicker} alt="Ticker" />
+        <Icon src={TokenTicker} alt="Ticker" />
         <ColumnContainer>
           <BoldText>{t('STACK_STX')}</BoldText>
           <SubText>{t('EARN_BTC')}</SubText>

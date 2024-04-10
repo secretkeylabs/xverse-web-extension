@@ -1,7 +1,8 @@
-import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
+import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { InputToSign, signPsbt } from '@secretkeylabs/xverse-core';
 import { decodeToken } from 'jsontokens';
+import { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { SignMultiplePsbtPayload, SignMultipleTransactionOptions } from 'sats-connect';
 import useSeedVault from './useSeedVault';
@@ -12,7 +13,10 @@ const useSignBatchPsbtTx = () => {
   const { getSeed } = useSeedVault();
   const params = new URLSearchParams(search);
   const requestToken = params.get('signBatchPsbtRequest') ?? '';
-  const request = decodeToken(requestToken) as any as SignMultipleTransactionOptions;
+  const request = useMemo(
+    () => decodeToken(requestToken) as any as SignMultipleTransactionOptions,
+    [requestToken],
+  );
   const tabId = params.get('tabId') ?? '0';
 
   const confirmSignPsbt = async (psbt: SignMultiplePsbtPayload) => {
@@ -36,7 +40,7 @@ const useSignBatchPsbtTx = () => {
   const cancelSignPsbt = () => {
     const signingMessage = {
       source: MESSAGE_SOURCE,
-      method: ExternalSatsMethods.signBatchPsbtResponse,
+      method: SatsConnectMethods.signBatchPsbtResponse,
       payload: { signBatchPsbtRequest: requestToken, signBatchPsbtResponse: 'cancel' },
     };
     chrome.tabs.sendMessage(+tabId, signingMessage);

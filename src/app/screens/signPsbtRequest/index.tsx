@@ -1,11 +1,12 @@
+import { makeRPCError, sendRpcResponse } from '@common/utils/rpc/helpers';
 import ConfirmBitcoinTransaction from '@components/confirmBtcTransaction';
-import useSignPsbtTx from '@hooks/useSignPsbtTx';
-import useTransactionContext from '@hooks/useTransactionContext';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { btcTransaction, Transport } from '@secretkeylabs/xverse-core';
-import { useEffect, useMemo, useState } from 'react';
+import RequestError from '@components/requests/requestError';
+import { Transport, btcTransaction } from '@secretkeylabs/xverse-core';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { RpcErrorCode } from 'sats-connect';
+import useSignPsbt from './useSignPsbt';
 import useSignPsbtValidationGate from './useSignPsbtValidationGate';
 
 function SignPsbtRequest() {
@@ -17,42 +18,42 @@ function SignPsbtRequest() {
   const [inputs, setInputs] = useState<btcTransaction.EnhancedInput[]>([]);
   const [outputs, setOutputs] = useState<btcTransaction.EnhancedOutput[]>([]);
   const [feeOutput, setFeeOutput] = useState<btcTransaction.TransactionFeeOutput | undefined>();
+  const [hasSigHashNone, setHasSigHashNone] = useState(false);
 
-  const { payload, confirmSignPsbt, cancelSignPsbt } = useSignPsbtTx();
-  const txnContext = useTransactionContext();
-  const parsedPsbt = useMemo(() => {
-    try {
-      return new btcTransaction.EnhancedPsbt(txnContext, payload.psbtBase64, payload.inputsToSign);
-    } catch (err) {
-      return undefined;
-    }
-  }, [txnContext, payload.psbtBase64]);
+  const { payload, parsedPsbt, confirmSignPsbt, cancelSignPsbt, onCloseError, requestId, tabId } =
+    useSignPsbt();
+  const { validationError, setValidationError } = useSignPsbtValidationGate({
+    payload,
+    parsedPsbt,
+  });
 
-  useSignPsbtValidationGate({ payload, parsedPsbt });
-
-  const { btcAddress, ordinalsAddress } = useWalletSelector();
   useEffect(() => {
     if (!parsedPsbt) return;
 
     parsedPsbt
       .getSummary()
       .then((summary) => {
-        const { feeOutput: psbtFeeOutput, inputs: psbtInputs, outputs: psbtOutputs } = summary;
+        const {
+          feeOutput: psbtFeeOutput,
+          inputs: psbtInputs,
+          outputs: psbtOutputs,
+          hasSigHashNone: psbtHasSigHashNone,
+        } = summary;
         setFeeOutput(psbtFeeOutput);
         setInputs(psbtInputs);
         setOutputs(psbtOutputs);
+        setHasSigHashNone(psbtHasSigHashNone);
         setIsLoading(false);
       })
-      .catch((error) => {
-        console.error(error);
-        navigate('/tx-status', {
-          state: {
-            txid: '',
-            currency: 'BTC',
-            errorTitle: t('PSBT_CANT_PARSE_ERROR_TITLE'),
-            error: t('PSBT_CANT_PARSE_ERROR_DESCRIPTION'),
-            browserTx: true,
-          },
+      .catch((err) => {
+        const error = makeRPCError(requestId, {
+          code: RpcErrorCode.INTERNAL_ERROR,
+          message: err,
+        });
+        sendRpcResponse(+tabId, error);
+        setValidationError({
+          error: JSON.stringify(err),
+          errorTitle: t('PSBT_CANT_PARSE_ERROR_TITLE'),
         });
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -74,7 +75,7 @@ function SignPsbtRequest() {
       if (payload.broadcast) {
         navigate('/tx-status', {
           state: {
-            txid: response.txId,
+            txid: response?.txId,
             currency: 'BTC',
             error: '',
             browserTx: true,
@@ -104,7 +105,18 @@ function SignPsbtRequest() {
     window.close();
   };
 
-  return (
+  const onCloseClick = () => {
+    onCloseError(validationError?.error || '');
+    window.close();
+  };
+
+  return validationError ? (
+    <RequestError
+      error={validationError.error}
+      errorTitle={validationError.errorTitle}
+      onClose={onCloseClick}
+    />
+  ) : (
     <ConfirmBitcoinTransaction
       inputs={inputs}
       outputs={outputs}
@@ -112,6 +124,7 @@ function SignPsbtRequest() {
       isLoading={isLoading}
       isSubmitting={isSigning}
       isBroadcast={payload.broadcast}
+      hasSigHashNone={hasSigHashNone}
       confirmText={t('CONFIRM')}
       cancelText={t('CANCEL')}
       onCancel={onCancel}

@@ -36,6 +36,7 @@ export const fetchSip10FungibleTokens =
         return {
           ...ft,
           ...found,
+          visible: true,
           name: found.name || ft.principal.split('.')[1],
         };
       })

@@ -1,4 +1,4 @@
-import ActionButton from '@components/button';
+import Button from '@ui-library/button';
 import { generateMnemonic } from 'bip39';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,7 +27,7 @@ const TransparentButtonContainer = styled.div((props) => ({
 }));
 
 const Heading = styled.h3((props) => ({
-  ...props.theme.body_l,
+  ...props.theme.typography.body_l,
   color: props.theme.colors.white_200,
   marginBottom: props.theme.spacing(16),
 }));
@@ -40,7 +40,7 @@ const WordGrid = styled.div`
 `;
 
 const WordButton = styled.button`
-  ${(props) => props.theme.body_medium_m};
+  ${(props) => props.theme.typography.body_medium_m};
   color: ${(props) => props.theme.colors.white_0};
   background-color: ${(props) => props.theme.colors.elevation3};
   display: flex;
@@ -48,8 +48,9 @@ const WordButton = styled.button`
   align-items: center;
   padding: ${(props) => props.theme.spacing(6)}px;
   border-radius: ${(props) => props.theme.radius(1)}px;
-  transition: all 0.1s ease;
-  :hover:enabled {
+  transition: opacity 0.1s ease;
+  :hover:enabled,
+  :focus:enabled {
     opacity: 0.8;
   }
   :active:enabled {
@@ -58,12 +59,12 @@ const WordButton = styled.button`
 `;
 
 const NthSpan = styled.span`
-  ${(props) => props.theme.body_bold_l};
+  ${(props) => props.theme.typography.body_bold_l};
   color: ${(props) => props.theme.colors.white_0};
 `;
 
 const ErrorMessage = styled.p<{ visible: boolean }>`
-  ${(props) => props.theme.body_s};
+  ${(props) => props.theme.typography.body_s};
   color: ${(props) => props.theme.colors.feedback.error};
   visibility: ${(props) => (props.visible ? 'initial' : 'hidden')};
 `;
@@ -151,7 +152,7 @@ export default function VerifySeed({
       <ErrorMessage visible={!!err}>{err}</ErrorMessage>
       <ButtonsContainer>
         <TransparentButtonContainer>
-          <ActionButton onPress={onBack} transparent text={t('SEED_PHRASE_BACK_BUTTON')} />
+          <Button onClick={onBack} variant="secondary" title={t('SEED_PHRASE_BACK_BUTTON')} />
         </TransparentButtonContainer>
       </ButtonsContainer>
     </Container>

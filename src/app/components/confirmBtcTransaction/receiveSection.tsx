@@ -44,7 +44,7 @@ type Props = {
   onShowInscription: (inscription: btcTransaction.IOInscription) => void;
 };
 function ReceiveSection({ outputs, netAmount, onShowInscription }: Props) {
-  const { btcAddress, ordinalsAddress } = useWalletSelector();
+  const { btcAddress, ordinalsAddress, hasActivatedRareSatsKey } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
 
   const { outputsToPayment, outputsToOrdinal } = getOutputsWithAssetsToUserAddress({
@@ -54,7 +54,8 @@ function ReceiveSection({ outputs, netAmount, onShowInscription }: Props) {
   });
 
   const inscriptionsRareSatsInPayment = outputsToPayment.filter(
-    (output) => output.inscriptions.length > 0 || output.satributes.length > 0,
+    (output) =>
+      output.inscriptions.length > 0 || (hasActivatedRareSatsKey && output.satributes.length > 0),
   );
   const areInscriptionsRareSatsInPayment = inscriptionsRareSatsInPayment.length > 0;
   const amountIsBiggerThanZero = netAmount > 0;

@@ -1,5 +1,6 @@
 import { ConfirmBtcTransactionState, LedgerTransactionType } from '@common/types/ledger';
-import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
+import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types';
+import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import AlertMessage from '@components/alertMessage';
 import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionComponent';
 import InfoContainer from '@components/infoContainer';
@@ -13,9 +14,10 @@ import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
 import { saveTimeForNonOrdinalTransferTransaction } from '@utils/localStorage';
 import BigNumber from 'bignumber.js';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { Return, RpcErrorCode } from 'sats-connect';
 import SendLayout from '../../layouts/sendLayout';
 
 function ConfirmBtcTransaction() {
@@ -41,6 +43,7 @@ function ConfirmBtcTransaction() {
     tabId,
     isBrc20TokenFlow,
     feePerVByte,
+    requestId,
   } = location.state;
   if (typeof fee !== 'string' && !BigNumber.isBigNumber(fee)) {
     Object.setPrototypeOf(fee, BigNumber.prototype);
@@ -79,45 +82,46 @@ function ConfirmBtcTransaction() {
     mutate({ txToBeBroadcasted: signedTx });
   };
 
-  useEffect(() => {
-    if (errorBtcOrdinalTransaction) {
-      navigate('/tx-status', {
-        state: {
-          txid: '',
-          currency: 'BTC',
-          isNft: true,
-          error: errorBtcOrdinalTransaction.toString(),
-        },
-      });
-    }
-  }, [errorBtcOrdinalTransaction]);
-
-  useEffect(() => {
-    if (btcTxBroadcastData) {
-      if (btcSendBrowserTx) {
+  const handleBrowserTx = useCallback(
+    (broadCastResult: BtcTransactionBroadcastResponse) => {
+      if (requestToken) {
         const btcSendMessage = {
           source: MESSAGE_SOURCE,
-          method: ExternalSatsMethods.sendBtcResponse,
+          method: SatsConnectMethods.sendBtcResponse,
           payload: {
             sendBtcRequest: requestToken,
-            sendBtcResponse: btcTxBroadcastData.tx.hash,
+            sendBtcResponse: broadCastResult.tx.hash,
           },
         };
         chrome.tabs.sendMessage(+tabId, btcSendMessage);
-        window.close();
       } else {
-        navigate('/tx-status', {
-          state: {
-            txid: btcTxBroadcastData.tx.hash,
-            currency: 'BTC',
-            error: '',
-            isBrc20TokenFlow,
-          },
-        });
-        setTimeout(() => {
-          refetch();
-        }, 1000);
+        const result: Return<'sendTransfer'> = {
+          txid: broadCastResult.tx.hash,
+        };
+        const response = makeRpcSuccessResponse(requestId, result);
+        sendRpcResponse(+tabId, response);
       }
+      window.close();
+    },
+    [btcTxBroadcastData, requestToken, tabId],
+  );
+
+  useEffect(() => {
+    if (!btcTxBroadcastData) return;
+    if (btcSendBrowserTx) {
+      handleBrowserTx(btcTxBroadcastData);
+    } else {
+      navigate('/tx-status', {
+        state: {
+          txid: btcTxBroadcastData.tx.hash,
+          currency: 'BTC',
+          error: '',
+          isBrc20TokenFlow,
+        },
+      });
+      setTimeout(() => {
+        refetch();
+      }, 1000);
     }
   }, [btcTxBroadcastData]);
 
@@ -141,6 +145,13 @@ function ConfirmBtcTransaction() {
 
   useEffect(() => {
     if (txError) {
+      if (btcSendBrowserTx) {
+        const errorResponse = makeRPCError(requestId, {
+          code: RpcErrorCode.INTERNAL_ERROR,
+          message: txError.toString(),
+        });
+        sendRpcResponse(+tabId, errorResponse);
+      }
       navigate('/tx-status', {
         state: {
           txid: '',
@@ -184,6 +195,23 @@ function ConfirmBtcTransaction() {
     if (isRestoreFundFlow || isBrc20TokenFlow) {
       navigate(-1);
     } else if (btcSendBrowserTx) {
+      if (requestToken) {
+        const addressMessage = {
+          source: MESSAGE_SOURCE,
+          method: SatsConnectMethods.sendBtcResponse,
+          payload: {
+            sendBtcRequest: requestToken,
+            sendBtcResponse: 'cancel',
+          },
+        };
+        chrome.tabs.sendMessage(+tabId, addressMessage);
+      } else {
+        const cancelError = makeRPCError(requestId as string, {
+          code: RpcErrorCode.USER_REJECTION,
+          message: `User rejected request to send transfer`,
+        });
+        sendRpcResponse(+tabId, cancelError);
+      }
       window.close();
     } else {
       navigate('/send-btc', {
