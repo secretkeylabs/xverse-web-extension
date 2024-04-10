@@ -38,6 +38,7 @@ const StepDot = styled.div<{
   marginRight: props.theme.spacing(4),
 }));
 
+// TODO refactor to delete this whole screen and use the backup steps screen instead
 function CreatePassword(): JSX.Element {
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
@@ -48,7 +49,7 @@ function CreatePassword(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'CREATE_PASSWORD_SCREEN' });
   const { createWallet } = useWalletReducer();
   const { disableWalletExistsGuard } = useWalletExistsContext();
-  const { getSeed, changePassword } = useSeedVault();
+  const { changePassword } = useSeedVault();
 
   const handleContinuePasswordCreation = () => {
     setCurrentStepIndex(1);
@@ -59,8 +60,7 @@ function CreatePassword(): JSX.Element {
       try {
         setIsCreatingWallet(true);
         disableWalletExistsGuard?.();
-        const seedPhrase = await getSeed();
-        await createWallet(seedPhrase);
+        await createWallet(); // TODO move this somwhere else
         await changePassword('', password);
         navigate('/wallet-success/create', { replace: true });
       } catch (err) {

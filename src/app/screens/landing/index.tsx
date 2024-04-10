@@ -223,40 +223,43 @@ function Landing() {
     },
   ];
 
-  const proceedToWallet = useCallback(async (isRestore?: boolean) => {
-    const isLegalAccepted = getIsTermsAccepted();
+  const proceedToWallet = useCallback(
+    async (isRestore?: boolean) => {
+      const isLegalAccepted = getIsTermsAccepted();
 
-    if (isInOptions()) {
+      if (isInOptions()) {
+        if (isLegalAccepted) {
+          if (isRestore) {
+            navigate(`/restoreWallet`);
+          } else {
+            navigate(`/backup`);
+          }
+        } else {
+          const params = isRestore ? '?restore=true' : '';
+          navigate(`/legal${params}`);
+        }
+        return;
+      }
+
       if (isLegalAccepted) {
         if (isRestore) {
-          navigate(`/restoreWallet`);
+          await chrome.tabs.create({
+            url: chrome.runtime.getURL(`options.html#/restoreWallet`),
+          });
         } else {
-          navigate(`/backup`);
+          await chrome.tabs.create({
+            url: chrome.runtime.getURL(`options.html#/backup`),
+          });
         }
       } else {
         const params = isRestore ? '?restore=true' : '';
-        navigate(`/legal${params}`);
-      }
-      return;
-    }
-
-    if (isLegalAccepted) {
-      if (isRestore) {
         await chrome.tabs.create({
-          url: chrome.runtime.getURL(`options.html#/restoreWallet`),
-        });
-      } else {
-        await chrome.tabs.create({
-          url: chrome.runtime.getURL(`options.html#/backup`),
+          url: chrome.runtime.getURL(`options.html#/legal${params}`),
         });
       }
-    } else {
-      const params = isRestore ? '?restore=true' : '';
-      await chrome.tabs.create({
-        url: chrome.runtime.getURL(`options.html#/legal${params}`),
-      });
-    }
-  }, []);
+    },
+    [navigate],
+  );
 
   const renderLandingSection = () => (
     <>

@@ -25,8 +25,8 @@ interface PasswordInputProps {
 }
 
 interface StrengthBarProps {
-  strengthColor: string;
-  strengthWidth: string;
+  $strengthColor: string;
+  $strengthWidth: string;
 }
 
 const Container = styled.div({
@@ -131,9 +131,9 @@ const StrengthBar = styled(animated.div)<StrengthBarProps>((props) => ({
   borderRadius: props.theme.radius(1),
   width: '50%',
   div: {
-    width: props.strengthWidth,
+    width: props.$strengthWidth,
     height: 4,
-    backgroundColor: props.strengthColor,
+    backgroundColor: props.$strengthColor,
     borderRadius: props.theme.radius(1),
   },
 }));
@@ -250,7 +250,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
         return (
           <PasswordStrengthContainer>
             <span>{t('PASSWORD_STRENGTH_LABEL')}</span>
-            <StrengthBar strengthColor={theme.colors.feedback.error} strengthWidth="20%">
+            <StrengthBar $strengthColor={theme.colors.feedback.error} $strengthWidth="20%">
               {transition((style) => (
                 <animated.div style={style} />
               ))}
@@ -265,7 +265,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
           <PasswordStrengthContainer>
             <span>{t('PASSWORD_STRENGTH_LABEL')}</span>
             {transition((style) => (
-              <StrengthBar strengthColor={theme.colors.feedback.caution} strengthWidth="50%">
+              <StrengthBar $strengthColor={theme.colors.feedback.caution} $strengthWidth="50%">
                 <animated.div style={style} />
               </StrengthBar>
             ))}
@@ -278,7 +278,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
         <PasswordStrengthContainer>
           <span>{t('PASSWORD_STRENGTH_LABEL')}</span>
           {transition((style) => (
-            <StrengthBar strengthColor={theme.colors.feedback.success} strengthWidth="100%">
+            <StrengthBar $strengthColor={theme.colors.feedback.success} $strengthWidth="100%">
               <animated.div style={style} />
             </StrengthBar>
           ))}
@@ -289,7 +289,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
     return (
       <PasswordStrengthContainer>
         <span>{t('PASSWORD_STRENGTH_LABEL')}</span>
-        <StrengthBar strengthColor={theme.colors.white_600} strengthWidth="0">
+        <StrengthBar $strengthColor={theme.colors.white_600} $strengthWidth="0">
           {transition((style) => (
             <animated.div style={style} />
           ))}

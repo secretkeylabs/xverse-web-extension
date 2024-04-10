@@ -246,10 +246,11 @@ const useWalletReducer = () => {
     }
   };
 
-  const createWallet = async (mnemonic?: string) => {
-    const wallet = mnemonic
-      ? await walletFromSeedPhrase({ mnemonic, index: 0n, network: 'Mainnet' })
-      : await newWallet();
+  const createWallet = async () => {
+    const mnemonic = await seedVault.getSeed();
+    // TODO refactor to use createWalletAccount instead, which also adds bns name
+    // and gaiahub config
+    const wallet = await walletFromSeedPhrase({ mnemonic, index: 0n, network: 'Mainnet' });
 
     const account: Account = {
       id: 0,

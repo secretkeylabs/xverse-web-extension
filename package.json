@@ -1,7 +1,7 @@
 {
   "name": "xverse-web-extension",
   "description": "A Bitcoin wallet for Web3",
-  "version": "0.33.0",
+  "version": "0.33.1",
   "private": true,
   "engines": {
     "node": "^18.18.2"
@@ -42,6 +42,7 @@
     "nanoid": "^4.0.0",
     "npm": "10.4.0",
     "p-queue": "^7.3.4",
+    "@playwright/test": "^1.42.1",
     "process": "^0.11.10",
     "qr-code-styling": "^1.5.0",
     "rc-image": "^5.14.0",
@@ -101,7 +102,6 @@
     ]
   },
   "devDependencies": {
-    "@playwright/test": "^1.42.1",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.7",
     "@tanstack/eslint-plugin-query": "^4.29.4",
     "@types/argon2-browser": "^1.18.1",
@@ -123,13 +123,14 @@
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.1",
     "dotenv-webpack": "^8.0.1",
-    "eslint": "8.22.0",
+    "eslint": "8.40.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jsx-a11y": "^6.6.1",
     "eslint-plugin-no-inline-styles": "^1.0.5",
+    "eslint-plugin-playwright": "^1.5.4",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.31.8",
     "eslint-plugin-react-hooks": "^4.6.0",
