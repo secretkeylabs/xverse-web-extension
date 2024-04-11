@@ -12,7 +12,7 @@
     "@playwright/test": "^1.42.1",
     "@react-spring/web": "^9.6.1",
     "@scure/btc-signer": "1.2.1",
-    "@secretkeylabs/xverse-core": "13.1.1",
+    "@secretkeylabs/xverse-core": "13.2.0",
     "@stacks/connect": "7.4.1",
     "@stacks/stacks-blockchain-api-types": "6.1.1",
     "@stacks/transactions": "6.9.0",

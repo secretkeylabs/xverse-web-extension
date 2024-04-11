@@ -72,11 +72,14 @@ function SendRuneScreen() {
   };
 
   useEffect(() => {
-    if (!recipientAddress || !feeRate) {
+    const bigAmount = BigNumber(amountToSend);
+
+    if (!recipientAddress || !feeRate || bigAmount.isNaN() || bigAmount.isLessThanOrEqualTo(0)) {
       setTransaction(undefined);
       setSummary(undefined);
       return;
     }
+
     // This effect can be slow to compute as it signs transactions, but
     // it can also be very fast if there is not enough rune balance
     // this can lead to a race condition where entering an amount to send
