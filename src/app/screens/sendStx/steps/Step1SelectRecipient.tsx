@@ -96,6 +96,7 @@ function Step1SelectRecipient({
     const newValue = e.target.value;
     setRecipient(newValue);
     setInputFeedback(undefined);
+    setRecipientAddress(newValue);
   };
 
   const handleMemoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
