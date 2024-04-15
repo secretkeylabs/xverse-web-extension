@@ -99,7 +99,6 @@ jobs:
           ./merge-to-remote.sh
       - id: copy-release-to-public
         name: Copy release to public remote
-        needs: push-to-public
         env:
           REMOTE_REPO: xverse-web-extension
         run: |
