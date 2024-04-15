@@ -105,7 +105,9 @@ function SendRuneScreen() {
         setTransaction(undefined);
         setSummary(undefined);
       } finally {
-        setIsLoading(false);
+        if (isActiveEffect) {
+          setIsLoading(false);
+        }
       }
     };
     generateTxnAndSummary();
