@@ -9,8 +9,7 @@
     "airbnb-typescript",
     "airbnb/hooks",
     "prettier",
-    "plugin:@tanstack/eslint-plugin-query/recommended",
-    "plugin:playwright/recommended"
+    "plugin:@tanstack/eslint-plugin-query/recommended"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -21,17 +20,10 @@
     "sourceType": "module",
     "project": "./tsconfig.json"
   },
-  "plugins": [
-    "react",
-    "prettier",
-    "eslint-plugin-no-inline-styles",
-    "@tanstack/query",
-    "eslint-plugin-playwright"
-  ],
+  "plugins": ["react", "prettier", "eslint-plugin-no-inline-styles", "@tanstack/query"],
   "rules": {
     "consistent-return": "off",
     "no-await-in-loop": "off",
-    "playwright/valid-title": "off",
     "import/prefer-default-export": 1,
     "no-restricted-imports": [
       "warn",
@@ -62,6 +54,16 @@
     "@tanstack/query/exhaustive-deps": 1,
     "import/order": 0
   },
+  "overrides": [
+    {
+      "files": ["tests/**/*.{js,jsx,ts,tsx}"],
+      "plugins": ["playwright"],
+      "extends": ["plugin:playwright/playwright-test"],
+      "rules": {
+        "playwright/expect-expect": "off"
+      }
+    }
+  ],
   "settings": {
     "import/resolver": {
       "node": {

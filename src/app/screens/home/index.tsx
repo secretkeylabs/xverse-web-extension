@@ -513,7 +513,7 @@ function Home() {
             refetchingRunesData
           }
         />
-        <RowButtonContainer>
+        <RowButtonContainer data-testid="transaction-buttons-row">
           <SquareButton
             icon={<ArrowUp weight="regular" size="20" />}
             text={t('SEND')}
