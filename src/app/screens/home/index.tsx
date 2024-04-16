@@ -275,7 +275,8 @@ function Home() {
   };
 
   const sendSheetCoinsList = (stxAddress ? sip10CoinsList : [])
-    .concat(brc20CoinsList)
+    // ENG-4020 - Disable BRC20 Sending on Ledger
+    .concat(isLedgerAccount(selectedAccount) ? [] : brc20CoinsList)
     .concat(runesCoinsList)
     .filter((ft) => new BigNumber(ft.balance).gt(0));
 
