@@ -106,6 +106,7 @@ interface Props {
   fungibleToken?: FungibleToken;
   enlargeTicker?: boolean;
   className?: string;
+  showProtocolIcon?: boolean;
 }
 
 function TokenTile({
@@ -116,6 +117,7 @@ function TokenTile({
   fungibleToken,
   enlargeTicker = false,
   className,
+  showProtocolIcon = true,
 }: Props) {
   const { fiatCurrency, stxBalance, btcBalance, stxBtcRate, btcFiatRate } = useSelector(
     (state: StoreState) => state.walletState,
@@ -165,6 +167,7 @@ function TokenTile({
           loading={loading}
           fungibleToken={fungibleToken}
           size={enlargeTicker ? 40 : 32}
+          showProtocolIcon={showProtocolIcon}
         />
         <TextContainer>
           <CoinTickerText>{getTickerTitle()}</CoinTickerText>

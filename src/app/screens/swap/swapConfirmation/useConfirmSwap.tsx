@@ -94,7 +94,7 @@ export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOu
               currency: 'STX',
               error: '',
               sponsored: isSponsored,
-              browserTx: true,
+              browserTx: false,
             },
           });
         }
@@ -107,7 +107,7 @@ export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOu
               error:
                 e.code !== SponsoredTxErrorCode.unknown_error ? e.message : 'Unknown sponsor error',
               sponsored: isSponsored,
-              browserTx: true,
+              browserTx: false,
               isSponsorServiceError: true,
               isSwapTransaction: true,
             },
@@ -119,7 +119,7 @@ export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOu
               currency: 'STX',
               error: e instanceof ApiResponseError ? (e.data as any).message : e.message,
               sponsored: isSponsored,
-              browserTx: true,
+              browserTx: false,
               isSwapTransaction: true,
             },
           });
