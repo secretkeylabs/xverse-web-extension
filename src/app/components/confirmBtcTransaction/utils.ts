@@ -1,4 +1,4 @@
-import { btcTransaction, BundleSatRange } from '@secretkeylabs/xverse-core';
+import { btcTransaction, BundleSatRange, FungibleToken } from '@secretkeylabs/xverse-core';
 
 export type SatRangeTx = {
   totalSats: number;
@@ -267,3 +267,13 @@ export const getSatRangesWithInscriptions = ({
 
   return { satRanges: satRangesArray, totalExoticSats };
 };
+
+export const mapRuneNameToPlaceholder = (runeName: string): FungibleToken => ({
+  protocol: 'runes',
+  name: runeName,
+  assetName: '',
+  balance: '',
+  principal: '',
+  total_received: '',
+  total_sent: '',
+});

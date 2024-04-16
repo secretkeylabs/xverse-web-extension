@@ -186,7 +186,9 @@ export default function CollectiblesTabs({
             <>
               {totalInscriptions > 0 && (
                 <StyledTotalItems typography="body_medium_m" color="white_200">
-                  {t('TOTAL_ITEMS', { count: totalInscriptions })}
+                  {totalInscriptions === 1
+                    ? t('TOTAL_ITEMS_ONE')
+                    : t('TOTAL_ITEMS', { count: totalInscriptions })}
                 </StyledTotalItems>
               )}
               {inscriptionListView}
@@ -201,7 +203,7 @@ export default function CollectiblesTabs({
           <>
             {totalNfts > 0 && (
               <StyledTotalItems typography="body_medium_m" color="white_200">
-                {t('TOTAL_ITEMS', { count: totalNfts })}
+                {totalNfts === 1 ? t('TOTAL_ITEMS_ONE') : t('TOTAL_ITEMS', { count: totalNfts })}
               </StyledTotalItems>
             )}
             {nftListView}
@@ -212,7 +214,9 @@ export default function CollectiblesTabs({
         <TabPanel>
           {!rareSatsQuery.isLoading && ordinalBundleCount > 0 && (
             <StyledTotalItems typography="body_medium_m" color="white_200">
-              {t('TOTAL_ITEMS', { count: ordinalBundleCount })}
+              {ordinalBundleCount === 1
+                ? t('TOTAL_ITEMS_ONE')
+                : t('TOTAL_ITEMS', { count: ordinalBundleCount })}
             </StyledTotalItems>
           )}
 

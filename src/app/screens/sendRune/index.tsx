@@ -1,10 +1,17 @@
 import { useGetRuneFungibleTokens } from '@hooks/queries/runes/useGetRuneFungibleTokens';
+import useBtcClient from '@hooks/useBtcClient';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useHasFeature from '@hooks/useHasFeature';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { btcTransaction, FungibleToken, Transport } from '@secretkeylabs/xverse-core';
+import {
+  FungibleToken,
+  RuneSummary,
+  Transport,
+  btcTransaction,
+  parseSummaryForRunes,
+} from '@secretkeylabs/xverse-core';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { getFtBalance } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
@@ -13,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { generateTransaction, type TransactionSummary } from './helpers';
 import StepDisplay from './stepDisplay';
-import { getPreviousStep, Step } from './steps';
+import { Step, getPreviousStep } from './steps';
 
 function SendRuneScreen() {
   const navigate = useNavigate();
@@ -24,9 +31,9 @@ function SendRuneScreen() {
   const location = useLocation();
   const { t } = useTranslation('translation');
   const { data: btcFeeRate, isLoading: feeRatesLoading } = useBtcFeeRate();
-  const { selectedAccount } = useWalletSelector();
+  const { selectedAccount, network } = useWalletSelector();
   const { data: runesCoinsList } = useGetRuneFungibleTokens();
-
+  const context = useTransactionContext();
   const [recipientAddress, setRecipientAddress] = useState(location.state?.recipientAddress || '');
   const [amountError, setAmountError] = useState('');
   const [amountToSend, setAmountToSend] = useState<string>(location.state?.amount || '');
@@ -38,10 +45,12 @@ function SendRuneScreen() {
   const transactionContext = useTransactionContext();
   const [transaction, setTransaction] = useState<btcTransaction.EnhancedTransaction | undefined>();
   const [summary, setSummary] = useState<TransactionSummary | undefined>();
+  const [runeSummary, setRuneSummary] = useState<RuneSummary | undefined>();
 
   const coinTicker = location.search ? location.search.split('coinTicker=')[1] : undefined;
   const fungibleToken: FungibleToken =
     location.state?.fungibleToken || runesCoinsList?.find((coin) => coin.ticker === coinTicker);
+  const hasRunesSupport = useHasFeature('RUNES_SUPPORT');
 
   useEffect(() => {
     if (!feeRate && btcFeeRate && !feeRatesLoading) {
@@ -77,6 +86,7 @@ function SendRuneScreen() {
     if (!recipientAddress || !feeRate || bigAmount.isNaN() || bigAmount.isLessThanOrEqualTo(0)) {
       setTransaction(undefined);
       setSummary(undefined);
+      setRuneSummary(undefined);
       return;
     }
 
@@ -92,11 +102,14 @@ function SendRuneScreen() {
       setIsLoading(true);
       try {
         const transactionDetails = await generateTransactionAndSummary();
-
         if (!isActiveEffect) return;
-
         setTransaction(transactionDetails.transaction);
-        setSummary(transactionDetails.summary);
+        if (transactionDetails.summary) {
+          setSummary(transactionDetails.summary);
+          setRuneSummary(
+            await parseSummaryForRunes(context, transactionDetails.summary, network.type),
+          );
+        }
       } catch (e) {
         if (!(e instanceof Error) || !e.message.includes('Insufficient funds')) {
           // don't log the error if it's just an insufficient funds error
@@ -115,13 +128,6 @@ function SendRuneScreen() {
       isActiveEffect = false;
     };
   }, [transactionContext, recipientAddress, amountToSend, feeRate, sendMax]);
-
-  const hasRunesSupport = useHasFeature('RUNES_SUPPORT');
-
-  if (!hasRunesSupport) {
-    navigate('/');
-    return null;
-  }
 
   const handleCancel = () => {
     if (isLedgerAccount(selectedAccount) && isInOption) {
@@ -186,10 +192,16 @@ function SendRuneScreen() {
     }
   };
 
+  if (!hasRunesSupport) {
+    navigate('/');
+    return null;
+  }
+
   return (
     <StepDisplay
       token={fungibleToken}
       summary={summary}
+      runeSummary={runeSummary}
       amountToSend={amountToSend}
       setAmountToSend={setAmount}
       amountError={amountError}
