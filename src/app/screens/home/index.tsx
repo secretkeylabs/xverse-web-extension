@@ -20,12 +20,14 @@ import useCoinRates from '@hooks/queries/useCoinRates';
 import useFeeMultipliers from '@hooks/queries/useFeeMultipliers';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useHasFeature from '@hooks/useHasFeature';
+import useNotificationBanners from '@hooks/useNotificationBanners';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowUp, Plus } from '@phosphor-icons/react';
 import CoinSelectModal from '@screens/home/coinSelectModal';
 import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import { changeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
 import Button from '@ui-library/button';
+import Divider from '@ui-library/divider';
 import Sheet from '@ui-library/sheet';
 import { CurrencyTypes } from '@utils/constants';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
@@ -38,6 +40,7 @@ import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 import SquareButton from '../../components/squareButton';
 import BalanceCard from './balanceCard';
+import Banner from './banner';
 
 export const Container = styled.div`
   display: flex;
@@ -194,6 +197,13 @@ const IconBackground = styled.div((props) => ({
   alignItems: 'center',
 }));
 
+const StyledDivider = styled(Divider)`
+  flex: 1 0 auto;
+  width: calc(100% + ${(props) => props.theme.space.xl});
+  margin-left: -${(props) => props.theme.space.m};
+  margin-right: -${(props) => props.theme.space.m};
+`;
+
 function Home() {
   const { t } = useTranslation('translation', {
     keyPrefix: 'DASHBOARD_SCREEN',
@@ -216,6 +226,7 @@ function Home() {
     showDataCollectionAlert,
     network,
     hideStx,
+    notificationBanners,
   } = useWalletSelector();
   const [areReceivingAddressesVisible, setAreReceivingAddressesVisible] = useState(
     !isLedgerAccount(selectedAccount),
@@ -241,9 +252,15 @@ function Home() {
     isLoading: loadingRunesData,
     isRefetching: refetchingRunesData,
   } = useVisibleRuneFungibleTokens();
+  const { data: notificationBannersArr } = useNotificationBanners();
   useFeeMultipliers();
   useCoinRates();
   useAppConfig();
+
+  const showNotificationBanner =
+    notificationBannersArr?.length &&
+    notificationBannersArr.length > 0 &&
+    !notificationBanners[notificationBannersArr[0].id];
 
   const onReceiveModalOpen = () => {
     setOpenReceiveModal(true);
@@ -532,6 +549,15 @@ function Home() {
             onPress={onBuyModalOpen}
           />
         </RowButtonContainer>
+
+        {showNotificationBanner && (
+          <>
+            <br />
+            <StyledDivider color="white_850" verticalMargin="m" />
+            <Banner {...notificationBannersArr[0]} />
+            <StyledDivider color="white_850" verticalMargin="xxs" />
+          </>
+        )}
 
         <ColumnContainer>
           {btcAddress && (

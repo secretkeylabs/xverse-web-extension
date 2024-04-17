@@ -2,7 +2,7 @@ import FeaturedCardCarousel from '@components/explore/FeaturedCarousel';
 import RecommendedApps from '@components/explore/RecommendedApps';
 import SwiperNavigation from '@components/explore/SwiperNavigation';
 import BottomBar from '@components/tabBar';
-import useFeaturedDapps from '@hooks/useFeaturedApps';
+import useFeaturedDapps from '@hooks/useFeaturedDapps';
 import { ArrowsOut } from '@phosphor-icons/react';
 import { StyledHeading } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
