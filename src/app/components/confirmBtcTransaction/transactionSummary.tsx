@@ -147,9 +147,7 @@ function TransactionSummary({
       <BurnSection burns={runeSummary?.burns} />
       <MintSection mints={[runeSummary?.mint]} />
       <TxInOutput inputs={inputs} outputs={outputs} />
-      {hasOutputScript && !runeSummary?.inputsHadRunes && (
-        <WarningCallout bodyText={t('SCRIPT_OUTPUT_TX')} />
-      )}
+      {hasOutputScript && !runeSummary && <WarningCallout bodyText={t('SCRIPT_OUTPUT_TX')} />}
       <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
       {feeOutput && !showFeeSelector && (
         <TransferFeeView
