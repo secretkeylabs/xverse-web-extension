@@ -1,6 +1,7 @@
 import ActionButton from '@components/button';
 import { StyledBarLoader, TilesSkeletonLoader } from '@components/tilesSkeletonLoader';
 import WrenchErrorMessage from '@components/wrenchErrorMessage';
+import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import { Bundle, mapRareSatsAPIResponseToBundle } from '@secretkeylabs/xverse-core';
 import { StyledP, StyledTab, StyledTabList } from '@ui-library/common.styled';
 import { useEffect, useState } from 'react';
@@ -146,6 +147,13 @@ export default function CollectiblesTabs({
     stacksNftsQuery,
     inscriptionsQuery,
   } = nftDashboard;
+
+  useTrackMixPanelPageViewed(
+    {
+      tab: tabs[tabIndex]?.key,
+    },
+    [tabIndex],
+  );
 
   const handleSelectTab = (index: number) => {
     setTabIndex(index);

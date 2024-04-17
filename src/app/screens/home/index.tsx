@@ -21,10 +21,11 @@ import useFeeMultipliers from '@hooks/queries/useFeeMultipliers';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useHasFeature from '@hooks/useHasFeature';
 import useNotificationBanners from '@hooks/useNotificationBanners';
+import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowUp, Plus } from '@phosphor-icons/react';
 import CoinSelectModal from '@screens/home/coinSelectModal';
-import type { FungibleToken } from '@secretkeylabs/xverse-core';
+import { type FungibleToken } from '@secretkeylabs/xverse-core';
 import { changeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
 import Button from '@ui-library/button';
 import Divider from '@ui-library/divider';
@@ -42,6 +43,7 @@ import SquareButton from '../../components/squareButton';
 import BalanceCard from './balanceCard';
 import Banner from './banner';
 
+// TODO: Move this styles to ./index.styled.ts
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -256,6 +258,7 @@ function Home() {
   useFeeMultipliers();
   useCoinRates();
   useAppConfig();
+  useTrackMixPanelPageViewed();
 
   const showNotificationBanner =
     notificationBannersArr?.length &&
