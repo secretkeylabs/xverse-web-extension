@@ -15,6 +15,7 @@ import {
   setRunesManageTokensAction,
   setSip10ManageTokensAction,
 } from '@stores/wallet/actions/actionCreators';
+import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -162,21 +163,21 @@ function ManageTokens() {
       case 'stacks':
         coins = (sip10List ?? []).map((ft) => ({
           ...ft,
-          visible: sip10ManageTokens[ft.principal] ?? ft.visible,
+          visible: sip10ManageTokens[ft.principal] ?? new BigNumber(ft.balance).gt(0),
         }));
         error = sip10Error;
         break;
       case 'brc-20':
         coins = (brc20List ?? []).map((ft) => ({
           ...ft,
-          visible: brc20ManageTokens[ft.principal] ?? ft.visible,
+          visible: brc20ManageTokens[ft.principal] ?? new BigNumber(ft.balance).gt(0),
         }));
         error = brc20Error;
         break;
       case 'runes':
         coins = (runesList ?? []).map((ft) => ({
           ...ft,
-          visible: runesManageTokens[ft.principal] ?? ft.visible,
+          visible: runesManageTokens[ft.principal] ?? new BigNumber(ft.balance).gt(0),
         }));
         error = runeError;
         break;
