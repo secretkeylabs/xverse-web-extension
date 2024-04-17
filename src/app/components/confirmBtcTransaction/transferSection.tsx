@@ -95,6 +95,7 @@ function TransferSection({
           <RuneAmount
             tokenName={transfer.runeName}
             amount={String(transfer.amount)}
+            divisibility={transfer.divisibility}
             hasSufficientBalance={transfer.hasSufficientBalance}
           />
         </RowContainer>
