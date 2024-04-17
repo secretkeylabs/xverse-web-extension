@@ -16,7 +16,7 @@ export const getMixpanelInstance = (instanceKey: keyof typeof mixpanelInstances)
     return mixpanel[instanceKey];
   }
 
-const token = mixpanelInstances[instanceKey]?.token;
+  const token = mixpanelInstances[instanceKey]?.token;
   if (!token) {
     throw new Error(`Mixpanel instance ${instanceKey} token not found`);
   }

@@ -4,10 +4,11 @@ import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { animated, useTransition } from '@react-spring/web';
 import SelectAccount from '@screens/connect/selectAccount';
-import { getAppIconFromWebManifest } from '@secretkeylabs/xverse-core';
+import { AnalyticsEvents, getAppIconFromWebManifest } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
+import { trackMixPanel } from '@utils/mixpanel';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -48,7 +49,17 @@ function BtcSelectAddressScreen() {
   const confirmCallback = async () => {
     setLoading(true);
     approveBtcAddressRequest();
-    window.close();
+    trackMixPanel(
+      AnalyticsEvents.AppConnected,
+      {
+        requestedAddress: payload.purposes,
+        wallet_type: selectedAccount?.accountType || 'software',
+      },
+      { send_immediately: true },
+      () => {
+        window.close();
+      },
+    );
   };
 
   const cancelCallback = () => {

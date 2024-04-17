@@ -40,6 +40,15 @@ const ExternalLink = styled.a`
   color: ${({ theme }) => theme.colors.white_0};
   margin-top: ${({ theme }) => theme.space.s};
   cursor: pointer;
+  transition: opacity 0.1s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &:active {
+    opacity: 0.6;
+  }
 `;
 
 const LoaderContainer = styled.div((props) => ({
