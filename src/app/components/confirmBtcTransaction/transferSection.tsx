@@ -91,6 +91,15 @@ function TransferSection({
           {t('YOU_WILL_TRANSFER')}
         </StyledP>
       </Header>
+      {runeTransfers?.map((transfer) => (
+        <RowContainer key={transfer.runeName}>
+          <RuneAmount
+            tokenName={transfer.runeName}
+            amount={String(transfer.amount)}
+            hasSufficientBalance={transfer.hasSufficientBalance}
+          />
+        </RowContainer>
+      ))}
       {showAmount && (
         <RowContainer>
           <Amount amount={netAmount} />
@@ -101,15 +110,6 @@ function TransferSection({
           />
         </RowContainer>
       )}
-      {runeTransfers?.map((transfer) => (
-        <RowContainer key={transfer.runeName}>
-          <RuneAmount
-            tokenName={transfer.runeName}
-            amount={String(transfer.amount)}
-            hasSufficientBalance={transfer.hasSufficientBalance}
-          />
-        </RowContainer>
-      ))}
       {isPartialTransaction
         ? inputFromOrdinal.map((input, index) => (
             <InscriptionSatributeRow
