@@ -1,4 +1,5 @@
 import BottomModal from '@components/bottomModal';
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   getBtcFiatEquivalent,
@@ -55,7 +56,9 @@ export default function CustomFee({
   });
   const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
 
-  const { btcFiatRate, stxBtcRate, fiatCurrency } = useWalletSelector();
+  const { fiatCurrency } = useWalletSelector();
+  const { btcFiatRate, stxBtcRate } = useCoinRates();
+
   const [feeRateInput, setFeeRateInput] = useState(feeRate || minimumFeeRate);
   const [totalFee, setTotalFee] = useState(fee || initialTotalFee);
 

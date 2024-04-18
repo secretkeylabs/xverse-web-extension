@@ -1,3 +1,4 @@
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useBtcClient from '@hooks/useBtcClient';
 import useBtcFees from '@hooks/useBtcFees';
 import useDebounce from '@hooks/useDebounce';
@@ -179,8 +180,9 @@ function EditBtcFee({
 }: Props) {
   const { t } = useTranslation('translation');
 
-  const { network, btcAddress, btcFiatRate, fiatCurrency, selectedAccount, ordinalsAddress } =
+  const { network, btcAddress, fiatCurrency, selectedAccount, ordinalsAddress } =
     useWalletSelector();
+  const { btcFiatRate } = useCoinRates();
   const [totalFee, setTotalFee] = useState(fee);
   const [feeRateInput, setFeeRateInput] = useState(feeRate?.toString() ?? '');
   const inputRef = useRef<HTMLInputElement>(null);

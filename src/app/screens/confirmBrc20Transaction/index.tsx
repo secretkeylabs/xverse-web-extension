@@ -3,6 +3,7 @@ import ActionButton from '@components/button';
 import InfoContainer from '@components/infoContainer';
 import BottomBar from '@components/tabBar';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useDebounce from '@hooks/useDebounce';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -135,13 +136,14 @@ const useConfirmBrc20Transfer = (): {
   const { t } = useTranslation('translation');
   const {
     network,
-    btcFiatRate,
+
     fiatCurrency,
     selectedAccount,
     btcAddress,
     ordinalsAddress,
     feeMultipliers,
   } = useWalletSelector();
+  const { btcFiatRate } = useCoinRates();
   const navigate = useNavigate();
   const {
     recipientAddress,

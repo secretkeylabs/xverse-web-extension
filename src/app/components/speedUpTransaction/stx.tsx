@@ -1,4 +1,5 @@
 import FiatAmountText from '@components/fiatAmountText';
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getStxFiatEquivalent, stxToMicrostacks } from '@secretkeylabs/xverse-core';
 import { EMPTY_LABEL } from '@utils/constants';
@@ -71,7 +72,8 @@ function SpeedUpStxTransaction({
   isBroadcasting,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SPEED_UP_TRANSACTION' });
-  const { btcFiatRate, stxBtcRate, fiatCurrency } = useWalletSelector();
+  const { fiatCurrency } = useWalletSelector();
+  const { btcFiatRate, stxBtcRate } = useCoinRates();
   const theme = useTheme();
 
   return (

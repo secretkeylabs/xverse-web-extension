@@ -1,3 +1,4 @@
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
@@ -62,7 +63,9 @@ function AmountSelector({
   const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
   const navigate = useNavigate();
 
-  const { btcFiatRate, fiatCurrency, btcBalance } = useWalletSelector();
+  const { fiatCurrency, btcBalance } = useWalletSelector();
+  const { btcFiatRate } = useCoinRates();
+
   const { data: recommendedFees } = useBtcFeeRate();
 
   const satsToFiat = (sats: string) =>

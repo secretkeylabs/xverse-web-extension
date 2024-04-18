@@ -1,3 +1,4 @@
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useWalletSelector from '@hooks/useWalletSelector';
 import RuneAmountSelector from '@screens/sendRune/runeAmountSelector';
@@ -63,7 +64,8 @@ function AmountSelector({
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
-  const { btcFiatRate, fiatCurrency } = useWalletSelector();
+  const { fiatCurrency } = useWalletSelector();
+  const { btcFiatRate } = useCoinRates();
   const { data: recommendedFees } = useBtcFeeRate();
 
   const balance = getFtBalance(token);

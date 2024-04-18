@@ -1,4 +1,5 @@
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { FungibleToken, getFiatEquivalent, microstacksToStx } from '@secretkeylabs/xverse-core';
 import { ftDecimals } from '@utils/helper';
@@ -9,7 +10,8 @@ import { SwapToken } from './types';
 // eslint-disable-next-line import/prefer-default-export
 export function useStxCurrencyConversion() {
   const alexSDK = new AlexSDK();
-  const { stxAvailableBalance, stxBtcRate, btcFiatRate } = useWalletSelector();
+  const { stxAvailableBalance } = useWalletSelector();
+  const { btcFiatRate, stxBtcRate } = useCoinRates();
   const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
 
   const acceptableCoinList = sip10CoinsList

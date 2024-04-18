@@ -1,6 +1,7 @@
 import { BetterBarLoader } from '@components/barLoader';
 import { StyledFiatAmountText } from '@components/fiatAmountText';
 import TokenImage from '@components/tokenImage';
+import useCoinRates from '@hooks/queries/useCoinRates';
 import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import { microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core';
 import { StoreState } from '@stores/index';
@@ -117,9 +118,10 @@ function TokenTile({
   enlargeTicker = false,
   className,
 }: Props) {
-  const { fiatCurrency, stxBalance, btcBalance, stxBtcRate, btcFiatRate } = useSelector(
+  const { fiatCurrency, stxBalance, btcBalance } = useSelector(
     (state: StoreState) => state.walletState,
   );
+  const { btcFiatRate, stxBtcRate } = useCoinRates();
 
   function getTickerTitle() {
     if (currency === 'STX' || currency === 'BTC') return `${currency}`;

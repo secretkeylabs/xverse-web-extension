@@ -10,6 +10,7 @@ import TransactionDetailComponent from '@components/transactionDetailComponent';
 import TransactionSettingAlert from '@components/transactionSetting';
 import TransferFeeView from '@components/transferFeeView';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useBtcClient from '@hooks/useBtcClient';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
@@ -154,7 +155,8 @@ function ConfirmInscriptionRequest() {
     brcContent,
     feePerVByte,
   } = location.state;
-  const { btcAddress, network, selectedAccount, btcFiatRate } = useWalletSelector();
+  const { btcAddress, network, selectedAccount } = useWalletSelector();
+  const { btcFiatRate } = useCoinRates();
   const { getSeed } = useSeedVault();
   const btcClient = useBtcClient();
   const [signedTx, setSignedTx] = useState<string>('');

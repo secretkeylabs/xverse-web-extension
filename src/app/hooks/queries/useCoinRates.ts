@@ -7,7 +7,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 
-export const useGetRates = (fiatCurrency: SupportedCurrency, networkType: NetworkType) => {
+const useGetRates = (fiatCurrency: SupportedCurrency, networkType: NetworkType) => {
   const fetchCoinRates = async () => {
     try {
       const btcFiatRate = await fetchBtcToCurrencyRate(networkType, {
@@ -32,8 +32,8 @@ export const useCoinRates = () => {
 
   const { data } = useGetRates(fiatCurrency, network.type);
 
-  const stxBtcRate = data?.stxBtcRate || '0';
-  const btcFiatRate = data?.btcFiatRate || '0';
+  const stxBtcRate = data?.stxBtcRate.toString() || '0';
+  const btcFiatRate = data?.btcFiatRate.toString() || '0';
 
   return { stxBtcRate, btcFiatRate };
 };

@@ -2,6 +2,7 @@ import ActionButton from '@components/button';
 import InfoContainer from '@components/infoContainer';
 import TokenImage from '@components/tokenImage';
 import { useBnsName, useBnsResolver } from '@hooks/queries/useBnsName';
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useDebounce from '@hooks/useDebounce';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
@@ -224,8 +225,8 @@ function SendForm({
   const [addressError, setAddressError] = useState<string | undefined>(recepientError);
   const navigate = useNavigate();
 
-  const { stxBtcRate, btcFiatRate, fiatCurrency, stxAddress, selectedAccount } =
-    useWalletSelector();
+  const { fiatCurrency, stxAddress, selectedAccount } = useWalletSelector();
+  const { btcFiatRate, stxBtcRate } = useCoinRates();
   const debouncedSearchTerm = useDebounce(recipientAddress, 300);
   const associatedBnsName = useBnsName(recipientAddress);
   const associatedAddress = useBnsResolver(debouncedSearchTerm, stxAddress, currencyType);
