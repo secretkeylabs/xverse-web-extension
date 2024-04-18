@@ -6,6 +6,7 @@ import { useVisibleBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc
 import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useGetRuneFungibleTokens';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import { CurrencyTypes } from '@utils/constants';
 import { getExplorerUrl } from '@utils/helper';
 import { useState } from 'react';
@@ -116,18 +117,25 @@ export default function CoinDashboard() {
   const { visible: brc20CoinsList } = useVisibleBrc20FungibleTokens();
   const ftKey = searchParams.get('ftKey');
 
-  useBtcWalletData();
-
-  const handleBack = () => {
-    navigate(-1);
-  };
-
   const selectedFt =
     sip10CoinsList.find((ft) => ft.principal === ftKey) ??
     brc20CoinsList.find((ft) => ft.principal === ftKey) ??
     runesCoinsList.find((ft) => ft.principal === ftKey);
 
   const protocol = selectedFt?.protocol;
+
+  useBtcWalletData();
+  useTrackMixPanelPageViewed(
+    protocol
+      ? {
+          protocol,
+        }
+      : {},
+  );
+
+  const handleBack = () => {
+    navigate(-1);
+  };
 
   const openContractDeployment = () =>
     window.open(getExplorerUrl(selectedFt?.principal as string), '_blank');

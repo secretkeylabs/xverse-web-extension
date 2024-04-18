@@ -3,7 +3,7 @@ import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import useWalletSelector from '@hooks/useWalletSelector';
 import TransportFactory from '@ledgerhq/hw-transport-webusb';
-import { FungibleToken, Transport, btcTransaction } from '@secretkeylabs/xverse-core';
+import { RuneSummary, Transport, btcTransaction } from '@secretkeylabs/xverse-core';
 import Callout from '@ui-library/callout';
 import { StickyHorizontalSplitButtonContainer, StyledP } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
@@ -46,13 +46,11 @@ type Props = {
   inputs: btcTransaction.EnhancedInput[];
   outputs: btcTransaction.EnhancedOutput[];
   feeOutput?: btcTransaction.TransactionFeeOutput;
+  runeSummary?: RuneSummary;
   isLoading: boolean;
   isSubmitting: boolean;
   isBroadcast?: boolean;
   isError?: boolean;
-  token?: FungibleToken;
-  amountToSend?: string;
-  recipientAddress?: string;
   showAccountHeader?: boolean;
   hideBottomBar?: boolean;
   cancelText: string;
@@ -74,13 +72,11 @@ function ConfirmBtcTransaction({
   inputs,
   outputs,
   feeOutput,
+  runeSummary,
   isLoading,
   isSubmitting,
   isBroadcast,
   isError = false,
-  token,
-  amountToSend,
-  recipientAddress,
   cancelText,
   confirmText,
   onConfirm,
@@ -108,6 +104,11 @@ function ConfirmBtcTransaction({
   const { selectedAccount } = useWalletSelector();
 
   const hideBackButton = !onBackClick;
+  const hasInsufficientRunes =
+    runeSummary?.transfers?.some((transfer) => !transfer.hasSufficientBalance) ?? false;
+  const validMintingRune =
+    !runeSummary?.mint ||
+    (runeSummary?.mint && runeSummary.mint.runeIsOpen && runeSummary.mint.runeIsMintable);
 
   const onConfirmPress = async () => {
     if (!isLedgerAccount(selectedAccount)) {
@@ -194,9 +195,7 @@ function ConfirmBtcTransaction({
         )}
         {!isBroadcast && <SpacedCallout bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />}
         <TransactionSummary
-          token={token}
-          amountToSend={amountToSend}
-          recipientAddress={recipientAddress}
+          runeSummary={runeSummary}
           inputs={inputs}
           outputs={outputs}
           feeOutput={feeOutput}
@@ -211,10 +210,10 @@ function ConfirmBtcTransaction({
             <ActionButton onPress={onCancel} text={cancelText} transparent />
             <ActionButton
               onPress={onConfirmPress}
-              disabled={confirmDisabled}
+              disabled={confirmDisabled || hasInsufficientRunes || !validMintingRune}
               processing={isSubmitting}
-              text={confirmText}
-              warning={isError}
+              text={hasInsufficientRunes ? t('INSUFFICIENT_BALANCE') : confirmText}
+              warning={isError || hasInsufficientRunes}
             />
           </StickyHorizontalSplitButtonContainer>
         )}

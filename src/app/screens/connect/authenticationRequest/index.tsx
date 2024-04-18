@@ -1,4 +1,4 @@
-import BitcoinIcon from '@assets/img/dashboard/bitcoin_icon.svg';
+import bitcoinIcon from '@assets/img/dashboard/bitcoin_icon.svg';
 import stxIcon from '@assets/img/dashboard/stx_icon.svg';
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
@@ -13,6 +13,7 @@ import Transport from '@ledgerhq/hw-transport-webusb';
 import { animated, useSpring } from '@react-spring/web';
 import SelectAccount from '@screens/connect/selectAccount';
 import {
+  AnalyticsEvents,
   AuthRequest,
   createAuthResponse,
   handleLedgerStxJWTAuth,
@@ -21,6 +22,7 @@ import { AddressVersion, StacksMessageType, publicKeyToAddress } from '@stacks/t
 import Callout from '@ui-library/callout';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
 import { isHardwareAccount } from '@utils/helper';
+import { trackMixPanel } from '@utils/mixpanel';
 import { decodeToken } from 'jsontokens';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -147,7 +149,17 @@ function AuthenticationRequest() {
         },
         method: 'authenticationResponse',
       });
-      window.close();
+      trackMixPanel(
+        AnalyticsEvents.AppConnected,
+        {
+          requestedAddress: [AddressPurpose.Stacks, AddressPurpose.Payment],
+          wallet_type: selectedAccount?.accountType || 'software',
+        },
+        { send_immediately: true },
+        () => {
+          window.close();
+        },
+      );
     } catch (e) {
       console.error(e);
     } finally {
@@ -228,7 +240,17 @@ function AuthenticationRequest() {
         },
         method: 'authenticationResponse',
       });
-      window.close();
+      trackMixPanel(
+        AnalyticsEvents.AppConnected,
+        {
+          requestedAddress: [AddressPurpose.Stacks, AddressPurpose.Payment],
+          wallet_type: selectedAccount?.accountType || 'software',
+        },
+        { send_immediately: true },
+        () => {
+          window.close();
+        },
+      );
     } catch (e) {
       setIsTxRejected(true);
       setIsButtonDisabled(false);
@@ -273,7 +295,7 @@ function AuthenticationRequest() {
             />
             <AddressPurposeBox
               purpose={AddressPurpose.Payment}
-              icon={BitcoinIcon}
+              icon={bitcoinIcon}
               title={t('BITCOIN_ADDRESS')}
               address={selectedAccount?.btcAddress || btcAddress}
             />

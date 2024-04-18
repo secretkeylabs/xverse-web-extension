@@ -176,7 +176,7 @@ function AccountHeaderComponent({
           disabledAccountSelect={disableAccountSwitch}
         />
         {!disableMenuOption && (
-          <OptionsButton onClick={openOptionsDialog}>
+          <OptionsButton aria-label="Open Header Options" onClick={openOptionsDialog}>
             <DotsThreeVertical size={20} fill="white" />
           </OptionsButton>
         )}

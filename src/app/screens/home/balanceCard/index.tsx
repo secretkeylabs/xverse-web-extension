@@ -144,7 +144,7 @@ function BalanceCard(props: BalanceCardProps) {
             prefix={`${currencySymbolMap[fiatCurrency]}`}
             thousandSeparator
             renderText={(value: string) => (
-              <BalanceAmountText id="balance">{value}</BalanceAmountText>
+              <BalanceAmountText data-testid="total-balance-value">{value}</BalanceAmountText>
             )}
           />
           {isRefetching && (

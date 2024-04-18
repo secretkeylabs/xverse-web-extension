@@ -73,12 +73,10 @@ function AmountSelector({
   const satsToFiat = (sats: string) =>
     getBtcFiatEquivalent(new BigNumber(sats), BigNumber(btcFiatRate)).toNumber().toFixed(2);
 
-  const isSendButtonEnabled =
-    amountToSend !== '' &&
-    !Number.isNaN(Number(amountToSend)) &&
-    !Number.isNaN(Number(balance)) &&
-    +amountToSend > 0 &&
-    +amountToSend <= +balance;
+  const amountIsPositiveNumber =
+    amountToSend !== '' && !Number.isNaN(Number(amountToSend)) && +amountToSend > 0;
+
+  const isSendButtonEnabled = amountIsPositiveNumber && +amountToSend <= +balance;
 
   return (
     <Container>
@@ -114,11 +112,13 @@ function AmountSelector({
       </div>
       <Buttons>
         <Button
-          title={!hasSufficientFunds ? t('INSUFFICIENT_FUNDS') : t('NEXT')}
+          title={
+            !hasSufficientFunds && amountIsPositiveNumber ? t('INSUFFICIENT_FUNDS') : t('NEXT')
+          }
           onClick={onNext}
           loading={isLoading}
           disabled={!hasSufficientFunds || !isSendButtonEnabled}
-          variant={hasSufficientFunds ? undefined : 'danger'}
+          variant={!hasSufficientFunds && amountIsPositiveNumber ? 'danger' : undefined}
         />
       </Buttons>
     </Container>

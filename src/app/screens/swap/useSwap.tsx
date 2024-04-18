@@ -90,6 +90,7 @@ export function useSwap(): UseSwap {
     prevTo: undefined,
     prevFrom: undefined,
   });
+  const [isLoadingRates, setIsLoadingRates] = useState(false);
 
   const fromAmount = Number.isNaN(Number(inputAmount)) ? undefined : Number(inputAmount);
 
@@ -164,7 +165,9 @@ export function useSwap(): UseSwap {
       selectedCurrency.from === selectedCurrency.to
     ) {
       setExchangeRate(undefined);
+      setIsLoadingRates(false);
     } else {
+      setIsLoadingRates(true);
       let cancelled = false;
       alexSDK
         .getAmountTo(
@@ -177,6 +180,9 @@ export function useSwap(): UseSwap {
             return;
           }
           setExchangeRate(Number(result) / 1e8 / fromAmount);
+        })
+        .finally(() => {
+          setIsLoadingRates(false);
         });
       return () => {
         cancelled = true;
@@ -294,5 +300,6 @@ export function useSwap(): UseSwap {
       setUserOverrideSponsorValue(checked);
     },
     isSponsorDisabled,
+    isLoadingRates,
   };
 }

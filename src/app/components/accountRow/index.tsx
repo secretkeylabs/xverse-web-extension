@@ -45,7 +45,7 @@ const AccountInfoContainer = styled.div({
   alignItems: 'center',
 });
 
-const CurrentAcountContainer = styled.div((props) => ({
+const CurrentAccountContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   paddingLeft: props.theme.space.s,
@@ -331,7 +331,7 @@ function AccountRow({
           thirdGradient={gradient[2]}
           isBig={isAccountListView}
         />
-        <CurrentAcountContainer>
+        <CurrentAccountContainer>
           {account && (
             <TransparentSpan>
               <CurrentAccountTextContainer>
@@ -365,11 +365,11 @@ function AccountRow({
               <BarLoader loaderSize={LoaderSize.MEDIUM} />
             </BarLoaderContainer>
           )}
-        </CurrentAcountContainer>
+        </CurrentAccountContainer>
       </AccountInfoContainer>
 
       {isAccountListView && (
-        <OptionsButton onClick={openOptionsDialog}>
+        <OptionsButton aria-label="Open Account Options" onClick={openOptionsDialog}>
           <DotsThreeVertical size={20} fill="white" />
         </OptionsButton>
       )}

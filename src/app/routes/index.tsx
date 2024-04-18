@@ -49,7 +49,7 @@ import Receive from '@screens/receive';
 import RestoreFunds from '@screens/restoreFunds';
 import RestoreOrdinals from '@screens/restoreFunds/restoreOrdinals';
 import RestoreWallet from '@screens/restoreWallet';
-import SendBrc20Screen from '@screens/sendBrc20';
+// import SendBrc20Screen from '@screens/sendBrc20';
 import SendBrc20OneStepScreen from '@screens/sendBrc20OneStep';
 import SendBtcScreen from '@screens/sendBtc';
 import SendSip10Screen from '@screens/sendFt';
@@ -396,15 +396,16 @@ const router = createHashRouter([
           </AuthGuard>
         ),
       },
-      {
-        // TODO deprecate this after brc20 one step ledger support done
-        path: 'send-brc20',
-        element: (
-          <AuthGuard>
-            <SendBrc20Screen />
-          </AuthGuard>
-        ),
-      },
+      // ENG-4020 - Disable BRC20 Sending on Ledger
+      // {
+      //   // TODO deprecate this after brc20 one step ledger support done
+      //   path: 'send-brc20',
+      //   element: (
+      //     <AuthGuard>
+      //       <SendBrc20Screen />
+      //     </AuthGuard>
+      //   ),
+      // },
       {
         path: 'send-brc20-one-step',
         element: (

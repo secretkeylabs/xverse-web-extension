@@ -1,4 +1,4 @@
-import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
+import { useGetSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { FungibleToken, getFiatEquivalent, microstacksToStx } from '@secretkeylabs/xverse-core';
@@ -11,21 +11,22 @@ import { SwapToken } from './types';
 export function useStxCurrencyConversion() {
   const alexSDK = new AlexSDK();
   const { stxAvailableBalance } = useWalletSelector();
-  const { btcFiatRate, stxBtcRate } = useCoinRates();
-  const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
+  const { stxBtcRate, btcFiatRate } = useCoinRates();
+  const { data: sip10CoinsList } = useGetSip10FungibleTokens();
 
-  const acceptableCoinList = sip10CoinsList
-    .filter((sc) => alexSDK.getCurrencyFrom(sc.principal) != null)
-    // TODO tim: remove this once alexsdk fix issue here
-    // https://github.com/alexgo-io/alex-sdk/issues/2
-    .filter((sc) => sc.principal !== 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9.brc20-db20')
-    .map<FungibleToken>((sc) => ({
-      ...sc,
-      assetName: '',
-      total_sent: sc?.total_sent ?? '0',
-      total_received: sc?.total_received ?? '0',
-      balance: sc?.balance ?? '0',
-    }));
+  const acceptableCoinList =
+    sip10CoinsList
+      ?.filter((sc) => alexSDK.getCurrencyFrom(sc.principal) != null)
+      // TODO tim: remove this once alexsdk fix issue here
+      // https://github.com/alexgo-io/alex-sdk/issues/2
+      .filter((sc) => sc.principal !== 'SP3K8BC0PPEVCV7NZ6QSRWPQ2JE9E5B6N3PA0KBR9.brc20-db20')
+      .map<FungibleToken>((sc) => ({
+        ...sc,
+        assetName: '',
+        total_sent: sc?.total_sent ?? '0',
+        total_received: sc?.total_received ?? '0',
+        balance: sc?.balance ?? '0',
+      })) ?? [];
 
   function currencyToToken(currency?: Currency, amount?: number): SwapToken | undefined {
     if (currency == null) {

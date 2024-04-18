@@ -1,12 +1,9 @@
 import RuneAmount from '@components/confirmBtcTransaction/itemRow/runeAmount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { ArrowRight } from '@phosphor-icons/react';
-import { btcTransaction, FungibleToken } from '@secretkeylabs/xverse-core';
+import { btcTransaction, RuneSummary } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
-import { getTruncatedAddress } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import Theme from '../../../theme';
 import Amount from './itemRow/amount';
 import AmountWithInscriptionSatribute from './itemRow/amountWithInscriptionSatribute';
 import InscriptionSatributeRow from './itemRow/inscriptionSatributeRow';
@@ -22,8 +19,9 @@ const Container = styled.div((props) => ({
   marginBottom: props.theme.space.s,
 }));
 
-const RowContainer = styled.div((props) => ({
-  padding: `0 ${props.theme.space.m}`,
+const RowContainer = styled.div<{ noPadding?: boolean; noMargin?: boolean }>((props) => ({
+  padding: props.noPadding ? 0 : `0 ${props.theme.space.m}`,
+  marginTop: props.noMargin ? 0 : `${props.theme.space.m}`,
 }));
 
 const RowCenter = styled.div<{ spaceBetween?: boolean }>((props) => ({
@@ -34,28 +32,16 @@ const RowCenter = styled.div<{ spaceBetween?: boolean }>((props) => ({
 }));
 
 const Header = styled(RowCenter)((props) => ({
-  marginBottom: props.theme.space.m,
   padding: `0 ${props.theme.space.m}`,
 }));
-
-const StyledStyledP = styled(StyledP)`
-  display: flex;
-  align-items: center;
-`;
-
-const StyledArrowRight = styled(ArrowRight)({
-  marginRight: 4,
-});
 
 type Props = {
   outputs: btcTransaction.EnhancedOutput[];
   inputs: btcTransaction.EnhancedInput[];
   isPartialTransaction: boolean;
+  runeTransfers?: RuneSummary['transfers'];
   netAmount: number;
   onShowInscription: (inscription: btcTransaction.IOInscription) => void;
-  token?: FungibleToken;
-  amountToSend?: string;
-  recipientAddress?: string;
 };
 
 // if isPartialTransaction, we use inputs instead of outputs
@@ -63,11 +49,9 @@ function TransferSection({
   outputs,
   inputs,
   isPartialTransaction,
+  runeTransfers,
   netAmount,
   onShowInscription,
-  token,
-  amountToSend,
-  recipientAddress,
 }: Props) {
   const { btcAddress, ordinalsAddress } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
@@ -91,15 +75,13 @@ function TransferSection({
     inscriptionsFromPayment.push(...item.inscriptions);
     satributesFromPayment.push(...item.satributes);
   });
+  const hasRuneTransfers = (runeTransfers ?? []).length > 0;
+  const hasInscriptionsRareSatsInOrdinal =
+    (isPartialTransaction && inputFromOrdinal.length > 0) || outputsFromOrdinal.length > 0;
 
-  const hasData =
-    showAmount ||
-    (isPartialTransaction && inputFromOrdinal.length > 0) ||
-    outputsFromOrdinal.length > 0;
+  const hasData = showAmount || hasRuneTransfers || hasInscriptionsRareSatsInOrdinal;
 
   if (!hasData) return null;
-
-  const isRuneTransaction = token && amountToSend && recipientAddress;
 
   return (
     <Container>
@@ -107,19 +89,19 @@ function TransferSection({
         <StyledP typography="body_medium_m" color="white_200">
           {t('YOU_WILL_TRANSFER')}
         </StyledP>
-        {isRuneTransaction && (
-          <StyledStyledP typography="body_medium_m" color="white_200">
-            <StyledArrowRight weight="bold" color={Theme.colors.white_0} size={16} />
-            {getTruncatedAddress(recipientAddress, 6)}
-          </StyledStyledP>
-        )}
       </Header>
+      {runeTransfers?.map((transfer) => (
+        <RowContainer key={transfer.runeName}>
+          <RuneAmount
+            tokenName={transfer.runeName}
+            amount={String(transfer.amount)}
+            hasSufficientBalance={transfer.hasSufficientBalance}
+          />
+        </RowContainer>
+      ))}
       {showAmount && (
         <RowContainer>
-          {isRuneTransaction && (
-            <RuneAmount amountSats={546} token={token} amountToSend={amountToSend} />
-          )}
-          {!isRuneTransaction && <Amount amount={netAmount} />}
+          <Amount amount={netAmount} />
           <AmountWithInscriptionSatribute
             inscriptions={inscriptionsFromPayment}
             satributes={satributesFromPayment}
@@ -127,31 +109,35 @@ function TransferSection({
           />
         </RowContainer>
       )}
-      {isPartialTransaction
-        ? inputFromOrdinal.map((input, index) => (
-            <InscriptionSatributeRow
-              // eslint-disable-next-line react/no-array-index-key
-              key={index}
-              inscriptions={input.inscriptions}
-              satributes={input.satributes}
-              amount={input.extendedUtxo.utxo.value}
-              onShowInscription={onShowInscription}
-              showTopDivider={showAmount && index === 0}
-              showBottomDivider={inputFromOrdinal.length > index + 1}
-            />
-          ))
-        : outputsFromOrdinal.map((output, index) => (
-            <InscriptionSatributeRow
-              // eslint-disable-next-line react/no-array-index-key
-              key={index}
-              inscriptions={output.inscriptions}
-              satributes={output.satributes}
-              amount={output.amount}
-              onShowInscription={onShowInscription}
-              showTopDivider={showAmount && index === 0}
-              showBottomDivider={outputsFromOrdinal.length > index + 1}
-            />
-          ))}
+      {hasInscriptionsRareSatsInOrdinal && (
+        <RowContainer noPadding noMargin={hasRuneTransfers || showAmount}>
+          {isPartialTransaction
+            ? inputFromOrdinal.map((input, index) => (
+                <InscriptionSatributeRow
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={index}
+                  inscriptions={input.inscriptions}
+                  satributes={input.satributes}
+                  amount={input.extendedUtxo.utxo.value}
+                  onShowInscription={onShowInscription}
+                  showTopDivider={(hasRuneTransfers || showAmount) && index === 0}
+                  showBottomDivider={inputFromOrdinal.length > index + 1}
+                />
+              ))
+            : outputsFromOrdinal.map((output, index) => (
+                <InscriptionSatributeRow
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={index}
+                  inscriptions={output.inscriptions}
+                  satributes={output.satributes}
+                  amount={output.amount}
+                  onShowInscription={onShowInscription}
+                  showTopDivider={(hasRuneTransfers || showAmount) && index === 0}
+                  showBottomDivider={outputsFromOrdinal.length > index + 1}
+                />
+              ))}
+        </RowContainer>
+      )}
     </Container>
   );
 }

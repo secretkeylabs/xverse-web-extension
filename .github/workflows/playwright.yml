@@ -1,14 +1,9 @@
 name: Playwright Tests
 on:
   workflow_dispatch:
-    inputs:
-      branch:
-        description: Branch name
-        required: true
-        default: develop
 jobs:
-  test:
-    timeout-minutes: 10
+  build:
+    if: ${{ !startsWith(github.head_ref, 'release/') }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,6 +19,11 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGE_REGISTRY_TOKEN }}
         run: npm ci
+      - name: Test
+        run: |
+          npx eslint .
+          npx tsc --noEmit
+          npm test
       - name: Build
         env:
           TRANSAC_API_KEY: ${{ secrets.TRANSAC_API_KEY }}
@@ -31,14 +31,85 @@ jobs:
           MIX_PANEL_TOKEN: ${{ secrets.MIX_PANEL_TOKEN }}
           MIX_PANEL_EXPLORE_APP_TOKEN: ${{ secrets.MIX_PANEL_EXPLORE_APP_TOKEN }}
         run: npm run build --if-present
+      - name: Upload Archive
+        uses: actions/upload-artifact@v3
+        with:
+          name: web-extension1
+          path: ./build
+          retention-days: 5
+          if-no-files-found: error
+  UItest:
+    needs: [build]
+    name: UI Test ${{ matrix.shardIndex }} of ${{ matrix.shardTotal }}
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shardIndex: [1, 2, 3, 4, 5]
+        shardTotal: [5]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download build artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: web-extension1
+          path: ./build
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          always-auth: true
+          node-version: 18
+          registry-url: https://npm.pkg.github.com
+          scope: '@secretkeylabs'
+          cache: npm
+      - name: Install dependencies
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGE_REGISTRY_TOKEN }}
+        run: npm install playwright
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
       - name: Run UI test suite
-        run: xvfb-run --auto-servernum --server-args="-screen 0 360x360x24" npx playwright test --reporter=html
+        run: xvfb-run --auto-servernum --server-args="-screen 0 360x360x24" npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
       - name: Upload Playwright report
-        if: always()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v3
         with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 30
+          name: all-blob-reports
+          path: blob-report
+          retention-days: 1
+
+  merge-reports:
+    # Merge reports after playwright-tests, even if some shards have failed
+    if: ${{ !cancelled() }}
+    needs: [UItest]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          always-auth: true
+          node-version: 18
+          registry-url: https://npm.pkg.github.com
+          scope: '@secretkeylabs'
+          cache: npm
+      - name: Install dependencies
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GH_PACKAGE_REGISTRY_TOKEN }}
+        run: npm install playwright
+
+      - name: Download blob reports from GitHub Actions Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: all-blob-reports
+          path: all-blob-reports
+
+      - name: Merge into HTML Report
+        run: npx playwright merge-reports --reporter html ./all-blob-reports
+
+      - name: Upload HTML report
+        uses: actions/upload-artifact@v3
+        with:
+          name: html-report--attempt-${{ github.run_attempt }}
+          path: playwright-report
+          retention-days: 5

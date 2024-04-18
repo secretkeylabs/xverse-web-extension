@@ -1,7 +1,16 @@
 import { makeRPCError, sendRpcResponse } from '@common/utils/rpc/helpers';
 import ConfirmBitcoinTransaction from '@components/confirmBtcTransaction';
 import RequestError from '@components/requests/requestError';
-import { Transport, btcTransaction } from '@secretkeylabs/xverse-core';
+import useBtcClient from '@hooks/useBtcClient';
+import useHasFeature from '@hooks/useHasFeature';
+import useTransactionContext from '@hooks/useTransactionContext';
+import useWalletSelector from '@hooks/useWalletSelector';
+import {
+  RuneSummary,
+  Transport,
+  btcTransaction,
+  parseSummaryForRunes,
+} from '@secretkeylabs/xverse-core';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -11,7 +20,9 @@ import useSignPsbtValidationGate from './useSignPsbtValidationGate';
 
 function SignPsbtRequest() {
   const navigate = useNavigate();
+
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
+  const txnContext = useTransactionContext();
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSigning, setIsSigning] = useState(false);
@@ -19,6 +30,8 @@ function SignPsbtRequest() {
   const [outputs, setOutputs] = useState<btcTransaction.EnhancedOutput[]>([]);
   const [feeOutput, setFeeOutput] = useState<btcTransaction.TransactionFeeOutput | undefined>();
   const [hasSigHashNone, setHasSigHashNone] = useState(false);
+  const [runeSummary, setRuneSummary] = useState<RuneSummary | undefined>(undefined);
+  const hasRunesSupport = useHasFeature('RUNES_SUPPORT');
 
   const { payload, parsedPsbt, confirmSignPsbt, cancelSignPsbt, onCloseError, requestId, tabId } =
     useSignPsbt();
@@ -27,12 +40,16 @@ function SignPsbtRequest() {
     parsedPsbt,
   });
 
+  useSignPsbtValidationGate({ payload, parsedPsbt });
+
+  const { network } = useWalletSelector();
+
   useEffect(() => {
     if (!parsedPsbt) return;
 
     parsedPsbt
       .getSummary()
-      .then((summary) => {
+      .then(async (summary) => {
         const {
           feeOutput: psbtFeeOutput,
           inputs: psbtInputs,
@@ -43,6 +60,9 @@ function SignPsbtRequest() {
         setInputs(psbtInputs);
         setOutputs(psbtOutputs);
         setHasSigHashNone(psbtHasSigHashNone);
+        if (hasRunesSupport) {
+          setRuneSummary(await parseSummaryForRunes(txnContext, summary, network.type));
+        }
         setIsLoading(false);
       })
       .catch((err) => {
@@ -121,6 +141,7 @@ function SignPsbtRequest() {
       inputs={inputs}
       outputs={outputs}
       feeOutput={feeOutput}
+      runeSummary={runeSummary}
       isLoading={isLoading}
       isSubmitting={isSigning}
       isBroadcast={payload.broadcast}

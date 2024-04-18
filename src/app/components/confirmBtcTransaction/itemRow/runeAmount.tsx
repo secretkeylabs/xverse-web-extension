@@ -1,17 +1,11 @@
+import { mapRuneNameToPlaceholder } from '@components/confirmBtcTransaction/utils';
 import TokenImage from '@components/tokenImage';
-import { FungibleToken } from '@secretkeylabs/xverse-core';
 import Avatar from '@ui-library/avatar';
 import { StyledP } from '@ui-library/common.styled';
-import { getFtTicker } from '@utils/tokens';
+import { getTicker } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
-
-type Props = {
-  amountSats: number;
-  token: FungibleToken;
-  amountToSend: string;
-};
 
 const Container = styled.div({
   width: '100%',
@@ -35,7 +29,13 @@ const ColumnContainer = styled.div({
   overflow: 'hidden',
 });
 
+const AmountDiv = styled.div`
+  flex: 3;
+  overflow: hidden;
+`;
+
 const NumberTypeContainer = styled.div`
+  flex: 1;
   text-align: right;
   overflow: hidden;
 `;
@@ -46,7 +46,13 @@ const EllipsisStyledP = styled(StyledP)`
   text-overflow: ellipsis;
 `;
 
-export default function RuneAmount({ amountSats, token, amountToSend }: Props) {
+type Props = {
+  tokenName: string;
+  amount: string;
+  hasSufficientBalance?: boolean;
+};
+
+export default function RuneAmount({ tokenName, amount, hasSufficientBalance = true }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
 
   return (
@@ -56,7 +62,7 @@ export default function RuneAmount({ amountSats, token, amountToSend }: Props) {
           src={
             <TokenImage
               currency="FT"
-              fungibleToken={token}
+              fungibleToken={mapRuneNameToPlaceholder(tokenName)}
               showProtocolIcon={false}
               loading={false}
               size={32}
@@ -65,27 +71,29 @@ export default function RuneAmount({ amountSats, token, amountToSend }: Props) {
         />
       </AvatarContainer>
       <ColumnContainer>
-        <div>
+        <AmountDiv>
           <StyledP typography="body_medium_m" color="white_200">
             {t('AMOUNT')}
           </StyledP>
-          <StyledP typography="body_medium_s" color="white_400">
-            {t('BITCOIN_VALUE')}
-          </StyledP>
-        </div>
+          <EllipsisStyledP typography="body_medium_s" color="white_400">
+            {tokenName}
+          </EllipsisStyledP>
+        </AmountDiv>
         <NumberTypeContainer>
           <NumericFormat
-            value={amountToSend}
+            value={amount}
             displayType="text"
             thousandSeparator
-            suffix={` ${getFtTicker(token)}`}
+            suffix={` ${getTicker(tokenName)}`}
             renderText={(value: string) => (
-              <EllipsisStyledP typography="body_medium_m">{value}</EllipsisStyledP>
+              <EllipsisStyledP
+                typography="body_medium_m"
+                color={hasSufficientBalance ? 'white_200' : 'danger_light'}
+              >
+                {value}
+              </EllipsisStyledP>
             )}
           />
-          <StyledP typography="body_medium_s" color="white_400">
-            {`${amountSats} ${t('SATS')}`}
-          </StyledP>
         </NumberTypeContainer>
       </ColumnContainer>
     </Container>
