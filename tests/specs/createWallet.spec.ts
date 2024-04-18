@@ -146,10 +146,6 @@ test.describe('Create and Restore Wallet Flow', () => {
       await expect(newPage.url()).toContain('restore');
       await onboardingpage2.checkRestoreWalletSeedPhrasePage();
 
-      // TODO: There is an bug that the page is refreshed after clicking on any button: https://linear.app/xverseapp/issue/ENG-4028/restore-wallet-reload-page-instead-of-showing-error-message
-      await onboardingpage2.button24SeedPhrase.click();
-      await onboardingpage2.checkRestoreWalletSeedPhrasePage();
-
       const seedWords = JSON.parse(fs.readFileSync(filePathSeedWords, 'utf8'));
 
       for (let i = 0; i < seedWords.length; i++) {

@@ -86,8 +86,6 @@ test.describe('onboarding flow', () => {
     const onboardingpage = new Onboarding(page);
     await onboardingpage.navigateToRestorePage();
 
-    // TODO: There is an bug that the page is refreshed after clicking on any button: https://linear.app/xverseapp/issue/ENG-4028/restore-wallet-reload-page-instead-of-showing-error-message
-    await onboardingpage.button24SeedPhrase.click();
     await onboardingpage.checkRestoreWalletSeedPhrasePage();
 
     // get 12 words from bip39
@@ -125,8 +123,6 @@ test.describe('onboarding flow', () => {
     const onboardingpage = new Onboarding(page);
     await onboardingpage.navigateToRestorePage();
 
-    await onboardingpage.button24SeedPhrase.click();
-    // TODO: There is an bug that the page is refreshed after clicking on any button https://linear.app/xverseapp/issue/ENG-4028/restore-wallet-reload-page-instead-of-showing-error-message
     await onboardingpage.checkRestoreWalletSeedPhrasePage();
     await onboardingpage.button24SeedPhrase.click();
 
@@ -170,8 +166,6 @@ test.describe('onboarding flow', () => {
     // Skip Landing and go directly to restore wallet via URL
     await page.goto(`chrome-extension://${extensionId}/options.html#/restoreWallet`);
 
-    await onboardingpage.button24SeedPhrase.click();
-    // TODO: There is an bug that the page is refreshed after clicking on any button https://linear.app/xverseapp/issue/ENG-4028/restore-wallet-reload-page-instead-of-showing-error-message
     await onboardingpage.checkRestoreWalletSeedPhrasePage();
 
     await onboardingpage.button24SeedPhrase.click();
