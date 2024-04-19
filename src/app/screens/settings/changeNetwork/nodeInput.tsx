@@ -77,7 +77,7 @@ function NodeInput({
         <NodeResetButton onClick={onReset}>{t('RESET_TO_DEFAULT')}</NodeResetButton>
       </NodeInputHeader>
       <InputContainer>
-        <Input onChange={onChange} value={value} />
+        <Input data-testid={label} onChange={onChange} value={value} />
         {value && (
           <Button onClick={onClear}>
             <XCircle size={18} weight="fill" color={theme.colors.white_200} />
