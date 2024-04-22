@@ -195,4 +195,14 @@ test.describe('onboarding flow', () => {
     await onboardingpage.buttonUnlock.click();
     await startpage.checkVisuals();
   });
+
+  test('switch to testnet and back to mainnet', async ({ page, extensionId }) => {
+    const onboardingpage = new Onboarding(page);
+    const startpage = new StartPage(page);
+    await onboardingpage.createWalletSkipBackup(strongPW);
+    await page.goto(`chrome-extension://${extensionId}/popup.html#/settings`);
+
+    await startpage.switchtoTestnetNetwork();
+    await startpage.switchtoMainnetNetwork();
+  });
 });
