@@ -2,7 +2,7 @@ import { mapRuneNameToPlaceholder } from '@components/confirmBtcTransaction/util
 import TokenImage from '@components/tokenImage';
 import Avatar from '@ui-library/avatar';
 import { StyledP } from '@ui-library/common.styled';
-import { getTicker } from '@utils/helper';
+import { ftDecimals, getTicker } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
@@ -18,43 +18,42 @@ const AvatarContainer = styled.div`
   margin-right: ${(props) => props.theme.space.xs};
 `;
 
-const ColumnContainer = styled.div({
+const Row = styled.div({
   width: '100%',
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'space-between',
-  alignItems: 'center',
   gap: '24px',
-  whiteSpace: 'nowrap',
-  overflow: 'hidden',
 });
 
-const AmountDiv = styled.div`
-  flex: 3;
+const Column = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   overflow: hidden;
 `;
 
-const NumberTypeContainer = styled.div`
-  flex: 1;
-  text-align: right;
-  overflow: hidden;
-`;
-
-const EllipsisStyledP = styled(StyledP)`
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+const StyledPRight = styled(StyledP)`
+  word-break: break-all;
+  text-align: end;
 `;
 
 type Props = {
   tokenName: string;
   amount: string;
+  divisibility: number;
   hasSufficientBalance?: boolean;
 };
 
-export default function RuneAmount({ tokenName, amount, hasSufficientBalance = true }: Props) {
+export default function RuneAmount({
+  tokenName,
+  amount,
+  divisibility,
+  hasSufficientBalance = true,
+}: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-
+  const amountWithDecimals = ftDecimals(amount, divisibility);
   return (
     <Container>
       <AvatarContainer>
@@ -70,32 +69,30 @@ export default function RuneAmount({ tokenName, amount, hasSufficientBalance = t
           }
         />
       </AvatarContainer>
-      <ColumnContainer>
-        <AmountDiv>
+      <Column>
+        <Row>
           <StyledP typography="body_medium_m" color="white_200">
             {t('AMOUNT')}
           </StyledP>
-          <EllipsisStyledP typography="body_medium_s" color="white_400">
-            {tokenName}
-          </EllipsisStyledP>
-        </AmountDiv>
-        <NumberTypeContainer>
           <NumericFormat
-            value={amount}
+            value={amountWithDecimals}
             displayType="text"
             thousandSeparator
             suffix={` ${getTicker(tokenName)}`}
             renderText={(value: string) => (
-              <EllipsisStyledP
+              <StyledPRight
                 typography="body_medium_m"
                 color={hasSufficientBalance ? 'white_200' : 'danger_light'}
               >
                 {value}
-              </EllipsisStyledP>
+              </StyledPRight>
             )}
           />
-        </NumberTypeContainer>
-      </ColumnContainer>
+        </Row>
+        <StyledP typography="body_medium_s" color="white_400">
+          {tokenName}
+        </StyledP>
+      </Column>
     </Container>
   );
 }

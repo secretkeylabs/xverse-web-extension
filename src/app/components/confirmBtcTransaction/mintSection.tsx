@@ -1,7 +1,9 @@
 import { ArrowRight } from '@phosphor-icons/react';
 import { RuneSummary } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
+import { ftDecimals } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
+import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 import Theme from '../../../theme';
 
@@ -77,9 +79,16 @@ function MintSection({ mints }: Props) {
                 <StyledP typography="body_medium_m" color="white_200">
                   {t('AMOUNT')}
                 </StyledP>
-                <StyledP typography="body_medium_m" color="white_0">
-                  {mint?.amount.toString(10)}
-                </StyledP>
+                <NumericFormat
+                  value={ftDecimals(mint?.amount.toString(10), mint?.divisibility)}
+                  displayType="text"
+                  thousandSeparator
+                  renderText={(value: string) => (
+                    <StyledP typography="body_medium_m" color="white_0">
+                      {value}
+                    </StyledP>
+                  )}
+                />
               </Header>
             </Container>
           ),
