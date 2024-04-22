@@ -11,9 +11,8 @@ export const useGetRuneFungibleTokens = () => {
   const RunesApi = useRunesApi();
   return useQuery({
     queryKey: ['get-rune-fungible-tokens', network.type, ordinalsAddress],
-    // TODO: remove showRunes once available in mainnet as well
     enabled: Boolean(network && ordinalsAddress && showRunes),
-    queryFn: async () => RunesApi.getRuneFungibleTokens(ordinalsAddress),
+    queryFn: () => RunesApi.getRuneFungibleTokens(ordinalsAddress),
   });
 };
 

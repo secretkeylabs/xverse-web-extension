@@ -135,3 +135,5 @@ yarn-error.log*
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+tests/specs/seedWords.json
+tests/specs/addresses.json

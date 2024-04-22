@@ -6,7 +6,7 @@ test.describe('healthcheck', () => {
     await context.close();
   });
 
-  test.skip('healthcheck', async ({ page, extensionId }) => {
+  test('healthcheck #smoketest', async ({ page, extensionId }) => {
     await page.goto(`chrome-extension://${extensionId}/options.html#/landing`);
     const landingpage = new Landing(page);
     await landingpage.initialize();

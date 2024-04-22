@@ -429,10 +429,12 @@ export default function CoinHeader(props: CoinBalanceProps) {
       </BalanceInfoContainer>
       {renderStackingBalances()}
       <RowButtonContainer>
-        <ButtonContainer>
-          <SmallActionButton src={ArrowUp} text={t('SEND')} onPress={() => goToSendScreen()} />
-        </ButtonContainer>
-
+        {/* ENG-4020 - Disable BRC20 Sending on Ledger */}
+        {!(fungibleToken?.protocol === 'brc-20' && isLedgerAccount(selectedAccount)) && (
+          <ButtonContainer>
+            <SmallActionButton src={ArrowUp} text={t('SEND')} onPress={() => goToSendScreen()} />
+          </ButtonContainer>
+        )}
         {!fungibleToken ? (
           <>
             <ButtonContainer>

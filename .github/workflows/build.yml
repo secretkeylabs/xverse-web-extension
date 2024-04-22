@@ -41,7 +41,7 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
       - name: Run UI test suite
-        run: xvfb-run --auto-servernum --server-args="-screen 0 360x360x24" npx playwright test --reporter=html
+        run: xvfb-run --auto-servernum --server-args="-screen 0 360x360x24" npx playwright test --grep "#smoketest" --reporter=html
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v3

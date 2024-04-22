@@ -37,6 +37,7 @@ export type UseSwap = {
   isServiceRunning: boolean;
   handleChangeUserOverrideSponsorValue: (checked: boolean) => void;
   isSponsorDisabled: boolean;
+  isLoadingRates: boolean;
 };
 
 export type SelectedCurrencyState = {
