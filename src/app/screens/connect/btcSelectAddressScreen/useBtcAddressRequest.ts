@@ -1,10 +1,6 @@
 import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types';
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { SettingsNetwork } from '@secretkeylabs/xverse-core';
-import { decodeToken } from 'jsontokens';
-import { useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
 import {
   Address,
   AddressPurpose,
@@ -15,7 +11,11 @@ import {
   GetAddressResponse,
   Return,
   RpcErrorCode,
-} from 'sats-connect';
+} from '@sats-connect/core';
+import { SettingsNetwork } from '@secretkeylabs/xverse-core';
+import { decodeToken } from 'jsontokens';
+import { useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 
 const useAddressRequestParams = (network: SettingsNetwork) => {
   const { search } = useLocation();

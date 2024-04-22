@@ -5,6 +5,7 @@ import useBtcClient from '@hooks/useBtcClient';
 import useHasFeature from '@hooks/useHasFeature';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { RpcErrorCode } from '@sats-connect/core';
 import {
   RuneSummary,
   Transport,
@@ -14,7 +15,6 @@ import {
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { RpcErrorCode } from 'sats-connect';
 import useSignPsbt from './useSignPsbt';
 import useSignPsbtValidationGate from './useSignPsbtValidationGate';
 

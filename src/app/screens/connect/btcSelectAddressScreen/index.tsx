@@ -3,6 +3,7 @@ import stxIcon from '@assets/img/dashboard/stx_icon.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { animated, useTransition } from '@react-spring/web';
+import { AddressPurpose } from '@sats-connect/core';
 import SelectAccount from '@screens/connect/selectAccount';
 import { AnalyticsEvents, getAppIconFromWebManifest } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
@@ -12,7 +13,6 @@ import { trackMixPanel } from '@utils/mixpanel';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { AddressPurpose } from 'sats-connect';
 import AddressPurposeBox from '../addressPurposeBox';
 import PermissionsList from '../permissionsList';
 import {

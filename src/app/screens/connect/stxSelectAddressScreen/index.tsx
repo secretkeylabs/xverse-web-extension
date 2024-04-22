@@ -3,6 +3,7 @@ import ActionButton from '@components/button';
 import useStxAddressRequest from '@hooks/useStxAddressRequest';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { animated, useTransition } from '@react-spring/web';
+import { AddressPurpose } from '@sats-connect/core';
 import SelectAccount from '@screens/connect/selectAccount';
 import { getAppIconFromWebManifest } from '@secretkeylabs/xverse-core';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
@@ -10,7 +11,6 @@ import Spinner from '@ui-library/spinner';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { AddressPurpose } from 'sats-connect';
 import AddressPurposeBox from '../addressPurposeBox';
 import {
   AddressBoxContainer,

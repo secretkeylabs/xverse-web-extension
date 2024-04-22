@@ -7,7 +7,7 @@ import {
 } from '@common/utils/legacy-external-message-handler';
 import internalBackgroundMessageHandler from '@common/utils/messageHandlers';
 import handleRPCRequest from '@common/utils/rpc';
-import { Requests } from 'sats-connect';
+import { Requests } from '@sats-connect/core';
 
 // Listen for connection to the content-script - port for two-way communication
 chrome.runtime.onConnect.addListener((port) => {

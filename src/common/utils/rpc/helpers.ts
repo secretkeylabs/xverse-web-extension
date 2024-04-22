@@ -6,7 +6,7 @@ import {
   RpcErrorResponse,
   RpcId,
   RpcSuccessResponse,
-} from 'sats-connect';
+} from '@sats-connect/core';
 
 export const makeRPCError = (id: RpcId, error: RpcError): RpcErrorResponse => ({
   jsonrpc: '2.0',

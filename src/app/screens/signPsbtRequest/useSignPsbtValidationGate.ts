@@ -1,8 +1,8 @@
 import useWalletSelector from '@hooks/useWalletSelector';
+import { SignTransactionPayload } from '@sats-connect/core';
 import { btcTransaction } from '@secretkeylabs/xverse-core';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SignTransactionPayload } from 'sats-connect';
 
 type Props = {
   payload: SignTransactionPayload | undefined;

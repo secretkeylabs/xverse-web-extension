@@ -1,6 +1,6 @@
 /* eslint-disable prefer-destructuring */
+import { Provider } from '@sats-connect/core';
 import type { NetworkType } from '@secretkeylabs/xverse-core';
-import { Provider } from 'sats-connect';
 
 export const GAMMA_URL = 'https://gamma.io/';
 export const TERMS_LINK = 'https://xverse.app/terms';

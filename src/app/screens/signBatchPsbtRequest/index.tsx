@@ -20,6 +20,7 @@ import useSignBatchPsbtTx from '@hooks/useSignBatchPsbtTx';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowLeft, ArrowRight } from '@phosphor-icons/react';
+import { SignMultiplePsbtPayload } from '@sats-connect/core';
 import { RuneSummary, btcTransaction, parseSummaryForRunes } from '@secretkeylabs/xverse-core';
 import Callout from '@ui-library/callout';
 import Spinner from '@ui-library/spinner';
@@ -28,7 +29,6 @@ import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { SignMultiplePsbtPayload } from 'sats-connect';
 import styled from 'styled-components';
 
 const OuterContainer = styled.div`

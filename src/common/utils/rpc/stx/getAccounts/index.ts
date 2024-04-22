@@ -1,6 +1,6 @@
 import { WebBtcMessage } from '@common/types/message-types';
 import { getTabIdFromPort, isUndefined } from '@common/utils';
-import { RpcErrorCode } from 'sats-connect';
+import { RpcErrorCode } from '@sats-connect/core';
 import {
   listenForPopupClose,
   makeSearchParamsWithDefaults,
