@@ -104,7 +104,7 @@ export default class Onboarding {
     this.button24SeedPhrase = page.getByRole('button', { name: '24 words' });
     this.button12SeedPhrase = page.getByRole('button', { name: '12 words' });
     this.inputSeedPhraseWord = page.locator('input');
-    this.inputSeedPhraseWordDisabled = page.locator('input[type="password"][disabled]');
+    this.inputSeedPhraseWordDisabled = page.locator('input[disabled]');
     this.buttonUnlock = page.getByRole('button', { name: 'Unlock' });
   }
 
