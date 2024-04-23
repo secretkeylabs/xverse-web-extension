@@ -14,6 +14,7 @@ import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import DelegateSection from './delegateSection';
 import AmountWithInscriptionSatribute from './itemRow/amountWithInscriptionSatribute';
 import ReceiveSection from './receiveSection';
 import TransferSection from './transferSection';
@@ -100,6 +101,8 @@ function TransactionSummary({
 
   const showFeeSelector = !!(feeRate && getFeeForFeeRate && onFeeRateSet);
 
+  const hasRuneDelegation = (runeSummary?.burns.length ?? 0) > 0 && isPartialTransaction;
+
   return (
     <>
       {inscriptionToShow && (
@@ -130,6 +133,7 @@ function TransactionSummary({
       {runeSummary?.mint && !runeSummary?.mint?.runeIsMintable && (
         <WarningCallout bodyText={t('RUNE_IS_CLOSED')} variant="danger" />
       )}
+      {hasRuneDelegation && <DelegateSection delegations={runeSummary?.burns} />}
       <TransferSection
         outputs={outputs}
         inputs={inputs}
@@ -144,7 +148,7 @@ function TransactionSummary({
         netAmount={netAmount}
         runeReceipts={runeSummary?.receipts}
       />
-      <BurnSection burns={runeSummary?.burns} />
+      {!hasRuneDelegation && <BurnSection burns={runeSummary?.burns} />}
       <MintSection mints={[runeSummary?.mint]} />
       <TxInOutput inputs={inputs} outputs={outputs} />
       {hasOutputScript && !runeSummary && <WarningCallout bodyText={t('SCRIPT_OUTPUT_TX')} />}

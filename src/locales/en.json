@@ -415,7 +415,10 @@
     "UNCONFIRMED_UTXO_WARNING": "You are spending unconfirmed outputs in this transaction. This may lower the effective fee rate causing delays in transaction confirmation",
     "INSCRIBED_RARE_SATS_WARNING": "Your payment wallet holds rare or inscribed sats. To avoid spending them in your transactions and fees, transfer them to your ordinals wallet",
     "RUNE_TERM_ENDED": "This rune has passed its mint term and can no longer be minted.",
-    "RUNE_IS_CLOSED": "This rune is closed and cannot be minted."
+    "RUNE_IS_CLOSED": "This rune is closed and cannot be minted.",
+    "UNKNOWN_RUNE_RECIPIENTS": "Undetermined Runes recipients ",
+    "RUNE_DELEGATION_DESCRIPTION": "This is a partial transaction with undetermined Runes recipients. You are delegating your Runes to the requesting app. The requesting app can burn your runes or transfer them to any recipient",
+    "YOU_WILL_DELEGATE": "You will delegate"
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "The requested transaction cannot be created due to insufficient balance",
