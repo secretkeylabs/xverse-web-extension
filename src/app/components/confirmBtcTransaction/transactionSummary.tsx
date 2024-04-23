@@ -34,6 +34,7 @@ const WarningCallout = styled(Callout)`
 
 type Props = {
   isPartialTransaction: boolean;
+  showCenotaphCallout: boolean;
   inputs: btcTransaction.EnhancedInput[];
   outputs: btcTransaction.EnhancedOutput[];
   feeOutput?: btcTransaction.TransactionFeeOutput;
@@ -49,6 +50,7 @@ type Props = {
 
 function TransactionSummary({
   isPartialTransaction,
+  showCenotaphCallout,
   inputs,
   outputs,
   feeOutput,
@@ -126,6 +128,9 @@ function TransactionSummary({
       )}
       {isUnConfirmedInput && (
         <WarningCallout bodyText={t('UNCONFIRMED_UTXO_WARNING')} variant="warning" />
+      )}
+      {showCenotaphCallout && (
+        <WarningCallout variant="danger" bodyText={t('RUNES_CENOTAPH_WARNING')} />
       )}
       {runeSummary?.mint && !runeSummary?.mint?.runeIsOpen && (
         <WarningCallout bodyText={t('RUNE_TERM_ENDED')} variant="danger" />

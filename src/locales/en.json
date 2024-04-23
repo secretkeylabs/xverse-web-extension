@@ -374,10 +374,11 @@
     "ORDINAL_DETECTED_ACTION": "Move to my ordinals address",
     "BTC_TRANSFER_DANGER_ALERT_TITLE": "Danger",
     "BTC_TRANSFER_DANGER_ALERT_DESC": "You are about to make a Bitcoin transfer which contains an ordinal inscription. Once transferred out of the wallet, you will not be able to recover them.",
-    "CONITNUE": "Continue",
+    "CONTINUE": "Continue",
     "BACK": "Back",
     "HIGH_FEE_WARNING_TEXT": "The estimated transaction fee for this transaction is very high.",
     "UNCONFIRMED_BALANCE_WARNING": "You are spending unconfirmed outputs in this transaction. This may lower the effective fee rate causing delays in transaction confirmation",
+    "RUNES_CENOTAPH_WARNING": "This transaction will burn all input Runes. Make sure you trust the requesting app.",
     "LEDGER": {
       "CONNECT": {
         "TITLE": "Connect your hardware wallet",

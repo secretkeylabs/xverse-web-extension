@@ -48,6 +48,7 @@ type Props = {
   outputs: btcTransaction.EnhancedOutput[];
   feeOutput?: btcTransaction.TransactionFeeOutput;
   runeSummary?: RuneSummary;
+  showCenotaphCallout: boolean;
   isLoading: boolean;
   isSubmitting: boolean;
   isBroadcast?: boolean;
@@ -76,6 +77,7 @@ function ConfirmBtcTransaction({
   outputs,
   feeOutput,
   runeSummary,
+  showCenotaphCallout,
   isLoading,
   isSubmitting,
   isBroadcast,
@@ -205,6 +207,7 @@ function ConfirmBtcTransaction({
           outputs={outputs}
           feeOutput={feeOutput}
           isPartialTransaction={isPartialTransaction}
+          showCenotaphCallout={showCenotaphCallout}
           getFeeForFeeRate={getFeeForFeeRate}
           onFeeRateSet={onFeeRateSet}
           feeRate={feeRate}

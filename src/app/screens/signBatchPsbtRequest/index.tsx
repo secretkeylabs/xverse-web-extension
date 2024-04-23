@@ -124,12 +124,8 @@ interface TxResponse {
   psbtBase64: string;
 }
 
-type PsbtSummary = {
-  inputs: btcTransaction.EnhancedInput[];
-  outputs: btcTransaction.EnhancedOutput[];
-  feeOutput?: btcTransaction.TransactionFeeOutput | undefined;
-  hasSigHashNone: boolean;
-};
+// TODO: export this from core
+type PsbtSummary = Awaited<ReturnType<btcTransaction.EnhancedPsbt['getSummary']>>;
 
 function SignBatchPsbtRequest() {
   const { btcAddress, ordinalsAddress, selectedAccount, network } = useWalletSelector();
@@ -434,6 +430,9 @@ function SignBatchPsbtRequest() {
                 feeOutput={parsedPsbts[currentPsbtIndex].summary.feeOutput}
                 runeSummary={parsedPsbts[currentPsbtIndex].runeSummary}
                 isPartialTransaction={!parsedPsbts[currentPsbtIndex].summary.feeOutput}
+                showCenotaphCallout={
+                  !!parsedPsbts[currentPsbtIndex].summary.runeOp?.Cenotaph?.flaws
+                }
               />
             )}
           </CustomizedModalContainer>

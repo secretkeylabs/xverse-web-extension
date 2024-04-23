@@ -176,6 +176,7 @@ function RecoverRunes() {
         inputs={summary?.inputs ?? []}
         outputs={summary?.outputs ?? []}
         feeOutput={summary?.feeOutput}
+        showCenotaphCallout={!!summary?.runeOp?.Cenotaph?.flaws}
         runeSummary={runeSummary}
         isLoading={isLoading}
         isSubmitting={isBroadcasting}
