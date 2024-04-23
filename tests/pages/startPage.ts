@@ -1,15 +1,38 @@
 import { expect, type Locator, type Page } from '@playwright/test';
+import exp from 'constants';
 
 export default class StartPage {
   readonly balance: Locator;
 
   readonly allupperButtons: Locator;
 
+  readonly labelAccountName: Locator;
+
+  readonly buttonGenerateAccount: Locator;
+
+  readonly buttonConnectHardwareWallet: Locator;
+
+  readonly inputName: Locator;
+
+  readonly buttonAccountOptions: Locator;
+
+  readonly accountBalance: Locator;
+
+  readonly buttonRenameAccount: Locator;
+
+  readonly buttonResetAccountName: Locator;
+
+  readonly labelInfoRenameAccount: Locator;
+
+  readonly errorMessageRenameAccount: Locator;
+
   readonly manageTokenButton: Locator;
 
   readonly buttonMenu: Locator;
 
   readonly buttonLock: Locator;
+
+  readonly buttonConfirm: Locator;
 
   readonly buttonResetWallet: Locator;
 
@@ -43,9 +66,26 @@ export default class StartPage {
     this.page = page;
     this.balance = page.getByTestId('total-balance-value');
     this.allupperButtons = page.getByTestId('transaction-buttons-row').getByRole('button');
+    this.labelAccountName = page.getByLabel('Account Name');
+    this.buttonAccountOptions = page.getByLabel('Open Account Options');
+    this.accountBalance = page.getByTestId('account-balance');
+    this.buttonRenameAccount = page.getByRole('button', { name: 'Rename account' });
+    this.buttonResetAccountName = page.getByRole('button', { name: 'Reset name' });
+    this.labelInfoRenameAccount = page
+      .locator('form div')
+      .filter({ hasText: 'name can only include alphabetical and numerical' });
+    this.buttonGenerateAccount = page.getByRole('button', { name: 'Generate account' });
+    this.buttonConnectHardwareWallet = page.getByRole('button', {
+      name: 'Connect hardware wallet',
+    });
+    this.inputName = page.locator('input[type="text"]');
+    this.errorMessageRenameAccount = page
+      .locator('p')
+      .filter({ hasText: 'contain alphabetic and numeric' });
     this.manageTokenButton = page.getByRole('button', { name: 'Manage token list' });
     this.buttonMenu = page.getByRole('button', { name: 'Open Header Options' });
     this.buttonLock = page.getByRole('button', { name: 'Lock' });
+    this.buttonConfirm = page.getByRole('button', { name: 'Confirm' });
     this.buttonResetWallet = page.getByRole('button', { name: 'Reset Wallet' });
     this.buttonDenyDataCollection = page.getByRole('button', { name: 'Deny' });
     this.buttonCopyBitcoinAddress = page.locator('#copy-address-Bitcoin');
@@ -80,6 +120,7 @@ export default class StartPage {
     await expect(this.buttonMenu).toBeVisible();
     // Check if all 4 buttons (send, receive, swap, buy) are visible
     await expect(this.allupperButtons).toHaveCount(4);
+    await expect(this.labelAccountName).toBeVisible();
   }
 
   async getAddress(button) {
@@ -150,5 +191,21 @@ export default class StartPage {
     await this.buttonSave.click();
     await expect(this.buttonNetwork).toBeVisible();
     await expect(this.buttonNetwork).toHaveText('NetworkMainnet');
+  }
+  
+  async getBalanceOfAllAccounts() {
+    const count = await this.accountBalance.count();
+    let totalBalance = 0;
+    if (count > 1) {
+      for (let i = 0; i < count; i++) {
+        const balanceText = await this.accountBalance.nth(i).innerText();
+        const numericValue = parseFloat(balanceText.replace(/[^\d.-]/g, ''));
+        totalBalance += numericValue;
+      }
+    } else {
+      const balanceText = await this.accountBalance.innerText();
+      totalBalance = parseFloat(balanceText.replace(/[^\d.-]/g, ''));
+    }
+    return totalBalance;
   }
 }
