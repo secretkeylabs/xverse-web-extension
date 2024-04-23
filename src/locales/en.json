@@ -665,15 +665,17 @@
     "HOLDS_RARE_SAT": "This inscription holds a rare sat."
   },
   "RESTORE_FUND_SCREEN": {
-    "TITLE": "Restore assets",
+    "TITLE": "Recover assets",
     "DESCRIPTION": "If you sent Ordinals to your Bitcoin payment address or Bitcoin to your ordinals address, you can recover it and send it to the correct address.",
     "RECOVER_BTC": "Recover BTC",
     "RECOVER_BTC_DESC": "If you sent Bitcoin to your Ordinals address.",
     "RECOVER_ORDINALS": "Recover Ordinals",
-    "RECOVER_ORDINALS_DESC": "If you sent Ordinals to your Bitcoin payment address."
+    "RECOVER_ORDINALS_DESC": "If you sent Ordinals to your Bitcoin payment address.",
+    "RECOVER_RUNES": "Recover Runes",
+    "RECOVER_RUNES_DESC": "If you sent Runes to your Bitcoin payment address."
   },
   "RESTORE_BTC_SCREEN": {
-    "TITLE": "Restore BTC",
+    "TITLE": "Recover BTC",
     "BTC": "Bitcoin",
     "TRANSFER": "Transfer",
     "BACK": "Back",
@@ -682,13 +684,22 @@
     "DESCRIPTION": "You have Bitcoin stored in your ordinal address. You can transfer them to your payment address so they can be used for payments and are shown in your balance."
   },
   "RESTORE_ORDINAL_SCREEN": {
-    "TITLE": "Restore Ordinals",
+    "TITLE": "Recover Ordinals",
     "BTC": "Bitcoin",
     "TRANSFER": "Transfer",
     "BACK": "Back",
     "ORDINAL_ADDRESS": "Ordinal address",
     "NO_FUNDS": "You don’t have any Ordinals stored on your Bitcoin payment address.",
     "DESCRIPTION": "You have Ordinals stored in your Bitcoin payment address. You can transfer them to your Ordinals address so that they show up in your collection."
+  },
+  "RECOVER_RUNES_SCREEN": {
+    "TITLE": "Recover Runes",
+    "DESCRIPTION": "Your Bitcoin payment address holds some Runes. To avoid accidentally spending them in Bitcoin payments, you can transfer them to your ordinals address, where you can manage your Runes portfolio",
+    "NO_RUNES": "You don't have any Runes stored on your Bitcoin payment address.",
+    "INSUFFICIENT_FUNDS": "You don't have enough bitcoin to cover the restore transaction.",
+    "CONFIRM": "Confirm",
+    "BACK": "Back",
+    "TRANSFER_ALL": "Transfer all"
   },
   "NFT_DETAIL_SCREEN": {
     "NFT_DETAIL": "Item detail",

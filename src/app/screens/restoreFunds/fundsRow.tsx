@@ -4,7 +4,6 @@ const Icon = styled.img((props) => ({
   marginRight: props.theme.spacing(8),
   width: 32,
   height: 32,
-  borderRadius: 30,
 }));
 
 const TitleText = styled.h1((props) => ({
@@ -34,6 +33,11 @@ const RowContainer = styled.button((props) => ({
   background: 'transparent',
   width: '100%',
   marginBottom: 12,
+  ':disabled': {
+    backgroundColor: props.theme.colors.elevation0,
+    opacity: 0.5,
+    cursor: 'not-allowed',
+  },
 }));
 
 interface Props {
@@ -41,11 +45,12 @@ interface Props {
   title: string;
   description: string;
   onClick: () => void;
+  disabled?: boolean;
 }
 
-function FundsRow({ image, title, description, onClick }: Props) {
+function FundsRow({ image, title, description, onClick, disabled }: Props) {
   return (
-    <RowContainer onClick={onClick}>
+    <RowContainer onClick={onClick} disabled={disabled}>
       <Icon src={image} />
       <Container>
         <TitleText>{title}</TitleText>

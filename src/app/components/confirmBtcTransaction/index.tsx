@@ -1,6 +1,7 @@
 import { delay } from '@common/utils/ledger';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
+import { Tab } from '@components/tabBar';
 import useWalletSelector from '@hooks/useWalletSelector';
 import TransportFactory from '@ledgerhq/hw-transport-webusb';
 import { RuneSummary, Transport, btcTransaction } from '@secretkeylabs/xverse-core';
@@ -66,6 +67,8 @@ type Props = {
   onFeeRateSet?: (feeRate: number) => void;
   feeRate?: number;
   hasSigHashNone?: boolean;
+  title?: string;
+  selectedBottomTab?: Tab;
 };
 
 function ConfirmBtcTransaction({
@@ -89,6 +92,8 @@ function ConfirmBtcTransaction({
   onFeeRateSet,
   feeRate,
   hasSigHashNone = false,
+  title,
+  selectedBottomTab,
 }: Props) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentStep, setCurrentStep] = useState(Steps.ConnectLedger);
@@ -177,14 +182,14 @@ function ConfirmBtcTransaction({
   ) : (
     <>
       <SendLayout
-        selectedBottomTab="dashboard"
+        selectedBottomTab={selectedBottomTab ?? 'dashboard'}
         onClickBack={onBackClick}
         hideBackButton={hideBackButton}
         showAccountHeader={showAccountHeader}
         hideBottomBar={hideBottomBar}
       >
         <ReviewTransactionText typography="headline_s">
-          {t('REVIEW_TRANSACTION')}
+          {title || t('REVIEW_TRANSACTION')}
         </ReviewTransactionText>
         {hasSigHashNone && (
           <SpacedCallout
