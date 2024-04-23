@@ -80,6 +80,7 @@
   },
   "scripts": {
     "build": "npm run clean && NODE_ENV=production npx node webpack/utils/build.js",
+    "build-named": "npm run clean && NODE_ENV=production node scripts/build-named.js",
     "start": "npx node webpack/utils/devServer.js",
     "clean": "rimraf build",
     "test": "vitest ./src",
