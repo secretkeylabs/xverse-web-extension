@@ -86,7 +86,11 @@ function DelegateSection({ delegations }: Props) {
       </Header>
       {delegations.map((delegation) => (
         <RowContainer key={delegation.runeName}>
-          <RuneAmount tokenName={delegation.runeName} amount={String(delegation.amount)} />
+          <RuneAmount
+            tokenName={delegation.runeName}
+            amount={String(delegation.amount)}
+            divisibility={delegation.divisibility}
+          />
         </RowContainer>
       ))}
       <WarningButton type="button" onClick={() => setShowDelegationInfo((prevState) => !prevState)}>
