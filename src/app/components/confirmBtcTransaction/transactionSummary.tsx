@@ -14,6 +14,7 @@ import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import DelegateSection from './delegateSection';
 import AmountWithInscriptionSatribute from './itemRow/amountWithInscriptionSatribute';
 import ReceiveSection from './receiveSection';
 import TransferSection from './transferSection';
@@ -33,6 +34,7 @@ const WarningCallout = styled(Callout)`
 
 type Props = {
   isPartialTransaction: boolean;
+  showCenotaphCallout: boolean;
   inputs: btcTransaction.EnhancedInput[];
   outputs: btcTransaction.EnhancedOutput[];
   feeOutput?: btcTransaction.TransactionFeeOutput;
@@ -48,6 +50,7 @@ type Props = {
 
 function TransactionSummary({
   isPartialTransaction,
+  showCenotaphCallout,
   inputs,
   outputs,
   feeOutput,
@@ -100,6 +103,8 @@ function TransactionSummary({
 
   const showFeeSelector = !!(feeRate && getFeeForFeeRate && onFeeRateSet);
 
+  const hasRuneDelegation = (runeSummary?.burns.length ?? 0) > 0 && isPartialTransaction;
+
   return (
     <>
       {inscriptionToShow && (
@@ -124,12 +129,16 @@ function TransactionSummary({
       {isUnConfirmedInput && (
         <WarningCallout bodyText={t('UNCONFIRMED_UTXO_WARNING')} variant="warning" />
       )}
+      {showCenotaphCallout && (
+        <WarningCallout variant="danger" bodyText={t('RUNES_CENOTAPH_WARNING')} />
+      )}
       {runeSummary?.mint && !runeSummary?.mint?.runeIsOpen && (
         <WarningCallout bodyText={t('RUNE_TERM_ENDED')} variant="danger" />
       )}
       {runeSummary?.mint && !runeSummary?.mint?.runeIsMintable && (
         <WarningCallout bodyText={t('RUNE_IS_CLOSED')} variant="danger" />
       )}
+      {hasRuneDelegation && <DelegateSection delegations={runeSummary?.burns} />}
       <TransferSection
         outputs={outputs}
         inputs={inputs}
@@ -144,7 +153,7 @@ function TransactionSummary({
         netAmount={netAmount}
         runeReceipts={runeSummary?.receipts}
       />
-      <BurnSection burns={runeSummary?.burns} />
+      {!hasRuneDelegation && <BurnSection burns={runeSummary?.burns} />}
       <MintSection mints={[runeSummary?.mint]} />
       <TxInOutput inputs={inputs} outputs={outputs} />
       {hasOutputScript && !runeSummary && <WarningCallout bodyText={t('SCRIPT_OUTPUT_TX')} />}

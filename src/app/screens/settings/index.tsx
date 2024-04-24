@@ -249,13 +249,6 @@ function Setting() {
           showDivider
         />
         <SettingComponent
-          text={t('RECOVER_ASSETS')}
-          onClick={onRestoreFundClick}
-          icon={ArrowIcon}
-          showDivider
-          disabled={!hasActivatedOrdinalsKey}
-        />
-        <SettingComponent
           text={t('ENABLE_RARE_SATS')}
           description={t('ENABLE_RARE_SATS_DETAIL')}
           toggle
@@ -279,7 +272,12 @@ function Setting() {
           toggleFunction={switchActivateRBFState}
           toggleValue={hasActivatedRBFKey}
         />
-
+        <SettingComponent
+          text={t('RECOVER_ASSETS')}
+          onClick={onRestoreFundClick}
+          icon={ArrowIcon}
+          showDivider
+        />
         <SettingComponent
           title={t('ABOUT')}
           text={t('TERMS_OF_SERVICE')}
