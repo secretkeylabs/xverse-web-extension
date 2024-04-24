@@ -1,4 +1,5 @@
-import { WebBtcMessage } from '@common/types/message-types';
+import { InternalMethods, WebBtcMessage } from '@common/types/message-types';
+import { sendMessage } from '@common/types/messages';
 import { Requests, RpcErrorCode } from '@sats-connect/core';
 import { getTabIdFromPort } from '..';
 import {
@@ -9,7 +10,7 @@ import {
   handleSignPsbt,
 } from './btc';
 import handleGetInfo from './getInfo';
-import { makeRPCError, sendRpcResponse } from './helpers';
+import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from './helpers';
 import callContract from './stx/callContract/index.ts';
 import deployContract from './stx/deployContract/index.ts';
 import handleGetStxAccounts from './stx/getAccounts';
@@ -25,25 +26,30 @@ const handleRPCRequest = async (
 ) => {
   try {
     switch (message.method) {
-      case 'getInfo':
+      case 'getInfo': {
         handleGetInfo(message.id, getTabIdFromPort(port));
         break;
-      case 'getAddresses':
+      }
+      case 'getAddresses': {
         await handleGetAddresses(message as WebBtcMessage<'getAddresses'>, port);
         break;
+      }
       case 'getAccounts': {
         await handleGetAccounts(message as WebBtcMessage<'getAccounts'>, port);
         break;
       }
-      case 'signMessage':
+      case 'signMessage': {
         await handleSignMessage(message as WebBtcMessage<'signMessage'>, port);
         break;
-      case 'sendTransfer':
+      }
+      case 'sendTransfer': {
         await handleSendTransfer(message as WebBtcMessage<'sendTransfer'>, port);
         break;
-      case 'signPsbt':
+      }
+      case 'signPsbt': {
         await handleSignPsbt(message as WebBtcMessage<'signPsbt'>, port);
         break;
+      }
 
       // Stacks methods
 
@@ -82,6 +88,15 @@ const handleRPCRequest = async (
         );
         break;
       }
+      case 'runes_getBalance': {
+        const account = await sendMessage({
+          method: InternalMethods.RequestActiveAccount,
+          payload: undefined,
+        });
+        console.log(account);
+        sendRpcResponse(getTabIdFromPort(port), makeRpcSuccessResponse(message.id, account));
+        break;
+      }
       default:
         sendRpcResponse(
           getTabIdFromPort(port),
@@ -93,6 +108,7 @@ const handleRPCRequest = async (
         break;
     }
   } catch (e: any) {
+    console.log(e);
     sendRpcResponse(
       getTabIdFromPort(port),
       makeRPCError(message.id as string, {

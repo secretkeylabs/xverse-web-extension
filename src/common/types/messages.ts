@@ -1,3 +1,4 @@
+import { Account } from '@secretkeylabs/xverse-core';
 import { ExtensionMethods, InternalMethods, Message } from './message-types';
 
 /**
@@ -13,7 +14,14 @@ type OriginatingTabClosed = BackgroundMessage<
   { tabId: number }
 >;
 
-export type BackgroundMessages = OriginatingTabClosed;
+type ChangeActiveAccount = BackgroundMessage<
+  InternalMethods.ChangeActiveAccount,
+  { account: Account }
+>;
+
+type RequestActiveAccount = BackgroundMessage<InternalMethods.RequestActiveAccount>;
+
+export type BackgroundMessages = OriginatingTabClosed | ChangeActiveAccount | RequestActiveAccount;
 
 export function sendMessage(message: BackgroundMessages) {
   return chrome.runtime.sendMessage(message);
