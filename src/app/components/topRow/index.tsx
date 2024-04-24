@@ -47,7 +47,7 @@ function TopRow({ title, onClick, showBackButton = true, className }: Props) {
     <TopSectionContainer className={className}>
       {showBackButton && (
         <BackButton onClick={onClick}>
-          <ArrowLeft size={20} color={Theme.colors.white_0} />
+          <ArrowLeft size={20} color={Theme.colors.white_0} alt="back button" />
         </BackButton>
       )}
       {title && <HeaderText>{title}</HeaderText>}
