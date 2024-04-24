@@ -210,14 +210,6 @@ function Home() {
   const { t } = useTranslation('translation', {
     keyPrefix: 'DASHBOARD_SCREEN',
   });
-  const theme = useTheme();
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const [openReceiveModal, setOpenReceiveModal] = useState(false);
-  const [openSendModal, setOpenSendModal] = useState(false);
-  const [openBuyModal, setOpenBuyModal] = useState(false);
-  const [isBtcReceiveAlertVisible, setIsBtcReceiveAlertVisible] = useState(false);
-  const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible] = useState(false);
   const {
     stxAddress,
     btcAddress,
@@ -230,15 +222,23 @@ function Home() {
     hideStx,
     notificationBanners,
   } = useWalletSelector();
+  const theme = useTheme();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [openReceiveModal, setOpenReceiveModal] = useState(false);
+  const [openSendModal, setOpenSendModal] = useState(false);
+  const [openBuyModal, setOpenBuyModal] = useState(false);
+  const [isBtcReceiveAlertVisible, setIsBtcReceiveAlertVisible] = useState(false);
+  const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible] = useState(false);
   const [areReceivingAddressesVisible, setAreReceivingAddressesVisible] = useState(
     !isLedgerAccount(selectedAccount),
   );
   const [choseToVerifyAddresses, setChoseToVerifyAddresses] = useState(false);
-  const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } =
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    stxAddress ? useStxWalletData() : { isLoading: false, isRefetching: false };
+  const { isInitialLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } =
+    useStxWalletData();
   const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } =
     useBtcWalletData();
+  const { data: notificationBannersArr } = useNotificationBanners();
   const {
     visible: sip10CoinsList,
     isLoading: loadingStxCoinData,
@@ -254,7 +254,7 @@ function Home() {
     isLoading: loadingRunesData,
     isRefetching: refetchingRunesData,
   } = useVisibleRuneFungibleTokens();
-  const { data: notificationBannersArr } = useNotificationBanners();
+
   useFeeMultipliers();
   useCoinRates();
   useAppConfig();
@@ -635,7 +635,6 @@ function Home() {
           title={t('SEND')}
           loadingWalletData={loadingStxWalletData || loadingBtcWalletData}
         />
-
         <CoinSelectModal
           onSelectBitcoin={onBuyBtcClick}
           onSelectStacks={onBuyStxClick}
