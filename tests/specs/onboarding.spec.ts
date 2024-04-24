@@ -2,7 +2,7 @@ import * as bip39 from 'bip39';
 import { expect, test } from '../fixtures/base';
 import { passwordTestCases } from '../fixtures/passwordTestData';
 import Onboarding from '../pages/onboarding';
-import StartPage from '../pages/startPage';
+import Wallet from '../pages/wallet';
 
 const strongPW = Onboarding.generateSecurePasswordCrypto();
 
@@ -183,26 +183,26 @@ test.describe('onboarding flow', () => {
 
   test('Lock and login #smoketest', async ({ page, extensionId }) => {
     const onboardingpage = new Onboarding(page);
-    const startpage = new StartPage(page);
+    const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
-    await expect(startpage.buttonMenu).toBeVisible();
-    await startpage.buttonMenu.click();
-    await expect(startpage.buttonLock).toBeVisible();
-    await startpage.buttonLock.click();
+    await expect(wallet.buttonMenu).toBeVisible();
+    await wallet.buttonMenu.click();
+    await expect(wallet.buttonLock).toBeVisible();
+    await wallet.buttonLock.click();
     await expect(onboardingpage.inputPassword).toBeVisible();
     await onboardingpage.inputPassword.fill(strongPW);
     await onboardingpage.buttonUnlock.click();
-    await startpage.checkVisuals();
+    await wallet.checkVisualsStartpage();
   });
 
   test('switch to testnet and back to mainnet', async ({ page, extensionId }) => {
     const onboardingpage = new Onboarding(page);
-    const startpage = new StartPage(page);
+    const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html#/settings`);
 
-    await startpage.switchtoTestnetNetwork();
-    await startpage.switchtoMainnetNetwork();
+    await wallet.switchtoTestnetNetwork();
+    await wallet.switchtoMainnetNetwork();
   });
 });

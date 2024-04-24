@@ -1,7 +1,6 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import exp from 'constants';
 
-export default class StartPage {
+export default class Wallet {
   readonly balance: Locator;
 
   readonly allupperButtons: Locator;
@@ -62,6 +61,28 @@ export default class StartPage {
 
   readonly inputFallbackBTCURL: Locator;
 
+  readonly labelCoinTitle: Locator;
+
+  readonly checkboxToken: Locator;
+
+  readonly checkboxTokenActive: Locator;
+
+  readonly checkboxTokenInactive: Locator;
+
+  readonly buttonSip10: Locator;
+
+  readonly buttonBRC20: Locator;
+
+  readonly buttonRunes: Locator;
+
+  readonly headingTokens: Locator;
+
+  readonly divTokenRow: Locator;
+
+  readonly labelTokenSubtitle: Locator;
+
+  readonly labelCoinBalance: Locator;
+
   constructor(readonly page: Page) {
     this.page = page;
     this.balance = page.getByTestId('total-balance-value');
@@ -98,6 +119,7 @@ export default class StartPage {
 
     this.buttonConfirmCopyAddress = page.getByRole('button', { name: 'I understand' });
 
+    // Settings network
     this.buttonNetwork = page.getByRole('button', { name: 'Network' });
     this.buttonSave = page.getByRole('button', { name: 'Save' });
     this.buttonMainnet = page.getByRole('button', { name: 'Mainnet' });
@@ -106,21 +128,33 @@ export default class StartPage {
     this.inputStacksURL = page.getByTestId('Stacks URL');
     this.inputBTCURL = page.getByTestId('BTC URL');
     this.inputFallbackBTCURL = page.getByTestId('Fallback BTC URL');
+
+    // Token
+    this.labelCoinTitle = page.getByLabel('Coin Title');
+    this.checkboxToken = page.locator('input[type="checkbox"]');
+    this.checkboxTokenActive = page.locator('input[type="checkbox"]:checked');
+    this.checkboxTokenInactive = page.locator('input[type="checkbox"]:not(:checked)');
+    this.buttonSip10 = page.getByRole('button', { name: 'SIP-10' });
+    this.buttonBRC20 = page.getByRole('button', { name: 'BRC-20' });
+    this.buttonRunes = page.getByRole('button', { name: 'RUNES' });
+    this.headingTokens = page.getByRole('heading', { name: 'Manage tokens' });
+    this.divTokenRow = page.getByLabel('Token Row');
+    this.labelTokenSubtitle = page.getByLabel('Token SubTitle');
+    this.labelCoinBalance = page.getByLabel('CoinBalance Container').locator('span');
   }
 
-  async checkVisuals() {
+  async checkVisualsStartpage() {
     // Deny data collection --> modal window is not always appearing so when it does we deny the data collection
     if (await this.buttonDenyDataCollection.isVisible()) {
       await this.buttonDenyDataCollection.click();
     }
-
-    // Check if specific visual elements are loaded
     await expect(this.balance).toBeVisible();
     await expect(this.manageTokenButton).toBeVisible();
     await expect(this.buttonMenu).toBeVisible();
     // Check if all 4 buttons (send, receive, swap, buy) are visible
     await expect(this.allupperButtons).toHaveCount(4);
     await expect(this.labelAccountName).toBeVisible();
+    await expect(this.labelTokenSubtitle).toHaveCount(2);
   }
 
   async getAddress(button) {
@@ -192,7 +226,7 @@ export default class StartPage {
     await expect(this.buttonNetwork).toBeVisible();
     await expect(this.buttonNetwork).toHaveText('NetworkMainnet');
   }
-  
+
   async getBalanceOfAllAccounts() {
     const count = await this.accountBalance.count();
     let totalBalance = 0;
@@ -207,5 +241,76 @@ export default class StartPage {
       totalBalance = parseFloat(balanceText.replace(/[^\d.-]/g, ''));
     }
     return totalBalance;
+  }
+
+  async getBalanceOfAllTokens() {
+    const count = await this.labelCoinBalance.count();
+    let totalBalance = 0;
+    if (count > 1) {
+      for (let i = 0; i < count; i++) {
+        const balanceText = await this.labelCoinBalance.nth(i).innerText();
+        const numericValue = parseFloat(balanceText.replace(/[^\d.-]/g, ''));
+        totalBalance += numericValue;
+      }
+    } else {
+      const balanceText = await this.labelCoinBalance.innerText();
+      totalBalance = parseFloat(balanceText.replace(/[^\d.-]/g, ''));
+    }
+    // Check if total balance of all tokens is the same as total wallet balance
+    const totalBalanceText = await this.balance.innerText();
+    const totalBalanceWallet = parseFloat(totalBalanceText.replace(/[^\d.-]/g, ''));
+    await expect(totalBalanceWallet).toBe(totalBalance);
+    return totalBalance;
+  }
+
+  async enableARandomToken(): Promise<string> {
+    const numberOfUnselectedTokens = await this.checkboxTokenInactive.count();
+
+    // Generate a random number within the range of available select elements
+    const chosenNumber = Math.floor(Math.random() * numberOfUnselectedTokens) + 1;
+
+    // Access the nth select element (note the adjustment for zero-based indexing)
+    const adjustChosenNumber = chosenNumber - 1;
+    const chosenUnselectedToken = this.divTokenRow
+      .filter({ has: this.checkboxTokenInactive })
+      .nth(adjustChosenNumber);
+    const enabledTokenName =
+      (await chosenUnselectedToken.getAttribute('data-testid')) || 'default-value';
+    await chosenUnselectedToken.locator('div.react-switch-handle').click();
+    return enabledTokenName;
+  }
+
+  async disableARandomToken(): Promise<string> {
+    const numberOfUnselectedTokens = await this.checkboxTokenActive.count();
+
+    // Generate a random number within the range of available select elements
+    const chosenNumber = Math.floor(Math.random() * numberOfUnselectedTokens) + 1;
+
+    // Access the nth select element (note the adjustment for zero-based indexing)
+    const adjustChosenNumber = chosenNumber - 1;
+    const chosenUnselectedToken = this.divTokenRow
+      .filter({ has: this.checkboxTokenActive })
+      .nth(adjustChosenNumber);
+    const disabledTokenName =
+      (await chosenUnselectedToken.getAttribute('data-testid')) || 'default-value';
+    await chosenUnselectedToken.locator('div.react-switch-handle').click();
+    return disabledTokenName;
+  }
+
+  async disableAllTokens() {
+    const allActiveTokens = this.divTokenRow.filter({ has: this.checkboxTokenActive });
+    const count = await allActiveTokens.count();
+    for (let i = 0; i < count; i++) {
+      await allActiveTokens.first().locator('div.react-switch-handle').click();
+    }
+  }
+
+  async enableAllTokens() {
+    const allInactiveTokens = this.divTokenRow.filter({ has: this.checkboxTokenInactive });
+    const count = await allInactiveTokens.count();
+    for (let i = 0; i < count; i++) {
+      // We click the first inactive Token and when this inactive token becomes active we need to click the next one which becomes the first then
+      await allInactiveTokens.first().locator('div.react-switch-handle').click();
+    }
   }
 }
