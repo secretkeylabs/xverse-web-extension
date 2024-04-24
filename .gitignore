@@ -137,3 +137,6 @@ yarn-error.log*
 /playwright/.cache/
 tests/specs/seedWords.json
 tests/specs/addresses.json
+
+# multiple wallets
+prebuilt-wallets

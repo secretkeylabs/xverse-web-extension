@@ -1,7 +1,7 @@
 {
   "name": "xverse-web-extension",
   "description": "A Bitcoin wallet for Web3",
-  "version": "0.33.2",
+  "version": "0.34.0",
   "private": true,
   "engines": {
     "node": "^18.18.2"
@@ -80,6 +80,7 @@
   },
   "scripts": {
     "build": "npm run clean && NODE_ENV=production npx node webpack/utils/build.js",
+    "build-named": "npm run clean && NODE_ENV=production node scripts/build-named.js",
     "start": "npx node webpack/utils/devServer.js",
     "clean": "rimraf build",
     "test": "vitest ./src",

@@ -59,10 +59,12 @@ function CoinItem({ id, name, image, ticker, protocol, disabled, toggled, enable
   };
 
   return (
-    <RowContainer>
+    <RowContainer aria-label="Token Row" data-testid={name}>
       <CoinContainer>
         <TokenImage fungibleToken={{ name, ticker, image, protocol } as FungibleToken} size={32} />
-        <CoinTitleText isEnabled={isEnabled}>{name}</CoinTitleText>
+        <CoinTitleText aria-label="Coin Title" isEnabled={isEnabled}>
+          {name}
+        </CoinTitleText>
       </CoinContainer>
       <CustomSwitch
         onColor={Theme.colors.tangerine}

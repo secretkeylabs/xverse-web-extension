@@ -38,7 +38,13 @@ function EnterSeedPhrase(props: Props): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_WALLET_SCREEN' });
 
   return (
-    <Form onSubmit={onContinue}>
+    <Form
+      onSubmit={(e) => {
+        e.preventDefault();
+
+        onContinue();
+      }}
+    >
       <Title>{t('ENTER_SEED_HEADER')}</Title>
       <SeedPhraseInput onSeedChange={setSeed} seedError={seedError} setSeedError={setSeedError} />
       <ButtonContainer>

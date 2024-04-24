@@ -46,7 +46,11 @@ function BurnSection({ burns }: Props) {
       </Header>
       {burns.map((burn) => (
         <RowContainer key={burn.runeName}>
-          <RuneAmount tokenName={burn.runeName} amount={String(burn.amount)} />
+          <RuneAmount
+            tokenName={burn.runeName}
+            amount={String(burn.amount)}
+            divisibility={burn.divisibility}
+          />
         </RowContainer>
       ))}
     </Container>
