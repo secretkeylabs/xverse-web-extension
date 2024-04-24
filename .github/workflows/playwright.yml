@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    if: ${{ startsWith(github.head_ref, 'uitests/') || github.event_name == 'workflow_dispatch' }}
+    if: ${{ startsWith(github.head_ref, 'e2etest/') || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -46,7 +46,7 @@ jobs:
     needs: [build]
     name: UI Test ${{ matrix.shardIndex }} of ${{ matrix.shardTotal }}
     timeout-minutes: 10
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
@@ -87,7 +87,7 @@ jobs:
     # Merge reports after playwright-tests, even if some shards have failed
     if: ${{ always() && needs.UItest.result != 'skipped' }}
     needs: [UItest]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

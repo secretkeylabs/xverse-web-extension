@@ -83,8 +83,31 @@ export default class Wallet {
 
   readonly labelCoinBalance: Locator;
 
+  readonly navigationDashboard: Locator;
+
+  readonly navigationNFT: Locator;
+
+  readonly navigationStacking: Locator;
+
+  readonly navigationExplore: Locator;
+
+  readonly navigationSettings: Locator;
+
+  readonly divAppSlide: Locator;
+
+  readonly divAppCard: Locator;
+
+  readonly divAppTitle: Locator;
+
+  readonly carouselApp: Locator;
+
   constructor(readonly page: Page) {
     this.page = page;
+    this.navigationDashboard = page.getByTestId('nav-dashboard');
+    this.navigationNFT = page.getByTestId('nav-nft');
+    this.navigationStacking = page.getByTestId('nav-stacking');
+    this.navigationExplore = page.getByTestId('nav-explore');
+    this.navigationSettings = page.getByTestId('nav-settings');
     this.balance = page.getByTestId('total-balance-value');
     this.allupperButtons = page.getByTestId('transaction-buttons-row').getByRole('button');
     this.labelAccountName = page.getByLabel('Account Name');
@@ -141,6 +164,12 @@ export default class Wallet {
     this.divTokenRow = page.getByLabel('Token Row');
     this.labelTokenSubtitle = page.getByLabel('Token SubTitle');
     this.labelCoinBalance = page.getByLabel('CoinBalance Container').locator('span');
+
+    // Explore
+    this.carouselApp = page.getByTestId('app-carousel');
+    this.divAppSlide = page.getByTestId('app-slide');
+    this.divAppCard = page.getByTestId('app-card');
+    this.divAppTitle = page.getByTestId('app-title');
   }
 
   async checkVisualsStartpage() {
@@ -155,6 +184,12 @@ export default class Wallet {
     await expect(this.allupperButtons).toHaveCount(4);
     await expect(this.labelAccountName).toBeVisible();
     await expect(this.labelTokenSubtitle).toHaveCount(2);
+
+    await expect(this.navigationDashboard).toBeVisible();
+    await expect(this.navigationNFT).toBeVisible();
+    await expect(this.navigationStacking).toBeVisible();
+    await expect(this.navigationExplore).toBeVisible();
+    await expect(this.navigationSettings).toBeVisible();
   }
 
   async getAddress(button) {
