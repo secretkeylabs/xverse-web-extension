@@ -35,8 +35,6 @@ export enum RpcMethods {
 
 export enum InternalMethods {
   OriginatingTabClosed = 'OriginatingTabClosed',
-  ChangeActiveAccount = 'AccountChanged',
-  RequestActiveAccount = 'RequestActiveAccount',
 }
 
 export type ExtensionMethods =

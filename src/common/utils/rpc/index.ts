@@ -1,5 +1,4 @@
-import { InternalMethods, WebBtcMessage } from '@common/types/message-types';
-import { sendMessage } from '@common/types/messages';
+import { WebBtcMessage } from '@common/types/message-types';
 import { Requests, RpcErrorCode } from '@sats-connect/core';
 import { getTabIdFromPort } from '..';
 import {
@@ -10,7 +9,8 @@ import {
   handleSignPsbt,
 } from './btc';
 import handleGetInfo from './getInfo';
-import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from './helpers';
+import { makeRPCError, sendRpcResponse } from './helpers';
+import handleGetRunesBalance from './runes/getBalance';
 import callContract from './stx/callContract/index.ts';
 import deployContract from './stx/deployContract/index.ts';
 import handleGetStxAccounts from './stx/getAccounts';
@@ -89,12 +89,7 @@ const handleRPCRequest = async (
         break;
       }
       case 'runes_getBalance': {
-        const account = await sendMessage({
-          method: InternalMethods.RequestActiveAccount,
-          payload: undefined,
-        });
-        console.log(account);
-        sendRpcResponse(getTabIdFromPort(port), makeRpcSuccessResponse(message.id, account));
+        await handleGetRunesBalance(message.id, getTabIdFromPort(port));
         break;
       }
       default:

@@ -1,5 +1,3 @@
-import { InternalMethods } from '@common/types/message-types';
-import { sendMessage } from '@common/types/messages';
 import { filterLedgerAccounts, getDeviceAccountIndex } from '@common/utils/ledger';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
@@ -14,7 +12,6 @@ import {
   createWalletAccount,
   decryptSeedPhraseCBC,
   getBnsName,
-  newWallet,
   restoreWalletWithAccounts,
   walletFromSeedPhrase,
 } from '@secretkeylabs/xverse-core';
@@ -305,12 +302,6 @@ const useWalletReducer = () => {
       ),
     );
     dispatch(fetchAccountAction(account, accountsList));
-    sendMessage({
-      method: InternalMethods.ChangeActiveAccount,
-      payload: {
-        account,
-      },
-    });
   };
 
   const changeNetwork = async (changedNetwork: SettingsNetwork) => {
@@ -332,12 +323,6 @@ const useWalletReducer = () => {
       stxPublicKey: wallet.stxPublicKey,
     };
     dispatch(setWalletAction(wallet));
-    sendMessage({
-      method: InternalMethods.ChangeActiveAccount,
-      payload: {
-        account,
-      },
-    });
     const networkObject =
       changedNetwork.type === 'Mainnet'
         ? new StacksMainnet({ url: changedNetwork.address })
