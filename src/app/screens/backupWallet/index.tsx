@@ -1,7 +1,7 @@
 import backup from '@assets/img/backupWallet/backup.svg';
-import ActionButton from '@components/button';
 import useSeedVault from '@hooks/useSeedVault';
 import { generateMnemonic } from '@secretkeylabs/xverse-core';
+import Button from '@ui-library/button';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -30,14 +30,14 @@ const ContentContainer = styled.div((props) => ({
 }));
 
 const Title = styled.h1((props) => ({
-  ...props.theme.body_bold_l,
+  ...props.theme.typography.body_bold_l,
   textAlign: 'center',
 }));
 
 const SubTitle = styled.h2((props) => ({
-  ...props.theme.body_l,
+  ...props.theme.typography.body_l,
   textAlign: 'center',
-  marginTop: props.theme.spacing(4),
+  marginTop: props.theme.space.xs,
   color: props.theme.colors.white_200,
 }));
 
@@ -47,11 +47,7 @@ const BackupActionsContainer = styled.div((props) => ({
   justifyContent: 'space-between',
   marginTop: props.theme.spacing(20),
   width: '100%',
-}));
-
-const TransparentButtonContainer = styled.div((props) => ({
-  marginRight: props.theme.spacing(8),
-  width: '100%',
+  columnGap: props.theme.space.xs,
 }));
 
 function BackupWallet(): JSX.Element {
@@ -65,6 +61,7 @@ function BackupWallet(): JSX.Element {
     clearVaultStorage,
   } = useSeedVault();
 
+  // TODO move this to SeedVault?
   const generateAndStoreSeedPhrase = async () => {
     const newSeedPhrase = generateMnemonic();
     await initSeedVault('');
@@ -103,10 +100,8 @@ function BackupWallet(): JSX.Element {
         <Title>{t('SCREEN_TITLE')}</Title>
         <SubTitle>{t('SCREEN_SUBTITLE')}</SubTitle>
         <BackupActionsContainer>
-          <TransparentButtonContainer>
-            <ActionButton onPress={handleSkip} transparent text={t('BACKUP_SKIP_BUTTON')} />
-          </TransparentButtonContainer>
-          <ActionButton onPress={handleBackup} text={t('BACKUP_BUTTON')} />
+          <Button onClick={handleSkip} variant="secondary" title={t('BACKUP_SKIP_BUTTON')} />
+          <Button onClick={handleBackup} title={t('BACKUP_BUTTON')} />
         </BackupActionsContainer>
       </ContentContainer>
     </Container>

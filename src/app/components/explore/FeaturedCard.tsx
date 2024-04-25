@@ -1,13 +1,23 @@
-import { Link } from 'react-router-dom';
+import { trackMixPanel } from '@utils/mixpanel';
 import styled from 'styled-components';
 
-const Card = styled(Link)`
+const Card = styled.div`
+  cursor: pointer;
   display: block;
   border-radius: 12px;
   background-color: ${({ theme }) => theme.colors.elevation2};
   height: 182px;
   width: 212px;
   color: ${({ theme }) => theme.colors.white_0};
+  transition: opacity 0.1s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &:active {
+    opacity: 0.6;
+  }
 `;
 
 const CardImage = styled.img`
@@ -35,7 +45,23 @@ export interface FeaturedCardProps {
 
 function FeaturedCard({ url, banner, description }: FeaturedCardProps) {
   return (
-    <Card to={url} target="_blank">
+    <Card
+      onClick={() => {
+        trackMixPanel(
+          'click_app',
+          {
+            link: url,
+            section: 'featured',
+            source: 'web-extension',
+          },
+          { send_immediately: true },
+          () => {
+            window.open(url, '_blank');
+          },
+          'explore-app',
+        );
+      }}
+    >
       <CardImage src={banner} />
       <CardText>{description}</CardText>
     </Card>

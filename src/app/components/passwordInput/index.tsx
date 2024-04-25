@@ -3,6 +3,7 @@ import EyeSlash from '@assets/img/createPassword/EyeSlash.svg';
 import PasswordIcon from '@assets/img/createPassword/Password.svg';
 import ActionButton from '@components/button';
 import { animated, useTransition } from '@react-spring/web';
+import Button from '@ui-library/button';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
@@ -20,11 +21,12 @@ interface PasswordInputProps {
   stackButtonAlignment?: boolean;
   loading?: boolean;
   createPasswordFlow?: boolean;
+  autoFocus?: boolean;
 }
 
 interface StrengthBarProps {
-  strengthColor: string;
-  strengthWidth: string;
+  $strengthColor: string;
+  $strengthWidth: string;
 }
 
 const Container = styled.div({
@@ -90,9 +92,13 @@ const ButtonsContainer = styled.div<ButtonContainerProps>((props) => ({
   marginBottom: props.theme.spacing(8),
 }));
 
-const Button = styled.button({
+const StyledButton = styled.button({
   background: 'none',
   display: 'flex',
+  transition: 'opacity 0.1s ease',
+  '&:hover, &:focus': {
+    opacity: 0.8,
+  },
 });
 
 const ErrorMessage = styled.h2((props) => ({
@@ -125,9 +131,9 @@ const StrengthBar = styled(animated.div)<StrengthBarProps>((props) => ({
   borderRadius: props.theme.radius(1),
   width: '50%',
   div: {
-    width: props.strengthWidth,
+    width: props.$strengthWidth,
     height: 4,
-    backgroundColor: props.strengthColor,
+    backgroundColor: props.$strengthColor,
     borderRadius: props.theme.radius(1),
   },
 }));
@@ -166,6 +172,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
     stackButtonAlignment = false,
     loading,
     createPasswordFlow,
+    autoFocus = false,
   } = props;
 
   const { t } = useTranslation('translation', { keyPrefix: 'CREATE_PASSWORD_SCREEN' });
@@ -243,7 +250,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
         return (
           <PasswordStrengthContainer>
             <span>{t('PASSWORD_STRENGTH_LABEL')}</span>
-            <StrengthBar strengthColor={theme.colors.feedback.error} strengthWidth="20%">
+            <StrengthBar $strengthColor={theme.colors.feedback.error} $strengthWidth="20%">
               {transition((style) => (
                 <animated.div style={style} />
               ))}
@@ -258,7 +265,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
           <PasswordStrengthContainer>
             <span>{t('PASSWORD_STRENGTH_LABEL')}</span>
             {transition((style) => (
-              <StrengthBar strengthColor={theme.colors.feedback.caution} strengthWidth="50%">
+              <StrengthBar $strengthColor={theme.colors.feedback.caution} $strengthWidth="50%">
                 <animated.div style={style} />
               </StrengthBar>
             ))}
@@ -271,7 +278,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
         <PasswordStrengthContainer>
           <span>{t('PASSWORD_STRENGTH_LABEL')}</span>
           {transition((style) => (
-            <StrengthBar strengthColor={theme.colors.feedback.success} strengthWidth="100%">
+            <StrengthBar $strengthColor={theme.colors.feedback.success} $strengthWidth="100%">
               <animated.div style={style} />
             </StrengthBar>
           ))}
@@ -282,7 +289,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
     return (
       <PasswordStrengthContainer>
         <span>{t('PASSWORD_STRENGTH_LABEL')}</span>
-        <StrengthBar strengthColor={theme.colors.white_600} strengthWidth="0">
+        <StrengthBar $strengthColor={theme.colors.white_600} $strengthWidth="0">
           {transition((style) => (
             <animated.div style={style} />
           ))}
@@ -310,25 +317,26 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
           type={isPasswordVisible ? 'text' : 'password'}
           value={enteredPassword}
           onChange={handlePasswordChange}
+          autoFocus={autoFocus}
         />
-        <Button onClick={handleTogglePasswordView}>
+        <StyledButton onClick={handleTogglePasswordView}>
           <img src={isPasswordVisible ? Eye : EyeSlash} alt="show-password" height={24} />
-        </Button>
+        </StyledButton>
       </PasswordInputContainer>
       {error && <ErrorMessage>{error}</ErrorMessage>}
       {checkPasswordStrength ? renderStrengthBar() : null}
       <ButtonsContainer stackButtonAlignment={stackButtonAlignment} ifError={error !== ''}>
         <ButtonContainer stackButtonAlignment={stackButtonAlignment}>
-          <ActionButton text={t('BACK_BUTTON')} onPress={handleBack} transparent />
+          <Button title={t('BACK_BUTTON')} onClick={handleBack} variant="secondary" />
         </ButtonContainer>
         <ButtonContainer stackButtonAlignment={stackButtonAlignment}>
-          <ActionButton
-            processing={loading}
+          <Button
+            loading={loading}
             disabled={
               !enteredPassword || (!!checkPasswordStrength && score <= PasswordStrength.WeakScore)
             }
-            text={t('CONTINUE_BUTTON')}
-            onPress={handleContinue}
+            title={t('CONTINUE_BUTTON')}
+            onClick={handleContinue}
           />
         </ButtonContainer>
       </ButtonsContainer>

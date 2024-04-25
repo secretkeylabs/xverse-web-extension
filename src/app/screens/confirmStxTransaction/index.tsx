@@ -1,5 +1,11 @@
 import IconStacks from '@assets/img/dashboard/stx_icon.svg';
 import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
+import {
+  sendInternalErrorMessage,
+  sendSignTransactionSuccessResponseMessage,
+  sendStxTransferSuccessResponseMessage,
+  sendUserRejectionMessage,
+} from '@common/utils/rpc/stx/rpcResponseMessages';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmStxTransactionComponent from '@components/confirmStxTransactionComponent';
 import TransferMemoView from '@components/confirmStxTransactionComponent/transferMemoView';
@@ -9,6 +15,7 @@ import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import finalizeTxSignature from '@components/transactionsRequests/utils';
+import useDelegationState from '@hooks/queries/useDelegationState';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
@@ -19,42 +26,85 @@ import {
   addressToString,
   broadcastSignedTransaction,
   buf2hex,
-  getStxFiatEquivalent,
   isMultiSig,
   microstacksToStx,
+  stxToMicrostacks,
 } from '@secretkeylabs/xverse-core';
 import { MultiSigSpendingCondition, deserializeTransaction } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
+import Callout from '@ui-library/callout';
+import { XVERSE_POOL_ADDRESS } from '@utils/constants';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { StxRequests } from 'sats-connect';
 import styled from 'styled-components';
 
 const AlertContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(12),
 }));
 
+const SpendDelegatedStxWarning = styled(Callout)((props) => ({
+  marginBottom: props.theme.space.m,
+}));
+
 function ConfirmStxTransaction() {
   const { t } = useTranslation('translation');
-  const [fee, setStateFee] = useState(new BigNumber(0));
-  const [amount, setAmount] = useState(new BigNumber(0));
-  const [fiatAmount, setFiatAmount] = useState(new BigNumber(0));
-  const [total, setTotal] = useState(new BigNumber(0));
-  const [fiatTotal, setFiatTotal] = useState(new BigNumber(0));
+  const [customFee, setCustomFee] = useState(new BigNumber(0));
   const [hasTabClosed, setHasTabClosed] = useState(false);
-  const [recipient, setRecipient] = useState('');
   const [txRaw, setTxRaw] = useState('');
-  const [memo, setMemo] = useState('');
   const navigate = useNavigate();
   const selectedNetwork = useNetworkSelector();
-  const { stxBtcRate, btcFiatRate, network, selectedAccount } = useWalletSelector();
+  const { network, selectedAccount, stxLockedBalance, stxAvailableBalance } = useWalletSelector();
   const { refetch } = useStxWalletData();
+  const { data: delegateState } = useDelegationState();
 
   const location = useLocation();
-  const { unsignedTx: stringHex, sponsored, isBrowserTx, tabId, requestToken } = location.state;
+  const {
+    unsignedTx: stringHex,
+    sponsored,
+    isBrowserTx,
+    tabId,
+    messageId,
+    rpcMethod,
+    requestToken,
+  } = location.state as {
+    tabId?: chrome.tabs.Tab['id'];
+    messageId?: string;
+    rpcMethod?: keyof StxRequests;
+    [key: string]: any;
+  };
   const unsignedTx = useMemo(() => deserializeTransaction(stringHex), [stringHex]);
+
+  const txPayload = unsignedTx.payload as TokenTransferPayload;
+  const recipient = addressToString(txPayload.recipient.address);
+  const amount = new BigNumber(txPayload.amount.toString(10));
+  const memo = txPayload.memo.content.split('\u0000').join('');
+  const delegatedAmount =
+    delegateState?.delegated &&
+    delegateState.amount &&
+    delegateState.delegatedTo === XVERSE_POOL_ADDRESS
+      ? delegateState.amount
+      : '0';
+
+  const getIsSpendDelegateStx = () => {
+    if (!amount || !recipient) {
+      return false;
+    }
+
+    const hasDelegationNotLocked = BigNumber(delegatedAmount).gt(
+      stxToMicrostacks(BigNumber(1)).plus(stxLockedBalance),
+    );
+    // stacking contract locks 1stx less from what user delegates to let them revoke delegation. counting this doesn't harm cause probably no one will top up just 1stx and min amount to first delegation is 100stx.
+
+    const fee = customFee.gt(0)
+      ? customFee
+      : new BigNumber(unsignedTx?.auth?.spendingCondition?.fee.toString() ?? '0');
+    const total = amount.plus(fee);
+    return hasDelegationNotLocked && BigNumber(total).plus(delegatedAmount).gt(stxAvailableBalance);
+  };
 
   // SignTransaction Params
   const isMultiSigTx = useMemo(() => isMultiSig(unsignedTx), [unsignedTx]);
@@ -80,13 +130,38 @@ function ConfirmStxTransaction() {
   });
 
   useEffect(() => {
+    // This useEffect runs when the tx has been broadcasted
     if (stxTxBroadcastData) {
       if (isBrowserTx) {
-        finalizeTxSignature({
-          requestPayload: requestToken,
-          tabId: Number(tabId),
-          data: { txId: stxTxBroadcastData, txRaw },
-        });
+        if (tabId && messageId && rpcMethod) {
+          switch (rpcMethod) {
+            case 'stx_signTransaction': {
+              sendSignTransactionSuccessResponseMessage({
+                tabId,
+                messageId,
+                result: { transaction: txRaw },
+              });
+              break;
+            }
+            case 'stx_transferStx': {
+              sendStxTransferSuccessResponseMessage({
+                tabId,
+                messageId,
+                result: { transaction: txRaw, txid: stxTxBroadcastData },
+              });
+              break;
+            }
+            default: {
+              sendInternalErrorMessage({ tabId, messageId });
+            }
+          }
+        } else {
+          finalizeTxSignature({
+            requestPayload: requestToken,
+            tabId: Number(tabId),
+            data: { txId: stxTxBroadcastData, txRaw },
+          });
+        }
       }
       navigate('/tx-status', {
         state: {
@@ -110,55 +185,17 @@ function ConfirmStxTransaction() {
           currency: 'STX',
           error: txError.toString(),
           browserTx: isBrowserTx,
+          tabId,
+          messageId,
         },
       });
     }
   }, [txError]);
 
-  const updateUI = () => {
-    const txPayload = unsignedTx.payload as TokenTransferPayload;
-
-    if (txPayload.recipient.address) {
-      setRecipient(addressToString(txPayload.recipient.address));
-    }
-
-    const txAmount = new BigNumber(txPayload.amount.toString(10));
-    const txFee = new BigNumber(unsignedTx.auth.spendingCondition.fee.toString());
-    const txTotal = amount.plus(fee);
-    const txFiatAmount = getStxFiatEquivalent(
-      amount,
-      BigNumber(stxBtcRate),
-      BigNumber(btcFiatRate),
-    );
-    const txFiatTotal = getStxFiatEquivalent(amount, BigNumber(stxBtcRate), BigNumber(btcFiatRate));
-    const { memo: txMemo } = txPayload;
-    // the txPayload returns a string of null bytes incase memo is null
-    // remove null bytes so send form treats it as an empty string
-    const modifiedMemoString = txMemo.content.split('\u0000').join('');
-
-    setAmount(txAmount);
-    setStateFee(txFee);
-    setFiatAmount(txFiatAmount);
-    setTotal(txTotal);
-    setFiatTotal(txFiatTotal);
-    setMemo(modifiedMemoString);
-  };
-
-  useEffect(() => {
-    if (recipient === '' || !fee || !amount || !fiatAmount || !total || !fiatTotal) {
-      updateUI();
-    }
-  });
-
-  const getAmount = () => {
-    const txPayload = unsignedTx?.payload as TokenTransferPayload;
-    const amountToTransfer = new BigNumber(txPayload?.amount?.toString(10));
-    return microstacksToStx(amountToTransfer);
-  };
-
   const handleConfirmClick = (txs: StacksTransaction[]) => {
     if (isLedgerAccount(selectedAccount)) {
       const type: LedgerTransactionType = 'STX';
+      const fee = new BigNumber(txs[0].auth.spendingCondition.fee.toString());
       const state: ConfirmStxTransactionState = {
         unsignedTx: Buffer.from(unsignedTx.serialize()),
         type,
@@ -172,12 +209,37 @@ function ConfirmStxTransaction() {
     const rawTx = buf2hex(txs[0].serialize());
     setTxRaw(rawTx);
     if (isMultiSigTx && isBrowserTx) {
-      finalizeTxSignature({
-        requestPayload: requestToken,
-        tabId: Number(tabId),
-        // No TxId since the tx was not broadcasted
-        data: { txId: '', txRaw: rawTx },
-      });
+      // A quick way to infer whether the app is responding to an RPC request.
+      if (tabId && messageId) {
+        switch (rpcMethod) {
+          case 'stx_signTransaction': {
+            sendSignTransactionSuccessResponseMessage({
+              tabId,
+              messageId,
+              result: { transaction: rawTx },
+            });
+            break;
+          }
+          case 'stx_transferStx': {
+            sendStxTransferSuccessResponseMessage({
+              tabId,
+              messageId,
+              result: { transaction: txRaw, txid: stxTxBroadcastData ?? '' },
+            });
+            break;
+          }
+          default: {
+            sendInternalErrorMessage({ tabId, messageId });
+          }
+        }
+      } else {
+        finalizeTxSignature({
+          requestPayload: requestToken,
+          tabId: Number(tabId),
+          // No TxId since the tx was not broadcasted
+          data: { txId: '', txRaw: rawTx },
+        });
+      }
       window.close();
     } else {
       mutate({ signedTx: txs[0] });
@@ -186,18 +248,25 @@ function ConfirmStxTransaction() {
 
   const handleCancelClick = () => {
     if (isBrowserTx) {
-      finalizeTxSignature({ requestPayload: requestToken, tabId: Number(tabId), data: 'cancel' });
+      // A quick way to infer whether the app is responding to an RPC request.
+      if (tabId && messageId) {
+        sendUserRejectionMessage({ tabId, messageId });
+      } else {
+        finalizeTxSignature({ requestPayload: requestToken, tabId: Number(tabId), data: 'cancel' });
+      }
       window.close();
     } else {
       navigate('/send-stx', {
         state: {
           recipientAddress: recipient,
-          amountToSend: getAmount().toString(),
+          amountToSend: microstacksToStx(amount).toString(),
           stxMemo: memo,
         },
       });
     }
   };
+
+  const showSpendDelegateStxWarning = getIsSpendDelegateStx();
 
   return (
     <>
@@ -214,10 +283,14 @@ function ConfirmStxTransaction() {
         isSponsored={sponsored}
         skipModal={isLedgerAccount(selectedAccount)}
         hasSignatures={hasSignatures}
+        onFeeChange={setCustomFee}
       >
+        {showSpendDelegateStxWarning && (
+          <SpendDelegatedStxWarning variant="warning" bodyText={t('SEND.SPEND_DELEGATED_STX')} />
+        )}
         <RecipientComponent
           address={recipient}
-          value={getAmount().toString()}
+          value={microstacksToStx(amount).toString()}
           icon={IconStacks}
           currencyType="STX"
           title={t('CONFIRM_TRANSACTION.AMOUNT')}

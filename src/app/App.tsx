@@ -1,12 +1,10 @@
 import LoadingScreen from '@components/loadingScreen';
 import { CheckCircle, XCircle } from '@phosphor-icons/react';
+import { setXClientVersion } from '@secretkeylabs/xverse-core';
 import rootStore from '@stores/index';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { MIX_PANEL_TOKEN } from '@utils/constants';
 import { queryClient } from '@utils/query';
-import mixpanel from 'mixpanel-browser';
-import { useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { Provider } from 'react-redux';
 import { RouterProvider } from 'react-router-dom';
@@ -18,6 +16,11 @@ import GlobalStyle from '../theme/global';
 import SessionGuard from './components/guards/session';
 import router from './routes';
 
+declare const VERSION: string;
+
+// set the X-Client-Version header for core api requests
+setXClientVersion(VERSION);
+
 // needed to keep the svg icon scale for toasts over multiple lines
 const StyledIcon = styled.div`
   display: flex;
@@ -26,18 +29,6 @@ const StyledIcon = styled.div`
 `;
 
 function App(): JSX.Element {
-  useEffect(() => {
-    if (!MIX_PANEL_TOKEN) {
-      return;
-    }
-
-    mixpanel.init(MIX_PANEL_TOKEN, {
-      debug: process.env.NODE_ENV === 'development',
-      ip: false,
-      persistence: 'localStorage',
-    });
-  }, []);
-
   return (
     <>
       <GlobalStyle />

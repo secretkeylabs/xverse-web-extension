@@ -1,7 +1,7 @@
+import { sendInternalErrorMessage } from '@common/utils/rpc/stx/rpcResponseMessages';
 import ContractCallRequest from '@components/transactionsRequests/ContractCallRequest';
 import ContractDeployRequest from '@components/transactionsRequests/ContractDeployTransaction';
 import useNetworkSelector from '@hooks/useNetwork';
-import useStxTransactionRequest from '@hooks/useStxTransactionRequest';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
@@ -21,8 +21,10 @@ import Spinner from '@ui-library/spinner';
 import { getNetworkType, isHardwareAccount } from '@utils/helper';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import useStxTransactionRequest from './useStxTransactionRequest';
 
 const LoaderContainer = styled.div((props) => ({
   display: 'flex',
@@ -34,7 +36,7 @@ const LoaderContainer = styled.div((props) => ({
 
 function TransactionRequest() {
   const { network, feeMultipliers, accountsList, selectedAccount } = useWalletSelector();
-  const { payload, tabId, requestToken, stacksTransaction } = useStxTransactionRequest();
+  const txReq = useStxTransactionRequest();
   const navigate = useNavigate();
   const selectedNetwork = useNetworkSelector();
   const { switchAccount } = useWalletReducer();
@@ -44,6 +46,9 @@ function TransactionRequest() {
   const [codeBody, setCodeBody] = useState(undefined);
   const [contractName, setContractName] = useState(undefined);
   const [attachment, setAttachment] = useState<Buffer | undefined>(undefined);
+  const { t } = useTranslation('translation', { keyPrefix: 'REQUEST_ERRORS' });
+  const { payload, tabId, requestToken, transaction } = txReq;
+  const { messageId, rpcMethod } = 'rpcMethod' in txReq ? txReq : { messageId: '', rpcMethod: '' };
 
   const handleTokenTransferRequest = async (tokenTransferPayload: any, requestAccount: Account) => {
     const stxPendingTxData = await fetchStxPendingTxData(
@@ -58,7 +63,7 @@ function TransactionRequest() {
       feeMultipliers,
       selectedNetwork,
       stxPendingTxData || [],
-      stacksTransaction?.auth,
+      transaction?.auth,
     );
     setUnsignedTx(unsignedSendStxTx);
     navigate('/confirm-stx-tx', {
@@ -67,7 +72,9 @@ function TransactionRequest() {
         sponsored: tokenTransferPayload.sponsored,
         isBrowserTx: true,
         tabId,
+        messageId,
         requestToken,
+        rpcMethod,
       },
     });
   };
@@ -85,7 +92,7 @@ function TransactionRequest() {
       requestAccount.stxAddress,
       selectedNetwork,
       requestAccount.stxPublicKey,
-      stacksTransaction?.auth,
+      transaction?.auth,
     );
     setUnsignedTx(unSignedContractCall);
     setCoinsMetaData(coinMeta);
@@ -102,8 +109,11 @@ function TransactionRequest() {
           state: {
             txid: '',
             currency: 'STX',
-            error: 'Contract function call missing arguments',
+            error: t('MISSING_ARGUMENTS'),
             browserTx: true,
+            tabId,
+            messageId,
+            rpcMethod,
           },
         });
       }
@@ -120,7 +130,7 @@ function TransactionRequest() {
       requestAccount.stxPublicKey,
       feeMultipliers!,
       requestAccount.stxAddress,
-      stacksTransaction?.auth,
+      transaction?.auth,
     );
     setUnsignedTx(response.contractDeployTx);
     setCodeBody(response.codeBody);
@@ -140,6 +150,8 @@ function TransactionRequest() {
           isBrowserTx: true,
           tabId,
           requestToken,
+          rpcMethod,
+          messageId,
         },
       });
     }
@@ -161,23 +173,29 @@ function TransactionRequest() {
     } catch (e: unknown) {
       console.error(e); // eslint-disable-line
       toast.error('Unexpected error creating transaction');
+      sendInternalErrorMessage({ tabId, messageId });
     }
   };
 
   const handleRequest = async () => {
-    if (getNetworkType(payload.network) !== network.type) {
+    if (payload.network && getNetworkType(payload.network) !== network.type) {
       navigate('/tx-status', {
         state: {
           txid: '',
           currency: 'STX',
-          error:
-            'There’s a mismatch between your active network and the network you’re logged with.',
+          error: t('NETWORK_MISMATCH'),
           browserTx: true,
+          tabId,
+          messageId,
         },
       });
       return;
     }
-    if (payload.stxAddress !== selectedAccount?.stxAddress && !isHardwareAccount(selectedAccount)) {
+    if (
+      payload.stxAddress &&
+      payload.stxAddress !== selectedAccount?.stxAddress &&
+      !isHardwareAccount(selectedAccount)
+    ) {
       const account = accountsList.find((acc) => acc.stxAddress === payload.stxAddress);
       if (account) {
         await switchAccount(account);
@@ -187,14 +205,16 @@ function TransactionRequest() {
           state: {
             txid: '',
             currency: 'STX',
-            error:
-              'There’s a mismatch between your active  address and the address you’re logged with.',
+            error: t('ADDRESS_MISMATCH'),
             browserTx: true,
+            tabId,
+            messageId,
+            rpcMethod,
           },
         });
       }
     } else if (selectedAccount) {
-      await createRequestTx(selectedAccount!);
+      await createRequestTx(selectedAccount);
     }
   };
 
@@ -209,7 +229,7 @@ function TransactionRequest() {
           <Spinner color="white" size={50} />
         </LoaderContainer>
       ) : null}
-      {payload.txType === 'contract_call' && unsignedTx ? (
+      {payload && payload.txType === 'contract_call' && unsignedTx ? (
         <ContractCallRequest
           request={payload}
           unsignedTx={unsignedTx}
@@ -218,9 +238,11 @@ function TransactionRequest() {
           coinsMetaData={coinsMetaData}
           tabId={Number(tabId)}
           requestToken={requestToken}
+          messageId={messageId}
+          rpcMethod={rpcMethod}
         />
       ) : null}
-      {payload.txType === 'smart_contract' && unsignedTx ? (
+      {payload && payload.txType === 'smart_contract' && unsignedTx ? (
         <ContractDeployRequest
           unsignedTx={unsignedTx}
           codeBody={codeBody!}
@@ -228,6 +250,8 @@ function TransactionRequest() {
           sponsored={payload?.sponsored}
           tabId={Number(tabId)}
           requestToken={requestToken}
+          messageId={messageId}
+          rpcMethod={rpcMethod}
         />
       ) : null}
     </>

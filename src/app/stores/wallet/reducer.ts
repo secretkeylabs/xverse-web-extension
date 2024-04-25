@@ -20,6 +20,7 @@ import {
   SetBtcWalletDataKey,
   SetCoinRatesKey,
   SetFeeMultiplierKey,
+  SetNotificationBannersKey,
   SetRunesManageTokensKey,
   SetSip10ManageTokensKey,
   SetStxWalletDataKey,
@@ -90,6 +91,7 @@ export const initialWalletState: WalletState = {
   sip10ManageTokens: {},
   brc20ManageTokens: {},
   runesManageTokens: {},
+  notificationBanners: {},
   feeMultipliers: null,
   hasActivatedOrdinalsKey: undefined,
   hasActivatedRareSatsKey: undefined,
@@ -267,6 +269,14 @@ const walletReducer = (
         runesManageTokens: {
           ...state.runesManageTokens,
           [action.principal]: action.isEnabled,
+        },
+      };
+    case SetNotificationBannersKey:
+      return {
+        ...state,
+        notificationBanners: {
+          ...state.notificationBanners,
+          [action.id]: action.isDismissed,
         },
       };
     case SetWalletLockPeriodKey:

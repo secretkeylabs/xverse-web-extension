@@ -92,31 +92,31 @@ function BottomTabBar({ tab }: Props) {
   return showBottomBar ? (
     <RowContainer>
       <MovingDiv style={styles} />
-      <Button onClick={handleDashboardButtonClick}>
+      <Button data-testid="nav-dashboard" onClick={handleDashboardButtonClick}>
         <Wallet
           color={tab === 'dashboard' ? theme.colors.white_0 : theme.colors.white_600}
           size="24"
         />
       </Button>
-      <Button onClick={handleNftButtonClick}>
+      <Button data-testid="nav-nft" onClick={handleNftButtonClick}>
         <SketchLogo
           color={tab === 'nft' ? theme.colors.white_0 : theme.colors.white_600}
           size="24"
         />
       </Button>
-      <Button onClick={handleStackingButtonClick}>
+      <Button data-testid="nav-stacking" onClick={handleStackingButtonClick}>
         <ChartLineUp
           color={tab === 'stacking' ? theme.colors.white_0 : theme.colors.white_600}
           size="24"
         />
       </Button>
-      <Button onClick={handleExploreButtonClick}>
+      <Button data-testid="nav-explore" onClick={handleExploreButtonClick}>
         <Globe
           color={tab === 'explore' ? theme.colors.white_0 : theme.colors.white_600}
           size="24"
         />
       </Button>
-      <Button onClick={handleSettingButtonClick}>
+      <Button data-testid="nav-settings" onClick={handleSettingButtonClick}>
         <Gear
           color={tab === 'settings' ? theme.colors.white_0 : theme.colors.white_600}
           size="24"

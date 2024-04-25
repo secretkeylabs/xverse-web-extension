@@ -36,6 +36,7 @@ export const fetchSip10FungibleTokens =
         return {
           ...ft,
           ...found,
+          visible: true,
           name: found.name || ft.principal.split('.')[1],
         };
       })
@@ -66,7 +67,7 @@ export const useGetSip10FungibleTokens = () => {
   );
 
   return useQuery({
-    queryKey: ['sip10-fungible-tokens', network.type, stxAddress],
+    queryKey: ['sip10-fungible-tokens', network.type, stxAddress, fiatCurrency],
     queryFn,
     enabled: Boolean(network && stxAddress),
   });

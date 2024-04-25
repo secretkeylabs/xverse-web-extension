@@ -1,84 +1,33 @@
 import BitcoinIcon from '@assets/img/dashboard/bitcoin_icon.svg';
 import stxIcon from '@assets/img/dashboard/stx_icon.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
-import ActionButton from '@components/button';
-import useBtcAddressRequest from '@hooks/useBtcAddressRequest';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { animated, useTransition } from '@react-spring/web';
 import SelectAccount from '@screens/connect/selectAccount';
-import { getAppIconFromWebManifest } from '@secretkeylabs/xverse-core';
+import { AnalyticsEvents, getAppIconFromWebManifest } from '@secretkeylabs/xverse-core';
+import Button from '@ui-library/button';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
+import { trackMixPanel } from '@utils/mixpanel';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { AddressPurpose } from 'sats-connect';
-import styled from 'styled-components';
 import AddressPurposeBox from '../addressPurposeBox';
 import PermissionsList from '../permissionsList';
-
-const OuterContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  paddingLeft: props.theme.space.m,
-  paddingRight: props.theme.space.m,
-  ...props.theme.scrollbar,
-}));
-
-const HeadingContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  marginTop: 48,
-});
-
-const AddressBoxContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  width: '100%',
-  marginTop: props.theme.spacing(12),
-}));
-
-const TopImage = styled.img((props) => ({
-  maxHeight: 48,
-  borderRadius: props.theme.radius(2),
-  maxWidth: 48,
-  marginBottom: props.theme.space.m,
-}));
-
-const Title = styled.h1((props) => ({
-  ...props.theme.typography.headline_xs,
-  color: props.theme.colors.white_0,
-}));
-
-const DapURL = styled.h2((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_400,
-  marginTop: props.theme.spacing(2),
-  textAlign: 'center',
-}));
-
-const RequestMessage = styled.p((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_200,
-  textAlign: 'left',
-  wordWrap: 'break-word',
-  marginTop: props.theme.spacing(12),
-  marginBottom: props.theme.spacing(12),
-}));
-
-const PermissionsContainer = styled.div((props) => ({
-  paddingBottom: props.theme.space.xxl,
-}));
-
-const LoaderContainer = styled.div(() => ({
-  justifySelf: 'center',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  flex: 1,
-}));
+import {
+  AddressBoxContainer,
+  DapURL,
+  HeadingContainer,
+  LoaderContainer,
+  OuterContainer,
+  PermissionsContainer,
+  RequestMessage,
+  RequestMessagePlaceholder,
+  Title,
+  TopImage,
+} from './index.styled';
+import useBtcAddressRequest from './useBtcAddressRequest';
 
 function BtcSelectAddressScreen() {
   const [loading, setLoading] = useState(false);
@@ -87,6 +36,7 @@ function BtcSelectAddressScreen() {
   const { network, btcAddress, ordinalsAddress, stxAddress, selectedAccount } = useWalletSelector();
   const [appIcon, setAppIcon] = useState<string>('');
   const [isLoadingIcon, setIsLoadingIcon] = useState(false);
+
   const { payload, origin, approveBtcAddressRequest, cancelAddressRequest } =
     useBtcAddressRequest();
   const appUrl = useMemo(() => origin.replace(/(^\w+:|^)\/\//, ''), [origin]);
@@ -99,7 +49,17 @@ function BtcSelectAddressScreen() {
   const confirmCallback = async () => {
     setLoading(true);
     approveBtcAddressRequest();
-    window.close();
+    trackMixPanel(
+      AnalyticsEvents.AppConnected,
+      {
+        requestedAddress: payload.purposes,
+        wallet_type: selectedAccount?.accountType || 'software',
+      },
+      { send_immediately: true },
+      () => {
+        window.close();
+      },
+    );
   };
 
   const cancelCallback = () => {
@@ -141,30 +101,25 @@ function BtcSelectAddressScreen() {
   }, []);
 
   useEffect(() => {
-    (async () => {
-      if (origin !== '') {
-        setIsLoadingIcon(true);
-        getAppIconFromWebManifest(origin)
-          .then((appIcons) => {
-            setAppIcon(appIcons);
-            setIsLoadingIcon(false);
-          })
-          .catch(() => {
-            setIsLoadingIcon(false);
-            setAppIcon('');
-          });
-      }
-    })();
+    if (origin === '') {
+      return;
+    }
 
-    return () => {
-      setAppIcon('');
-    };
+    setIsLoadingIcon(true);
+    getAppIconFromWebManifest(origin)
+      .then((manifestAppIcon) => {
+        setAppIcon(manifestAppIcon);
+      })
+      .finally(() => {
+        setIsLoadingIcon(false);
+      });
   }, [origin]);
 
   const AddressPurposeRow = useCallback((purpose: AddressPurpose) => {
     if (purpose === AddressPurpose.Payment) {
       return (
         <AddressPurposeBox
+          key={purpose}
           purpose={purpose}
           icon={BitcoinIcon}
           title={t('BITCOIN_ADDRESS')}
@@ -175,6 +130,7 @@ function BtcSelectAddressScreen() {
     if (purpose === AddressPurpose.Ordinals) {
       return (
         <AddressPurposeBox
+          key={purpose}
           purpose={purpose}
           icon={OrdinalsIcon}
           title={t('ORDINAL_ADDRESS')}
@@ -185,6 +141,7 @@ function BtcSelectAddressScreen() {
     if (purpose === AddressPurpose.Stacks) {
       return (
         <AddressPurposeBox
+          key={purpose}
           purpose={purpose}
           icon={stxIcon}
           title={t('STX_ADDRESS')}
@@ -199,11 +156,15 @@ function BtcSelectAddressScreen() {
     navigate('/account-list?hideListActions=true');
   };
 
-  return isLoadingIcon ? (
-    <LoaderContainer>
-      <Spinner color="white" size={50} />
-    </LoaderContainer>
-  ) : (
+  if (isLoadingIcon) {
+    return (
+      <LoaderContainer>
+        <Spinner color="white" size={50} />
+      </LoaderContainer>
+    );
+  }
+
+  return (
     <OuterContainer>
       {transition((style) => (
         <animated.div style={style}>
@@ -214,19 +175,17 @@ function BtcSelectAddressScreen() {
           </HeadingContainer>
           {payload.message ? (
             <RequestMessage>{payload.message.substring(0, 80)}</RequestMessage>
-          ) : null}
+          ) : (
+            <RequestMessagePlaceholder />
+          )}
           <SelectAccount account={selectedAccount!} handlePressAccount={handleSwitchAccount} />
           <AddressBoxContainer>{payload.purposes.map(AddressPurposeRow)}</AddressBoxContainer>
           <PermissionsContainer>
             <PermissionsList />
           </PermissionsContainer>
           <StickyHorizontalSplitButtonContainer>
-            <ActionButton text={t('CANCEL_BUTTON')} transparent onPress={cancelCallback} />
-            <ActionButton
-              text={t('CONNECT_BUTTON')}
-              processing={loading}
-              onPress={confirmCallback}
-            />
+            <Button title={t('CANCEL_BUTTON')} variant="secondary" onClick={cancelCallback} />
+            <Button title={t('CONNECT_BUTTON')} loading={loading} onClick={confirmCallback} />
           </StickyHorizontalSplitButtonContainer>
         </animated.div>
       ))}

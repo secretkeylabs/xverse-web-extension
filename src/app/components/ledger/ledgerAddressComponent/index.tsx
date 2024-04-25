@@ -87,6 +87,7 @@ function LedgerAddressComponent({ title, address }: Props) {
           content={isCopied ? 'Copied' : title}
           events={['hover']}
           place="bottom"
+          hidden={!isCopied}
         />
       </AddressComponentContainer>
     </AddressComponent>

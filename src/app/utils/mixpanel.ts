@@ -1,53 +1,48 @@
 import { AnalyticsEvents } from '@secretkeylabs/xverse-core';
+import { getMixpanelInstance, mixpanelInstances } from 'app/mixpanelSetup';
 import { sha256 } from 'js-sha256';
-import mixpanel from 'mixpanel-browser';
-import { MIX_PANEL_TOKEN } from './constants';
 
-export const isMixPanelInited = () => !!MIX_PANEL_TOKEN && !!mixpanel.config;
-
-export const trackMixPanel = (event: string, properties?: any, options?: any, callback?: any) => {
-  if (!isMixPanelInited()) {
-    return;
-  }
-
-  mixpanel.track(event, properties, options, callback);
+export const trackMixPanel = (
+  event: string,
+  properties?: any,
+  options?: any,
+  callback?: any,
+  instanceKey: keyof typeof mixpanelInstances = 'web-extension',
+) => {
+  getMixpanelInstance(instanceKey).track(event, properties, options, callback);
 };
 
 export const optOutMixPanel = () => {
-  if (!isMixPanelInited()) {
-    return;
-  }
-
-  trackMixPanel(AnalyticsEvents.OptOut, undefined, { send_immediately: true }, () => {
-    mixpanel.opt_out_tracking();
+  Object.keys(mixpanelInstances).forEach((instanceKey) => {
+    trackMixPanel(
+      AnalyticsEvents.OptOut,
+      undefined,
+      { send_immediately: true },
+      () => {
+        getMixpanelInstance(instanceKey).opt_out_tracking();
+      },
+      instanceKey,
+    );
   });
 };
 
 export const optInMixPanel = (masterPubKey?: string) => {
-  if (!isMixPanelInited()) {
-    return;
-  }
+  Object.keys(mixpanelInstances).forEach((instanceKey) => {
+    getMixpanelInstance(instanceKey).opt_in_tracking();
 
-  mixpanel.opt_in_tracking();
-
-  if (masterPubKey) {
-    mixpanel.identify(sha256(masterPubKey));
-  }
+    if (masterPubKey) {
+      getMixpanelInstance(instanceKey).identify(sha256(masterPubKey));
+    }
+  });
 };
 
-export const hasOptedInMixPanelTracking = async () => {
-  if (!isMixPanelInited()) {
-    return false;
-  }
-
-  const hasOptedIn = await mixpanel.has_opted_in_tracking();
-  return hasOptedIn;
-};
+export const hasOptedInMixPanelTracking = () =>
+  Object.keys(mixpanelInstances).every((instanceKey) =>
+    getMixpanelInstance(instanceKey).has_opted_in_tracking(),
+  );
 
 export const resetMixPanel = () => {
-  if (!isMixPanelInited()) {
-    return;
-  }
-
-  mixpanel.reset();
+  Object.keys(mixpanelInstances).forEach((instanceKey) => {
+    getMixpanelInstance(instanceKey).reset();
+  });
 };

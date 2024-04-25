@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     if: ${{ !startsWith(github.head_ref, 'release/') }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js
@@ -36,7 +36,19 @@ jobs:
           TRANSAC_API_KEY: ${{ secrets.TRANSAC_API_KEY }}
           MOON_PAY_API_KEY: ${{ secrets.MOON_PAY_API_KEY }}
           MIX_PANEL_TOKEN: ${{ secrets.MIX_PANEL_TOKEN }}
+          MIX_PANEL_EXPLORE_APP_TOKEN: ${{ secrets.MIX_PANEL_EXPLORE_APP_TOKEN }}
         run: npm run build --if-present
+      - name: Install Playwright Browsers
+        run: npx playwright install chromium --with-deps
+      - name: Run UI test suite
+        run: xvfb-run --auto-servernum --server-args="-screen 0 360x360x24" npx playwright test --grep "#smoketest" --reporter=html
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
       - name: Save Filename
         run: |
           BRANCH_NAME=$(echo ${{ github.head_ref }} | sed 's/\//-/g')

@@ -2,7 +2,7 @@ import FeaturedCardCarousel from '@components/explore/FeaturedCarousel';
 import RecommendedApps from '@components/explore/RecommendedApps';
 import SwiperNavigation from '@components/explore/SwiperNavigation';
 import BottomBar from '@components/tabBar';
-import useFeaturedDapps from '@hooks/useFeaturedApps';
+import useFeaturedDapps from '@hooks/useFeaturedDapps';
 import { ArrowsOut } from '@phosphor-icons/react';
 import { StyledHeading } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
@@ -40,6 +40,15 @@ const ExternalLink = styled.a`
   color: ${({ theme }) => theme.colors.white_0};
   margin-top: ${({ theme }) => theme.space.s};
   cursor: pointer;
+  transition: opacity 0.1s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &:active {
+    opacity: 0.6;
+  }
 `;
 
 const LoaderContainer = styled.div((props) => ({

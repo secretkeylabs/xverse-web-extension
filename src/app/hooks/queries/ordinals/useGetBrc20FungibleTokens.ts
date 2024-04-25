@@ -58,7 +58,7 @@ export const useGetBrc20FungibleTokens = () => {
   const queryFn = fetchBrc20FungibleTokens(ordinalsAddress, fiatCurrency, network);
 
   return useQuery({
-    queryKey: ['brc20-fungible-tokens', ordinalsAddress, network.type],
+    queryKey: ['brc20-fungible-tokens', ordinalsAddress, network.type, fiatCurrency],
     queryFn,
     enabled: Boolean(network && ordinalsAddress),
   });

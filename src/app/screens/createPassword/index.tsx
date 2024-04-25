@@ -7,9 +7,6 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-interface StepDotProps {
-  active: boolean;
-}
 const Container = styled.div((props) => ({
   display: 'flex',
   flex: 1,
@@ -31,7 +28,9 @@ const PasswordContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(32),
 }));
 
-const StepDot = styled.div<StepDotProps>((props) => ({
+const StepDot = styled.div<{
+  active: boolean;
+}>((props) => ({
   width: 8,
   height: 8,
   borderRadius: 4,
@@ -39,6 +38,7 @@ const StepDot = styled.div<StepDotProps>((props) => ({
   marginRight: props.theme.spacing(4),
 }));
 
+// TODO refactor to delete this whole screen and use the backup steps screen instead
 function CreatePassword(): JSX.Element {
   const [password, setPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
@@ -49,7 +49,7 @@ function CreatePassword(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'CREATE_PASSWORD_SCREEN' });
   const { createWallet } = useWalletReducer();
   const { disableWalletExistsGuard } = useWalletExistsContext();
-  const { getSeed, changePassword } = useSeedVault();
+  const { changePassword } = useSeedVault();
 
   const handleContinuePasswordCreation = () => {
     setCurrentStepIndex(1);
@@ -60,8 +60,7 @@ function CreatePassword(): JSX.Element {
       try {
         setIsCreatingWallet(true);
         disableWalletExistsGuard?.();
-        const seedPhrase = await getSeed();
-        await createWallet(seedPhrase);
+        await createWallet(); // TODO move this somwhere else
         await changePassword('', password);
         navigate('/wallet-success/create', { replace: true });
       } catch (err) {
@@ -101,6 +100,7 @@ function CreatePassword(): JSX.Element {
             handleBack={handleNewPasswordBack}
             checkPasswordStrength
             createPasswordFlow
+            autoFocus
           />
         ) : (
           <PasswordInput
@@ -112,6 +112,7 @@ function CreatePassword(): JSX.Element {
             handleBack={handleConfirmPasswordBack}
             passwordError={error}
             loading={isCreatingWallet}
+            autoFocus
           />
         )}
       </PasswordContainer>

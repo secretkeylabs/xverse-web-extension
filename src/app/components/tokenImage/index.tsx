@@ -9,15 +9,6 @@ import { getTicker } from '@utils/helper';
 import { useCallback } from 'react';
 import styled from 'styled-components';
 
-export interface TokenImageProps {
-  currency?: CurrencyTypes;
-  fungibleToken?: FungibleToken;
-  loading?: boolean;
-  size?: number;
-  round?: boolean;
-  showProtocolIcon?: boolean;
-}
-
 const DEFAULT_SIZE = 40;
 
 const TickerImage = styled.img<{ size?: number }>((props) => ({
@@ -71,6 +62,15 @@ const ProtocolImage = styled.img({
   height: '100%',
   width: '100%',
 });
+
+export interface TokenImageProps {
+  currency?: CurrencyTypes;
+  fungibleToken?: FungibleToken;
+  loading?: boolean;
+  size?: number;
+  round?: boolean;
+  showProtocolIcon?: boolean;
+}
 
 export default function TokenImage({
   currency,

@@ -22,7 +22,7 @@ import styled from 'styled-components';
 import OrdinalRow from './ordinalRow';
 
 const RestoreFundTitle = styled.h1((props) => ({
-  ...props.theme.body_l,
+  ...props.theme.typography.body_l,
   marginBottom: 32,
   color: props.theme.colors.white_200,
 }));
@@ -170,7 +170,7 @@ function RestoreOrdinals() {
           </>
         )}
       </Container>
-      <BottomTabBar tab="nft" />
+      <BottomTabBar tab="settings" />
     </>
   );
 }

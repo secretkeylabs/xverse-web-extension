@@ -134,10 +134,6 @@ function ConfirmOrdinalTransaction() {
     mutate({ signedTx: txHex });
   };
 
-  const handleOnCancelClick = () => {
-    navigate(-1);
-  };
-
   useResetUserFlow('/confirm-ordinal-tx');
   const handleBackButtonClick = () => {
     navigate(-1);
@@ -156,7 +152,7 @@ function ConfirmOrdinalTransaction() {
         loadingBroadcastedTx={isLoading}
         signedTxHex={signedTxHex}
         onConfirmClick={handleOnConfirmClick}
-        onCancelClick={handleOnCancelClick}
+        onCancelClick={handleBackButtonClick}
         ordinalTxUtxo={ordinalUtxo}
         assetDetail={selectedOrdinal ? selectedOrdinal.number.toString() : ''}
         currentFee={currentFee}

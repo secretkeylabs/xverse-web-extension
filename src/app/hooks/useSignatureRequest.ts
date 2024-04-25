@@ -1,16 +1,17 @@
-import { getStxAddressKeyChain, signBip322Message, signMessage } from '@secretkeylabs/xverse-core';
-import { SignaturePayload } from '@stacks/connect';
+import { getStxAddressKeyChain, signMessage } from '@secretkeylabs/xverse-core';
+import { SignaturePayload, StructuredDataSignatureRequestOptions } from '@stacks/connect';
 import {
   ChainID,
+  TupleCV,
   createStacksPrivateKey,
   deserializeCV,
+  hexToCV,
   signStructuredData,
-  TupleCV,
 } from '@stacks/transactions';
 import { decodeToken } from 'jsontokens';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { SignMessagePayload } from 'sats-connect';
+import useNetworkSelector from './useNetwork';
 import useSeedVault from './useSeedVault';
 import useWalletSelector from './useWalletSelector';
 
@@ -25,28 +26,55 @@ export function isUtf8Message(messageType: SignatureMessageType): messageType is
   return messageType === 'utf8';
 }
 
-export function isSignBip322Request(
-  requestPayload: SignMessagePayload | SignaturePayload,
-): requestPayload is SignMessagePayload {
-  return (requestPayload as SignMessagePayload).address !== undefined;
-}
-
 function useSignatureRequest() {
   const { search } = useLocation();
-  const params = new URLSearchParams(search);
-  const requestToken = params.get('request') || params.get('signMessageRequest');
-  const request = decodeToken(requestToken as string);
-  const messageType = params.get('messageType') || '';
+  const params = useMemo(() => new URLSearchParams(search), [search]);
   const tabId = params.get('tabId') ?? '0';
+  const requestId = params.get('messageId') ?? '';
+  const { stxPublicKey, stxAddress } = useWalletSelector();
+  const selectedNetwork = useNetworkSelector();
+
+  const { payload, domain, messageType, requestToken } = useMemo(() => {
+    const token = params.get('request') || params.get('signMessageRequest');
+    if (token) {
+      const request = decodeToken(token as string);
+      const type = params.get('messageType') || '';
+      return {
+        payload: request.payload as any, // TODO: fix type error
+        requestToken: token,
+        messageType: type as SignatureMessageType,
+        domain: (request.payload as any).domain // TODO: fix type error
+          ? deserializeCV(Buffer.from((request.payload as any).domain, 'hex')) // TODO: fix type error
+          : null,
+      };
+    }
+    const message = params.get('message') || '';
+    const requestDomain = params.get('domain') || '';
+
+    const innerDomain = requestDomain ? (hexToCV(requestDomain) as TupleCV) : undefined;
+
+    const rpcPayload: SignaturePayload | StructuredDataSignatureRequestOptions = {
+      message,
+      stxAddress,
+      domain: innerDomain,
+      publicKey: stxPublicKey,
+      network: selectedNetwork,
+    };
+    return {
+      payload: rpcPayload,
+      messageType: requestDomain ? 'structured' : ('utf8' as SignatureMessageType),
+      requestToken: null,
+      domain: innerDomain,
+    };
+  }, [params, stxAddress, stxPublicKey, selectedNetwork]);
+
   return {
-    payload: request.payload as any,
-    isSignMessageBip322: isSignBip322Request(request.payload as any),
-    request: requestToken as string,
-    domain: (request.payload as any).domain // TODO: fix type error
-      ? deserializeCV(Buffer.from((request.payload as any).domain, 'hex')) // TODO: fix type error
-      : null,
-    messageType: messageType as SignatureMessageType,
     tabId,
+    requestId,
+    requestToken,
+    payload,
+    domain,
+    messageType,
   };
 }
 
@@ -67,7 +95,7 @@ export function useSignMessage(messageType: SignatureMessageType) {
       }
       if (!domain) throw new Error('Domain is required for structured messages');
       const sk = createStacksPrivateKey(privateKey);
-      const messageDeserialize = deserializeCV(Buffer.from(message, 'hex'));
+      const messageDeserialize = hexToCV(message);
       const signature = signStructuredData({
         domain,
         message: messageDeserialize,
@@ -80,21 +108,6 @@ export function useSignMessage(messageType: SignatureMessageType) {
     },
     [selectedAccount],
   );
-}
-
-export function useSignBip322Message(message: string, address: string) {
-  const { accountsList, network } = useWalletSelector();
-  const { getSeed } = useSeedVault();
-  return useCallback(async () => {
-    const seedPhrase = await getSeed();
-    return signBip322Message({
-      accounts: accountsList,
-      message,
-      signatureAddress: address,
-      seedPhrase,
-      network: network.type,
-    });
-  }, []);
 }
 
 export default useSignatureRequest;

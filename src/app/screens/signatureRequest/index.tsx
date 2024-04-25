@@ -1,8 +1,7 @@
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
-import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
-import { ExternalSatsMethods, MESSAGE_SOURCE } from '@common/types/message-types';
 import { delay } from '@common/utils/ledger';
+import { makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
@@ -12,123 +11,38 @@ import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import useSignatureRequest, {
   isStructuredMessage,
   isUtf8Message,
-  useSignBip322Message,
   useSignMessage,
 } from '@hooks/useSignatureRequest';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
-import { bip0322Hash, buf2hex, hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
+import { buf2hex, hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
 import { SignaturePayload, StructuredDataSignaturePayload } from '@stacks/connect';
 import { getNetworkType, getTruncatedAddress, isHardwareAccount } from '@utils/helper';
-import { handleBip322LedgerMessageSigning, signatureVrsToRsv } from '@utils/ledger';
+import { signatureVrsToRsv } from '@utils/ledger';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import { Return } from 'sats-connect';
 import CollapsableContainer from './collapsableContainer';
+import {
+  ActionDisclaimer,
+  InnerContainer,
+  MainContainer,
+  MessageHash,
+  OuterContainer,
+  RequestSource,
+  RequestType,
+  SigningAddress,
+  SigningAddressContainer,
+  SigningAddressTitle,
+  SigningAddressType,
+  SigningAddressValue,
+  SuccessActionsContainer,
+} from './index.styled';
 import SignatureRequestMessage from './signatureRequestMessage';
 import SignatureRequestStructuredData from './signatureRequestStructuredData';
 import { finalizeMessageSignature } from './utils';
-
-const OuterContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-  height: '100%',
-});
-
-const InnerContainer = styled.div((props) => ({
-  flex: 1,
-  ...props.theme.scrollbar,
-}));
-
-export const MainContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  paddingLeft: props.theme.spacing(4),
-  paddingRight: props.theme.spacing(4),
-}));
-
-const RequestType = styled.h1((props) => ({
-  ...props.theme.headline_s,
-  marginTop: props.theme.spacing(11),
-  color: props.theme.colors.white_0,
-  textAlign: 'left',
-  marginBottom: props.theme.spacing(4),
-}));
-
-const RequestSource = styled.h2((props) => ({
-  ...props.theme.body_medium_m,
-  color: props.theme.colors.white_400,
-  textAlign: 'left',
-  marginBottom: props.theme.spacing(12),
-}));
-
-const MessageHash = styled.p((props) => ({
-  ...props.theme.body_medium_m,
-  textAlign: 'left',
-  lineHeight: 1.6,
-  wordWrap: 'break-word',
-  color: props.theme.colors.white_0,
-  marginBottom: props.theme.spacing(4),
-}));
-
-const SigningAddressContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  background: props.theme.colors.elevation1,
-  borderRadius: 12,
-  padding: '12px 16px',
-  marginBottom: props.theme.spacing(6),
-  flex: 1,
-}));
-
-const SigningAddressTitle = styled.p((props) => ({
-  ...props.theme.body_medium_m,
-  wordWrap: 'break-word',
-  color: props.theme.colors.white_200,
-  marginBottom: props.theme.spacing(4),
-}));
-
-const SigningAddress = styled.div({
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-});
-
-const SigningAddressType = styled.p((props) => ({
-  ...props.theme.body_medium_m,
-  textAlign: 'left',
-  wordWrap: 'break-word',
-  color: props.theme.colors.white_0,
-  marginBottom: props.theme.spacing(4),
-}));
-
-const SigningAddressValue = styled.p((props) => ({
-  ...props.theme.body_medium_m,
-  textAlign: 'left',
-  wordWrap: 'break-word',
-  color: props.theme.colors.white_0,
-  marginBottom: props.theme.spacing(4),
-}));
-
-const ActionDisclaimer = styled.p((props) => ({
-  ...props.theme.body_m,
-  color: props.theme.colors.white_400,
-  marginTop: props.theme.spacing(4),
-  marginBottom: props.theme.spacing(8),
-}));
-
-const SuccessActionsContainer = styled.div((props) => ({
-  width: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: props.theme.spacing(6),
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(20),
-  marginTop: props.theme.spacing(20),
-}));
 
 function SignatureRequest(): JSX.Element {
   const { t } = useTranslation('translation');
@@ -144,22 +58,13 @@ function SignatureRequest(): JSX.Element {
   const { selectedAccount, accountsList, network } = useWalletSelector();
   const [addressType, setAddressType] = useState('');
   const { switchAccount } = useWalletReducer();
-  const { messageType, request, payload, tabId, domain, isSignMessageBip322 } =
-    useSignatureRequest();
+  const { messageType, requestToken, payload, tabId, domain, requestId } = useSignatureRequest();
   const navigate = useNavigate();
   const isMessageSigningDisabled =
-    isHardwareAccount(selectedAccount) && !isSignMessageBip322 && !selectedAccount?.stxAddress;
+    isHardwareAccount(selectedAccount) && !selectedAccount?.stxAddress;
 
   const checkAddressAvailability = () => {
     const account = accountsList.filter((acc) => {
-      if (acc.btcAddress === payload.address) {
-        setAddressType(t('SIGNATURE_REQUEST.SIGNING_ADDRESS_SEGWIT'));
-        return true;
-      }
-      if (acc.ordinalsAddress === payload.address) {
-        setAddressType(t('SIGNATURE_REQUEST.SIGNING_ADDRESS_TAPROOT'));
-        return true;
-      }
       if (acc.stxAddress === payload.stxAddress) {
         setAddressType(t('SIGNATURE_REQUEST.SIGNING_ADDRESS_STX'));
         return true;
@@ -170,7 +75,7 @@ function SignatureRequest(): JSX.Element {
   };
 
   const switchAccountBasedOnRequest = () => {
-    if (!isSignMessageBip322 && getNetworkType(payload.network) !== network.type) {
+    if (getNetworkType(payload.network) !== network.type) {
       navigate('/tx-status', {
         state: {
           txid: '',
@@ -204,10 +109,10 @@ function SignatureRequest(): JSX.Element {
 
   const handleMessageSigning = useSignMessage(messageType);
 
-  const handleBip322MessageSigning = useSignBip322Message(payload.message, payload.address);
-
   const cancelCallback = () => {
-    finalizeMessageSignature({ requestPayload: request, tabId: +tabId, data: 'cancel' });
+    if (requestToken) {
+      finalizeMessageSignature({ requestPayload: requestToken, tabId: +tabId, data: 'cancel' });
+    }
     window.close();
   };
 
@@ -218,26 +123,26 @@ function SignatureRequest(): JSX.Element {
         setIsModalVisible(true);
         return;
       }
-      if (!isSignMessageBip322) {
-        const signature = await handleMessageSigning({
-          message: payload.message,
-          domain: (domain as any) || undefined, // TODO fix type error
-        });
-        if (signature) {
-          finalizeMessageSignature({ requestPayload: request, tabId: +tabId, data: signature });
+      const signature = await handleMessageSigning({
+        message: payload.message,
+        domain: (domain as any) || undefined, // TODO fix type error
+      });
+      if (signature) {
+        if (requestToken) {
+          finalizeMessageSignature({
+            requestPayload: requestToken,
+            tabId: +tabId,
+            data: signature,
+          });
+        } else {
+          const result: Return<'stx_signMessage' | 'stx_signStructuredMessage'> = {
+            signature: signature.signature,
+            publicKey: signature.publicKey,
+          };
+          const response = makeRpcSuccessResponse(requestId, result);
+          sendRpcResponse(+tabId, response);
+          window.close();
         }
-      } else {
-        const bip322signature = await handleBip322MessageSigning();
-        const signingMessage = {
-          source: MESSAGE_SOURCE,
-          method: ExternalSatsMethods.signMessageResponse,
-          payload: {
-            signMessageRequest: request,
-            signMessageResponse: bip322signature,
-          },
-        };
-        chrome.tabs.sendMessage(+tabId, signingMessage);
-        window.close();
       }
     } catch (err) {
       console.log(err);
@@ -267,48 +172,37 @@ function SignatureRequest(): JSX.Element {
     setCurrentStepIndex(1);
 
     try {
-      if (isSignMessageBip322) {
-        const signature = await handleBip322LedgerMessageSigning({
-          transport,
-          addressIndex: selectedAccount.deviceAccountIndex,
-          address: payload.address,
-          networkType: network.type,
-          message: payload.message,
+      const signature = await signStxMessage({
+        transport,
+        message: payload.message,
+        accountIndex: 0,
+        addressIndex: selectedAccount.deviceAccountIndex,
+      });
+      if (
+        !!signature.errorMessage &&
+        signature.errorMessage !== 'No errors' && // @zondax/ledger-stacks npm package returns this string when there are no errors
+        !!signature.returnCode
+      ) {
+        throw new Error(signature.errorMessage, {
+          cause: signature.returnCode,
         });
-        const signingMessage = {
-          source: MESSAGE_SOURCE,
-          method: ExternalSatsMethods.signMessageResponse,
-          payload: {
-            signMessageRequest: request,
-            signMessageResponse: signature,
-          },
-        };
-        chrome.tabs.sendMessage(+tabId, signingMessage);
-        window.close();
-      } else {
-        const signature = await signStxMessage({
-          transport,
-          message: payload.message,
-          accountIndex: 0,
-          addressIndex: selectedAccount.deviceAccountIndex,
-        });
-        if (
-          !!signature.errorMessage &&
-          signature.errorMessage !== 'No errors' && // @zondax/ledger-stacks npm package returns this string when there are no errors
-          !!signature.returnCode
-        ) {
-          throw new Error(signature.errorMessage, {
-            cause: signature.returnCode,
-          });
+      }
+      const rsvSignature = signatureVrsToRsv(signature.signatureVRS.toString('hex'));
+      const data = {
+        signature: rsvSignature,
+        publicKey: selectedAccount.stxPublicKey,
+      };
+      if (requestToken) {
+        if (signature) {
+          finalizeMessageSignature({ requestPayload: requestToken, tabId: +tabId, data });
         }
-        const rsvSignature = signatureVrsToRsv(signature.signatureVRS.toString('hex'));
-        const data = {
+      } else {
+        const result: Return<'stx_signMessage' | 'stx_signStructuredMessage'> = {
           signature: rsvSignature,
           publicKey: selectedAccount.stxPublicKey,
         };
-        if (signature) {
-          finalizeMessageSignature({ requestPayload: request, tabId: +tabId, data });
-        }
+        const response = makeRpcSuccessResponse(requestId, result);
+        sendRpcResponse(+tabId, response);
       }
     } catch (e: any) {
       console.error(e);
@@ -339,12 +233,10 @@ function SignatureRequest(): JSX.Element {
     setCurrentStepIndex(0);
   };
 
-  const getMessageHash = useCallback(() => {
-    if (!isSignMessageBip322) {
-      return buf2hex(hashMessage(payload.message));
-    }
-    return bip0322Hash(payload.message);
-  }, [isSignMessageBip322, payload.message]);
+  const getMessageHash = useCallback(
+    () => buf2hex(hashMessage(payload.message)),
+    [payload.message],
+  );
 
   const getConfirmationError = (type: 'title' | 'subtitle') => {
     if (type === 'title') {
@@ -400,15 +292,13 @@ function SignatureRequest(): JSX.Element {
           ) : (
             <MainContainer>
               <RequestType>{t('SIGNATURE_REQUEST.TITLE')}</RequestType>
-              {!isSignMessageBip322 ? (
-                <RequestSource>
-                  {`${t('SIGNATURE_REQUEST.DAPP_NAME_PREFIX')} ${payload.appDetails?.name}`}
-                </RequestSource>
-              ) : null}
-              {(isUtf8Message(messageType) || isSignMessageBip322) && (
-                <SignatureRequestMessage request={payload as SignaturePayload} />
+              <RequestSource>
+                {`${t('SIGNATURE_REQUEST.DAPP_NAME_PREFIX')} ${payload.appDetails?.name}`}
+              </RequestSource>
+              {isUtf8Message(messageType) && (
+                <SignatureRequestMessage message={(payload as SignaturePayload).message} />
               )}
-              {!isSignMessageBip322 && isStructuredMessage(messageType) && (
+              {isStructuredMessage(messageType) && (
                 <SignatureRequestStructuredData
                   payload={payload as StructuredDataSignaturePayload}
                 />
@@ -426,7 +316,7 @@ function SignatureRequest(): JSX.Element {
                 <SigningAddress>
                   {addressType && <SigningAddressType>{addressType}</SigningAddressType>}
                   <SigningAddressValue>
-                    {getTruncatedAddress(payload.address || payload.stxAddress, 6)}
+                    {getTruncatedAddress(payload.stxAddress, 6)}
                   </SigningAddressValue>
                 </SigningAddress>
               </SigningAddressContainer>
@@ -439,11 +329,11 @@ function SignatureRequest(): JSX.Element {
               <LedgerConnectionView
                 title={t('SIGNATURE_REQUEST.LEDGER.CONNECT.TITLE')}
                 text={t('SIGNATURE_REQUEST.LEDGER.CONNECT.SUBTITLE', {
-                  name: isSignMessageBip322 ? 'Bitcoin' : 'Stacks',
+                  name: 'Stacks',
                 })}
                 titleFailed={t('SIGNATURE_REQUEST.LEDGER.CONNECT.ERROR_TITLE')}
                 textFailed={t('SIGNATURE_REQUEST.LEDGER.CONNECT.ERROR_SUBTITLE')}
-                imageDefault={isSignMessageBip322 ? ledgerConnectBtcIcon : ledgerConnectStxIcon}
+                imageDefault={ledgerConnectStxIcon}
                 isConnectSuccess={isConnectSuccess}
                 isConnectFailed={isConnectFailed}
               />

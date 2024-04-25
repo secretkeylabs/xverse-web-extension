@@ -3,8 +3,10 @@ import FirstTx from '@assets/img/nftDashboard/rareSats/1stx.png';
 import TwoDPali from '@assets/img/nftDashboard/rareSats/2Dpali.png';
 import ThreeDPali from '@assets/img/nftDashboard/rareSats/3Dpali.png';
 import Alpha from '@assets/img/nftDashboard/rareSats/alpha.png';
+import Block286 from '@assets/img/nftDashboard/rareSats/b286.png';
 import Block78 from '@assets/img/nftDashboard/rareSats/b78.png';
 import Block9 from '@assets/img/nftDashboard/rareSats/b9.png';
+import Block9_450 from '@assets/img/nftDashboard/rareSats/b9_450.png';
 import BlackEpic from '@assets/img/nftDashboard/rareSats/black_epic.png';
 import BlackLegendary from '@assets/img/nftDashboard/rareSats/black_legendary.png';
 import BlackRare from '@assets/img/nftDashboard/rareSats/black_rare.png';
@@ -13,6 +15,7 @@ import Epic from '@assets/img/nftDashboard/rareSats/epic.png';
 import FibonacciSequence from '@assets/img/nftDashboard/rareSats/fibonacci.png';
 import Hitman from '@assets/img/nftDashboard/rareSats/hitman.png';
 import Jpeg from '@assets/img/nftDashboard/rareSats/jpeg.png';
+import Legacy from '@assets/img/nftDashboard/rareSats/legacy.png';
 import Legendary from '@assets/img/nftDashboard/rareSats/legendary.png';
 import Mythic from '@assets/img/nftDashboard/rareSats/mythic.png';
 import Nakamoto from '@assets/img/nftDashboard/rareSats/nakamoto.png';
@@ -42,7 +45,7 @@ interface Props {
 }
 
 function RareSatIcon({ type, size }: Props) {
-  const src = {
+  const srcByType: Record<RareSatsType, string> = {
     EPIC: Epic,
     LEGENDARY: Legendary,
     MYTHIC: Mythic,
@@ -61,19 +64,22 @@ function RareSatIcon({ type, size }: Props) {
     PERFECT_PALINCEPTION: Palinception,
     PALIBLOCK_PALINDROME: BlockPali,
     PALINDROME: Palindrome,
-    NAME_PALINDROME: Palindrome,
     ALPHA: Alpha,
     OMEGA: Omega,
     FIRST_TRANSACTION: FirstTx,
     BLOCK9: Block9,
+    BLOCK9_450: Block9_450,
     BLOCK78: Block78,
+    BLOCK286: Block286,
     NAKAMOTO: Nakamoto,
     VINTAGE: Vintage,
     PIZZA: Pizza,
     JPEG: Jpeg,
     HITMAN: Hitman,
     SILK_ROAD: SilkRoad,
-  }[type];
+    LEGACY: Legacy,
+  };
+  const src = srcByType[type];
   if (!src) {
     return null;
   }

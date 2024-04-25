@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 const Label = styled.label`
-  ${(props) => props.theme.body_medium_m};
+  ${(props) => props.theme.typography.body_medium_m};
   display: block;
   margin-bottom: ${(props) => props.theme.spacing(4)}px;
 `;
@@ -14,7 +14,7 @@ const InputGroup = styled.div`
 `;
 
 const Input = styled.input`
-  ${(props) => props.theme.body_medium_m};
+  ${(props) => props.theme.typography.body_medium_m};
   max-width: 144px;
   min-height: ${(props) => props.theme.spacing(22)}px;
   background-color: ${(props) => props.theme.colors.elevation0};
@@ -52,9 +52,14 @@ type SeedWordInputProps = {
   handleKeyDownInput: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   handlePaste: (pastedText: string) => void;
   disabled?: boolean;
+  autoFocus?: boolean;
 };
+
 const SeedWordInput = React.forwardRef<HTMLInputElement, SeedWordInputProps>(
-  ({ value, index, handleChangeInput, handleKeyDownInput, disabled, handlePaste }, ref) => {
+  (
+    { value, index, handleChangeInput, handleKeyDownInput, disabled, handlePaste, autoFocus },
+    ref,
+  ) => {
     const DEV_MODE = process.env.NODE_ENV === 'development';
     const [showValue, setShowValue] = useState(DEV_MODE);
 
@@ -63,7 +68,7 @@ const SeedWordInput = React.forwardRef<HTMLInputElement, SeedWordInputProps>(
     const handlePasteInput = (e: React.ClipboardEvent<HTMLInputElement>) => {
       e.preventDefault();
 
-      if (DEV_MODE) {
+      if (DEV_MODE || process.env.WALLET_LABEL) {
         const { clipboardData } = e;
         const pastedText = clipboardData.getData('text');
         handlePaste(pastedText);
@@ -89,6 +94,7 @@ const SeedWordInput = React.forwardRef<HTMLInputElement, SeedWordInputProps>(
             onBlur={handleBlurInput}
             disabled={disabled}
             ref={ref}
+            autoFocus={autoFocus}
           />
         </InputGroup>
       </div>
@@ -116,7 +122,7 @@ const InputGrid = styled.div<{ visible?: boolean }>`
 `;
 
 const ErrorMessage = styled.p<{ visible: boolean }>`
-  ${(props) => props.theme.body_s};
+  ${(props) => props.theme.typography.body_s};
   visibility: ${(props) => (props.visible ? 'visible' : 'hidden')};
   text-align: center;
   color: ${(props) => props.theme.colors.feedback.error};
@@ -125,11 +131,16 @@ const ErrorMessage = styled.p<{ visible: boolean }>`
 `;
 
 const TransparentButton = styled.button`
-  ${(props) => props.theme.body_m};
+  ${(props) => props.theme.typography.body_m};
   background-color: transparent;
   border: none;
   color: ${(props) => props.theme.colors.white_200};
   text-decoration: underline;
+  transition: color 0.1s ease;
+  :hover,
+  :focus {
+    color: ${(props) => props.theme.colors.white_400};
+  }
 `;
 
 const seedInit: string[] = [];
@@ -210,6 +221,7 @@ export default function SeedPhraseInput({
             ref={(el) => {
               inputsRef.current[index] = el;
             }}
+            autoFocus={index === 0}
           />
         ))}
       </InputGrid>
@@ -228,12 +240,13 @@ export default function SeedPhraseInput({
                 inputsRef.current[index] = el;
               }}
               disabled={!show24Words}
+              autoFocus={index === 0}
             />
           );
         })}
       </InputGrid>
       <ErrorMessage visible={!!seedError}>{seedError}</ErrorMessage>
-      <TransparentButton onClick={handleClickShow24Words}>
+      <TransparentButton onClick={handleClickShow24Words} type="button">
         {t('HAVE_A_24_WORDS_SEEDPHRASE?', { number: show24Words ? '12' : '24' })}
       </TransparentButton>
     </InputContainer>

@@ -47,7 +47,7 @@ function CopyButton({ text }: Props) {
     if (isCopied) {
       setTimeout(() => {
         setIsCopied(false);
-      }, 5000);
+      }, 2000);
     }
   }, [isCopied]);
 
@@ -62,6 +62,7 @@ function CopyButton({ text }: Props) {
         content={t('COPIED')}
         events={['click']}
         place="top"
+        hidden={!isCopied}
       />
     </>
   );

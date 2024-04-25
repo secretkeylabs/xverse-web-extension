@@ -23,6 +23,7 @@
   "plugins": ["react", "prettier", "eslint-plugin-no-inline-styles", "@tanstack/query"],
   "rules": {
     "consistent-return": "off",
+    "no-await-in-loop": "off",
     "import/prefer-default-export": 1,
     "no-restricted-imports": [
       "warn",
@@ -50,8 +51,19 @@
       }
     ],
     "no-plusplus": "off",
-    "@tanstack/query/exhaustive-deps": 1
+    "@tanstack/query/exhaustive-deps": 1,
+    "import/order": 0
   },
+  "overrides": [
+    {
+      "files": ["tests/**/*.{js,jsx,ts,tsx}"],
+      "plugins": ["playwright"],
+      "extends": ["plugin:playwright/playwright-test"],
+      "rules": {
+        "playwright/expect-expect": "off"
+      }
+    }
+  ],
   "settings": {
     "import/resolver": {
       "node": {
