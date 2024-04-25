@@ -46,7 +46,7 @@ function TopRow({ title, onClick, showBackButton = true, className }: Props) {
   return (
     <TopSectionContainer className={className}>
       {showBackButton && (
-        <BackButton onClick={onClick}>
+        <BackButton onClick={onClick} data-testid="back-button">
           <ArrowLeft size={20} color={Theme.colors.white_0} alt="back button" />
         </BackButton>
       )}
