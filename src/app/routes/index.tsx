@@ -47,6 +47,7 @@ import RareSatsBundle from '@screens/rareSatsBundle';
 import RareSatsDetailScreen from '@screens/rareSatsDetail/rareSatsDetail';
 import Receive from '@screens/receive';
 import RestoreFunds from '@screens/restoreFunds';
+import RecoverRunes from '@screens/restoreFunds/recoverRunes';
 import RestoreOrdinals from '@screens/restoreFunds/restoreOrdinals';
 import RestoreWallet from '@screens/restoreWallet';
 // import SendBrc20Screen from '@screens/sendBrc20';
@@ -339,6 +340,10 @@ const router = createHashRouter([
       {
         path: 'restore-ordinals',
         element: <RestoreOrdinals />,
+      },
+      {
+        path: 'recover-runes',
+        element: <RecoverRunes />,
       },
       {
         path: 'fiat-currency',
