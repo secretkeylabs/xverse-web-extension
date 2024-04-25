@@ -1,6 +1,6 @@
 import ConfirmBitcoinTransaction from '@components/confirmBtcTransaction';
 import TokenImage from '@components/tokenImage';
-import { FungibleToken } from '@secretkeylabs/xverse-core';
+import { FungibleToken, RuneSummary } from '@secretkeylabs/xverse-core';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import SendLayout from '../../layouts/sendLayout';
@@ -31,6 +31,7 @@ const Container = styled.div`
 type StepDisplayProps = {
   token: FungibleToken;
   summary: TransactionSummary | undefined;
+  runeSummary: RuneSummary | undefined;
   amountToSend: string;
   setAmountToSend: (amount: string) => void;
   amountError: string;
@@ -53,6 +54,7 @@ type StepDisplayProps = {
 function StepDisplay({
   token,
   summary,
+  runeSummary,
   amountToSend,
   setAmountToSend,
   amountError,
@@ -126,12 +128,11 @@ function StepDisplay({
       }
       return (
         <ConfirmBitcoinTransaction
-          token={token}
-          amountToSend={amountToSend}
-          recipientAddress={recipientAddress}
           inputs={summary.inputs}
           outputs={summary.outputs}
           feeOutput={summary.feeOutput}
+          showCenotaphCallout={!!summary?.runeOp?.Cenotaph?.flaws}
+          runeSummary={runeSummary}
           isLoading={false}
           confirmText={t('COMMON.CONFIRM')}
           cancelText={t('COMMON.CANCEL')}

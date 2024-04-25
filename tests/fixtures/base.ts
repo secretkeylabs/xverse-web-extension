@@ -9,9 +9,10 @@ export const test = baseTest.extend<{
 }>({
   // parts of the setup for the persistent context from https://playwright.dev/docs/chrome-extensions#testing
   context: async ({}, use) => {
-    const extPath = path.join(__dirname, '../../build');
+    const extPath = process.env.BUILD_EXTENSION_PATH || path.join(__dirname, '../../build');
     const context = await chromium.launchPersistentContext('', {
       args: [`--disable-extensions-except=${extPath}`, `--load-extension=${extPath}`],
+      // slowMo: 400, // Slows down Playwright operations by 400 milliseconds for showcasing or testing reasons
     });
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);
     await use(context);

@@ -1,10 +1,10 @@
+import * as bip39 from 'bip39';
 import { expect, test } from '../fixtures/base';
 import { passwordTestCases } from '../fixtures/passwordTestData';
-import Landing from '../pages/landing';
 import Onboarding from '../pages/onboarding';
+import StartPage from '../pages/startPage';
 
-// TODO outsoure Password value
-const strongPW = 'Admin12345567!!!!';
+const strongPW = Onboarding.generateSecurePasswordCrypto();
 
 test.describe('onboarding flow', () => {
   test.beforeEach(async ({ page, extensionId, context }) => {
@@ -22,38 +22,25 @@ test.describe('onboarding flow', () => {
     }
   });
 
-  test('visual check legal page', async ({ page, context }) => {
-    const landingpage = new Landing(page);
-
-    // Click on create Wallet and check legal page elements
-    await landingpage.buttonCreateWallet.click();
+  test('visual check legal page', async ({ page, context, extensionId }) => {
     const onboardingpage = new Onboarding(page);
-    await expect(page.url()).toContain('legal');
+    // Skip Landing and go directly to legal via URL
+    await page.goto(`chrome-extension://${extensionId}/options.html#/legal`);
     await onboardingpage.checkLegalPage(context);
   });
 
   // Visual check of the first page for backup
-  test('visual check backup page main', async ({ page }) => {
-    const landingpage = new Landing(page);
-
-    await landingpage.buttonCreateWallet.click();
+  test('visual check backup page main #smoketest', async ({ page }) => {
     const onboardingpage = new Onboarding(page);
-    await expect(page.url()).toContain('legal');
-    await onboardingpage.buttonAccept.click();
-    await expect(page.url()).toContain('backup');
+    await onboardingpage.navigateToBackupPage();
     await onboardingpage.checkBackupPage();
   });
 
   // Visual check of the first page for password creation
-  test('skip backup and visual check password page', async ({ page }) => {
-    const landingpage = new Landing(page);
-
-    await landingpage.buttonCreateWallet.click();
+  test('skip backup and visual check password page', async ({ page, extensionId }) => {
     const onboardingpage = new Onboarding(page);
-    await expect(page.url()).toContain('legal');
-    await onboardingpage.buttonAccept.click();
-    await expect(page.url()).toContain('backup');
-    await onboardingpage.buttonBackupLater.click();
+    // Skip landing and go directly to create password via URL
+    await page.goto(`chrome-extension://${extensionId}/options.html#/create-password`);
     await expect(page.url()).toContain('create-password');
     await onboardingpage.checkPasswordPage();
     await onboardingpage.buttonBack.click();
@@ -61,14 +48,9 @@ test.describe('onboarding flow', () => {
   });
 
   // No Wallet is created in this step as we only check the display of the error messages and that you can't create a wallet if passwords don't align
-  test('Skip backup and check password error messages', async ({ page }) => {
-    const landingpage = new Landing(page);
-
-    await landingpage.buttonCreateWallet.click();
+  test('Skip backup and check password error messages #smoketest', async ({ page }) => {
     const onboardingpage = new Onboarding(page);
-    await expect(page.url()).toContain('legal');
-    await onboardingpage.buttonAccept.click();
-    await expect(page.url()).toContain('backup');
+    await onboardingpage.navigateToBackupPage();
     await onboardingpage.buttonBackupLater.click();
     await expect(page.url()).toContain('create-password');
 
@@ -89,9 +71,7 @@ test.describe('onboarding flow', () => {
     await onboardingpage.buttonContinue.click();
     await expect(onboardingpage.errorMessage2).toBeVisible();
     // multiple times clicking on continue to check that the user stays on the page and can't continue even of clicked multiple times
-    await onboardingpage.buttonContinue.click();
-    await onboardingpage.buttonContinue.click();
-    await onboardingpage.buttonContinue.click();
+    await Onboarding.multipleClickCheck(onboardingpage.buttonContinue);
     await expect(onboardingpage.errorMessage2).toBeVisible();
     await onboardingpage.buttonBack.click();
     await expect(onboardingpage.inputPassword).toHaveValue(/.+/);
@@ -100,67 +80,135 @@ test.describe('onboarding flow', () => {
     await expect(onboardingpage.errorMessage2).toBeVisible();
   });
 
-  test('backup seedphrase and successfully create a wallet', async ({ page, context }) => {
-    const landingpage = new Landing(page);
-
-    await landingpage.buttonCreateWallet.click();
+  test('Restore wallet error message check for false 12 word seed phrase #smoketest', async ({
+    page,
+  }) => {
     const onboardingpage = new Onboarding(page);
-    await expect(page.url()).toContain('legal');
-    await onboardingpage.buttonAccept.click();
-    await expect(page.url()).toContain('backup');
-    await onboardingpage.buttonBackupNow.click();
-    await expect(page.url()).toContain('backupWalletSteps');
-    await expect(onboardingpage.buttonContinue).toBeDisabled();
-    await expect(onboardingpage.buttonShowSeed).toBeVisible();
-    await expect(onboardingpage.firstParagraphBackupStep).toBeVisible();
-    await onboardingpage.buttonShowSeed.click();
+    await onboardingpage.navigateToRestorePage();
+
+    // TODO: There is an bug that the page is refreshed after clicking on any button: https://linear.app/xverseapp/issue/ENG-4028/restore-wallet-reload-page-instead-of-showing-error-message
+    await onboardingpage.button24SeedPhrase.click();
+    await onboardingpage.checkRestoreWalletSeedPhrasePage();
+
+    // get 12 words from bip39
+    const mnemonic = bip39.generateMnemonic();
+    const wordsArray = mnemonic.split(' '); // Split the mnemonic by spaces
+
+    // We only input 11 word to cause the error message
+    for (let i = 0; i < wordsArray.length - 1; i++) {
+      await onboardingpage.inputWord(i).fill(wordsArray[i]);
+    }
+
     await expect(onboardingpage.buttonContinue).toBeEnabled();
-    const seedWords = await onboardingpage.textSeedWords.allTextContents();
+    await onboardingpage.buttonContinue.click();
+    await expect(onboardingpage.inputSeedPhraseWordDisabled).toHaveCount(12);
+    await expect(onboardingpage.buttonContinue).toBeEnabled();
+    await expect(onboardingpage.errorMessageSeedPhrase).toBeVisible();
+
+    // multiple times clicking on continue to check that the user stays on the page and can't continue even of clicked multiple times
+    await Onboarding.multipleClickCheck(onboardingpage.buttonContinue);
+    await expect(page.url()).toContain('restoreWallet');
+    await expect(onboardingpage.inputSeedPhraseWordDisabled).toHaveCount(12);
+    await expect(onboardingpage.errorMessageSeedPhrase).toBeVisible();
+
+    // empty all fields and check if continue button is disabled
+    for (let i = 0; i < 12; i++) {
+      await onboardingpage.inputWord(i).clear();
+    }
+
+    await expect(onboardingpage.buttonContinue).toBeDisabled();
+    await expect(onboardingpage.inputSeedPhraseWordDisabled).toHaveCount(12);
+    await expect(onboardingpage.errorMessageSeedPhrase).toBeHidden();
+  });
+
+  test('Restore wallet Error Message check for false 24 word seed phrase', async ({ page }) => {
+    const onboardingpage = new Onboarding(page);
+    await onboardingpage.navigateToRestorePage();
+
+    await onboardingpage.button24SeedPhrase.click();
+    // TODO: There is an bug that the page is refreshed after clicking on any button https://linear.app/xverseapp/issue/ENG-4028/restore-wallet-reload-page-instead-of-showing-error-message
+    await onboardingpage.checkRestoreWalletSeedPhrasePage();
+    await onboardingpage.button24SeedPhrase.click();
+
+    // All input fields should now be visible and enabled
+    await expect(onboardingpage.inputSeedPhraseWordDisabled).toHaveCount(0);
+    await expect(onboardingpage.inputSeedPhraseWord).toHaveCount(24);
+
+    // get 24 words from bip39
+    const mnemonic = bip39.generateMnemonic(256);
+    const wordsArray = mnemonic.split(' '); // Split the mnemonic by spaces
+
+    for (let i = 0; i < wordsArray.length - 1; i++) {
+      await onboardingpage.inputWord(i).fill(wordsArray[i]);
+    }
+    await expect(onboardingpage.buttonContinue).toBeEnabled();
     await onboardingpage.buttonContinue.click();
 
-    // check if 12 words are displayed
-    await expect(onboardingpage.buttonSeedWords).toHaveCount(12);
-    await expect(onboardingpage.secondParagraphBackupStep).toBeVisible();
-    let seedword = await onboardingpage.selectSeedWord(seedWords);
+    // As the seed phrase is not complete an error should be shown and the continue button is still enabled
+    await expect(onboardingpage.buttonContinue).toBeEnabled();
+    await expect(onboardingpage.inputSeedPhraseWordDisabled).toHaveCount(0);
+    await expect(onboardingpage.errorMessageSeedPhrase).toBeVisible();
 
-    // get all displayed values and filter the value from the actual seedphrase out to do an error message check
-    const buttonValues = await onboardingpage.buttonSeedWords.evaluateAll((buttons) =>
-      buttons.map((button) => {
-        // Assert that the button is an HTMLButtonElement to access the `value` property
-        if (button instanceof HTMLButtonElement) {
-          return button.value;
-        }
-        return 'testvalue';
-      }),
-    );
+    // multiple times clicking on continue to check that the user stays on the page and can't continue even of clicked multiple times
+    await Onboarding.multipleClickCheck(onboardingpage.buttonContinue);
+    await expect(page.url()).toContain('restoreWallet');
 
-    const filteredValues = buttonValues.filter((value) => value !== seedword);
-    const randomValue = filteredValues[Math.floor(Math.random() * filteredValues.length)];
-    await page.locator(`button[value="${randomValue}"]`).click();
+    await expect(onboardingpage.inputSeedPhraseWordDisabled).toHaveCount(0);
+    await expect(onboardingpage.errorMessageSeedPhrase).toBeVisible();
 
-    // Check if error message is displayed when clicking the wrong seedword
-    await expect(page.locator('p:has-text("This word is not")')).toBeVisible();
+    // empty all fields and check if continue button is disabled
+    for (let i = 0; i < 24; i++) {
+      await onboardingpage.inputWord(i).clear();
+    }
+    await expect(onboardingpage.buttonContinue).toBeDisabled();
+    await expect(onboardingpage.errorMessageSeedPhrase).toBeHidden();
+  });
 
-    await page.locator(`button[value="${seedword}"]`).click();
-    seedword = await onboardingpage.selectSeedWord(seedWords);
-    await page.locator(`button[value="${seedword}"]`).click();
-    seedword = await onboardingpage.selectSeedWord(seedWords);
-    await page.locator(`button[value="${seedword}"]`).click();
+  test('Restore wallet check switch 12 to 24 seed phrase', async ({ page, extensionId }) => {
+    const onboardingpage = new Onboarding(page);
 
-    // TODO: currently the error messages as not shown for the passwords in this step so this check needs to be commment out until it is fixed
-    /*     for (const testCase of passwordTestCases) {
-      await onboardingpage.testPasswordInput(testCase);
-    } */
+    // Skip Landing and go directly to restore wallet via URL
+    await page.goto(`chrome-extension://${extensionId}/options.html#/restoreWallet`);
 
+    await onboardingpage.button24SeedPhrase.click();
+    // TODO: There is an bug that the page is refreshed after clicking on any button https://linear.app/xverseapp/issue/ENG-4028/restore-wallet-reload-page-instead-of-showing-error-message
+    await onboardingpage.checkRestoreWalletSeedPhrasePage();
+
+    await onboardingpage.button24SeedPhrase.click();
+    await expect(onboardingpage.inputSeedPhraseWordDisabled).toHaveCount(0);
+    await expect(onboardingpage.inputSeedPhraseWord).toHaveCount(24);
+    await expect(onboardingpage.buttonContinue).toBeDisabled();
+    await expect(onboardingpage.button12SeedPhrase).toBeVisible();
+
+    await onboardingpage.button12SeedPhrase.click();
+    await expect(onboardingpage.inputSeedPhraseWordDisabled).toHaveCount(12);
+    await expect(onboardingpage.inputSeedPhraseWord).toHaveCount(24);
+    await expect(onboardingpage.buttonContinue).toBeDisabled();
+    await expect(onboardingpage.button24SeedPhrase).toBeVisible();
+  });
+
+  test('Lock and login #smoketest', async ({ page, extensionId }) => {
+    const onboardingpage = new Onboarding(page);
+    const startpage = new StartPage(page);
+    await onboardingpage.createWalletSkipBackup(strongPW);
+    await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await expect(startpage.buttonMenu).toBeVisible();
+    await startpage.buttonMenu.click();
+    await expect(startpage.buttonLock).toBeVisible();
+    await startpage.buttonLock.click();
+    await expect(onboardingpage.inputPassword).toBeVisible();
     await onboardingpage.inputPassword.fill(strongPW);
-    await onboardingpage.buttonContinue.click();
-    await onboardingpage.inputPassword.fill(strongPW);
-    await onboardingpage.buttonContinue.click();
+    await onboardingpage.buttonUnlock.click();
+    await startpage.checkVisuals();
+  });
 
-    await expect(onboardingpage.imageSuccess).toBeVisible();
-    await expect(onboardingpage.instruction).toBeVisible();
-    await expect(onboardingpage.buttonCloseTab).toBeVisible();
-    await onboardingpage.buttonCloseTab.click();
-    expect(context.pages()).toHaveLength(0);
+  test('switch to testnet and back to mainnet', async ({ page, extensionId }) => {
+    const onboardingpage = new Onboarding(page);
+    const startpage = new StartPage(page);
+    await onboardingpage.createWalletSkipBackup(strongPW);
+    await page.goto(`chrome-extension://${extensionId}/popup.html#/settings`);
+
+    await startpage.switchtoTestnetNetwork();
+    await startpage.switchtoMainnetNetwork();
   });
 });

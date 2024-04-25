@@ -148,7 +148,7 @@ export default function StxInfoBlock({ type, swap }: StxInfoCardProps) {
             <SpaceBetweenContainer>
               <ItemsCenterContainer>
                 {/* eslint-disable-next-line react/jsx-props-no-spreading */}
-                <TokenImage {...token.image} />
+                <TokenImage {...token.image} showProtocolIcon={false} />
                 <AmountLabel>{token.name}</AmountLabel>
               </ItemsCenterContainer>
               <ItemsCenterContainer>

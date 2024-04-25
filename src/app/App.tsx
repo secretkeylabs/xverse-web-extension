@@ -1,5 +1,6 @@
 import LoadingScreen from '@components/loadingScreen';
 import { CheckCircle, XCircle } from '@phosphor-icons/react';
+import { setXClientVersion } from '@secretkeylabs/xverse-core';
 import rootStore from '@stores/index';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
@@ -14,6 +15,11 @@ import Theme from '../theme';
 import GlobalStyle from '../theme/global';
 import SessionGuard from './components/guards/session';
 import router from './routes';
+
+declare const VERSION: string;
+
+// set the X-Client-Version header for core api requests
+setXClientVersion(VERSION);
 
 // needed to keep the svg icon scale for toasts over multiple lines
 const StyledIcon = styled.div`

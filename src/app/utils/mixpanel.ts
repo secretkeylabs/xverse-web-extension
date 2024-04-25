@@ -13,54 +13,36 @@ export const trackMixPanel = (
 };
 
 export const optOutMixPanel = () => {
-  const mixpanelInstance = getMixpanelInstance('web-extension');
-  const mixpanelInstanceExploreApp = getMixpanelInstance('explore-app');
-  if (!mixpanelInstance || !mixpanelInstanceExploreApp) {
-    return;
-  }
-
-  trackMixPanel(AnalyticsEvents.OptOut, undefined, { send_immediately: true }, () => {
-    mixpanelInstance.opt_out_tracking();
-    mixpanelInstanceExploreApp.opt_out_tracking();
+  Object.keys(mixpanelInstances).forEach((instanceKey) => {
+    trackMixPanel(
+      AnalyticsEvents.OptOut,
+      undefined,
+      { send_immediately: true },
+      () => {
+        getMixpanelInstance(instanceKey).opt_out_tracking();
+      },
+      instanceKey,
+    );
   });
 };
 
 export const optInMixPanel = (masterPubKey?: string) => {
-  const mixpanelInstance = getMixpanelInstance('web-extension');
-  const mixpanelInstanceExploreApp = getMixpanelInstance('explore-app');
-  if (!mixpanelInstance || !mixpanelInstanceExploreApp) {
-    return;
-  }
+  Object.keys(mixpanelInstances).forEach((instanceKey) => {
+    getMixpanelInstance(instanceKey).opt_in_tracking();
 
-  mixpanelInstance.opt_in_tracking();
-  mixpanelInstanceExploreApp.opt_in_tracking();
-
-  if (masterPubKey) {
-    mixpanelInstance.identify(sha256(masterPubKey));
-    mixpanelInstanceExploreApp.identify(sha256(masterPubKey));
-  }
+    if (masterPubKey) {
+      getMixpanelInstance(instanceKey).identify(sha256(masterPubKey));
+    }
+  });
 };
 
-export const hasOptedInMixPanelTracking = async () => {
-  const mixpanelInstance = getMixpanelInstance('web-extension');
-  const mixpanelInstanceExploreApp = getMixpanelInstance('explore-app');
-  if (!mixpanelInstance || !mixpanelInstanceExploreApp) {
-    return;
-  }
-
-  const hasOptedIn =
-    (await mixpanelInstance.has_opted_in_tracking()) &&
-    (await mixpanelInstanceExploreApp.has_opted_in_tracking());
-  return hasOptedIn;
-};
+export const hasOptedInMixPanelTracking = () =>
+  Object.keys(mixpanelInstances).every((instanceKey) =>
+    getMixpanelInstance(instanceKey).has_opted_in_tracking(),
+  );
 
 export const resetMixPanel = () => {
-  const mixpanelInstance = getMixpanelInstance('web-extension');
-  const mixpanelInstanceExploreApp = getMixpanelInstance('explore-app');
-  if (!mixpanelInstance || !mixpanelInstanceExploreApp) {
-    return;
-  }
-
-  mixpanelInstance.reset();
-  mixpanelInstanceExploreApp.reset();
+  Object.keys(mixpanelInstances).forEach((instanceKey) => {
+    getMixpanelInstance(instanceKey).reset();
+  });
 };

@@ -1,6 +1,7 @@
+import RuneAmount from '@components/confirmBtcTransaction/itemRow/runeAmount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowRight } from '@phosphor-icons/react';
-import { btcTransaction } from '@secretkeylabs/xverse-core';
+import { btcTransaction, RuneSummary } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -27,13 +28,14 @@ const RowCenter = styled.div<{ spaceBetween?: boolean }>((props) => ({
 }));
 
 const Header = styled(RowCenter)((props) => ({
-  marginBottom: props.theme.space.m,
   padding: `0 ${props.theme.space.m}`,
 }));
 
-const RowContainer = styled.div((props) => ({
-  padding: `0 ${props.theme.space.m}`,
+const RowContainer = styled.div<{ noPadding?: boolean; noMargin?: boolean }>((props) => ({
+  padding: props.noPadding ? 0 : `0 ${props.theme.space.m}`,
+  marginTop: props.noMargin ? 0 : `${props.theme.space.m}`,
 }));
+
 const AddressLabel = styled(StyledP)((props) => ({
   marginLeft: props.theme.space.xxs,
 }));
@@ -42,8 +44,9 @@ type Props = {
   outputs: btcTransaction.EnhancedOutput[];
   netAmount: number;
   onShowInscription: (inscription: btcTransaction.IOInscription) => void;
+  runeReceipts?: RuneSummary['receipts'];
 };
-function ReceiveSection({ outputs, netAmount, onShowInscription }: Props) {
+function ReceiveSection({ outputs, netAmount, onShowInscription, runeReceipts }: Props) {
   const { btcAddress, ordinalsAddress, hasActivatedRareSatsKey } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
 
@@ -53,17 +56,41 @@ function ReceiveSection({ outputs, netAmount, onShowInscription }: Props) {
     ordinalsAddress,
   });
 
+  // if receiving runes from own addresses, hide it because it is change, unless it swap addresses (recover runes)
+  const filteredRuneReceipts =
+    runeReceipts?.filter(
+      (receipt) =>
+        !receipt.sourceAddresses.some(
+          (address) =>
+            (address === ordinalsAddress && receipt.destinationAddress === ordinalsAddress) ||
+            (address === btcAddress && receipt.destinationAddress === btcAddress),
+        ),
+    ) ?? [];
+  const ordinalRuneReceipts = filteredRuneReceipts.filter(
+    (receipt) => receipt.destinationAddress === ordinalsAddress,
+  );
+  const paymentRuneReceipts = filteredRuneReceipts.filter(
+    (receipt) => receipt.destinationAddress === btcAddress,
+  );
+
   const inscriptionsRareSatsInPayment = outputsToPayment.filter(
     (output) =>
       output.inscriptions.length > 0 || (hasActivatedRareSatsKey && output.satributes.length > 0),
   );
   const areInscriptionsRareSatsInPayment = inscriptionsRareSatsInPayment.length > 0;
+  const areInscriptionRareSatsInOrdinal = outputsToOrdinal.length > 0;
   const amountIsBiggerThanZero = netAmount > 0;
-  const showPaymentSection = areInscriptionsRareSatsInPayment || amountIsBiggerThanZero;
+
+  const showOrdinalSection = !!(ordinalRuneReceipts.length || areInscriptionRareSatsInOrdinal);
+  const showPaymentSection = !!(
+    amountIsBiggerThanZero ||
+    paymentRuneReceipts.length ||
+    areInscriptionsRareSatsInPayment
+  );
 
   return (
     <>
-      {!!outputsToOrdinal.length && (
+      {showOrdinalSection && (
         <Container>
           <Header spaceBetween>
             <StyledP typography="body_medium_m" color="white_200">
@@ -74,19 +101,33 @@ function ReceiveSection({ outputs, netAmount, onShowInscription }: Props) {
               <AddressLabel typography="body_medium_m">{t('YOUR_ORDINAL_ADDRESS')}</AddressLabel>
             </RowCenter>
           </Header>
-          {outputsToOrdinal
-            .sort((a, b) => b.inscriptions.length - a.inscriptions.length)
-            .map((output, index) => (
-              <InscriptionSatributeRow
-                // eslint-disable-next-line react/no-array-index-key
-                key={index}
-                inscriptions={output.inscriptions}
-                satributes={output.satributes}
-                amount={output.amount}
-                onShowInscription={onShowInscription}
-                showBottomDivider={outputsToOrdinal.length > index + 1}
+          {ordinalRuneReceipts.map((receipt) => (
+            <RowContainer key={receipt.runeName}>
+              <RuneAmount
+                tokenName={receipt.runeName}
+                amount={String(receipt.amount)}
+                divisibility={receipt.divisibility}
               />
-            ))}
+            </RowContainer>
+          ))}
+          {areInscriptionRareSatsInOrdinal && (
+            <RowContainer noPadding noMargin={Boolean(ordinalRuneReceipts.length)}>
+              {outputsToOrdinal
+                .sort((a, b) => b.inscriptions.length - a.inscriptions.length)
+                .map((output, index) => (
+                  <InscriptionSatributeRow
+                    // eslint-disable-next-line react/no-array-index-key
+                    key={index}
+                    inscriptions={output.inscriptions}
+                    satributes={output.satributes}
+                    amount={output.amount}
+                    onShowInscription={onShowInscription}
+                    showTopDivider={Boolean(ordinalRuneReceipts.length) && index === 0}
+                    showBottomDivider={outputsToOrdinal.length > index + 1}
+                  />
+                ))}
+            </RowContainer>
+          )}
         </Container>
       )}
       {showPaymentSection && (
@@ -100,25 +141,43 @@ function ReceiveSection({ outputs, netAmount, onShowInscription }: Props) {
               <AddressLabel typography="body_medium_m">{t('YOUR_PAYMENT_ADDRESS')}</AddressLabel>
             </RowCenter>
           </Header>
+          {paymentRuneReceipts.map((receipt) => (
+            <RowContainer key={receipt.runeName}>
+              <RuneAmount
+                tokenName={receipt.runeName}
+                amount={String(receipt.amount)}
+                divisibility={receipt.divisibility}
+              />
+            </RowContainer>
+          ))}
           {amountIsBiggerThanZero && (
             <RowContainer>
               <Amount amount={netAmount} />
             </RowContainer>
           )}
-          {inscriptionsRareSatsInPayment
-            .sort((a, b) => b.inscriptions.length - a.inscriptions.length)
-            .map((output, index) => (
-              <InscriptionSatributeRow
-                // eslint-disable-next-line react/no-array-index-key
-                key={index}
-                inscriptions={output.inscriptions}
-                satributes={output.satributes}
-                amount={output.amount}
-                onShowInscription={onShowInscription}
-                showTopDivider={amountIsBiggerThanZero && index === 0}
-                showBottomDivider={inscriptionsRareSatsInPayment.length > index + 1}
-              />
-            ))}
+          {areInscriptionsRareSatsInPayment && (
+            <RowContainer
+              noPadding
+              noMargin={Boolean(paymentRuneReceipts.length) || amountIsBiggerThanZero}
+            >
+              {inscriptionsRareSatsInPayment
+                .sort((a, b) => b.inscriptions.length - a.inscriptions.length)
+                .map((output, index) => (
+                  <InscriptionSatributeRow
+                    // eslint-disable-next-line react/no-array-index-key
+                    key={index}
+                    inscriptions={output.inscriptions}
+                    satributes={output.satributes}
+                    amount={output.amount}
+                    onShowInscription={onShowInscription}
+                    showTopDivider={
+                      (Boolean(paymentRuneReceipts.length) || amountIsBiggerThanZero) && index === 0
+                    }
+                    showBottomDivider={inscriptionsRareSatsInPayment.length > index + 1}
+                  />
+                ))}
+            </RowContainer>
+          )}
         </Container>
       )}
     </>

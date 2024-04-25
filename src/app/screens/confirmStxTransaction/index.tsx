@@ -15,6 +15,7 @@ import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import finalizeTxSignature from '@components/transactionsRequests/utils';
+import useDelegationState from '@hooks/queries/useDelegationState';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
@@ -25,12 +26,14 @@ import {
   addressToString,
   broadcastSignedTransaction,
   buf2hex,
-  getStxFiatEquivalent,
   isMultiSig,
   microstacksToStx,
+  stxToMicrostacks,
 } from '@secretkeylabs/xverse-core';
 import { MultiSigSpendingCondition, deserializeTransaction } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
+import Callout from '@ui-library/callout';
+import { XVERSE_POOL_ADDRESS } from '@utils/constants';
 import { isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect, useMemo, useState } from 'react';
@@ -43,21 +46,20 @@ const AlertContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(12),
 }));
 
+const SpendDelegatedStxWarning = styled(Callout)((props) => ({
+  marginBottom: props.theme.space.m,
+}));
+
 function ConfirmStxTransaction() {
   const { t } = useTranslation('translation');
-  const [fee, setStateFee] = useState(new BigNumber(0));
-  const [amount, setAmount] = useState(new BigNumber(0));
-  const [fiatAmount, setFiatAmount] = useState(new BigNumber(0));
-  const [total, setTotal] = useState(new BigNumber(0));
-  const [fiatTotal, setFiatTotal] = useState(new BigNumber(0));
+  const [customFee, setCustomFee] = useState(new BigNumber(0));
   const [hasTabClosed, setHasTabClosed] = useState(false);
-  const [recipient, setRecipient] = useState('');
   const [txRaw, setTxRaw] = useState('');
-  const [memo, setMemo] = useState('');
   const navigate = useNavigate();
   const selectedNetwork = useNetworkSelector();
-  const { stxBtcRate, btcFiatRate, network, selectedAccount } = useWalletSelector();
+  const { network, selectedAccount, stxLockedBalance, stxAvailableBalance } = useWalletSelector();
   const { refetch } = useStxWalletData();
+  const { data: delegateState } = useDelegationState();
 
   const location = useLocation();
   const {
@@ -75,6 +77,34 @@ function ConfirmStxTransaction() {
     [key: string]: any;
   };
   const unsignedTx = useMemo(() => deserializeTransaction(stringHex), [stringHex]);
+
+  const txPayload = unsignedTx.payload as TokenTransferPayload;
+  const recipient = addressToString(txPayload.recipient.address);
+  const amount = new BigNumber(txPayload.amount.toString(10));
+  const memo = txPayload.memo.content.split('\u0000').join('');
+  const delegatedAmount =
+    delegateState?.delegated &&
+    delegateState.amount &&
+    delegateState.delegatedTo === XVERSE_POOL_ADDRESS
+      ? delegateState.amount
+      : '0';
+
+  const getIsSpendDelegateStx = () => {
+    if (!amount || !recipient) {
+      return false;
+    }
+
+    const hasDelegationNotLocked = BigNumber(delegatedAmount).gt(
+      stxToMicrostacks(BigNumber(1)).plus(stxLockedBalance),
+    );
+    // stacking contract locks 1stx less from what user delegates to let them revoke delegation. counting this doesn't harm cause probably no one will top up just 1stx and min amount to first delegation is 100stx.
+
+    const fee = customFee.gt(0)
+      ? customFee
+      : new BigNumber(unsignedTx?.auth?.spendingCondition?.fee.toString() ?? '0');
+    const total = amount.plus(fee);
+    return hasDelegationNotLocked && BigNumber(total).plus(delegatedAmount).gt(stxAvailableBalance);
+  };
 
   // SignTransaction Params
   const isMultiSigTx = useMemo(() => isMultiSig(unsignedTx), [unsignedTx]);
@@ -162,50 +192,10 @@ function ConfirmStxTransaction() {
     }
   }, [txError]);
 
-  const updateUI = () => {
-    const txPayload = unsignedTx.payload as TokenTransferPayload;
-
-    if (txPayload.recipient.address) {
-      setRecipient(addressToString(txPayload.recipient.address));
-    }
-
-    const txAmount = new BigNumber(txPayload.amount.toString(10));
-    const txFee = new BigNumber(unsignedTx.auth.spendingCondition.fee.toString());
-    const txTotal = amount.plus(fee);
-    const txFiatAmount = getStxFiatEquivalent(
-      amount,
-      BigNumber(stxBtcRate),
-      BigNumber(btcFiatRate),
-    );
-    const txFiatTotal = getStxFiatEquivalent(amount, BigNumber(stxBtcRate), BigNumber(btcFiatRate));
-    const { memo: txMemo } = txPayload;
-    // the txPayload returns a string of null bytes incase memo is null
-    // remove null bytes so send form treats it as an empty string
-    const modifiedMemoString = txMemo.content.split('\u0000').join('');
-
-    setAmount(txAmount);
-    setStateFee(txFee);
-    setFiatAmount(txFiatAmount);
-    setTotal(txTotal);
-    setFiatTotal(txFiatTotal);
-    setMemo(modifiedMemoString);
-  };
-
-  useEffect(() => {
-    if (recipient === '' || !fee || !amount || !fiatAmount || !total || !fiatTotal) {
-      updateUI();
-    }
-  });
-
-  const getAmount = () => {
-    const txPayload = unsignedTx?.payload as TokenTransferPayload;
-    const amountToTransfer = new BigNumber(txPayload?.amount?.toString(10));
-    return microstacksToStx(amountToTransfer);
-  };
-
   const handleConfirmClick = (txs: StacksTransaction[]) => {
     if (isLedgerAccount(selectedAccount)) {
       const type: LedgerTransactionType = 'STX';
+      const fee = new BigNumber(txs[0].auth.spendingCondition.fee.toString());
       const state: ConfirmStxTransactionState = {
         unsignedTx: Buffer.from(unsignedTx.serialize()),
         type,
@@ -269,12 +259,14 @@ function ConfirmStxTransaction() {
       navigate('/send-stx', {
         state: {
           recipientAddress: recipient,
-          amountToSend: getAmount().toString(),
+          amountToSend: microstacksToStx(amount).toString(),
           stxMemo: memo,
         },
       });
     }
   };
+
+  const showSpendDelegateStxWarning = getIsSpendDelegateStx();
 
   return (
     <>
@@ -291,10 +283,14 @@ function ConfirmStxTransaction() {
         isSponsored={sponsored}
         skipModal={isLedgerAccount(selectedAccount)}
         hasSignatures={hasSignatures}
+        onFeeChange={setCustomFee}
       >
+        {showSpendDelegateStxWarning && (
+          <SpendDelegatedStxWarning variant="warning" bodyText={t('SEND.SPEND_DELEGATED_STX')} />
+        )}
         <RecipientComponent
           address={recipient}
-          value={getAmount().toString()}
+          value={microstacksToStx(amount).toString()}
           icon={IconStacks}
           currencyType="STX"
           title={t('CONFIRM_TRANSACTION.AMOUNT')}

@@ -1,7 +1,15 @@
 import { makeRPCError, sendRpcResponse } from '@common/utils/rpc/helpers';
 import ConfirmBitcoinTransaction from '@components/confirmBtcTransaction';
 import RequestError from '@components/requests/requestError';
-import { Transport, btcTransaction } from '@secretkeylabs/xverse-core';
+import useHasFeature from '@hooks/useHasFeature';
+import useTransactionContext from '@hooks/useTransactionContext';
+import useWalletSelector from '@hooks/useWalletSelector';
+import {
+  RuneSummary,
+  Transport,
+  btcTransaction,
+  parseSummaryForRunes,
+} from '@secretkeylabs/xverse-core';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -9,16 +17,20 @@ import { RpcErrorCode } from 'sats-connect';
 import useSignPsbt from './useSignPsbt';
 import useSignPsbtValidationGate from './useSignPsbtValidationGate';
 
+// TODO: export this from core
+type PSBTSummary = Awaited<ReturnType<btcTransaction.EnhancedPsbt['getSummary']>>;
+
 function SignPsbtRequest() {
   const navigate = useNavigate();
+
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
+  const txnContext = useTransactionContext();
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSigning, setIsSigning] = useState(false);
-  const [inputs, setInputs] = useState<btcTransaction.EnhancedInput[]>([]);
-  const [outputs, setOutputs] = useState<btcTransaction.EnhancedOutput[]>([]);
-  const [feeOutput, setFeeOutput] = useState<btcTransaction.TransactionFeeOutput | undefined>();
-  const [hasSigHashNone, setHasSigHashNone] = useState(false);
+  const [summary, setSummary] = useState<PSBTSummary | undefined>();
+  const [runeSummary, setRuneSummary] = useState<RuneSummary | undefined>(undefined);
+  const hasRunesSupport = useHasFeature('RUNES_SUPPORT');
 
   const { payload, parsedPsbt, confirmSignPsbt, cancelSignPsbt, onCloseError, requestId, tabId } =
     useSignPsbt();
@@ -27,22 +39,20 @@ function SignPsbtRequest() {
     parsedPsbt,
   });
 
+  useSignPsbtValidationGate({ payload, parsedPsbt });
+
+  const { network } = useWalletSelector();
+
   useEffect(() => {
     if (!parsedPsbt) return;
 
     parsedPsbt
       .getSummary()
-      .then((summary) => {
-        const {
-          feeOutput: psbtFeeOutput,
-          inputs: psbtInputs,
-          outputs: psbtOutputs,
-          hasSigHashNone: psbtHasSigHashNone,
-        } = summary;
-        setFeeOutput(psbtFeeOutput);
-        setInputs(psbtInputs);
-        setOutputs(psbtOutputs);
-        setHasSigHashNone(psbtHasSigHashNone);
+      .then(async (txSummary) => {
+        setSummary(txSummary);
+        if (hasRunesSupport) {
+          setRuneSummary(await parseSummaryForRunes(txnContext, txSummary, network.type));
+        }
         setIsLoading(false);
       })
       .catch((err) => {
@@ -118,13 +128,15 @@ function SignPsbtRequest() {
     />
   ) : (
     <ConfirmBitcoinTransaction
-      inputs={inputs}
-      outputs={outputs}
-      feeOutput={feeOutput}
+      inputs={summary?.inputs ?? []}
+      outputs={summary?.outputs ?? []}
+      feeOutput={summary?.feeOutput}
+      showCenotaphCallout={!!summary?.runeOp?.Cenotaph?.flaws}
+      runeSummary={runeSummary}
       isLoading={isLoading}
       isSubmitting={isSigning}
       isBroadcast={payload.broadcast}
-      hasSigHashNone={hasSigHashNone}
+      hasSigHashNone={summary?.hasSigHashNone}
       confirmText={t('CONFIRM')}
       cancelText={t('CANCEL')}
       onCancel={onCancel}

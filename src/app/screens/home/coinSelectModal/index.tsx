@@ -81,6 +81,7 @@ function CoinSelectModal({
               onClose();
             }}
             fungibleToken={coin}
+            showProtocolIcon={false}
           />
         ))}
       </Container>

@@ -1,5 +1,4 @@
 import { trackMixPanel } from '@utils/mixpanel';
-import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 const Container = styled.div`
@@ -10,13 +9,22 @@ const Container = styled.div`
   width: 100%;
 `;
 
-const Card = styled(Link)`
+const Card = styled.div`
+  cursor: pointer;
   display: flex;
   align-items: center;
   column-gap: ${({ theme }) => theme.space.m};
   width: 100%;
-  max-width: 282px;
   color: ${({ theme }) => theme.colors.white_0};
+  transition: opacity 0.1s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &:active {
+    opacity: 0.6;
+  }
 `;
 
 const CardImage = styled.img`
@@ -45,6 +53,7 @@ function RecommendedApps({ items }: Props) {
     <Container>
       {items.map((item) => (
         <Card
+          key={item.url}
           onClick={() => {
             trackMixPanel(
               'click_app',
@@ -54,14 +63,13 @@ function RecommendedApps({ items }: Props) {
                 section: 'recommended',
                 source: 'web-extension',
               },
-              undefined,
-              undefined,
+              { send_immediately: true },
+              () => {
+                window.open(item.url, '_blank');
+              },
               'explore-app',
             );
           }}
-          to={item.url}
-          key={item.url}
-          target="_blank"
         >
           <CardImage src={item.icon} />
           <div>

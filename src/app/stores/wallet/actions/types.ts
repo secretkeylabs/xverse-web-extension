@@ -33,6 +33,7 @@ export const UpdateLedgerAccountsKey = 'UpdateLedgerAccountsKey';
 export const SetSip10ManageTokensKey = 'SetSip10ManageTokensKey';
 export const SetBrc20ManageTokensKey = 'SetBrc20ManageTokensKey';
 export const SetRunesManageTokensKey = 'SetRunesManageTokens';
+export const SetNotificationBannersKey = 'SetNotificationBanners';
 export const SetWalletLockPeriodKey = 'SetWalletLockPeriod';
 export const SetWalletUnlockedKey = 'SetWalletUnlocked';
 export const RenameAccountKey = 'RenameAccountKey';
@@ -71,6 +72,7 @@ export interface WalletState {
   sip10ManageTokens: Record<string, boolean>;
   brc20ManageTokens: Record<string, boolean>;
   runesManageTokens: Record<string, boolean>;
+  notificationBanners: Record<string, boolean>;
   feeMultipliers: AppInfo | null;
   hasActivatedOrdinalsKey: boolean | undefined;
   hasActivatedRareSatsKey: boolean | undefined;
@@ -224,6 +226,12 @@ export interface SetRunesManageTokens {
   isEnabled: boolean;
 }
 
+export interface SetNotificationBanners {
+  type: typeof SetNotificationBannersKey;
+  id: string;
+  isDismissed: boolean;
+}
+
 export interface SetWalletLockPeriod {
   type: typeof SetWalletLockPeriodKey;
   walletLockPeriod: WalletSessionPeriods;
@@ -274,6 +282,7 @@ export type WalletActions =
   | SetSip10ManageTokens
   | SetBrc20ManageTokens
   | SetRunesManageTokens
+  | SetNotificationBanners
   | SetWalletLockPeriod
   | SetRareSatsNoticeDismissed
   | SetWalletUnlocked

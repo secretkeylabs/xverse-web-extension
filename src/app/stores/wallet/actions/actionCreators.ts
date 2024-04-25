@@ -253,6 +253,14 @@ export const setRunesManageTokensAction = (params: {
   ...params,
 });
 
+export const setNotificationBannersAction = (params: {
+  id: string;
+  isDismissed: boolean;
+}): actions.SetNotificationBanners => ({
+  type: actions.SetNotificationBannersKey,
+  ...params,
+});
+
 export function setWalletLockPeriodAction(
   walletLockPeriod: actions.WalletSessionPeriods,
 ): actions.SetWalletLockPeriod {

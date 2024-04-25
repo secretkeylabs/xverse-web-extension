@@ -1,5 +1,4 @@
 import {
-  fetchDelegationState,
   fetchPoolStackerInfo,
   fetchStackingPoolInfo,
   getStacksInfo,
@@ -7,22 +6,18 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { useQueries } from '@tanstack/react-query';
 import { useCallback } from 'react';
-import useNetworkSelector from '../useNetwork';
 import useWalletSelector from '../useWalletSelector';
+import useDelegationState from './useDelegationState';
 
 const useStackingData = () => {
   const { stxAddress, network } = useWalletSelector();
-  const selectedNetwork = useNetworkSelector();
+  const { data: delegationStateData, isLoading: delegateStateIsLoading } = useDelegationState();
 
   const results = useQueries({
     queries: [
       {
         queryKey: ['stacking-core-info', network],
         queryFn: () => getStacksInfo(network.address),
-      },
-      {
-        queryKey: ['stacking-delegation-state', stxAddress, network, selectedNetwork],
-        queryFn: () => fetchDelegationState(stxAddress, selectedNetwork),
       },
       {
         queryKey: ['stacking-pool-info', network.type],
@@ -36,12 +31,10 @@ const useStackingData = () => {
   });
 
   const coreInfoData = results[0].data;
-  const delegationStateData = results[1].data;
-  const poolInfoData = results[2].data;
-  const stackerInfoData = results[3].data;
+  const poolInfoData = results[1].data;
+  const stackerInfoData = results[2].data;
 
-  const isStackingLoading = results.some((result) => result.isLoading);
-  const stackingError = results.find(({ error }) => error != null)?.error;
+  const isStackingLoading = results.some((result) => result.isLoading) || delegateStateIsLoading;
   const refetchStackingData = useCallback(() => {
     results.forEach((result) => result.refetch());
   }, [results]);
@@ -55,7 +48,6 @@ const useStackingData = () => {
 
   return {
     isStackingLoading,
-    stackingError,
     stackingData,
     refetchStackingData,
   };

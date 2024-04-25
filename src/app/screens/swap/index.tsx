@@ -1,4 +1,3 @@
-import ActionButton from '@components/button';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import { ArrowDown } from '@phosphor-icons/react';
@@ -6,6 +5,7 @@ import CoinSelectModal from '@screens/home/coinSelectModal';
 import { SwapInfoBlock } from '@screens/swap/swapInfoBlock';
 import SwapTokenBlock from '@screens/swap/swapTokenBlock';
 import { useSwap } from '@screens/swap/useSwap';
+import Button from '@ui-library/button';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -111,12 +111,12 @@ function SwapScreen() {
         />
       )}
       <SendButtonContainer>
-        <ActionButton
+        <Button
           disabled={!!swap.submitError || swap.onSwap == null}
-          warning={!!swap.submitError}
-          text={swap.submitError ?? t('CONTINUE')}
-          processing={loading}
-          onPress={handleClickContinue}
+          variant={swap.submitError ? 'danger' : 'primary'}
+          title={swap.submitError ?? t('CONTINUE')}
+          loading={loading || swap.isLoadingRates}
+          onClick={handleClickContinue}
         />
       </SendButtonContainer>
       <BottomBar tab="dashboard" />

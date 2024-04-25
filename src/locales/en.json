@@ -300,7 +300,8 @@
     "COPYRIGHT": "© {{year}} Secret Key Labs Limited",
     "INSUFFICIENT_FUNDS": "Insufficient funds",
     "RATE_TOO_LOW": "Set fee is below minimum of {{minFee}} Sats/vByte",
-    "RATE_TOO_HIGH": "Set fee is above maximum of {{maxFee}} Sats/vByte"
+    "RATE_TOO_HIGH": "Set fee is above maximum of {{maxFee}} Sats/vByte",
+    "SPEND_DELEGATED_STX": "You are transferring some STX that is registered for the next stacking cycle. The amount transferred will be subtracted from your current stacking pool delegation, and will not be locked to generate rewards in the next cycle."
   },
   "CONFIRM_TRANSACTION": {
     "SEND": "Confirm Transaction",
@@ -330,6 +331,7 @@
     "REVIEW_TRANSACTION": "Review transaction",
     "SIGN_TRANSACTIONS": "Sign {{count}} transactions",
     "AMOUNT": "Amount",
+    "INSUFFICIENT_BALANCE": "Insufficient balance",
     "YOUR_ADDRESS": "Your address",
     "FROM": "From",
     "INPUT": "Inputs",
@@ -338,6 +340,8 @@
     "RECIPIENT": "Recipient",
     "ASSET": "Asset",
     "CLOSE": "Close",
+    "NAME": "Name",
+    "SYMBOL": "Symbol",
     "SIGNING_TRANSACTIONS": "Signing transactions",
     "BROADCASTING_TRANSACTIONS": "Broadcasting transactions",
     "THIS_MAY_TAKE_A_FEW_MINUTES": "This may take a few minutes, please keep this window open.",
@@ -358,6 +362,8 @@
     "To": "To",
     "YOU_WILL_TRANSFER": "You will transfer",
     "YOU_WILL_RECEIVE": "You will receive",
+    "YOU_WILL_BURN": "You will burn",
+    "YOU_WILL_MINT": "You will mint",
     "YOU_WILL_TRANSFER_IN_TOTAL": "You will transfer in total",
     "YOU_WILL_RECEIVE_IN_TOTAL": "You will receive in total",
     "REVIEW_ALL": "Review all",
@@ -368,10 +374,11 @@
     "ORDINAL_DETECTED_ACTION": "Move to my ordinals address",
     "BTC_TRANSFER_DANGER_ALERT_TITLE": "Danger",
     "BTC_TRANSFER_DANGER_ALERT_DESC": "You are about to make a Bitcoin transfer which contains an ordinal inscription. Once transferred out of the wallet, you will not be able to recover them.",
-    "CONITNUE": "Continue",
+    "CONTINUE": "Continue",
     "BACK": "Back",
     "HIGH_FEE_WARNING_TEXT": "The estimated transaction fee for this transaction is very high.",
     "UNCONFIRMED_BALANCE_WARNING": "You are spending unconfirmed outputs in this transaction. This may lower the effective fee rate causing delays in transaction confirmation",
+    "RUNES_CENOTAPH_WARNING": "This transaction will burn all input Runes. Make sure you trust the requesting app.",
     "LEDGER": {
       "CONNECT": {
         "TITLE": "Connect your hardware wallet",
@@ -407,7 +414,12 @@
     "INSCRIBED_SATS": "Some of these sats are inscribed",
     "INSCRIBED_RARE_SATS": "Some of these sats are rare or inscribed",
     "UNCONFIRMED_UTXO_WARNING": "You are spending unconfirmed outputs in this transaction. This may lower the effective fee rate causing delays in transaction confirmation",
-    "INSCRIBED_RARE_SATS_WARNING": "Your payment wallet holds rare or inscribed sats. To avoid spending them in your transactions and fees, transfer them to your ordinals wallet"
+    "INSCRIBED_RARE_SATS_WARNING": "Your payment wallet holds rare or inscribed sats. To avoid spending them in your transactions and fees, transfer them to your ordinals wallet",
+    "RUNE_TERM_ENDED": "This rune has passed its mint term and can no longer be minted.",
+    "RUNE_IS_CLOSED": "This rune is closed and cannot be minted.",
+    "UNKNOWN_RUNE_RECIPIENTS": "Undetermined Runes recipients ",
+    "RUNE_DELEGATION_DESCRIPTION": "This is a partial transaction with undetermined Runes recipients. You are delegating your Runes to the requesting app. The requesting app can burn your runes or transfer them to any recipient",
+    "YOU_WILL_DELEGATE": "You will delegate"
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "The requested transaction cannot be created due to insufficient balance",
@@ -613,8 +625,8 @@
     "ERROR_RETRIEVING": "We are having trouble retrieving data.",
     "TRY_AGAIN": "Please try again later.",
     "LOAD_MORE": "Load more",
-    "TOTAL_ITEMS_one": "{{count}} item",
-    "TOTAL_ITEMS_other": "{{count}} items",
+    "TOTAL_ITEMS_ONE": "1 item",
+    "TOTAL_ITEMS": "{{count}} items",
     "WEB_GALLERY": "Open gallery",
     "RECEIVE": "Receive",
     "SEND": "Send",
@@ -654,15 +666,17 @@
     "HOLDS_RARE_SAT": "This inscription holds a rare sat."
   },
   "RESTORE_FUND_SCREEN": {
-    "TITLE": "Restore assets",
+    "TITLE": "Recover assets",
     "DESCRIPTION": "If you sent Ordinals to your Bitcoin payment address or Bitcoin to your ordinals address, you can recover it and send it to the correct address.",
     "RECOVER_BTC": "Recover BTC",
     "RECOVER_BTC_DESC": "If you sent Bitcoin to your Ordinals address.",
     "RECOVER_ORDINALS": "Recover Ordinals",
-    "RECOVER_ORDINALS_DESC": "If you sent Ordinals to your Bitcoin payment address."
+    "RECOVER_ORDINALS_DESC": "If you sent Ordinals to your Bitcoin payment address.",
+    "RECOVER_RUNES": "Recover Runes",
+    "RECOVER_RUNES_DESC": "If you sent Runes to your Bitcoin payment address."
   },
   "RESTORE_BTC_SCREEN": {
-    "TITLE": "Restore BTC",
+    "TITLE": "Recover BTC",
     "BTC": "Bitcoin",
     "TRANSFER": "Transfer",
     "BACK": "Back",
@@ -671,13 +685,22 @@
     "DESCRIPTION": "You have Bitcoin stored in your ordinal address. You can transfer them to your payment address so they can be used for payments and are shown in your balance."
   },
   "RESTORE_ORDINAL_SCREEN": {
-    "TITLE": "Restore Ordinals",
+    "TITLE": "Recover Ordinals",
     "BTC": "Bitcoin",
     "TRANSFER": "Transfer",
     "BACK": "Back",
     "ORDINAL_ADDRESS": "Ordinal address",
     "NO_FUNDS": "You don’t have any Ordinals stored on your Bitcoin payment address.",
     "DESCRIPTION": "You have Ordinals stored in your Bitcoin payment address. You can transfer them to your Ordinals address so that they show up in your collection."
+  },
+  "RECOVER_RUNES_SCREEN": {
+    "TITLE": "Recover Runes",
+    "DESCRIPTION": "Your Bitcoin payment address holds some Runes. To avoid accidentally spending them in Bitcoin payments, you can transfer them to your ordinals address, where you can manage your Runes portfolio",
+    "NO_RUNES": "You don't have any Runes stored on your Bitcoin payment address.",
+    "INSUFFICIENT_FUNDS": "You don't have enough bitcoin to cover the restore transaction.",
+    "CONFIRM": "Confirm",
+    "BACK": "Back",
+    "TRANSFER_ALL": "Transfer all"
   },
   "NFT_DETAIL_SCREEN": {
     "NFT_DETAIL": "Item detail",
@@ -1280,7 +1303,7 @@
       "VINTAGE": "Sats mined in the first 1000 bitcoin blocks.",
       "PIZZA": "Sats involved in the famous pizza transaction from 2010.",
       "JPEG": "Sats involved in the possible first bitcoin trade for an image on February 24, 2010.",
-      "HITMAN": "Sats involved in the transaction made by Ross Ulbricht to hire a hitman.",
+      "HITMAN": "Sats involved in a transaction allegedly made by Ross Ulbricht to hire a Hitman.",
       "SILK_ROAD": "Sats seized from Silk Road and auctioned off on June 27, 2014 by US Marshals.",
       "LEGACY": "Sats that were given out in paper wallets during Casey Rodarmor's Bitcoin workshop back in June 2022."
     },

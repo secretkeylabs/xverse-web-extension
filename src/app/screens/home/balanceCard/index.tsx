@@ -56,13 +56,9 @@ const BalanceContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'flex-start',
-  alignItems: 'flex-end',
+  alignItems: 'center',
   gap: props.theme.spacing(5),
 }));
-
-const ReloadContainer = styled.div({
-  marginBottom: 11,
-});
 
 interface BalanceCardProps {
   isLoading: boolean;
@@ -108,6 +104,26 @@ function BalanceCard(props: BalanceCardProps) {
     }
   }, [balance, oldTotalBalance, selectedAccount, isLoading, isRefetching]);
 
+  useEffect(() => {
+    (() => {
+      const balanceEl = document.getElementById('balance');
+
+      if (!balanceEl || !balanceEl.parentElement) {
+        return;
+      }
+
+      const fontSize = balanceEl.style.fontSize ? parseInt(balanceEl.style.fontSize, 10) : 42;
+
+      for (let i = fontSize; i >= 0; i--) {
+        // 26 is loading icon + padding
+        const overflow = balanceEl.clientWidth + 26 > balanceEl.parentElement.clientWidth;
+        if (overflow) {
+          balanceEl.style.fontSize = `${i}px`;
+        }
+      }
+    })();
+  });
+
   return (
     <>
       <RowContainer>
@@ -127,12 +143,14 @@ function BalanceCard(props: BalanceCardProps) {
             displayType="text"
             prefix={`${currencySymbolMap[fiatCurrency]}`}
             thousandSeparator
-            renderText={(value: string) => <BalanceAmountText>{value}</BalanceAmountText>}
+            renderText={(value: string) => (
+              <BalanceAmountText data-testid="total-balance-value">{value}</BalanceAmountText>
+            )}
           />
           {isRefetching && (
-            <ReloadContainer>
+            <div>
               <Spinner color="white" size={16} />
-            </ReloadContainer>
+            </div>
           )}
         </BalanceContainer>
       )}
