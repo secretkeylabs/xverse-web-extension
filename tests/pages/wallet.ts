@@ -101,6 +101,14 @@ export default class Wallet {
 
   readonly carouselApp: Locator;
 
+  readonly buttonStartStacking: Locator;
+
+  readonly headingStacking: Locator;
+
+  readonly containerStackingInfo: Locator;
+
+  readonly infoTextStacking: Locator;
+
   constructor(readonly page: Page) {
     this.page = page;
     this.navigationDashboard = page.getByTestId('nav-dashboard');
@@ -170,6 +178,12 @@ export default class Wallet {
     this.divAppSlide = page.getByTestId('app-slide');
     this.divAppCard = page.getByTestId('app-card');
     this.divAppTitle = page.getByTestId('app-title');
+
+    // Stacking
+    this.buttonStartStacking = page.getByRole('button', { name: 'Start stacking' });
+    this.headingStacking = page.getByRole('heading', { name: 'Stack STX, earn BTC' });
+    this.containerStackingInfo = page.getByTestId('stacking-info');
+    this.infoTextStacking = page.locator('h1').filter({ hasText: 'STX with other stackers' });
   }
 
   async checkVisualsStartpage() {
@@ -179,10 +193,10 @@ export default class Wallet {
     }
     await expect(this.balance).toBeVisible();
     await expect(this.manageTokenButton).toBeVisible();
-    await expect(this.buttonMenu).toBeVisible();
     // Check if all 4 buttons (send, receive, swap, buy) are visible
     await expect(this.allupperButtons).toHaveCount(4);
     await expect(this.labelAccountName).toBeVisible();
+    await expect(this.buttonMenu).toBeVisible();
     await expect(this.labelTokenSubtitle).toHaveCount(2);
 
     await expect(this.navigationDashboard).toBeVisible();
