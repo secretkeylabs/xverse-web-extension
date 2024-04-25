@@ -56,12 +56,14 @@ function ReceiveSection({ outputs, netAmount, onShowInscription, runeReceipts }:
     ordinalsAddress,
   });
 
-  // if receiving runes from own addresses, hide it because it is change
+  // if receiving runes from own addresses, hide it because it is change, unless it swap addresses (recover runes)
   const filteredRuneReceipts =
     runeReceipts?.filter(
       (receipt) =>
         !receipt.sourceAddresses.some(
-          (address) => address === ordinalsAddress || address === btcAddress,
+          (address) =>
+            (address === ordinalsAddress && receipt.destinationAddress === ordinalsAddress) ||
+            (address === btcAddress && receipt.destinationAddress === btcAddress),
         ),
     ) ?? [];
   const ordinalRuneReceipts = filteredRuneReceipts.filter(

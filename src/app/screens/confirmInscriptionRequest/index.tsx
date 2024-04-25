@@ -344,7 +344,7 @@ function ConfirmInscriptionRequest() {
           description={t('CONFIRM_TRANSACTION.BTC_TRANSFER_DANGER_ALERT_DESC')}
           buttonText={t('CONFIRM_TRANSACTION.BACK')}
           onClose={onClosePress}
-          secondButtonText={t('CONITNUE')}
+          secondButtonText={t('CONTINUE')}
           onButtonClick={onClosePress}
           onSecondButtonClick={onContinueButtonClick}
           isWarningAlert
