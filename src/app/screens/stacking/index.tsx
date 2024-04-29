@@ -3,7 +3,6 @@ import BottomBar from '@components/tabBar';
 import useStackingData from '@hooks/queries/useStackingData';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Spinner from '@ui-library/spinner';
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import StackingProgress from './stackingProgress';
@@ -30,16 +29,9 @@ const Text = styled.h1((props) => ({
 function Stacking() {
   const { t } = useTranslation('translation', { keyPrefix: 'STACKING_SCREEN' });
   const { isStackingLoading, stackingData } = useStackingData();
-  const [isStacking, setIsStacking] = useState<boolean>(false);
   const { stxAddress } = useWalletSelector();
 
-  useEffect(() => {
-    if (stackingData) {
-      if (stackingData?.stackerInfo?.stacked || stackingData?.delegationInfo?.delegated) {
-        setIsStacking(true);
-      }
-    }
-  }, [stackingData]);
+  const isStacking = stackingData?.stackerInfo?.stacked || stackingData?.delegationInfo?.delegated;
 
   const showStatus = !isStackingLoading && (isStacking ? <StackingProgress /> : <StartStacking />);
 
