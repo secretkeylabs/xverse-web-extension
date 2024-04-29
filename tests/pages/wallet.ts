@@ -101,6 +101,26 @@ export default class Wallet {
 
   readonly carouselApp: Locator;
 
+  readonly buttonDownArrow: Locator;
+
+  readonly inputCoinAmount: Locator;
+
+  readonly buttonSelectCoin: Locator;
+
+  readonly buttonContinue: Locator;
+
+  readonly buttonDetails: Locator;
+
+  readonly coinText: Locator;
+
+  readonly buttonInsufficientBalance: Locator;
+
+  readonly imageToken: Locator;
+
+  readonly swapTokenBalance: Locator;
+
+  readonly textUSD: Locator;
+
   readonly buttonStartStacking: Locator;
 
   readonly headingStacking: Locator;
@@ -108,6 +128,7 @@ export default class Wallet {
   readonly containerStackingInfo: Locator;
 
   readonly infoTextStacking: Locator;
+
 
   constructor(readonly page: Page) {
     this.page = page;
@@ -118,6 +139,14 @@ export default class Wallet {
     this.navigationSettings = page.getByTestId('nav-settings');
     this.balance = page.getByTestId('total-balance-value');
     this.allupperButtons = page.getByTestId('transaction-buttons-row').getByRole('button');
+    this.manageTokenButton = page.getByRole('button', { name: 'Manage token list' });
+    this.buttonMenu = page.getByRole('button', { name: 'Open Header Options' });
+    this.buttonLock = page.getByRole('button', { name: 'Lock' });
+    this.buttonConfirm = page.getByRole('button', { name: 'Confirm' });
+    this.buttonResetWallet = page.getByRole('button', { name: 'Reset Wallet' });
+    this.buttonDenyDataCollection = page.getByRole('button', { name: 'Deny' });
+
+    // Account
     this.labelAccountName = page.getByLabel('Account Name');
     this.buttonAccountOptions = page.getByLabel('Open Account Options');
     this.accountBalance = page.getByTestId('account-balance');
@@ -134,21 +163,6 @@ export default class Wallet {
     this.errorMessageRenameAccount = page
       .locator('p')
       .filter({ hasText: 'contain alphabetic and numeric' });
-    this.manageTokenButton = page.getByRole('button', { name: 'Manage token list' });
-    this.buttonMenu = page.getByRole('button', { name: 'Open Header Options' });
-    this.buttonLock = page.getByRole('button', { name: 'Lock' });
-    this.buttonConfirm = page.getByRole('button', { name: 'Confirm' });
-    this.buttonResetWallet = page.getByRole('button', { name: 'Reset Wallet' });
-    this.buttonDenyDataCollection = page.getByRole('button', { name: 'Deny' });
-    this.buttonCopyBitcoinAddress = page.locator('#copy-address-Bitcoin');
-    this.buttonCopyOrdinalsAddress = page.locator(
-      '#copy-address-Ordinals\\,\\ BRC-20\\ \\&\\ Runes',
-    );
-    this.buttonCopyStacksAddress = page.locator(
-      '#copy-address-Stacks\\ NFTs\\ \\&\\ SIP-10\\ tokens',
-    );
-
-    this.buttonConfirmCopyAddress = page.getByRole('button', { name: 'I understand' });
 
     // Settings network
     this.buttonNetwork = page.getByRole('button', { name: 'Network' });
@@ -179,11 +193,34 @@ export default class Wallet {
     this.divAppCard = page.getByTestId('app-card');
     this.divAppTitle = page.getByTestId('app-title');
 
+    // Receive
+    this.buttonCopyBitcoinAddress = page.locator('#copy-address-Bitcoin');
+    this.buttonCopyOrdinalsAddress = page.locator(
+      '#copy-address-Ordinals\\,\\ BRC-20\\ \\&\\ Runes',
+    );
+    this.buttonCopyStacksAddress = page.locator(
+      '#copy-address-Stacks\\ NFTs\\ \\&\\ SIP-10\\ tokens',
+    );
+    this.buttonConfirmCopyAddress = page.getByRole('button', { name: 'I understand' });
+
+    // Swap
+    this.buttonSelectCoin = page.getByTestId('select-coin-button');
+    this.inputCoinAmount = page.getByTestId('coin-input');
+    this.coinText = page.getByTestId('coin-text');
+    this.buttonDownArrow = page.getByTestId('down-arrow-button');
+    this.buttonContinue = page.getByRole('button', { name: 'Continue' });
+    this.buttonDetails = page.getByRole('button', { name: 'Details' });
+    this.buttonInsufficientBalance = page.getByRole('button', { name: 'Insufficient balance' });
+    this.imageToken = page.getByTestId('token-image');
+    this.swapTokenBalance = page.getByTestId('swap-token-balance');
+    this.textUSD = page.getByTestId('usd-text');
+
     // Stacking
     this.buttonStartStacking = page.getByRole('button', { name: 'Start stacking' });
     this.headingStacking = page.getByRole('heading', { name: 'Stack STX, earn BTC' });
     this.containerStackingInfo = page.getByTestId('stacking-info');
     this.infoTextStacking = page.locator('h1').filter({ hasText: 'STX with other stackers' });
+
   }
 
   async checkVisualsStartpage() {

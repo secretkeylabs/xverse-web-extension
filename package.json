@@ -14,8 +14,10 @@
     "test": "vitest ./src",
     "style": "prettier --write \"src/**/*.{ts,tsx}\"",
     "prepare": "husky install",
-    "uitest": "npx playwright test",
-    "uitest:report": "playwright show-report"
+    "e2etest": "npx playwright test",
+    "e2etest:ui": "npx playwright test --ui",
+    "smoketest": "npx playwright test --grep \"#smoketest\"",
+    "e2etest:report": "playwright show-report"
   },
   "dependencies": {
     "@ledgerhq/hw-transport-webusb": "^6.27.13",

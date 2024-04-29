@@ -33,13 +33,29 @@ cd ../xverse-core && npm i && npm run build:esm && \
 cd $OLDPWD && npm i --legacy-peer-deps @secretkeylabs/xverse-core@../xverse-core && npm start
 ```
 
-### Run UI Tests
-To run ui tests, run:
+### Run E2E Tests
+
+Our End-to-end (E2E) test suite is build with Playwright.
+To run the whole E2E test suite, run:
+
 ```
-npm run uitest
+npm run 2e2test
+```
+
+If you only want to run the smoke test suite, run
+
+```
+npm run smoketest
+```
+
+If you want to run the e2e test in UI Mode:
+
+```
+npm run e2etest:ui
 ```
 
 To generate test report, run:
+
 ```
-npm run uitest:report
+npm run e2etest:report
 ```

@@ -161,7 +161,7 @@ function TokenTile({
 
   return (
     <TileContainer onClick={handleTokenPressed} className={className}>
-      <RowContainer>
+      <RowContainer aria-label="Token Row">
         <TokenImage
           currency={currency}
           loading={loading}
