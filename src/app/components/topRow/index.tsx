@@ -1,5 +1,6 @@
-import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
+import { ArrowLeft } from '@phosphor-icons/react';
 import styled from 'styled-components';
+import Theme from 'theme';
 
 const TopSectionContainer = styled.div((props) => ({
   display: 'flex',
@@ -18,25 +19,21 @@ const HeaderText = styled.h1((props) => ({
   paddingRight: props.theme.spacing(10),
 }));
 
-const BackButton = styled.button({
+const BackButton = styled.button((props) => ({
   display: 'flex',
   justifyContent: 'flex-start',
   backgroundColor: 'transparent',
   padding: 5,
   position: 'absolute',
+  borderRadius: 24,
   left: 0,
-});
-
-const AnimatedBackButton = styled(BackButton)`
-  :hover {
-    background: ${(props) => props.theme.colors.white_900};
-    border-radius: 24px;
-  }
-  :focus {
-    background: ${(props) => props.theme.colors.white_850};
-    border-radius: 24px;
-  }
-`;
+  '&:hover': {
+    backgroundColor: props.theme.colors.white_900,
+  },
+  '&:focus': {
+    backgroundColor: props.theme.colors.white_850,
+  },
+}));
 
 interface Props {
   title?: string;
@@ -49,9 +46,9 @@ function TopRow({ title, onClick, showBackButton = true, className }: Props) {
   return (
     <TopSectionContainer className={className}>
       {showBackButton && (
-        <AnimatedBackButton onClick={onClick}>
-          <img src={ArrowLeft} alt="back button" />
-        </AnimatedBackButton>
+        <BackButton onClick={onClick} data-testid="back-button">
+          <ArrowLeft size={20} color={Theme.colors.white_0} alt="back button" />
+        </BackButton>
       )}
       {title && <HeaderText>{title}</HeaderText>}
     </TopSectionContainer>

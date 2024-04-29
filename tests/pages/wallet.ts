@@ -169,7 +169,7 @@ export default class Wallet {
     this.buttonSave = page.getByRole('button', { name: 'Save' });
     this.buttonMainnet = page.getByRole('button', { name: 'Mainnet' });
     this.buttonTestnet = page.getByRole('button', { name: 'Testnet' });
-    this.buttonBack = page.getByRole('button', { name: 'back button' });
+    this.buttonBack = page.getByTestId('back-button');
     this.inputStacksURL = page.getByTestId('Stacks URL');
     this.inputBTCURL = page.getByTestId('BTC URL');
     this.inputFallbackBTCURL = page.getByTestId('Fallback BTC URL');
