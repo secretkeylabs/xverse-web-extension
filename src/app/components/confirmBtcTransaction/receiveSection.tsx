@@ -43,10 +43,17 @@ const AddressLabel = styled(StyledP)((props) => ({
 type Props = {
   outputs: btcTransaction.EnhancedOutput[];
   netAmount: number;
+  transactionIsFinal: boolean;
   onShowInscription: (inscription: btcTransaction.IOInscription) => void;
   runeReceipts?: RuneSummary['receipts'];
 };
-function ReceiveSection({ outputs, netAmount, onShowInscription, runeReceipts }: Props) {
+function ReceiveSection({
+  outputs,
+  netAmount,
+  onShowInscription,
+  runeReceipts,
+  transactionIsFinal,
+}: Props) {
   const { btcAddress, ordinalsAddress, hasActivatedRareSatsKey } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
 
@@ -81,10 +88,15 @@ function ReceiveSection({ outputs, netAmount, onShowInscription, runeReceipts }:
   const areInscriptionRareSatsInOrdinal = outputsToOrdinal.length > 0;
   const amountIsBiggerThanZero = netAmount > 0;
 
-  const showOrdinalSection = !!(ordinalRuneReceipts.length || areInscriptionRareSatsInOrdinal);
+  // if transaction is not final, then runes will be delegated and will show up in the delegation section
+  const showOrdinalRunes = !!(transactionIsFinal && ordinalRuneReceipts.length);
+  const showOrdinalSection = !!(showOrdinalRunes || areInscriptionRareSatsInOrdinal);
+
+  // if transaction is not final, then runes will be delegated and will show up in the delegation section
+  const showPaymentRunes = !!(transactionIsFinal && paymentRuneReceipts.length);
   const showPaymentSection = !!(
     amountIsBiggerThanZero ||
-    paymentRuneReceipts.length ||
+    showPaymentRunes ||
     areInscriptionsRareSatsInPayment
   );
 
@@ -101,15 +113,16 @@ function ReceiveSection({ outputs, netAmount, onShowInscription, runeReceipts }:
               <AddressLabel typography="body_medium_m">{t('YOUR_ORDINAL_ADDRESS')}</AddressLabel>
             </RowCenter>
           </Header>
-          {ordinalRuneReceipts.map((receipt) => (
-            <RowContainer key={receipt.runeName}>
-              <RuneAmount
-                tokenName={receipt.runeName}
-                amount={String(receipt.amount)}
-                divisibility={receipt.divisibility}
-              />
-            </RowContainer>
-          ))}
+          {showOrdinalRunes &&
+            ordinalRuneReceipts.map((receipt) => (
+              <RowContainer key={receipt.runeName}>
+                <RuneAmount
+                  tokenName={receipt.runeName}
+                  amount={String(receipt.amount)}
+                  divisibility={receipt.divisibility}
+                />
+              </RowContainer>
+            ))}
           {areInscriptionRareSatsInOrdinal && (
             <RowContainer noPadding noMargin={Boolean(ordinalRuneReceipts.length)}>
               {outputsToOrdinal
@@ -141,15 +154,16 @@ function ReceiveSection({ outputs, netAmount, onShowInscription, runeReceipts }:
               <AddressLabel typography="body_medium_m">{t('YOUR_PAYMENT_ADDRESS')}</AddressLabel>
             </RowCenter>
           </Header>
-          {paymentRuneReceipts.map((receipt) => (
-            <RowContainer key={receipt.runeName}>
-              <RuneAmount
-                tokenName={receipt.runeName}
-                amount={String(receipt.amount)}
-                divisibility={receipt.divisibility}
-              />
-            </RowContainer>
-          ))}
+          {showPaymentRunes &&
+            paymentRuneReceipts.map((receipt) => (
+              <RowContainer key={receipt.runeName}>
+                <RuneAmount
+                  tokenName={receipt.runeName}
+                  amount={String(receipt.amount)}
+                  divisibility={receipt.divisibility}
+                />
+              </RowContainer>
+            ))}
           {amountIsBiggerThanZero && (
             <RowContainer>
               <Amount amount={netAmount} />

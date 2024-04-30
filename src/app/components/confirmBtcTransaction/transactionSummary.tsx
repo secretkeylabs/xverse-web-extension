@@ -33,7 +33,7 @@ const WarningCallout = styled(Callout)`
 `;
 
 type Props = {
-  isPartialTransaction: boolean;
+  transactionIsFinal: boolean;
   showCenotaphCallout: boolean;
   inputs: btcTransaction.EnhancedInput[];
   outputs: btcTransaction.EnhancedOutput[];
@@ -49,7 +49,7 @@ type Props = {
 };
 
 function TransactionSummary({
-  isPartialTransaction,
+  transactionIsFinal,
   showCenotaphCallout,
   inputs,
   outputs,
@@ -83,7 +83,8 @@ function TransactionSummary({
 
   const isUnConfirmedInput = inputs.some((input) => !input.extendedUtxo.utxo.status.confirmed);
 
-  const paymentHasInscribedRareSats = isPartialTransaction
+  // if transaction is not final, we don't know where the rare sats will go, so check inputs instead of outputs
+  const paymentHasInscribedRareSats = !transactionIsFinal
     ? inputs.some(
         (input) =>
           input.extendedUtxo.address === btcAddress &&
@@ -103,7 +104,7 @@ function TransactionSummary({
 
   const showFeeSelector = !!(feeRate && getFeeForFeeRate && onFeeRateSet);
 
-  const hasRuneDelegation = (runeSummary?.burns.length ?? 0) > 0 && isPartialTransaction;
+  const hasRuneDelegation = !transactionIsFinal;
 
   return (
     <>
@@ -138,17 +139,18 @@ function TransactionSummary({
       {runeSummary?.mint && !runeSummary?.mint?.runeIsMintable && (
         <WarningCallout bodyText={t('RUNE_IS_CLOSED')} variant="danger" />
       )}
-      {hasRuneDelegation && <DelegateSection delegations={runeSummary?.burns} />}
+      {hasRuneDelegation && <DelegateSection delegations={runeSummary?.transfers} />}
       <TransferSection
         outputs={outputs}
         inputs={inputs}
-        isPartialTransaction={isPartialTransaction}
+        transactionIsFinal={transactionIsFinal}
         runeTransfers={runeSummary?.transfers}
         onShowInscription={setInscriptionToShow}
         netAmount={-netAmount}
       />
       <ReceiveSection
         outputs={outputs}
+        transactionIsFinal={transactionIsFinal}
         onShowInscription={setInscriptionToShow}
         netAmount={netAmount}
         runeReceipts={runeSummary?.receipts}

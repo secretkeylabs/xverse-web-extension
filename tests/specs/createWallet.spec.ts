@@ -1,7 +1,7 @@
 import { expect, test } from '../fixtures/base';
 import Landing from '../pages/landing';
 import Onboarding from '../pages/onboarding';
-import StartPage from '../pages/startPage';
+import Wallet from '../pages/wallet';
 
 test.beforeEach(async ({ page, extensionId, context }) => {
   await page.goto(`chrome-extension://${extensionId}/options.html#/landing`);
@@ -29,7 +29,7 @@ const filePathAddresses = path.join(__dirname, 'addresses.json');
 test.describe('Create and Restore Wallet Flow', () => {
   test('create and restore a wallet via Menu', async ({ page, extensionId, context }) => {
     const onboardingpage = new Onboarding(page);
-    const startpage = new StartPage(page);
+    const wallet = new Wallet(page);
     await test.step('backup seedphrase and successfully create a wallet', async () => {
       await onboardingpage.navigateToBackupPage();
       await onboardingpage.buttonBackupNow.click();
@@ -83,23 +83,23 @@ test.describe('Create and Restore Wallet Flow', () => {
       await expect(onboardingpage.instruction).toBeVisible();
       await expect(onboardingpage.buttonCloseTab).toBeVisible();
 
-      // Open the startpage directly via URL
+      // Open the wallet directly via URL
       await page.goto(`chrome-extension://${extensionId}/popup.html`);
-      const startPage = new StartPage(page);
-      await startPage.checkVisuals();
+      const newWallet = new Wallet(page);
+      await newWallet.checkVisualsStartpage();
 
-      const balanceText = await startPage.balance.innerText();
+      const balanceText = await newWallet.balance.innerText();
       await expect(balanceText).toBe('$0.00');
 
       // TODO: find better selector for the receive button
-      await startPage.allupperButtons.nth(1).click();
+      await newWallet.allupperButtons.nth(1).click();
 
       // Get the addresses and save it in variables
-      const addressBitcoin = await startPage.getAddress(startPage.buttonCopyBitcoinAddress);
-      const addressOrdinals = await startPage.getAddress(startPage.buttonCopyOrdinalsAddress);
+      const addressBitcoin = await newWallet.getAddress(newWallet.buttonCopyBitcoinAddress);
+      const addressOrdinals = await newWallet.getAddress(newWallet.buttonCopyOrdinalsAddress);
       // Stack Address doesn't have the confirm message
-      await expect(startPage.buttonCopyStacksAddress).toBeVisible();
-      await startPage.buttonCopyStacksAddress.click();
+      await expect(newWallet.buttonCopyStacksAddress).toBeVisible();
+      await newWallet.buttonCopyStacksAddress.click();
       const addressStack = await page.evaluate('navigator.clipboard.readText()');
 
       // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
@@ -120,11 +120,11 @@ test.describe('Create and Restore Wallet Flow', () => {
       fs.writeFileSync(filePathAddresses, dataAddress, 'utf8');
     });
     await test.step('reset Wallet via Menu', async () => {
-      await expect(startpage.buttonMenu).toBeVisible();
-      await startpage.buttonMenu.click();
-      await expect(startpage.buttonResetWallet).toBeVisible();
-      await startpage.buttonResetWallet.click();
-      await startpage.buttonResetWallet.click();
+      await expect(wallet.buttonMenu).toBeVisible();
+      await wallet.buttonMenu.click();
+      await expect(wallet.buttonResetWallet).toBeVisible();
+      await wallet.buttonResetWallet.click();
+      await wallet.buttonResetWallet.click();
       await expect(onboardingpage.inputPassword).toBeVisible();
       await onboardingpage.inputPassword.fill(strongPW);
       await onboardingpage.buttonContinue.click();
@@ -146,10 +146,6 @@ test.describe('Create and Restore Wallet Flow', () => {
       await expect(newPage.url()).toContain('restore');
       await onboardingpage2.checkRestoreWalletSeedPhrasePage();
 
-      // TODO: There is an bug that the page is refreshed after clicking on any button: https://linear.app/xverseapp/issue/ENG-4028/restore-wallet-reload-page-instead-of-showing-error-message
-      await onboardingpage2.button24SeedPhrase.click();
-      await onboardingpage2.checkRestoreWalletSeedPhrasePage();
-
       const seedWords = JSON.parse(fs.readFileSync(filePathSeedWords, 'utf8'));
 
       for (let i = 0; i < seedWords.length; i++) {
@@ -164,22 +160,22 @@ test.describe('Create and Restore Wallet Flow', () => {
       await expect(onboardingpage2.imageSuccess).toBeVisible();
       await expect(onboardingpage2.headingWalletRestored).toBeVisible();
       await expect(onboardingpage2.buttonCloseTab).toBeVisible();
-      // Open the startpage directly via URL
+      // Open the wallet directly via URL
       await newPage.goto(`chrome-extension://${extensionId}/popup.html`);
-      const startPage = new StartPage(newPage);
-      await startPage.checkVisuals();
+      const newWallet = new Wallet(newPage);
+      await newWallet.checkVisualsStartpage();
 
-      const balanceText = await startPage.balance.innerText();
+      const balanceText = await newWallet.balance.innerText();
       await expect(balanceText).toBe('$0.00');
 
-      await startPage.allupperButtons.nth(1).click();
+      await newWallet.allupperButtons.nth(1).click();
 
       // Get the Addresses
-      const addressBitcoinCheck = await startPage.getAddress(startPage.buttonCopyBitcoinAddress);
-      const addressOrdinalsCheck = await startPage.getAddress(startPage.buttonCopyOrdinalsAddress);
+      const addressBitcoinCheck = await newWallet.getAddress(newWallet.buttonCopyBitcoinAddress);
+      const addressOrdinalsCheck = await newWallet.getAddress(newWallet.buttonCopyOrdinalsAddress);
       // Stack Address doesn't have the confirm message
-      await expect(startPage.buttonCopyStacksAddress).toBeVisible();
-      await startPage.buttonCopyStacksAddress.click();
+      await expect(newWallet.buttonCopyStacksAddress).toBeVisible();
+      await newWallet.buttonCopyStacksAddress.click();
       const addressStackCheck = await newPage.evaluate('navigator.clipboard.readText()');
 
       // Read and parse the file

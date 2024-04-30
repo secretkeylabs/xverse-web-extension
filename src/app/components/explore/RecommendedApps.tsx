@@ -53,6 +53,7 @@ function RecommendedApps({ items }: Props) {
     <Container>
       {items.map((item) => (
         <Card
+          data-testid="app-card"
           key={item.url}
           onClick={() => {
             trackMixPanel(
@@ -73,7 +74,7 @@ function RecommendedApps({ items }: Props) {
         >
           <CardImage src={item.icon} />
           <div>
-            <CardTitle>{item.name}</CardTitle>
+            <CardTitle data-testid="app-title">{item.name}</CardTitle>
             <CardText>{item.description}</CardText>
           </div>
         </Card>

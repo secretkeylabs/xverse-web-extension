@@ -172,14 +172,14 @@ function TokenTile({
         <TextContainer>
           <CoinTickerText>{getTickerTitle()}</CoinTickerText>
           <TokenTitleContainer>
-            <SubText>{title}</SubText>
+            <SubText aria-label="Token SubTitle">{title}</SubText>
           </TokenTitleContainer>
         </TextContainer>
       </RowContainer>
       {loading ? (
         <TokenLoader />
       ) : (
-        <AmountContainer>
+        <AmountContainer aria-label="CoinBalance Container">
           <NumericFormat
             value={getBalanceAmount()}
             displayType="text"

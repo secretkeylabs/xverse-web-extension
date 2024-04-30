@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     if: ${{ !startsWith(github.head_ref, 'release/') }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js
