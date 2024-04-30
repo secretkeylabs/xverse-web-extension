@@ -1,6 +1,6 @@
 import { useGetSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
+import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useCoinRates from '@hooks/queries/useCoinRates';
-import useWalletSelector from '@hooks/useWalletSelector';
 import { FungibleToken, getFiatEquivalent, microstacksToStx } from '@secretkeylabs/xverse-core';
 import { ftDecimals } from '@utils/helper';
 import { AlexSDK, Currency } from 'alex-sdk';
@@ -10,7 +10,7 @@ import { SwapToken } from './types';
 // eslint-disable-next-line import/prefer-default-export
 export function useStxCurrencyConversion() {
   const alexSDK = new AlexSDK();
-  const { stxAvailableBalance } = useWalletSelector();
+  const { data: stxData } = useStxWalletData();
   const { stxBtcRate, btcFiatRate } = useCoinRates();
   const { data: sip10CoinsList } = useGetSip10FungibleTokens();
 
@@ -34,7 +34,7 @@ export function useStxCurrencyConversion() {
     }
     if (currency === Currency.STX) {
       return {
-        balance: Number(microstacksToStx(BigNumber(stxAvailableBalance) as any)),
+        balance: Number(microstacksToStx(stxData?.availableBalance ?? new BigNumber(0))),
         image: { currency: 'STX', size: 28 },
         name: 'STX',
         amount,

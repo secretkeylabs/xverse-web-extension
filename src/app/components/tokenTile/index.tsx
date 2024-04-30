@@ -1,6 +1,8 @@
 import { BetterBarLoader } from '@components/barLoader';
 import { StyledFiatAmountText } from '@components/fiatAmountText';
 import TokenImage from '@components/tokenImage';
+import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import { microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core';
@@ -120,10 +122,12 @@ function TokenTile({
   className,
   showProtocolIcon = true,
 }: Props) {
-  const { fiatCurrency, stxBalance, btcBalance } = useSelector(
+  const { fiatCurrency } = useSelector(
     (state: StoreState) => state.walletState,
   );
   const { btcFiatRate, stxBtcRate } = useCoinRates();
+  const { data: stxData } = useStxWalletData();
+  const { data: btcBalance } = useBtcWalletData();
 
   function getTickerTitle() {
     if (currency === 'STX' || currency === 'BTC') return `${currency}`;
@@ -133,9 +137,9 @@ function TokenTile({
   function getBalanceAmount() {
     switch (currency) {
       case 'STX':
-        return microstacksToStx(new BigNumber(stxBalance)).toString();
+        return microstacksToStx(new BigNumber(stxData?.balance ?? 0)).toString();
       case 'BTC':
-        return satsToBtc(new BigNumber(btcBalance)).toString();
+        return satsToBtc(new BigNumber(btcBalance ?? 0)).toString();
       case 'FT':
         return fungibleToken ? getFtBalance(fungibleToken) : '';
       default:
@@ -145,11 +149,11 @@ function TokenTile({
   function getFiatEquivalent(): BigNumber | undefined {
     switch (currency) {
       case 'STX':
-        return microstacksToStx(new BigNumber(stxBalance))
+        return microstacksToStx(new BigNumber(stxData?.balance ?? 0))
           .multipliedBy(stxBtcRate)
           .multipliedBy(btcFiatRate);
       case 'BTC':
-        return satsToBtc(new BigNumber(btcBalance)).multipliedBy(btcFiatRate);
+        return satsToBtc(new BigNumber(btcBalance ?? 0)).multipliedBy(btcFiatRate);
       case 'FT':
         return fungibleToken?.tokenFiatRate
           ? new BigNumber(getFtBalance(fungibleToken)).multipliedBy(fungibleToken.tokenFiatRate)

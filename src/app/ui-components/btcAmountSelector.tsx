@@ -1,3 +1,4 @@
+import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowsDownUp } from '@phosphor-icons/react';
@@ -52,7 +53,8 @@ function AmountSelector({
   disabled = false,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
-  const { btcBalance: btcBalanceSats, fiatCurrency } = useWalletSelector();
+  const { fiatCurrency } = useWalletSelector();
+  const { data: btcBalanceSats } = useBtcWalletData();
   const { btcFiatRate } = useCoinRates();
 
   const [amountDisplay, setAmountDisplay] = useState(
@@ -75,7 +77,7 @@ function AmountSelector({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- We specifically only want to run this on these 2 deps
   }, [sendMax, amountSats]);
 
-  const btcBalance = new BigNumber(btcBalanceSats);
+  const btcBalance = new BigNumber(btcBalanceSats ?? 0);
   const balance = useBtcValue
     ? satsToBtcString(btcBalance)
     : getBtcFiatEquivalent(btcBalance, new BigNumber(btcFiatRate)).toFixed(2);

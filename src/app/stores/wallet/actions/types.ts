@@ -5,7 +5,6 @@ import type {
   BaseWallet,
   SettingsNetwork,
   SupportedCurrency,
-  TransactionData,
 } from '@secretkeylabs/xverse-core';
 
 export const SetWalletKey = 'SetWallet';
@@ -18,9 +17,6 @@ export const SetFeeMultiplierKey = 'SetFeeMultiplierKey';
 export const ChangeFiatCurrencyKey = 'ChangeFiatCurrency';
 export const ChangeNetworkKey = 'ChangeNetwork';
 export const GetActiveAccountsKey = 'GetActiveAccounts';
-export const FetchStxWalletDataRequestKey = 'FetchStxWalletDataRequest';
-export const SetStxWalletDataKey = 'SetStxWalletDataKey';
-export const SetBtcWalletDataKey = 'SetBtcWalletData';
 export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
 export const RareSatsNoticeDismissedKey = 'RareSatsNoticeDismissedKey';
 export const ChangeHasActivatedRareSatsKey = 'ChangeHasActivatedRareSatsKey';
@@ -61,11 +57,6 @@ export interface WalletState {
   savedNetworks: SettingsNetwork[]; // previously set network urls for type
   encryptedSeed: string;
   fiatCurrency: SupportedCurrency;
-  stxBalance: string;
-  stxAvailableBalance: string;
-  stxLockedBalance: string;
-  stxNonce: number;
-  btcBalance: string;
   sip10ManageTokens: Record<string, boolean>;
   brc20ManageTokens: Record<string, boolean>;
   runesManageTokens: Record<string, boolean>;
@@ -135,20 +126,6 @@ export interface SelectAccount {
   // stackingState: StackingStateData;
   accountType?: AccountType;
   accountName: string | undefined;
-}
-
-export interface SetStxWalletData {
-  type: typeof SetStxWalletDataKey;
-  stxBalance: string;
-  stxAvailableBalance: string;
-  stxLockedBalance: string;
-  stxTransactions: TransactionData[];
-  stxNonce: number;
-}
-
-export interface SetBtcWalletData {
-  type: typeof SetBtcWalletDataKey;
-  balance: string;
 }
 
 export interface ChangeFiatCurrency {
@@ -259,8 +236,6 @@ export type WalletActions =
   | SelectAccount
   | StoreEncryptedSeed
   | SetFeeMultiplier
-  | SetStxWalletData
-  | SetBtcWalletData
   | ChangeFiatCurrency
   | ChangeNetwork
   | GetActiveAccounts

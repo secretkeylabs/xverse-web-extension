@@ -17,12 +17,10 @@ import {
   SelectAccountKey,
   SetAccountBalanceKey,
   SetBrc20ManageTokensKey,
-  SetBtcWalletDataKey,
   SetFeeMultiplierKey,
   SetNotificationBannersKey,
   SetRunesManageTokensKey,
   SetSip10ManageTokensKey,
-  SetStxWalletDataKey,
   SetWalletHideStxKey,
   SetWalletKey,
   SetWalletLockPeriodKey,
@@ -54,11 +52,6 @@ import {
  * because we get many bugs around caching the wrong values when switching accounts,
  * we prefer react-query cache (with the correct cache keys) for all
  * account-specific values, and API fetch results such as:
- *  - stxBalance: '0',
- *  - stxAvailableBalance: '0',
- *  - stxLockedBalance: '0',
- *  - stxNonce: 0,
- *  - btcBalance: '0',
  *  - feeMultipliers: null,
  *
  * TODO refactor most of these values out of the store and use query cache instead
@@ -78,11 +71,6 @@ export const initialWalletState: WalletState = {
   selectedAccount: null,
   encryptedSeed: '',
   fiatCurrency: 'USD',
-  stxBalance: '0',
-  stxAvailableBalance: '0',
-  stxLockedBalance: '0',
-  stxNonce: 0,
-  btcBalance: '0',
   sip10ManageTokens: {},
   brc20ManageTokens: {},
   runesManageTokens: {},
@@ -155,27 +143,11 @@ const walletReducer = (
         network: action.network,
         accountType: action.accountType,
         accountName: action.accountName,
-        btcBalance: '',
-        stxBalance: '',
-        stxAvailableBalance: '',
       };
     case StoreEncryptedSeedKey:
       return {
         ...state,
         encryptedSeed: action.encryptedSeed,
-      };
-    case SetStxWalletDataKey:
-      return {
-        ...state,
-        stxBalance: action.stxBalance,
-        stxAvailableBalance: action.stxAvailableBalance,
-        stxLockedBalance: action.stxLockedBalance,
-        stxNonce: action.stxNonce,
-      };
-    case SetBtcWalletDataKey:
-      return {
-        ...state,
-        btcBalance: action.balance,
       };
     case SetFeeMultiplierKey:
       return {
