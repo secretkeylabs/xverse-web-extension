@@ -1,4 +1,4 @@
-name: UI Test Suite
+name: E2E Test Suite
 on:
   pull_request:
     branches:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    if: ${{ startsWith(github.head_ref, 'uitests/') || github.event_name == 'workflow_dispatch' }}
+    if: ${{ startsWith(github.head_ref, 'e2etest/') || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -46,12 +46,12 @@ jobs:
     needs: [build]
     name: UI Test ${{ matrix.shardIndex }} of ${{ matrix.shardTotal }}
     timeout-minutes: 10
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
-        shardIndex: [1, 2, 3, 4, 5]
-        shardTotal: [5]
+        shardIndex: [1, 2, 3, 4, 5, 6]
+        shardTotal: [6]
     steps:
       - uses: actions/checkout@v4
       - name: Download build artifact
@@ -87,7 +87,7 @@ jobs:
     # Merge reports after playwright-tests, even if some shards have failed
     if: ${{ always() && needs.UItest.result != 'skipped' }}
     needs: [UItest]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

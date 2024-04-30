@@ -1,9 +1,4 @@
-import {
-  fetchPoolStackerInfo,
-  fetchStackingPoolInfo,
-  getStacksInfo,
-  StackingData,
-} from '@secretkeylabs/xverse-core';
+import { getStacksInfo, getXverseApiClient, StackingData } from '@secretkeylabs/xverse-core';
 import { useQueries } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import useWalletSelector from '../useWalletSelector';
@@ -13,6 +8,8 @@ const useStackingData = () => {
   const { stxAddress, network } = useWalletSelector();
   const { data: delegationStateData, isLoading: delegateStateIsLoading } = useDelegationState();
 
+  const xverseApiClient = getXverseApiClient(network.type);
+
   const results = useQueries({
     queries: [
       {
@@ -21,11 +18,11 @@ const useStackingData = () => {
       },
       {
         queryKey: ['stacking-pool-info', network.type],
-        queryFn: () => fetchStackingPoolInfo(network.type),
+        queryFn: () => xverseApiClient.fetchStackingPoolInfo(),
       },
       {
         queryKey: ['pool-stacker-info', stxAddress, network.type],
-        queryFn: () => fetchPoolStackerInfo(network.type, stxAddress),
+        queryFn: () => xverseApiClient.fetchPoolStackerInfo(stxAddress),
       },
     ],
   });
@@ -39,6 +36,11 @@ const useStackingData = () => {
     results.forEach((result) => result.refetch());
   }, [results]);
 
+  // Warning: the non-null assertions here are dangerous, as they assume
+  // consumers will check the `isStackingLoading` prop returned below before
+  // using them. This isn't always the case, and many parts of the code opt for
+  // optional chainig of these values despite the types not indicating that
+  // optional chaining is necessary.
   const stackingData: StackingData = {
     poolInfo: poolInfoData!,
     delegationInfo: delegationStateData!,

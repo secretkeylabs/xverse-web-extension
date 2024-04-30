@@ -17,13 +17,10 @@ import {
   SelectAccountKey,
   SetAccountBalanceKey,
   SetBrc20ManageTokensKey,
-  SetBtcWalletDataKey,
-  SetCoinRatesKey,
   SetFeeMultiplierKey,
   SetNotificationBannersKey,
   SetRunesManageTokensKey,
   SetSip10ManageTokensKey,
-  SetStxWalletDataKey,
   SetWalletHideStxKey,
   SetWalletKey,
   SetWalletLockPeriodKey,
@@ -55,13 +52,6 @@ import {
  * because we get many bugs around caching the wrong values when switching accounts,
  * we prefer react-query cache (with the correct cache keys) for all
  * account-specific values, and API fetch results such as:
- *  - btcFiatRate: '0',
- *  - stxBtcRate: '0',
- *  - stxBalance: '0',
- *  - stxAvailableBalance: '0',
- *  - stxLockedBalance: '0',
- *  - stxNonce: 0,
- *  - btcBalance: '0',
  *  - feeMultipliers: null,
  *
  * TODO refactor most of these values out of the store and use query cache instead
@@ -81,13 +71,6 @@ export const initialWalletState: WalletState = {
   selectedAccount: null,
   encryptedSeed: '',
   fiatCurrency: 'USD',
-  btcFiatRate: '0',
-  stxBtcRate: '0',
-  stxBalance: '0',
-  stxAvailableBalance: '0',
-  stxLockedBalance: '0',
-  stxNonce: 0,
-  btcBalance: '0',
   sip10ManageTokens: {},
   brc20ManageTokens: {},
   runesManageTokens: {},
@@ -160,33 +143,11 @@ const walletReducer = (
         network: action.network,
         accountType: action.accountType,
         accountName: action.accountName,
-        btcBalance: '',
-        stxBalance: '',
-        stxAvailableBalance: '',
       };
     case StoreEncryptedSeedKey:
       return {
         ...state,
         encryptedSeed: action.encryptedSeed,
-      };
-    case SetCoinRatesKey:
-      return {
-        ...state,
-        btcFiatRate: action.btcFiatRate,
-        stxBtcRate: action.stxBtcRate,
-      };
-    case SetStxWalletDataKey:
-      return {
-        ...state,
-        stxBalance: action.stxBalance,
-        stxAvailableBalance: action.stxAvailableBalance,
-        stxLockedBalance: action.stxLockedBalance,
-        stxNonce: action.stxNonce,
-      };
-    case SetBtcWalletDataKey:
-      return {
-        ...state,
-        btcBalance: action.balance,
       };
     case SetFeeMultiplierKey:
       return {

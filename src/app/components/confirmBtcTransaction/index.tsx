@@ -1,6 +1,7 @@
 import { delay } from '@common/utils/ledger';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
+import { Tab } from '@components/tabBar';
 import useWalletSelector from '@hooks/useWalletSelector';
 import TransportFactory from '@ledgerhq/hw-transport-webusb';
 import { RuneSummary, Transport, btcTransaction } from '@secretkeylabs/xverse-core';
@@ -47,6 +48,7 @@ type Props = {
   outputs: btcTransaction.EnhancedOutput[];
   feeOutput?: btcTransaction.TransactionFeeOutput;
   runeSummary?: RuneSummary;
+  showCenotaphCallout: boolean;
   isLoading: boolean;
   isSubmitting: boolean;
   isBroadcast?: boolean;
@@ -65,7 +67,12 @@ type Props = {
   ) => Promise<number | undefined>;
   onFeeRateSet?: (feeRate: number) => void;
   feeRate?: number;
+  isFinal?: boolean;
+  // TODO: add sighash single warning
+  hasSigHashSingle?: boolean;
   hasSigHashNone?: boolean;
+  title?: string;
+  selectedBottomTab?: Tab;
 };
 
 function ConfirmBtcTransaction({
@@ -73,6 +80,7 @@ function ConfirmBtcTransaction({
   outputs,
   feeOutput,
   runeSummary,
+  showCenotaphCallout,
   isLoading,
   isSubmitting,
   isBroadcast,
@@ -89,6 +97,10 @@ function ConfirmBtcTransaction({
   onFeeRateSet,
   feeRate,
   hasSigHashNone = false,
+  isFinal = true,
+  hasSigHashSingle = false,
+  title,
+  selectedBottomTab,
 }: Props) {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentStep, setCurrentStep] = useState(Steps.ConnectLedger);
@@ -167,9 +179,6 @@ function ConfirmBtcTransaction({
     setCurrentStep(Steps.ConnectLedger);
   };
 
-  // TODO: this is a bit naive, but should be correct. We may want to look at the sig hash types of the inputs instead
-  const isPartialTransaction = !feeOutput;
-
   return isLoading ? (
     <LoaderContainer>
       <Spinner size={50} />
@@ -177,14 +186,14 @@ function ConfirmBtcTransaction({
   ) : (
     <>
       <SendLayout
-        selectedBottomTab="dashboard"
+        selectedBottomTab={selectedBottomTab ?? 'dashboard'}
         onClickBack={onBackClick}
         hideBackButton={hideBackButton}
         showAccountHeader={showAccountHeader}
         hideBottomBar={hideBottomBar}
       >
         <ReviewTransactionText typography="headline_s">
-          {t('REVIEW_TRANSACTION')}
+          {title || t('REVIEW_TRANSACTION')}
         </ReviewTransactionText>
         {hasSigHashNone && (
           <SpacedCallout
@@ -199,7 +208,8 @@ function ConfirmBtcTransaction({
           inputs={inputs}
           outputs={outputs}
           feeOutput={feeOutput}
-          isPartialTransaction={isPartialTransaction}
+          transactionIsFinal={isFinal}
+          showCenotaphCallout={showCenotaphCallout}
           getFeeForFeeRate={getFeeForFeeRate}
           onFeeRateSet={onFeeRateSet}
           feeRate={feeRate}

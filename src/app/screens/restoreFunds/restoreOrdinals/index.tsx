@@ -1,6 +1,7 @@
 import ActionButton from '@components/button';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useBtcClient from '@hooks/useBtcClient';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import useSeedVault from '@hooks/useSeedVault';
@@ -22,7 +23,7 @@ import styled from 'styled-components';
 import OrdinalRow from './ordinalRow';
 
 const RestoreFundTitle = styled.h1((props) => ({
-  ...props.theme.body_l,
+  ...props.theme.typography.body_l,
   marginBottom: 32,
   color: props.theme.colors.white_200,
 }));
@@ -64,8 +65,8 @@ const ButtonContainer = styled.div({
 
 function RestoreOrdinals() {
   const { t } = useTranslation('translation');
-  const { network, ordinalsAddress, btcAddress, selectedAccount, btcFiatRate } =
-    useWalletSelector();
+  const { network, ordinalsAddress, btcAddress, selectedAccount } = useWalletSelector();
+  const { btcFiatRate } = useCoinRates();
   const { getSeed } = useSeedVault();
   const navigate = useNavigate();
   const ordinalsQuery = useOrdinalsByAddress(btcAddress);
@@ -170,7 +171,7 @@ function RestoreOrdinals() {
           </>
         )}
       </Container>
-      <BottomTabBar tab="nft" />
+      <BottomTabBar tab="settings" />
     </>
   );
 }

@@ -33,7 +33,7 @@ interface Props {
 
 function StackingInfoTile({ title, value, color }: Props) {
   return (
-    <Container>
+    <Container data-testid="stacking-info">
       <TitleText>{title}</TitleText>
       {value ? (
         <ValueText color={color}>{value}</ValueText>

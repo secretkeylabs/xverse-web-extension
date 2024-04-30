@@ -35,9 +35,9 @@ test.describe('Create and Restore Wallet Flow', () => {
       await onboardingpage.buttonBackupNow.click();
       await expect(page.url()).toContain('backupWalletSteps');
       await expect(onboardingpage.buttonContinue).toBeDisabled();
-      await expect(onboardingpage.buttonShowSeed).toBeVisible();
+      await expect(onboardingpage.buttonRevealSeed).toBeVisible();
       await expect(onboardingpage.firstParagraphBackupStep).toBeVisible();
-      await onboardingpage.buttonShowSeed.click();
+      await onboardingpage.buttonRevealSeed.click();
       await expect(onboardingpage.buttonContinue).toBeEnabled();
       const seedWords = await onboardingpage.textSeedWords.allTextContents();
       await onboardingpage.buttonContinue.click();

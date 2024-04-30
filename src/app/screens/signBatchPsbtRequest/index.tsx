@@ -5,6 +5,7 @@ import AssetModal from '@components/assetModal';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import BurnSection from '@components/confirmBtcTransaction/burnSection';
+import DelegateSection from '@components/confirmBtcTransaction/delegateSection';
 import MintSection from '@components/confirmBtcTransaction/mintSection';
 import ReceiveSection from '@components/confirmBtcTransaction/receiveSection';
 import TransactionSummary from '@components/confirmBtcTransaction/transactionSummary';
@@ -14,7 +15,6 @@ import InfoContainer from '@components/infoContainer';
 import LoadingTransactionStatus from '@components/loadingTransactionStatus';
 import { ConfirmationStatus } from '@components/loadingTransactionStatus/circularSvgAnimation';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
-import useBtcClient from '@hooks/useBtcClient';
 import useHasFeature from '@hooks/useHasFeature';
 import useSignBatchPsbtTx from '@hooks/useSignBatchPsbtTx';
 import useTransactionContext from '@hooks/useTransactionContext';
@@ -71,6 +71,10 @@ const TransparentButtonContainer = styled.div((props) => ({
   width: '100%',
 }));
 
+const WarningCallout = styled(Callout)`
+  margin-bottom: ${(props) => props.theme.space.m};
+`;
+
 const ReviewTransactionText = styled.h1((props) => ({
   ...props.theme.headline_s,
   color: props.theme.colors.white_0,
@@ -120,12 +124,8 @@ interface TxResponse {
   psbtBase64: string;
 }
 
-type PsbtSummary = {
-  inputs: btcTransaction.EnhancedInput[];
-  outputs: btcTransaction.EnhancedOutput[];
-  feeOutput?: btcTransaction.TransactionFeeOutput | undefined;
-  hasSigHashNone: boolean;
-};
+// TODO: export this from core
+type PsbtSummary = Awaited<ReturnType<btcTransaction.EnhancedPsbt['getSummary']>>;
 
 function SignBatchPsbtRequest() {
   const { btcAddress, ordinalsAddress, selectedAccount, network } = useWalletSelector();
@@ -334,6 +334,14 @@ function SignBatchPsbtRequest() {
     );
   }
 
+  const transactionIsFinal = parsedPsbts.reduce((acc, psbt) => acc && psbt.summary.isFinal, true);
+  const runeBurns = parsedPsbts.map((psbt) => psbt.runeSummary?.burns ?? []).flat();
+  const runeDelegations = parsedPsbts
+    .filter((psbt) => !psbt.summary.isFinal)
+    .map((psbt) => psbt.runeSummary?.transfers ?? [])
+    .flat();
+  const hasSomeRuneDelegation = runeDelegations.length > 0;
+
   return (
     <>
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
@@ -367,6 +375,7 @@ function SignBatchPsbtRequest() {
                     }}
                   />
                 )}
+                {hasSomeRuneDelegation && <DelegateSection delegations={runeDelegations} />}
                 <TransferSection
                   inputs={parsedPsbts.map((psbt) => psbt.summary.inputs).flat()}
                   outputs={parsedPsbts.map((psbt) => psbt.summary.outputs).flat()}
@@ -374,7 +383,7 @@ function SignBatchPsbtRequest() {
                     .map((psbt) => psbt.runeSummary?.transfers ?? [])
                     .flat()}
                   netAmount={(totalNetAmount.toNumber() + totalFeeAmount.toNumber()) * -1}
-                  isPartialTransaction={parsedPsbts.some((psbt) => !psbt.summary.feeOutput)}
+                  transactionIsFinal={transactionIsFinal}
                   onShowInscription={setInscriptionToShow}
                 />
                 <ReceiveSection
@@ -382,10 +391,9 @@ function SignBatchPsbtRequest() {
                   runeReceipts={parsedPsbts.map((psbt) => psbt.runeSummary?.receipts ?? []).flat()}
                   onShowInscription={setInscriptionToShow}
                   netAmount={totalNetAmount.toNumber()}
+                  transactionIsFinal={transactionIsFinal}
                 />
-                <BurnSection
-                  burns={parsedPsbts.map((psbt) => psbt.runeSummary?.burns ?? []).flat()}
-                />
+                {!hasSomeRuneDelegation && <BurnSection burns={runeBurns} />}
                 <MintSection mints={parsedPsbts.map((psbt) => psbt.runeSummary?.mint)} />
                 <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
                 {hasOutputScript && !parsedPsbts.some((psbt) => psbt.runeSummary !== undefined) && (
@@ -426,7 +434,10 @@ function SignBatchPsbtRequest() {
                 outputs={parsedPsbts[currentPsbtIndex].summary.outputs}
                 feeOutput={parsedPsbts[currentPsbtIndex].summary.feeOutput}
                 runeSummary={parsedPsbts[currentPsbtIndex].runeSummary}
-                isPartialTransaction={!parsedPsbts[currentPsbtIndex].summary.feeOutput}
+                transactionIsFinal={parsedPsbts[currentPsbtIndex].summary.isFinal}
+                showCenotaphCallout={
+                  !!parsedPsbts[currentPsbtIndex].summary.runeOp?.Cenotaph?.flaws
+                }
               />
             )}
           </CustomizedModalContainer>

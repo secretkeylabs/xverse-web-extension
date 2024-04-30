@@ -1,22 +1,36 @@
 {
   "name": "xverse-web-extension",
   "description": "A Bitcoin wallet for Web3",
-  "version": "0.34.0",
+  "version": "0.34.2",
   "private": true,
   "engines": {
     "node": "^18.18.2"
   },
+  "scripts": {
+    "build": "npm run clean && NODE_ENV=production npx node webpack/utils/build.js",
+    "build-named": "npm run clean && NODE_ENV=production node scripts/build-named.js",
+    "start": "npx node webpack/utils/devServer.js",
+    "clean": "rimraf build",
+    "test": "vitest ./src",
+    "style": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "prepare": "husky install",
+    "postinstall": "patch-package",
+    "e2etest": "npx playwright test",
+    "e2etest:ui": "npx playwright test --ui",
+    "smoketest": "npx playwright test --grep \"#smoketest\"",
+    "e2etest:report": "playwright show-report"
+  },
   "dependencies": {
     "@ledgerhq/hw-transport-webusb": "^6.27.13",
     "@phosphor-icons/react": "^2.0.10",
-    "@playwright/test": "^1.42.1",
+    "@playwright/test": "^1.43.1",
     "@react-spring/web": "^9.6.1",
     "@sats-connect/core": "0.0.9-7e4d74e",
     "@scure/btc-signer": "1.2.1",
-    "@secretkeylabs/xverse-core": "13.4.0-cecd4d5",
+    "@secretkeylabs/xverse-core": "13.6.1-d75220b",
     "@stacks/connect": "7.4.1",
     "@stacks/stacks-blockchain-api-types": "6.1.1",
-    "@stacks/transactions": "6.9.0",
+    "@stacks/transactions": "6.13.1",
     "@tanstack/query-sync-storage-persister": "^4.29.1",
     "@tanstack/react-query": "^4.29.3",
     "@tanstack/react-query-devtools": "^4.29.3",
@@ -79,18 +93,6 @@
     "zod": "3.22.4",
     "zxcvbn": "^4.4.2"
   },
-  "scripts": {
-    "build": "npm run clean && NODE_ENV=production npx node webpack/utils/build.js",
-    "build-named": "npm run clean && NODE_ENV=production node scripts/build-named.js",
-    "start": "npx node webpack/utils/devServer.js",
-    "clean": "rimraf build",
-    "test": "vitest ./src",
-    "style": "prettier --write \"src/**/*.{ts,tsx}\"",
-    "prepare": "husky install",
-    "uitest": "npx playwright test",
-    "uitest:report": "playwright show-report",
-    "postinstall": "patch-package"
-  },
   "overrides": {
     "buffer": "6.0.3"
   },
@@ -136,7 +138,6 @@
     "eslint-plugin-playwright": "^1.5.4",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.31.8",
-    "patch-package": "8.0.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "fork-ts-checker-webpack-plugin": "^9.0.2",
     "glob": "^7.1.6",
@@ -144,6 +145,7 @@
     "html-webpack-plugin": "^5.5.0",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.3",
+    "patch-package": "8.0.0",
     "path": "^0.12.7",
     "prettier": "^2.7.1",
     "prettier-plugin-organize-imports": "^3.2.3",

@@ -37,7 +37,7 @@ type FeaturedCardCarouselProps = {
 
 function FeaturedCardCarousel({ items }: FeaturedCardCarouselProps) {
   return (
-    <CarouselContainer>
+    <CarouselContainer data-testid="app-carousel">
       <Swiper
         slidesPerView="auto"
         spaceBetween={16}
@@ -47,7 +47,7 @@ function FeaturedCardCarousel({ items }: FeaturedCardCarouselProps) {
         allowTouchMove
       >
         {items.map((item) => (
-          <SwiperSlide key={item.url}>
+          <SwiperSlide data-testid="app-slide" key={item.url}>
             <FeaturedCard {...item} />
           </SwiperSlide>
         ))}

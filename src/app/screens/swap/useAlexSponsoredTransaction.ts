@@ -1,5 +1,5 @@
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
-import useWalletSelector from '@hooks/useWalletSelector';
+import useStxWalletData from '@hooks/queries/useStxWalletData';
 import { buf2hex } from '@secretkeylabs/xverse-core';
 import { StacksTransaction } from '@stacks/transactions';
 import { useQuery } from '@tanstack/react-query';
@@ -16,7 +16,7 @@ export const useAlexSponsoredTransaction = (userOverrideSponsorValue: boolean) =
   const alexSDK = useRef(new AlexSDK()).current;
   const [isServiceRunning, setIsServiceRunning] = useState(false);
   const { error, data: isEnabled, isLoading } = useAlexSponsorSwapEnabledQuery(alexSDK);
-  const { stxNonce } = useWalletSelector();
+  const { data: stxData } = useStxWalletData();
 
   useEffect(() => {
     if (!isLoading && !error) {
@@ -34,9 +34,9 @@ export const useAlexSponsoredTransaction = (userOverrideSponsorValue: boolean) =
       0,
     ) + 1;
 
-  let hasPendingTransactions = false;
+  let hasPendingTransactions: boolean;
   // ignore pending transactions if account nonce has advanced pass the nonce in pending transactions
-  if (stxNonce > upcomingPendingTransactionNonce) {
+  if ((stxData?.nonce ?? 0) > upcomingPendingTransactionNonce) {
     hasPendingTransactions = false;
   } else {
     hasPendingTransactions = (stxPendingTxData?.pendingTransactions?.length ?? 0) > 0;

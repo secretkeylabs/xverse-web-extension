@@ -2,89 +2,36 @@ import TokenTicker from '@assets/img/dashboard/stx_icon.svg';
 import useStackingData from '@hooks/queries/useStackingData';
 import { StackingState } from '@secretkeylabs/xverse-core';
 import { XVERSE_WEB_POOL_URL } from '@utils/constants';
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
-
-const Container = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  background: props.theme.colors.elevation1,
-  borderRadius: props.theme.radius(2),
-  padding: props.theme.spacing(9),
-}));
-
-const TextContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'row',
-  flex: 1,
-});
-
-const StatusContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  background: 'rgba(81, 214, 166, 0.15)',
-  borderRadius: props.theme.radius(7),
-  paddingLeft: props.theme.spacing(7),
-  paddingRight: props.theme.spacing(7),
-  paddingTop: props.theme.spacing(4),
-  paddingBottom: props.theme.spacing(4),
-}));
-
-const Dot = styled.div((props) => ({
-  width: 7,
-  height: 7,
-  borderRadius: props.theme.radius(9),
-  marginRight: props.theme.spacing(4),
-  background: props.theme.colors.feedback.success,
-}));
-
-const ColumnContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'flex-start',
-  marginLeft: props.theme.spacing(6),
-}));
-
-const BoldText = styled.h1((props) => ({
-  ...props.theme.body_bold_m,
-  color: props.theme.colors.white_0,
-}));
-
-const SubText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.white_400,
-}));
-
-const StatusText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  fontWeight: 500,
-  color: props.theme.colors.white_0,
-}));
-
-const Icon = styled.img({
-  width: 36,
-  height: 36,
-});
+import {
+  BoldText,
+  ColumnContainer,
+  Container,
+  Dot,
+  Icon,
+  StatusContainer,
+  StatusText,
+  SubText,
+  TextContainer,
+} from './components';
 
 function StackingStatusTile() {
   const { t } = useTranslation('translation', { keyPrefix: 'STACKING_SCREEN' });
   const { stackingData } = useStackingData();
-  const [status, setStatus] = useState<StackingState>('Pending');
 
-  useEffect(() => {
-    if (stackingData) {
-      if (!stackingData?.stackerInfo?.stacked && stackingData?.delegationInfo?.delegated) {
-        setStatus('Delegated');
-      } else if (stackingData?.stackerInfo?.stacked) {
-        setStatus('Stacking');
-      }
+  // Refactored from existing logic. Not sure why `status` is being calculated
+  // this way. Worth moving to xverse-core?
+  const status: StackingState = (() => {
+    if (!stackingData?.stackerInfo?.stacked && stackingData?.delegationInfo?.delegated) {
+      return 'Delegated';
     }
-  }, [stackingData]);
+
+    if (stackingData?.stackerInfo?.stacked) {
+      return 'Stacking';
+    }
+
+    return 'Pending';
+  })();
 
   const handleOnClick = () => {
     window.open(XVERSE_WEB_POOL_URL);

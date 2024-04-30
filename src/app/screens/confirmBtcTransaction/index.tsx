@@ -242,7 +242,7 @@ function ConfirmBtcTransaction() {
           description={t('BTC_TRANSFER_DANGER_ALERT_DESC')}
           buttonText={t('BACK')}
           onClose={onClosePress}
-          secondButtonText={t('CONITNUE')}
+          secondButtonText={t('CONTINUE')}
           onButtonClick={onClosePress}
           onSecondButtonClick={onContinueButtonClick}
           isWarningAlert
