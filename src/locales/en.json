@@ -669,13 +669,13 @@
   },
   "RESTORE_FUND_SCREEN": {
     "TITLE": "Recover assets",
-    "DESCRIPTION": "If you sent Ordinals to your Bitcoin payment address or Bitcoin to your ordinals address, you can recover it and send it to the correct address.",
+    "DESCRIPTION": "If you sent Ordinals or Runes to your Bitcoin payment address, you can recover it and send it to the correct address.",
     "RECOVER_BTC": "Recover BTC",
     "RECOVER_BTC_DESC": "If you sent Bitcoin to your Ordinals address.",
     "RECOVER_ORDINALS": "Recover Ordinals",
-    "RECOVER_ORDINALS_DESC": "If you sent Ordinals to your Bitcoin payment address.",
+    "RECOVER_ORDINALS_DESC": "Ordinals sent on BTC address",
     "RECOVER_RUNES": "Recover Runes",
-    "RECOVER_RUNES_DESC": "If you sent Runes to your Bitcoin payment address."
+    "RECOVER_RUNES_DESC": "Runes sent on BTC address"
   },
   "RESTORE_BTC_SCREEN": {
     "TITLE": "Recover BTC",
