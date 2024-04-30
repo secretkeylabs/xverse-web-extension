@@ -1,6 +1,5 @@
 import BarLoader from '@components/barLoader';
 import { useVisibleBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
-import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useGetRuneFungibleTokens';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useAccountBalance from '@hooks/queries/useAccountBalance';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
@@ -81,14 +80,12 @@ function BalanceCard(props: BalanceCardProps) {
   const oldTotalBalance = accountBalances[btcAddress];
   const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
   const { visible: brc20CoinsList } = useVisibleBrc20FungibleTokens();
-  const { visible: runesCoinList } = useVisibleRuneFungibleTokens();
 
   const balance = calculateTotalBalance({
     stxBalance: stxData?.balance.toString() ?? '0',
     btcBalance: btcBalance?.toString() ?? '0',
     sipCoinsList: sip10CoinsList,
     brcCoinsList: brc20CoinsList,
-    runesCoinList,
     btcFiatRate,
     stxBtcRate,
     hideStx,
