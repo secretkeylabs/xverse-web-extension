@@ -131,7 +131,7 @@ function BalanceCard(props: BalanceCardProps) {
       <RowContainer>
         <BalanceHeadingText>{t('TOTAL_BALANCE')}</BalanceHeadingText>
         <CurrencyCard>
-          <CurrencyText>{fiatCurrency}</CurrencyText>
+          <CurrencyText data-testid="currency-text">{fiatCurrency}</CurrencyText>
         </CurrencyCard>
       </RowContainer>
       {isLoading ? (

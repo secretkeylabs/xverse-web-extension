@@ -129,6 +129,23 @@ export default class Wallet {
 
   readonly infoTextStacking: Locator;
 
+  readonly buttonUpdatePassword: Locator;
+
+  readonly errorMessage: Locator;
+
+  readonly headerNewPassword: Locator;
+
+  readonly infoUpdatePassword: Locator;
+
+  readonly buttonCurrency: Locator;
+
+  readonly buttonBackupWallet: Locator;
+
+  readonly textCurrency: Locator;
+
+  readonly iconFlag: Locator;
+
+  readonly selectCurrency: Locator;
 
   constructor(readonly page: Page) {
     this.page = page;
@@ -138,6 +155,7 @@ export default class Wallet {
     this.navigationExplore = page.getByTestId('nav-explore');
     this.navigationSettings = page.getByTestId('nav-settings');
     this.balance = page.getByTestId('total-balance-value');
+    this.textCurrency = page.getByTestId('currency-text');
     this.allupperButtons = page.getByTestId('transaction-buttons-row').getByRole('button');
     this.manageTokenButton = page.getByRole('button', { name: 'Manage token list' });
     this.buttonMenu = page.getByRole('button', { name: 'Open Header Options' });
@@ -173,6 +191,14 @@ export default class Wallet {
     this.inputStacksURL = page.getByTestId('Stacks URL');
     this.inputBTCURL = page.getByTestId('BTC URL');
     this.inputFallbackBTCURL = page.getByTestId('Fallback BTC URL');
+    this.buttonUpdatePassword = page.getByRole('button', { name: 'Update Password' });
+    this.errorMessage = page.getByRole('heading', { name: 'Incorrect password' });
+    this.headerNewPassword = page.getByRole('heading', { name: 'Enter your new password' });
+    this.infoUpdatePassword = page.getByRole('heading', { name: 'Password successfully updated' });
+    this.buttonCurrency = page.getByRole('button', { name: 'Fiat Currency' });
+    this.buttonBackupWallet = page.getByRole('button', { name: 'Backup Wallet' });
+    this.selectCurrency = page.getByTestId('currency-button');
+    this.iconFlag = page.locator('img[alt="flag"]');
 
     // Token
     this.labelCoinTitle = page.getByLabel('Coin Title');
@@ -220,7 +246,6 @@ export default class Wallet {
     this.headingStacking = page.getByRole('heading', { name: 'Stack STX, earn BTC' });
     this.containerStackingInfo = page.getByTestId('stacking-info');
     this.infoTextStacking = page.locator('h1').filter({ hasText: 'STX with other stackers' });
-
   }
 
   async checkVisualsStartpage() {

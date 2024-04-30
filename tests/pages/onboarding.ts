@@ -39,7 +39,7 @@ export default class Onboarding {
 
   readonly firstParagraphBackupStep: Locator;
 
-  readonly buttonShowSeed: Locator;
+  readonly buttonRevealSeed: Locator;
 
   readonly secondParagraphBackupStep: Locator;
 
@@ -80,7 +80,7 @@ export default class Onboarding {
     this.titleBackupOnboarding = page.getByRole('heading', { name: 'Backup' });
     this.subTitleBackupOnboarding = page.getByRole('heading', { name: 'Your seedphrase' });
     this.firstParagraphBackupStep = page.locator('p').filter({ hasText: 'Write down your' });
-    this.buttonShowSeed = page.getByRole('button', { name: 'Show' });
+    this.buttonRevealSeed = page.getByRole('button', { name: 'Reveal' });
     this.secondParagraphBackupStep = page.getByRole('heading', { name: 'Confirm you' });
     this.textSeedWords = page.locator('p[translate="no"]');
     this.buttonSeedWords = page.locator('button[value]:not([value=""])');

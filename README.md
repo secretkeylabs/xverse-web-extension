@@ -39,7 +39,7 @@ Our End-to-end (E2E) test suite is build with Playwright.
 To run the whole E2E test suite, run:
 
 ```
-npm run 2e2test
+npm run e2etest
 ```
 
 If you only want to run the smoke test suite, run
