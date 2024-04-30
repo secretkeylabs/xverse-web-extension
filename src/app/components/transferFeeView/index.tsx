@@ -1,4 +1,6 @@
 import AmountWithInscriptionSatribute from '@components/confirmBtcTransaction/itemRow/amountWithInscriptionSatribute';
+import useCoinRates from '@hooks/queries/useCoinRates';
+import useWalletSelector from '@hooks/useWalletSelector';
 import {
   btcTransaction,
   currencySymbolMap,
@@ -59,9 +61,8 @@ function TransferFeeView({
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
 
-  const { btcFiatRate, stxBtcRate, fiatCurrency } = useSelector(
-    (state: StoreState) => state.walletState,
-  );
+  const { fiatCurrency } = useWalletSelector();
+  const { btcFiatRate, stxBtcRate } = useCoinRates();
 
   const getFiatAmountString = (fiatAmount: BigNumber) => {
     if (!fiatAmount) {

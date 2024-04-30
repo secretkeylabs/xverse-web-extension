@@ -110,17 +110,6 @@ export function setFeeMultiplierAction(feeMultipliers: AppInfo): actions.SetFeeM
   };
 }
 
-export function setCoinRatesAction(
-  stxBtcRate: NumberLike,
-  btcFiatRate: NumberLike,
-): actions.SetCoinRates {
-  return {
-    type: actions.SetCoinRatesKey,
-    stxBtcRate: numberLikeToStringOrThrow(stxBtcRate, 'stx fiat rate'),
-    btcFiatRate: numberLikeToStringOrThrow(btcFiatRate, 'btc fiat rate'),
-  };
-}
-
 export function setStxWalletDataAction(
   stxBalance: NumberLike,
   stxAvailableBalance: NumberLike,

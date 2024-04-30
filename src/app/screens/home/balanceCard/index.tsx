@@ -2,6 +2,7 @@ import BarLoader from '@components/barLoader';
 import { useVisibleBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useAccountBalance from '@hooks/queries/useAccountBalance';
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
@@ -69,8 +70,6 @@ function BalanceCard(props: BalanceCardProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const {
     fiatCurrency,
-    btcFiatRate,
-    stxBtcRate,
     stxBalance,
     btcBalance,
     btcAddress,
@@ -78,6 +77,7 @@ function BalanceCard(props: BalanceCardProps) {
     selectedAccount,
     accountBalances,
   } = useWalletSelector();
+  const { btcFiatRate, stxBtcRate } = useCoinRates();
   const { setAccountBalance } = useAccountBalance();
   const { isLoading, isRefetching } = props;
   const oldTotalBalance = accountBalances[btcAddress];

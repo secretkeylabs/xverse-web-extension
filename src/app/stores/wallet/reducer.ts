@@ -18,7 +18,6 @@ import {
   SetAccountBalanceKey,
   SetBrc20ManageTokensKey,
   SetBtcWalletDataKey,
-  SetCoinRatesKey,
   SetFeeMultiplierKey,
   SetNotificationBannersKey,
   SetRunesManageTokensKey,
@@ -55,8 +54,6 @@ import {
  * because we get many bugs around caching the wrong values when switching accounts,
  * we prefer react-query cache (with the correct cache keys) for all
  * account-specific values, and API fetch results such as:
- *  - btcFiatRate: '0',
- *  - stxBtcRate: '0',
  *  - stxBalance: '0',
  *  - stxAvailableBalance: '0',
  *  - stxLockedBalance: '0',
@@ -81,8 +78,6 @@ export const initialWalletState: WalletState = {
   selectedAccount: null,
   encryptedSeed: '',
   fiatCurrency: 'USD',
-  btcFiatRate: '0',
-  stxBtcRate: '0',
   stxBalance: '0',
   stxAvailableBalance: '0',
   stxLockedBalance: '0',
@@ -168,12 +163,6 @@ const walletReducer = (
       return {
         ...state,
         encryptedSeed: action.encryptedSeed,
-      };
-    case SetCoinRatesKey:
-      return {
-        ...state,
-        btcFiatRate: action.btcFiatRate,
-        stxBtcRate: action.stxBtcRate,
       };
     case SetStxWalletDataKey:
       return {

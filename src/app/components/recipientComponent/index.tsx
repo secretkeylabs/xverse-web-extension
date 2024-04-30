@@ -3,6 +3,7 @@ import OutputIcon from '@assets/img/transactions/output.svg';
 import WalletIcon from '@assets/img/transactions/wallet.svg';
 import TokenImage from '@components/tokenImage';
 import TransferDetailView from '@components/transferDetailView';
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CubeTransparent } from '@phosphor-icons/react';
 import { currencySymbolMap, FungibleToken, getFiatEquivalent } from '@secretkeylabs/xverse-core';
@@ -129,7 +130,8 @@ function RecipientComponent({
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [fiatAmount, setFiatAmount] = useState<string | undefined>('0');
-  const { stxBtcRate, btcFiatRate, fiatCurrency, ordinalsAddress } = useWalletSelector();
+  const { fiatCurrency, ordinalsAddress } = useWalletSelector();
+  const { btcFiatRate, stxBtcRate } = useCoinRates();
 
   useEffect(() => {
     setFiatAmount(

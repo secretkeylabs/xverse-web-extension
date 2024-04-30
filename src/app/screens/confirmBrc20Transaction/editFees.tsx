@@ -2,6 +2,7 @@ import { BetterBarLoader } from '@components/barLoader';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import FiatAmountText from '@components/fiatAmountText';
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
@@ -159,7 +160,8 @@ export function EditFees({
 }) {
   const { t } = useTranslation('translation');
 
-  const { btcFiatRate, fiatCurrency } = useWalletSelector();
+  const { fiatCurrency } = useWalletSelector();
+  const { btcFiatRate } = useCoinRates();
   const { data: feeRates } = useBtcFeeRate();
 
   // save the previous state in case user clicks X without applying

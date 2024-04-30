@@ -6,6 +6,7 @@ import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import SmallActionButton from '@components/smallActionButton';
 import TokenImage from '@components/tokenImage';
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   currencySymbolMap,
@@ -166,12 +167,11 @@ export default function CoinHeader(props: CoinBalanceProps) {
     btcBalance,
     stxBalance,
     fiatCurrency,
-    stxBtcRate,
-    btcFiatRate,
     stxLockedBalance,
     stxAvailableBalance,
     selectedAccount,
   } = useWalletSelector();
+  const { btcFiatRate, stxBtcRate } = useCoinRates();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
