@@ -1,3 +1,5 @@
+import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
@@ -62,11 +64,18 @@ function AmountSelector({
   const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
   const navigate = useNavigate();
 
-  const { btcFiatRate, fiatCurrency, btcBalance } = useWalletSelector();
+  const { fiatCurrency } = useWalletSelector();
+  const { data: btcBalance, isLoading: btcBalanceLoading } = useBtcWalletData();
+  const { btcFiatRate } = useCoinRates();
+
   const { data: recommendedFees } = useBtcFeeRate();
 
   const satsToFiat = (sats: string) =>
     getBtcFiatEquivalent(new BigNumber(sats), BigNumber(btcFiatRate)).toNumber().toFixed(2);
+
+  if (btcBalanceLoading || !btcBalance) {
+    return null;
+  }
 
   const hasBtc = +btcBalance > 0;
   return (

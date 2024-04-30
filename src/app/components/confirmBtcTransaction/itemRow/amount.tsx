@@ -1,4 +1,5 @@
 import TokenImage from '@components/tokenImage';
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { currencySymbolMap, getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core';
 import Avatar from '@ui-library/avatar';
@@ -29,7 +30,8 @@ const AvatarContainer = styled.div`
 `;
 
 export default function Amount({ amount }: Props) {
-  const { btcFiatRate, fiatCurrency } = useWalletSelector();
+  const { fiatCurrency } = useWalletSelector();
+  const { btcFiatRate } = useCoinRates();
   const { t } = useTranslation('translation');
 
   const getFiatAmountString = (amountParam: number, btcFiatRateParam: string) => {

@@ -16,7 +16,6 @@ import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useGetRuneFun
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useAppConfig from '@hooks/queries/useAppConfig';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useCoinRates from '@hooks/queries/useCoinRates';
 import useFeeMultipliers from '@hooks/queries/useFeeMultipliers';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useHasFeature from '@hooks/useHasFeature';
@@ -256,7 +255,6 @@ function Home() {
   } = useVisibleRuneFungibleTokens();
 
   useFeeMultipliers();
-  useCoinRates();
   useAppConfig();
   useTrackMixPanelPageViewed();
 

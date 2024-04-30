@@ -6,16 +6,29 @@
   "engines": {
     "node": "^18.18.2"
   },
+  "scripts": {
+    "build": "npm run clean && NODE_ENV=production npx node webpack/utils/build.js",
+    "build-named": "npm run clean && NODE_ENV=production node scripts/build-named.js",
+    "start": "npx node webpack/utils/devServer.js",
+    "clean": "rimraf build",
+    "test": "vitest ./src",
+    "style": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "prepare": "husky install",
+    "e2etest": "npx playwright test",
+    "e2etest:ui": "npx playwright test --ui",
+    "smoketest": "npx playwright test --grep \"#smoketest\"",
+    "e2etest:report": "playwright show-report"
+  },
   "dependencies": {
     "@ledgerhq/hw-transport-webusb": "^6.27.13",
     "@phosphor-icons/react": "^2.0.10",
     "@playwright/test": "^1.43.1",
     "@react-spring/web": "^9.6.1",
     "@scure/btc-signer": "1.2.1",
-    "@secretkeylabs/xverse-core": "13.4.1",
+    "@secretkeylabs/xverse-core": "13.5.0",
     "@stacks/connect": "7.4.1",
     "@stacks/stacks-blockchain-api-types": "6.1.1",
-    "@stacks/transactions": "6.9.0",
+    "@stacks/transactions": "6.13.1",
     "@tanstack/query-sync-storage-persister": "^4.29.1",
     "@tanstack/react-query": "^4.29.3",
     "@tanstack/react-query-devtools": "^4.29.3",
@@ -77,17 +90,6 @@
     "webextension-polyfill": "^0.10.0",
     "zod": "3.22.4",
     "zxcvbn": "^4.4.2"
-  },
-  "scripts": {
-    "build": "npm run clean && NODE_ENV=production npx node webpack/utils/build.js",
-    "build-named": "npm run clean && NODE_ENV=production node scripts/build-named.js",
-    "start": "npx node webpack/utils/devServer.js",
-    "clean": "rimraf build",
-    "test": "vitest ./src",
-    "style": "prettier --write \"src/**/*.{ts,tsx}\"",
-    "prepare": "husky install",
-    "uitest": "npx playwright test",
-    "uitest:report": "playwright show-report"
   },
   "overrides": {
     "buffer": "6.0.3"

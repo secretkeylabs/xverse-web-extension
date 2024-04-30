@@ -8,6 +8,7 @@ import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import SpeedUpBtcTransaction from '@components/speedUpTransaction/btc';
 import SpeedUpStxTransaction from '@components/speedUpTransaction/stx';
 import TopRow from '@components/topRow';
+import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useTransaction from '@hooks/queries/useTransaction';
 import useBtcClient from '@hooks/useBtcClient';
 import useNetworkSelector from '@hooks/useNetwork';
@@ -47,7 +48,8 @@ function SpeedUpTransactionScreen() {
   const navigate = useNavigate();
 
   const [showCustomFee, setShowCustomFee] = useState(false);
-  const { selectedAccount, stxAddress, network, stxAvailableBalance } = useWalletSelector();
+  const { selectedAccount, stxAddress, network } = useWalletSelector();
+  const { data: stxData } = useStxWalletData();
   const { id } = useParams();
   const location = useLocation();
   const btcClient = useBtcClient();
@@ -102,7 +104,7 @@ function SpeedUpTransactionScreen() {
       return;
     }
 
-    if (stxToMicrostacks(BigNumber(feeRate)).gt(BigNumber(stxAvailableBalance))) {
+    if (stxToMicrostacks(BigNumber(feeRate)).gt(BigNumber(stxData?.availableBalance ?? 0))) {
       setCustomFeeError(t('INSUFFICIENT_FUNDS'));
     } else {
       setCustomFeeError(undefined);

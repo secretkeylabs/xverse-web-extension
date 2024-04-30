@@ -2,7 +2,6 @@ import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import { useGetBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
 import { useGetSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
-import useCoinRates from '@hooks/queries/useCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { SupportedCurrency } from '@secretkeylabs/xverse-core';
 import { ChangeFiatCurrencyAction } from '@stores/wallet/actions/actionCreators';
@@ -31,8 +30,6 @@ function FiatCurrencyScreen() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // here to fetch new rates on currency change, to avoid glitches in home balance card and tokens fiat value
-  useCoinRates();
   useGetSip10FungibleTokens();
   useGetBrc20FungibleTokens();
 

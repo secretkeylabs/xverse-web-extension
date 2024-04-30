@@ -1,3 +1,4 @@
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useBtcClient from '@hooks/useBtcClient';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -21,15 +22,9 @@ import { fetchSip10FungibleTokens } from './stx/useGetSip10FungibleTokens';
 const useAccountBalance = () => {
   const btcClient = useBtcClient();
   const stacksNetwork = useNetworkSelector();
-  const {
-    btcFiatRate,
-    stxBtcRate,
-    fiatCurrency,
-    network,
-    hideStx,
-    brc20ManageTokens,
-    sip10ManageTokens,
-  } = useWalletSelector();
+  const { fiatCurrency, network, hideStx, brc20ManageTokens, sip10ManageTokens } =
+    useWalletSelector();
+  const { btcFiatRate, stxBtcRate } = useCoinRates();
   const dispatch = useDispatch();
   const queue = useRef<Account[]>([]);
   const [isProcessingQueue, setIsProcessingQueue] = useState(false);

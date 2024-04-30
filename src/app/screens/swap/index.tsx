@@ -84,7 +84,7 @@ function SwapScreen() {
             onAmountChange={swap.onInputAmountChanged}
             onSelectCoin={() => setSelecting('from')}
           />
-          <DownArrowButton onClick={swap.handleClickDownArrow}>
+          <DownArrowButton data-testid="down-arrow-button" onClick={swap.handleClickDownArrow}>
             <ArrowDown size={20} weight="regular" color="white" />
           </DownArrowButton>
           <SwapTokenBlock

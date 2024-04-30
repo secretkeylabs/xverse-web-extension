@@ -59,6 +59,7 @@ const StyledButton = styled(ActionButton)((props) => ({
   div: {
     ...props.theme.typography.body_medium_m,
     color: props.theme.colors.tangerine,
+    whiteSpace: 'nowrap',
   },
   ':hover:enabled': {
     backgroundColor: 'transparent',

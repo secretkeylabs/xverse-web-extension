@@ -27,6 +27,7 @@ import ConfirmScreen from '@components/confirmScreen';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getShortTruncatedAddress, isLedgerAccount } from '@utils/helper';
 
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useConfirmedBtcBalance from '@hooks/queries/useConfirmedBtcBalance';
 import useBtcClient from '@hooks/useBtcClient';
 import useSeedVault from '@hooks/useSeedVault';
@@ -276,8 +277,9 @@ function CreateInscription() {
   const { getSeed } = useSeedVault();
   const btcClient = useBtcClient();
 
-  const { ordinalsAddress, network, btcAddress, selectedAccount, btcFiatRate, fiatCurrency } =
+  const { ordinalsAddress, network, btcAddress, selectedAccount, fiatCurrency } =
     useWalletSelector();
+  const { btcFiatRate } = useCoinRates();
 
   useEffect(() => {
     getNonOrdinalUtxo(btcAddress, btcClient, requestedNetwork.type).then(setUtxos);

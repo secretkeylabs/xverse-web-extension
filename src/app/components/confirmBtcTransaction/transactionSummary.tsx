@@ -5,6 +5,7 @@ import AssetModal from '@components/assetModal';
 import BurnSection from '@components/confirmBtcTransaction/burnSection';
 import MintSection from '@components/confirmBtcTransaction/mintSection';
 import TransferFeeView from '@components/transferFeeView';
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import { btcTransaction, getBtcFiatEquivalent, RuneSummary } from '@secretkeylabs/xverse-core';
 import SelectFeeRate from '@ui-components/selectFeeRate';
@@ -64,7 +65,8 @@ function TransactionSummary({
     btcTransaction.IOInscription | undefined
   >(undefined);
 
-  const { network, fiatCurrency, btcFiatRate } = useWalletSelector();
+  const { btcFiatRate } = useCoinRates();
+  const { network, fiatCurrency } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { t: rareSatsT } = useTranslation('translation', { keyPrefix: 'RARE_SATS' });
   const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
