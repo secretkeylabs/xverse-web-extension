@@ -7,8 +7,8 @@ import ActionButton from '@components/button';
 import SmallActionButton from '@components/smallActionButton';
 import TokenImage from '@components/tokenImage';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useCoinRates from '@hooks/queries/useCoinRates';
+import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   currencySymbolMap,
@@ -165,10 +165,7 @@ const StacksLockedInfoText = styled.span((props) => ({
 
 export default function CoinHeader(props: CoinBalanceProps) {
   const { coin, fungibleToken } = props;
-  const {
-    fiatCurrency,
-    selectedAccount,
-  } = useWalletSelector();
+  const { fiatCurrency, selectedAccount } = useWalletSelector();
   const { data: btcBalance } = useBtcWalletData();
   const { data: stxData } = useStxWalletData();
   const { btcFiatRate, stxBtcRate } = useCoinRates();

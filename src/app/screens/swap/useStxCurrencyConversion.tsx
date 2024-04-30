@@ -1,6 +1,6 @@
 import { useGetSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
-import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useCoinRates from '@hooks/queries/useCoinRates';
+import useStxWalletData from '@hooks/queries/useStxWalletData';
 import { FungibleToken, getFiatEquivalent, microstacksToStx } from '@secretkeylabs/xverse-core';
 import { ftDecimals } from '@utils/helper';
 import { AlexSDK, Currency } from 'alex-sdk';

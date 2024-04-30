@@ -2,8 +2,8 @@ import { BetterBarLoader } from '@components/barLoader';
 import { StyledFiatAmountText } from '@components/fiatAmountText';
 import TokenImage from '@components/tokenImage';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useCoinRates from '@hooks/queries/useCoinRates';
+import useStxWalletData from '@hooks/queries/useStxWalletData';
 import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import { microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core';
 import { StoreState } from '@stores/index';
@@ -122,9 +122,7 @@ function TokenTile({
   className,
   showProtocolIcon = true,
 }: Props) {
-  const { fiatCurrency } = useSelector(
-    (state: StoreState) => state.walletState,
-  );
+  const { fiatCurrency } = useSelector((state: StoreState) => state.walletState);
   const { btcFiatRate, stxBtcRate } = useCoinRates();
   const { data: stxData } = useStxWalletData();
   const { data: btcBalance } = useBtcWalletData();
