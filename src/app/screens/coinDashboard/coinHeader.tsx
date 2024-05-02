@@ -297,9 +297,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
           return;
         case 'runes':
           await chrome.tabs.create({
-            url: chrome.runtime.getURL(
-              `options.html#/send-rune?coinTicker=${fungibleToken?.ticker}`,
-            ),
+            url: chrome.runtime.getURL(`options.html#/send-rune?coinTicker=${fungibleToken?.name}`),
           });
           return;
         default:

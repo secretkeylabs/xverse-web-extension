@@ -363,7 +363,7 @@ function Home() {
     if (fungibleToken.protocol === 'runes') {
       if (isLedgerAccount(selectedAccount) && !isInOptions()) {
         await chrome.tabs.create({
-          url: chrome.runtime.getURL(`options.html#/send-rune?coinTicker=${fungibleToken.ticker}`),
+          url: chrome.runtime.getURL(`options.html#/send-rune?coinTicker=${fungibleToken.name}`),
         });
         return;
       }
