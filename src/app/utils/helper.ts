@@ -246,6 +246,7 @@ export const calculateTotalBalance = ({
   btcBalance,
   sipCoinsList,
   brcCoinsList,
+  runesCoinList,
   stxBtcRate,
   btcFiatRate,
   hideStx,
@@ -254,6 +255,7 @@ export const calculateTotalBalance = ({
   btcBalance?: string;
   sipCoinsList: FungibleToken[];
   brcCoinsList: FungibleToken[];
+  runesCoinList: FungibleToken[];
   stxBtcRate: string;
   btcFiatRate: string;
   hideStx: boolean;
@@ -290,6 +292,19 @@ export const calculateTotalBalance = ({
 
   if (brcCoinsList) {
     totalBalance = brcCoinsList.reduce((acc, coin) => {
+      if (coin.visible && coin.tokenFiatRate) {
+        const coinFiatValue = new BigNumber(coin.balance).multipliedBy(
+          new BigNumber(coin.tokenFiatRate),
+        );
+        return acc.plus(coinFiatValue);
+      }
+
+      return acc;
+    }, totalBalance);
+  }
+
+  if (runesCoinList) {
+    totalBalance = runesCoinList.reduce((acc, coin) => {
       if (coin.visible && coin.tokenFiatRate) {
         const coinFiatValue = new BigNumber(coin.balance).multipliedBy(
           new BigNumber(coin.tokenFiatRate),
