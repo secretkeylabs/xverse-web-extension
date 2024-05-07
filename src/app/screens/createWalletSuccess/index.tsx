@@ -2,7 +2,10 @@ import CheckCircle from '@assets/img/createWalletSuccess/CheckCircle.svg';
 import Extension from '@assets/img/createWalletSuccess/extension.svg';
 import Logo from '@assets/img/createWalletSuccess/logo.svg';
 import Pin from '@assets/img/createWalletSuccess/pin.svg';
+import useSanityCheck from '@hooks/useSanityCheck';
+import useWalletReducer from '@hooks/useWalletReducer';
 import Button from '@ui-library/button';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
@@ -72,6 +75,20 @@ const ContinueButton = styled(Button)((props) => ({
 function CreateWalletSuccess(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'WALLET_SUCCESS_SCREEN' });
   const { action } = useParams();
+  const { resetWallet } = useWalletReducer();
+  const { getSanityCheck } = useSanityCheck();
+
+  useEffect(() => {
+    (async () => {
+      if (action !== 'create') {
+        return;
+      }
+      const isCheckOk = await getSanityCheck('X-Create-Version');
+      if (!isCheckOk) {
+        await resetWallet();
+      }
+    })();
+  }, [action, getSanityCheck, resetWallet]);
 
   const handleCloseTab = () => {
     window.close();
