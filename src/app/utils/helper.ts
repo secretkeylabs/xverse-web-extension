@@ -22,26 +22,23 @@ import {
 
 const validUrl = require('valid-url');
 
-export function initBigNumber(num: string | number | BigNumber) {
-  return BigNumber.isBigNumber(num) ? num : new BigNumber(num);
-}
+export const initBigNumber = (num: string | number | BigNumber) =>
+  BigNumber.isBigNumber(num) ? num : new BigNumber(num);
 
-export function ftDecimals(value: number | string | BigNumber, decimals: number): string {
+export const ftDecimals = (value: number | string | BigNumber, decimals: number): string => {
   const amount = initBigNumber(value);
   return amount.shiftedBy(-decimals).toString();
-}
+};
 
-export function convertAmountToFtDecimalPlaces(
+export const convertAmountToFtDecimalPlaces = (
   value: number | string | BigNumber,
   decimals: number,
-): number {
+): number => {
   const amount = initBigNumber(value);
   return amount.shiftedBy(+decimals).toNumber();
-}
+};
 
-export function replaceCommaByDot(amount: string) {
-  return amount.replace(/,/g, '.');
-}
+export const replaceCommaByDot = (amount: string) => amount.replace(/,/g, '.');
 
 export const microStxToStx = (mStx: number | string | BigNumber) => {
   const microStacks = initBigNumber(mStx);
@@ -51,7 +48,7 @@ export const microStxToStx = (mStx: number | string | BigNumber) => {
 /**
  * get ticker from name
  */
-export function getTicker(name: string) {
+export const getTicker = (name: string) => {
   if (name.includes('-')) {
     const parts = name.split('-');
     if (parts.length >= 3) {
@@ -63,22 +60,21 @@ export function getTicker(name: string) {
     return `${name[0]}${name[1]}${name[2]}`;
   }
   return name;
-}
+};
 
-export function getTruncatedAddress(address: string, lengthToShow = 4) {
-  return `${address.substring(0, lengthToShow)}...${address.substring(
+export const getTruncatedAddress = (address: string, lengthToShow = 4) =>
+  `${address.substring(0, lengthToShow)}...${address.substring(
     address.length - lengthToShow,
     address.length,
   )}`;
-}
 
-export function getShortTruncatedAddress(address: string) {
+export const getShortTruncatedAddress = (address: string) => {
   if (address) {
     return `${address.substring(0, 8)}...${address.substring(address.length - 8, address.length)}`;
   }
-}
+};
 
-export function getAddressDetail(account: Account) {
+export const getAddressDetail = (account: Account) => {
   if (account.btcAddress && account.stxAddress) {
     return `${getTruncatedAddress(account.btcAddress)} / ${getTruncatedAddress(
       account.stxAddress,
@@ -89,24 +85,22 @@ export function getAddressDetail(account: Account) {
     return getTruncatedAddress(existingAddress);
   }
   return '';
-}
+};
 
-export function getExplorerUrl(stxAddress: string): string {
-  return `https://explorer.stacks.co/address/${stxAddress}?chain=mainnet`;
-}
+export const getExplorerUrl = (stxAddress: string): string =>
+  `https://explorer.stacks.co/address/${stxAddress}?chain=mainnet`;
 
-export function getStxTxStatusUrl(transactionId: string, currentNetwork: SettingsNetwork): string {
-  return `${TRANSACTION_STATUS_URL}${transactionId}?chain=${currentNetwork.type.toLowerCase()}`;
-}
+export const getStxTxStatusUrl = (transactionId: string, currentNetwork: SettingsNetwork): string =>
+  `${TRANSACTION_STATUS_URL}${transactionId}?chain=${currentNetwork.type.toLowerCase()}`;
 
-export function getBtcTxStatusUrl(txId: string, network: SettingsNetwork) {
+export const getBtcTxStatusUrl = (txId: string, network: SettingsNetwork) => {
   if (network.type === 'Testnet') {
     return `${BTC_TRANSACTION_TESTNET_STATUS_URL}${txId}`;
   }
   return `${BTC_TRANSACTION_STATUS_URL}${txId}`;
-}
+};
 
-export function getFetchableUrl(uri: string, protocol: string): string | undefined {
+export const getFetchableUrl = (uri: string, protocol: string): string | undefined => {
   const publicIpfs = 'https://gamma.mypinata.cloud/ipfs';
   if (protocol === 'http') return uri;
   if (protocol === 'ipfs') {
@@ -114,17 +108,17 @@ export function getFetchableUrl(uri: string, protocol: string): string | undefin
     return `${publicIpfs}/${url[1]}`;
   }
   return undefined;
-}
+};
 /**
  * check if nft transaction exists in pending transactions
  * @param pendingTransactions
  * @param nft
  * @returns true if nft exists, false otherwise
  */
-export function checkNftExists(
+export const checkNftExists = (
   pendingTransactions: StxMempoolTransactionData[],
   nft: NftData,
-): boolean {
+): boolean => {
   const principal: string[] = nft?.fully_qualified_token_id?.split('::');
   const transaction = pendingTransactions.find(
     (tx) =>
@@ -133,9 +127,9 @@ export function checkNftExists(
   );
   if (transaction) return true;
   return false;
-}
+};
 
-export async function isValidStacksApi(url: string, type: NetworkType): Promise<boolean> {
+export const isValidStacksApi = async (url: string, type: NetworkType): Promise<boolean> => {
   const networkChainId = type === 'Mainnet' ? ChainID.Mainnet : ChainID.Testnet;
 
   if (!validUrl.isUri(url)) {
@@ -156,9 +150,9 @@ export async function isValidStacksApi(url: string, type: NetworkType): Promise<
   }
 
   return false;
-}
+};
 
-export async function isValidBtcApi(url: string, network: NetworkType) {
+export const isValidBtcApi = async (url: string, network: NetworkType) => {
   if (!validUrl.isUri(url)) {
     return false;
   }
@@ -183,7 +177,7 @@ export async function isValidBtcApi(url: string, network: NetworkType) {
   }
 
   return false;
-}
+};
 
 export const getNetworkType = (stxNetwork) =>
   stxNetwork.chainId === ChainID.Mainnet ? 'Mainnet' : 'Testnet';
@@ -196,9 +190,8 @@ export const isLedgerAccount = (account: Account | null): boolean =>
 
 export const isInOptions = (): boolean => !!window.location?.pathname?.match(/options.html$/);
 
-export function formatNumber(value?: string | number) {
-  return value ? new Intl.NumberFormat().format(Number(value)) : '-';
-}
+export const formatNumber = (value?: string | number) =>
+  value ? new Intl.NumberFormat().format(Number(value)) : '-';
 
 export const handleKeyDownFeeRateInput = (e: React.KeyboardEvent<HTMLInputElement>) => {
   // only allow positive integers
