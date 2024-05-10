@@ -73,7 +73,7 @@ function AmountSelector({
   const satsToFiat = (sats: string) =>
     getBtcFiatEquivalent(new BigNumber(sats), BigNumber(btcFiatRate)).toNumber().toFixed(2);
 
-  if (btcBalanceLoading || !btcBalance) {
+  if (btcBalanceLoading || btcBalance === undefined) {
     return null;
   }
 
