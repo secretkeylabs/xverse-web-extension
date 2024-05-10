@@ -127,7 +127,7 @@ function AmountSelector({
             bodyText={t('BTC.NO_FUNDS')}
             redirectText={t('BTC.BUY_BTC')}
             onClickRedirect={() => {
-              navigate('/buy/btc');
+              navigate('/buy/BTC');
             }}
           />
         )}
