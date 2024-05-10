@@ -1,12 +1,12 @@
+import PasswordInput from '@components/passwordInput';
+import BottomBar from '@components/tabBar';
+import TopRow from '@components/topRow';
+import useSeedVault from '@hooks/useSeedVault';
+import SeedCheck from '@screens/backupWalletSteps/seedCheck';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import PasswordInput from '@components/passwordInput';
-import TopRow from '@components/topRow';
-import BottomBar from '@components/tabBar';
-import SeedCheck from '@screens/backupWalletSteps/seedCheck';
 import styled from 'styled-components';
-import useSeedVault from '@hooks/useSeedVault';
 
 const Container = styled.div`
   display: flex;
@@ -98,9 +98,7 @@ function BackupWalletScreen() {
           </EnterPasswordContainer>
         )}
         <SeedphraseContainer>
-          {showSeed && (
-            <SeedCheck showButton={false} seedPhrase={seed} onContinue={goToSettingScreen} />
-          )}
+          {showSeed && <SeedCheck seedPhrase={seed} onContinue={goToSettingScreen} />}
         </SeedphraseContainer>
       </Container>
       <BottomBar tab="settings" />

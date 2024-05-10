@@ -4,6 +4,7 @@ import ActionButton from '@components/button';
 import RecipientComponent from '@components/recipientComponent';
 import TransactionSettingAlert from '@components/transactionSetting';
 import TransferFeeView from '@components/transferFeeView';
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useBtcClient from '@hooks/useBtcClient';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
@@ -140,7 +141,8 @@ function ConfirmBtcTransactionComponent({
   const { t } = useTranslation('translation');
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const [loading, setLoading] = useState(false);
-  const { btcAddress, selectedAccount, network, btcFiatRate, feeMultipliers } = useWalletSelector();
+  const { btcAddress, selectedAccount, network, feeMultipliers } = useWalletSelector();
+  const { btcFiatRate } = useCoinRates();
   const { selectedSatBundle } = useNftDataSelector();
   const { getSeed } = useSeedVault();
   const [showFeeSettings, setShowFeeSettings] = useState(false);

@@ -2,6 +2,7 @@ import ActionButton from '@components/button';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import { useGetBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSeedVault from '@hooks/useSeedVault';
@@ -56,8 +57,9 @@ const SendButtonContainer = styled.div<ButtonProps>((props) => ({
 function SendBrc20Screen() {
   const { t } = useTranslation('translation');
   const navigate = useNavigate();
-  const { btcAddress, ordinalsAddress, selectedAccount, network, btcFiatRate } =
-    useWalletSelector();
+  const { btcAddress, ordinalsAddress, selectedAccount, network } = useWalletSelector();
+  const { btcFiatRate } = useCoinRates();
+
   const { data: brc20CoinsList } = useGetBrc20FungibleTokens();
   const { getSeed } = useSeedVault();
   const [amountError, setAmountError] = useState('');

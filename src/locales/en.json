@@ -23,7 +23,7 @@
     "SCREEN_TITLE": "The Bitcoin wallet for everyone",
     "CREATE_WALLET_BUTTON": "Create a new wallet",
     "RESTORE_WALLET_BUTTON": "Restore an existing wallet",
-    "ONBOARDING_1_TITlE": "Store BTC, Ordinals, Rare Sats, BRC20, STX and more!",
+    "ONBOARDING_1_TITlE": "Store BTC, Runes, Ordinals, BRC-20, Rare Sats, STX and more!",
     "ONBOARDING_2_TITlE": "Connect to your favorite Bitcoin apps"
   },
   "LEDGER_IMPORT_SCREEN": {
@@ -492,6 +492,8 @@
     "SEED_PHRASE_VIEW_HEADING": "Write down your seed phrase and make sure to keep it private. This is the unique key to your wallet. ",
     "SEED_PHRASE_VIEW_LABEL": "Seedphrase",
     "SEED_PHRASE_VIEW_CONTINUE": "Continue",
+    "SEED_PHRASE_VIEW_REVEAL": "Reveal",
+    "SEED_PHRASE_VIEW_HIDE": "Hide",
     "SEED_PHRASE_VERIFY_HEADING": "Write your seedphrase to confirm you saved it properly.",
     "SEED_PHRASE_VERIFY_BUTTON": "Verify",
     "SEED_PHRASE_BACK_BUTTON": "Back to seedphrase",
@@ -667,13 +669,13 @@
   },
   "RESTORE_FUND_SCREEN": {
     "TITLE": "Recover assets",
-    "DESCRIPTION": "If you sent Ordinals to your Bitcoin payment address or Bitcoin to your ordinals address, you can recover it and send it to the correct address.",
+    "DESCRIPTION": "If you sent Ordinals or Runes to your Bitcoin payment address, you can recover it and send it to the correct address.",
     "RECOVER_BTC": "Recover BTC",
     "RECOVER_BTC_DESC": "If you sent Bitcoin to your Ordinals address.",
     "RECOVER_ORDINALS": "Recover Ordinals",
-    "RECOVER_ORDINALS_DESC": "If you sent Ordinals to your Bitcoin payment address.",
+    "RECOVER_ORDINALS_DESC": "Ordinals sent on BTC address",
     "RECOVER_RUNES": "Recover Runes",
-    "RECOVER_RUNES_DESC": "If you sent Runes to your Bitcoin payment address."
+    "RECOVER_RUNES_DESC": "Runes sent on BTC address"
   },
   "RESTORE_BTC_SCREEN": {
     "TITLE": "Recover BTC",

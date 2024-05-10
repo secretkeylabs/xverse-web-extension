@@ -16,11 +16,11 @@ import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useGetRuneFun
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useAppConfig from '@hooks/queries/useAppConfig';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useCoinRates from '@hooks/queries/useCoinRates';
 import useFeeMultipliers from '@hooks/queries/useFeeMultipliers';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useHasFeature from '@hooks/useHasFeature';
 import useNotificationBanners from '@hooks/useNotificationBanners';
+import useSanityCheck from '@hooks/useSanityCheck';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowUp, Plus } from '@phosphor-icons/react';
@@ -34,7 +34,7 @@ import { CurrencyTypes } from '@utils/constants';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -254,11 +254,21 @@ function Home() {
     isLoading: loadingRunesData,
     isRefetching: refetchingRunesData,
   } = useVisibleRuneFungibleTokens();
+  const { getSanityCheck } = useSanityCheck();
 
   useFeeMultipliers();
-  useCoinRates();
   useAppConfig();
   useTrackMixPanelPageViewed();
+
+  useEffect(() => {
+    (async () => {
+      if (localStorage.getItem('sanityCheck')) {
+        return;
+      }
+      localStorage.setItem('sanityCheck', 'true');
+      getSanityCheck('X-Current-Version');
+    })();
+  }, [getSanityCheck]);
 
   const showNotificationBanner =
     notificationBannersArr?.length &&
@@ -365,7 +375,7 @@ function Home() {
     if (fungibleToken.protocol === 'runes') {
       if (isLedgerAccount(selectedAccount) && !isInOptions()) {
         await chrome.tabs.create({
-          url: chrome.runtime.getURL(`options.html#/send-rune?coinTicker=${fungibleToken.ticker}`),
+          url: chrome.runtime.getURL(`options.html#/send-rune?coinTicker=${fungibleToken.name}`),
         });
         return;
       }
