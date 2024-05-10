@@ -171,8 +171,7 @@ const OnBoardingImage = styled.img(() => ({
 
 const OnBoardingContent = styled.div((props) => ({
   marginTop: props.theme.spacing(24),
-  marginLeft: props.theme.space.l,
-  marginRight: props.theme.space.l,
+  padding: `0 ${props.theme.space.l}`,
 }));
 
 const OnboardingTitle = styled.h1<{ needPadding: boolean }>((props) => ({

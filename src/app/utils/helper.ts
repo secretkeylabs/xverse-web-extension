@@ -11,6 +11,7 @@ import {
   StxMempoolTransactionData,
 } from '@secretkeylabs/xverse-core';
 import { ChainID } from '@stacks/transactions';
+import { getFtBalance } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { TFunction } from 'react-i18next';
 import {
@@ -299,7 +300,7 @@ export const calculateTotalBalance = ({
   if (runesCoinList) {
     totalBalance = runesCoinList.reduce((acc, coin) => {
       if (coin.visible && coin.tokenFiatRate) {
-        const coinFiatValue = new BigNumber(coin.balance).multipliedBy(
+        const coinFiatValue = new BigNumber(getFtBalance(coin)).multipliedBy(
           new BigNumber(coin.tokenFiatRate),
         );
         return acc.plus(coinFiatValue);

@@ -31,8 +31,7 @@ const useAccountBalance = () => {
     brc20ManageTokens,
     sip10ManageTokens,
     runesManageTokens,
-  } =
-    useWalletSelector();
+  } = useWalletSelector();
   const { btcFiatRate, stxBtcRate } = useCoinRates();
   const runesApi = useRunesApi();
   const dispatch = useDispatch();
