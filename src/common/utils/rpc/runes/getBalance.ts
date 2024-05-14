@@ -8,8 +8,16 @@ const handleGetRunesBalance = async (requestId: RpcId, tabId: number) => {
   const { ordinalsAddress, network } = rootStore.store.getState().walletState;
   const runesApi = getRunesClient(network.type, fetchAdapter);
   try {
-    const balance = await runesApi.getRuneBalance(ordinalsAddress);
-    sendRpcResponse(tabId, makeRpcSuccessResponse(requestId, balance as any));
+    const runesBalances = await runesApi.getRuneBalances(ordinalsAddress);
+    sendRpcResponse(
+      tabId,
+      makeRpcSuccessResponse<'runes_getBalance'>(requestId, {
+        balances: runesBalances.map((runeBalance) => ({
+          ...runeBalance,
+          amount: runeBalance.amount.toString(),
+        })),
+      }),
+    );
   } catch (error) {
     sendRpcResponse(
       tabId,
