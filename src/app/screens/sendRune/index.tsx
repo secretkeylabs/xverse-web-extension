@@ -47,9 +47,11 @@ function SendRuneScreen() {
   const [summary, setSummary] = useState<TransactionSummary | undefined>();
   const [runeSummary, setRuneSummary] = useState<RuneSummary | undefined>();
 
-  const coinTicker = location.search ? location.search.split('coinTicker=')[1] : undefined;
+  const coinTicker = location.search
+    ? decodeURIComponent(location.search.split('coinTicker=')[1])
+    : undefined;
   const fungibleToken: FungibleToken =
-    location.state?.fungibleToken || runesCoinsList?.find((coin) => coin.ticker === coinTicker);
+    location.state?.fungibleToken || runesCoinsList?.find((coin) => coin.name === coinTicker);
   const hasRunesSupport = useHasFeature('RUNES_SUPPORT');
 
   useEffect(() => {

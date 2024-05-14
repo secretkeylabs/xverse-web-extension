@@ -105,7 +105,7 @@ function SendFtScreen() {
     return fungibleToken?.balance;
   };
 
-  function validateFields(associatedAddress: string, amount: string, memo: string): boolean {
+  const validateFields = (associatedAddress: string, amount: string, memo?: string): boolean => {
     if (!associatedAddress) {
       setAddressError(t('ERRORS.ADDRESS_REQUIRED'));
       return false;
@@ -166,12 +166,12 @@ function SendFtScreen() {
     }
 
     return true;
-  }
+  };
 
   const onPressSendSTX = async (associatedAddress: string, amount: string, memo?: string) => {
     const modifyAmount = replaceCommaByDot(amount);
     const addMemo = memo ?? '';
-    if (validateFields(associatedAddress.trim(), modifyAmount, memo!)) {
+    if (validateFields(associatedAddress.trim(), modifyAmount, memo)) {
       setAddressError('');
       setMemoError('');
       setAmountError('');
@@ -186,7 +186,7 @@ function SendFtScreen() {
         processing={isLoading}
         currencyType="FT"
         amountError={amountError}
-        recepientError={addressError}
+        recipientError={addressError}
         memoError={memoError}
         fungibleToken={fungibleToken}
         balance={getBalance()}

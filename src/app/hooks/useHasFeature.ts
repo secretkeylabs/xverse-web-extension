@@ -7,7 +7,7 @@ const useAppFeatures = () => {
 
   return useQuery({
     queryKey: ['appFeatures', network.type, masterPubKey],
-    queryFn: () => getXverseApiClient(network.type).getAppFeatures({ masterPubKey }),
+    queryFn: () => getXverseApiClient(network.type).getAppFeatures(),
     staleTime: 1000 * 60 * 5, // 5 minutes
     cacheTime: 1000 * 60 * 60 * 24, // 24 hours
   });
