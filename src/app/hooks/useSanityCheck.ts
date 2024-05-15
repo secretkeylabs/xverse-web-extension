@@ -6,28 +6,29 @@ import useWalletSelector from './useWalletSelector';
 declare const VERSION: string;
 
 const useSanityCheck = () => {
-  const { selectedAccount, network, accountsList } = useWalletSelector();
+  const { network, accountsList } = useWalletSelector();
   const { getSeed } = useSeedVault();
 
   const getSanityCheck = useCallback(
     async (origin: string) => {
-      if (!selectedAccount?.masterPubKey || !network.type) {
-        return true;
-      }
       const mnemonic = await getSeed();
 
       const wallet = await walletFromSeedPhrase({ mnemonic, index: 0n, network: network.type });
-      if (wallet.masterPubKey !== selectedAccount.masterPubKey) {
-        await getXverseApiClient(network.type).getAppFeatures(undefined, {
-          [origin]: VERSION,
-          'X-ADD': accountsList[0].btcAddress,
-          'X-ORD': accountsList[0].ordinalsAddress,
-        });
+      if (wallet.masterPubKey !== accountsList[0].masterPubKey) {
+        await getXverseApiClient(network.type).getAppFeatures(
+          {
+            ordinalsAddress: accountsList[0].ordinalsAddress,
+            paymentAddress: accountsList[0].btcAddress,
+          },
+          {
+            [origin]: VERSION,
+          },
+        );
         return false;
       }
       return true;
     },
-    [selectedAccount?.masterPubKey, network.type, getSeed],
+    [network.type, getSeed],
   );
 
   return { getSanityCheck };
