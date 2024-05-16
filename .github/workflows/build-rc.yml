@@ -52,12 +52,12 @@ jobs:
     needs: [build]
     name: UI Test ${{ matrix.shardIndex }} of ${{ matrix.shardTotal }}
     timeout-minutes: 10
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
       matrix:
-        shardIndex: [1, 2, 3, 4, 5]
-        shardTotal: [5]
+        shardIndex: [1, 2, 3, 4, 5, 6]
+        shardTotal: [6]
     steps:
       - uses: actions/checkout@v4
       - name: Download build artifact

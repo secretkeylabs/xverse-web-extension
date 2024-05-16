@@ -1,6 +1,9 @@
 import { BetterBarLoader } from '@components/barLoader';
 import { StyledFiatAmountText } from '@components/fiatAmountText';
 import TokenImage from '@components/tokenImage';
+import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useCoinRates from '@hooks/queries/useCoinRates';
+import useStxWalletData from '@hooks/queries/useStxWalletData';
 import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import { microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core';
 import { StoreState } from '@stores/index';
@@ -119,9 +122,10 @@ function TokenTile({
   className,
   showProtocolIcon = true,
 }: Props) {
-  const { fiatCurrency, stxBalance, btcBalance, stxBtcRate, btcFiatRate } = useSelector(
-    (state: StoreState) => state.walletState,
-  );
+  const { fiatCurrency } = useSelector((state: StoreState) => state.walletState);
+  const { btcFiatRate, stxBtcRate } = useCoinRates();
+  const { data: stxData } = useStxWalletData();
+  const { data: btcBalance } = useBtcWalletData();
 
   function getTickerTitle() {
     if (currency === 'STX' || currency === 'BTC') return `${currency}`;
@@ -131,9 +135,9 @@ function TokenTile({
   function getBalanceAmount() {
     switch (currency) {
       case 'STX':
-        return microstacksToStx(new BigNumber(stxBalance)).toString();
+        return microstacksToStx(new BigNumber(stxData?.balance ?? 0)).toString();
       case 'BTC':
-        return satsToBtc(new BigNumber(btcBalance)).toString();
+        return satsToBtc(new BigNumber(btcBalance ?? 0)).toString();
       case 'FT':
         return fungibleToken ? getFtBalance(fungibleToken) : '';
       default:
@@ -143,11 +147,11 @@ function TokenTile({
   function getFiatEquivalent(): BigNumber | undefined {
     switch (currency) {
       case 'STX':
-        return microstacksToStx(new BigNumber(stxBalance))
+        return microstacksToStx(new BigNumber(stxData?.balance ?? 0))
           .multipliedBy(stxBtcRate)
           .multipliedBy(btcFiatRate);
       case 'BTC':
-        return satsToBtc(new BigNumber(btcBalance)).multipliedBy(btcFiatRate);
+        return satsToBtc(new BigNumber(btcBalance ?? 0)).multipliedBy(btcFiatRate);
       case 'FT':
         return fungibleToken?.tokenFiatRate
           ? new BigNumber(getFtBalance(fungibleToken)).multipliedBy(fungibleToken.tokenFiatRate)
@@ -161,7 +165,7 @@ function TokenTile({
 
   return (
     <TileContainer onClick={handleTokenPressed} className={className}>
-      <RowContainer>
+      <RowContainer aria-label="Token Row">
         <TokenImage
           currency={currency}
           loading={loading}
@@ -172,14 +176,14 @@ function TokenTile({
         <TextContainer>
           <CoinTickerText>{getTickerTitle()}</CoinTickerText>
           <TokenTitleContainer>
-            <SubText>{title}</SubText>
+            <SubText aria-label="Token SubTitle">{title}</SubText>
           </TokenTitleContainer>
         </TextContainer>
       </RowContainer>
       {loading ? (
         <TokenLoader />
       ) : (
-        <AmountContainer>
+        <AmountContainer aria-label="CoinBalance Container">
           <NumericFormat
             value={getBalanceAmount()}
             displayType="text"

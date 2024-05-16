@@ -1,6 +1,7 @@
 import SendForm from '@components/sendForm';
 import BottomBar from '@components/tabBar';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
+import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
@@ -23,8 +24,8 @@ import TopRow from '../../components/topRow';
 function SendStxScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
-  const { stxAddress, stxAvailableBalance, stxPublicKey, network, feeMultipliers } =
-    useWalletSelector();
+  const { stxAddress, stxPublicKey, network, feeMultipliers } = useWalletSelector();
+  const { data: stxData } = useStxWalletData();
   const [amountError, setAmountError] = useState('');
   const [addressError, setAddressError] = useState('');
   const [memoError, setMemoError] = useState('');
@@ -114,7 +115,7 @@ function SendStxScreen() {
       return false;
     }
 
-    if (stxToMicrostacks(parsedAmount).gt(stxAvailableBalance)) {
+    if (stxToMicrostacks(parsedAmount).gt(stxData?.availableBalance ?? new BigNumber(0))) {
       setAmountError(t('ERRORS.INSUFFICIENT_BALANCE'));
       return false;
     }
@@ -148,7 +149,7 @@ function SendStxScreen() {
         amountError={amountError}
         recepientError={addressError}
         memoError={memoError}
-        balance={Number(microstacksToStx(new BigNumber(stxAvailableBalance)))}
+        balance={Number(microstacksToStx(new BigNumber(stxData?.availableBalance || 0)))}
         onPressSend={onPressSendSTX}
         recipient={recipientAddress!}
         amountToSend={amountToSend!}

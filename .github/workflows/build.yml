@@ -10,8 +10,8 @@ on:
       - develop
 jobs:
   build:
-    if: ${{ !startsWith(github.head_ref, 'release/') }}
-    runs-on: ubuntu-latest
+    if: ${{ !startsWith(github.head_ref, 'release/') && !startsWith(github.head_ref, 'e2etest/')}}
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js

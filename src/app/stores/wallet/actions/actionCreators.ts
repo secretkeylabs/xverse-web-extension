@@ -6,7 +6,6 @@ import type {
   BaseWallet,
   SettingsNetwork,
   SupportedCurrency,
-  TransactionData,
 } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import * as actions from './types';
@@ -107,41 +106,6 @@ export function setFeeMultiplierAction(feeMultipliers: AppInfo): actions.SetFeeM
   return {
     type: actions.SetFeeMultiplierKey,
     feeMultipliers,
-  };
-}
-
-export function setCoinRatesAction(
-  stxBtcRate: NumberLike,
-  btcFiatRate: NumberLike,
-): actions.SetCoinRates {
-  return {
-    type: actions.SetCoinRatesKey,
-    stxBtcRate: numberLikeToStringOrThrow(stxBtcRate, 'stx fiat rate'),
-    btcFiatRate: numberLikeToStringOrThrow(btcFiatRate, 'btc fiat rate'),
-  };
-}
-
-export function setStxWalletDataAction(
-  stxBalance: NumberLike,
-  stxAvailableBalance: NumberLike,
-  stxLockedBalance: NumberLike,
-  stxTransactions: TransactionData[],
-  stxNonce: number,
-): actions.SetStxWalletData {
-  return {
-    type: actions.SetStxWalletDataKey,
-    stxBalance: numberLikeToStringOrThrow(stxBalance, 'stx balance'),
-    stxAvailableBalance: numberLikeToStringOrThrow(stxAvailableBalance, 'stx available'),
-    stxLockedBalance: numberLikeToStringOrThrow(stxLockedBalance, 'stx locked'),
-    stxTransactions,
-    stxNonce,
-  };
-}
-
-export function SetBtcWalletDataAction(balance: NumberLike): actions.SetBtcWalletData {
-  return {
-    type: actions.SetBtcWalletDataKey,
-    balance: numberLikeToStringOrThrow(balance, 'bitcoin balance'),
   };
 }
 

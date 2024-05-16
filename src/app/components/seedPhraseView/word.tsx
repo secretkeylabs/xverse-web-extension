@@ -21,14 +21,15 @@ const Container = styled.div({
 interface Props {
   index: number;
   word: string;
+  isVisible: boolean;
 }
 
-function SeedPhraseWord({ index, word }: Props) {
+function SeedPhraseWord({ index, word, isVisible }: Props) {
   return (
     <Container>
       <OrdinalNumber>{index + 1}.</OrdinalNumber>
       <SeedWord key={word} translate="no">
-        {word}
+        {isVisible ? word : '••••••••'}
       </SeedWord>
     </Container>
   );

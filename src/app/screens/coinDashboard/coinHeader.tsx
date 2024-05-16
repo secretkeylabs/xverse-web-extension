@@ -6,6 +6,9 @@ import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import SmallActionButton from '@components/smallActionButton';
 import TokenImage from '@components/tokenImage';
+import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useCoinRates from '@hooks/queries/useCoinRates';
+import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   currencySymbolMap,
@@ -162,16 +165,10 @@ const StacksLockedInfoText = styled.span((props) => ({
 
 export default function CoinHeader(props: CoinBalanceProps) {
   const { coin, fungibleToken } = props;
-  const {
-    btcBalance,
-    stxBalance,
-    fiatCurrency,
-    stxBtcRate,
-    btcFiatRate,
-    stxLockedBalance,
-    stxAvailableBalance,
-    selectedAccount,
-  } = useWalletSelector();
+  const { fiatCurrency, selectedAccount } = useWalletSelector();
+  const { data: btcBalance } = useBtcWalletData();
+  const { data: stxData } = useStxWalletData();
+  const { btcFiatRate, stxBtcRate } = useCoinRates();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
@@ -188,9 +185,9 @@ export default function CoinHeader(props: CoinBalanceProps) {
   function getBalanceAmount() {
     switch (coin) {
       case 'STX':
-        return microstacksToStx(new BigNumber(stxBalance)).toString();
+        return microstacksToStx(new BigNumber(stxData?.balance ?? 0)).toString();
       case 'BTC':
-        return satsToBtc(new BigNumber(btcBalance)).toString();
+        return satsToBtc(new BigNumber(btcBalance ?? 0)).toString();
       default:
         return fungibleToken ? getFtBalance(fungibleToken) : '';
     }
@@ -218,13 +215,13 @@ export default function CoinHeader(props: CoinBalanceProps) {
   function getFiatEquivalent() {
     switch (coin) {
       case 'STX':
-        return microstacksToStx(new BigNumber(stxBalance))
+        return microstacksToStx(new BigNumber(stxData?.balance ?? '0'))
           .multipliedBy(new BigNumber(stxBtcRate))
           .multipliedBy(new BigNumber(btcFiatRate))
           .toFixed(2)
           .toString();
       case 'BTC':
-        return satsToBtc(new BigNumber(btcBalance))
+        return satsToBtc(new BigNumber(btcBalance ?? 0))
           .multipliedBy(new BigNumber(btcFiatRate))
           .toFixed(2)
           .toString();
@@ -236,7 +233,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
   }
 
   const renderStackingBalances = () => {
-    if (!new BigNumber(stxLockedBalance).eq(0) && coin === 'STX') {
+    if (!new BigNumber(stxData?.locked ?? 0).eq(0) && coin === 'STX') {
       return (
         <>
           <HeaderSeparator />
@@ -245,7 +242,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
               <img src={Lock} alt="locked" />
               <StacksLockedInfoText>{t('STX_LOCKED_BALANCE_PREFIX')}</StacksLockedInfoText>
               <NumericFormat
-                value={microstacksToStx(new BigNumber(stxLockedBalance)).toString()}
+                value={microstacksToStx(new BigNumber(stxData?.locked ?? '0')).toString()}
                 displayType="text"
                 thousandSeparator
                 renderText={(value: string) => <StxLockedText>{`${value} STX`}</StxLockedText>}
@@ -254,7 +251,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
             <AvailableStxContainer>
               <StacksLockedInfoText>{t('STX_AVAILABLE_BALANCE_PREFIX')}</StacksLockedInfoText>
               <NumericFormat
-                value={microstacksToStx(new BigNumber(stxAvailableBalance)).toString()}
+                value={microstacksToStx(new BigNumber(stxData?.availableBalance ?? 0)).toString()}
                 displayType="text"
                 thousandSeparator
                 renderText={(value: string) => <StxLockedText>{`${value} STX`}</StxLockedText>}
@@ -300,9 +297,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
           return;
         case 'runes':
           await chrome.tabs.create({
-            url: chrome.runtime.getURL(
-              `options.html#/send-rune?coinTicker=${fungibleToken?.ticker}`,
-            ),
+            url: chrome.runtime.getURL(`options.html#/send-rune?coinTicker=${fungibleToken?.name}`),
           });
           return;
         default:

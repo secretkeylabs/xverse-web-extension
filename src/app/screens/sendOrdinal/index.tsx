@@ -1,5 +1,6 @@
 import ActionButton from '@components/button';
 import useAddressInscription from '@hooks/queries/ordinals/useAddressInscription';
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSeedVault from '@hooks/useSeedVault';
@@ -97,8 +98,9 @@ function SendOrdinal() {
   const location = useLocation();
   const { id } = useParams();
   const { data: selectedOrdinal } = useAddressInscription(id!);
-  const { network, ordinalsAddress, btcAddress, selectedAccount, btcFiatRate } =
-    useWalletSelector();
+  const { network, ordinalsAddress, btcAddress, selectedAccount } = useWalletSelector();
+  const { btcFiatRate } = useCoinRates();
+
   const { getSeed } = useSeedVault();
   const [ordinalUtxo, setOrdinalUtxo] = useState<UTXO | undefined>(undefined);
   const [recipientAddress, setRecipientAddress] = useState(location.state?.recipientAddress ?? '');

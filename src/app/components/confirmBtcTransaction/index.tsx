@@ -67,6 +67,9 @@ type Props = {
   ) => Promise<number | undefined>;
   onFeeRateSet?: (feeRate: number) => void;
   feeRate?: number;
+  isFinal?: boolean;
+  // TODO: add sighash single warning
+  hasSigHashSingle?: boolean;
   hasSigHashNone?: boolean;
   title?: string;
   selectedBottomTab?: Tab;
@@ -94,6 +97,8 @@ function ConfirmBtcTransaction({
   onFeeRateSet,
   feeRate,
   hasSigHashNone = false,
+  isFinal = true,
+  hasSigHashSingle = false,
   title,
   selectedBottomTab,
 }: Props) {
@@ -174,9 +179,6 @@ function ConfirmBtcTransaction({
     setCurrentStep(Steps.ConnectLedger);
   };
 
-  // TODO: this is a bit naive, but should be correct. We may want to look at the sig hash types of the inputs instead
-  const isPartialTransaction = !feeOutput;
-
   return isLoading ? (
     <LoaderContainer>
       <Spinner size={50} />
@@ -206,7 +208,7 @@ function ConfirmBtcTransaction({
           inputs={inputs}
           outputs={outputs}
           feeOutput={feeOutput}
-          isPartialTransaction={isPartialTransaction}
+          transactionIsFinal={isFinal}
           showCenotaphCallout={showCenotaphCallout}
           getFeeForFeeRate={getFeeForFeeRate}
           onFeeRateSet={onFeeRateSet}

@@ -38,7 +38,7 @@ const Header = styled(RowCenter)((props) => ({
 type Props = {
   outputs: btcTransaction.EnhancedOutput[];
   inputs: btcTransaction.EnhancedInput[];
-  isPartialTransaction: boolean;
+  transactionIsFinal: boolean;
   runeTransfers?: RuneSummary['transfers'];
   netAmount: number;
   onShowInscription: (inscription: btcTransaction.IOInscription) => void;
@@ -48,7 +48,7 @@ type Props = {
 function TransferSection({
   outputs,
   inputs,
-  isPartialTransaction,
+  transactionIsFinal,
   runeTransfers,
   netAmount,
   onShowInscription,
@@ -71,13 +71,14 @@ function TransferSection({
 
   const inscriptionsFromPayment: btcTransaction.IOInscription[] = [];
   const satributesFromPayment: btcTransaction.IOSatribute[] = [];
-  (isPartialTransaction ? inputFromPayment : outputsFromPayment).forEach((item) => {
+  (transactionIsFinal ? outputsFromPayment : inputFromPayment).forEach((item) => {
     inscriptionsFromPayment.push(...item.inscriptions);
     satributesFromPayment.push(...item.satributes);
   });
-  const hasRuneTransfers = (runeTransfers ?? []).length > 0;
+  // if transaction is not final, then runes will be delegated and will show up in the delegation section
+  const hasRuneTransfers = transactionIsFinal && (runeTransfers ?? []).length > 0;
   const hasInscriptionsRareSatsInOrdinal =
-    (isPartialTransaction && inputFromOrdinal.length > 0) || outputsFromOrdinal.length > 0;
+    (!transactionIsFinal && inputFromOrdinal.length > 0) || outputsFromOrdinal.length > 0;
 
   const hasData = showAmount || hasRuneTransfers || hasInscriptionsRareSatsInOrdinal;
 
@@ -90,16 +91,20 @@ function TransferSection({
           {t('YOU_WILL_TRANSFER')}
         </StyledP>
       </Header>
-      {runeTransfers?.map((transfer) => (
-        <RowContainer key={transfer.runeName}>
-          <RuneAmount
-            tokenName={transfer.runeName}
-            amount={String(transfer.amount)}
-            divisibility={transfer.divisibility}
-            hasSufficientBalance={transfer.hasSufficientBalance}
-          />
-        </RowContainer>
-      ))}
+      {
+        // if transaction is not final, then runes will be delegated and will show up in the delegation section
+        transactionIsFinal &&
+          runeTransfers?.map((transfer) => (
+            <RowContainer key={transfer.runeName}>
+              <RuneAmount
+                tokenName={transfer.runeName}
+                amount={String(transfer.amount)}
+                divisibility={transfer.divisibility}
+                hasSufficientBalance={transfer.hasSufficientBalance}
+              />
+            </RowContainer>
+          ))
+      }
       {showAmount && (
         <RowContainer>
           <Amount amount={netAmount} />
@@ -112,7 +117,7 @@ function TransferSection({
       )}
       {hasInscriptionsRareSatsInOrdinal && (
         <RowContainer noPadding noMargin={hasRuneTransfers || showAmount}>
-          {isPartialTransaction
+          {!transactionIsFinal
             ? inputFromOrdinal.map((input, index) => (
                 <InscriptionSatributeRow
                   // eslint-disable-next-line react/no-array-index-key

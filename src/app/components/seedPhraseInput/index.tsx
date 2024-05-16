@@ -68,7 +68,7 @@ const SeedWordInput = React.forwardRef<HTMLInputElement, SeedWordInputProps>(
     const handlePasteInput = (e: React.ClipboardEvent<HTMLInputElement>) => {
       e.preventDefault();
 
-      if (DEV_MODE) {
+      if (DEV_MODE || process.env.WALLET_LABEL) {
         const { clipboardData } = e;
         const pastedText = clipboardData.getData('text');
         handlePaste(pastedText);
@@ -246,7 +246,7 @@ export default function SeedPhraseInput({
         })}
       </InputGrid>
       <ErrorMessage visible={!!seedError}>{seedError}</ErrorMessage>
-      <TransparentButton onClick={handleClickShow24Words}>
+      <TransparentButton onClick={handleClickShow24Words} type="button">
         {t('HAVE_A_24_WORDS_SEEDPHRASE?', { number: show24Words ? '12' : '24' })}
       </TransparentButton>
     </InputContainer>

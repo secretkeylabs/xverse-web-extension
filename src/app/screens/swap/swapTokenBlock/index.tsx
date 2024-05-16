@@ -126,17 +126,18 @@ function SwapTokenBlock({
       <RowContainer>
         <TitleText>{title}</TitleText>
         <BalanceText>{t('BALANCE')}:</BalanceText>
-        <Text>{selectedCoin?.balance ?? EMPTY_LABEL}</Text>
+        <Text data-testid="swap-token-balance">{selectedCoin?.balance ?? EMPTY_LABEL}</Text>
       </RowContainer>
       <CardContainer error={error}>
         <RowContainer>
-          <CoinButtonContainer onClick={onSelectCoin}>
+          <CoinButtonContainer data-testid="select-coin-button" onClick={onSelectCoin}>
             {/* eslint-disable-next-line react/jsx-props-no-spreading */}
             {selectedCoin && <TokenImage {...selectedCoin?.image} showProtocolIcon={false} />}
-            <CoinText>{selectedCoin?.name ?? t('SELECT_COIN')}</CoinText>
+            <CoinText data-testid="coin-text">{selectedCoin?.name ?? t('SELECT_COIN')}</CoinText>
             <CoinButtonArrow src={ChevronIcon} />
           </CoinButtonContainer>
           <AmountInput
+            data-testid="coin-input"
             error={error}
             placeholder="0"
             disabled={onAmountChange == null}
@@ -152,7 +153,9 @@ function SwapTokenBlock({
             thousandSeparator
             prefix={`${currencySymbolMap[fiatCurrency]} `}
             suffix={` ${fiatCurrency}`}
-            renderText={(value) => <EstimateUSDText>{value}</EstimateUSDText>}
+            renderText={(value) => (
+              <EstimateUSDText data-testid="usd-text">{value}</EstimateUSDText>
+            )}
           />
         </RowContainer>
       </CardContainer>

@@ -1,5 +1,4 @@
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
-import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import AlertMessage from '@components/alertMessage';
 import { BetterBarLoader } from '@components/barLoader';

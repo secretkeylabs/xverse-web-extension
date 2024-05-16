@@ -334,9 +334,13 @@ function SignBatchPsbtRequest() {
     );
   }
 
-  const isPartialTransaction = parsedPsbts.some((psbt) => !psbt.summary.feeOutput);
+  const transactionIsFinal = parsedPsbts.reduce((acc, psbt) => acc && psbt.summary.isFinal, true);
   const runeBurns = parsedPsbts.map((psbt) => psbt.runeSummary?.burns ?? []).flat();
-  const hasSomeRuneDelegation = (runeBurns.length ?? 0) > 0 && isPartialTransaction;
+  const runeDelegations = parsedPsbts
+    .filter((psbt) => !psbt.summary.isFinal)
+    .map((psbt) => psbt.runeSummary?.transfers ?? [])
+    .flat();
+  const hasSomeRuneDelegation = runeDelegations.length > 0;
 
   return (
     <>
@@ -371,7 +375,7 @@ function SignBatchPsbtRequest() {
                     }}
                   />
                 )}
-                {hasSomeRuneDelegation && <DelegateSection delegations={runeBurns} />}
+                {hasSomeRuneDelegation && <DelegateSection delegations={runeDelegations} />}
                 <TransferSection
                   inputs={parsedPsbts.map((psbt) => psbt.summary.inputs).flat()}
                   outputs={parsedPsbts.map((psbt) => psbt.summary.outputs).flat()}
@@ -379,7 +383,7 @@ function SignBatchPsbtRequest() {
                     .map((psbt) => psbt.runeSummary?.transfers ?? [])
                     .flat()}
                   netAmount={(totalNetAmount.toNumber() + totalFeeAmount.toNumber()) * -1}
-                  isPartialTransaction={isPartialTransaction}
+                  transactionIsFinal={transactionIsFinal}
                   onShowInscription={setInscriptionToShow}
                 />
                 <ReceiveSection
@@ -387,8 +391,9 @@ function SignBatchPsbtRequest() {
                   runeReceipts={parsedPsbts.map((psbt) => psbt.runeSummary?.receipts ?? []).flat()}
                   onShowInscription={setInscriptionToShow}
                   netAmount={totalNetAmount.toNumber()}
+                  transactionIsFinal={transactionIsFinal}
                 />
-                {!isPartialTransaction && <BurnSection burns={runeBurns} />}
+                {!hasSomeRuneDelegation && <BurnSection burns={runeBurns} />}
                 <MintSection mints={parsedPsbts.map((psbt) => psbt.runeSummary?.mint)} />
                 <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
                 {hasOutputScript && !parsedPsbts.some((psbt) => psbt.runeSummary !== undefined) && (
@@ -429,7 +434,7 @@ function SignBatchPsbtRequest() {
                 outputs={parsedPsbts[currentPsbtIndex].summary.outputs}
                 feeOutput={parsedPsbts[currentPsbtIndex].summary.feeOutput}
                 runeSummary={parsedPsbts[currentPsbtIndex].runeSummary}
-                isPartialTransaction={!parsedPsbts[currentPsbtIndex].summary.feeOutput}
+                transactionIsFinal={parsedPsbts[currentPsbtIndex].summary.isFinal}
                 showCenotaphCallout={
                   !!parsedPsbts[currentPsbtIndex].summary.runeOp?.Cenotaph?.flaws
                 }

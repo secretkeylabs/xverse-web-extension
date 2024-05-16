@@ -1,3 +1,4 @@
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ErrorCodes, getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
@@ -25,7 +26,8 @@ function BtcSendScreen() {
   const { payload, signedTx, isLoading, tabId, requestToken, requestId, error, recipient } =
     useSendBtcRequest();
   const navigate = useNavigate();
-  const { btcFiatRate, btcAddress, network } = useWalletSelector();
+  const { btcAddress, network } = useWalletSelector();
+  const { btcFiatRate } = useCoinRates();
   const { t } = useTranslation('translation');
 
   useEffect(() => {

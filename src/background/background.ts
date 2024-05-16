@@ -36,6 +36,8 @@ chrome.runtime.onInstalled.addListener((details) => {
   }
 });
 
-if (process.env.NODE_ENV === 'development') {
+if (process.env.WALLET_LABEL) {
+  chrome.action.setBadgeText({ text: process.env.WALLET_LABEL });
+} else if (process.env.NODE_ENV === 'development') {
   chrome.action.setBadgeText({ text: 'DEV' });
 }

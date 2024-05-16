@@ -30,7 +30,7 @@ const StyledButton = styled.button`
     border: 1px solid;
     color: ${(props) => props.theme.colors.elevation0};
 
-    :focus:enabled,
+    :focus-visible,
     :hover:enabled {
       background-color: ${(props) => props.theme.colors.white_200};
     }
@@ -47,7 +47,7 @@ const StyledButton = styled.button`
     border: 1px solid ${(props) => props.theme.colors.white_800};
     color: ${(props) => props.theme.colors.white_0};
 
-    :focus:enabled,
+    :focus-visible,
     :hover:enabled {
       background-color: ${(props) => props.theme.colors.elevation6_800};
       border: 1px solid ${(props) => props.theme.colors.white_850};
@@ -69,7 +69,7 @@ const StyledButton = styled.button`
     border: none;
     color: ${(props) => props.theme.colors.white_0};
 
-    :focus:enabled,
+    :focus-visible,
     :hover:enabled {
       color: ${(props) => props.theme.colors.white_200};
     }
@@ -86,7 +86,7 @@ const StyledButton = styled.button`
     border: none;
     color: ${(props) => props.theme.colors.white_0};
 
-    :focus:enabled,
+    :focus-visible,
     :hover:enabled {
       background-color: ${(props) => props.theme.colors.danger_dark_100};
       color: ${(props) => props.theme.colors.white_0};
@@ -100,6 +100,11 @@ const StyledButton = styled.button`
       color: ${(props) => props.theme.colors.white_400};
     }
   }
+`;
+
+const CenterDiv = styled.div`
+  display: flex;
+  align-content: center;
 `;
 
 type Props = {
@@ -135,7 +140,7 @@ function Button({
         <Spinner />
       ) : (
         <>
-          {icon && <div>{icon}</div>}
+          {icon && <CenterDiv>{icon}</CenterDiv>}
           <div>{title}</div>
         </>
       )}

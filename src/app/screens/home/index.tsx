@@ -16,11 +16,11 @@ import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useGetRuneFun
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useAppConfig from '@hooks/queries/useAppConfig';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useCoinRates from '@hooks/queries/useCoinRates';
 import useFeeMultipliers from '@hooks/queries/useFeeMultipliers';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useHasFeature from '@hooks/useHasFeature';
 import useNotificationBanners from '@hooks/useNotificationBanners';
+import useSanityCheck from '@hooks/useSanityCheck';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowUp, Plus } from '@phosphor-icons/react';
@@ -34,7 +34,7 @@ import { CurrencyTypes } from '@utils/constants';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -210,14 +210,6 @@ function Home() {
   const { t } = useTranslation('translation', {
     keyPrefix: 'DASHBOARD_SCREEN',
   });
-  const theme = useTheme();
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const [openReceiveModal, setOpenReceiveModal] = useState(false);
-  const [openSendModal, setOpenSendModal] = useState(false);
-  const [openBuyModal, setOpenBuyModal] = useState(false);
-  const [isBtcReceiveAlertVisible, setIsBtcReceiveAlertVisible] = useState(false);
-  const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible] = useState(false);
   const {
     stxAddress,
     btcAddress,
@@ -230,15 +222,23 @@ function Home() {
     hideStx,
     notificationBanners,
   } = useWalletSelector();
+  const theme = useTheme();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [openReceiveModal, setOpenReceiveModal] = useState(false);
+  const [openSendModal, setOpenSendModal] = useState(false);
+  const [openBuyModal, setOpenBuyModal] = useState(false);
+  const [isBtcReceiveAlertVisible, setIsBtcReceiveAlertVisible] = useState(false);
+  const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible] = useState(false);
   const [areReceivingAddressesVisible, setAreReceivingAddressesVisible] = useState(
     !isLedgerAccount(selectedAccount),
   );
   const [choseToVerifyAddresses, setChoseToVerifyAddresses] = useState(false);
-  const { isLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } =
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    stxAddress ? useStxWalletData() : { isLoading: false, isRefetching: false };
+  const { isInitialLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } =
+    useStxWalletData();
   const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } =
     useBtcWalletData();
+  const { data: notificationBannersArr } = useNotificationBanners();
   const {
     visible: sip10CoinsList,
     isLoading: loadingStxCoinData,
@@ -254,11 +254,22 @@ function Home() {
     isLoading: loadingRunesData,
     isRefetching: refetchingRunesData,
   } = useVisibleRuneFungibleTokens();
-  const { data: notificationBannersArr } = useNotificationBanners();
+  const { getSanityCheck } = useSanityCheck();
+
   useFeeMultipliers();
-  useCoinRates();
   useAppConfig();
   useTrackMixPanelPageViewed();
+
+  useEffect(() => {
+    (async () => {
+      const featLog = localStorage.getItem('featLog');
+      if (featLog) {
+        return;
+      }
+      localStorage.setItem('featLog', 'true');
+      getSanityCheck('X-Current-Version');
+    })();
+  }, [getSanityCheck]);
 
   const showNotificationBanner =
     notificationBannersArr?.length &&
@@ -365,7 +376,7 @@ function Home() {
     if (fungibleToken.protocol === 'runes') {
       if (isLedgerAccount(selectedAccount) && !isInOptions()) {
         await chrome.tabs.create({
-          url: chrome.runtime.getURL(`options.html#/send-rune?coinTicker=${fungibleToken.ticker}`),
+          url: chrome.runtime.getURL(`options.html#/send-rune?coinTicker=${fungibleToken.name}`),
         });
         return;
       }
@@ -635,7 +646,6 @@ function Home() {
           title={t('SEND')}
           loadingWalletData={loadingStxWalletData || loadingBtcWalletData}
         />
-
         <CoinSelectModal
           onSelectBitcoin={onBuyBtcClick}
           onSelectStacks={onBuyStxClick}

@@ -109,10 +109,10 @@ export default function TokenImage({
 
   const renderIcon = () => {
     if (!fungibleToken) {
-      return <TickerImage size={size} src={getCurrencyIcon()} />;
+      return <TickerImage data-testid="token-image" size={size} src={getCurrencyIcon()} />;
     }
     if (fungibleToken?.image) {
-      return <TickerImage size={size} src={fungibleToken.image} />;
+      return <TickerImage data-testid="token-image" size={size} src={fungibleToken.image} />;
     }
     const ticker = fungibleToken?.name
       ? getTicker(fungibleToken.name)
