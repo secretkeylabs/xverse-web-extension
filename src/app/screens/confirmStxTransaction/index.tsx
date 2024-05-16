@@ -57,7 +57,8 @@ function ConfirmStxTransaction() {
   const [txRaw, setTxRaw] = useState('');
   const navigate = useNavigate();
   const selectedNetwork = useNetworkSelector();
-  const { network, selectedAccount, stxLockedBalance, stxAvailableBalance } = useWalletSelector();
+  const { network, selectedAccount } = useWalletSelector();
+  const { data: stxData } = useStxWalletData();
   const { refetch } = useStxWalletData();
   const { data: delegateState } = useDelegationState();
 
@@ -95,7 +96,7 @@ function ConfirmStxTransaction() {
     }
 
     const hasDelegationNotLocked = BigNumber(delegatedAmount).gt(
-      stxToMicrostacks(BigNumber(1)).plus(stxLockedBalance),
+      stxToMicrostacks(BigNumber(1)).plus(stxData?.locked ?? new BigNumber(0)),
     );
     // stacking contract locks 1stx less from what user delegates to let them revoke delegation. counting this doesn't harm cause probably no one will top up just 1stx and min amount to first delegation is 100stx.
 
@@ -103,7 +104,12 @@ function ConfirmStxTransaction() {
       ? customFee
       : new BigNumber(unsignedTx?.auth?.spendingCondition?.fee.toString() ?? '0');
     const total = amount.plus(fee);
-    return hasDelegationNotLocked && BigNumber(total).plus(delegatedAmount).gt(stxAvailableBalance);
+    return (
+      hasDelegationNotLocked &&
+      BigNumber(total)
+        .plus(delegatedAmount)
+        .gt(stxData?.availableBalance ?? new BigNumber(0))
+    );
   };
 
   // SignTransaction Params

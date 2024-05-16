@@ -1,6 +1,8 @@
 import ArrowIcon from '@assets/img/settings/arrow.svg';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
+import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { isCustomFeesAllowed, Recipient, stxToMicrostacks, UTXO } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
@@ -113,12 +115,14 @@ function TransactionSettingAlert({
   const [showNonceSettings, setShowNonceSettings] = useState(false);
   const [isLoading, setIsLoading] = useState(loading);
   const [customFeeSelected, setCustomFeeSelected] = useState(false);
-  const { btcBalance, stxAvailableBalance, network } = useWalletSelector();
+  const { network } = useWalletSelector();
+  const { data: stxData } = useStxWalletData();
+  const { data: btcBalance } = useBtcWalletData();
 
   const applyClickForStx = () => {
-    if (stxAvailableBalance) {
+    if (stxData?.availableBalance) {
       const currentFee = stxToMicrostacks(new BigNumber(feeInput));
-      if (currentFee.gt(stxAvailableBalance)) {
+      if (currentFee.gt(stxData.availableBalance)) {
         setError(t('TRANSACTION_SETTING.GREATER_FEE_ERROR'));
         return;
       }
@@ -143,7 +147,7 @@ function TransactionSettingAlert({
 
   const applyClickForBtc = async () => {
     const currentFee = new BigNumber(feeInput);
-    if (currentFee.gt(btcBalance)) {
+    if (currentFee.gt(btcBalance ?? 0)) {
       // show fee exceeds total balance error
       setError(t('TRANSACTION_SETTING.GREATER_FEE_ERROR'));
       return;
@@ -164,7 +168,7 @@ function TransactionSettingAlert({
 
   const btcFeeOptionSelected = async (selectedFeeRate: string, totalFee: string) => {
     const currentFee = new BigNumber(feeInput);
-    if (currentFee.gt(btcBalance)) {
+    if (currentFee.gt(btcBalance ?? 0)) {
       // show fee exceeds total balance error
       setError(t('TRANSACTION_SETTING.GREATER_FEE_ERROR'));
       return;

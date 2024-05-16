@@ -1,4 +1,5 @@
 import ActionButton from '@components/button';
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
@@ -95,8 +96,9 @@ function SendOrdinal() {
   const { selectedSatBundle } = useNftDataSelector();
   const btcClient = useBtcClient();
   const location = useLocation();
-  const { network, ordinalsAddress, btcAddress, selectedAccount, btcFiatRate } =
-    useWalletSelector();
+  const { network, ordinalsAddress, btcAddress, selectedAccount } = useWalletSelector();
+  const { btcFiatRate } = useCoinRates();
+
   const { getSeed } = useSeedVault();
   const [ordinalUtxo, setOrdinalUtxo] = useState<UTXO | undefined>(undefined);
   const [recipientAddress, setRecipientAddress] = useState('');

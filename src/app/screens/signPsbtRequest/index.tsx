@@ -136,6 +136,8 @@ function SignPsbtRequest() {
       isLoading={isLoading}
       isSubmitting={isSigning}
       isBroadcast={payload.broadcast}
+      isFinal={summary?.isFinal}
+      hasSigHashSingle={summary?.hasSigHashSingle}
       hasSigHashNone={summary?.hasSigHashNone}
       confirmText={t('CONFIRM')}
       cancelText={t('CANCEL')}

@@ -1,3 +1,4 @@
+import useStxWalletData from '@hooks/queries/useStxWalletData';
 import {
   BtcTransactionData,
   RecommendedFeeResponse,
@@ -114,8 +115,8 @@ const sortFees = (fees: RbfRecommendedFees) =>
 const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransactionData): RbfData => {
   const [isLoading, setIsLoading] = useState(true);
   const [rbfData, setRbfData] = useState<RbfData>({});
-  const { accountType, network, selectedAccount, stxAvailableBalance, feeMultipliers } =
-    useWalletSelector();
+  const { accountType, network, selectedAccount, feeMultipliers } = useWalletSelector();
+  const { data: stxData } = useStxWalletData();
   const btcClient = useBtcClient();
   const selectedNetwork = useNetworkSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'SPEED_UP_TRANSACTION' });
@@ -140,7 +141,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
         selectedNetwork,
       );
 
-      let feePresets: RbfRecommendedFees = {};
+      let feePresets: RbfRecommendedFees;
       let mediumFee = medium.fee;
       let highFee = high.fee;
       const higherFee = fee.multipliedBy(1.25).toNumber();
@@ -166,7 +167,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
           mediumFee,
           'high',
           highFee,
-          stxAvailableBalance,
+          stxData?.availableBalance.toString() ?? '0',
         );
       } else {
         feePresets = constructRecommendedFees(
@@ -174,7 +175,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
           higherFee,
           'highest',
           highestFee,
-          stxAvailableBalance,
+          stxData?.availableBalance.toString() ?? '0',
         );
       }
 
@@ -202,7 +203,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
     } finally {
       setIsLoading(false);
     }
-  }, [transaction, network, selectedNetwork, feeMultipliers, stxAvailableBalance, t, navigate]);
+  }, [transaction, network, selectedNetwork, feeMultipliers, stxData, t, navigate]);
 
   const fetchRbfData = useCallback(async () => {
     if (!selectedAccount || !transaction) {

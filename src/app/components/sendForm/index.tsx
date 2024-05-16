@@ -1,7 +1,7 @@
-import ActionButton from '@components/button';
 import InfoContainer from '@components/infoContainer';
 import TokenImage from '@components/tokenImage';
 import { useBnsName, useBnsResolver } from '@hooks/queries/useBnsName';
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useDebounce from '@hooks/useDebounce';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
@@ -19,161 +19,38 @@ import { ReactNode, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 import { FiatRow } from './fiatRow';
 import useClearFormOnAccountSwitch from './useClearFormOnAccountSwitch';
 
-interface ContainerProps {
-  error: boolean;
-}
-const ScrollContainer = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  overflow-y: auto;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-  margin-left: 5%;
-  margin-right: 5%;
-`;
-
-const OuterContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  marginBottom: props.theme.spacing(32.5),
-  flex: 1,
-}));
-
-const RowContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-});
-
-const Container = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  marginTop: props.theme.spacing(16),
-}));
-
-const OrdinalInfoContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(6),
-}));
-
-const MemoContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(3),
-  marginBottom: props.theme.spacing(6),
-}));
-
-const ErrorText = styled.p((props) => ({
-  ...props.theme.typography.body_s,
-  color: props.theme.colors.danger_medium,
-}));
-
-const InputFieldContainer = styled.div(() => ({
-  flex: 1,
-}));
-
-const TitleText = styled.p((props) => ({
-  ...props.theme.typography.body_medium_m,
-  flex: 1,
-  display: 'flex',
-}));
-
-const Text = styled.p((props) => ({
-  ...props.theme.typography.body_medium_m,
-}));
-
-const SubText = styled.p((props) => ({
-  ...props.theme.typography.body_s,
-  display: 'flex',
-  flex: 1,
-  color: props.theme.colors.white_400,
-}));
-
-const AssociatedText = styled.p((props) => ({
-  ...props.theme.typography.body_s,
-  wordWrap: 'break-word',
-}));
-
-const BalanceText = styled.p((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_400,
-  marginRight: props.theme.spacing(2),
-}));
-
-const InputField = styled.input((props) => ({
-  ...props.theme.typography.body_m,
-  backgroundColor: props.theme.colors.elevation_n1,
-  color: props.theme.colors.white_0,
-  width: '100%',
-  border: 'transparent',
-}));
-
-const AmountInputContainer = styled.div<ContainerProps>((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginTop: props.theme.spacing(4),
-  marginBottom: props.theme.spacing(4),
-  border: props.error
-    ? '1px solid rgba(211, 60, 60, 0.3)'
-    : `1px solid ${props.theme.colors.elevation3}`,
-  backgroundColor: props.theme.colors.elevation_n1,
-  borderRadius: props.theme.radius(1),
-  paddingLeft: props.theme.spacing(5),
-  paddingRight: props.theme.spacing(5),
-  height: 44,
-  ':focus-within': {
-    border: `1px solid ${props.theme.colors.elevation6}`,
-  },
-}));
-
-const MemoInputContainer = styled.div<ContainerProps>((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  marginTop: props.theme.spacing(4),
-  marginBottom: props.theme.spacing(4),
-  border: props.error
-    ? '1px solid rgba(211, 60, 60, 0.3)'
-    : `1px solid ${props.theme.colors.elevation3}`,
-  backgroundColor: props.theme.colors.elevation_n1,
-  borderRadius: props.theme.radius(1),
-  padding: props.theme.spacing(7),
-  height: 76,
-  ':focus-within': {
-    border: `1px solid ${props.theme.colors.elevation6}`,
-  },
-}));
-
-const SendButtonContainer = styled.div((props) => ({
-  paddingBottom: props.theme.spacing(12),
-  paddingTop: props.theme.spacing(4),
-  marginLeft: '5%',
-  marginRight: '5%',
-}));
-
-const CurrencyFlag = styled.img((props) => ({
-  marginLeft: props.theme.spacing(4),
-}));
-
-const TokenContainer = styled.div((props) => ({
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  marginTop: props.theme.spacing(8),
-}));
-
-const StyledInputFeedback = styled(InputFeedback)((props) => ({
-  marginBottom: props.theme.spacing(4),
-}));
+import Button from '@ui-library/button';
+import {
+  AmountInputContainer,
+  AssociatedText,
+  BalanceText,
+  Container,
+  CurrencyFlag,
+  ErrorText,
+  InputField,
+  InputFieldContainer,
+  MemoContainer,
+  MemoInputContainer,
+  OrdinalInfoContainer,
+  OuterContainer,
+  RowContainer,
+  ScrollContainer,
+  SendButtonContainer,
+  StyledInputFeedback,
+  SubText,
+  Text,
+  TitleText,
+  TokenContainer,
+} from './index.styled';
 
 interface Props {
   onPressSend: (recipientID: string, amount: string, memo?: string) => void;
   currencyType: CurrencyTypes;
   amountError?: string;
-  recepientError?: string;
+  recipientError?: string;
   memoError?: string;
   fungibleToken?: FungibleToken;
   disableAmountInput?: boolean;
@@ -196,7 +73,7 @@ function SendForm({
   onPressSend,
   currencyType,
   amountError,
-  recepientError,
+  recipientError,
   memoError,
   fungibleToken,
   disableAmountInput,
@@ -221,11 +98,11 @@ function SendForm({
   const [memo, setMemo] = useState(stxMemo ?? '');
   const [fiatAmount, setFiatAmount] = useState<string | undefined>('0');
   const [switchToFiat, setSwitchToFiat] = useState(false);
-  const [addressError, setAddressError] = useState<string | undefined>(recepientError);
+  const [addressError, setAddressError] = useState<string | undefined>(recipientError);
   const navigate = useNavigate();
 
-  const { stxBtcRate, btcFiatRate, fiatCurrency, stxAddress, selectedAccount } =
-    useWalletSelector();
+  const { fiatCurrency, stxAddress, selectedAccount } = useWalletSelector();
+  const { btcFiatRate, stxBtcRate } = useCoinRates();
   const debouncedSearchTerm = useDebounce(recipientAddress, 300);
   const associatedBnsName = useBnsName(recipientAddress);
   const associatedAddress = useBnsResolver(debouncedSearchTerm, stxAddress, currencyType);
@@ -239,14 +116,14 @@ function SendForm({
   }, [selectedAccount, isAccountSwitched]);
 
   useEffect(() => {
-    if (recepientError) {
-      if (associatedAddress !== '' && recepientError.includes(t('ERRORS.ADDRESS_INVALID'))) {
+    if (recipientError) {
+      if (associatedAddress !== '' && recipientError.includes(t('ERRORS.ADDRESS_INVALID'))) {
         setAddressError('');
       } else {
-        setAddressError(recepientError);
+        setAddressError(recipientError);
       }
     }
-  }, [recepientError, associatedAddress]);
+  }, [recipientError, associatedAddress]);
 
   useEffect(() => {
     const resultRegex = /^\d*\.?\d*$/;
@@ -266,7 +143,7 @@ function SendForm({
     );
   }, [amountToSend]);
 
-  function getTokenCurrency(): string {
+  const getTokenCurrency = (): string => {
     if (fungibleToken) {
       if (fungibleToken?.ticker) {
         return fungibleToken.ticker.toUpperCase();
@@ -276,7 +153,7 @@ function SendForm({
       }
     }
     return currencyType;
-  }
+  };
 
   const onSwitchPress = () => {
     setSwitchToFiat(!switchToFiat);
@@ -416,9 +293,9 @@ function SendForm({
     </Container>
   );
 
-  const handleOnPress = () => {
+  const handleOnClickSend = () => {
     onPressSend(
-      associatedAddress !== '' ? associatedAddress : debouncedSearchTerm,
+      associatedAddress !== '' ? associatedAddress : debouncedSearchTerm || recipientAddress,
       switchToFiat ? getTokenEquivalent(amount) : amount,
       memo,
     );
@@ -514,11 +391,11 @@ function SendForm({
         </OuterContainer>
       </ScrollContainer>
       <SendButtonContainer>
-        <ActionButton
-          text={buttonText ?? t('NEXT')}
-          processing={processing}
+        <Button
+          title={buttonText ?? t('NEXT')}
+          loading={processing}
           disabled={!checkIfEnableButton()}
-          onPress={handleOnPress}
+          onClick={handleOnClickSend}
         />
       </SendButtonContainer>
     </>

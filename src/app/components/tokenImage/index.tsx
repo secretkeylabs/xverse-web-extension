@@ -3,7 +3,9 @@ import IconStacks from '@assets/img/dashboard/stx_icon.svg';
 import OrdinalIcon from '@assets/img/transactions/ordinal.svg';
 import RunesIcon from '@assets/img/transactions/runes.svg';
 import { StyledBarLoader } from '@components/tilesSkeletonLoader';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { FungibleToken } from '@secretkeylabs/xverse-core';
+import { ORDINALS_URL } from '@secretkeylabs/xverse-core/constant';
 import { CurrencyTypes } from '@utils/constants';
 import { getTicker } from '@utils/helper';
 import { useCallback } from 'react';
@@ -80,6 +82,7 @@ export default function TokenImage({
   round,
   showProtocolIcon = true,
 }: TokenImageProps) {
+  const { network } = useWalletSelector();
   const ftProtocol = fungibleToken?.protocol;
 
   const getCurrencyIcon = useCallback(() => {
@@ -109,11 +112,32 @@ export default function TokenImage({
 
   const renderIcon = () => {
     if (!fungibleToken) {
-      return <TickerImage size={size} src={getCurrencyIcon()} />;
+      return <TickerImage data-testid="token-image" size={size} src={getCurrencyIcon()} />;
     }
     if (fungibleToken?.image) {
-      return <TickerImage size={size} src={fungibleToken.image} />;
+      return <TickerImage data-testid="token-image" size={size} src={fungibleToken.image} />;
     }
+    if (fungibleToken.runeInscriptionId) {
+      const img = new Image(); // determine if valid image
+      img.src = ORDINALS_URL(network.type, fungibleToken.runeInscriptionId);
+      if (img.complete) {
+        return (
+          <TickerImage
+            data-testid="token-image"
+            size={size}
+            src={ORDINALS_URL(network.type, fungibleToken.runeInscriptionId)}
+          />
+        );
+      }
+    }
+    if (fungibleToken.runeSymbol) {
+      return (
+        <TickerIconContainer size={size} round={round}>
+          <TickerIconText>{fungibleToken.runeSymbol}</TickerIconText>
+        </TickerIconContainer>
+      );
+    }
+
     const ticker = fungibleToken?.name
       ? getTicker(fungibleToken.name)
       : fungibleToken?.ticker || fungibleToken?.assetName || '';
