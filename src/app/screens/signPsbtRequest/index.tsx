@@ -2,14 +2,17 @@ import { makeRPCError, sendRpcResponse } from '@common/utils/rpc/helpers';
 import ConfirmBitcoinTransaction from '@components/confirmBtcTransaction';
 import RequestError from '@components/requests/requestError';
 import useHasFeature from '@hooks/useHasFeature';
+import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  AnalyticsEvents,
   RuneSummary,
   Transport,
   btcTransaction,
   parseSummaryForRunes,
 } from '@secretkeylabs/xverse-core';
+import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -22,7 +25,7 @@ type PSBTSummary = Awaited<ReturnType<btcTransaction.EnhancedPsbt['getSummary']>
 
 function SignPsbtRequest() {
   const navigate = useNavigate();
-
+  const { selectedAccount } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const txnContext = useTransactionContext();
 
@@ -31,13 +34,14 @@ function SignPsbtRequest() {
   const [summary, setSummary] = useState<PSBTSummary | undefined>();
   const [runeSummary, setRuneSummary] = useState<RuneSummary | undefined>(undefined);
   const hasRunesSupport = useHasFeature('RUNES_SUPPORT');
-
   const { payload, parsedPsbt, confirmSignPsbt, cancelSignPsbt, onCloseError, requestId, tabId } =
     useSignPsbt();
   const { validationError, setValidationError } = useSignPsbtValidationGate({
     payload,
     parsedPsbt,
   });
+
+  useTrackMixPanelPageViewed();
 
   useSignPsbtValidationGate({ payload, parsedPsbt });
 
@@ -78,6 +82,13 @@ function SignPsbtRequest() {
       });
 
       const response = await confirmSignPsbt(signedPsbt);
+
+      trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
+        protocol: 'bitcoin',
+        action: 'sign-psbt',
+        wallet_type: selectedAccount?.accountType || 'software',
+      });
+
       if (ledgerTransport) {
         await ledgerTransport?.close();
       }

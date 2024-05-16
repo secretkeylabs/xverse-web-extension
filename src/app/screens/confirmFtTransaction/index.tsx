@@ -8,10 +8,15 @@ import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { StacksTransaction, broadcastSignedTransaction } from '@secretkeylabs/xverse-core';
+import {
+  AnalyticsEvents,
+  StacksTransaction,
+  broadcastSignedTransaction,
+} from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
+import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
 import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -82,6 +87,12 @@ function ConfirmFtTransaction() {
       navigate('/confirm-ledger-tx', { state });
       return;
     }
+
+    trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
+      protocol: 'sip10',
+      action: 'transfer',
+      wallet_type: selectedAccount?.accountType || 'software',
+    });
 
     mutate({ signedTx: txs[0] });
   };

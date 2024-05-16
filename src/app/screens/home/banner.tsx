@@ -1,5 +1,5 @@
 import { XCircle } from '@phosphor-icons/react';
-import { NotificationBanner } from '@secretkeylabs/xverse-core';
+import { AnalyticsEvents, NotificationBanner } from '@secretkeylabs/xverse-core';
 import { setNotificationBannersAction } from '@stores/wallet/actions/actionCreators';
 import { trackMixPanel } from '@utils/mixpanel';
 import { useDispatch } from 'react-redux';
@@ -84,7 +84,7 @@ function Banner({ id, name, url, icon, description }: NotificationBanner) {
       <BannerContent
         onClick={() => {
           trackMixPanel(
-            'click_app',
+            AnalyticsEvents.ClickApp,
             {
               link: url,
               source: 'web-extension',

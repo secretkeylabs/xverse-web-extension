@@ -19,6 +19,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import Brc20Tile from '@screens/ordinals/brc20Tile';
 import CollapsableContainer from '@screens/signatureRequest/collapsableContainer';
 import {
+  AnalyticsEvents,
   BtcTransactionBroadcastResponse,
   Recipient,
   ResponseError,
@@ -30,6 +31,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
+import { trackMixPanel } from '@utils/mixpanel';
 import axios from 'axios';
 import BigNumber from 'bignumber.js';
 import { useEffect, useMemo, useState } from 'react';
@@ -297,6 +299,12 @@ function ConfirmInscriptionRequest() {
       navigate('/confirm-ledger-tx', { state });
       return;
     }
+
+    trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
+      protocol: 'brc20',
+      action: 'transfer',
+      wallet_type: selectedAccount?.accountType || 'software',
+    });
 
     mutate({ txToBeBroadcasted: signedTxHex });
   };

@@ -1,16 +1,34 @@
-import { AnalyticsEvents } from '@secretkeylabs/xverse-core';
+import { AnalyticsEventProperties, AnalyticsEvents } from '@secretkeylabs/xverse-core';
 import { getMixpanelInstance, mixpanelInstances } from 'app/mixpanelSetup';
 import { sha256 } from 'js-sha256';
+import { Callback, RequestOptions } from 'mixpanel-browser';
 
-export const trackMixPanel = (
-  event: string,
+// Overload definitions
+export function trackMixPanel<E extends keyof AnalyticsEventProperties>(
+  event: E,
+  properties: AnalyticsEventProperties[E],
+  options?: RequestOptions | Callback,
+  callback?: Callback,
+  instanceKey?: keyof typeof mixpanelInstances,
+): void;
+export function trackMixPanel(
+  event: Exclude<AnalyticsEvents, keyof AnalyticsEventProperties>,
   properties?: any,
-  options?: any,
-  callback?: any,
+  options?: RequestOptions | Callback,
+  callback?: Callback,
+  instanceKey?: keyof typeof mixpanelInstances,
+): void;
+
+// Implementation
+export function trackMixPanel(
+  event: AnalyticsEvents,
+  properties?: any,
+  options?: RequestOptions | Callback,
+  callback?: Callback,
   instanceKey: keyof typeof mixpanelInstances = 'web-extension',
-) => {
+) {
   getMixpanelInstance(instanceKey).track(event, properties, options, callback);
-};
+}
 
 export const optOutMixPanel = () => {
   Object.keys(mixpanelInstances).forEach((instanceKey) => {
