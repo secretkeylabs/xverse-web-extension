@@ -268,7 +268,11 @@ export const getSatRangesWithInscriptions = ({
   return { satRanges: satRangesArray, totalExoticSats };
 };
 
-export const mapRuneNameToPlaceholder = (runeName: string): FungibleToken => ({
+export const mapRuneNameToPlaceholder = (
+  runeName: string,
+  symbol: string,
+  inscriptionId: string,
+): FungibleToken => ({
   protocol: 'runes',
   name: runeName,
   assetName: '',
@@ -276,4 +280,6 @@ export const mapRuneNameToPlaceholder = (runeName: string): FungibleToken => ({
   principal: '',
   total_received: '',
   total_sent: '',
+  runeSymbol: symbol,
+  runeInscriptionId: inscriptionId,
 });

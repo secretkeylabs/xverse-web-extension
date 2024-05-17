@@ -22,6 +22,7 @@ import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { StxRequests } from '@sats-connect/core';
 import {
+  AnalyticsEvents,
   StacksTransaction,
   TokenTransferPayload,
   addressToString,
@@ -36,6 +37,7 @@ import { useMutation } from '@tanstack/react-query';
 import Callout from '@ui-library/callout';
 import { XVERSE_POOL_ADDRESS } from '@utils/constants';
 import { isLedgerAccount } from '@utils/helper';
+import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -248,6 +250,12 @@ function ConfirmStxTransaction() {
       }
       window.close();
     } else {
+      trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
+        protocol: 'stacks',
+        action: 'transfer',
+        wallet_type: selectedAccount?.accountType || 'software',
+      });
+
       mutate({ signedTx: txs[0] });
     }
   };

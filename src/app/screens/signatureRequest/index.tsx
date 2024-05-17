@@ -13,6 +13,7 @@ import useSignatureRequest, {
   isUtf8Message,
   useSignMessage,
 } from '@hooks/useSignatureRequest';
+import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
@@ -62,6 +63,11 @@ function SignatureRequest(): JSX.Element {
   const navigate = useNavigate();
   const isMessageSigningDisabled =
     isHardwareAccount(selectedAccount) && !selectedAccount?.stxAddress;
+
+  useTrackMixPanelPageViewed({
+    protocol: 'stacks',
+    structured: !!isStructuredMessage(messageType),
+  });
 
   const checkAddressAvailability = () => {
     const account = accountsList.filter((acc) => {

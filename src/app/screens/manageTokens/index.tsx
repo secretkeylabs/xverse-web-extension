@@ -197,6 +197,8 @@ function ManageTokens() {
             name={coin.name}
             image={coin.image}
             ticker={coin.ticker}
+            runeInscriptionId={coin.runeInscriptionId}
+            runeSymbol={coin.runeSymbol}
             disabled={false}
             toggled={toggled}
             enabled={coin.visible}

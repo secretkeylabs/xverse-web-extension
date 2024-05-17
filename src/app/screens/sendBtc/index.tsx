@@ -2,8 +2,9 @@ import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { btcTransaction, Transport } from '@secretkeylabs/xverse-core';
+import { AnalyticsEvents, btcTransaction, Transport } from '@secretkeylabs/xverse-core';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
+import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -130,6 +131,13 @@ function SendBtcScreen() {
     try {
       setIsSubmitting(true);
       const txnId = await transaction?.broadcast({ ledgerTransport, rbfEnabled: true });
+
+      trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
+        protocol: 'bitcoin',
+        action: 'transfer',
+        wallet_type: selectedAccount?.accountType || 'software',
+      });
+
       navigate('/tx-status', {
         state: {
           txid: txnId,

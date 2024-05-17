@@ -3,8 +3,9 @@ import IconStacks from '@assets/img/dashboard/stx_icon.svg';
 import OrdinalIcon from '@assets/img/transactions/ordinal.svg';
 import RunesIcon from '@assets/img/transactions/runes.svg';
 import { StyledBarLoader } from '@components/tilesSkeletonLoader';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { FungibleToken } from '@secretkeylabs/xverse-core';
-import { CurrencyTypes } from '@utils/constants';
+import { CurrencyTypes, XVERSE_ORDIVIEW_URL } from '@utils/constants';
 import { getTicker } from '@utils/helper';
 import { useCallback } from 'react';
 import styled from 'styled-components';
@@ -80,6 +81,7 @@ export default function TokenImage({
   round,
   showProtocolIcon = true,
 }: TokenImageProps) {
+  const { network } = useWalletSelector();
   const ftProtocol = fungibleToken?.protocol;
 
   const getCurrencyIcon = useCallback(() => {
@@ -114,6 +116,23 @@ export default function TokenImage({
     if (fungibleToken?.image) {
       return <TickerImage data-testid="token-image" size={size} src={fungibleToken.image} />;
     }
+    if (fungibleToken.runeInscriptionId) {
+      return (
+        <TickerImage
+          data-testid="token-image"
+          size={size}
+          src={`${XVERSE_ORDIVIEW_URL(network.type)}/thumbnail/${fungibleToken.runeInscriptionId}`}
+        />
+      );
+    }
+    if (fungibleToken.runeSymbol) {
+      return (
+        <TickerIconContainer size={size} round={round}>
+          <TickerIconText>{fungibleToken.runeSymbol}</TickerIconText>
+        </TickerIconContainer>
+      );
+    }
+
     const ticker = fungibleToken?.name
       ? getTicker(fungibleToken.name)
       : fungibleToken?.ticker || fungibleToken?.assetName || '';
