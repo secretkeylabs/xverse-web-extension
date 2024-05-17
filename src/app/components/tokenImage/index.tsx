@@ -5,8 +5,7 @@ import RunesIcon from '@assets/img/transactions/runes.svg';
 import { StyledBarLoader } from '@components/tilesSkeletonLoader';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { FungibleToken } from '@secretkeylabs/xverse-core';
-import { ORDINALS_URL } from '@secretkeylabs/xverse-core/constant';
-import { CurrencyTypes } from '@utils/constants';
+import { CurrencyTypes, XVERSE_ORDIVIEW_URL } from '@utils/constants';
 import { getTicker } from '@utils/helper';
 import { useCallback } from 'react';
 import styled from 'styled-components';
@@ -118,17 +117,13 @@ export default function TokenImage({
       return <TickerImage data-testid="token-image" size={size} src={fungibleToken.image} />;
     }
     if (fungibleToken.runeInscriptionId) {
-      const img = new Image(); // determine if valid image
-      img.src = ORDINALS_URL(network.type, fungibleToken.runeInscriptionId);
-      if (img.complete) {
-        return (
-          <TickerImage
-            data-testid="token-image"
-            size={size}
-            src={ORDINALS_URL(network.type, fungibleToken.runeInscriptionId)}
-          />
-        );
-      }
+      return (
+        <TickerImage
+          data-testid="token-image"
+          size={size}
+          src={`${XVERSE_ORDIVIEW_URL(network.type)}/thumbnail/${fungibleToken.runeInscriptionId}`}
+        />
+      );
     }
     if (fungibleToken.runeSymbol) {
       return (
