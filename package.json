@@ -25,7 +25,7 @@
     "@phosphor-icons/react": "^2.0.10",
     "@playwright/test": "^1.43.1",
     "@react-spring/web": "^9.6.1",
-    "@sats-connect/core": "^0.0.9-c7cae71",
+    "@sats-connect/core": "0.0.9",
     "@scure/btc-signer": "1.2.1",
     "@secretkeylabs/xverse-core": "13.6.5",
     "@stacks/connect": "7.4.1",

@@ -6,6 +6,7 @@ import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '../helper
 
 const handleGetRunesBalance = async (requestId: RpcId, tabId: number) => {
   const { ordinalsAddress, network } = rootStore.store.getState().walletState;
+  // TODO: Remove the fetchAdapter once a newer version of axios is released
   const runesApi = getRunesClient(network.type, fetchAdapter);
   try {
     const runesBalances = await runesApi.getRuneBalances(ordinalsAddress);
