@@ -1,13 +1,11 @@
 import { RpcErrorCode, RpcId } from '@sats-connect/core';
 import { getRunesClient } from '@secretkeylabs/xverse-core';
 import rootStore from '@stores/index';
-import fetchAdapter from '@vespaiach/axios-fetch-adapter';
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '../helpers';
 
 const handleGetRunesBalance = async (requestId: RpcId, tabId: number) => {
   const { ordinalsAddress, network } = rootStore.store.getState().walletState;
-  // TODO: Remove the fetchAdapter once a newer version of axios is released
-  const runesApi = getRunesClient(network.type, fetchAdapter);
+  const runesApi = getRunesClient(network.type);
   try {
     const runesBalances = await runesApi.getRuneBalances(ordinalsAddress);
     sendRpcResponse(
