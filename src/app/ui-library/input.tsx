@@ -151,6 +151,7 @@ type Props = {
   title?: string;
   placeholder?: string;
   value: string;
+  dataTestID?: string;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (event: ChangeEvent<HTMLInputElement>) => void;
   type?: 'text' | 'number';
@@ -172,6 +173,7 @@ function Input({
   title,
   placeholder,
   value,
+  dataTestID,
   onChange,
   onBlur,
   type = 'text',
@@ -235,6 +237,7 @@ function Input({
           ref={inputRef}
           type={type}
           value={value}
+          data-testid={dataTestID}
           onChange={handleChange}
           onBlur={onBlur}
           placeholder={placeholder}

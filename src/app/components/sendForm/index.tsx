@@ -224,12 +224,17 @@ function SendForm({
           value={balance}
           displayType="text"
           thousandSeparator
-          renderText={(value: string) => <Text>{value}</Text>}
+          renderText={(value: string) => <Text data-testid="balance-label">{value}</Text>}
         />
       </RowContainer>
       <AmountInputContainer error={amountError !== ''}>
         <InputFieldContainer>
-          <InputField value={amount} placeholder="0" onChange={onInputChange} />
+          <InputField
+            data-testid="send-input"
+            value={amount}
+            placeholder="0"
+            onChange={onInputChange}
+          />
         </InputFieldContainer>
         <Text>{getAmountLabel()}</Text>
         {switchToFiat && <CurrencyFlag src={getCurrencyFlag(fiatCurrency)} />}
@@ -266,6 +271,7 @@ function SendForm({
       <AmountInputContainer error={addressError !== ''}>
         <InputFieldContainer>
           <InputField
+            data-testid="recipient-adress"
             value={recipientAddress}
             placeholder={getAddressInputPlaceholder()}
             onChange={handleAddressInputChange}
@@ -368,6 +374,7 @@ function SendForm({
                   <MemoInputContainer error={memoError !== ''}>
                     <InputFieldContainer>
                       <InputField
+                        data-testid="memo-input"
                         value={memo}
                         placeholder={t('MEMO_PLACEHOLDER')}
                         onChange={(e: { target: { value: SetStateAction<string> } }) =>

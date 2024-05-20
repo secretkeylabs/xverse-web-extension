@@ -50,7 +50,9 @@ function TransactionInput({ input }: Props) {
     addressToBeDisplayed === btcAddress || addressToBeDisplayed === ordinalsAddress ? (
       <TxIdContainer>
         <YourAddressText typography="body_s">({t('YOUR_ADDRESS')})</YourAddressText>
-        <SubValueText typography="body_s">{getTruncatedAddress(addressToBeDisplayed)}</SubValueText>
+        <SubValueText data-testid="address-send" typography="body_s">
+          {getTruncatedAddress(addressToBeDisplayed)}
+        </SubValueText>
       </TxIdContainer>
     ) : (
       <SubValueText typography="body_s">{getTruncatedAddress(addressToBeDisplayed)}</SubValueText>
@@ -61,6 +63,7 @@ function TransactionInput({ input }: Props) {
       <TransferDetailView
         icon={IconBitcoin}
         hideAddress
+        dataTestID="confirm-balance"
         hideCopyButton={isPaymentsAddress || isOrdinalsAddress}
         amount={`${satsToBtc(
           new BigNumber(input.extendedUtxo.utxo.value.toString()),

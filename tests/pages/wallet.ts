@@ -81,7 +81,7 @@ export default class Wallet {
 
   readonly labelTokenSubtitle: Locator;
 
-  readonly labelCoinBalance: Locator;
+  readonly labelCoinBalanceCurrency: Locator;
 
   readonly navigationDashboard: Locator;
 
@@ -147,6 +147,72 @@ export default class Wallet {
 
   readonly selectCurrency: Locator;
 
+  readonly buttonNext: Locator;
+
+  readonly inputMemo: Locator;
+
+  readonly inputRecipientAdress: Locator;
+
+  readonly inputSendAmount: Locator;
+
+  readonly errorMessageAddressInvalid: Locator;
+
+  readonly errorInsufficientBalance: Locator;
+
+  readonly errorMessageAddressRequired: Locator;
+
+  readonly containerFeeRate: Locator;
+
+  readonly inputBTCAdress: Locator;
+
+  readonly coinBalance: Locator;
+
+  readonly transactionHistoryAmount: Locator;
+
+  readonly containerTransactionHistory: Locator;
+
+  readonly errorMessageSendSelf: Locator;
+
+  readonly inputBTCAmount: Locator;
+
+  readonly buttonExpand: Locator;
+
+  readonly confirmCurrencyAmount: Locator;
+
+  readonly confirmTotalAmount: Locator;
+
+  readonly confirmAmount: Locator;
+
+  readonly sendAddress: Locator;
+
+  readonly receiveAddress: Locator;
+
+  readonly confirmBalance: Locator;
+
+  readonly buttonCancel: Locator;
+
+  readonly labelCoinBalanceCrypto: Locator;
+
+  readonly labelBalanceAmountSelector: Locator;
+
+  readonly buttonClose: Locator;
+
+  readonly sendTransactionID: Locator;
+
+  readonly errorInsufficientFunds: Locator;
+
+  readonly noFundsBTCMessage: Locator;
+
+  readonly buttonCoinContract: Locator;
+
+  readonly coinContractContainer: Locator;
+
+  readonly coinContractAddress: Locator;
+
+  readonly textCoinTitle: Locator;
+
+  readonly sendSTXValue: Locator;
+
   constructor(readonly page: Page) {
     this.page = page;
     this.navigationDashboard = page.getByTestId('nav-dashboard');
@@ -163,6 +229,8 @@ export default class Wallet {
     this.buttonConfirm = page.getByRole('button', { name: 'Confirm' });
     this.buttonResetWallet = page.getByRole('button', { name: 'Reset Wallet' });
     this.buttonDenyDataCollection = page.getByRole('button', { name: 'Deny' });
+    this.labelBalanceAmountSelector = page.getByTestId('balance-label');
+    this.buttonClose = page.getByRole('button', { name: 'Close' });
 
     // Account
     this.labelAccountName = page.getByLabel('Account Name');
@@ -188,6 +256,7 @@ export default class Wallet {
     this.buttonMainnet = page.getByRole('button', { name: 'Mainnet' });
     this.buttonTestnet = page.getByRole('button', { name: 'Testnet' });
     this.buttonBack = page.getByTestId('back-button');
+    this.buttonNext = page.getByRole('button', { name: 'Next' });
     this.inputStacksURL = page.getByTestId('Stacks URL');
     this.inputBTCURL = page.getByTestId('BTC URL');
     this.inputFallbackBTCURL = page.getByTestId('Fallback BTC URL');
@@ -211,7 +280,20 @@ export default class Wallet {
     this.headingTokens = page.getByRole('heading', { name: 'Manage tokens' });
     this.divTokenRow = page.getByLabel('Token Row');
     this.labelTokenSubtitle = page.getByLabel('Token SubTitle');
-    this.labelCoinBalance = page.getByLabel('CoinBalance Container').locator('span');
+    this.labelCoinBalanceCurrency = page.getByLabel('CoinBalance Container').locator('span');
+    this.labelCoinBalanceCrypto = page.getByLabel('CoinBalance Container').locator('p');
+
+    // Coin details
+    this.coinBalance = page.getByTestId('coin-balance');
+    this.containerTransactionHistory = page.getByTestId('transaction-container');
+    this.transactionHistoryAmount = page.getByTestId('transaction-amount');
+    this.buttonCoinContract = page.getByTestId('coin-contract-button');
+    this.coinContractContainer = page.getByTestId('coin-contract-container');
+    this.coinContractAddress = page.getByTestId('coin-contract-address');
+    this.textCoinTitle = page.getByTestId('coin-title-text');
+
+    //
+    // data-id="coin-contract-container"
 
     // Explore
     this.carouselApp = page.getByTestId('app-carousel');
@@ -240,6 +322,34 @@ export default class Wallet {
     this.imageToken = page.getByTestId('token-image');
     this.swapTokenBalance = page.getByTestId('swap-token-balance');
     this.textUSD = page.getByTestId('usd-text');
+    this.noFundsBTCMessage = page.getByTestId('no-funds-message');
+
+    // Send
+    this.inputSendAmount = page.getByTestId('send-input');
+    this.inputRecipientAdress = page.getByTestId('recipient-adress');
+    this.inputMemo = page.getByTestId('memo-input');
+    this.errorMessageAddressInvalid = page
+      .locator('p')
+      .filter({ hasText: 'Recipient address invalid' });
+    this.errorMessageAddressRequired = page
+      .locator('p')
+      .filter({ hasText: 'Recipient address is required' });
+    this.errorMessageSendSelf = page.locator('p').filter({ hasText: 'Cannot send to self' });
+    this.errorInsufficientBalance = page.locator('p').filter({ hasText: 'Insufficient balance' });
+    this.errorInsufficientFunds = page.locator('p').filter({ hasText: 'Insufficient funds' });
+    this.containerFeeRate = page.getByTestId('feerate-container');
+    this.inputBTCAdress = page.locator('input[type="text"]');
+    this.inputBTCAmount = page.getByTestId('btc-amount');
+    this.buttonExpand = page.getByRole('button', { name: 'Inputs & Outputs Dropdown' });
+    this.confirmTotalAmount = page.getByTestId('confirm-total-amount');
+    this.confirmCurrencyAmount = page.getByTestId('confirm-currency-amount');
+    this.confirmAmount = page.getByTestId('confirm-amount');
+    this.sendAddress = page.getByTestId('address-send');
+    this.receiveAddress = page.getByTestId('address-receive');
+    this.confirmBalance = page.getByTestId('confirm-balance');
+    this.buttonCancel = page.getByRole('button', { name: 'Cancel' });
+    this.sendTransactionID = page.getByTestId('transaction-id');
+    this.sendSTXValue = page.getByTestId('send-value');
 
     // Stacking
     this.buttonStartStacking = page.getByRole('button', { name: 'Start stacking' });
@@ -248,24 +358,98 @@ export default class Wallet {
     this.infoTextStacking = page.locator('h1').filter({ hasText: 'STX with other stackers' });
   }
 
-  async checkVisualsStartpage() {
+  async checkVisualsStartpage(network?: string) {
     // Deny data collection --> modal window is not always appearing so when it does we deny the data collection
     if (await this.buttonDenyDataCollection.isVisible()) {
       await this.buttonDenyDataCollection.click();
     }
     await expect(this.balance).toBeVisible();
     await expect(this.manageTokenButton).toBeVisible();
-    // Check if all 4 buttons (send, receive, swap, buy) are visible
-    await expect(this.allupperButtons).toHaveCount(4);
+
+    switch (network) {
+      case (network = 'testnet'):
+        // Check if all 3 buttons (send, receive, buy) are visible
+        await expect(this.allupperButtons).toHaveCount(3);
+        break;
+      default:
+        // Check if all 4 buttons (send, receive, swap, buy) are visible
+        await expect(this.allupperButtons).toHaveCount(4);
+    }
     await expect(this.labelAccountName).toBeVisible();
     await expect(this.buttonMenu).toBeVisible();
-    await expect(this.labelTokenSubtitle).toHaveCount(2);
+    await expect(await this.labelTokenSubtitle.count()).toBeGreaterThanOrEqual(2);
 
     await expect(this.navigationDashboard).toBeVisible();
     await expect(this.navigationNFT).toBeVisible();
     await expect(this.navigationStacking).toBeVisible();
     await expect(this.navigationExplore).toBeVisible();
     await expect(this.navigationSettings).toBeVisible();
+  }
+
+  async checkVisualsSendSTXPage() {
+    await expect(this.page.url()).toContain('send-stx');
+    await expect(this.buttonNext).toBeVisible();
+    await expect(this.buttonNext).toBeDisabled();
+    await expect(this.inputSendAmount).toBeVisible();
+    await expect(this.inputRecipientAdress).toBeVisible();
+    await expect(this.inputMemo).toBeVisible();
+    await expect(this.imageToken).toBeVisible();
+    await expect(this.buttonBack).toBeVisible();
+  }
+
+  // had to disable this rule as my first assertion was always changed to a wrong assertion
+  /* eslint-disable playwright/prefer-web-first-assertions */
+  async checkAmountsSendingSTX(amountSTXSend, STXTest) {
+    await expect(await this.receiveAddress.innerText()).toContain(STXTest.slice(-4));
+
+    // Sending amount without Fee
+    const sendAmount = await this.confirmAmount.first().innerText();
+    const numericValueSendAmount = parseFloat(sendAmount.replace(/[^0-9.]/g, ''));
+
+    await await expect(numericValueSendAmount).toEqual(amountSTXSend);
+
+    // Fees
+    const fee = await this.sendSTXValue.first().innerText();
+    const numericValueFee = parseFloat(fee.replace(/[^0-9.]/g, ''));
+
+    // total amount (amount + fees)
+    const totalAmount = await this.sendSTXValue.last().innerText();
+    const numericValuetotalAmount = parseFloat(totalAmount.replace(/[^0-9.]/g, ''));
+
+    const roundedResult = Number((numericValueSendAmount + numericValueFee).toFixed(9));
+    await expect(numericValuetotalAmount).toEqual(roundedResult);
+  }
+
+  /* eslint-disable playwright/prefer-web-first-assertions */
+  async checkAmountsSendingBTC(selfBTCTest, BTCTest, amountBTCSend) {
+    // Sending amount without Fee
+    const amountText = await this.confirmAmount.first().innerText();
+    const numericValueamountText = parseFloat(amountText.replace(/[^0-9.]/g, ''));
+    await expect(numericValueamountText).toEqual(amountBTCSend);
+
+    // Address check sending and receiving
+    await expect(await this.sendAddress.innerText()).toContain(selfBTCTest.slice(-4));
+    await expect(await this.receiveAddress.innerText()).toContain(BTCTest.slice(-4));
+
+    const confirmAmountAfter = await this.confirmAmount.last().innerText();
+    const confirmTotalAmount = await this.confirmTotalAmount.innerText();
+    const confirmBalance = await this.confirmBalance.innerText();
+    // Extract amounts for balance, sending amount and amount afterwards
+    const num1 = parseFloat(confirmAmountAfter.replace(/[^0-9.]/g, ''));
+    const num2 = parseFloat(confirmTotalAmount.replace(/[^0-9.]/g, ''));
+    const num3 = parseFloat(confirmBalance.replace(/[^0-9.]/g, ''));
+
+    const roundedResult = Number((num3 - num2).toFixed(9));
+    await expect(num1).toEqual(roundedResult);
+  }
+
+  async confirmSendTransaction(network?: string) {
+    await expect(this.buttonConfirm).toBeEnabled();
+    await this.buttonConfirm.click();
+    await expect(this.buttonClose).toBeVisible();
+    await expect(this.sendTransactionID).toBeVisible();
+    await this.buttonClose.click();
+    await this.checkVisualsStartpage(network);
   }
 
   async getAddress(button) {
@@ -275,6 +459,17 @@ export default class Wallet {
     await this.buttonConfirmCopyAddress.click();
     const address = await this.page.evaluate('navigator.clipboard.readText()');
     return address;
+  }
+
+  async getTokenBalance(tokenname) {
+    const locator = this.page
+      .getByRole('button')
+      .filter({ has: this.labelTokenSubtitle.getByText(tokenname, { exact: true }) })
+      .getByLabel('CoinBalance Container')
+      .locator('p');
+    const balanceText = await locator.innerText();
+    const numericValue = parseFloat(balanceText.replace(/[^\d.-]/g, ''));
+    return numericValue;
   }
 
   async checkNetworkSettingVisuals() {
@@ -312,10 +507,14 @@ export default class Wallet {
     await expect(this.buttonTestnet.locator('img')).toHaveAttribute('alt', 'tick');
     await expect(this.buttonMainnet.locator('img[alt="tick"]')).toHaveCount(0);
 
+    await this.inputStacksURL.fill('https://api.nakamoto.testnet.hiro.so');
+    // To speed up some checks we use our own servers
+    await this.inputBTCURL.fill('https://btc-testnet.xverse.app');
+
     await this.checkTestnetUrls(true);
 
     await this.buttonSave.click();
-    await expect(this.buttonNetwork).toBeVisible();
+    await expect(this.buttonNetwork).toBeVisible({ timeout: 30000 });
     await expect(this.buttonNetwork).toHaveText('NetworkTestnet');
   }
 
@@ -334,7 +533,7 @@ export default class Wallet {
     await this.checkTestnetUrls(false);
 
     await this.buttonSave.click();
-    await expect(this.buttonNetwork).toBeVisible();
+    await expect(this.buttonNetwork).toBeVisible({ timeout: 30000 });
     await expect(this.buttonNetwork).toHaveText('NetworkMainnet');
   }
 
@@ -355,16 +554,16 @@ export default class Wallet {
   }
 
   async getBalanceOfAllTokens() {
-    const count = await this.labelCoinBalance.count();
+    const count = await this.labelCoinBalanceCurrency.count();
     let totalBalance = 0;
     if (count > 1) {
       for (let i = 0; i < count; i++) {
-        const balanceText = await this.labelCoinBalance.nth(i).innerText();
+        const balanceText = await this.labelCoinBalanceCurrency.nth(i).innerText();
         const numericValue = parseFloat(balanceText.replace(/[^\d.-]/g, ''));
         totalBalance += numericValue;
       }
     } else {
-      const balanceText = await this.labelCoinBalance.innerText();
+      const balanceText = await this.labelCoinBalanceCurrency.innerText();
       totalBalance = parseFloat(balanceText.replace(/[^\d.-]/g, ''));
     }
     // Check if total balance of all tokens is the same as total wallet balance
@@ -374,7 +573,27 @@ export default class Wallet {
     return totalBalance;
   }
 
+  async enableRandomBRC20Token(): Promise<string> {
+    await this.manageTokenButton.click();
+    await expect(this.page.url()).toContain('manage-tokens');
+    await this.buttonBRC20.click();
+    const tokenName = await this.enableARandomToken();
+    await this.buttonBack.click();
+    await expect(this.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeVisible();
+    return tokenName;
+  }
+
+  async enableRandomSIP10Token(): Promise<string> {
+    await this.manageTokenButton.click();
+    await expect(this.page.url()).toContain('manage-tokens');
+    const tokenName = await this.enableARandomToken();
+    await this.buttonBack.click();
+    await expect(this.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeVisible();
+    return tokenName;
+  }
+
   async enableARandomToken(): Promise<string> {
+    await expect(this.checkboxTokenInactive.first()).toBeVisible();
     const numberOfUnselectedTokens = await this.checkboxTokenInactive.count();
 
     // Generate a random number within the range of available select elements
@@ -392,6 +611,7 @@ export default class Wallet {
   }
 
   async disableARandomToken(): Promise<string> {
+    await expect(this.checkboxTokenActive.first()).toBeVisible();
     const numberOfUnselectedTokens = await this.checkboxTokenActive.count();
 
     // Generate a random number within the range of available select elements

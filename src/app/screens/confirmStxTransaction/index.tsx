@@ -303,6 +303,7 @@ function ConfirmStxTransaction() {
           <SpendDelegatedStxWarning variant="warning" bodyText={t('SEND.SPEND_DELEGATED_STX')} />
         )}
         <RecipientComponent
+          dataTestID="confirm-amount"
           address={recipient}
           value={microstacksToStx(amount).toString()}
           icon={IconStacks}
