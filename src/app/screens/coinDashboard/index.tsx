@@ -165,6 +165,7 @@ export default function CoinDashboard() {
               {t('TRANSACTIONS')}
             </Button>
             <Button
+              data-testid="coin-contract-button"
               disabled={showFtContractDetails}
               onClick={onContractClick}
               isSelected={showFtContractDetails}
@@ -174,10 +175,10 @@ export default function CoinDashboard() {
           </FtInfoContainer>
         )}
         {protocol === 'stacks' && showFtContractDetails && (
-          <TokenContractContainer>
+          <TokenContractContainer data-testid="coin-contract-container">
             <h1>{t('FT_CONTRACT_PREFIX')}</h1>
             <ContractAddressCopyButton onClick={handleCopyContractAddress}>
-              <TokenContractAddress>
+              <TokenContractAddress data-testid="coin-contract-address">
                 {formatAddress(selectedFt?.principal as string)}
               </TokenContractAddress>
               <CopyButtonContainer>

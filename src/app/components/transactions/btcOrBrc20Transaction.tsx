@@ -97,7 +97,7 @@ export default function BtcOrBrc20TransactionHistoryItem({
     isBtcTransaction(transaction) &&
     rbf.isTransactionRbfEnabled(transaction, wallet);
   return (
-    <TransactionContainer onClick={openBtcTxStatusLink}>
+    <TransactionContainer data-testid="transaction-container" onClick={openBtcTxStatusLink}>
       <TransactionStatusIcon transaction={transaction} currency={currency} protocol={protocol} />
       <TransactionInfoContainer>
         <TransactionRow>
@@ -105,7 +105,7 @@ export default function BtcOrBrc20TransactionHistoryItem({
             <TransactionTitle transaction={transaction} />
             <TransactionRecipient transaction={transaction} />
           </div>
-          <TransactionAmountContainer>
+          <TransactionAmountContainer data-testid="transaction-amount">
             <TransactionAmount transaction={transaction} currency={currency} protocol={protocol} />
             {showAccelerateButton && (
               <Link to={`/speed-up-tx/${transaction.txid}`}>

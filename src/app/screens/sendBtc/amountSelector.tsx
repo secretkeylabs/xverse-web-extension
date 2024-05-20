@@ -83,6 +83,7 @@ function AmountSelector({
       <div>
         {header}
         <BtcAmountSelector
+          data-testid="test-container"
           amountSats={amountSats}
           setAmountSats={setAmountSats}
           sendMax={sendMax}
@@ -90,7 +91,7 @@ function AmountSelector({
           disabled={!hasBtc}
         />
         {hasBtc && (
-          <FeeRateContainer>
+          <FeeRateContainer data-testid="feerate-container">
             <SelectFeeRate
               fee={fee}
               feeUnits="Sats"
@@ -123,6 +124,7 @@ function AmountSelector({
         )}
         {!hasBtc && (
           <Callout
+            dataTestID="no-funds-message"
             titleText={t('BTC.NO_FUNDS_TITLE')}
             bodyText={t('BTC.NO_FUNDS')}
             redirectText={t('BTC.BUY_BTC')}

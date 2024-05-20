@@ -394,7 +394,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
           fungibleToken={fungibleToken || undefined}
         />
         <RowContainer>
-          <BalanceTitleText>{getDashboardTitle()}</BalanceTitleText>
+          <BalanceTitleText data-testid="coin-title-text">{getDashboardTitle()}</BalanceTitleText>
           {fungibleToken?.protocol && (
             <ProtocolText>
               {fungibleToken?.protocol === 'stacks'
@@ -409,7 +409,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
             displayType="text"
             thousandSeparator
             renderText={(value: string) => (
-              <CoinBalanceText>{`${value} ${getTokenTicker()}`}</CoinBalanceText>
+              <CoinBalanceText data-testid="coin-balance">{`${value} ${getTokenTicker()}`}</CoinBalanceText>
             )}
           />
           <NumericFormat

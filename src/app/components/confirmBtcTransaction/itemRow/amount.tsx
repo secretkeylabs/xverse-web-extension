@@ -76,9 +76,17 @@ export default function Amount({ amount }: Props) {
             displayType="text"
             thousandSeparator
             suffix=" BTC"
-            renderText={(value: string) => <StyledP typography="body_medium_m">{value}</StyledP>}
+            renderText={(value: string) => (
+              <StyledP typography="body_medium_m" data-testid="confirm-total-amount">
+                {value}
+              </StyledP>
+            )}
           />
-          <StyledP typography="body_medium_s" color="white_400">
+          <StyledP
+            typography="body_medium_s"
+            color="white_400"
+            data-testid="confirm-currency-amount"
+          >
             {getFiatAmountString(amount, btcFiatRate)}
           </StyledP>
         </NumberTypeContainer>
