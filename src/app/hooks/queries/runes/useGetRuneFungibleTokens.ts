@@ -7,13 +7,18 @@ import BigNumber from 'bignumber.js';
 
 export const fetchRuneBalances =
   (
-    runesApi,
+    runesApi: ReturnType<typeof useRunesApi>,
     network: NetworkType,
     ordinalsAddress: string,
     fiatCurrency: string,
   ): (() => Promise<FungibleToken[]>) =>
   async () => {
-    const runeBalances = await runesApi.getRuneFungibleTokens(ordinalsAddress);
+    const runeBalances = await runesApi.getRuneFungibleTokens(ordinalsAddress, true);
+
+    if (!Array.isArray(runeBalances) || runeBalances.length === 0) {
+      return [];
+    }
+
     const runeNames = runeBalances.map((runeBalanceFt: FungibleToken) => runeBalanceFt.name);
     return getXverseApiClient(network)
       .getRuneFiatRates(runeNames, fiatCurrency)
