@@ -22,18 +22,11 @@ type Props = {
   recipientAddress: string;
   setRecipientAddress: (address: string) => void;
   onNext: () => void;
-  isLoading: boolean;
   header?: React.ReactNode;
 };
 
 // TODO: this could be extracted into a component for reuse
-function RecipientSelector({
-  recipientAddress,
-  setRecipientAddress,
-  onNext,
-  isLoading,
-  header,
-}: Props) {
+function RecipientSelector({ recipientAddress, setRecipientAddress, onNext, header }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { network } = useWalletSelector();
   const [addressIsValid, setAddressIsValid] = useState(true);
@@ -81,7 +74,6 @@ function RecipientSelector({
           title={t('NEXT')}
           onClick={handleNext}
           disabled={!recipientAddress || !addressIsValid}
-          loading={isLoading}
         />
       </Buttons>
     </Container>
