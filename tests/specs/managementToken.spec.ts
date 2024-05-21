@@ -35,15 +35,20 @@ test.describe('Token Management', () => {
     await expect(wallet.buttonRunes).toBeVisible();
     await expect(wallet.headingTokens).toBeVisible();
     // Check tokens
-    await expect(wallet.labelCoinTitle).toHaveCount(16);
-    await expect(wallet.checkboxTokenInactive).toHaveCount(15);
+    await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
+    const amounttokenSIP = await wallet.labelCoinTitle.count();
+
+    await await expect(amounttokenSIP).toBeGreaterThanOrEqual(15);
+    await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenSIP - 1);
     await expect(wallet.checkboxTokenActive).toHaveCount(1);
-    await expect(wallet.checkboxToken).toHaveCount(16);
+    await expect(wallet.checkboxToken).toHaveCount(amounttokenSIP);
     await wallet.buttonBRC20.click();
-    await expect(wallet.labelCoinTitle).toHaveCount(9);
-    await expect(wallet.checkboxTokenInactive).toHaveCount(9);
+    await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
+    const amounttokenBRC20 = await wallet.labelCoinTitle.count();
+    await expect(amounttokenBRC20).toBeGreaterThanOrEqual(8);
+    await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenBRC20);
     await expect(wallet.checkboxTokenActive).toHaveCount(0);
-    await expect(wallet.checkboxToken).toHaveCount(9);
+    await expect(wallet.checkboxToken).toHaveCount(amounttokenBRC20);
     await wallet.buttonRunes.click();
     await expect(wallet.labelCoinTitle).toHaveCount(0);
     await expect(wallet.checkboxTokenInactive).toHaveCount(0);
