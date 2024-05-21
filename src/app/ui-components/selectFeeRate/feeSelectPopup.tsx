@@ -122,7 +122,7 @@ function FeeSelectPopup({
     };
 
     calculateTotalFee();
-  }, [baseToFiat, customValue, getFeeForFeeRate]);
+  }, [customValue]);
 
   const handleClick = (newRate: string) => () => {
     setFeeRate(newRate);
