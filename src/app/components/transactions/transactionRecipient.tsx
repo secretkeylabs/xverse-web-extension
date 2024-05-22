@@ -1,9 +1,14 @@
 import {
   Brc20HistoryTransactionData,
   BtcTransactionData,
+  GetRunesActivityForAddressEvent,
   StxTransactionData,
 } from '@secretkeylabs/xverse-core';
-import { isBrc20Transaction } from '@utils/transactions/transactions';
+import {
+  isBrc20Transaction,
+  isBtcTransaction,
+  isRuneTransaction,
+} from '@utils/transactions/transactions';
 import styled from 'styled-components';
 
 const RecipientAddress = styled.p((props) => ({
@@ -13,13 +18,11 @@ const RecipientAddress = styled.p((props) => ({
 }));
 
 interface TransactionRecipientProps {
-  transaction: StxTransactionData | BtcTransactionData | Brc20HistoryTransactionData;
-}
-
-function isBtcTransaction(
-  tx: StxTransactionData | BtcTransactionData | Brc20HistoryTransactionData,
-): tx is BtcTransactionData {
-  return (tx as BtcTransactionData).txType === 'bitcoin';
+  transaction:
+    | StxTransactionData
+    | BtcTransactionData
+    | Brc20HistoryTransactionData
+    | GetRunesActivityForAddressEvent;
 }
 
 function formatAddress(addr: string): string {
@@ -38,12 +41,14 @@ export default function TransactionRecipient(props: TransactionRecipientProps): 
       </RecipientAddress>
     );
   }
-  if (transaction.txType === 'token_transfer' || transaction.txType === 'coinbase') {
-    return (
-      <RecipientAddress>
-        {formatAddress(transaction.tokenTransfer?.recipientAddress as string)}
-      </RecipientAddress>
-    );
+  if (!isRuneTransaction(transaction)) {
+    if (transaction.txType === 'token_transfer' || transaction.txType === 'coinbase') {
+      return (
+        <RecipientAddress>
+          {formatAddress(transaction.tokenTransfer?.recipientAddress as string)}
+        </RecipientAddress>
+      );
+    }
   }
   return null;
 }

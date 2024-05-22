@@ -4,6 +4,7 @@ import {
   BtcTransactionData,
   FungibleToken,
   FungibleTokenProtocol,
+  GetRunesActivityForAddressEvent,
   microstacksToStx,
   satsToBtc,
   StxTransactionData,
@@ -15,9 +16,14 @@ import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 
 interface TransactionAmountProps {
-  transaction: StxTransactionData | BtcTransactionData | Brc20HistoryTransactionData;
+  transaction:
+    | StxTransactionData
+    | BtcTransactionData
+    | Brc20HistoryTransactionData
+    | GetRunesActivityForAddressEvent;
   currency: CurrencyTypes;
   protocol?: FungibleTokenProtocol;
+  tokenSymbol?: string;
 }
 
 const TransactionValue = styled.p((props) => ({
@@ -26,14 +32,15 @@ const TransactionValue = styled.p((props) => ({
 }));
 
 export default function TransactionAmount(props: TransactionAmountProps): JSX.Element | null {
-  const { transaction, currency, protocol } = props;
+  const { transaction, currency, protocol, tokenSymbol } = props;
   const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
   if (currency === 'STX' || (currency === 'FT' && protocol === 'stacks')) {
-    if (transaction.txType === 'token_transfer') {
-      const prefix = transaction.incoming ? '' : '-';
+    const stxTransaction = transaction as StxTransactionData;
+    if (stxTransaction.txType === 'token_transfer') {
+      const prefix = stxTransaction.incoming ? '' : '-';
       return (
         <NumericFormat
-          value={microstacksToStx(transaction.amount).toString()}
+          value={microstacksToStx(stxTransaction.amount).toString()}
           displayType="text"
           thousandSeparator
           prefix={prefix}
@@ -44,12 +51,12 @@ export default function TransactionAmount(props: TransactionAmountProps): JSX.El
         />
       );
     }
-    if (transaction.txType === 'contract_call') {
-      if (transaction.tokenType === 'fungible') {
+    if (stxTransaction.txType === 'contract_call') {
+      if (stxTransaction.tokenType === 'fungible') {
         const token = sip10CoinsList.find(
-          (cn) => cn.principal === transaction.contractCall?.contract_id,
+          (cn) => cn.principal === stxTransaction.contractCall?.contract_id,
         );
-        const prefix = transaction.incoming ? '' : '-';
+        const prefix = stxTransaction.incoming ? '' : '-';
         return (
           <NumericFormat
             value={getFtBalance(token as FungibleToken)}
@@ -101,6 +108,19 @@ export default function TransactionAmount(props: TransactionAmountProps): JSX.El
         />
       );
     }
+  } else if (currency === 'FT' && protocol === 'runes') {
+    const runeTransaction = transaction as GetRunesActivityForAddressEvent;
+    return (
+      <NumericFormat
+        value={BigNumber(runeTransaction.amount).toString()}
+        displayType="text"
+        thousandSeparator
+        allowNegative
+        renderText={(value: string) => (
+          <TransactionValue>{`${value} ${tokenSymbol}`}</TransactionValue>
+        )}
+      />
+    );
   }
   return null;
 }

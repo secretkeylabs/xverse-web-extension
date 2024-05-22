@@ -192,13 +192,17 @@ export default function CoinDashboard() {
             </ContractDeploymentButton>
           </TokenContractContainer>
         )}
-        {protocol !== 'runes' && (
-          <TransactionsHistoryList
-            coin={currency as CurrencyTypes}
-            txFilter={`${selectedFt?.principal}::${selectedFt?.assetName}`}
-            brc20Token={protocol === 'brc-20' ? selectedFt?.principal || null : null}
-          />
-        )}
+        <TransactionsHistoryList
+          coin={currency as CurrencyTypes}
+          stxTxFilter={
+            selectedFt?.protocol === 'runes'
+              ? selectedFt.name
+              : `${selectedFt?.principal}::${selectedFt?.assetName}`
+          }
+          brc20Token={protocol === 'brc-20' ? selectedFt?.principal || null : null}
+          runeToken={protocol === 'runes' ? selectedFt?.name || null : null}
+          runeSymbol={protocol === 'runes' ? selectedFt?.runeSymbol || null : null}
+        />
       </Container>
       <BottomBar tab="dashboard" />
     </>

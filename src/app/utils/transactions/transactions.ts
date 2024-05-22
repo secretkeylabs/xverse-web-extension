@@ -1,10 +1,12 @@
 import {
+  APIGetRunesActivityForAddressResponse,
   API_TIMEOUT_MILLI,
   Brc20HistoryTransactionData,
   BtcTransactionData,
-  getNetworkURL,
+  GetRunesActivityForAddressEvent,
   StacksNetwork,
   StxTransactionData,
+  getNetworkURL,
 } from '@secretkeylabs/xverse-core';
 import {
   AddressTransactionWithTransfers,
@@ -93,7 +95,13 @@ export function isAddressTransactionWithTransfers(
 }
 
 export function isBtcTransaction(
-  tx: AddressTransactionWithTransfers | Tx | BtcTransactionData | Brc20HistoryTransactionData,
+  tx:
+    | AddressTransactionWithTransfers
+    | Tx
+    | BtcTransactionData
+    | StxTransactionData
+    | Brc20HistoryTransactionData
+    | GetRunesActivityForAddressEvent,
 ): tx is BtcTransactionData {
   return (tx as BtcTransactionData).txType === 'bitcoin';
 }
@@ -102,7 +110,8 @@ export function isBtcTransactionArr(
   txs:
     | (AddressTransactionWithTransfers | MempoolTransaction)[]
     | BtcTransactionData[]
-    | Brc20HistoryTransactionData[],
+    | Brc20HistoryTransactionData[]
+    | APIGetRunesActivityForAddressResponse,
 ): txs is BtcTransactionData[] {
   return (txs as BtcTransactionData[])[0].txType === 'bitcoin';
 }
@@ -111,13 +120,38 @@ export function isBrc20TransactionArr(
   txs:
     | (AddressTransactionWithTransfers | MempoolTransaction)[]
     | BtcTransactionData[]
-    | Brc20HistoryTransactionData[],
+    | Brc20HistoryTransactionData[]
+    | APIGetRunesActivityForAddressResponse,
 ): txs is BtcTransactionData[] {
   return (txs as Brc20HistoryTransactionData[])[0].txType === 'brc20';
 }
 
 export function isBrc20Transaction(
-  tx: StxTransactionData | BtcTransactionData | Brc20HistoryTransactionData,
+  tx:
+    | StxTransactionData
+    | BtcTransactionData
+    | Brc20HistoryTransactionData
+    | GetRunesActivityForAddressEvent,
 ): tx is Brc20HistoryTransactionData {
   return (tx as Brc20HistoryTransactionData).txType === 'brc20';
+}
+
+export function isRuneTransactionArr(
+  txs:
+    | (AddressTransactionWithTransfers | MempoolTransaction)[]
+    | BtcTransactionData[]
+    | Brc20HistoryTransactionData[]
+    | APIGetRunesActivityForAddressResponse,
+): txs is APIGetRunesActivityForAddressResponse {
+  return !Array.isArray(txs);
+}
+
+export function isRuneTransaction(
+  tx:
+    | StxTransactionData
+    | BtcTransactionData
+    | Brc20HistoryTransactionData
+    | GetRunesActivityForAddressEvent,
+): tx is GetRunesActivityForAddressEvent {
+  return (tx as GetRunesActivityForAddressEvent).burned !== undefined;
 }
