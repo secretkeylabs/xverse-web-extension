@@ -17,6 +17,7 @@ import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10Fun
 import useAppConfig from '@hooks/queries/useAppConfig';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useFeeMultipliers from '@hooks/queries/useFeeMultipliers';
+import useSpamTokens from '@hooks/queries/useSpamTokens';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useHasFeature from '@hooks/useHasFeature';
 import useNotificationBanners from '@hooks/useNotificationBanners';
@@ -26,15 +27,23 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowUp, Plus } from '@phosphor-icons/react';
 import CoinSelectModal from '@screens/home/coinSelectModal';
 import { type FungibleToken } from '@secretkeylabs/xverse-core';
-import { changeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
+import {
+  changeShowDataCollectionAlertAction,
+  setBrc20ManageTokensAction,
+  setRunesManageTokensAction,
+  setSip10ManageTokensAction,
+  setSpamTokenAction,
+} from '@stores/wallet/actions/actionCreators';
 import Button from '@ui-library/button';
 import Divider from '@ui-library/divider';
 import Sheet from '@ui-library/sheet';
+import SnackBar from '@ui-library/snackBar';
 import { CurrencyTypes } from '@utils/constants';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -220,6 +229,7 @@ function Home() {
     showDataCollectionAlert,
     network,
     hideStx,
+    spamToken,
     notificationBanners,
   } = useWalletSelector();
   const theme = useTheme();
@@ -240,16 +250,19 @@ function Home() {
     useBtcWalletData();
   const { data: notificationBannersArr } = useNotificationBanners();
   const {
+    unfilteredData: fullSip10CoinsList,
     visible: sip10CoinsList,
     isLoading: loadingStxCoinData,
     isRefetching: refetchingStxCoinData,
   } = useVisibleSip10FungibleTokens();
   const {
+    unfilteredData: fullBrc20CoinsList,
     visible: brc20CoinsList,
     isLoading: loadingBtcCoinData,
     isRefetching: refetchingBtcCoinData,
   } = useVisibleBrc20FungibleTokens();
   const {
+    unfilteredData: fullRunesCoinsList,
     visible: runesCoinsList,
     isLoading: loadingRunesData,
     isRefetching: refetchingRunesData,
@@ -259,6 +272,47 @@ function Home() {
   useFeeMultipliers();
   useAppConfig();
   useTrackMixPanelPageViewed();
+  const { removeFromSpamTokens } = useSpamTokens();
+
+  useEffect(
+    () => () => {
+      toast.dismiss();
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (spamToken) {
+      const toastId = toast.custom(
+        <SnackBar
+          text={t('TOKEN_HIDDEN')}
+          type="neutral"
+          actionButtonText={t('UNDO')}
+          actionButtonCallback={() => {
+            toast.remove(toastId);
+
+            // set the visibility back to true
+            const payload = {
+              principal: spamToken.principal,
+              isEnabled: true,
+            };
+
+            if (fullRunesCoinsList?.find((ft) => ft.principal === spamToken.principal)) {
+              dispatch(setRunesManageTokensAction(payload));
+            } else if (fullSip10CoinsList?.find((ft) => ft.principal === spamToken.principal)) {
+              dispatch(setSip10ManageTokensAction(payload));
+            } else if (fullBrc20CoinsList?.find((ft) => ft.principal === spamToken.principal)) {
+              dispatch(setBrc20ManageTokensAction(payload));
+            }
+
+            removeFromSpamTokens(spamToken.principal);
+            dispatch(setSpamTokenAction(null));
+          }}
+        />,
+      );
+      dispatch(setSpamTokenAction(null));
+    }
+  }, [spamToken]);
 
   useEffect(() => {
     (async () => {

@@ -9,7 +9,7 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
 
-export const brc20TokenToFungibleToken = (coin: Brc20Token): FungibleToken => ({
+const brc20TokenToFungibleToken = (coin: Brc20Token): FungibleToken => ({
   name: coin.name,
   principal: coin.ticker ?? coin.name,
   balance: '0',
@@ -54,14 +54,27 @@ export const fetchBrc20FungibleTokens =
   };
 
 export const useGetBrc20FungibleTokens = () => {
-  const { ordinalsAddress, fiatCurrency, network } = useWalletSelector();
+  const { ordinalsAddress, fiatCurrency, network, spamTokens, showSpamTokens } =
+    useWalletSelector();
   const queryFn = fetchBrc20FungibleTokens(ordinalsAddress, fiatCurrency, network);
 
-  return useQuery({
+  const query = useQuery({
     queryKey: ['brc20-fungible-tokens', ordinalsAddress, network.type, fiatCurrency],
     queryFn,
     enabled: Boolean(network && ordinalsAddress),
   });
+
+  return {
+    ...query,
+    unfilteredData: query.data,
+    data: query.data?.filter((ft) => {
+      let passedSpamCheck = true;
+      if (spamTokens?.length) {
+        passedSpamCheck = showSpamTokens || !spamTokens.includes(ft.principal);
+      }
+      return passedSpamCheck;
+    }),
+  };
 };
 
 export const useVisibleBrc20FungibleTokens = (): ReturnType<typeof useGetBrc20FungibleTokens> & {

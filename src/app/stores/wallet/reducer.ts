@@ -20,7 +20,10 @@ import {
   SetFeeMultiplierKey,
   SetNotificationBannersKey,
   SetRunesManageTokensKey,
+  SetShowSpamTokensKey,
   SetSip10ManageTokensKey,
+  SetSpamTokenKey,
+  SetSpamTokensKey,
   SetWalletHideStxKey,
   SetWalletKey,
   SetWalletLockPeriodKey,
@@ -89,6 +92,9 @@ export const initialWalletState: WalletState = {
   isUnlocked: false,
   hideStx: false,
   accountBalances: {},
+  spamToken: null,
+  spamTokens: [],
+  showSpamTokens: false,
 };
 
 const walletReducer = (
@@ -268,6 +274,21 @@ const walletReducer = (
       return {
         ...state,
         hideStx: action.hideStx,
+      };
+    case SetSpamTokenKey:
+      return {
+        ...state,
+        spamToken: action.spamToken,
+      };
+    case SetSpamTokensKey:
+      return {
+        ...state,
+        spamTokens: action.spamTokens,
+      };
+    case SetShowSpamTokensKey:
+      return {
+        ...state,
+        showSpamTokens: action.showSpamTokens,
       };
     default:
       return state;

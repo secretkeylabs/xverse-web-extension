@@ -1,18 +1,30 @@
 import linkIcon from '@assets/img/linkIcon.svg';
 import CopyButton from '@components/copyButton';
+import OptionsDialog from '@components/optionsDialog/optionsDialog';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import { useVisibleBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
 import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useGetRuneFungibleTokens';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useSpamTokens from '@hooks/queries/useSpamTokens';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
-import { CurrencyTypes } from '@utils/constants';
+import { Flag } from '@phosphor-icons/react';
+import {
+  setBrc20ManageTokensAction,
+  setRunesManageTokensAction,
+  setSip10ManageTokensAction,
+  setSpamTokenAction,
+} from '@stores/wallet/actions/actionCreators';
+import { StyledP } from '@ui-library/common.styled';
+import { CurrencyTypes, SPAM_OPTIONS_WIDTH } from '@utils/constants';
 import { getExplorerUrl } from '@utils/helper';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
+import Theme from 'theme';
 import CoinHeader from './coinHeader';
 import TransactionsHistoryList from './transactionsHistoryList';
 
@@ -106,25 +118,65 @@ const Button = styled.button<{
   opacity: props.isSelected ? 1 : 0.6,
 }));
 
+const ButtonRow = styled.button`
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+  flex-direction: row;
+  padding-left: ${(props) => props.theme.space.m};
+  padding-right: ${(props) => props.theme.space.m};
+  padding-top: ${(props) => props.theme.space.s};
+  padding-bottom: ${(props) => props.theme.space.s};
+  transition: background-color 0.2s ease;
+  :hover {
+    background-color: ${(props) => props.theme.colors.elevation3};
+  }
+  :active {
+    background-color: ${(props) => props.theme.colors.elevation3};
+  }
+`;
+
+const TokenText = styled(StyledP)`
+  margin-left: ${(props) => props.theme.space.m};
+`;
+
 export default function CoinDashboard() {
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
   const navigate = useNavigate();
   const [showFtContractDetails, setShowFtContractDetails] = useState(false);
-  const { currency } = useParams();
+  const [showOptionsDialog, setShowOptionsDialog] = useState(false);
+  const [optionsDialogIndents, setOptionsDialogIndents] = useState<
+    { top: string; left: string } | undefined
+  >();
   const [searchParams] = useSearchParams();
+  const { addToSpamTokens } = useSpamTokens();
+  const dispatch = useDispatch();
+  const { currency } = useParams();
   const { visible: runesCoinsList } = useVisibleRuneFungibleTokens();
   const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
   const { visible: brc20CoinsList } = useVisibleBrc20FungibleTokens();
   const ftKey = searchParams.get('ftKey');
 
-  const selectedFt =
-    sip10CoinsList.find((ft) => ft.principal === ftKey) ??
-    brc20CoinsList.find((ft) => ft.principal === ftKey) ??
-    runesCoinsList.find((ft) => ft.principal === ftKey);
-
-  const protocol = selectedFt?.protocol;
-
   useBtcWalletData();
+
+  const handleGoBack = () => {
+    navigate(-1);
+  };
+
+  let selectedFt = sip10CoinsList.find((ft) => ft.principal === ftKey);
+  let selectedProtocol = 'stacks';
+
+  if (!selectedFt) {
+    selectedFt = brc20CoinsList.find((ft) => ft.principal === ftKey);
+    selectedProtocol = 'brc-20';
+  }
+
+  if (!selectedFt) {
+    selectedFt = runesCoinsList.find((ft) => ft.principal === ftKey);
+    selectedProtocol = 'runes';
+  }
+
+  const protocol = selectedProtocol || selectedFt?.protocol;
   useTrackMixPanelPageViewed(
     protocol
       ? {
@@ -133,8 +185,17 @@ export default function CoinDashboard() {
       : {},
   );
 
-  const handleBack = () => {
-    navigate(-1);
+  const openOptionsDialog = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setShowOptionsDialog(true);
+
+    setOptionsDialogIndents({
+      top: `${(event.target as HTMLElement).parentElement?.getBoundingClientRect().top}px`,
+      left: `calc(100% - ${SPAM_OPTIONS_WIDTH}px)`,
+    });
+  };
+
+  const closeOptionsDialog = () => {
+    setShowOptionsDialog(false);
   };
 
   const openContractDeployment = () =>
@@ -152,7 +213,50 @@ export default function CoinDashboard() {
 
   return (
     <>
-      <TopRow onClick={handleBack} />
+      <TopRow
+        onClick={handleGoBack}
+        onMenuClick={currency !== 'STX' && currency !== 'BTC' ? openOptionsDialog : undefined}
+      />
+      {showOptionsDialog && (
+        <OptionsDialog
+          closeDialog={closeOptionsDialog}
+          optionsDialogIndents={optionsDialogIndents}
+          width={SPAM_OPTIONS_WIDTH}
+        >
+          <ButtonRow
+            onClick={() => {
+              if (!selectedFt) {
+                handleGoBack();
+                return;
+              }
+
+              // set the visibility to false
+              const payload = {
+                principal: selectedFt.principal,
+                isEnabled: false,
+              };
+
+              if (protocol === 'runes') {
+                dispatch(setRunesManageTokensAction(payload));
+              } else if (protocol === 'stacks') {
+                dispatch(setSip10ManageTokensAction(payload));
+              } else if (protocol === 'brc-20') {
+                dispatch(setBrc20ManageTokensAction(payload));
+              }
+
+              addToSpamTokens(selectedFt.principal);
+              dispatch(setSpamTokenAction(selectedFt));
+
+              handleGoBack();
+            }}
+          >
+            <Flag size={24} color={Theme.colors.danger_light} />
+            <TokenText color="danger_light" typography="body_medium_l">
+              {t('HIDE_AND_REPORT')}
+            </TokenText>
+          </ButtonRow>
+        </OptionsDialog>
+      )}
       <Container>
         <CoinHeader coin={currency as CurrencyTypes} fungibleToken={selectedFt} />
         {protocol === 'stacks' && (

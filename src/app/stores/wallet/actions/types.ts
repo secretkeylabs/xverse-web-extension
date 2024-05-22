@@ -3,6 +3,7 @@ import type {
   AccountType,
   AppInfo,
   BaseWallet,
+  FungibleToken,
   SettingsNetwork,
   SupportedCurrency,
 } from '@secretkeylabs/xverse-core';
@@ -34,6 +35,9 @@ export const SetWalletUnlockedKey = 'SetWalletUnlocked';
 export const RenameAccountKey = 'RenameAccountKey';
 export const SetAccountBalanceKey = 'SetAccountBalanceKey';
 export const SetWalletHideStxKey = 'SetWalletHideStx';
+export const SetSpamTokenKey = 'SetSpamTokenKey';
+export const SetSpamTokensKey = 'SetSpamTokensKey';
+export const SetShowSpamTokensKey = 'SetShowSpamTokensKey';
 
 export enum WalletSessionPeriods {
   LOW = 15,
@@ -77,6 +81,9 @@ export interface WalletState {
     [key: string]: string;
   };
   hideStx: boolean;
+  showSpamTokens: boolean;
+  spamToken: FungibleToken | null;
+  spamTokens: string[];
 }
 
 export interface SetWallet {
@@ -227,6 +234,21 @@ export interface SetWalletHideStx {
   hideStx: boolean;
 }
 
+export interface SetSpamToken {
+  type: typeof SetSpamTokenKey;
+  spamToken: FungibleToken | null;
+}
+
+export interface SetSpamTokens {
+  type: typeof SetSpamTokensKey;
+  spamTokens: string[];
+}
+
+export interface SetShowSpamTokens {
+  type: typeof SetShowSpamTokensKey;
+  showSpamTokens: boolean;
+}
+
 export type WalletActions =
   | SetWallet
   | ResetWallet
@@ -254,4 +276,7 @@ export type WalletActions =
   | SetWalletUnlocked
   | RenameAccount
   | SetAccountBalance
-  | SetWalletHideStx;
+  | SetWalletHideStx
+  | SetSpamToken
+  | SetSpamTokens
+  | SetShowSpamTokens;

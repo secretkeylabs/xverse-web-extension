@@ -32,15 +32,28 @@ export const fetchRuneBalances =
   };
 
 export const useGetRuneFungibleTokens = () => {
-  const { ordinalsAddress, network, fiatCurrency } = useWalletSelector();
+  const { ordinalsAddress, network, fiatCurrency, spamTokens, showSpamTokens } =
+    useWalletSelector();
   const showRunes = useHasFeature('RUNES_SUPPORT');
   const runesApi = useRunesApi();
   const queryFn = fetchRuneBalances(runesApi, network.type, ordinalsAddress, fiatCurrency);
-  return useQuery({
+  const query = useQuery({
     queryKey: ['get-rune-fungible-tokens', network.type, ordinalsAddress, fiatCurrency],
     enabled: Boolean(network && ordinalsAddress && showRunes),
     queryFn,
   });
+
+  return {
+    ...query,
+    unfilteredData: query.data,
+    data: query.data?.filter((ft) => {
+      let passedSpamCheck = true;
+      if (spamTokens?.length) {
+        passedSpamCheck = showSpamTokens || !spamTokens.includes(ft.principal);
+      }
+      return passedSpamCheck;
+    }),
+  };
 };
 
 /*

@@ -17,7 +17,22 @@
     "e2etest": "npx playwright test",
     "e2etest:ui": "npx playwright test --ui",
     "smoketest": "npx playwright test --grep \"#smoketest\"",
-    "e2etest:report": "playwright show-report"
+    "e2etest:report": "playwright show-report",
+    "find-deadcode": "ts-prune"
+  },
+  "overrides": {
+    "buffer": "6.0.3"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "node scripts/ts-prune-staged.js",
+      "prettier --write",
+      "eslint",
+      "tsc-files --noEmit src/styled.d.ts src/react-app-env.d.ts"
+    ],
+    "*.json": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@ledgerhq/hw-transport-webusb": "^6.27.13",
@@ -91,19 +106,6 @@
     "zod": "3.22.4",
     "zxcvbn": "^4.4.2"
   },
-  "overrides": {
-    "buffer": "6.0.3"
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "prettier --write",
-      "eslint",
-      "tsc-files --noEmit src/styled.d.ts src/react-app-env.d.ts"
-    ],
-    "*.json": [
-      "prettier --write"
-    ]
-  },
   "devDependencies": {
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.7",
     "@tanstack/eslint-plugin-query": "^4.29.4",
@@ -153,6 +155,7 @@
     "style-loader": "^3.3.1",
     "terser-webpack-plugin": "^5.3.6",
     "ts-loader": "^9.5.1",
+    "ts-prune": "0.10.3",
     "tsc-files": "^1.1.4",
     "tsconfig-paths-webpack-plugin": "^4.0.0",
     "type-fest": "^2.19.0",
