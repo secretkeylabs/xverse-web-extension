@@ -3,6 +3,13 @@ import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/u
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  BitcoinNetworkType,
+  Return,
+  RpcErrorCode,
+  SignTransactionOptions,
+  SignTransactionPayload,
+} from '@sats-connect/core';
+import {
   InputToSign,
   SettingsNetwork,
   btcTransaction,
@@ -12,13 +19,6 @@ import {
 import { decodeToken } from 'jsontokens';
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import {
-  BitcoinNetworkType,
-  Return,
-  RpcErrorCode,
-  SignTransactionOptions,
-  SignTransactionPayload,
-} from 'sats-connect';
 import useBtcClient from '../../hooks/useBtcClient';
 import useSeedVault from '../../hooks/useSeedVault';
 

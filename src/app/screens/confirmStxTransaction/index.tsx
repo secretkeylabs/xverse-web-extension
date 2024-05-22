@@ -20,6 +20,7 @@ import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { StxRequests } from '@sats-connect/core';
 import {
   AnalyticsEvents,
   StacksTransaction,
@@ -41,7 +42,6 @@ import BigNumber from 'bignumber.js';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { StxRequests } from 'sats-connect';
 import styled from 'styled-components';
 
 const AlertContainer = styled.div((props) => ({

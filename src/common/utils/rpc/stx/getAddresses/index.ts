@@ -1,5 +1,5 @@
 import { WebBtcMessage } from '@common/types/message-types';
-import { RpcErrorCode } from 'sats-connect';
+import { RpcErrorCode } from '@sats-connect/core';
 import {
   listenForPopupClose,
   makeSearchParamsWithDefaults,

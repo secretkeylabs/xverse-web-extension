@@ -7,18 +7,18 @@ import { NumericFormat } from 'react-number-format';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { CreateInscriptionPayload, CreateRepeatInscriptionsPayload } from '@sats-connect/core';
 import {
   AnalyticsEvents,
   BtcFeeResponse,
+  InscriptionErrorCode,
+  UTXO,
   currencySymbolMap,
   fetchBtcFeeRate,
   getNonOrdinalUtxo,
-  InscriptionErrorCode,
   useInscriptionExecute,
   useInscriptionFees,
-  UTXO,
 } from '@secretkeylabs/xverse-core';
-import { CreateInscriptionPayload, CreateRepeatInscriptionsPayload } from 'sats-connect';
 
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';

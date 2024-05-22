@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import { Return, RpcErrorCode, RpcId } from 'sats-connect';
+import { Return, RpcErrorCode, RpcId } from '@sats-connect/core';
 import { ZodError } from 'zod';
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '../helpers';
 

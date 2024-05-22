@@ -1,5 +1,5 @@
+import { RpcErrorResponse } from '@sats-connect/core';
 import { SignatureData } from '@stacks/connect';
-import { RpcErrorResponse } from 'sats-connect';
 import { getTabIdFromPort } from '.';
 import {
   InternalMethods,

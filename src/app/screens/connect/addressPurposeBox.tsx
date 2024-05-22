@@ -1,5 +1,5 @@
+import { AddressPurpose } from '@sats-connect/core';
 import { getTruncatedAddress } from '@utils/helper';
-import { AddressPurpose } from 'sats-connect';
 import styled from 'styled-components';
 
 const AddressBox = styled.div((props) => ({

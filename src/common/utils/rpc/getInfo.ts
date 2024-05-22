@@ -1,4 +1,4 @@
-import { Requests, Return, RpcId } from 'sats-connect';
+import { Requests, Return, RpcId } from '@sats-connect/core';
 import { keys } from 'ts-transformer-keys';
 import { makeRpcSuccessResponse, sendRpcResponse } from './helpers';
 

@@ -6,7 +6,7 @@ import {
   triggerRequestWindowOpen,
 } from '@common/utils/legacy-external-message-handler';
 import RequestsRoutes from '@common/utils/route-urls';
-import { RpcErrorCode } from 'sats-connect';
+import { RpcErrorCode } from '@sats-connect/core';
 import { makeRPCError } from '../../helpers';
 import { sendInvalidParametersMessage, sendMissingParametersMessage } from '../rpcResponseMessages';
 import { rpcParamsSchema } from './paramsSchema';
