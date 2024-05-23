@@ -7,17 +7,18 @@ import { NumericFormat } from 'react-number-format';
 import { useLocation } from 'react-router-dom';
 import styled from 'styled-components';
 
+import { CreateInscriptionPayload, CreateRepeatInscriptionsPayload } from '@sats-connect/core';
 import {
+  AnalyticsEvents,
   BtcFeeResponse,
+  InscriptionErrorCode,
+  UTXO,
   currencySymbolMap,
   fetchBtcFeeRate,
   getNonOrdinalUtxo,
-  InscriptionErrorCode,
   useInscriptionExecute,
   useInscriptionFees,
-  UTXO,
 } from '@secretkeylabs/xverse-core';
-import { CreateInscriptionPayload, CreateRepeatInscriptionsPayload } from 'sats-connect';
 
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
@@ -34,6 +35,7 @@ import useSeedVault from '@hooks/useSeedVault';
 import Callout from '@ui-library/callout';
 import { StyledP } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
+import { trackMixPanel } from '@utils/mixpanel';
 import CompleteScreen from './CompleteScreen';
 import ContentLabel from './ContentLabel';
 import EditFee from './EditFee';
@@ -445,6 +447,17 @@ function CreateInscription() {
     return <CompleteScreen txId={revealTransactionId} onClose={onClose} network={network} />;
   }
 
+  const handleClickConfirm = () => {
+    trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
+      protocol: 'ordinals',
+      action: 'inscribe',
+      wallet_type: selectedAccount?.accountType || 'software',
+      repeat,
+    });
+
+    executeMint();
+  };
+
   const disableConfirmButton =
     !!errorCode ||
     isExecuting ||
@@ -454,7 +467,7 @@ function CreateInscription() {
 
   return (
     <ConfirmScreen
-      onConfirm={executeMint}
+      onConfirm={handleClickConfirm}
       onCancel={cancelCallback}
       cancelText={t('CANCEL_BUTTON')}
       confirmText={!errorCode ? t('CONFIRM_BUTTON') : t(`ERRORS.SHORT.${errorCode}`)}

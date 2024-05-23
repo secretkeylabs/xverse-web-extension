@@ -33,6 +33,8 @@ jobs:
           npm test
       - name: Build
         env:
+          SEED_WORDS1: ${{ secrets.SEED_WORDS1 }}
+          SEED_WORDS2: ${{ secrets.SEED_WORDS2 }}
           TRANSAC_API_KEY: ${{ secrets.TRANSAC_API_KEY }}
           MOON_PAY_API_KEY: ${{ secrets.MOON_PAY_API_KEY }}
           MIX_PANEL_TOKEN: ${{ secrets.MIX_PANEL_TOKEN }}
@@ -40,7 +42,10 @@ jobs:
         run: npm run build --if-present
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
-      - name: Run UI test suite
+      - name: Run E2E test suite
+        env:
+          SEED_WORDS1: ${{ secrets.SEED_WORDS1 }}
+          SEED_WORDS2: ${{ secrets.SEED_WORDS2 }}
         run: xvfb-run --auto-servernum --server-args="-screen 0 360x360x24" npx playwright test --grep "#smoketest" --reporter=html
       - name: Upload Playwright report
         if: always()
@@ -48,7 +53,7 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report/
-          retention-days: 30
+          retention-days: 4
       - name: Save Filename
         run: |
           BRANCH_NAME=$(echo ${{ github.head_ref }} | sed 's/\//-/g')

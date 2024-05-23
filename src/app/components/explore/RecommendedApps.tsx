@@ -1,3 +1,4 @@
+import { AnalyticsEvents } from '@secretkeylabs/xverse-core';
 import { trackMixPanel } from '@utils/mixpanel';
 import styled from 'styled-components';
 
@@ -57,7 +58,7 @@ function RecommendedApps({ items }: Props) {
           key={item.url}
           onClick={() => {
             trackMixPanel(
-              'click_app',
+              AnalyticsEvents.ClickApp,
               {
                 title: item.name,
                 link: item.url,

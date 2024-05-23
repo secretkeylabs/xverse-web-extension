@@ -13,9 +13,11 @@ import useSignatureRequest, {
   isUtf8Message,
   useSignMessage,
 } from '@hooks/useSignatureRequest';
+import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
+import { Return } from '@sats-connect/core';
 import { buf2hex, hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
 import { SignaturePayload, StructuredDataSignaturePayload } from '@stacks/connect';
 import { getNetworkType, getTruncatedAddress, isHardwareAccount } from '@utils/helper';
@@ -23,7 +25,6 @@ import { signatureVrsToRsv } from '@utils/ledger';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Return } from 'sats-connect';
 import CollapsableContainer from './collapsableContainer';
 import {
   ActionDisclaimer,
@@ -62,6 +63,11 @@ function SignatureRequest(): JSX.Element {
   const navigate = useNavigate();
   const isMessageSigningDisabled =
     isHardwareAccount(selectedAccount) && !selectedAccount?.stxAddress;
+
+  useTrackMixPanelPageViewed({
+    protocol: 'stacks',
+    structured: !!isStructuredMessage(messageType),
+  });
 
   const checkAddressAvailability = () => {
     const account = accountsList.filter((acc) => {

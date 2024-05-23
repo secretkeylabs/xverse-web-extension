@@ -88,7 +88,6 @@ function StepDisplay({
               recipientAddress={recipientAddress}
               setRecipientAddress={setRecipientAddress}
               onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient, amountEditable))}
-              isLoading={isLoading}
             />
           </Container>
         </SendLayout>

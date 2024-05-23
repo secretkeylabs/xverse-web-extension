@@ -100,7 +100,7 @@ function TransferFeeView({
             thousandSeparator
             suffix={` ${currency}`}
             renderText={(value: string) => (
-              <StyledP typography="body_medium_m" color="white_0">
+              <StyledP data-testid="send-value" typography="body_medium_m" color="white_0">
                 {value}
               </StyledP>
             )}

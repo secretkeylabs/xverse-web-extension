@@ -4,12 +4,12 @@ import {
   sendUserRejectionMessage,
 } from '@common/utils/rpc/stx/rpcResponseMessages';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { GetAddressOptions } from '@sats-connect/core';
 import { bip32, bip39, bs58 } from '@secretkeylabs/xverse-core';
 import { GAIA_HUB_URL } from '@secretkeylabs/xverse-core/constant';
 import { decodeToken } from 'jsontokens';
 import { useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { GetAddressOptions } from 'sats-connect';
 import useSeedVault from './useSeedVault';
 
 const useStxAccountRequest = () => {

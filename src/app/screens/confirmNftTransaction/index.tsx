@@ -12,10 +12,15 @@ import useNetworkSelector from '@hooks/useNetwork';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import NftImage from '@screens/nftDashboard/nftImage';
-import { StacksTransaction, broadcastSignedTransaction } from '@secretkeylabs/xverse-core';
+import {
+  AnalyticsEvents,
+  StacksTransaction,
+  broadcastSignedTransaction,
+} from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
+import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
 import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -142,6 +147,12 @@ function ConfirmNftTransaction() {
       navigate('/confirm-ledger-tx', { state });
       return;
     }
+
+    trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
+      protocol: 'stacks-nfts',
+      action: 'transfer',
+      wallet_type: selectedAccount?.accountType || 'software',
+    });
 
     mutate({ signedTx: txs[0] });
   };

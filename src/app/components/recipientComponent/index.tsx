@@ -108,6 +108,7 @@ interface Props {
   title: string;
   currencyType: CurrencyTypes;
   valueDetail?: string;
+  dataTestID?: string;
   recipientIndex?: number;
   totalRecipient?: number;
   icon?: string;
@@ -121,6 +122,7 @@ function RecipientComponent({
   value,
   totalRecipient,
   valueDetail,
+  dataTestID,
   title,
   fungibleToken,
   icon,
@@ -222,7 +224,7 @@ function RecipientComponent({
                 displayType="text"
                 thousandSeparator
                 suffix={currencyType === 'FT' ? ` ${getFtTicker()} ` : ` ${currencyType}`}
-                renderText={(amount) => <ValueText>{amount}</ValueText>}
+                renderText={(amount) => <ValueText data-testid={dataTestID}>{amount}</ValueText>}
               />
               <SubValueText>{getFiatAmountString(new BigNumber(fiatAmount!))}</SubValueText>
             </ColumnContainer>

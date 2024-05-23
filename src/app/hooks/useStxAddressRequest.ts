@@ -1,10 +1,10 @@
 import { MESSAGE_SOURCE } from '@common/types/message-types';
 import { sendGetAddressesSuccessResponseMessage } from '@common/utils/rpc/stx/rpcResponseMessages';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { GetAddressOptions } from '@sats-connect/core';
 import { decodeToken } from 'jsontokens';
 import { useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { GetAddressOptions } from 'sats-connect';
 
 const useStxAddressRequest = () => {
   // Params

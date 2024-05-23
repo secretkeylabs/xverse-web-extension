@@ -20,7 +20,9 @@ import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { StxRequests } from '@sats-connect/core';
 import {
+  AnalyticsEvents,
   StacksTransaction,
   TokenTransferPayload,
   addressToString,
@@ -35,11 +37,11 @@ import { useMutation } from '@tanstack/react-query';
 import Callout from '@ui-library/callout';
 import { XVERSE_POOL_ADDRESS } from '@utils/constants';
 import { isLedgerAccount } from '@utils/helper';
+import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { StxRequests } from 'sats-connect';
 import styled from 'styled-components';
 
 const AlertContainer = styled.div((props) => ({
@@ -248,6 +250,12 @@ function ConfirmStxTransaction() {
       }
       window.close();
     } else {
+      trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
+        protocol: 'stacks',
+        action: 'transfer',
+        wallet_type: selectedAccount?.accountType || 'software',
+      });
+
       mutate({ signedTx: txs[0] });
     }
   };
@@ -295,6 +303,7 @@ function ConfirmStxTransaction() {
           <SpendDelegatedStxWarning variant="warning" bodyText={t('SEND.SPEND_DELEGATED_STX')} />
         )}
         <RecipientComponent
+          dataTestID="confirm-amount"
           address={recipient}
           value={microstacksToStx(amount).toString()}
           icon={IconStacks}

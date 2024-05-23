@@ -1,5 +1,5 @@
 import { WebBtcMessage } from '@common/types/message-types';
-import { Requests, RpcErrorCode } from 'sats-connect';
+import { Requests, RpcErrorCode } from '@sats-connect/core';
 import { getTabIdFromPort } from '..';
 import {
   handleGetAccounts,
@@ -10,6 +10,7 @@ import {
 } from './btc';
 import handleGetInfo from './getInfo';
 import { makeRPCError, sendRpcResponse } from './helpers';
+import handleGetRunesBalance from './runes/getBalance';
 import callContract from './stx/callContract/index.ts';
 import deployContract from './stx/deployContract/index.ts';
 import handleGetStxAccounts from './stx/getAccounts';
@@ -25,25 +26,30 @@ const handleRPCRequest = async (
 ) => {
   try {
     switch (message.method) {
-      case 'getInfo':
+      case 'getInfo': {
         handleGetInfo(message.id, getTabIdFromPort(port));
         break;
-      case 'getAddresses':
+      }
+      case 'getAddresses': {
         await handleGetAddresses(message as WebBtcMessage<'getAddresses'>, port);
         break;
+      }
       case 'getAccounts': {
         await handleGetAccounts(message as WebBtcMessage<'getAccounts'>, port);
         break;
       }
-      case 'signMessage':
+      case 'signMessage': {
         await handleSignMessage(message as WebBtcMessage<'signMessage'>, port);
         break;
-      case 'sendTransfer':
+      }
+      case 'sendTransfer': {
         await handleSendTransfer(message as WebBtcMessage<'sendTransfer'>, port);
         break;
-      case 'signPsbt':
+      }
+      case 'signPsbt': {
         await handleSignPsbt(message as WebBtcMessage<'signPsbt'>, port);
         break;
+      }
 
       // Stacks methods
 
@@ -82,6 +88,10 @@ const handleRPCRequest = async (
         );
         break;
       }
+      case 'runes_getBalance': {
+        await handleGetRunesBalance(message.id, getTabIdFromPort(port));
+        break;
+      }
       default:
         sendRpcResponse(
           getTabIdFromPort(port),
@@ -93,6 +103,7 @@ const handleRPCRequest = async (
         break;
     }
   } catch (e: any) {
+    console.log(e);
     sendRpcResponse(
       getTabIdFromPort(port),
       makeRPCError(message.id as string, {

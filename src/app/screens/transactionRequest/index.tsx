@@ -2,6 +2,7 @@ import { sendInternalErrorMessage } from '@common/utils/rpc/stx/rpcResponseMessa
 import ContractCallRequest from '@components/transactionsRequests/ContractCallRequest';
 import ContractDeployRequest from '@components/transactionsRequests/ContractDeployTransaction';
 import useNetworkSelector from '@hooks/useNetwork';
+import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
@@ -49,6 +50,20 @@ function TransactionRequest() {
   const { t } = useTranslation('translation', { keyPrefix: 'REQUEST_ERRORS' });
   const { payload, tabId, requestToken, transaction } = txReq;
   const { messageId, rpcMethod } = 'rpcMethod' in txReq ? txReq : { messageId: '', rpcMethod: '' };
+
+  let action: 'token_transfer' | 'contract_call' | 'smart_contract' | 'transfer' = 'transfer';
+  if (
+    payload.txType === 'token_transfer' ||
+    payload.txType === 'contract_call' ||
+    payload.txType === 'smart_contract'
+  ) {
+    action = payload.txType;
+  }
+
+  useTrackMixPanelPageViewed({
+    protocol: 'stacks',
+    action,
+  });
 
   const handleTokenTransferRequest = async (tokenTransferPayload: any, requestAccount: Account) => {
     const stxPendingTxData = await fetchStxPendingTxData(

@@ -160,6 +160,7 @@ function AmountSelector({
     <Input
       title={t('BTC.AMOUNT', { currency: useBtcValue ? 'BTC' : fiatCurrency })}
       value={amountDisplay}
+      dataTestID="btc-amount"
       onChange={(e) => handleAmountChange(e.target.value)}
       onBlur={handleBlur}
       placeholder="0"
@@ -170,7 +171,7 @@ function AmountSelector({
           thousandSeparator
           prefix={useBtcValue ? '' : `~${currencySymbolMap[fiatCurrency]}`}
           renderText={(value: string) => (
-            <BalanceDiv>
+            <BalanceDiv data-testid="balance-label">
               <BalanceText>{t('BALANCE')} </BalanceText> {value}{' '}
               {useBtcValue ? 'BTC' : fiatCurrency}
             </BalanceDiv>

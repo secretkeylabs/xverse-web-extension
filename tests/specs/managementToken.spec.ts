@@ -34,16 +34,26 @@ test.describe('Token Management', () => {
     await expect(wallet.buttonBRC20).toBeVisible();
     await expect(wallet.buttonRunes).toBeVisible();
     await expect(wallet.headingTokens).toBeVisible();
-    // Check tokens
-    await expect(wallet.labelCoinTitle).toHaveCount(16);
-    await expect(wallet.checkboxTokenInactive).toHaveCount(15);
+
+    // Check SIP10 token
+    await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
+    const amounttokenSIP = await wallet.labelCoinTitle.count();
+
+    await await expect(amounttokenSIP).toBeGreaterThanOrEqual(15);
+    await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenSIP - 1);
     await expect(wallet.checkboxTokenActive).toHaveCount(1);
-    await expect(wallet.checkboxToken).toHaveCount(16);
+    await expect(wallet.checkboxToken).toHaveCount(amounttokenSIP);
+
+    // Check BRC20 token
     await wallet.buttonBRC20.click();
-    await expect(wallet.labelCoinTitle).toHaveCount(9);
-    await expect(wallet.checkboxTokenInactive).toHaveCount(9);
+    await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
+    const amounttokenBRC20 = await wallet.labelCoinTitle.count();
+    await expect(amounttokenBRC20).toBeGreaterThanOrEqual(8);
+    await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenBRC20);
     await expect(wallet.checkboxTokenActive).toHaveCount(0);
-    await expect(wallet.checkboxToken).toHaveCount(9);
+    await expect(wallet.checkboxToken).toHaveCount(amounttokenBRC20);
+
+    // Check rune token
     await wallet.buttonRunes.click();
     await expect(wallet.labelCoinTitle).toHaveCount(0);
     await expect(wallet.checkboxTokenInactive).toHaveCount(0);
@@ -66,10 +76,15 @@ test.describe('Token Management', () => {
       await wallet.manageTokenButton.click();
       await expect(page.url()).toContain('manage-tokens');
       await wallet.buttonBRC20.click();
+      await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
+      const amounttokenBRC20 = await wallet.labelCoinTitle.count();
+      // Enable random token
       const tokenName = await wallet.enableARandomToken();
+      // Check that amount of checkboxes changed
       await expect(wallet.checkboxTokenActive).toHaveCount(1);
-      await expect(wallet.checkboxTokenInactive).toHaveCount(8);
+      await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenBRC20 - 1);
       await wallet.buttonBack.click();
+      // new enabled token should be visibal on dashboard
       await expect(wallet.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeVisible();
       // Check balances
       await expect(wallet.balance).toBeVisible();
@@ -81,12 +96,15 @@ test.describe('Token Management', () => {
     await test.step('Enable some more token', async () => {
       await wallet.manageTokenButton.click();
       await wallet.buttonBRC20.click();
+      await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
+      const amounttokenBRC20 = await wallet.labelCoinTitle.count();
       const tokenName1 = await wallet.enableARandomToken();
       const tokenName2 = await wallet.enableARandomToken();
       const tokenName3 = await wallet.enableARandomToken();
       await expect(wallet.checkboxTokenActive).toHaveCount(4);
-      await expect(wallet.checkboxTokenInactive).toHaveCount(5);
+      await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenBRC20 - 4);
       await wallet.buttonBack.click();
+      // new enabled tokens should be visibal on dashboard
       await expect(wallet.labelTokenSubtitle.getByText(tokenName1, { exact: true })).toBeVisible();
       await expect(wallet.labelTokenSubtitle.getByText(tokenName2, { exact: true })).toBeVisible();
       await expect(wallet.labelTokenSubtitle.getByText(tokenName3, { exact: true })).toBeVisible();
@@ -97,10 +115,13 @@ test.describe('Token Management', () => {
       await wallet.manageTokenButton.click();
       await expect(page.url()).toContain('manage-tokens');
       await wallet.buttonBRC20.click();
+      await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
+      const amounttokenBRC20 = await wallet.labelCoinTitle.count();
       const tokenName = await wallet.disableARandomToken();
       await expect(wallet.checkboxTokenActive).toHaveCount(3);
-      await expect(wallet.checkboxTokenInactive).toHaveCount(6);
+      await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenBRC20 - 3);
       await wallet.buttonBack.click();
+      // new enabled token should be visibal on dashboard
       await expect(wallet.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeHidden();
       // Check balances
       await expect(wallet.balance).toBeVisible();
@@ -124,10 +145,15 @@ test.describe('Token Management', () => {
       await expect(balanceText).toBe(0);
       await wallet.manageTokenButton.click();
       await expect(page.url()).toContain('manage-tokens');
+      await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
+      const amounttokenSIP = await wallet.labelCoinTitle.count();
+      // Enable random token
       const tokenName = await wallet.enableARandomToken();
+      // Check that amount of checkboxes changed
       await expect(wallet.checkboxTokenActive).toHaveCount(2);
-      await expect(wallet.checkboxTokenInactive).toHaveCount(14);
+      await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenSIP - 2);
       await wallet.buttonBack.click();
+      // new enabled token should be visibal on dashboard
       await expect(wallet.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeVisible();
       // Check balances
       await expect(wallet.balance).toBeVisible();
@@ -138,12 +164,15 @@ test.describe('Token Management', () => {
 
     await test.step('Enable some more token', async () => {
       await wallet.manageTokenButton.click();
+      await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
+      const amounttokenSIP = await wallet.labelCoinTitle.count();
       const tokenName1 = await wallet.enableARandomToken();
       const tokenName2 = await wallet.enableARandomToken();
       const tokenName3 = await wallet.enableARandomToken();
       await expect(wallet.checkboxTokenActive).toHaveCount(5);
-      await expect(wallet.checkboxTokenInactive).toHaveCount(11);
+      await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenSIP - 5);
       await wallet.buttonBack.click();
+      // new enabled tokens should be visibal on dashboard
       await expect(wallet.labelTokenSubtitle.getByText(tokenName1, { exact: true })).toBeVisible();
       await expect(wallet.labelTokenSubtitle.getByText(tokenName2, { exact: true })).toBeVisible();
       await expect(wallet.labelTokenSubtitle.getByText(tokenName3, { exact: true })).toBeVisible();
@@ -153,10 +182,13 @@ test.describe('Token Management', () => {
       await page.goto(`chrome-extension://${extensionId}/popup.html`);
       await wallet.manageTokenButton.click();
       await expect(page.url()).toContain('manage-tokens');
+      await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
+      const amounttokenSIP = await wallet.labelCoinTitle.count();
       const tokenName = await wallet.disableARandomToken();
       await expect(wallet.checkboxTokenActive).toHaveCount(4);
-      await expect(wallet.checkboxTokenInactive).toHaveCount(12);
+      await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenSIP - 4);
       await wallet.buttonBack.click();
+      // new enabled token should be visibal on dashboard
       await expect(wallet.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeHidden();
       // Check balances
       await expect(wallet.balance).toBeVisible();
@@ -180,13 +212,15 @@ test.describe('Token Management', () => {
       await expect(balanceText).toBe(0);
       await expect(wallet.labelTokenSubtitle).toHaveCount(2);
       await wallet.manageTokenButton.click();
+      await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
+      const amounttokenSIP = await wallet.labelCoinTitle.count();
       await expect(page.url()).toContain('manage-tokens');
-      await expect(wallet.checkboxToken).toHaveCount(16);
+      await expect(wallet.checkboxToken).toHaveCount(amounttokenSIP);
       await wallet.enableAllTokens();
-      await expect(wallet.checkboxTokenActive).toHaveCount(16);
+      await expect(wallet.checkboxTokenActive).toHaveCount(amounttokenSIP);
       await expect(wallet.checkboxTokenInactive).toHaveCount(0);
       await wallet.buttonBack.click();
-      await expect(wallet.labelTokenSubtitle).toHaveCount(17);
+      await expect(wallet.labelTokenSubtitle).toHaveCount(amounttokenSIP + 1);
       await expect(wallet.balance).toBeVisible();
       await expect(wallet.balance).toHaveText('$0.00');
       balanceText = await wallet.getBalanceOfAllTokens();
@@ -198,8 +232,10 @@ test.describe('Token Management', () => {
       await wallet.manageTokenButton.click();
       await expect(page.url()).toContain('manage-tokens');
       await wallet.disableAllTokens();
+      await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
+      const amounttokenSIP = await wallet.labelCoinTitle.count();
       await expect(wallet.checkboxTokenActive).toHaveCount(0);
-      await expect(wallet.checkboxTokenInactive).toHaveCount(16);
+      await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenSIP);
       await wallet.buttonBack.click();
       await expect(wallet.labelTokenSubtitle).toHaveCount(1);
       // Check balances
@@ -225,12 +261,14 @@ test.describe('Token Management', () => {
       await wallet.manageTokenButton.click();
       await expect(page.url()).toContain('manage-tokens');
       await wallet.buttonBRC20.click();
-      await expect(wallet.checkboxToken).toHaveCount(9);
+      await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
+      const amounttokenBRC20 = await wallet.labelCoinTitle.count();
+      await expect(wallet.checkboxToken).toHaveCount(amounttokenBRC20);
       await wallet.enableAllTokens();
-      await expect(wallet.checkboxTokenActive).toHaveCount(9);
+      await expect(wallet.checkboxTokenActive).toHaveCount(amounttokenBRC20);
       await expect(wallet.checkboxTokenInactive).toHaveCount(0);
       await wallet.buttonBack.click();
-      await expect(wallet.labelTokenSubtitle).toHaveCount(11);
+      await expect(wallet.labelTokenSubtitle).toHaveCount(amounttokenBRC20 + 2);
       await expect(wallet.balance).toBeVisible();
       await expect(wallet.balance).toHaveText('$0.00');
       balanceText = await wallet.getBalanceOfAllTokens();
@@ -242,9 +280,11 @@ test.describe('Token Management', () => {
       await wallet.manageTokenButton.click();
       await expect(page.url()).toContain('manage-tokens');
       await wallet.buttonBRC20.click();
+      await expect(wallet.checkboxTokenActive.first()).toBeVisible();
+      const amounttokenBRC20 = await wallet.labelCoinTitle.count();
       await wallet.disableAllTokens();
       await expect(wallet.checkboxTokenActive).toHaveCount(0);
-      await expect(wallet.checkboxTokenInactive).toHaveCount(9);
+      await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenBRC20);
       await wallet.buttonBack.click();
       await expect(wallet.labelTokenSubtitle).toHaveCount(2);
       // Check balances

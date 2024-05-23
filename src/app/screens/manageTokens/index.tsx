@@ -1,5 +1,6 @@
 import stacksIcon from '@assets/img/dashboard/stx_icon.svg';
 import runesComingSoon from '@assets/img/manageTokens/runes_coming_soon.svg';
+import OptionsDialog from '@components/optionsDialog/optionsDialog';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import { useGetBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
@@ -8,19 +9,24 @@ import { useGetSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10Fungibl
 import useHasFeature from '@hooks/useHasFeature';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { Eye, EyeSlash } from '@phosphor-icons/react';
 import CoinItem from '@screens/manageTokens/coinItem';
 import { FungibleToken, FungibleTokenProtocol } from '@secretkeylabs/xverse-core';
 import {
   setBrc20ManageTokensAction,
   setRunesManageTokensAction,
+  setShowSpamTokensAction,
   setSip10ManageTokensAction,
 } from '@stores/wallet/actions/actionCreators';
+import { StyledP } from '@ui-library/common.styled';
+import { SPAM_OPTIONS_WIDTH } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import Theme from 'theme';
 
 const TokenContainer = styled.div`
   display: flex;
@@ -106,6 +112,28 @@ const RunesComingSoon = styled.img({
   width: '70%',
 });
 
+const ButtonRow = styled.button`
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+  flex-direction: row;
+  padding-left: ${(props) => props.theme.space.m};
+  padding-right: ${(props) => props.theme.space.m};
+  padding-top: ${(props) => props.theme.space.s};
+  padding-bottom: ${(props) => props.theme.space.s};
+  transition: background-color 0.2s ease;
+  :hover {
+    background-color: ${(props) => props.theme.colors.elevation3};
+  }
+  :active {
+    background-color: ${(props) => props.theme.colors.elevation3};
+  }
+`;
+
+const TokenText = styled(StyledP)`
+  margin-left: ${(props) => props.theme.space.m};
+`;
+
 function Stacks() {
   const { hideStx } = useWalletSelector();
   const { toggleStxVisibility } = useWalletReducer();
@@ -127,8 +155,13 @@ function Stacks() {
 function ManageTokens() {
   const { t } = useTranslation('translation', { keyPrefix: 'TOKEN_SCREEN' });
 
-  const { sip10ManageTokens, brc20ManageTokens, runesManageTokens, selectedAccount } =
-    useWalletSelector();
+  const {
+    sip10ManageTokens,
+    brc20ManageTokens,
+    runesManageTokens,
+    selectedAccount,
+    showSpamTokens,
+  } = useWalletSelector();
   const { data: runesList, isError: runeError } = useGetRuneFungibleTokens();
   const { data: sip10List, isError: sip10Error } = useGetSip10FungibleTokens();
   const { data: brc20List, isError: brc20Error } = useGetBrc20FungibleTokens();
@@ -137,20 +170,40 @@ function ManageTokens() {
     selectedAccount?.stxAddress ? 'stacks' : 'brc-20',
   );
   const showRunes = useHasFeature('RUNES_SUPPORT');
+  const [showOptionsDialog, setShowOptionsDialog] = useState(false);
+
+  const [optionsDialogIndents, setOptionsDialogIndents] = useState<
+    { top: string; left: string } | undefined
+  >();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const openOptionsDialog = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setShowOptionsDialog(true);
+
+    setOptionsDialogIndents({
+      top: `${(event.target as HTMLElement).parentElement?.getBoundingClientRect().top}px`,
+      left: `calc(100% - ${SPAM_OPTIONS_WIDTH}px)`,
+    });
+  };
+
+  const closeOptionsDialog = () => {
+    setShowOptionsDialog(false);
+  };
 
   const toggled = (isEnabled: boolean, _coinName: string, coinKey: string) => {
     const runeFt = runesList?.find((ft) => ft.principal === coinKey);
     const sip10Ft = sip10List?.find((ft) => ft.principal === coinKey);
     const brc20Ft = brc20List?.find((ft) => ft.principal === coinKey);
 
+    const payload = { principal: coinKey, isEnabled };
+
     if (selectedProtocol === 'runes' && runeFt) {
-      dispatch(setRunesManageTokensAction({ principal: coinKey, isEnabled }));
+      dispatch(setRunesManageTokensAction(payload));
     } else if (selectedProtocol === 'stacks' && sip10Ft) {
-      dispatch(setSip10ManageTokensAction({ principal: coinKey, isEnabled }));
+      dispatch(setSip10ManageTokensAction(payload));
     } else if (selectedProtocol === 'brc-20' && brc20Ft) {
-      dispatch(setBrc20ManageTokensAction({ principal: coinKey, isEnabled }));
+      dispatch(setBrc20ManageTokensAction(payload));
     }
   };
 
@@ -187,6 +240,7 @@ function ManageTokens() {
     }
 
     if (error) return <ErrorsText>{t('FAILED_TO_FETCH')}</ErrorsText>;
+
     return (
       <>
         {selectedProtocol === 'stacks' && <Stacks />}
@@ -197,6 +251,8 @@ function ManageTokens() {
             name={coin.name}
             image={coin.image}
             ticker={coin.ticker}
+            runeInscriptionId={coin.runeInscriptionId}
+            runeSymbol={coin.runeSymbol}
             disabled={false}
             toggled={toggled}
             enabled={coin.visible}
@@ -209,7 +265,29 @@ function ManageTokens() {
 
   return (
     <>
-      <TopRow onClick={handleBackButtonClick} />
+      <TopRow onClick={handleBackButtonClick} onMenuClick={openOptionsDialog} />
+      {showOptionsDialog && (
+        <OptionsDialog
+          closeDialog={closeOptionsDialog}
+          optionsDialogIndents={optionsDialogIndents}
+          width={SPAM_OPTIONS_WIDTH}
+        >
+          <ButtonRow
+            onClick={() => {
+              dispatch(setShowSpamTokensAction(!showSpamTokens));
+            }}
+          >
+            {showSpamTokens ? (
+              <EyeSlash size={24} color={Theme.colors.white_200} />
+            ) : (
+              <Eye size={24} color={Theme.colors.white_200} />
+            )}
+            <TokenText color="white_200" typography="body_medium_l">
+              {showSpamTokens ? t('HIDE_SPAM_TOKENS') : t('DISPLAY_SPAM_TOKENS')}
+            </TokenText>
+          </ButtonRow>
+        </OptionsDialog>
+      )}
       <Container>
         <ScrollableContainer>
           <Header>{t('ADD_COINS')}</Header>

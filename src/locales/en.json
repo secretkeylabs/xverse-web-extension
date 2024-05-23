@@ -220,11 +220,15 @@
       "DESCRIPTION": "Help improve the app experience, by allowing Xverse to collect anonymized usage data. This data cannot be used to identify your wallet individually.",
       "DENY": "Deny",
       "ALLOW": "Allow"
-    }
+    },
+    "TOKEN_HIDDEN": "Token hidden and reported",
+    "UNDO": "Undo"
   },
   "TOKEN_SCREEN": {
     "ADD_COINS": "Manage tokens",
     "DESCRIPTION": "Select which assets you would like to see on your dashboard.",
+    "HIDE_SPAM_TOKENS": "Hide spam tokens",
+    "DISPLAY_SPAM_TOKENS": "Display spam tokens",
     "NO_COINS": "There's nothing here yet.",
     "FAILED_TO_FETCH": "Failed to fetch data"
   },
@@ -864,7 +868,9 @@
     "TRANSACTIONS_LIST_ERROR": "Error fetching transaction history for this token",
     "TRANSACTION_SENT": "Sent",
     "TRANSACTION_RECEIVED": "Received",
+    "TRANSACTION_RUNE_CONSOLIDATION": "Consolidation",
     "MINT": "Mint",
+    "BURNED": "Burned",
     "SPEED_UP": "Speed up",
     "INSCRIBE_TRANSFER": "Inscribe Transfer",
     "TRANSACTION_PENDING_RECEIVING": "Receiving",
@@ -893,7 +899,8 @@
     "CONTRACT": "CONTRACT",
     "COMING_SOON": "Coming soon",
     "VERIFY_ADDRESS_ON_LEDGER": "Verify address on Ledger",
-    "VIEW_ADDRESS": "View address"
+    "VIEW_ADDRESS": "View address",
+    "HIDE_AND_REPORT": "Hide & Report"
   },
   "SPEED_UP_TRANSACTION": {
     "TITLE": "Speed up transaction",

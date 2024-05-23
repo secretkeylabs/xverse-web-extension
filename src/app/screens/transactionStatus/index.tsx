@@ -226,7 +226,7 @@ function TransactionStatus() {
     <TransactionIDContainer>
       <TxIDText>{t('TRANSACTION_ID')}</TxIDText>
       <TxIDContainer>
-        <IDText>{txid}</IDText>
+        <IDText data-testid="transaction-id">{txid}</IDText>
         <CopyButtonContainer>
           <CopyButton text={txid} />
         </CopyButtonContainer>
@@ -235,7 +235,7 @@ function TransactionStatus() {
   );
 
   return (
-    <TxStatusContainer>
+    <TxStatusContainer data-testid="transaction-container">
       <OuterContainer>
         {txid ? renderTransactionSuccessStatus : renderTransactionFailureStatus}
         {txid && renderLink}

@@ -9,15 +9,20 @@ import useBtcClient from '@hooks/useBtcClient';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { BtcTransactionBroadcastResponse, Recipient } from '@secretkeylabs/xverse-core';
+import { Return, RpcErrorCode } from '@sats-connect/core';
+import {
+  AnalyticsEvents,
+  BtcTransactionBroadcastResponse,
+  Recipient,
+} from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
 import { saveTimeForNonOrdinalTransferTransaction } from '@utils/localStorage';
+import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Return, RpcErrorCode } from 'sats-connect';
 import SendLayout from '../../layouts/sendLayout';
 
 function ConfirmBtcTransaction() {
@@ -187,6 +192,12 @@ function ConfirmBtcTransaction() {
       navigate('/confirm-ledger-tx', { state });
       return;
     }
+
+    trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
+      protocol: 'bitcoin',
+      action: 'transfer',
+      wallet_type: selectedAccount?.accountType || 'software',
+    });
 
     mutate({ txToBeBroadcasted: txHex });
   };

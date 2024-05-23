@@ -1,13 +1,13 @@
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { BitcoinNetworkType, SignMessageOptions, SignMessagePayload } from '@sats-connect/core';
 import { SettingsNetwork, signBip322Message } from '@secretkeylabs/xverse-core';
 import { isHardwareAccount } from '@utils/helper';
 import { decodeToken } from 'jsontokens';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
-import { BitcoinNetworkType, SignMessageOptions, SignMessagePayload } from 'sats-connect';
 
 const useSignMessageRequestParams = (network: SettingsNetwork) => {
   const { search } = useLocation();

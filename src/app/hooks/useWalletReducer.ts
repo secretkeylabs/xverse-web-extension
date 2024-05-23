@@ -12,7 +12,6 @@ import {
   createWalletAccount,
   decryptSeedPhraseCBC,
   getBnsName,
-  newWallet,
   restoreWalletWithAccounts,
   walletFromSeedPhrase,
 } from '@secretkeylabs/xverse-core';

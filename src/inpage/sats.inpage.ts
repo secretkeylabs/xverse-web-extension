@@ -18,7 +18,6 @@ import {
   SignMessageResponseMessage,
   SignPsbtResponseMessage,
 } from '@common/types/message-types';
-import { nanoid } from 'nanoid';
 import {
   BitcoinProvider,
   CreateInscriptionResponse,
@@ -30,7 +29,8 @@ import {
   RpcResponse,
   SignMultipleTransactionsResponse,
   SignTransactionResponse,
-} from 'sats-connect';
+} from '@sats-connect/core';
+import { nanoid } from 'nanoid';
 import { isValidLegacyEvent, isValidRpcEvent } from './utils';
 
 const SatsMethodsProvider: BitcoinProvider = {

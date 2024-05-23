@@ -1,11 +1,12 @@
 import BtcOrBrc20TransactionHistoryItem from '@components/transactions/btcOrBrc20Transaction';
+import RuneTransactionHistoryItem from '@components/transactions/RuneTransaction';
 import StxTransactionHistoryItem from '@components/transactions/stxTransaction';
 import useTransactions from '@hooks/queries/useTransactions';
 import useBtcClient from '@hooks/useBtcClient';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { animated, config, useSpring } from '@react-spring/web';
-import type { BtcTransactionData } from '@secretkeylabs/xverse-core';
+import { BtcTransactionData, GetRunesActivityForAddressEvent } from '@secretkeylabs/xverse-core';
 import {
   AddressTransactionWithTransfers,
   MempoolTransaction,
@@ -16,12 +17,14 @@ import { CurrencyTypes } from '@utils/constants';
 import { formatDate } from '@utils/date';
 import { isLedgerAccount } from '@utils/helper';
 import {
-  Tx,
   isAddressTransactionWithTransfers,
   isBrc20Transaction,
   isBrc20TransactionArr,
   isBtcTransaction,
   isBtcTransactionArr,
+  isRuneTransaction,
+  isRuneTransactionArr,
+  Tx,
 } from '@utils/transactions/transactions';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -84,8 +87,10 @@ const SectionTitle = styled.p((props) => ({
 
 interface TransactionsHistoryListProps {
   coin: CurrencyTypes;
-  txFilter: string | null;
+  stxTxFilter: string | null;
   brc20Token: string | null;
+  runeToken: string | null;
+  runeSymbol: string | null;
 }
 
 const sortTransactionsByBlockHeight = (transactions: BtcTransactionData[]) =>
@@ -121,6 +126,21 @@ const groupBtcTxsByDate = (
   return processedTransactions;
 };
 
+const groupRuneTxsByDate = (
+  transactions: GetRunesActivityForAddressEvent[],
+): Record<string, GetRunesActivityForAddressEvent[]> => {
+  const mappedTransactions = {};
+  transactions.forEach((transaction) => {
+    const txDate = formatDate(new Date(transaction.blockTimestamp));
+    if (!mappedTransactions[txDate]) {
+      mappedTransactions[txDate] = [transaction];
+    } else {
+      mappedTransactions[txDate].push(transaction);
+    }
+  });
+  return mappedTransactions;
+};
+
 const groupedTxsByDateMap = (txs: (AddressTransactionWithTransfers | MempoolTransaction)[]) =>
   txs.reduce(
     (
@@ -144,7 +164,7 @@ const groupedTxsByDateMap = (txs: (AddressTransactionWithTransfers | MempoolTran
     {},
   );
 
-const filterTxs = (
+const filterStxTxs = (
   txs: (AddressTransactionWithTransfers | MempoolTransaction)[],
   filter: string,
 ): (AddressTransactionWithTransfers | MempoolTransaction)[] =>
@@ -166,14 +186,16 @@ const filterTxs = (
   });
 
 export default function TransactionsHistoryList(props: TransactionsHistoryListProps) {
-  const { coin, txFilter, brc20Token } = props;
+  const { coin, stxTxFilter, brc20Token, runeToken, runeSymbol } = props;
   const { network, selectedAccount, accountType } = useWalletSelector();
   const btcClient = useBtcClient();
   const seedVault = useSeedVault();
   const { data, isLoading, isFetching, error } = useTransactions(
     (coin as CurrencyTypes) || 'STX',
     brc20Token,
+    runeToken,
   );
+  const runeDecimals = data && isRuneTransactionArr(data) ? data.divisibility : null;
   const styles = useSpring({
     config: { ...config.stiff },
     from: { opacity: 0 },
@@ -198,22 +220,25 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
     : undefined;
 
   const groupedTxs = useMemo(() => {
-    if (!data?.length) {
+    if (!data) {
       return;
     }
-
+    if (!isRuneTransactionArr(data) && !data.length) {
+      return;
+    }
+    if (isRuneTransactionArr(data)) {
+      return groupRuneTxsByDate(data.items);
+    }
     if (isBtcTransactionArr(data) || isBrc20TransactionArr(data)) {
       return groupBtcTxsByDate(data);
     }
-
-    if (txFilter && coin === 'FT') {
-      const filteredTxs = filterTxs(
+    if (stxTxFilter && coin === 'FT') {
+      const filteredTxs = filterStxTxs(
         data as (AddressTransactionWithTransfers | MempoolTransaction)[],
-        txFilter,
+        stxTxFilter,
       );
       return groupedTxsByDateMap(filteredTxs);
     }
-
     return groupedTxsByDateMap(data as (AddressTransactionWithTransfers | MempoolTransaction)[]);
   }, [data, isLoading, isFetching]);
 
@@ -229,6 +254,16 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
               <SectionSeparator />
             </SectionHeader>
             {groupedTxs[group].map((transaction) => {
+              if (wallet && isRuneTransaction(transaction)) {
+                return (
+                  <RuneTransactionHistoryItem
+                    transaction={transaction}
+                    runeSymbol={runeSymbol ?? ''}
+                    runeDecimals={runeDecimals ?? 0}
+                    key={transaction.txid}
+                  />
+                );
+              }
               if (wallet && (isBtcTransaction(transaction) || isBrc20Transaction(transaction))) {
                 return (
                   <BtcOrBrc20TransactionHistoryItem
@@ -238,12 +273,22 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
                   />
                 );
               }
+              if (stxTxFilter) {
+                return (
+                  <StxTransactionHistoryItem
+                    transaction={transaction}
+                    transactionCoin={coin}
+                    key={transaction.tx_id}
+                    txFilter={stxTxFilter}
+                  />
+                );
+              }
               return (
                 <StxTransactionHistoryItem
                   transaction={transaction}
                   transactionCoin={coin}
                   key={transaction.tx_id}
-                  txFilter={txFilter}
+                  txFilter={stxTxFilter}
                 />
               );
             })}
@@ -257,9 +302,13 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
       {!isLoading && !!error && (
         <NoTransactionsContainer>{t('TRANSACTIONS_LIST_ERROR')}</NoTransactionsContainer>
       )}
-      {!isLoading && data?.length === 0 && !error && (
-        <NoTransactionsContainer>{t('TRANSACTIONS_LIST_EMPTY')}</NoTransactionsContainer>
-      )}
+      {!isLoading &&
+        !error &&
+        data &&
+        ((isRuneTransactionArr(data) && data.items.length === 0) ||
+          (!isRuneTransactionArr(data) && data.length === 0)) && (
+          <NoTransactionsContainer>{t('TRANSACTIONS_LIST_EMPTY')}</NoTransactionsContainer>
+        )}
     </ListItemsContainer>
   );
 }

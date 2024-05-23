@@ -1,5 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import { CallContractParams } from 'sats-connect';
+import { CallContractParams } from '@sats-connect/core';
 import { z } from 'zod';
 
 export const callContractParamsSchema = z.object({
