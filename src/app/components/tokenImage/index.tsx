@@ -7,7 +7,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { FungibleToken } from '@secretkeylabs/xverse-core';
 import { CurrencyTypes, XVERSE_ORDIVIEW_URL } from '@utils/constants';
 import { getTicker } from '@utils/helper';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import styled from 'styled-components';
 
 const DEFAULT_SIZE = 40;
@@ -83,6 +83,7 @@ export default function TokenImage({
 }: TokenImageProps) {
   const { network } = useWalletSelector();
   const ftProtocol = fungibleToken?.protocol;
+  const [imageError, setImageError] = useState(false);
 
   const getCurrencyIcon = useCallback(() => {
     if (currency === 'STX') {
@@ -110,11 +111,37 @@ export default function TokenImage({
   };
 
   const renderIcon = () => {
+    const ticker =
+      fungibleToken?.ticker ||
+      (fungibleToken?.name ? getTicker(fungibleToken.name) : fungibleToken?.assetName || '');
+
+    if (imageError) {
+      return (
+        <TickerIconContainer size={size} round={round}>
+          <TickerIconText>{ticker.substring(0, 4)}</TickerIconText>
+        </TickerIconContainer>
+      );
+    }
+
     if (!fungibleToken) {
-      return <TickerImage data-testid="token-image" size={size} src={getCurrencyIcon()} />;
+      return (
+        <TickerImage
+          data-testid="token-image"
+          size={size}
+          src={getCurrencyIcon()}
+          onError={() => setImageError(true)}
+        />
+      );
     }
     if (fungibleToken?.image) {
-      return <TickerImage data-testid="token-image" size={size} src={fungibleToken.image} />;
+      return (
+        <TickerImage
+          data-testid="token-image"
+          size={size}
+          src={fungibleToken.image}
+          onError={() => setImageError(true)}
+        />
+      );
     }
     if (fungibleToken.runeInscriptionId) {
       return (
@@ -122,6 +149,7 @@ export default function TokenImage({
           data-testid="token-image"
           size={size}
           src={`${XVERSE_ORDIVIEW_URL(network.type)}/thumbnail/${fungibleToken.runeInscriptionId}`}
+          onError={() => setImageError(true)}
         />
       );
     }
@@ -132,10 +160,6 @@ export default function TokenImage({
         </TickerIconContainer>
       );
     }
-
-    const ticker = fungibleToken?.name
-      ? getTicker(fungibleToken.name)
-      : fungibleToken?.ticker || fungibleToken?.assetName || '';
 
     return (
       <TickerIconContainer size={size} round={round}>

@@ -127,12 +127,12 @@ function TokenTile({
   const { data: stxData } = useStxWalletData();
   const { data: btcBalance } = useBtcWalletData();
 
-  function getTickerTitle() {
+  const getTickerTitle = () => {
     if (currency === 'STX' || currency === 'BTC') return `${currency}`;
     return `${getFtTicker(fungibleToken as FungibleToken)}`;
-  }
+  };
 
-  function getBalanceAmount() {
+  const getBalanceAmount = () => {
     switch (currency) {
       case 'STX':
         return microstacksToStx(new BigNumber(stxData?.balance ?? 0)).toString();
@@ -141,10 +141,11 @@ function TokenTile({
       case 'FT':
         return fungibleToken ? getFtBalance(fungibleToken) : '';
       default:
+        return undefined;
     }
-  }
+  };
 
-  function getFiatEquivalent(): BigNumber | undefined {
+  const getFiatEquivalent = (): BigNumber | undefined => {
     switch (currency) {
       case 'STX':
         return microstacksToStx(new BigNumber(stxData?.balance ?? 0))
@@ -159,7 +160,7 @@ function TokenTile({
       default:
         return undefined;
     }
-  }
+  };
 
   const handleTokenPressed = () => onPress(currency, fungibleToken?.principal);
 
