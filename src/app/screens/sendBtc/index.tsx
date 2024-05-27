@@ -30,7 +30,7 @@ function SendBtcScreen() {
   const [recipientAddress, setRecipientAddress] = useState(location.state?.recipientAddress || '');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [amountSats, setAmountSats] = useState(location.state?.amount || '');
+  const [amountSats, setAmountSats] = useState<string>(location.state?.amount || '');
   const [feeRate, setFeeRate] = useState('');
   const [sendMax, setSendMax] = useState(false);
   const amountEditable = location.state?.disableAmountEdit ?? true;
@@ -79,10 +79,15 @@ function SendBtcScreen() {
       return;
     }
 
+    const isCancelled = {
+      current: false,
+    };
     const generateTxnAndSummary = async () => {
       setIsLoading(true);
       try {
         const transactionDetails = await generateTransactionAndSummary();
+
+        if (isCancelled.current) return;
 
         setTransaction(transactionDetails.transaction);
 
@@ -92,6 +97,8 @@ function SendBtcScreen() {
           setAmountSats(transactionDetails.summary.outputs[0].amount.toString());
         }
       } catch (e) {
+        if (isCancelled.current) return;
+
         if (!(e instanceof Error) || !e.message.includes('Insufficient funds')) {
           // don't log the error if it's just an insufficient funds error
           console.error(e);
@@ -100,11 +107,17 @@ function SendBtcScreen() {
         setTransaction(undefined);
         setSummary(undefined);
       } finally {
-        setIsLoading(false);
+        if (!isCancelled.current) {
+          setIsLoading(false);
+        }
       }
     };
 
     generateTxnAndSummary();
+
+    return () => {
+      isCancelled.current = true;
+    };
   }, [transactionContext, debouncedRecipient, amountSats, feeRate, sendMax]);
 
   const handleCancel = () => {
