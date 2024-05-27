@@ -868,7 +868,7 @@
     "TRANSACTIONS_LIST_ERROR": "Error fetching transaction history for this token",
     "TRANSACTION_SENT": "Sent",
     "TRANSACTION_RECEIVED": "Received",
-    "TRANSACTION_RUNE_CONSOLIDATION": "Consolidation",
+    "TRANSACTION_RUNE_RESTRUCTURED": "Restructured",
     "MINT": "Mint",
     "BURNED": "Burned",
     "SPEED_UP": "Speed up",
