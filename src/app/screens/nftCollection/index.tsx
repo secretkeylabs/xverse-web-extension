@@ -50,6 +50,7 @@ const CollectionText = styled.p((props) => ({
   color: props.theme.colors.white_0,
   marginTop: props.theme.spacing(1),
   marginBottom: props.theme.spacing(4),
+  wordBreak: 'break-word',
 }));
 
 const BottomBarContainer = styled.div({
