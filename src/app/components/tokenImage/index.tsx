@@ -31,12 +31,12 @@ const TickerIconContainer = styled.div<{ size?: number; round?: boolean }>((prop
   height: props.size ?? DEFAULT_SIZE,
   width: props.size ?? DEFAULT_SIZE,
   borderRadius: '50%',
-  backgroundColor: props.theme.colors.white_400,
+  backgroundColor: props.theme.colors.white_850,
 }));
 
 const TickerIconText = styled.h1((props) => ({
   ...props.theme.typography.body_bold_m,
-  color: props.theme.colors.elevation0,
+  color: props.theme.colors.white_0,
   textAlign: 'center',
   wordBreak: 'break-all',
   fontSize: 11,
@@ -55,7 +55,7 @@ const ProtocolIcon = styled.div<{ isSquare?: boolean }>((props) => ({
   position: 'absolute',
   right: props.isSquare ? -9 : -11,
   bottom: -2,
-  backgroundColor: props.theme.colors.elevation1,
+  backgroundColor: props.theme.colors.elevation0,
   padding: 2,
 }));
 
