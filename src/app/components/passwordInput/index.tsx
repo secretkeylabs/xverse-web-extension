@@ -140,7 +140,7 @@ const StrengthBar = styled(animated.div)<StrengthBarProps>((props) => ({
 
 const REQUIRED_PASSWORD_LENGTH = 5;
 
-export enum PasswordStrength {
+enum PasswordStrength {
   NoScore,
   PoorScore,
   WeakScore,
@@ -314,6 +314,7 @@ function PasswordInput(props: PasswordInputProps): JSX.Element {
         }
       >
         <Input
+          key={`${title}-${inputLabel}`}
           type={isPasswordVisible ? 'text' : 'password'}
           value={enteredPassword}
           onChange={handlePasswordChange}
