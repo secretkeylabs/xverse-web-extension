@@ -69,9 +69,9 @@ export default function TxTransfers(props: TxTransfersProps) {
 
   const renderTransactionIcon = (transfer: any) => {
     if (selectedAccount?.stxAddress === transfer.recipient) {
-      return <img src={ReceiveIcon} alt="received" />;
+      return <img width={24} height={24} src={ReceiveIcon} alt="received" />;
     }
-    return <img src={SendIcon} alt="sent" />;
+    return <img width={24} height={24} src={SendIcon} alt="sent" />;
   };
 
   const getTokenTransferTitle = (transfer): string =>

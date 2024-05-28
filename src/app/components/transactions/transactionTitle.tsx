@@ -61,7 +61,7 @@ export default function TransactionTitle(props: TransactionTitleProps) {
       return t('BURNED');
     }
     if (tx.amount === '0') {
-      return t('TRANSACTION_RUNE_CONSOLIDATION');
+      return t('TRANSACTION_RUNE_RESTRUCTURED');
     }
     if (BigNumber(tx.amount).gt(0)) {
       return t('TRANSACTION_RECEIVED');

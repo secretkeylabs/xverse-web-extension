@@ -30,8 +30,6 @@ jobs:
           npm test
       - name: Build
         env:
-          SEED_WORDS1: ${{ secrets.SEED_WORDS1 }}
-          SEED_WORDS2: ${{ secrets.SEED_WORDS2 }}
           TRANSAC_API_KEY: ${{ secrets.TRANSAC_API_KEY }}
           MOON_PAY_API_KEY: ${{ secrets.MOON_PAY_API_KEY }}
           MIX_PANEL_TOKEN: ${{ secrets.MIX_PANEL_TOKEN }}
