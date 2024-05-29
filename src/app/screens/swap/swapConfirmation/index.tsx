@@ -1,8 +1,7 @@
 import SponsoredTransactionIcon from '@assets/img/transactions/CircleWavyCheck.svg';
-import AccountHeaderComponent from '@components/accountHeader';
-import ActionButton from '@components/button';
 import InfoContainer from '@components/infoContainer';
 import BottomBar from '@components/tabBar';
+import TopRow from '@components/topRow';
 import { Container } from '@screens/home';
 import { AdvanceSettings } from '@screens/swap/swapConfirmation/advanceSettings';
 import FeesBlock from '@screens/swap/swapConfirmation/feesBlock';
@@ -10,6 +9,7 @@ import FunctionBlock from '@screens/swap/swapConfirmation/functionBlock';
 import RouteBlock from '@screens/swap/swapConfirmation/routeBlock';
 import StxInfoBlock from '@screens/swap/swapConfirmation/stxInfoBlock';
 import { useConfirmSwap } from '@screens/swap/swapConfirmation/useConfirmSwap';
+import Button from '@ui-library/button';
 import { SUPPORT_URL_TAB_TARGET, SWAP_SPONSOR_DISABLED_SUPPORT_URL } from '@utils/constants';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,20 +24,15 @@ const TitleText = styled.div((props) => ({
   marginTop: props.theme.spacing(12),
 }));
 
-export const ButtonContainer = styled.div((props) => ({
+const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  marginBottom: props.theme.spacing(8),
-  marginTop: props.theme.spacing(8),
+  columnGap: props.theme.space.s,
+  marginTop: props.theme.space.m,
   position: 'sticky',
   bottom: 0,
   background: props.theme.colors.elevation0,
-  padding: `${props.theme.spacing(12)}px 0`,
-}));
-
-export const ActionButtonWrap = styled.div((props) => ({
-  marginRight: props.theme.spacing(8),
-  width: '100%',
+  padding: `${props.theme.space.s} 0`,
 }));
 
 const SponsoredTransactionText = styled.div((props) => ({
@@ -82,7 +77,7 @@ export default function SwapConfirmation() {
 
   return (
     <>
-      <AccountHeaderComponent disableMenuOption disableAccountSwitch />
+      <TopRow onClick={() => navigate(-1)} />
       <Container>
         <TitleText>{t('TOKEN_SWAP')}</TitleText>
         {swap.isSponsorDisabled && (
@@ -111,10 +106,8 @@ export default function SwapConfirmation() {
           <AdvanceSettings swap={swap} />
         )}
         <ButtonContainer>
-          <ActionButtonWrap>
-            <ActionButton text={t('CANCEL')} transparent onPress={onCancel} />
-          </ActionButtonWrap>
-          <ActionButton text={t('CONFIRM')} processing={confirming} onPress={onConfirm} />
+          <Button title={t('CANCEL')} variant="secondary" onClick={onCancel} />
+          <Button title={t('CONFIRM')} loading={confirming} onClick={onConfirm} />
         </ButtonContainer>
       </Container>
       <BottomBar tab="dashboard" />
