@@ -5,7 +5,7 @@ import { PersistConfig, createMigrate, persistReducer, persistStore } from 'redu
 import { createStateSyncMiddleware, initMessageListener } from 'redux-state-sync';
 import NftDataStateReducer from './nftData/reducer';
 import { WalletState } from './wallet/actions/types';
-import walletReducer, { initialWalletState } from './wallet/reducer';
+import walletReducer, { initialWalletState, rehydrateError } from './wallet/reducer';
 
 const rootPersistConfig = {
   version: 1,
@@ -55,7 +55,7 @@ const migrations = {
   }),
 };
 
-export const WalletPersistConfig: PersistConfig<WalletState> = {
+const WalletPersistConfig: PersistConfig<WalletState> = {
   version: 3,
   key: 'walletState',
   storage: chromeLocalStorage,
@@ -80,9 +80,10 @@ const storeMiddleware = [
   }),
 ];
 const store = createStore(persistedReducer, applyMiddleware(...storeMiddleware));
-const persistedStore = persistStore(store);
+const persistor = persistStore(store);
+
 initMessageListener(store);
 
-const rootStore = { store, persistedStore };
+const rootStore = { store, persistor, rehydrateError };
 
 export default rootStore;
