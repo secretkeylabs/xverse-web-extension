@@ -98,6 +98,11 @@ export const initialWalletState: WalletState = {
   showSpamTokens: false,
 };
 
+/**
+ * This is a ref to store the error that occurred during rehydration
+ * It's a hack to prevent data corruption when rehydration fails but still
+ * show the error to the user
+ */
 export const rehydrateError: { current?: string } = {
   current: undefined,
 };
