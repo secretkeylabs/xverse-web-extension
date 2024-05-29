@@ -26,12 +26,7 @@ function AuthGuard({ children }: PropsWithChildren) {
       return;
     }
     const hasSeedPhrase = await hasSeed();
-    if (
-      !hasSeedPhrase ||
-      // We ensure there is at least 1 account with a masterPubKey as the unlock code will select an account if one
-      // is not selected in the store
-      (!masterPubKey && (accountsList.length === 0 || !accountsList[0].masterPubKey))
-    ) {
+    if (!hasSeedPhrase) {
       navigate('/landing');
       return;
     }
