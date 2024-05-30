@@ -14,10 +14,13 @@ if [[ -z "$BUMP" ]]; then
   exit 1
 fi
 
-echo -e "\n--- Prepare for $BUMP release branch ---"
+# Check for an optional SOURCE_BRANCH variable, default to 'develop' if not provided
+SOURCE_BRANCH="${SOURCE_BRANCH:-develop}"
+
+echo -e "\n--- Prepare for $BUMP release branch from $SOURCE_BRANCH ---"
 
 git fetch --all
-git checkout develop
+git checkout $SOURCE_BRANCH
 git pull
 
 npm version $BUMP --git-tag-version=false
