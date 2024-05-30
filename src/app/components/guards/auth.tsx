@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 
 function AuthGuard({ children }: PropsWithChildren) {
   const navigate = useNavigate();
-  const { masterPubKey, encryptedSeed, isUnlocked, accountsList } = useWalletSelector();
+  const { encryptedSeed, isUnlocked } = useWalletSelector();
   const { getSeed, hasSeed } = useSeedVault();
   const dispatch = useDispatch();
 
