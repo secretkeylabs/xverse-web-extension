@@ -153,8 +153,32 @@ const useWalletReducer = () => {
     }
     await seedVault.unlockVault(password);
     try {
-      const decrypted = await seedVault.getSeed();
-      await loadActiveAccounts(decrypted, network, selectedNetwork, accountsList);
+      const seedPhrase = await seedVault.getSeed();
+      const currentAccounts = accountsList || [];
+
+      if (currentAccounts.length === 0) {
+        // If there are no accounts, it's possible that the wallet was created but the accounts didn't persist
+        // We create one account to ensure the wallet is functional on load, if there were others, they will
+        // get populated in the loadActiveAccounts method
+        const wallet = await walletFromSeedPhrase({
+          mnemonic: seedPhrase,
+          index: 0n,
+          network: 'Mainnet',
+        });
+        const account: Account = {
+          id: 0,
+          btcAddress: wallet.btcAddress,
+          btcPublicKey: wallet.btcPublicKey,
+          masterPubKey: wallet.masterPubKey,
+          ordinalsAddress: wallet.ordinalsAddress,
+          ordinalsPublicKey: wallet.ordinalsPublicKey,
+          stxAddress: wallet.stxAddress,
+          stxPublicKey: wallet.stxPublicKey,
+        };
+        currentAccounts.push(account);
+      }
+
+      await loadActiveAccounts(seedPhrase, network, selectedNetwork, currentAccounts);
     } catch (err) {
       dispatch(fetchAccountAction(accountsList[0], accountsList));
       dispatch(getActiveAccountsAction(accountsList));
