@@ -1,6 +1,6 @@
 import logo from '@assets/img/xverse_logo.svg';
+import ErrorDisplay from '@components/errorDisplay';
 import rootStore from '@stores/index';
-import InputFeedback from '@ui-library/inputFeedback';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
@@ -31,11 +31,13 @@ function StartupLoadingScreen(): React.ReactNode {
     };
   }, []);
 
+  if (error) {
+    return <ErrorDisplay error={{ message: error }} />;
+  }
+
   return (
     <Container>
       <img src={logo} width={100} alt="logo" />
-      <br />
-      {error && <InputFeedback message={error} variant="danger" />}
     </Container>
   );
 }
