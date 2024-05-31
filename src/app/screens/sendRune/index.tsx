@@ -1,11 +1,11 @@
 import { useGetRuneFungibleTokens } from '@hooks/queries/runes/useGetRuneFungibleTokens';
-import useBtcClient from '@hooks/useBtcClient';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useHasFeature from '@hooks/useHasFeature';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  AnalyticsEvents,
   FungibleToken,
   RuneSummary,
   Transport,
@@ -13,6 +13,7 @@ import {
   parseSummaryForRunes,
 } from '@secretkeylabs/xverse-core';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
+import { trackMixPanel } from '@utils/mixpanel';
 import { getFtBalance } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
@@ -158,6 +159,13 @@ function SendRuneScreen() {
     try {
       setIsSubmitting(true);
       const txnId = await transaction?.broadcast({ ledgerTransport, rbfEnabled: true });
+
+      trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
+        protocol: 'runes',
+        action: 'transfer',
+        wallet_type: selectedAccount?.accountType || 'software',
+      });
+
       navigate('/tx-status', {
         state: {
           txid: txnId,

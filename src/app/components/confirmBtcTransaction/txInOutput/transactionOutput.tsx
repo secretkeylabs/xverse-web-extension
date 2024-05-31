@@ -53,7 +53,7 @@ function TransactionOutput({ output, scriptOutputCount }: Props) {
       <SubValueText>{getTruncatedAddress(output.address)}</SubValueText>
     </TxIdContainer>
   ) : (
-    <SubValueText>{getTruncatedAddress(output.address)}</SubValueText>
+    <SubValueText data-testid="address-receive">{getTruncatedAddress(output.address)}</SubValueText>
   );
 
   return (
@@ -62,6 +62,7 @@ function TransactionOutput({ output, scriptOutputCount }: Props) {
         icon={detailViewIcon}
         hideAddress
         hideCopyButton={detailViewHideCopyButton}
+        dataTestID="confirm-amount"
         amount={`${satsToBtc(
           new BigNumber(isSpendOutput(output) ? output.amount.toString() : '0'),
         ).toFixed()} BTC`}

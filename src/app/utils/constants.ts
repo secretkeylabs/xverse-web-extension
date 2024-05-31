@@ -1,6 +1,6 @@
 /* eslint-disable prefer-destructuring */
+import { Provider } from '@sats-connect/core';
 import type { NetworkType } from '@secretkeylabs/xverse-core';
-import { Provider } from 'sats-connect';
 
 export const GAMMA_URL = 'https://gamma.io/';
 export const TERMS_LINK = 'https://xverse.app/terms';
@@ -62,6 +62,8 @@ export const MAX_ACC_NAME_LENGTH = 20;
 
 // UI
 export const EMPTY_LABEL = '--';
+export const OPTIONS_DIALOG_WIDTH = 179;
+export const SPAM_OPTIONS_WIDTH = 244;
 
 export const XverseProviderInfo: Provider = {
   id: 'XverseProviders.BitcoinProvider',

@@ -56,7 +56,7 @@ export const fetchSip10FungibleTokens =
   };
 
 export const useGetSip10FungibleTokens = () => {
-  const { stxAddress, fiatCurrency, network } = useWalletSelector();
+  const { stxAddress, fiatCurrency, network, spamTokens, showSpamTokens } = useWalletSelector();
   const currentNetworkInstance = useNetworkSelector();
 
   const queryFn = fetchSip10FungibleTokens(
@@ -66,11 +66,23 @@ export const useGetSip10FungibleTokens = () => {
     currentNetworkInstance,
   );
 
-  return useQuery({
+  const query = useQuery({
     queryKey: ['sip10-fungible-tokens', network.type, stxAddress, fiatCurrency],
     queryFn,
     enabled: Boolean(network && stxAddress),
   });
+
+  return {
+    ...query,
+    unfilteredData: query.data,
+    data: query.data?.filter((ft) => {
+      let passedSpamCheck = true;
+      if (spamTokens?.length) {
+        passedSpamCheck = showSpamTokens || !spamTokens.includes(ft.principal);
+      }
+      return passedSpamCheck;
+    }),
+  };
 };
 
 export const useVisibleSip10FungibleTokens = (): ReturnType<typeof useGetSip10FungibleTokens> & {

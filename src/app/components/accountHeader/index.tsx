@@ -7,10 +7,11 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
+import OptionsDialog from '@components/optionsDialog/optionsDialog';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { DotsThreeVertical } from '@phosphor-icons/react';
+import { OPTIONS_DIALOG_WIDTH } from '@utils/constants';
 
 const SelectedAccountContainer = styled.div<{ showBorderBottom?: boolean }>((props) => ({
   display: 'flex',
@@ -51,10 +52,10 @@ const ButtonRow = styled.button`
   align-items: center;
   background-color: transparent;
   justify-content: flex-start;
-  padding-left: 24px;
-  padding-right: 24px;
-  padding-top: 11px;
-  padding-bottom: 11px;
+  padding-top: ${(props) => props.theme.space.s};
+  padding-bottom: ${(props) => props.theme.space.s};
+  padding-left: ${(props) => props.theme.space.l};
+  padding-right: ${(props) => props.theme.space.l};
   font: ${(props) => props.theme.body_medium_m};
   color: ${(props) => props.theme.colors.white_0};
   transition: background-color 0.2s ease;
@@ -138,9 +139,7 @@ function AccountHeaderComponent({
 
     setOptionsDialogIndents({
       top: `${(event.target as HTMLElement).parentElement?.getBoundingClientRect().top}px`,
-      left: `calc(${
-        (event.target as HTMLElement).parentElement?.getBoundingClientRect().right
-      }px - ${OPTIONS_DIALOG_WIDTH}px)`,
+      left: `calc(100% - ${OPTIONS_DIALOG_WIDTH}px)`,
     });
   };
 

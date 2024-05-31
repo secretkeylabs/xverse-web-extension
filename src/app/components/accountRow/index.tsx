@@ -1,7 +1,7 @@
 import LedgerBadge from '@assets/img/ledger/ledger_badge.svg';
 import BarLoader from '@components/barLoader';
 import BottomModal from '@components/bottomModal';
-import OptionsDialog, { OPTIONS_DIALOG_WIDTH } from '@components/optionsDialog/optionsDialog';
+import OptionsDialog from '@components/optionsDialog/optionsDialog';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CaretDown, DotsThreeVertical } from '@phosphor-icons/react';
@@ -9,7 +9,12 @@ import { Account, currencySymbolMap } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import Input from '@ui-library/input';
 import Spinner from '@ui-library/spinner';
-import { EMPTY_LABEL, LoaderSize, MAX_ACC_NAME_LENGTH } from '@utils/constants';
+import {
+  EMPTY_LABEL,
+  LoaderSize,
+  MAX_ACC_NAME_LENGTH,
+  OPTIONS_DIALOG_WIDTH,
+} from '@utils/constants';
 import { getAccountGradient } from '@utils/gradient';
 import { isLedgerAccount, validateAccountName } from '@utils/helper';
 import { useEffect, useRef, useState } from 'react';

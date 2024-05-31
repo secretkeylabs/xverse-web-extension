@@ -41,8 +41,9 @@ function App(): JSX.Element {
                 <RouterProvider router={router} />
                 <Toaster
                   position="bottom-center"
-                  containerStyle={{ bottom: 80 }}
+                  containerStyle={{ bottom: 32 }}
                   toastOptions={{
+                    duration: 1500,
                     success: {
                       icon: (
                         <StyledIcon>
@@ -79,7 +80,6 @@ function App(): JSX.Element {
                         padding: Theme.space.s,
                         color: Theme.colors.elevation0,
                       },
-                      duration: 2000,
                     },
                   }}
                 />

@@ -10,6 +10,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { FadersHorizontal } from '@phosphor-icons/react';
 import type { BRC20ErrorCode, SettingsNetwork } from '@secretkeylabs/xverse-core';
 import {
+  AnalyticsEvents,
   getBtcFiatEquivalent,
   useBrc20TransferFees,
   validateBtcAddressIsTaproot,
@@ -22,6 +23,7 @@ import {
   getFeeValuesForBrc20OneStepTransfer,
 } from '@utils/brc20';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
+import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -203,6 +205,11 @@ const useConfirmBrc20Transfer = (): {
       },
       token,
     };
+    trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
+      protocol: 'brc20',
+      action: 'transfer',
+      wallet_type: selectedAccount?.accountType || 'software',
+    });
     navigate('/execute-brc20-tx', { state });
     setIsConfirmLoading(false);
   };

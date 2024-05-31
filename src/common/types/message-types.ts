@@ -1,4 +1,3 @@
-import { FinishedTxPayload, SignatureData, SponsoredFinishedTxPayload } from '@stacks/connect';
 import {
   CreateInscriptionResponse,
   CreateRepeatInscriptionsResponse,
@@ -8,7 +7,8 @@ import {
   SignTransactionResponse,
   type Params,
   type Requests,
-} from 'sats-connect';
+} from '@sats-connect/core';
+import { FinishedTxPayload, SignatureData, SponsoredFinishedTxPayload } from '@stacks/connect';
 
 export const MESSAGE_SOURCE = 'xverse-wallet';
 

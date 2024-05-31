@@ -4,6 +4,7 @@ import type {
   AccountType,
   AppInfo,
   BaseWallet,
+  FungibleToken,
   SettingsNetwork,
   SupportedCurrency,
 } from '@secretkeylabs/xverse-core';
@@ -267,5 +268,26 @@ export function setWalletHideStxAction(hideStx: boolean): actions.SetWalletHideS
   return {
     type: actions.SetWalletHideStxKey,
     hideStx,
+  };
+}
+
+export function setSpamTokenAction(spamToken: FungibleToken | null): actions.SetSpamToken {
+  return {
+    type: actions.SetSpamTokenKey,
+    spamToken,
+  };
+}
+
+export function setSpamTokensAction(spamTokens: string[]): actions.SetSpamTokens {
+  return {
+    type: actions.SetSpamTokensKey,
+    spamTokens,
+  };
+}
+
+export function setShowSpamTokensAction(showSpamTokens: boolean): actions.SetShowSpamTokens {
+  return {
+    type: actions.SetShowSpamTokensKey,
+    showSpamTokens,
   };
 }

@@ -37,10 +37,34 @@ test.describe('Settings Tab', () => {
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
-    await page.goto(`chrome-extension://${extensionId}/popup.html#/settings`);
 
+    // generate extra account
+    await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.labelAccountName.click();
+    await expect(page.url()).toContain('account-list');
+    await expect(wallet.labelAccountName).toHaveCount(1);
+    await wallet.buttonGenerateAccount.click();
+    await expect(wallet.labelAccountName).toHaveCount(2);
+
+    // should always reset to first account after switching to testnet
+    await wallet.labelAccountName.last().click();
+    await wallet.checkVisualsStartpage();
+    await expect(wallet.labelAccountName).toHaveText('Account 2');
+    await page.goto(`chrome-extension://${extensionId}/popup.html#/settings`);
     await wallet.switchtoTestnetNetwork();
+    await wallet.navigationDashboard.click();
+    await expect(wallet.labelAccountName).toHaveText('Account 1');
+
+    // should always reset to first account after switching to mainnet
+    await wallet.labelAccountName.click();
+    await expect(page.url()).toContain('account-list');
+    await wallet.labelAccountName.last().click();
+    await wallet.checkVisualsStartpage('testnet');
+    await expect(wallet.labelAccountName).toHaveText('Account 2');
+    await page.goto(`chrome-extension://${extensionId}/popup.html#/settings`);
     await wallet.switchtoMainnetNetwork();
+    await wallet.navigationDashboard.click();
+    await expect(wallet.labelAccountName).toHaveText('Account 1');
   });
   test('Update password', async ({ page, extensionId }) => {
     const onboardingpage = new Onboarding(page);

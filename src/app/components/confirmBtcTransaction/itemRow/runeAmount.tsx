@@ -1,5 +1,6 @@
 import { mapRuneNameToPlaceholder } from '@components/confirmBtcTransaction/utils';
 import TokenImage from '@components/tokenImage';
+import { RuneBase } from '@secretkeylabs/xverse-core';
 import Avatar from '@ui-library/avatar';
 import { StyledP } from '@ui-library/common.styled';
 import { ftDecimals, getTicker } from '@utils/helper';
@@ -40,20 +41,14 @@ const StyledPRight = styled(StyledP)`
 `;
 
 type Props = {
-  tokenName: string;
-  amount: string;
-  divisibility: number;
+  rune: RuneBase;
   hasSufficientBalance?: boolean;
 };
 
-export default function RuneAmount({
-  tokenName,
-  amount,
-  divisibility,
-  hasSufficientBalance = true,
-}: Props) {
+export default function RuneAmount({ rune, hasSufficientBalance = true }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const amountWithDecimals = ftDecimals(amount, divisibility);
+  const { runeName, amount, divisibility, symbol, inscriptionId } = rune;
+  const amountWithDecimals = ftDecimals(String(amount), divisibility);
   return (
     <Container>
       <AvatarContainer>
@@ -61,7 +56,7 @@ export default function RuneAmount({
           src={
             <TokenImage
               currency="FT"
-              fungibleToken={mapRuneNameToPlaceholder(tokenName)}
+              fungibleToken={mapRuneNameToPlaceholder(runeName, symbol, inscriptionId)}
               showProtocolIcon={false}
               loading={false}
               size={32}
@@ -78,7 +73,7 @@ export default function RuneAmount({
             value={amountWithDecimals}
             displayType="text"
             thousandSeparator
-            suffix={` ${getTicker(tokenName)}`}
+            suffix={` ${symbol}`}
             renderText={(value: string) => (
               <StyledPRight
                 typography="body_medium_m"
@@ -90,7 +85,7 @@ export default function RuneAmount({
           />
         </Row>
         <StyledP typography="body_medium_s" color="white_400">
-          {tokenName}
+          {runeName}
         </StyledP>
       </Column>
     </Container>

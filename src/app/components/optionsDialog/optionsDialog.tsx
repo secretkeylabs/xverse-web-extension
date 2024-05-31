@@ -1,17 +1,17 @@
+import { OPTIONS_DIALOG_WIDTH } from '@utils/constants';
 import styled from 'styled-components';
 
-export const OPTIONS_DIALOG_WIDTH = 179;
-
-const Container = styled.div((props) => ({
+const Container = styled.div<{ $width: number }>((props) => ({
+  width: 'auto',
+  maxWidth: props.$width,
   display: 'flex',
   flexDirection: 'column',
   position: 'absolute',
-  top: props.theme.spacing(15),
-  right: props.theme.spacing(10),
-  borderRadius: 12,
-  paddingTop: 11,
-  paddingBottom: 11,
-  width: OPTIONS_DIALOG_WIDTH,
+  top: props.theme.space.l,
+  right: props.theme.space.s,
+  borderRadius: props.theme.space.s,
+  paddingTop: props.theme.space.s,
+  paddingBottom: props.theme.space.s,
   background: props.theme.colors.elevation2,
   userSelect: 'none',
 }));
@@ -30,12 +30,20 @@ interface Props {
   children: React.ReactNode;
   closeDialog: () => void;
   optionsDialogIndents?: { top: string; left: string };
+  width?: number;
 }
 
-function OptionsDialog({ closeDialog, optionsDialogIndents, children }: Props) {
+function OptionsDialog({
+  closeDialog,
+  optionsDialogIndents,
+  children,
+  width = OPTIONS_DIALOG_WIDTH,
+}: Props) {
   return (
     <OuterContainer onClick={closeDialog}>
-      <Container style={optionsDialogIndents}>{children}</Container>
+      <Container style={optionsDialogIndents} $width={width}>
+        {children}
+      </Container>
     </OuterContainer>
   );
 }

@@ -11,6 +11,7 @@ import useSeedVault from '@hooks/useSeedVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { animated, useSpring } from '@react-spring/web';
+import { AddressPurpose } from '@sats-connect/core';
 import SelectAccount from '@screens/connect/selectAccount';
 import {
   AnalyticsEvents,
@@ -27,7 +28,6 @@ import { decodeToken } from 'jsontokens';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { AddressPurpose } from 'sats-connect';
 import styled from 'styled-components';
 import validUrl from 'valid-url';
 import AddressPurposeBox from '../addressPurposeBox';

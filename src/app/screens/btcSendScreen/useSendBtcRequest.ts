@@ -1,14 +1,14 @@
+import {
+  BitcoinNetworkType,
+  SendBtcTransactionOptions,
+  SendBtcTransactionPayload,
+} from '@sats-connect/core';
 import { Recipient, SettingsNetwork, signBtcTransaction } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
 import { decodeToken } from 'jsontokens';
 import { useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import {
-  BitcoinNetworkType,
-  SendBtcTransactionOptions,
-  SendBtcTransactionPayload,
-} from 'sats-connect';
 import useBtcClient from '../../hooks/useBtcClient';
 import useSeedVault from '../../hooks/useSeedVault';
 import useWalletSelector from '../../hooks/useWalletSelector';

@@ -1,10 +1,10 @@
 import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { SignMultiplePsbtPayload, SignMultipleTransactionOptions } from '@sats-connect/core';
 import { InputToSign, signPsbt } from '@secretkeylabs/xverse-core';
 import { decodeToken } from 'jsontokens';
 import { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { SignMultiplePsbtPayload, SignMultipleTransactionOptions } from 'sats-connect';
 import useSeedVault from './useSeedVault';
 
 const useSignBatchPsbtTx = () => {

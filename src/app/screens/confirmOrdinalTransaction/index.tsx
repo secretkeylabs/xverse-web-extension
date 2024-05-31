@@ -8,9 +8,10 @@ import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
-import { BtcTransactionBroadcastResponse } from '@secretkeylabs/xverse-core';
+import { AnalyticsEvents, BtcTransactionBroadcastResponse } from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
+import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -130,6 +131,12 @@ function ConfirmOrdinalTransaction() {
       navigate('/confirm-ledger-tx', { state });
       return;
     }
+
+    trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
+      protocol: isRareSat ? 'rare-sats' : 'ordinals',
+      action: 'transfer',
+      wallet_type: selectedAccount?.accountType || 'software',
+    });
 
     mutate({ signedTx: txHex });
   };

@@ -11,6 +11,7 @@ import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import RequestError from '@components/requests/requestError';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
+import { Return, RpcErrorCode } from '@sats-connect/core';
 import CollapsableContainer from '@screens/signatureRequest/collapsableContainer';
 import SignatureRequestMessage from '@screens/signatureRequest/signatureRequestMessage';
 import { finalizeMessageSignature } from '@screens/signatureRequest/utils';
@@ -20,7 +21,6 @@ import { getTruncatedAddress, isHardwareAccount } from '@utils/helper';
 import { handleBip322LedgerMessageSigning } from '@utils/ledger';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Return, RpcErrorCode } from 'sats-connect';
 import styled from 'styled-components';
 import { useSignMessageRequest, useSignMessageValidation } from './useSignMessageRequest';
 

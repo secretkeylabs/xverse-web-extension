@@ -45,13 +45,26 @@ interface Props {
   name: string;
   image?: string;
   ticker?: string;
+  runeSymbol?: string | null;
+  runeInscriptionId?: string | null;
   protocol?: string;
   disabled: boolean;
   toggled(enabled: boolean, coinName: string, coinKey: string): void;
   enabled?: boolean;
 }
 
-function CoinItem({ id, name, image, ticker, protocol, disabled, toggled, enabled }: Props) {
+function CoinItem({
+  id,
+  name,
+  image,
+  ticker,
+  runeInscriptionId,
+  runeSymbol,
+  protocol,
+  disabled,
+  toggled,
+  enabled,
+}: Props) {
   const [isEnabled, setIsEnabled] = useState(enabled);
   const toggleSwitch = () => {
     setIsEnabled((previousState) => !previousState);
@@ -61,7 +74,12 @@ function CoinItem({ id, name, image, ticker, protocol, disabled, toggled, enable
   return (
     <RowContainer aria-label="Token Row" data-testid={name}>
       <CoinContainer>
-        <TokenImage fungibleToken={{ name, ticker, image, protocol } as FungibleToken} size={32} />
+        <TokenImage
+          fungibleToken={
+            { name, ticker, image, runeInscriptionId, runeSymbol, protocol } as FungibleToken
+          }
+          size={32}
+        />
         <CoinTitleText aria-label="Coin Title" isEnabled={isEnabled}>
           {name}
         </CoinTitleText>

@@ -1,9 +1,11 @@
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import useDebounce from '@hooks/useDebounce';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { btcTransaction, Transport } from '@secretkeylabs/xverse-core';
+import { AnalyticsEvents, btcTransaction, Transport } from '@secretkeylabs/xverse-core';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
+import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
@@ -28,11 +30,13 @@ function SendBtcScreen() {
   const [recipientAddress, setRecipientAddress] = useState(location.state?.recipientAddress || '');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [amountSats, setAmountSats] = useState(location.state?.amount || '');
+  const [amountSats, setAmountSats] = useState<string>(location.state?.amount || '');
   const [feeRate, setFeeRate] = useState('');
   const [sendMax, setSendMax] = useState(false);
   const amountEditable = location.state?.disableAmountEdit ?? true;
   const addressEditable = location.state?.disableAddressEdit ?? true;
+
+  const debouncedRecipient = useDebounce(recipientAddress, 500);
 
   const initialStep = addressEditable
     ? Step.SelectRecipient
@@ -57,28 +61,33 @@ function SendBtcScreen() {
     return sendMax && currentStep !== Step.Confirm
       ? generateSendMaxTransaction(
           transactionContext,
-          recipientAddress,
+          debouncedRecipient,
           feeRateOverride ?? +feeRate,
         )
       : generateTransaction(
           transactionContext,
-          recipientAddress,
+          debouncedRecipient,
           amountBigInt,
           feeRateOverride ?? +feeRate,
         );
   };
 
   useEffect(() => {
-    if (!recipientAddress || !feeRate) {
+    if (!debouncedRecipient || !feeRate) {
       setTransaction(undefined);
       setSummary(undefined);
       return;
     }
 
+    const isCancelled = {
+      current: false,
+    };
     const generateTxnAndSummary = async () => {
       setIsLoading(true);
       try {
         const transactionDetails = await generateTransactionAndSummary();
+
+        if (isCancelled.current) return;
 
         setTransaction(transactionDetails.transaction);
 
@@ -88,6 +97,8 @@ function SendBtcScreen() {
           setAmountSats(transactionDetails.summary.outputs[0].amount.toString());
         }
       } catch (e) {
+        if (isCancelled.current) return;
+
         if (!(e instanceof Error) || !e.message.includes('Insufficient funds')) {
           // don't log the error if it's just an insufficient funds error
           console.error(e);
@@ -96,12 +107,18 @@ function SendBtcScreen() {
         setTransaction(undefined);
         setSummary(undefined);
       } finally {
-        setIsLoading(false);
+        if (!isCancelled.current) {
+          setIsLoading(false);
+        }
       }
     };
 
     generateTxnAndSummary();
-  }, [transactionContext, recipientAddress, amountSats, feeRate, sendMax]);
+
+    return () => {
+      isCancelled.current = true;
+    };
+  }, [transactionContext, debouncedRecipient, amountSats, feeRate, sendMax]);
 
   const handleCancel = () => {
     if (isLedgerAccount(selectedAccount) && isInOption) {
@@ -130,6 +147,13 @@ function SendBtcScreen() {
     try {
       setIsSubmitting(true);
       const txnId = await transaction?.broadcast({ ledgerTransport, rbfEnabled: true });
+
+      trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
+        protocol: 'bitcoin',
+        action: 'transfer',
+        wallet_type: selectedAccount?.accountType || 'software',
+      });
+
       navigate('/tx-status', {
         state: {
           txid: txnId,

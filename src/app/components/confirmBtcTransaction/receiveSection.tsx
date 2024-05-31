@@ -116,11 +116,7 @@ function ReceiveSection({
           {showOrdinalRunes &&
             ordinalRuneReceipts.map((receipt) => (
               <RowContainer key={receipt.runeName}>
-                <RuneAmount
-                  tokenName={receipt.runeName}
-                  amount={String(receipt.amount)}
-                  divisibility={receipt.divisibility}
-                />
+                <RuneAmount rune={receipt} />
               </RowContainer>
             ))}
           {areInscriptionRareSatsInOrdinal && (
@@ -157,11 +153,7 @@ function ReceiveSection({
           {showPaymentRunes &&
             paymentRuneReceipts.map((receipt) => (
               <RowContainer key={receipt.runeName}>
-                <RuneAmount
-                  tokenName={receipt.runeName}
-                  amount={String(receipt.amount)}
-                  divisibility={receipt.divisibility}
-                />
+                <RuneAmount rune={receipt} />
               </RowContainer>
             ))}
           {amountIsBiggerThanZero && (

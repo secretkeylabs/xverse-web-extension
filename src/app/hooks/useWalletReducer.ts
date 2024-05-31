@@ -12,7 +12,6 @@ import {
   createWalletAccount,
   decryptSeedPhraseCBC,
   getBnsName,
-  newWallet,
   restoreWalletWithAccounts,
   walletFromSeedPhrase,
 } from '@secretkeylabs/xverse-core';
@@ -63,6 +62,7 @@ const useWalletReducer = () => {
     currentNetwork: SettingsNetwork,
     currentNetworkObject: StacksNetwork,
     currentAccounts: Account[],
+    resetIndex?: boolean,
   ) => {
     const walletAccounts = await restoreWalletWithAccounts(
       secretKey,
@@ -86,7 +86,7 @@ const useWalletReducer = () => {
     };
 
     let selectedAccountData: Account | undefined;
-    if (!selectedAccount) {
+    if (!selectedAccount || resetIndex) {
       [selectedAccountData] = walletAccounts;
     } else if (isLedgerAccount(selectedAccount)) {
       const networkLedgerAccounts = filterLedgerAccounts(ledgerAccountsList, currentNetwork.type);
@@ -131,10 +131,8 @@ const useWalletReducer = () => {
           account.masterPubKey,
         ),
       }));
-
       dispatch(updateLedgerAccountsAction(newLedgerAccountsList));
     }
-
     dispatch(getActiveAccountsAction(walletAccounts));
   };
 
@@ -329,7 +327,7 @@ const useWalletReducer = () => {
         ? new StacksMainnet({ url: changedNetwork.address })
         : new StacksTestnet({ url: changedNetwork.address });
     try {
-      await loadActiveAccounts(wallet.seedPhrase, changedNetwork, networkObject, [account]);
+      await loadActiveAccounts(wallet.seedPhrase, changedNetwork, networkObject, [account], true);
     } catch (err) {
       const bnsName = await getBnsName(wallet.stxAddress, networkObject);
       dispatch(

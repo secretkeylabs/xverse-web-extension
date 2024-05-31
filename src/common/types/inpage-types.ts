@@ -1,4 +1,4 @@
-import { RpcBase } from 'sats-connect';
+import { RpcBase } from '@sats-connect/core';
 
 /**
  * Inpage Script (Stacks Provider / BitcoinProvider) <-> Content Script

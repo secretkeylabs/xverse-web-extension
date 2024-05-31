@@ -130,7 +130,7 @@ function FeeItem({
     };
 
     getFee();
-  }, [feeRate, getFeeForFeeRate, baseToFiat]);
+  }, [feeRate]);
 
   const getIcon = () => {
     const color = totalFee ? theme.colors.tangerine : theme.colors.white_600;

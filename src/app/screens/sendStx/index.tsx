@@ -77,7 +77,7 @@ function SendStxScreen() {
     navigate('/');
   };
 
-  function validateFields(associatedAddress: string, amount: string, memo: string): boolean {
+  const validateFields = (associatedAddress: string, amount: string, memo?: string): boolean => {
     if (!associatedAddress) {
       setAddressError(t('ERRORS.ADDRESS_REQUIRED'));
       return false;
@@ -127,12 +127,12 @@ function SendStxScreen() {
       }
     }
     return true;
-  }
+  };
 
   const onPressSendSTX = async (associatedAddress: string, amount: string, memo?: string) => {
     const modifyAmount = replaceCommaByDot(amount);
     const addMemo = memo ?? '';
-    if (validateFields(associatedAddress.trim(), modifyAmount, memo!)) {
+    if (validateFields(associatedAddress.trim(), modifyAmount, memo)) {
       setAddressError('');
       setMemoError('');
       setAmountError('');
@@ -147,13 +147,13 @@ function SendStxScreen() {
         processing={isLoading}
         currencyType="STX"
         amountError={amountError}
-        recepientError={addressError}
+        recipientError={addressError}
         memoError={memoError}
         balance={Number(microstacksToStx(new BigNumber(stxData?.availableBalance || 0)))}
         onPressSend={onPressSendSTX}
-        recipient={recipientAddress!}
-        amountToSend={amountToSend!}
-        stxMemo={stxMemo!}
+        recipient={recipientAddress}
+        amountToSend={amountToSend}
+        stxMemo={stxMemo}
       />
       <BottomBar tab="dashboard" />
     </>
