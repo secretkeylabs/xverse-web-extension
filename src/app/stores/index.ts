@@ -60,6 +60,9 @@ const WalletPersistConfig: PersistConfig<WalletState> = {
   key: 'walletState',
   storage: chromeLocalStorage,
   migrate: createMigrate(migrations as any, { debug: false }),
+  // A timeout of 0 means timeout is disabled
+  // If the timeout is enabled, the rehydration will fail on slower machines and the store will be reset
+  timeout: 0,
 };
 
 const appReducer = combineReducers({
