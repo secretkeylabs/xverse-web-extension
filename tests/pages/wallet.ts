@@ -472,6 +472,13 @@ export default class Wallet {
     return numericValue;
   }
 
+  async clickOnSpecificToken(tokenname) {
+    const specificToken = this.page
+      .getByRole('button')
+      .filter({ has: this.labelTokenSubtitle.getByText(tokenname, { exact: true }) });
+    await specificToken.last().click();
+  }
+
   async checkNetworkSettingVisuals() {
     await expect(this.buttonSave).toBeVisible();
     await expect(this.buttonBack).toBeVisible();
