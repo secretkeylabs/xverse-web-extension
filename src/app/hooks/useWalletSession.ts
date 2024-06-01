@@ -18,7 +18,8 @@ const useWalletSession = () => {
     chromeSessionStorage.setItem(SESSION_START_TIME_KEY, sessionStartTime);
   };
 
-  const getSessionStartTime = async () => chromeSessionStorage.getItem(SESSION_START_TIME_KEY);
+  const getSessionStartTime = async () =>
+    chromeSessionStorage.getItem<number>(SESSION_START_TIME_KEY);
 
   const clearSessionTime = async () => {
     await chromeSessionStorage.removeItem(SESSION_START_TIME_KEY);
@@ -28,6 +29,8 @@ const useWalletSession = () => {
     const isUnlocked = await isVaultUnlocked();
     if (!isUnlocked) return false;
     const startTime = await getSessionStartTime();
+    // we don't know when the session started, so we assume we need to lock
+    if (!startTime) return true;
     const currentTime = new Date().getTime();
     return currentTime >= addMinutes(startTime, walletLockPeriod).getTime();
   };

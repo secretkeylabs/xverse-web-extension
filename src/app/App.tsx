@@ -1,4 +1,4 @@
-import LoadingScreen from '@components/loadingScreen';
+import StartupLoadingScreen from '@components/startupLoadingScreen';
 import { CheckCircle, XCircle } from '@phosphor-icons/react';
 import { setXClientVersion } from '@secretkeylabs/xverse-core';
 import rootStore from '@stores/index';
@@ -28,16 +28,16 @@ const StyledIcon = styled.div`
   justify-content: center;
 `;
 
-function App(): JSX.Element {
+function App(): React.ReactNode {
   return (
     <>
       <GlobalStyle />
-      <QueryClientProvider client={queryClient}>
-        <ReactQueryDevtools initialIsOpen={false} />
-        <Provider store={rootStore.store}>
-          <PersistGate persistor={rootStore.persistedStore} loading={<LoadingScreen />}>
-            <SessionGuard>
-              <ThemeProvider theme={Theme}>
+      <ThemeProvider theme={Theme}>
+        <QueryClientProvider client={queryClient}>
+          <ReactQueryDevtools initialIsOpen={false} />
+          <Provider store={rootStore.store}>
+            <PersistGate persistor={rootStore.persistor} loading={<StartupLoadingScreen />}>
+              <SessionGuard>
                 <RouterProvider router={router} />
                 <Toaster
                   position="bottom-center"
@@ -83,11 +83,11 @@ function App(): JSX.Element {
                     },
                   }}
                 />
-              </ThemeProvider>
-            </SessionGuard>
-          </PersistGate>
-        </Provider>
-      </QueryClientProvider>
+              </SessionGuard>
+            </PersistGate>
+          </Provider>
+        </QueryClientProvider>
+      </ThemeProvider>
     </>
   );
 }

@@ -37,7 +37,8 @@ test.describe('Transaction STX', () => {
 
     await expect(await wallet.divTokenRow.count()).toBeGreaterThanOrEqual(2);
     // Send STX
-    await wallet.divTokenRow.nth(3).click();
+
+    await wallet.clickOnSpecificToken('Stacks');
     await wallet.checkVisualsSendSTXPage();
 
     // Recipient address invalid check
@@ -80,7 +81,7 @@ test.describe('Transaction STX', () => {
     await wallet.allupperButtons.nth(0).click();
 
     await expect(await wallet.divTokenRow.count()).toBeGreaterThanOrEqual(2);
-    await wallet.divTokenRow.nth(3).click();
+    await wallet.clickOnSpecificToken('Stacks');
     await wallet.checkVisualsSendSTXPage();
 
     // Fill in Receiver Address
@@ -140,7 +141,7 @@ test.describe('Transaction STX', () => {
 
     // Needed to add this to avoid loading issues with the token list to be displayed
     await expect(await wallet.divTokenRow.count()).toBeGreaterThanOrEqual(2);
-    await wallet.divTokenRow.nth(3).click();
+    await wallet.clickOnSpecificToken('Stacks');
 
     // Check visuals of sending page
     await wallet.checkVisualsSendSTXPage();
@@ -187,7 +188,7 @@ test.describe('Transaction STX', () => {
     await wallet.navigationDashboard.click();
     // Check if switch to testnet was successfull and all visuals are correct
     await wallet.checkVisualsStartpage('testnet');
-    await wallet.divTokenRow.nth(2).click();
+    await wallet.clickOnSpecificToken('Stacks');
     await expect(page.url()).toContain('STX');
     // Check token detail page for token image and coin title
     await expect(wallet.imageToken).toBeVisible();

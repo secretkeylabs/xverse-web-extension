@@ -1,12 +1,12 @@
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSession from '@hooks/useWalletSession';
-import { ReactElement, useLayoutEffect, useState } from 'react';
+import { ReactNode, useLayoutEffect, useState } from 'react';
 
 interface SessionGuardProps {
-  children: ReactElement;
+  children: ReactNode;
 }
 
-function SessionGuard({ children }: SessionGuardProps): ReactElement | null {
+function SessionGuard({ children }: SessionGuardProps): ReactNode {
   const { shouldLock, setSessionStartTime } = useWalletSession();
   const { lockWallet } = useWalletReducer();
   const [lockTested, setLockTested] = useState(false);
