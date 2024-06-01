@@ -7,7 +7,7 @@ import useWalletSession from './useWalletSession';
 function useFeaturedDapps() {
   const { network } = useWalletSelector();
   const { getSessionStartTime } = useWalletSession();
-  const [sessionStartTime, setSessionStartTime] = useState<number | null>(null);
+  const [sessionStartTime, setSessionStartTime] = useState<number | undefined>(undefined);
 
   const fetchSessionStartTime = async () => {
     const time = await getSessionStartTime();

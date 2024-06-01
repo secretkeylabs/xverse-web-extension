@@ -1,4 +1,5 @@
 import { defaultMainnet, initialNetworksList } from '@secretkeylabs/xverse-core';
+import { REHYDRATE } from 'redux-persist';
 import {
   AddAccountKey,
   ChangeFiatCurrencyKey,
@@ -97,12 +98,31 @@ export const initialWalletState: WalletState = {
   showSpamTokens: false,
 };
 
+/**
+ * This is a ref to store the error that occurred during rehydration
+ * It's a hack to prevent data corruption when rehydration fails but still
+ * show the error to the user
+ */
+export const rehydrateError: { current?: string } = {
+  current: undefined,
+};
+
 const walletReducer = (
   // eslint-disable-next-line @typescript-eslint/default-param-last
   state: WalletState = initialWalletState,
-  action: WalletActions,
+  action: WalletActions | { type: typeof REHYDRATE; err?: unknown },
 ): WalletState => {
   switch (action.type) {
+    case REHYDRATE:
+      if (action.err) {
+        // We can't update the state since we're throwing an error, so we store the error in a ref
+        rehydrateError.current = `${action.err}`;
+        // There was an error loading state from chrome storage so we bail to prevent data corruption
+        // If not done, redux-persist will hydrate the state with the initial state and then store that
+        // in storage resulting in data loss
+        throw new Error('Failed to load state from storage.');
+      }
+      return state;
     case SetWalletKey:
       return {
         ...state,

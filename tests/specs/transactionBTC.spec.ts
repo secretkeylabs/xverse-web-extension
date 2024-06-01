@@ -43,7 +43,7 @@ test.describe('Transaction BTC', () => {
 
     await expect(await wallet.divTokenRow.count()).toBeGreaterThanOrEqual(2);
     // Send BTC
-    await wallet.divTokenRow.nth(2).click();
+    await wallet.clickOnSpecificToken('Bitcoin');
     await expect(page.url()).toContain('send-btc');
     await expect(wallet.buttonNext).toBeVisible();
     await expect(wallet.buttonNext).toBeDisabled();
@@ -87,7 +87,7 @@ test.describe('Transaction BTC', () => {
     await wallet.allupperButtons.nth(0).click();
 
     await expect(await wallet.divTokenRow.count()).toBeGreaterThanOrEqual(2);
-    await wallet.divTokenRow.nth(2).click();
+    await wallet.clickOnSpecificToken('Bitcoin');
     await expect(page.url()).toContain('send-btc');
     await expect(wallet.buttonNext).toBeVisible();
     await expect(wallet.buttonNext).toBeDisabled();
@@ -151,7 +151,7 @@ test.describe('Transaction BTC', () => {
     await wallet.allupperButtons.nth(0).click();
 
     await expect(await wallet.divTokenRow.count()).toBeGreaterThanOrEqual(2);
-    await wallet.divTokenRow.nth(2).click();
+    await wallet.clickOnSpecificToken('Bitcoin');
     await expect(page.url()).toContain('send-btc');
     await expect(wallet.buttonNext).toBeVisible();
     await expect(wallet.buttonNext).toBeDisabled();
