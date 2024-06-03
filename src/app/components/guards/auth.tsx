@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 function AuthGuard({ children }: PropsWithChildren) {
   const navigate = useNavigate();
   const { encryptedSeed, isUnlocked } = useWalletSelector();
-  const { getSeed, hasSeed } = useSeedVault();
+  const { getSeed, hasSeed, unlockVault } = useSeedVault();
   const dispatch = useDispatch();
 
   const tryAuthenticating = async () => {
@@ -30,6 +30,15 @@ function AuthGuard({ children }: PropsWithChildren) {
       navigate('/landing');
       return;
     }
+    try {
+      // if we successfully unlock with empty pwd, then the wallet is not set up yet
+      await unlockVault('');
+      navigate('/landing');
+      return;
+    } catch (e) {
+      // no-op
+    }
+
     await tryAuthenticating();
   };
 
