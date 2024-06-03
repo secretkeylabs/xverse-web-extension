@@ -23,8 +23,8 @@
     "SCREEN_TITLE": "The Bitcoin wallet for everyone",
     "CREATE_WALLET_BUTTON": "Create a new wallet",
     "RESTORE_WALLET_BUTTON": "Restore an existing wallet",
-    "ONBOARDING_1_TITlE": "Store BTC, Runes, Ordinals, BRC-20, Rare Sats, STX and more!",
-    "ONBOARDING_2_TITlE": "Connect to your favorite Bitcoin apps"
+    "ONBOARDING_1_TITLE": "Store BTC, Runes, Ordinals, BRC20, Rare Sats, STX and more!",
+    "ONBOARDING_2_TITLE": "Connect to your favorite Bitcoin apps"
   },
   "LEDGER_IMPORT_SCREEN": {
     "LEDGER_IMPORT_1_TITLE": "Secure Your Assets with Ledger",

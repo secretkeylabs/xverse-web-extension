@@ -1,6 +1,6 @@
+import Dots from '@components/dots';
 import { useWalletExistsContext } from '@components/guards/onboarding';
 import PasswordInput from '@components/passwordInput';
-import Steps from '@components/steps';
 import useWalletReducer from '@hooks/useWalletReducer';
 import * as bip39 from 'bip39';
 import { useState } from 'react';
@@ -137,7 +137,7 @@ function RestoreWallet(): JSX.Element {
   return (
     <Body>
       <Container>
-        <Steps data={restoreSteps} activeIndex={currentStepIndex} />
+        <Dots numDots={restoreSteps.length} activeIndex={currentStepIndex} />
         {restoreSteps[currentStepIndex]}
       </Container>
     </Body>

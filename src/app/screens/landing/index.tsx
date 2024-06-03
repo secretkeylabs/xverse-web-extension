@@ -2,7 +2,7 @@ import animationData from '@assets/animation/full_logo_horizontal.json';
 import logo from '@assets/img/full_logo_horizontal.svg';
 import onboarding1 from '@assets/img/landing/onboarding1.svg';
 import onboarding2 from '@assets/img/landing/onboarding2.svg';
-import Steps from '@components/steps';
+import Dots from '@components/dots';
 import { CaretLeft, CaretRight } from '@phosphor-icons/react';
 import Button from '@ui-library/button';
 import { isInOptions } from '@utils/helper';
@@ -105,7 +105,7 @@ const CaretButton = styled.button<{ disabled: boolean }>((props) => ({
     opacity: props.disabled ? 0.6 : 1,
     transition: 'opacity 0.1s ease',
   },
-  '&:hover, &:focus': {
+  '&:hover:enabled, &:focus:enabled': {
     svg: {
       opacity: 0.8,
     },
@@ -146,7 +146,7 @@ const Logo = styled.img`
 
 const LandingTitle = styled.h1`
   ${(props) => props.theme.typography.body_medium_l}
-  margin-top: 17px;
+  margin-top: ${(props) => props.theme.space.m};
   color: ${(props) => props.theme.colors.white_200};
   text-align: center;
 `;
@@ -164,14 +164,14 @@ const TransitionRightOnboardingContainer = styled(OnboardingContainer)`
 `;
 
 const OnBoardingImage = styled.img(() => ({
-  marginTop: -25,
+  marginTop: -26,
   alignSelf: 'center',
   transform: 'all',
 }));
 
 const OnBoardingContent = styled.div((props) => ({
   marginTop: props.theme.spacing(24),
-  padding: `0 ${props.theme.space.l}`,
+  padding: `0 22px`,
 }));
 
 const OnboardingTitle = styled.h1<{ needPadding: boolean }>((props) => ({
@@ -214,11 +214,11 @@ function Landing() {
     },
     {
       image: onboarding1,
-      title: t('ONBOARDING_1_TITlE'),
+      title: t('ONBOARDING_1_TITLE'),
     },
     {
       image: onboarding2,
-      title: t('ONBOARDING_2_TITlE'),
+      title: t('ONBOARDING_2_TITLE'),
     },
   ];
 
@@ -291,6 +291,14 @@ function Landing() {
     }
   };
 
+  const handleClickDot = (index: number) => {
+    if (!slideTransitions) {
+      setSlideTransitions(true);
+    }
+    setCurrentStepIndex(index);
+    setTransitionDirection(index > currentStepIndex ? 'right' : 'left');
+  };
+
   const renderTransitions = () => {
     if (slideTransitions) {
       switch (currentStepIndex) {
@@ -351,7 +359,13 @@ function Landing() {
           </ArrowContainer>
           {renderTransitions()}
           <BottomContainer>
-            <Steps data={onboardingViews} activeIndex={currentStepIndex} dotStrategy="selection" />
+            <Dots
+              numDots={onboardingViews.length}
+              activeIndex={currentStepIndex}
+              dotStrategy="selection"
+              handleClickDot={handleClickDot}
+              size={6}
+            />
             <CreateButton onClick={() => proceedToWallet()} title={t('CREATE_WALLET_BUTTON')} />
             <RestoreButton
               variant="secondary"
