@@ -10,7 +10,6 @@ import ReceiveCardComponent from '@components/receiveCardComponent';
 import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import BottomBar from '@components/tabBar';
-import TokenTile from '@components/tokenTile';
 import { useVisibleBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
 import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useGetRuneFungibleTokens';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
@@ -35,7 +34,6 @@ import {
   setSpamTokenAction,
 } from '@stores/wallet/actions/actionCreators';
 import Button from '@ui-library/button';
-import Divider from '@ui-library/divider';
 import Sheet from '@ui-library/sheet';
 import SnackBar from '@ui-library/snackBar';
 import { CurrencyTypes } from '@utils/constants';
@@ -47,173 +45,35 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import styled, { useTheme } from 'styled-components';
+import { useTheme } from 'styled-components';
 import SquareButton from '../../components/squareButton';
 import BalanceCard from './balanceCard';
 import Banner from './banner';
-
-// TODO: Move this styles to ./index.styled.ts
-export const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  padding: 0 ${(props) => props.theme.space.xs};
-  ${(props) => props.theme.scrollbar}
-`;
-
-const ColumnContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'space-between',
-  justifyContent: 'space-between',
-  gap: props.theme.space.s,
-  marginTop: props.theme.space.l,
-  marginBottom: props.theme.space.s,
-}));
-
-const ReceiveContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  marginTop: props.theme.spacing(12),
-  marginBottom: props.theme.spacing(16),
-  gap: props.theme.space.m,
-}));
-
-const TokenListButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'flex-end',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: 'transparent',
-  opacity: 0.8,
-  marginTop: props.theme.spacing(5),
-  cursor: props.disabled ? 'not-allowed' : 'pointer',
-}));
-
-const ButtonText = styled.div((props) => ({
-  ...props.theme.typography.body_s,
-  fontWeight: 700,
-  color: props.theme.colors.white_0,
-  textAlign: 'center',
-}));
-
-const ButtonImage = styled.img((props) => ({
-  marginRight: props.theme.spacing(3),
-  alignSelf: 'center',
-  transform: 'all',
-}));
-
-const RowButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  marginTop: props.theme.spacing(11),
-  columnGap: props.theme.spacing(11),
-}));
-
-const TokenListButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  marginTop: props.theme.spacing(6),
-  marginBottom: props.theme.spacing(22),
-}));
-
-const StyledTokenTile = styled(TokenTile)`
-  background-color: ${(props) => props.theme.colors.elevation1};
-`;
-
-const Icon = styled.img({
-  width: 24,
-  height: 24,
-});
-
-const MergedOrdinalsIcon = styled.img({
-  width: 64,
-  height: 24,
-});
-
-const VerifyOrViewContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(16),
-  marginBottom: props.theme.spacing(20),
-}));
-
-const VerifyButtonContainer = styled.div((props) => ({
-  marginBottom: props.theme.spacing(6),
-}));
-
-const ModalContent = styled.div((props) => ({
-  padding: props.theme.spacing(8),
-  paddingTop: 0,
-  paddingBottom: props.theme.spacing(16),
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-}));
-
-const ModalIcon = styled.img((props) => ({
-  marginBottom: props.theme.spacing(10),
-}));
-
-const ModalTitle = styled.div((props) => ({
-  ...props.theme.typography.body_bold_l,
-  marginBottom: props.theme.spacing(4),
-  textAlign: 'center',
-}));
-
-const ModalDescription = styled.div((props) => ({
-  ...props.theme.typography.body_m,
-  color: props.theme.colors.white_200,
-  marginBottom: props.theme.spacing(16),
-  textAlign: 'center',
-}));
-
-const ModalControlsContainer = styled.div({
-  display: 'flex',
-  width: '100%',
-});
-
-const ModalButtonContainer = styled.div((props) => ({
-  width: '100%',
-  '&:first-child': {
-    marginRight: props.theme.spacing(6),
-  },
-}));
-
-const StacksIcon = styled.img({
-  width: 24,
-  height: 24,
-  position: 'absolute',
-  zIndex: 2,
-  left: 0,
-  top: 0,
-});
-
-const MergedIcon = styled.div((props) => ({
-  position: 'relative',
-  marginBottom: props.theme.spacing(12),
-}));
-
-const IconBackground = styled.div((props) => ({
-  width: 24,
-  height: 24,
-  position: 'absolute',
-  zIndex: 1,
-  left: 20,
-  top: 0,
-  backgroundColor: props.theme.colors.white_900,
-  borderRadius: 30,
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-}));
-
-const StyledDivider = styled(Divider)`
-  flex: 1 0 auto;
-  width: calc(100% + ${(props) => props.theme.space.xl});
-  margin-left: -${(props) => props.theme.space.m};
-  margin-right: -${(props) => props.theme.space.m};
-`;
+import {
+  ButtonImage,
+  ButtonText,
+  ColumnContainer,
+  Container,
+  Icon,
+  IconBackground,
+  MergedIcon,
+  MergedOrdinalsIcon,
+  ModalButtonContainer,
+  ModalContent,
+  ModalControlsContainer,
+  ModalDescription,
+  ModalIcon,
+  ModalTitle,
+  ReceiveContainer,
+  RowButtonContainer,
+  StacksIcon,
+  StyledDivider,
+  StyledTokenTile,
+  TokenListButton,
+  TokenListButtonContainer,
+  VerifyButtonContainer,
+  VerifyOrViewContainer,
+} from './index.styled';
 
 function Home() {
   const { t } = useTranslation('translation', {

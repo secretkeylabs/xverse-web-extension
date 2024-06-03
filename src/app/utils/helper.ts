@@ -323,3 +323,12 @@ export const getLockCountdownLabel = (
   const hours = period / 60;
   return t('LOCK_COUNTDOWN_HS', { count: hours });
 };
+
+export const isFungibleToken = (token: any): token is FungibleToken =>
+  token &&
+  typeof token === 'object' &&
+  'balance' in token &&
+  'total_sent' in token &&
+  'total_received' in token &&
+  'principal' in token &&
+  'assetName' in token;
