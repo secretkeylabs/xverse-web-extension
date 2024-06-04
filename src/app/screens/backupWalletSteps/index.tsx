@@ -38,14 +38,14 @@ export default function BackupWalletSteps(): JSX.Element {
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const navigate = useNavigate();
   const [seedPhrase, setSeedPhrase] = useState<string>('');
-  const { getSeed, changePassword } = useSeedVault();
+  const seedVault = useSeedVault();
   const { createWallet } = useWalletReducer();
   const { disableWalletExistsGuard } = useWalletExistsContext();
 
   useEffect(() => {
     (async () => {
       try {
-        const seed = await getSeed();
+        const seed = await seedVault.getSeed();
         setSeedPhrase(seed);
       } catch (e) {
         navigate('/backup');
@@ -83,8 +83,15 @@ export default function BackupWalletSteps(): JSX.Element {
   const handleConfirmPasswordContinue = async () => {
     if (confirmPassword === password) {
       disableWalletExistsGuard?.();
+      const seed = await seedVault.getSeed();
+
+      await chrome.storage.local.clear();
+      await chrome.storage.session.clear();
+
+      await seedVault.init(password);
+      await seedVault.storeSeed(seed);
+
       await createWallet(); // TODO move this somwhere else
-      await changePassword('', password);
       navigate('/wallet-success/create', { replace: true });
     } else {
       setError(t('CONFIRM_PASSWORD_MATCH_ERROR'));

@@ -31,7 +31,7 @@ test.describe('Transaction BTC', () => {
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
 
-    await onboardingpage.restoreWallet(strongPW, 'SEED_WORDS1');
+    await onboardingpage.restoreWallet(strongPW, 'SEED_WORDS2');
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
     await expect(wallet.allupperButtons).toHaveCount(4);
 
