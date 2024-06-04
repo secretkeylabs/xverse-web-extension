@@ -176,12 +176,7 @@ function Home() {
 
   useEffect(() => {
     (async () => {
-      const featLog = localStorage.getItem('featLog');
-      if (featLog) {
-        return;
-      }
-      localStorage.setItem('featLog', 'true');
-      getSanityCheck('X-Current-Version');
+      await getSanityCheck('X-Current-Version');
     })();
   }, [getSanityCheck]);
 
