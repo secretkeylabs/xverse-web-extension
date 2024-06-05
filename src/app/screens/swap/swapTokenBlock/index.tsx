@@ -151,7 +151,7 @@ function SwapTokenBlock({
             value={selectedCoin?.fiatAmount ?? EMPTY_LABEL}
             displayType="text"
             thousandSeparator
-            prefix={`${currencySymbolMap[fiatCurrency]} `}
+            prefix={`${currencySymbolMap[fiatCurrency]}`}
             suffix={` ${fiatCurrency}`}
             renderText={(value) => (
               <EstimateUSDText data-testid="usd-text">{value}</EstimateUSDText>

@@ -276,7 +276,7 @@ export default function CoinHeader({ coin, fungibleToken }: Props) {
             value={getFiatEquivalent()}
             displayType="text"
             thousandSeparator
-            prefix={`${currencySymbolMap[fiatCurrency]} `}
+            prefix={`${currencySymbolMap[fiatCurrency]}`}
             suffix={` ${fiatCurrency}`}
             renderText={(value) => <FiatAmountText>{value}</FiatAmountText>}
           />

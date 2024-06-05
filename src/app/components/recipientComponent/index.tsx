@@ -1,6 +1,7 @@
 import ArrowIcon from '@assets/img/transactions/ArrowDown.svg';
 import OutputIcon from '@assets/img/transactions/output.svg';
 import WalletIcon from '@assets/img/transactions/wallet.svg';
+import FiatAmountText from '@components/fiatAmountText';
 import TokenImage from '@components/tokenImage';
 import TransferDetailView from '@components/transferDetailView';
 import useCoinRates from '@hooks/queries/useCoinRates';
@@ -26,7 +27,7 @@ const Container = styled.div((props) => ({
 }));
 
 const RecipientTitleText = styled.p((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_200,
   marginBottom: props.theme.space.xs,
 }));
@@ -55,20 +56,19 @@ const DownArrowIcon = styled.img((props) => ({
 }));
 
 const TitleText = styled.p((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_200,
   textAlign: 'center',
   marginTop: 5,
 }));
 
 const ValueText = styled.p((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_0,
 }));
 
 const SubValueText = styled.p((props) => ({
-  ...props.theme.body_m,
-  fontSize: 12,
+  ...props.theme.typography.body_s,
   color: props.theme.colors.white_400,
 }));
 
@@ -102,7 +102,7 @@ const IconContainer = styled.div((props) => ({
   marginRight: props.theme.spacing(4),
 }));
 
-interface Props {
+type Props = {
   address?: string;
   value: string;
   title: string;
@@ -115,7 +115,8 @@ interface Props {
   fungibleToken?: FungibleToken;
   heading?: string;
   showSenderAddress?: boolean;
-}
+};
+
 function RecipientComponent({
   recipientIndex,
   address,
@@ -147,30 +148,12 @@ function RecipientComponent({
     );
   }, [value]);
 
-  function getFtTicker() {
+  const getFtTicker = () => {
     if (fungibleToken?.ticker) {
       return fungibleToken?.ticker.toUpperCase();
     }
     if (fungibleToken?.name) {
       return getTicker(fungibleToken.name).toUpperCase();
-    }
-    return '';
-  }
-
-  const getFiatAmountString = (amount: BigNumber) => {
-    if (amount) {
-      if (amount.isLessThan(0.01)) {
-        return `<${currencySymbolMap[fiatCurrency]}0.01 ${fiatCurrency}`;
-      }
-      return (
-        <NumericFormat
-          value={amount.toFixed(2).toString()}
-          displayType="text"
-          thousandSeparator
-          prefix={`~ ${currencySymbolMap[fiatCurrency]} `}
-          suffix={` ${fiatCurrency}`}
-        />
-      );
     }
     return '';
   };
@@ -226,7 +209,7 @@ function RecipientComponent({
                 suffix={currencyType === 'FT' ? ` ${getFtTicker()} ` : ` ${currencyType}`}
                 renderText={(amount) => <ValueText data-testid={dataTestID}>{amount}</ValueText>}
               />
-              <SubValueText>{getFiatAmountString(new BigNumber(fiatAmount!))}</SubValueText>
+              <FiatAmountText fiatAmount={BigNumber(fiatAmount!)} fiatCurrency={fiatCurrency} />
             </ColumnContainer>
           )}
         </RowContainer>

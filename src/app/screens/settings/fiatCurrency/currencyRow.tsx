@@ -3,32 +3,33 @@ import type { SupportedCurrency } from '@secretkeylabs/xverse-core';
 import { Currency } from '@utils/currency';
 import styled, { useTheme } from 'styled-components';
 
-interface TitleProps {
-  color: string;
-}
-
-interface ButtonProps {
-  border: string;
-}
-
-const Button = styled.button<ButtonProps>((props) => ({
+const Button = styled.button<{
+  $border: string;
+  $color: string;
+}>((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.$color,
   display: 'flex',
-  flexDirection: 'row',
   alignItems: 'center',
-  background: 'transparent',
-  justifyContent: 'flex-start',
-  paddingBottom: props.theme.spacing(10),
-  paddingTop: props.theme.spacing(10),
-  borderBottom: props.border,
+  justifyContent: 'space-between',
+  padding: `${props.theme.space.m} 0`,
+  backgroundColor: 'transparent',
+  borderBottom: props.$border,
+  transition: 'color 0.1s ease',
+  '&:hover': {
+    color: props.theme.colors.white_200,
+  },
 }));
 
-const Text = styled.h1<TitleProps>((props) => ({
-  ...props.theme.body_medium_m,
-  color: props.color,
-  flex: 1,
-  textAlign: 'left',
-  marginLeft: props.theme.spacing(6),
+const CurrencyWrapper = styled.div((props) => ({
+  display: 'flex',
+  alignItems: 'center',
+  columnGap: props.theme.space.s,
 }));
+
+const StyledImg = styled.img({
+  width: 21,
+});
 
 interface Props {
   currency: Currency;
@@ -42,16 +43,18 @@ function CurrencyRow({ currency, isSelected, onCurrencySelected, showDivider }: 
   const onClick = () => {
     onCurrencySelected(currency.name);
   };
+
   return (
     <Button
       data-testid="currency-button"
       onClick={onClick}
-      border={showDivider ? '1px solid rgb(76,81,135,0.3)' : 'transparent'}
+      $border={showDivider ? `1px solid ${theme.colors.white_900}` : 'transparent'}
+      $color={isSelected ? theme.colors.white_0 : theme.colors.white_400}
     >
-      <img src={currency.flag} alt="flag" />
-      <Text color={isSelected ? theme.colors.white_0 : 'rgb(255,255,255,0.6)'}>
+      <CurrencyWrapper>
+        <StyledImg src={currency.flag} alt="flag" />
         {currency.name}
-      </Text>
+      </CurrencyWrapper>
       {isSelected && <img src={TickIcon} alt="tick" />}
     </Button>
   );
