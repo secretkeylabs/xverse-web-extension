@@ -5,21 +5,6 @@ import Wallet from '../pages/wallet';
 const strongPW = Onboarding.generateSecurePasswordCrypto();
 
 test.describe('Settings Tab', () => {
-  test.beforeEach(async ({ page, extensionId, context }) => {
-    await page.goto(`chrome-extension://${extensionId}/options.html#/landing`);
-    // TODO: this fixes a temporary issue with two tabs at the start see technical debt https://linear.app/xverseapp/issue/ENG-3992/two-tabs-open-instead-of-one-since-version-0323-for-start-extension
-    const pages = await context.pages();
-    if (pages.length === 2) {
-      await pages[1].close(); // pages[1] is the second (newest) page
-    }
-  });
-  test.afterEach(async ({ context }) => {
-    if (context.pages().length > 0) {
-      // Close the context only if there are open pages
-      await context.close();
-    }
-  });
-
   test('Check settings page', async ({ page, extensionId }) => {
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
@@ -33,7 +18,12 @@ test.describe('Settings Tab', () => {
     await expect(wallet.buttonBackupWallet).toBeVisible();
   });
 
-  test('switch to testnet and back to mainnet', async ({ page, extensionId }) => {
+  test('switch to testnet and back to mainnet', async ({
+    page,
+    extensionId,
+    disableOverridePageRoutes,
+  }) => {
+    await disableOverridePageRoutes(page);
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);

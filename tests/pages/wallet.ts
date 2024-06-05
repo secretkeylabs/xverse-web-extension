@@ -452,12 +452,16 @@ export default class Wallet {
     await this.checkVisualsStartpage(network);
   }
 
-  async getAddress(button) {
+  async getAddress(button: Locator, ClickConfirm = true): Promise<string> {
     await expect(button).toBeVisible();
     await button.click();
-    await expect(this.buttonConfirmCopyAddress).toBeVisible();
-    await this.buttonConfirmCopyAddress.click();
-    const address = await this.page.evaluate('navigator.clipboard.readText()');
+
+    if (ClickConfirm) {
+      await expect(this.buttonConfirmCopyAddress).toBeVisible();
+      await this.buttonConfirmCopyAddress.click();
+    }
+
+    const address = await this.page.evaluate<string>('navigator.clipboard.readText()');
     return address;
   }
 
