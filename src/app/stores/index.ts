@@ -1,5 +1,5 @@
 import { Coin, FungibleToken } from '@secretkeylabs/xverse-core';
-import { chromeLocalStorage } from '@utils/chromeStorage';
+import chromeStorage from '@utils/chromeStorage';
 import { applyMiddleware, combineReducers, createStore } from 'redux';
 import { PersistConfig, createMigrate, persistReducer, persistStore } from 'redux-persist';
 import { createStateSyncMiddleware, initMessageListener } from 'redux-state-sync';
@@ -10,7 +10,7 @@ import walletReducer, { initialWalletState, rehydrateError } from './wallet/redu
 const rootPersistConfig = {
   version: 1,
   key: 'root',
-  storage: chromeLocalStorage,
+  storage: chromeStorage.local,
   blacklist: ['walletState'],
 };
 
@@ -58,7 +58,7 @@ const migrations = {
 const WalletPersistConfig: PersistConfig<WalletState> = {
   version: 3,
   key: 'walletState',
-  storage: chromeLocalStorage,
+  storage: chromeStorage.local,
   migrate: createMigrate(migrations as any, { debug: false }),
   // A timeout of 0 means timeout is disabled
   // If the timeout is enabled, the rehydration will fail on slower machines and the store will be reset

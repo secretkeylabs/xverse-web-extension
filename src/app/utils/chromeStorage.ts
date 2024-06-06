@@ -48,5 +48,20 @@ class ChromeStorage {
     });
   }
 }
-export const chromeSessionStorage = new ChromeStorage(chrome.storage.session);
-export const chromeLocalStorage = new ChromeStorage(chrome.storage.local);
+
+const storageInstances: { session?: ChromeStorage; local?: ChromeStorage } = {};
+
+export default {
+  get session() {
+    if (!storageInstances.session) {
+      storageInstances.session = new ChromeStorage(chrome.storage.session);
+    }
+    return storageInstances.session;
+  },
+  get local() {
+    if (!storageInstances.local) {
+      storageInstances.local = new ChromeStorage(chrome.storage.local);
+    }
+    return storageInstances.local;
+  },
+};
