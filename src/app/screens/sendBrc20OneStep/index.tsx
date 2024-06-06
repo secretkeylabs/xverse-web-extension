@@ -1,16 +1,14 @@
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import { useGetBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
-import useBtcClient from '@hooks/useBtcClient';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   BRC20ErrorCode,
   brc20TransferEstimateFees,
   CoreError,
-  getNonOrdinalUtxo,
-  UTXO,
   validateBtcAddress,
 } from '@secretkeylabs/xverse-core';
 import { InputFeedbackProps, isDangerFeedback } from '@ui-library/inputFeedback';
@@ -19,7 +17,7 @@ import {
   ConfirmBrc20TransferState,
   SendBrc20TransferState,
 } from '@utils/brc20';
-import { replaceCommaByDot } from '@utils/helper';
+import { isInOptions, replaceCommaByDot } from '@utils/helper';
 import { getFtTicker } from '@utils/tokens';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -38,9 +36,11 @@ function SendBrc20Screen() {
   const [recipientError, setRecipientError] = useState<InputFeedbackProps | null>(null);
   const [recipientAddress, setRecipientAddress] = useState('');
   const [processing, setProcessing] = useState(false);
-  const btcClient = useBtcClient();
+  const transactionContext = useTransactionContext();
 
-  useResetUserFlow('/send-brc20');
+  const isFullScreen = isInOptions();
+
+  useResetUserFlow('/send-brc20-one-step');
 
   const isNextEnabled =
     !isDangerFeedback(amountError) &&
@@ -118,19 +118,15 @@ function SendBrc20Screen() {
       }
       setProcessing(true);
 
-      // TODO get this from store or cache?
-      const addressUtxos: UTXO[] = await getNonOrdinalUtxo(btcAddress, btcClient, network.type);
       const ticker = getFtTicker(fungibleToken);
       const numberAmount = Number(replaceCommaByDot(amountToSend));
       const estimateFeesParams: Brc20TransferEstimateFeesParams = {
-        addressUtxos,
         tick: ticker,
         amount: numberAmount,
         revealAddress: ordinalsAddress,
         feeRate: feeRate?.regular,
-        network: network.type,
       };
-      const estimatedFees = await brc20TransferEstimateFees(estimateFeesParams);
+      const estimatedFees = await brc20TransferEstimateFees(estimateFeesParams, transactionContext);
       const state: ConfirmBrc20TransferState = {
         recipientAddress,
         estimateFeesParams,
@@ -156,7 +152,7 @@ function SendBrc20Screen() {
 
   return (
     <>
-      <TopRow title={t('SEND')} onClick={handleBackButtonClick} />
+      <TopRow title={t('SEND')} onClick={handleBackButtonClick} showBackButton={!isFullScreen} />
       <Brc20TransferForm
         amountToSend={amountToSend}
         onAmountChange={onInputChange}

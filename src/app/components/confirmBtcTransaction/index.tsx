@@ -1,5 +1,4 @@
 import { delay } from '@common/utils/ledger';
-import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import { Tab } from '@components/tabBar';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -7,6 +6,7 @@ import TransportFactory from '@ledgerhq/hw-transport-webusb';
 import { RuneSummary, Transport, btcTransaction } from '@secretkeylabs/xverse-core';
 import Callout from '@ui-library/callout';
 import { StickyHorizontalSplitButtonContainer, StyledP } from '@ui-library/common.styled';
+import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
 import { isLedgerAccount } from '@utils/helper';
 import { useState } from 'react';
@@ -228,7 +228,7 @@ function ConfirmBtcTransaction({
           </StickyHorizontalSplitButtonContainer>
         )}
       </SendLayout>
-      <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
+      <Sheet title="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
         <LedgerStepView
           currentStep={currentStep}
           isConnectSuccess={isConnectSuccess}
@@ -258,7 +258,7 @@ function ConfirmBtcTransaction({
             </>
           )}
         </SuccessActionsContainer>
-      </BottomModal>
+      </Sheet>
     </>
   );
 }

@@ -41,11 +41,6 @@ export const convertAmountToFtDecimalPlaces = (
 
 export const replaceCommaByDot = (amount: string) => amount.replace(/,/g, '.');
 
-export const microStxToStx = (mStx: number | string | BigNumber) => {
-  const microStacks = initBigNumber(mStx);
-  return microStacks.shiftedBy(-6);
-};
-
 /**
  * get ticker from name
  */
@@ -73,19 +68,6 @@ export const getShortTruncatedAddress = (address: string) => {
   if (address) {
     return `${address.substring(0, 8)}...${address.substring(address.length - 8, address.length)}`;
   }
-};
-
-export const getAddressDetail = (account: Account) => {
-  if (account.btcAddress && account.stxAddress) {
-    return `${getTruncatedAddress(account.btcAddress)} / ${getTruncatedAddress(
-      account.stxAddress,
-    )}`;
-  }
-  if (account.btcAddress || account.stxAddress) {
-    const existingAddress = account.btcAddress || account.stxAddress;
-    return getTruncatedAddress(existingAddress);
-  }
-  return '';
 };
 
 export const getExplorerUrl = (stxAddress: string): string =>

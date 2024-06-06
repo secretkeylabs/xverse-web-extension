@@ -176,10 +176,9 @@ export default function CoinHeader({ coin, fungibleToken }: Props) {
           });
           return;
         case 'brc-20':
-          // TODO replace with send-brc20-one-step route, when ledger support is ready
           await chrome.tabs.create({
             url: chrome.runtime.getURL(
-              `options.html#/send-brc20?coinTicker=${fungibleToken?.ticker}`,
+              `options.html#/send-brc20-one-step?coinName=${fungibleToken?.ticker}`,
             ),
           });
           return;
@@ -284,10 +283,7 @@ export default function CoinHeader({ coin, fungibleToken }: Props) {
       </BalanceInfoContainer>
       {renderStackingBalances()}
       <RowButtonContainer>
-        {/* ENG-4020 - Disable BRC20 Sending on Ledger */}
-        {!(fungibleToken?.protocol === 'brc-20' && isLedgerAccount(selectedAccount)) && (
-          <SmallActionButton src={ArrowUp} text={t('SEND')} onPress={() => goToSendScreen()} />
-        )}
+        <SmallActionButton src={ArrowUp} text={t('SEND')} onPress={() => goToSendScreen()} />
         {!fungibleToken ? (
           <>
             <SmallActionButton

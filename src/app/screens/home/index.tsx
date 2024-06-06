@@ -215,8 +215,7 @@ function Home() {
   };
 
   const sendSheetCoinsList = (stxAddress ? sip10CoinsList : [])
-    // ENG-4020 - Disable BRC20 Sending on Ledger
-    .concat(isLedgerAccount(selectedAccount) ? [] : brc20CoinsList)
+    .concat(brc20CoinsList)
     .concat(runesCoinsList)
     .filter((ft) => new BigNumber(ft.balance).gt(0));
 
@@ -256,8 +255,9 @@ function Home() {
     if (fungibleToken.protocol === 'brc-20') {
       if (isLedgerAccount(selectedAccount) && !isInOptions()) {
         await chrome.tabs.create({
-          // TODO replace with send-brc20-one-step route, when ledger support is ready
-          url: chrome.runtime.getURL(`options.html#/send-brc20?coinTicker=${fungibleToken.ticker}`),
+          url: chrome.runtime.getURL(
+            `options.html#/send-brc20-one-step?coinName=${fungibleToken.ticker}`,
+          ),
         });
         return;
       }

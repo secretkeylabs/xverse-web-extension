@@ -1,20 +1,13 @@
-import {
-  brc20TransferEstimateFees,
-  FungibleToken,
-  NetworkType,
-  UTXO,
-} from '@secretkeylabs/xverse-core';
+import { brc20TransferEstimateFees, FungibleToken } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 
 export type TransferEstimateResult = Awaited<ReturnType<typeof brc20TransferEstimateFees>>;
 
 export type Brc20TransferEstimateFeesParams = {
-  addressUtxos: UTXO[];
   tick: string;
   amount: number;
   feeRate: number;
   revealAddress: string;
-  network: NetworkType;
 };
 
 export type SendBrc20TransferState = {

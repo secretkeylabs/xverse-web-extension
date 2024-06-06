@@ -401,16 +401,6 @@ const router = createHashRouter([
           </AuthGuard>
         ),
       },
-      // ENG-4020 - Disable BRC20 Sending on Ledger
-      // {
-      //   // TODO deprecate this after brc20 one step ledger support done
-      //   path: 'send-brc20',
-      //   element: (
-      //     <AuthGuard>
-      //       <SendBrc20Screen />
-      //     </AuthGuard>
-      //   ),
-      // },
       {
         path: 'send-brc20-one-step',
         element: (

@@ -33,7 +33,7 @@ type Props = {
   title: string;
   visible: boolean;
   children: React.ReactNode;
-  onClose: () => void;
+  onClose?: () => void;
   overlayStylesOverriding?: {};
   contentStylesOverriding?: {};
   className?: string;
@@ -55,12 +55,12 @@ function Sheet({
     overlay: {
       backgroundColor: theme.colors.background.modalBackdrop,
       zIndex: 15000,
+      display: 'flex',
+      alignItems: isGalleryOpen ? 'center' : 'flex-end',
+      justifyContent: 'center',
       ...overlayStylesOverriding,
     },
     content: {
-      bottom: isGalleryOpen ? '50%' : '0',
-      left: isGalleryOpen ? '50%' : undefined,
-      transform: isGalleryOpen ? 'translateX(-50%) translateY(50%)' : undefined,
       width: '100vw',
       maxWidth: isGalleryOpen ? 330 : 360,
       maxHeight: '90vh',
@@ -88,9 +88,11 @@ function Sheet({
     >
       <RowContainer>
         <BottomModalTitleText>{title}</BottomModalTitleText>
-        <ButtonImage onClick={onClose}>
-          <XCircle color={theme.colors.white_200} weight="fill" size="28" />
-        </ButtonImage>
+        {onClose && (
+          <ButtonImage onClick={onClose}>
+            <XCircle color={theme.colors.white_200} weight="fill" size="28" />
+          </ButtonImage>
+        )}
       </RowContainer>
       <BodyContainer>{children}</BodyContainer>
     </CustomisedModal>
