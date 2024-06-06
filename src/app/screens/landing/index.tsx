@@ -33,10 +33,10 @@ const slideY = keyframes`
       }
   `;
 
-const slideOpacity = keyframes` 
+const slideOpacity = keyframes`
     0% {
         opacity: 0;
-    } 
+    }
     100% {
         opacity: 1;
     }
@@ -256,6 +256,8 @@ function Landing() {
           url: chrome.runtime.getURL(`options.html#/legal${params}`),
         });
       }
+
+      window.close();
     },
     [navigate],
   );
