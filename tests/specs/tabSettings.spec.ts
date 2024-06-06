@@ -123,7 +123,6 @@ test.describe('Settings Tab', () => {
     await expect(await wallet.selectCurrency.count()).toBeGreaterThanOrEqual(5);
     await expect(await wallet.iconFlag.count()).toBeGreaterThanOrEqual(5);
     await wallet.selectCurrency.filter({ hasText: 'SGD' }).click();
-    await wallet.buttonBack.click();
     await expect(wallet.buttonCurrency).toBeVisible();
     await expect(wallet.buttonCurrency).toHaveText('Fiat CurrencySGD');
     await wallet.navigationDashboard.click();
