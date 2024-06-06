@@ -50,7 +50,6 @@ import RestoreFunds from '@screens/restoreFunds';
 import RecoverRunes from '@screens/restoreFunds/recoverRunes';
 import RestoreOrdinals from '@screens/restoreFunds/restoreOrdinals';
 import RestoreWallet from '@screens/restoreWallet';
-// import SendBrc20Screen from '@screens/sendBrc20';
 import SendBrc20OneStepScreen from '@screens/sendBrc20OneStep';
 import SendBtcScreen from '@screens/sendBtc';
 import SendSip10Screen from '@screens/sendFt';

@@ -36,10 +36,7 @@ const useSendBtcRequestParams = (btcAddress: string, network: SettingsNetwork) =
     const rpcPayload: SendBtcTransactionPayload = {
       senderAddress: btcAddress,
       recipients: transferRecipients,
-      network:
-        network.type === 'Mainnet'
-          ? { type: BitcoinNetworkType.Mainnet }
-          : { type: BitcoinNetworkType.Testnet },
+      network: { type: BitcoinNetworkType[network.type] },
     };
     return {
       payload: rpcPayload,

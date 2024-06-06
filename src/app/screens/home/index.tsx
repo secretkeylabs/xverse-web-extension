@@ -431,7 +431,7 @@ function Home() {
     dispatch(changeShowDataCollectionAlertAction(false));
   };
 
-  const showSwaps = !isLedgerAccount(selectedAccount) && network.type !== 'Testnet';
+  const showSwaps = !isLedgerAccount(selectedAccount) && network.type === 'Mainnet';
   const showRunes = useHasFeature('RUNES_SUPPORT');
 
   return (

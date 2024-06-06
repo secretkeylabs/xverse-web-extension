@@ -32,7 +32,7 @@ const SuccessActionsContainer = styled.div((props) => ({
 const AMOUNT_OF_STEPS = Object.keys(ExecuteTransferProgressCodes).length + 1;
 const PERCENTAGE_PER_STEP = 1 / AMOUNT_OF_STEPS;
 
-export function ExecuteBrc20Transaction() {
+function ExecuteBrc20Transaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'EXECUTE_BRC20' });
   const { network, selectedAccount } = useWalletSelector();
   const navigate = useNavigate();

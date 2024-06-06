@@ -6,6 +6,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import {
   SettingsNetwork,
   defaultMainnet,
+  defaultSignet,
   defaultTestnet,
   initialNetworksList,
 } from '@secretkeylabs/xverse-core';
@@ -162,6 +163,7 @@ function ChangeNetworkScreen() {
 
   const savedMainnet = savedNetworks.find((n) => n.type === 'Mainnet');
   const savedTestnet = savedNetworks.find((n) => n.type === 'Testnet');
+  const savedSignet = savedNetworks.find((n) => n.type === 'Signet');
 
   return (
     <>
@@ -176,6 +178,12 @@ function ChangeNetworkScreen() {
         <NetworkRow
           network={savedTestnet || defaultTestnet}
           isSelected={formInputs.type === 'Testnet'}
+          onNetworkSelected={onNetworkSelected}
+          showDivider
+        />
+        <NetworkRow
+          network={savedSignet || defaultSignet}
+          isSelected={formInputs.type === 'Signet'}
           onNetworkSelected={onNetworkSelected}
           showDivider={false}
         />

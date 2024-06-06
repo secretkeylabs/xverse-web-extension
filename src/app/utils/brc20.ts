@@ -1,7 +1,7 @@
 import { brc20TransferEstimateFees, FungibleToken } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 
-export type TransferEstimateResult = Awaited<ReturnType<typeof brc20TransferEstimateFees>>;
+type TransferEstimateResult = Awaited<ReturnType<typeof brc20TransferEstimateFees>>;
 
 export type Brc20TransferEstimateFeesParams = {
   tick: string;

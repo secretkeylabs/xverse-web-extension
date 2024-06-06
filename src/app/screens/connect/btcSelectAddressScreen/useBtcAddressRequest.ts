@@ -42,14 +42,9 @@ const useAddressRequestParams = (network: SettingsNetwork) => {
       const getAddressRpcPayload: GetAddressPayload = {
         message,
         purposes,
-        network:
-          network.type === 'Mainnet'
-            ? {
-                type: BitcoinNetworkType.Mainnet,
-              }
-            : {
-                type: BitcoinNetworkType.Testnet,
-              },
+        network: {
+          type: BitcoinNetworkType[network.type],
+        },
       };
       return {
         payload: getAddressRpcPayload,

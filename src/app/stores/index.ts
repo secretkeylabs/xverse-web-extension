@@ -16,7 +16,7 @@ const rootPersistConfig = {
 
 const migrations = {
   2: (state: WalletState) => {
-    if (state.network.type === 'Testnet') {
+    if (state.network.type !== 'Mainnet') {
       return state;
     }
     return {

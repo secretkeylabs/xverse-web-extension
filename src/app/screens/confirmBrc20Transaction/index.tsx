@@ -288,7 +288,7 @@ const useConfirmBrc20Transfer = (): {
   };
 };
 
-export function ConfirmBrc20Transaction() {
+function ConfirmBrc20Transaction() {
   const { t } = useTranslation('translation');
   const {
     callouts,

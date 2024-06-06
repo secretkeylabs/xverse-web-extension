@@ -5,7 +5,7 @@ import { BitcoinNetworkType, SignMessageOptions, SignMessagePayload } from '@sat
 import { SettingsNetwork, signBip322Message } from '@secretkeylabs/xverse-core';
 import { isHardwareAccount } from '@utils/helper';
 import { decodeToken } from 'jsontokens';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 
@@ -30,14 +30,9 @@ const useSignMessageRequestParams = (network: SettingsNetwork) => {
     const rpcPayload: SignMessagePayload = {
       message,
       address,
-      network:
-        network.type === 'Mainnet'
-          ? {
-              type: BitcoinNetworkType.Mainnet,
-            }
-          : {
-              type: BitcoinNetworkType.Testnet,
-            },
+      network: {
+        type: BitcoinNetworkType[network.type],
+      },
     };
     return {
       payload: rpcPayload,
@@ -128,18 +123,3 @@ export const useSignMessageRequest = () => {
     confirmSignMessage,
   };
 };
-
-export function useSignBip322Message(message: string, address: string) {
-  const { accountsList, network } = useWalletSelector();
-  const { getSeed } = useSeedVault();
-  return useCallback(async () => {
-    const seedPhrase = await getSeed();
-    return signBip322Message({
-      accounts: accountsList,
-      message,
-      signatureAddress: address,
-      seedPhrase,
-      network: network.type,
-    });
-  }, []);
-}

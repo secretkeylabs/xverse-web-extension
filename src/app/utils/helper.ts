@@ -15,6 +15,7 @@ import { getFtBalance } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { TFunction } from 'react-i18next';
 import {
+  BTC_TRANSACTION_SIGNET_STATUS_URL,
   BTC_TRANSACTION_STATUS_URL,
   BTC_TRANSACTION_TESTNET_STATUS_URL,
   MAX_ACC_NAME_LENGTH,
@@ -79,6 +80,9 @@ export const getStxTxStatusUrl = (transactionId: string, currentNetwork: Setting
 export const getBtcTxStatusUrl = (txId: string, network: SettingsNetwork) => {
   if (network.type === 'Testnet') {
     return `${BTC_TRANSACTION_TESTNET_STATUS_URL}${txId}`;
+  }
+  if (network.type === 'Signet') {
+    return `${BTC_TRANSACTION_SIGNET_STATUS_URL}${txId}`;
   }
   return `${BTC_TRANSACTION_STATUS_URL}${txId}`;
 };
