@@ -10,6 +10,7 @@ import TokenImage from '@components/tokenImage';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useHasFeature from '@hooks/useHasFeature';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   currencySymbolMap,
@@ -60,7 +61,10 @@ export default function CoinHeader({ coin, fungibleToken }: Props) {
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const isReceivingAddressesVisible = !isLedgerAccount(selectedAccount);
   const showSwaps =
-    coin === 'STX' && !isLedgerAccount(selectedAccount) && network.type !== 'Testnet';
+    useHasFeature('SWAPS') &&
+    coin === 'STX' &&
+    !isLedgerAccount(selectedAccount) &&
+    network.type !== 'Testnet';
 
   const handleReceiveModalOpen = () => {
     setOpenReceiveModal(true);
