@@ -184,6 +184,7 @@ const walletReducer = (
       return {
         ...state,
         fiatCurrency: action.fiatCurrency,
+        accountBalances: {},
       };
     case ChangeNetworkKey:
       return {
@@ -193,6 +194,7 @@ const walletReducer = (
           ...state.savedNetworks.filter((n) => n.type !== action.network.type),
           action.network,
         ],
+        accountBalances: {},
       };
     case GetActiveAccountsKey:
       return {
