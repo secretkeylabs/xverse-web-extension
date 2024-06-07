@@ -116,12 +116,12 @@ test.describe('Create and Restore Wallet Flow', () => {
       await expect(landingpage.buttonRestoreWallet).toBeVisible();
       await landingpage.buttonRestoreWallet.click();
 
+      await context.waitForEvent('page');
+
       // Clicking on restore opens in this setup a new page for legal
       const newPage = await context.pages()[context.pages().length - 1];
       await expect(newPage.url()).toContain('legal');
-      // old page needs to be closed as the test is continuing in the new tab
-      const pages = await context.pages();
-      await pages[0].close(); // pages[0] is the first (oldest) page
+
       const onboardingpage2 = new Onboarding(newPage);
 
       await onboardingpage2.buttonAccept.click();

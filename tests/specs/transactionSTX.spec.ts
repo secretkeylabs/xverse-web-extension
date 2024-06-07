@@ -15,7 +15,7 @@ test.describe('Transaction STX', () => {
     await onboardingpage.restoreWallet(strongPW, 'SEED_WORDS1');
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
 
-    await expect(wallet.allupperButtons).toHaveCount(4);
+    await wallet.checkVisualsStartpage();
 
     // get own STX Address
     await wallet.allupperButtons.nth(1).click();
@@ -24,7 +24,7 @@ test.describe('Transaction STX', () => {
     // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
     await page.reload();
 
-    await expect(wallet.allupperButtons).toHaveCount(4);
+    await wallet.checkVisualsStartpage();
 
     // Click on send button
     await wallet.allupperButtons.nth(0).click();

@@ -17,7 +17,7 @@ test.describe('Transaction BTC', () => {
 
     await onboardingpage.restoreWallet(strongPW, 'SEED_WORDS2');
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
-    await expect(wallet.allupperButtons).toHaveCount(4);
+    await wallet.checkVisualsStartpage();
 
     // Save initial Balance for later Balance checks
     const initalBTCBalance = await wallet.getTokenBalance('Bitcoin');

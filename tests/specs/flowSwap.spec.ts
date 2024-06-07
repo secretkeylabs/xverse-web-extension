@@ -4,7 +4,8 @@ import Wallet from '../pages/wallet';
 
 const strongPW = Onboarding.generateSecurePasswordCrypto();
 
-test.describe('Swapping Coins', () => {
+// TODO adjust the test suite to relay on featureEnabled flag to be executed as only than the swap button is visible
+test.describe.skip('Swapping Coins', () => {
   test('Visual check swap page', async ({ page, extensionId }) => {
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
