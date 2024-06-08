@@ -21,11 +21,11 @@
   },
   "dependencies": {
     "@ledgerhq/hw-transport-webusb": "^6.27.13",
-    "@phosphor-icons/react": "^2.0.10",
+    "@phosphor-icons/react": "^2.0.13",
     "@playwright/test": "^1.43.1",
     "@react-spring/web": "^9.6.1",
     "@scure/btc-signer": "1.2.1",
-    "@secretkeylabs/xverse-core": "13.6.7",
+    "@secretkeylabs/xverse-core": "file:../xverse-core",
     "@stacks/connect": "7.4.1",
     "@stacks/stacks-blockchain-api-types": "6.1.1",
     "@stacks/transactions": "6.13.1",
