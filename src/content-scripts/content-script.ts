@@ -1,14 +1,16 @@
 import {
+  AddStakedBitcoinEvent,
   AuthenticationRequestEvent,
   CreateInscriptionEvent,
   CreateRepeatInscriptionsEvent,
   DomEventName,
   GetAddressRequestEvent,
+  GetStakedBitcoinEvent,
   SendBtcRequestEvent,
-  SignatureRequestEvent,
   SignBatchPsbtRequestEvent,
   SignMessageRequestEvent,
   SignPsbtRequestEvent,
+  SignatureRequestEvent,
   TransactionRequestEvent,
 } from '@common/types/inpage-types';
 import {
@@ -19,6 +21,8 @@ import {
   SatsConnectMessageFromContentScript,
   SatsConnectMethods,
   StacksLegacyMethods,
+  StakedMessageFromContentScript,
+  StakesMethods,
 } from '@common/types/message-types';
 import getEventSourceWindow from '@common/utils/get-event-source-window';
 import RequestsRoutes from '@common/utils/route-urls';
@@ -57,7 +61,10 @@ connect();
 
 // Sends message to background script that an event has fired
 function sendMessageToBackground(
-  message: LegacyMessageFromContentScript | SatsConnectMessageFromContentScript,
+  message:
+    | LegacyMessageFromContentScript
+    | SatsConnectMessageFromContentScript
+    | StakedMessageFromContentScript,
 ) {
   backgroundPort.postMessage(message);
 }
@@ -72,7 +79,10 @@ chrome.runtime.onMessage.addListener((message: LegacyMessageToContentScript) => 
 
 interface ForwardDomEventToBackgroundArgs {
   payload: string;
-  method: LegacyMessageFromContentScript['method'] | SatsConnectMessageFromContentScript['method'];
+  method:
+    | LegacyMessageFromContentScript['method']
+    | SatsConnectMessageFromContentScript['method']
+    | StakedMessageFromContentScript['method'];
   urlParam: string;
   path: RequestsRoutes;
 }
@@ -208,6 +218,25 @@ document.addEventListener(DomEventName.createRepeatInscriptionsRequest, ((
 document.addEventListener(DomEventName.rpcRequest, (event: any) => {
   sendMessageToBackground({ source: MESSAGE_SOURCE, ...event.detail });
 });
+
+// Listen for a CustomEvent (Add Staked Bitcoin Request) coming from the web app
+document.addEventListener(DomEventName.addStakedBitcoinRequest, ((event: AddStakedBitcoinEvent) => {
+  forwardDomEventToBackground({
+    path: RequestsRoutes.AddStakedBitcoin,
+    payload: event.detail.addStakedBitcoinRequest,
+    urlParam: 'addStakedBitcoinRequest',
+    method: StakesMethods.addStakedBitcoinRequest,
+  });
+}) as EventListener);
+
+document.addEventListener(DomEventName.getStakedBitcoinRequest, ((event: GetStakedBitcoinEvent) => {
+  forwardDomEventToBackground({
+    path: RequestsRoutes.GetStakedBitcoin,
+    payload: event.detail.getStakedBitcoinRequest,
+    urlParam: 'addStakedBitcoinRequest',
+    method: StakesMethods.getStakedBitcoinRequest,
+  });
+}) as EventListener);
 
 // Inject in-page script (Stacks and Bitcoin Providers)
 const injectInPageScript = (isPriority) => {

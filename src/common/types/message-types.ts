@@ -15,6 +15,44 @@ export const MESSAGE_SOURCE = 'xverse-wallet';
 export const CONTENT_SCRIPT_PORT = 'xverse-content-script';
 
 /**
+ * Staked External Callable Methods
+ * @enum {string}
+ */
+export enum StakesMethods {
+  addStakedBitcoinResponse = 'addStakedBitcoinResponse',
+  addStakedBitcoinRequest = 'addStakedBitcoinRequest',
+  getStakedBitcoinResponse = 'getStakedBitcoinResponse',
+  getStakedBitcoinRequest = 'getStakedBitcoinRequest',
+}
+
+type AddStakedBitcoinRequestMessage = Message<StakesMethods.addStakedBitcoinRequest, string>;
+
+export type AddStakedBitcoinResponseMessage = Message<
+  StakesMethods.addStakedBitcoinResponse,
+  {
+    addStakedBitcoinRequest: string;
+    addStakedBitcoinResponse: string;
+  }
+>;
+
+type GetStakedBitcoinRequestMessage = Message<StakesMethods.getStakedBitcoinRequest, string>;
+export type GetStakedBitcoinResponseMessage = Message<
+  StakesMethods.getStakedBitcoinResponse,
+  {
+    getStakedBitcoinRequest: string;
+    getStakedBitcoinResponse: { address: string; script: string }[];
+  }
+>;
+
+export type StakedMessageFromContentScript =
+  | AddStakedBitcoinRequestMessage
+  | GetStakedBitcoinRequestMessage;
+
+export type StakedMessageToContentScript =
+  | AddStakedBitcoinResponseMessage
+  | GetStakedBitcoinResponseMessage;
+
+/**
  * Stacks External Callable Methods
  * @enum {string}
  */
@@ -38,6 +76,7 @@ export enum InternalMethods {
 }
 
 export type ExtensionMethods =
+  | StakesMethods
   | StacksLegacyMethods
   | SatsConnectMethods
   | InternalMethods

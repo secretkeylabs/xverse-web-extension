@@ -4,6 +4,8 @@ import { RpcBase } from 'sats-connect';
  * Inpage Script (Stacks Provider / BitcoinProvider) <-> Content Script
  */
 export enum DomEventName {
+  addStakedBitcoinRequest = 'xverse_staked_add_staked_bitcoin_request',
+  getStakedBitcoinRequest = 'xverse_staked_get_staked_bitcoin_request',
   authenticationRequest = 'xverse_stx_authentication_request',
   signatureRequest = 'xverse_stx_signature_request',
   structuredDataSignatureRequest = 'xverse_stx_structured_data_signature_request',
@@ -17,6 +19,15 @@ export enum DomEventName {
   createRepeatInscriptionsRequest = 'xverse_btc_create_repeat_inscriptions_request',
   rpcRequest = 'xverse_rpc_request',
 }
+export interface AddStakedBitcoinEventDetails {
+  addStakedBitcoinRequest: string;
+}
+export type AddStakedBitcoinEvent = CustomEvent<AddStakedBitcoinEventDetails>;
+
+export interface GetStakedBitcoinEventDetails {
+  getStakedBitcoinRequest: string;
+}
+export type GetStakedBitcoinEvent = CustomEvent<GetStakedBitcoinEventDetails>;
 
 export interface AuthenticationRequestEventDetails {
   authenticationRequest: string;

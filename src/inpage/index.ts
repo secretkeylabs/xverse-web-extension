@@ -4,6 +4,7 @@ import { BitcoinProvider } from 'sats-connect';
 import { XverseProviderInfo } from '@utils/constants';
 import SatsMethodsProvider from './sats.inpage';
 import StacksMethodsProvider from './stacks.inpage';
+import StakesMethodsProvider, { StakesProvider } from './stakes.inpage';
 
 declare global {
   interface XverseProviders {
@@ -17,6 +18,7 @@ window.XverseProviders = {
   // @ts-ignore
   StacksProvider: StacksMethodsProvider as StacksProvider,
   BitcoinProvider: SatsMethodsProvider as BitcoinProvider,
+  StakesProvider: StakesMethodsProvider as StakesProvider,
 };
 
 // we inject these in case implementors call the default providers
@@ -46,6 +48,22 @@ try {
 } catch (e) {
   console.log(
     'Failed setting Xverse Bitcoin default provider. Another wallet may have already set it in an immutable way.',
+  );
+  console.error(e);
+}
+
+// we inject these in case implementors call the default providers
+try {
+  if (document.currentScript?.dataset.isPriority) {
+    Object.defineProperties(window, {
+      StakesProvider: { get: () => StakesMethodsProvider, set: () => {} },
+    });
+  } else {
+    window.StakesProvider = StakesMethodsProvider as StakesProvider;
+  }
+} catch (e) {
+  console.log(
+    'Failed setting Xverse Stakes default provider. Another wallet may have already set it in an immutable way.',
   );
   console.error(e);
 }

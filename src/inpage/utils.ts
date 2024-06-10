@@ -3,6 +3,7 @@ import {
   MESSAGE_SOURCE,
   SatsConnectMessageToContentScript,
   StacksLegacyMethods,
+  StakedMessageToContentScript,
 } from '@common/types/message-types';
 
 type CallableMethods = keyof typeof StacksLegacyMethods;
@@ -16,7 +17,10 @@ interface ExtensionResponse {
 
 export const isValidLegacyEvent = (
   event: MessageEvent,
-  method: SatsConnectMessageToContentScript['method'] | LegacyMessageToContentScript['method'],
+  method:
+    | SatsConnectMessageToContentScript['method']
+    | LegacyMessageToContentScript['method']
+    | StakedMessageToContentScript['method'],
 ) => {
   const { data } = event;
   const correctSource = data.source === MESSAGE_SOURCE;

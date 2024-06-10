@@ -11,6 +11,9 @@ import {
   SatsConnectMethods,
   SignatureResponseMessage,
   StacksLegacyMethods,
+  StakedMessageFromContentScript,
+  StakedMessageToContentScript,
+  StakesMethods,
 } from '../types/message-types';
 import { sendMessage } from '../types/messages';
 import popupCenter from './popup-center';
@@ -59,7 +62,11 @@ interface ListenForPopupCloseArgs {
   id?: number;
   // TabID from requesting tab, to which request should be returned
   tabId?: number;
-  response: LegacyMessageToContentScript | SatsConnectMessageToContentScript | RpcErrorResponse;
+  response:
+    | LegacyMessageToContentScript
+    | SatsConnectMessageToContentScript
+    | RpcErrorResponse
+    | StakedMessageToContentScript;
 }
 export function listenForPopupClose({ id, tabId, response }: ListenForPopupCloseArgs) {
   chrome.windows.onRemoved.addListener((winId) => {
@@ -99,7 +106,10 @@ export async function triggerRequestWindowOpen(path: RequestsRoutes, urlParams: 
 }
 
 export async function handleLegacyExternalMethodFormat(
-  message: LegacyMessageFromContentScript | SatsConnectMessageFromContentScript,
+  message:
+    | LegacyMessageFromContentScript
+    | SatsConnectMessageFromContentScript
+    | StakedMessageFromContentScript,
   port: chrome.runtime.Port,
 ) {
   const { payload } = message;
@@ -322,6 +332,26 @@ export async function handleLegacyExternalMethodFormat(
             createRepeatInscriptionsResponse: 'cancel',
           },
           method: SatsConnectMethods.createRepeatInscriptionsResponse,
+        },
+      });
+      listenForOriginTabClose({ tabId });
+      break;
+    }
+    case StakesMethods.addStakedBitcoinRequest: {
+      const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
+        ['addStakedBitcoin', payload],
+      ]);
+      const { id } = await triggerRequestWindowOpen(RequestsRoutes.AddStakedBitcoin, urlParams);
+      listenForPopupClose({
+        id,
+        tabId,
+        response: {
+          source: MESSAGE_SOURCE,
+          payload: {
+            addStakedBitcoinRequest: payload,
+            addStakedBitcoinResponse: 'cancel',
+          },
+          method: StakesMethods.addStakedBitcoinResponse,
         },
       });
       listenForOriginTabClose({ tabId });
