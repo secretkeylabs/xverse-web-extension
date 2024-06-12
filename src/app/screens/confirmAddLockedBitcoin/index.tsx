@@ -1,15 +1,13 @@
-import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import ConfirmAddLockedBitcoinComponent from '@components/confirmAddLockedBitcoinComponent';
 import InfoContainer from '@components/infoContainer';
-import StakedAddressComponent from '@components/stakedAddressComponent';
+import LockedAddressComponent from '@components/lockedAddressComponent';
 import TopRow from '@components/topRow';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import useAddLockedBitcoin from '@hooks/useAddLockedBitcoin';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import useWalletSelector from '@hooks/useWalletSelector';
 import type { Account } from '@secretkeylabs/xverse-core';
-import { lockedBitcoins } from '@utils/locked';
+import { lockedBitcoins, parseCLTVScript } from '@utils/locked';
 import * as bitcoin from 'bitcoinjs-lib';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -43,7 +41,12 @@ function ConfirmAddLockedBitcoin() {
   const handleConfirmClick = async () => {
     setIsLoading(true);
     if (belongsToAccount && payload.address && payload.script) {
-      await lockedBitcoins.add(payload.address, payload.script, belongsToAccount.btcAddress);
+      await lockedBitcoins.add(
+        payload.address,
+        payload.script,
+        belongsToAccount.btcAddress,
+        lockTime,
+      );
       approveAddLockedBitcoinRequest();
     }
     window.close();
@@ -52,66 +55,6 @@ function ConfirmAddLockedBitcoin() {
   const handleCancelClick = () => {
     cancelAddLockedBitcoinRequest();
     window.close();
-  };
-
-  const parseCLTVScript = (cltvScript) => {
-    const unlockScript = Buffer.from(cltvScript.toString('hex'), 'hex');
-    // const OPS = bitcoin.script.OPS;
-    const options: {
-      lockTime: number;
-      n?: number;
-      m?: number;
-      pubkeys?: string[];
-      pubkey?: string;
-      pubkeyhash?: string;
-    } = {
-      lockTime: 0,
-    };
-
-    try {
-      const decompiled = bitcoin.script.decompile(unlockScript);
-      if (
-        decompiled &&
-        decompiled.length > 4 &&
-        decompiled[1] === bitcoin.script.OPS.OP_CHECKLOCKTIMEVERIFY &&
-        decompiled[2] === bitcoin.script.OPS.OP_DROP
-      ) {
-        options.lockTime = bitcoin.script.number.decode(decompiled[0] as Buffer);
-        if (
-          decompiled[decompiled.length - 1] === bitcoin.script.OPS.OP_CHECKMULTISIG &&
-          decompiled.length > 5
-        ) {
-          const n = +decompiled[decompiled.length - 6] - bitcoin.script.OPS.OP_RESERVED;
-          const m = +decompiled[3] - bitcoin.script.OPS.OP_RESERVED;
-          const publicKeys: any[] = decompiled.slice(4, 4 + n);
-          let isValidatePublicKey = true;
-          publicKeys.forEach((key: any) => {
-            if (key.length !== 33) {
-              isValidatePublicKey = false;
-            }
-          });
-          if (m < n && isValidatePublicKey) {
-            options.n = n;
-            options.m = m;
-            options.pubkeys = publicKeys;
-          }
-        } else if (decompiled[decompiled.length - 1] === bitcoin.script.OPS.OP_CHECKSIG) {
-          if (decompiled.length === 5) {
-            options.pubkey = Buffer.from(decompiled[3] as any).toString('hex');
-          } else if (
-            decompiled.length === 8 &&
-            decompiled[3] === bitcoin.script.OPS.OP_DUP &&
-            decompiled[4] === bitcoin.script.OPS.OP_HASH160 &&
-            decompiled[6] === bitcoin.script.OPS.OP_EQUALVERIFY
-          ) {
-            options.pubkeyhash = Buffer.from(decompiled[5] as any).toString('hex');
-          }
-        }
-      }
-      return options;
-    } catch (error: any) {
-      throw new Error(`Check MultisigScript: ${error}`);
-    }
   };
 
   const checkScriptAddress = useCallback(() => {
@@ -160,22 +103,18 @@ function ConfirmAddLockedBitcoin() {
   }, [payload, bitcoinNetwork, accountsList]);
   return (
     <>
-      <TopRow title={t('STAKES.CONFIRM_ADD_STAKED_BITCOIN')} onClick={handleCancelClick} />
+      <TopRow title={t('LOCKED.CONFIRM_ADD_LOCKED_BITCOIN')} onClick={handleCancelClick} />
 
       <ConfirmAddLockedBitcoinComponent
         loading={isLoading}
         onConfirmClick={handleConfirmClick}
         onCancelClick={handleCancelClick}
       >
-        <StakedAddressComponent
+        <LockedAddressComponent
           address={payload.address}
           script={payload.script}
           locktime={lockTime}
           account={belongsToAccount}
-          value="0"
-          icon={IconBitcoin}
-          currencyType="BTC"
-          title={t('CONFIRM_TRANSACTION.AMOUNT')}
         />
 
         <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
@@ -190,16 +129,16 @@ function ConfirmAddLockedBitcoin() {
         {!isScriptMatched && (
           <AlertContainer>
             <InfoContainer
-              titleText={t('STAKES.SCRIPT_MISMATCH_ALERT.TITLE')}
-              bodyText={t('STAKES.SCRIPT_MISMATCH_ALERT.BODY')}
+              titleText={t('LOCKED.SCRIPT_MISMATCH_ALERT.TITLE')}
+              bodyText={t('LOCKED.SCRIPT_MISMATCH_ALERT.BODY')}
             />
           </AlertContainer>
         )}
         {!belongsToAccount && (
           <AlertContainer>
             <InfoContainer
-              titleText={t('STAKES.ACCOUNT_MISMATCH_ALERT.TITLE')}
-              bodyText={t('STAKES.ACCOUNT_MISMATCH_ALERT.BODY')}
+              titleText={t('LOCKED.ACCOUNT_MISMATCH_ALERT.TITLE')}
+              bodyText={t('LOCKED.ACCOUNT_MISMATCH_ALERT.BODY')}
             />
           </AlertContainer>
         )}

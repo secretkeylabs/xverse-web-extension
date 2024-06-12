@@ -15,7 +15,7 @@ export const MESSAGE_SOURCE = 'xverse-wallet';
 export const CONTENT_SCRIPT_PORT = 'xverse-content-script';
 
 /**
- * Staked External Callable Methods
+ * Locked External Callable Methods
  * @enum {string}
  */
 export enum LockedBitcoinMethods {

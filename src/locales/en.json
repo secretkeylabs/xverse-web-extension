@@ -1348,8 +1348,8 @@
     "PSBT_CANT_PARSE_ERROR_TITLE": "Transaction Error",
     "PSBT_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction is invalid and cannot be processed. Please contact the developer of the requesting app for support."
   },
-  "STAKES": {
-    "CONFIRM_ADD_STAKED_BITCOIN": "Add staked bitcoin to wallet",
+  "LOCKED": {
+    "CONFIRM_ADD_LOCKED_BITCOIN": "Add locked bitcoin to wallet",
     "ADDRESS": "Address",
     "AMOUNT": "Amount",
     "REDEEM_SCRIPT": "Redeem Script",

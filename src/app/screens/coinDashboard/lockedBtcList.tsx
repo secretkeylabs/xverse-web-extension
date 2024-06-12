@@ -1,9 +1,11 @@
 import useLockedBtcData from '@hooks/queries/useLockedBtcData';
 import useWalletSelector from '@hooks/useWalletSelector';
-
 import { BtcAddressData, satsToBtc } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
+import { formatDate } from '@utils/date';
+import { lockedBitcoins } from '@utils/locked';
 import BigNumber from 'bignumber.js';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
@@ -65,15 +67,28 @@ const LockedAmountContainer = styled.div({
   alignItems: 'flex-end',
   flex: 1,
 });
+const LockeTimeContainer = styled.div({
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-end',
+  flex: 1,
+});
 const LockedValue = styled.p((props) => ({
   ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_0,
 }));
 function formatAddress(addr: string): string {
-  return addr ? `${addr.substring(0, 8)}...${addr.substring(addr.length - 8, addr.length)}` : '';
+  return addr ? `${addr.substring(0, 4)}...${addr.substring(addr.length - 4, addr.length)}` : '';
 }
 
-function LockedBtcItem({ lockedBtcData }: { lockedBtcData: BtcAddressData }) {
+function LockedBtcItem({
+  lockedBtcData,
+  lockTime = 0,
+}: {
+  lockedBtcData: BtcAddressData;
+  lockTime?: number;
+}) {
   return (
     <LockedBtcContainer>
       <LockedAddress>{formatAddress(lockedBtcData?.address ?? '')}</LockedAddress>
@@ -86,20 +101,36 @@ function LockedBtcItem({ lockedBtcData }: { lockedBtcData: BtcAddressData }) {
           renderText={(value: string) => <LockedValue>{`${value} BTC`}</LockedValue>}
         />
       </LockedAmountContainer>
+      <LockeTimeContainer>
+        <LockedValue>{`${formatDate(new Date(lockTime * 1000))}`}</LockedValue>
+      </LockeTimeContainer>
     </LockedBtcContainer>
   );
 }
 
 export default function LockedBtcList() {
-  const { lockedBtcBalances } = useWalletSelector();
+  const { lockedBtcBalances, btcAddress } = useWalletSelector();
   const { isLoading, error } = useLockedBtcData();
+  const [lockedBtcMap, setLockedBtcMap] = useState<{
+    [key: string]: { script: string; lockTime: number };
+  }>();
+  useEffect(() => {
+    (async () => {
+      const lockedMap = await lockedBitcoins.get(btcAddress);
+      setLockedBtcMap(lockedMap);
+    })();
+  }, [btcAddress]);
 
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
   return (
     <ListItemsContainer>
       <ListHeader>{t('LOCKED_BTC_LIST_TITLE')}</ListHeader>
       {Object.keys(lockedBtcBalances).map((address) => (
-        <LockedBtcItem key={address} lockedBtcData={lockedBtcBalances[address]} />
+        <LockedBtcItem
+          key={address}
+          lockedBtcData={lockedBtcBalances[address]}
+          lockTime={lockedBtcMap?.[address].lockTime}
+        />
       ))}
       {isLoading && (
         <LoadingContainer>

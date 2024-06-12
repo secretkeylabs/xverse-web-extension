@@ -3,11 +3,11 @@ import { AddLockedBitcoinResponseMessage, LockedBitcoinMethods } from '@common/t
 
 import { isValidLegacyEvent } from './utils';
 
-export interface StakesProvider {
+export interface LockedBitcoinProvider {
   addLockedBitcoin: (params: string) => Promise<string>;
 }
 
-const LockedBitcoinMethodsProvider: StakesProvider = {
+const LockedBitcoinMethodsProvider: LockedBitcoinProvider = {
   addLockedBitcoin: async (addLockedBitcoinRequest): Promise<string> => {
     const event = new CustomEvent<AddLockedBitcoinEventDetails>(
       DomEventName.addLockedBitcoinRequest,

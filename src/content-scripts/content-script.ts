@@ -218,8 +218,7 @@ document.addEventListener(DomEventName.createRepeatInscriptionsRequest, ((
 document.addEventListener(DomEventName.rpcRequest, (event: any) => {
   sendMessageToBackground({ source: MESSAGE_SOURCE, ...event.detail });
 });
-
-// Listen for a CustomEvent (Add Staked Bitcoin Request) coming from the web app
+// Listen for a CustomEvent (Add Locked Bitcoin Request) coming from the web app
 document.addEventListener(DomEventName.addLockedBitcoinRequest, ((event: AddLockedBitcoinEvent) => {
   forwardDomEventToBackground({
     path: RequestsRoutes.AddLockedBitcoin,
@@ -233,7 +232,7 @@ document.addEventListener(DomEventName.getLockedBitcoinRequest, ((event: GetLock
   forwardDomEventToBackground({
     path: RequestsRoutes.GetLockedBitcoin,
     payload: event.detail.getLockedBitcoinRequest,
-    urlParam: 'addLockedBitcoinRequest',
+    urlParam: 'getLockedBitcoinRequest',
     method: LockedBitcoinMethods.getLockedBitcoinRequest,
   });
 }) as EventListener);
