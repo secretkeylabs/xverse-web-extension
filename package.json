@@ -20,7 +20,6 @@
     "e2etest:report": "playwright show-report"
   },
   "dependencies": {
-    "@core/btc-staking": "github:coredao-org/btc-staking-tool.git",
     "@ledgerhq/hw-transport-webusb": "^6.27.13",
     "@phosphor-icons/react": "^2.0.13",
     "@playwright/test": "^1.43.1",

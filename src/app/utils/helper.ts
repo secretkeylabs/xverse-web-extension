@@ -238,6 +238,7 @@ export const validateAccountName = (
 export const calculateTotalBalance = ({
   stxBalance,
   btcBalance,
+  lockedBtcBalance,
   sipCoinsList,
   brcCoinsList,
   runesCoinList,
@@ -247,6 +248,7 @@ export const calculateTotalBalance = ({
 }: {
   stxBalance?: string;
   btcBalance?: string;
+  lockedBtcBalance?: string;
   sipCoinsList: FungibleToken[];
   brcCoinsList: FungibleToken[];
   runesCoinList: FungibleToken[];
@@ -268,6 +270,13 @@ export const calculateTotalBalance = ({
       new BigNumber(btcFiatRate),
     );
     totalBalance = totalBalance.plus(btcFiatEquiv);
+  }
+
+  if (lockedBtcBalance) {
+    const lockedBtcFiatEquiv = satsToBtc(new BigNumber(lockedBtcBalance)).multipliedBy(
+      new BigNumber(btcFiatRate),
+    );
+    totalBalance = totalBalance.plus(lockedBtcFiatEquiv);
   }
 
   if (sipCoinsList) {

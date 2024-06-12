@@ -3,6 +3,7 @@ import { StyledFiatAmountText } from '@components/fiatAmountText';
 import TokenImage from '@components/tokenImage';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useCoinRates from '@hooks/queries/useCoinRates';
+import useLockedBtcData from '@hooks/queries/useLockedBtcData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import { microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core';
@@ -126,9 +127,11 @@ function TokenTile({
   const { btcFiatRate, stxBtcRate } = useCoinRates();
   const { data: stxData } = useStxWalletData();
   const { data: btcBalance } = useBtcWalletData();
+  const { data: lockedBtcBalance } = useLockedBtcData();
 
   function getTickerTitle() {
     if (currency === 'STX' || currency === 'BTC') return `${currency}`;
+    if (currency === 'Locked-BTC') return 'Locked BTC';
     return `${getFtTicker(fungibleToken as FungibleToken)}`;
   }
 
@@ -138,6 +141,8 @@ function TokenTile({
         return microstacksToStx(new BigNumber(stxData?.balance ?? 0)).toString();
       case 'BTC':
         return satsToBtc(new BigNumber(btcBalance ?? 0)).toString();
+      case 'Locked-BTC':
+        return satsToBtc(new BigNumber(lockedBtcBalance ?? 0)).toString();
       case 'FT':
         return fungibleToken ? getFtBalance(fungibleToken) : '';
       default:
@@ -152,6 +157,8 @@ function TokenTile({
           .multipliedBy(btcFiatRate);
       case 'BTC':
         return satsToBtc(new BigNumber(btcBalance ?? 0)).multipliedBy(btcFiatRate);
+      case 'Locked-BTC':
+        return satsToBtc(new BigNumber(lockedBtcBalance ?? 0)).multipliedBy(btcFiatRate);
       case 'FT':
         return fungibleToken?.tokenFiatRate
           ? new BigNumber(getFtBalance(fungibleToken)).multipliedBy(fungibleToken.tokenFiatRate)

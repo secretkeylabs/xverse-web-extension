@@ -198,6 +198,7 @@
     "TOTAL_BALANCE": "total balance",
     "BITCOIN": "Bitcoin",
     "STACKS": "Stacks",
+    "LOCKED_BITCOIN": "Locked Bitcoin",
     "ACCOUNT_NAME": "Account",
     "RECEIVE": "Receive",
     "CANCEL": "Cancel",

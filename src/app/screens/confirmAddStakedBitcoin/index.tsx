@@ -12,7 +12,7 @@ import useAddStakedBitcoin from '@hooks/useAddStakedBitcoin';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import useWalletSelector from '@hooks/useWalletSelector';
 import type { Account } from '@secretkeylabs/xverse-core';
-import { stakedBitcoins } from '@utils/stakes';
+import { lockedBitcoins } from '@utils/locked';
 import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -56,7 +56,7 @@ function ConfirmAddStakedBitcoin() {
   const handleConfirmClick = async () => {
     setIsLoading(true);
     if (belongsToAccount && payload.address && payload.script) {
-      await stakedBitcoins.add(payload.address, payload.script, belongsToAccount.btcAddress);
+      await lockedBitcoins.add(payload.address, payload.script, belongsToAccount.btcAddress);
       approveAddStakedBitcoinRequest();
     }
     window.close();
