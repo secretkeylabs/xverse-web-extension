@@ -4,22 +4,8 @@ import Wallet from '../pages/wallet';
 
 const strongPW = Onboarding.generateSecurePasswordCrypto();
 
-test.describe('Swapping Coins', () => {
-  test.beforeEach(async ({ page, extensionId, context }) => {
-    await page.goto(`chrome-extension://${extensionId}/options.html#/landing`);
-    // TODO: this fixes a temporary issue with two tabs at the start see technical debt https://linear.app/xverseapp/issue/ENG-3992/two-tabs-open-instead-of-one-since-version-0323-for-start-extension
-    const pages = await context.pages();
-    if (pages.length === 2) {
-      await pages[1].close(); // pages[1] is the second (newest) page
-    }
-  });
-  test.afterEach(async ({ context }) => {
-    if (context.pages().length > 0) {
-      // Close the context only if there are open pages
-      await context.close();
-    }
-  });
-
+// TODO adjust the test suite to relay on featureEnabled flag to be executed as only than the swap button is visible
+test.describe.skip('Swapping Coins', () => {
   test('Visual check swap page', async ({ page, extensionId }) => {
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);

@@ -35,11 +35,7 @@ import styled from 'styled-components';
 import TransactionDetailComponent from '../transactionDetailComponent';
 import SatsBundle from './bundle';
 
-interface MainContainerProps {
-  isGalleryOpen: boolean;
-}
-
-const OuterContainer = styled.div<MainContainerProps>`
+const OuterContainer = styled.div`
   display: flex;
   flex-direction: column;
 `;
@@ -73,15 +69,14 @@ const ErrorContainer = styled.div((props) => ({
   marginRight: props.theme.spacing(8),
 }));
 
-const ErrorText = styled.h1((props) => ({
+const ErrorText = styled.p((props) => ({
   ...props.theme.typography.body_s,
   color: props.theme.colors.danger_medium,
 }));
 
-interface ReviewTransactionTitleProps {
+const ReviewTransactionText = styled.h1<{
   centerAligned: boolean;
-}
-const ReviewTransactionText = styled.h1<ReviewTransactionTitleProps>((props) => ({
+}>((props) => ({
   ...props.theme.typography.headline_s,
   color: props.theme.colors.white_0,
   marginBottom: props.theme.spacing(16),
@@ -93,7 +88,7 @@ const CalloutContainer = styled.div((props) => ({
   marginhorizontal: props.theme.spacing(8),
 }));
 
-interface Props {
+type Props = {
   currentFee: BigNumber;
   feePerVByte: BigNumber; // TODO tim: is this the same as currentFeeRate? refactor to be clear
   loadingBroadcastedTx: boolean;
@@ -114,7 +109,7 @@ interface Props {
   setCurrentFeeRate: (feeRate: BigNumber) => void;
   onConfirmClick: (signedTxHex: string) => void;
   onCancelClick: () => void;
-}
+};
 
 function ConfirmBtcTransactionComponent({
   currentFee,
@@ -139,7 +134,6 @@ function ConfirmBtcTransactionComponent({
   onCancelClick,
 }: Props) {
   const { t } = useTranslation('translation');
-  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const [loading, setLoading] = useState(false);
   const { btcAddress, selectedAccount, network, feeMultipliers } = useWalletSelector();
   const { btcFiatRate } = useCoinRates();
@@ -353,7 +347,7 @@ function ConfirmBtcTransactionComponent({
 
   return (
     <>
-      <OuterContainer isGalleryOpen={isGalleryOpen}>
+      <OuterContainer>
         {showFeeWarning && (
           <CalloutContainer>
             <Callout bodyText={t('CONFIRM_TRANSACTION.HIGH_FEE_WARNING_TEXT')} variant="warning" />

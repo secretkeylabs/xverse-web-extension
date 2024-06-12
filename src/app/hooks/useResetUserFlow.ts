@@ -11,7 +11,7 @@ const resetUserFlowChannel = 'resetUserFlow';
 const userFlowConfig: Record<string, { resetTo: string }> = {
   '/send-btc': { resetTo: '/send-btc' },
   '/confirm-btc-tx': { resetTo: '/send-btc' },
-  '/send-brc20': { resetTo: '/' },
+  '/send-brc20-one-step': { resetTo: '/' },
   '/confirm-brc20-tx': { resetTo: '/' },
   '/confirm-inscription-request': { resetTo: '/' },
   '/ordinals-collection': { resetTo: '/nft-dashboard?tab=inscriptions' },
@@ -35,7 +35,7 @@ type UserFlowConfigKey = keyof typeof userFlowConfig;
  * Usage:
  *
  * To subscribe:
- *   useResetUserFlow('/send-brc20');
+ *   useResetUserFlow('/send-brc20-one-step');
  *
  * To broadcast:
  *   broadcastResetUserFlow();

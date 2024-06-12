@@ -1,6 +1,6 @@
+import Dots from '@components/dots';
 import { useWalletExistsContext } from '@components/guards/onboarding';
 import PasswordInput from '@components/passwordInput';
-import Steps from '@components/steps';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { useEffect, useState } from 'react';
@@ -136,7 +136,7 @@ export default function BackupWalletSteps(): JSX.Element {
 
   return (
     <Container>
-      <Steps data={backupSteps} activeIndex={currentActiveIndex} />
+      <Dots numDots={backupSteps.length} activeIndex={currentActiveIndex} />
       {backupSteps[currentActiveIndex]}
     </Container>
   );

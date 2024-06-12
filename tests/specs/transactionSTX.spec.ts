@@ -4,33 +4,27 @@ import Wallet from '../pages/wallet';
 
 const STXMain = 'SPN2AMZQ54Y0NN4H5Z4S0DGMWP27CTXY5M1Q812S';
 const STXTest = `STN2AMZQ54Y0NN4H5Z4S0DGMWP27CTXY5QEDCQAN`;
-const selfSTXMain = 'SP7QMYRVFTW4Z9A48FVCCM0A10RVTYTM8ZQPTWNR';
 const strongPW = Onboarding.generateSecurePasswordCrypto();
 
 const amountSTXSend = 10;
 test.describe('Transaction STX', () => {
-  test.beforeEach(async ({ page, extensionId, context }) => {
-    await page.goto(`chrome-extension://${extensionId}/options.html#/landing`);
-    // TODO: this fixes a temporary issue with two tabs at the start see technical debt https://linear.app/xverseapp/issue/ENG-3992/two-tabs-open-instead-of-one-since-version-0323-for-start-extension
-    const pages = await context.pages();
-    if (pages.length === 2) {
-      await pages[1].close(); // pages[1] is the second (newest) page
-    }
-  });
-  test.afterEach(async ({ context }) => {
-    if (context.pages().length > 0) {
-      // Close the context only if there are open pages
-      await context.close();
-    }
-  });
-
   test('Send STX Page Visual Check without funds Mainnet', async ({ page, extensionId }) => {
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
 
     await onboardingpage.restoreWallet(strongPW, 'SEED_WORDS1');
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
-    await expect(wallet.allupperButtons).toHaveCount(4);
+
+    await wallet.checkVisualsStartpage();
+
+    // get own STX Address
+    await wallet.allupperButtons.nth(1).click();
+    const selfSTXMain = await wallet.getAddress(wallet.buttonCopyStacksAddress, false);
+
+    // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
+    await page.reload();
+
+    await wallet.checkVisualsStartpage();
 
     // Click on send button
     await wallet.allupperButtons.nth(0).click();
@@ -62,7 +56,7 @@ test.describe('Transaction STX', () => {
     await expect(wallet.errorInsufficientBalance).toBeVisible();
   });
 
-  // TODO: need to add STX funds to the wallet, testnet is currently not avaiable
+  // TODO: need to add STX funds to the wallet, testnet is currently not available
   test.skip('Send STX - Cancel transaction testnet', async ({ page, extensionId }) => {
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);

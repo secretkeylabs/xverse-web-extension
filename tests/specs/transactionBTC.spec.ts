@@ -4,7 +4,6 @@ import Wallet from '../pages/wallet';
 
 const BTCMain = '3HEcJNAry4C8raqvM4cCPKbZpivTon7hMY';
 const BTCTest = '2MySeYxLrpGg47oqZGJUGBu53cVSy7WKGWf';
-const selfBTCTest = '2NBNBKm81AkZzufdBAmSPGECqjM5hR9AAH3';
 
 // TODO add API_TIMEOUT_MILLI for timeout --> needs invetigation as playwright itself didn't accept the import of the module
 
@@ -12,28 +11,13 @@ const strongPW = Onboarding.generateSecurePasswordCrypto();
 const amountBTCSend = 0.000001;
 
 test.describe('Transaction BTC', () => {
-  test.beforeEach(async ({ page, extensionId, context }) => {
-    await page.goto(`chrome-extension://${extensionId}/options.html#/landing`);
-    // TODO: this fixes a temporary issue with two tabs at the start see technical debt https://linear.app/xverseapp/issue/ENG-3992/two-tabs-open-instead-of-one-since-version-0323-for-start-extension
-    const pages = await context.pages();
-    if (pages.length === 2) {
-      await pages[1].close(); // pages[1] is the second (newest) page
-    }
-  });
-  test.afterEach(async ({ context }) => {
-    if (context.pages().length > 0) {
-      // Close the context only if there are open pages
-      await context.close();
-    }
-  });
-
   test('Send BTC Page Visual Check without funds Mainnet', async ({ page, extensionId }) => {
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
 
     await onboardingpage.restoreWallet(strongPW, 'SEED_WORDS2');
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
-    await expect(wallet.allupperButtons).toHaveCount(4);
+    await wallet.checkVisualsStartpage();
 
     // Save initial Balance for later Balance checks
     const initalBTCBalance = await wallet.getTokenBalance('Bitcoin');
@@ -79,6 +63,13 @@ test.describe('Transaction BTC', () => {
     await wallet.navigationSettings.click();
     await wallet.switchtoTestnetNetwork();
     await wallet.navigationDashboard.click();
+
+    // get own BTC Address
+    await wallet.allupperButtons.nth(1).click();
+    const selfBTCTest = await wallet.getAddress(wallet.buttonCopyBitcoinAddress);
+
+    // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
+    await page.reload();
 
     // Save initial Balance for later Balance checks
     const initalBTCBalance = await wallet.getTokenBalance('Bitcoin');
@@ -143,6 +134,13 @@ test.describe('Transaction BTC', () => {
     await wallet.navigationSettings.click();
     await wallet.switchtoTestnetNetwork();
     await wallet.navigationDashboard.click();
+
+    // get own BTC Address
+    await wallet.allupperButtons.nth(1).click();
+    const selfBTCTest = await wallet.getAddress(wallet.buttonCopyBitcoinAddress);
+
+    // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
+    await page.reload();
 
     // Save initial Balance for later Balance checks
     const initalBTCBalance = await wallet.getTokenBalance('Bitcoin');

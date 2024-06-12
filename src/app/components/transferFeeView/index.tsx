@@ -1,25 +1,23 @@
 import AmountWithInscriptionSatribute from '@components/confirmBtcTransaction/itemRow/amountWithInscriptionSatribute';
+import FiatAmountText from '@components/fiatAmountText';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   btcTransaction,
-  currencySymbolMap,
   getBtcFiatEquivalent,
   getFiatEquivalent,
 } from '@secretkeylabs/xverse-core';
-import { StoreState } from '@stores/index';
 import { StyledP } from '@ui-library/common.styled';
 import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
-import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
   background: props.theme.colors.elevation1,
   borderRadius: 12,
   padding: '12px 16px',
-  marginBottom: 12,
+  marginBottom: props.theme.space.s,
 }));
 
 const Row = styled.div({
@@ -40,7 +38,7 @@ const FeeContainer = styled.div({
   alignItems: 'flex-end',
 });
 
-interface Props {
+type Props = {
   feePerVByte?: BigNumber;
   fee: BigNumber;
   currency: string;
@@ -48,7 +46,8 @@ interface Props {
   inscriptions?: btcTransaction.IOInscription[];
   satributes?: btcTransaction.IOSatribute[];
   onShowInscription?: (inscription: btcTransaction.IOInscription) => void;
-}
+};
+
 function TransferFeeView({
   feePerVByte,
   fee,
@@ -63,27 +62,6 @@ function TransferFeeView({
 
   const { fiatCurrency } = useWalletSelector();
   const { btcFiatRate, stxBtcRate } = useCoinRates();
-
-  const getFiatAmountString = (fiatAmount: BigNumber) => {
-    if (!fiatAmount) {
-      return '';
-    }
-
-    if (fiatAmount.isLessThan(0.01)) {
-      return `<${currencySymbolMap[fiatCurrency]}0.01 ${fiatCurrency}`;
-    }
-
-    return (
-      <NumericFormat
-        value={fiatAmount.toFixed(2).toString()}
-        displayType="text"
-        thousandSeparator
-        prefix={`${currencySymbolMap[fiatCurrency]} `}
-        suffix={` ${fiatCurrency}`}
-        renderText={(value: string) => `~ ${value}`}
-      />
-    );
-  };
 
   return (
     <Container>
@@ -119,18 +97,21 @@ function TransferFeeView({
             />
           )}
           <StyledP typography="body_s" color="white_400">
-            {getFiatAmountString(
-              currency === 'sats'
-                ? getBtcFiatEquivalent(new BigNumber(fee), BigNumber(btcFiatRate))
-                : new BigNumber(
-                    getFiatEquivalent(
-                      Number(fee),
-                      'STX',
-                      BigNumber(stxBtcRate),
-                      BigNumber(btcFiatRate),
-                    )!,
-                  ),
-            )}
+            <FiatAmountText
+              fiatAmount={
+                currency === 'sats'
+                  ? getBtcFiatEquivalent(new BigNumber(fee), BigNumber(btcFiatRate))
+                  : new BigNumber(
+                      getFiatEquivalent(
+                        Number(fee),
+                        'STX',
+                        BigNumber(stxBtcRate),
+                        BigNumber(btcFiatRate),
+                      )!,
+                    )
+              }
+              fiatCurrency={fiatCurrency}
+            />
           </StyledP>
         </FeeContainer>
       </Row>

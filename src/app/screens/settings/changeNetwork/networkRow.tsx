@@ -40,7 +40,10 @@ function NetworkRow({ network, isSelected, onNetworkSelected, showDivider }: Pro
   };
 
   return (
-    <Button onClick={onClick} border={showDivider ? '1px solid rgb(76,81,135,0.3)' : 'transparent'}>
+    <Button
+      onClick={onClick}
+      border={showDivider ? `1px solid ${theme.colors.white_900}` : 'transparent'}
+    >
       <Text color={isSelected ? theme.colors.white_0 : theme.colors.white_200}>{network.type}</Text>
       {isSelected && <img src={TickIcon} alt="tick" />}
     </Button>

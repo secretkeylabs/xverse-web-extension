@@ -4,7 +4,7 @@ import {
   SeedVault,
   StorageAdapter,
 } from '@secretkeylabs/xverse-core';
-import { chromeLocalStorage, chromeSessionStorage } from '@utils/chromeStorage';
+import chromeStorage from '@utils/chromeStorage';
 import {
   decryptSeedPhraseHandler,
   encryptSeedPhraseHandler,
@@ -20,15 +20,15 @@ const cryptoUtilsAdapter: CryptoUtilsAdapter = {
 };
 
 const secureStorageAdapter: StorageAdapter = {
-  get: async (key: string) => chromeSessionStorage.getItem<string, null>(key, null),
-  set: async (key: string, value: string) => chromeSessionStorage.setItem(key, value),
-  remove: async (key: string) => chromeSessionStorage.removeItem(key),
+  get: async (key: string) => chromeStorage.session.getItem<string, null>(key, null),
+  set: async (key: string, value: string) => chromeStorage.session.setItem(key, value),
+  remove: async (key: string) => chromeStorage.session.removeItem(key),
 };
 
 const commonStorageAdapter: StorageAdapter = {
-  get: async (key: string) => chromeLocalStorage.getItem<string, null>(key, null),
-  set: async (key: string, value: string) => chromeLocalStorage.setItem(key, value),
-  remove: async (key: string) => chromeLocalStorage.removeItem(key),
+  get: async (key: string) => chromeStorage.local.getItem<string, null>(key, null),
+  set: async (key: string, value: string) => chromeStorage.local.setItem(key, value),
+  remove: async (key: string) => chromeStorage.local.removeItem(key),
 };
 
 const useSeedVault = () => {

@@ -1,3 +1,4 @@
+import TransportFactory from '@ledgerhq/hw-transport-webusb';
 import { ArrowDown } from '@phosphor-icons/react';
 import BigNumber from 'bignumber.js';
 import { decodeToken } from 'jsontokens';
@@ -12,6 +13,7 @@ import {
   AnalyticsEvents,
   BtcFeeResponse,
   InscriptionErrorCode,
+  Transport,
   UTXO,
   currencySymbolMap,
   fetchBtcFeeRate,
@@ -25,21 +27,23 @@ import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmScreen from '@components/confirmScreen';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { getShortTruncatedAddress, isLedgerAccount } from '@utils/helper';
-
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useConfirmedBtcBalance from '@hooks/queries/useConfirmedBtcBalance';
 import useBtcClient from '@hooks/useBtcClient';
-import useSeedVault from '@hooks/useSeedVault';
+import useTransactionContext from '@hooks/useTransactionContext';
+import useWalletSelector from '@hooks/useWalletSelector';
+import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
 import { StyledP } from '@ui-library/common.styled';
+import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
+import { getShortTruncatedAddress, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import CompleteScreen from './CompleteScreen';
 import ContentLabel from './ContentLabel';
 import EditFee from './EditFee';
 import ErrorModal from './ErrorModal';
+import LedgerStepView from './ledgerStepView';
 
 const SATS_PER_BTC = 100e6;
 
@@ -53,6 +57,17 @@ const CardRow = styled.div<CardRowProps>((props) => ({
   alignItems: props.center ? 'center' : 'flex-start',
   justifyContent: 'space-between',
   marginTop: props.topMargin ? props.theme.spacing(8) : 0,
+}));
+
+const SuccessActionsContainer = styled.div((props) => ({
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: props.theme.space.s,
+  paddingLeft: props.theme.space.m,
+  paddingRight: props.theme.space.m,
+  marginBottom: props.theme.space.xxl,
+  marginTop: props.theme.space.xxl,
 }));
 
 const NumberWithSuffixContainer = styled.div((props) => ({
@@ -212,7 +227,7 @@ const InfoIconContainer = styled.div((props) => ({
   marginRight: props.theme.spacing(5),
 }));
 
-const Button = styled.button((props) => ({
+const EditFeesButton = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
@@ -276,12 +291,13 @@ function CreateInscription() {
   const [showConfirmedBalanceError, setShowConfirmedBalanceError] = useState(false);
   const [feeRate, setFeeRate] = useState(suggestedMinerFeeRate ?? DEFAULT_FEE_RATE);
   const [feeRates, setFeeRates] = useState<BtcFeeResponse>();
-  const { getSeed } = useSeedVault();
   const btcClient = useBtcClient();
 
   const { ordinalsAddress, network, btcAddress, selectedAccount, fiatCurrency } =
     useWalletSelector();
   const { btcFiatRate } = useCoinRates();
+
+  const transactionContext = useTransactionContext();
 
   useEffect(() => {
     getNonOrdinalUtxo(btcAddress, btcClient, requestedNetwork.type).then(setUtxos);
@@ -323,14 +339,13 @@ function CreateInscription() {
     errorCode: feeErrorCode,
     isLoading: inscriptionFeesLoading,
   } = useInscriptionFees({
-    addressUtxos: utxos,
+    context: transactionContext,
     content,
     contentType,
     feeRate,
     revealAddress: ordinalsAddress,
     serviceFee: appFee,
     serviceFeeAddress: appFeeAddress,
-    network: network.type,
     repetitions: repeat,
   });
 
@@ -341,20 +356,23 @@ function CreateInscription() {
     revealTransactionId,
     isExecuting,
   } = useInscriptionExecute({
-    addressUtxos: utxos || [],
-    accountIndex: selectedAccount!.id,
-    changeAddress: btcAddress,
+    context: transactionContext,
     contentType,
     feeRate,
-    network: requestedNetwork.type,
     revealAddress: ordinalsAddress,
-    getSeedPhrase: getSeed,
     contentBase64: payloadType === 'BASE_64' ? content : undefined,
     contentString: payloadType === 'PLAIN_TEXT' ? content : undefined,
     serviceFee: appFee,
     serviceFeeAddress: appFeeAddress,
     repetitions: repeat,
   });
+
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [isConnectSuccess, setIsConnectSuccess] = useState(false);
+  const [isConnectFailed, setIsConnectFailed] = useState(false);
+  const [isLedgerConnectVisible, setIsLedgerConnectVisible] = useState(false);
+
+  const isLedger = isLedgerAccount(selectedAccount);
 
   const cancelCallback = () => {
     const response = {
@@ -405,7 +423,14 @@ function CreateInscription() {
     .plus(new BigNumber(totalInscriptionValue ?? 0))
     .toString();
 
-  const errorCode = feeErrorCode || executeErrorCode;
+  const nonLedgerExecuteErrorCode =
+    executeErrorCode &&
+    (executeErrorCode === InscriptionErrorCode.DEVICE_LOCKED ||
+      executeErrorCode === InscriptionErrorCode.USER_REJECTED ||
+      executeErrorCode === InscriptionErrorCode.GENERAL_LEDGER_ERROR)
+      ? undefined
+      : executeErrorCode;
+  const errorCode = feeErrorCode || nonLedgerExecuteErrorCode;
 
   const isLoading = utxos === undefined || inscriptionFeesLoading;
 
@@ -447,7 +472,7 @@ function CreateInscription() {
     return <CompleteScreen txId={revealTransactionId} onClose={onClose} network={network} />;
   }
 
-  const handleClickConfirm = () => {
+  const handleExecuteMint = (ledgerTransport?: Transport) => {
     trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
       protocol: 'ordinals',
       action: 'inscribe',
@@ -455,15 +480,53 @@ function CreateInscription() {
       repeat,
     });
 
-    executeMint();
+    executeMint({ ledgerTransport });
+  };
+
+  const handleLedgerConnect = async () => {
+    try {
+      setIsConnectSuccess(false);
+      setIsConnectFailed(false);
+      setIsConnecting(true);
+
+      const ledgerTransport = await TransportFactory.create();
+
+      if (!ledgerTransport) {
+        setIsConnectSuccess(false);
+        setIsConnectFailed(true);
+        return;
+      }
+
+      setIsConnectSuccess(true);
+      setIsConnecting(false);
+      handleExecuteMint(ledgerTransport);
+    } catch (error) {
+      console.error(error);
+      setIsConnectSuccess(false);
+      setIsConnectFailed(true);
+    } finally {
+      setIsConnecting(false);
+    }
+  };
+
+  const handleLedgerConnectCancel = () => {
+    setIsLedgerConnectVisible(false);
+  };
+
+  const handleClickConfirm = () => {
+    if (!isLedger) {
+      handleExecuteMint();
+    } else {
+      setIsLedgerConnectVisible(true);
+    }
   };
 
   const disableConfirmButton =
-    !!errorCode ||
-    isExecuting ||
-    showOver24RepeatsError ||
-    showConfirmedBalanceError ||
-    isLedgerAccount(selectedAccount);
+    !!errorCode || isExecuting || showOver24RepeatsError || showConfirmedBalanceError;
+
+  const canLedgerRetry =
+    executeErrorCode === InscriptionErrorCode.USER_REJECTED ||
+    executeErrorCode === InscriptionErrorCode.GENERAL_LEDGER_ERROR;
 
   return (
     <ConfirmScreen
@@ -488,9 +551,6 @@ function CreateInscription() {
           )}
           {showConfirmedBalanceError && (
             <StyledCallout variant="danger" bodyText={t('ERRORS.UNCONFIRMED_UTXO')} />
-          )}
-          {isLedgerAccount(selectedAccount) && (
-            <StyledCallout variant="danger" bodyText={t('ERRORS.LEDGER_INSCRIPTION')} />
           )}
           <CardContainer bottomPadding>
             <CardRow>
@@ -608,10 +668,10 @@ function CreateInscription() {
               fiatRate={btcFiatRate}
             />
           </CardContainer>
-          <Button onClick={onAdvancedSettingClick}>
+          <EditFeesButton onClick={onAdvancedSettingClick}>
             <ButtonImage src={SettingIcon} />
             <ButtonText>{t('EDIT_FEES')}</ButtonText>
-          </Button>
+          </EditFeesButton>
           {showFeeSettings && (
             <EditFee
               feeRate={feeRate}
@@ -631,10 +691,42 @@ function CreateInscription() {
             <ErrorModal
               key={errorCode}
               errorCode={errorCode}
-              onRetrySubmit={executeErrorCode ? executeMint : undefined}
+              onRetrySubmit={executeErrorCode ? handleClickConfirm : undefined}
               onEnd={cancelCallback}
             />
           )}
+          <Sheet
+            title=""
+            visible={isLedgerConnectVisible}
+            onClose={isConnectSuccess ? undefined : handleLedgerConnectCancel}
+          >
+            <LedgerStepView
+              isConnectSuccess={isConnectSuccess}
+              isConnectFailed={isConnectFailed || !!executeErrorCode}
+              errorCode={executeErrorCode}
+            />
+            <SuccessActionsContainer>
+              {(!isConnectSuccess || canLedgerRetry) && (
+                <>
+                  <Button
+                    onClick={handleLedgerConnect}
+                    title={t(
+                      isConnectFailed || canLedgerRetry
+                        ? 'LEDGER.RETRY_BUTTON'
+                        : 'LEDGER.CONNECT_BUTTON',
+                    )}
+                    disabled={isConnecting}
+                    loading={isConnecting}
+                  />
+                  <Button
+                    onClick={handleLedgerConnectCancel}
+                    title={t('LEDGER.CANCEL_BUTTON')}
+                    variant="tertiary"
+                  />
+                </>
+              )}
+            </SuccessActionsContainer>
+          </Sheet>
         </MainContainer>
       </OuterContainer>
     </ConfirmScreen>

@@ -366,8 +366,14 @@ export default class Wallet {
     await expect(this.balance).toBeVisible();
     await expect(this.manageTokenButton).toBeVisible();
 
-    switch (network) {
-      case (network = 'testnet'):
+    /*
+TODO: needs to be changed to be debending on network and feature enabled
+const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
+
+    const featureFlags = await getXverseApiClient('Mainnet').getAppFeatures();
+    const featureEnabled = featureFlags?.SWAPS?.enabled;
+    switch (true) {
+      case network === 'testnet':
         // Check if all 3 buttons (send, receive, buy) are visible
         await expect(this.allupperButtons).toHaveCount(3);
         break;
@@ -375,6 +381,8 @@ export default class Wallet {
         // Check if all 4 buttons (send, receive, swap, buy) are visible
         await expect(this.allupperButtons).toHaveCount(4);
     }
+*/
+    await expect(this.allupperButtons).toHaveCount(3);
     await expect(this.labelAccountName).toBeVisible();
     await expect(this.buttonMenu).toBeVisible();
     await expect(await this.labelTokenSubtitle.count()).toBeGreaterThanOrEqual(2);
@@ -452,12 +460,16 @@ export default class Wallet {
     await this.checkVisualsStartpage(network);
   }
 
-  async getAddress(button) {
+  async getAddress(button: Locator, ClickConfirm = true): Promise<string> {
     await expect(button).toBeVisible();
     await button.click();
-    await expect(this.buttonConfirmCopyAddress).toBeVisible();
-    await this.buttonConfirmCopyAddress.click();
-    const address = await this.page.evaluate('navigator.clipboard.readText()');
+
+    if (ClickConfirm) {
+      await expect(this.buttonConfirmCopyAddress).toBeVisible();
+      await this.buttonConfirmCopyAddress.click();
+    }
+
+    const address = await this.page.evaluate<string>('navigator.clipboard.readText()');
     return address;
   }
 

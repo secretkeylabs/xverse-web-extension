@@ -21,10 +21,10 @@ import { useStxCurrencyConversion } from './useStxCurrencyConversion';
 
 const isNotNull = <T extends any>(t: T | null | undefined): t is T => t != null;
 
-function updateOppositeCurrencyIfSameAsSelected(
+const updateOppositeCurrencyIfSameAsSelected = (
   state: SelectedCurrencyState,
-  { newCurrency, side },
-) {
+  { newCurrency, side }: { newCurrency: Currency; side: Side },
+) => {
   switch (side) {
     case 'from':
       if (state.to !== newCurrency) {
@@ -45,7 +45,7 @@ function updateOppositeCurrencyIfSameAsSelected(
     default:
       return state.to;
   }
-}
+};
 
 export const selectedTokenReducer: (
   state: SelectedCurrencyState,

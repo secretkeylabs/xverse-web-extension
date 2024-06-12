@@ -17,7 +17,7 @@ import {
   signPsbt,
 } from '@secretkeylabs/xverse-core';
 import { decodeToken } from 'jsontokens';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import useBtcClient from '../../hooks/useBtcClient';
 import useSeedVault from '../../hooks/useSeedVault';
@@ -49,14 +49,9 @@ const useSignPsbtParams = (network: SettingsNetwork) => {
       inputsToSign,
       broadcast: Boolean(params.get('broadcast')) ?? false,
       message: params.get('message') ?? '',
-      network:
-        network.type === 'Mainnet'
-          ? {
-              type: BitcoinNetworkType.Mainnet,
-            }
-          : {
-              type: BitcoinNetworkType.Testnet,
-            },
+      network: {
+        type: BitcoinNetworkType[network.type],
+      },
     };
     return {
       payload: rpcPayload,

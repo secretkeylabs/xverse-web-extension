@@ -2,7 +2,7 @@ import SponsoredTransactionIcon from '@assets/img/transactions/CircleWavyCheck.s
 import InfoContainer from '@components/infoContainer';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import { Container } from '@screens/home';
+import { Container } from '@screens/home/index.styled';
 import { AdvanceSettings } from '@screens/swap/swapConfirmation/advanceSettings';
 import FeesBlock from '@screens/swap/swapConfirmation/feesBlock';
 import FunctionBlock from '@screens/swap/swapConfirmation/functionBlock';
@@ -36,7 +36,7 @@ const ButtonContainer = styled.div((props) => ({
 }));
 
 const SponsoredTransactionText = styled.div((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   color: props.theme.colors.white_200,
   marginTop: props.theme.spacing(10),
   display: 'flex',
@@ -59,9 +59,9 @@ export default function SwapConfirmation() {
   const navigate = useNavigate();
   const swap = useConfirmSwap(location.state);
 
-  const onCancel = useCallback(() => {
-    navigate('/swap');
-  }, [navigate]);
+  const handleGoBack = () => {
+    navigate(-1);
+  };
 
   const [confirming, setConfirming] = useState(false);
   const onConfirm = useCallback(() => {
@@ -106,7 +106,7 @@ export default function SwapConfirmation() {
           <AdvanceSettings swap={swap} />
         )}
         <ButtonContainer>
-          <Button title={t('CANCEL')} variant="secondary" onClick={onCancel} />
+          <Button title={t('CANCEL')} variant="secondary" onClick={handleGoBack} />
           <Button title={t('CONFIRM')} loading={confirming} onClick={onConfirm} />
         </ButtonContainer>
       </Container>

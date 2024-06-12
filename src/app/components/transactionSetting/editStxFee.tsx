@@ -1,3 +1,4 @@
+import FiatAmountText from '@components/fiatAmountText';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
@@ -19,25 +20,19 @@ const Container = styled.div((props) => ({
   marginBottom: props.theme.spacing(2),
 }));
 
-const FiatAmountText = styled.h1((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.white_400,
-}));
-
 const DetailText = styled.h1((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   color: props.theme.colors.white_200,
 }));
 
 const Text = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   marginTop: props.theme.spacing(8),
 }));
 
-interface InputContainerProps {
+const InputContainer = styled.div<{
   withError?: boolean;
-}
-const InputContainer = styled.div<InputContainerProps>((props) => ({
+}>((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
@@ -52,7 +47,7 @@ const InputContainer = styled.div<InputContainerProps>((props) => ({
 }));
 
 const InputField = styled.input((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   backgroundColor: 'transparent',
   color: props.theme.colors.white_0,
   border: 'transparent',
@@ -70,16 +65,15 @@ const InputField = styled.input((props) => ({
   },
 }));
 
-const SubText = styled.h1((props) => ({
+const SubText = styled.p((props) => ({
   ...props.theme.body_xs,
   color: props.theme.colors.white_400,
 }));
 
-interface ButtonProps {
+const FeeButton = styled.button<{
   isSelected: boolean;
   isLastInRow?: boolean;
-}
-const FeeButton = styled.button<ButtonProps>((props) => ({
+}>((props) => ({
   ...props.theme.body_medium_m,
   color: `${props.isSelected ? props.theme.colors.elevation2 : props.theme.colors.white_400}`,
   background: `${props.isSelected ? props.theme.colors.white : 'transparent'}`,
@@ -120,7 +114,7 @@ const ErrorText = styled.h1((props) => ({
 }));
 
 // TODO tim: this component needs refactoring. separate business logic from presentation
-interface Props {
+type Props = {
   type?: string;
   fee: string;
   feeRate?: BigNumber | string;
@@ -130,7 +124,8 @@ interface Props {
   setFeeRate: (feeRate: string) => void;
   setFeeMode: (feeMode: string) => void;
   setError: (error: string) => void;
-}
+};
+
 function EditStxFee({
   type,
   fee,
@@ -191,33 +186,6 @@ function EditStxFee({
     }
   }, [feeRateInput]);
 
-  function getFiatEquivalent() {
-    return getStxFiatEquivalent(
-      stxToMicrostacks(new BigNumber(totalFee)),
-      BigNumber(stxBtcRate),
-      BigNumber(btcFiatRate),
-    );
-  }
-
-  const getFiatAmountString = (fiatAmount: BigNumber) => {
-    if (fiatAmount) {
-      if (fiatAmount.isLessThan(0.01)) {
-        return `<${currencySymbolMap[fiatCurrency]}0.01 ${fiatCurrency}`;
-      }
-      return (
-        <NumericFormat
-          value={fiatAmount.toFixed(2).toString()}
-          displayType="text"
-          thousandSeparator
-          prefix={`~ ${currencySymbolMap[fiatCurrency]} `}
-          suffix={` ${fiatCurrency}`}
-          renderText={(value: string) => <FiatAmountText>{value}</FiatAmountText>}
-        />
-      );
-    }
-    return '';
-  };
-
   const onInputEditFeesChange = ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
     if (error) {
       setError('');
@@ -244,7 +212,14 @@ function EditStxFee({
             onChange={onInputEditFeesChange}
           />
           <TickerContainer>
-            <SubText>{getFiatAmountString(getFiatEquivalent())}</SubText>
+            <FiatAmountText
+              fiatAmount={getStxFiatEquivalent(
+                stxToMicrostacks(new BigNumber(totalFee)),
+                BigNumber(stxBtcRate),
+                BigNumber(btcFiatRate),
+              )}
+              fiatCurrency={fiatCurrency}
+            />
           </TickerContainer>
         </InputContainer>
         {error && <ErrorText>{error}</ErrorText>}

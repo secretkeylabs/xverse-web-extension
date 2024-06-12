@@ -14,7 +14,7 @@ const Container = styled.div((props) => ({
   rowGap: props.theme.spacing(4),
 }));
 
-export const RowContainer = styled.div({
+const RowContainer = styled.div({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
@@ -69,7 +69,7 @@ const CoinButtonArrow = styled.img({
   height: 12,
 });
 
-export const NumberInput = styled.input`
+const NumberInput = styled.input`
   ::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
@@ -79,7 +79,7 @@ export const NumberInput = styled.input`
     margin: 0;
   }
 `;
-export const AmountInput = styled(NumberInput)<{ error?: boolean }>((props) => ({
+const AmountInput = styled(NumberInput)<{ error?: boolean }>((props) => ({
   ...props.theme.body_bold_l,
   flex: 1,
   color: props.error ? props.theme.colors.feedback.error : props.theme.colors.white_0,
@@ -151,7 +151,7 @@ function SwapTokenBlock({
             value={selectedCoin?.fiatAmount ?? EMPTY_LABEL}
             displayType="text"
             thousandSeparator
-            prefix={`${currencySymbolMap[fiatCurrency]} `}
+            prefix={`${currencySymbolMap[fiatCurrency]}`}
             suffix={` ${fiatCurrency}`}
             renderText={(value) => (
               <EstimateUSDText data-testid="usd-text">{value}</EstimateUSDText>

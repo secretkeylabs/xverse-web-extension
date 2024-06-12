@@ -10,13 +10,19 @@ export const BLOG_LINK = 'https:/xverse.app/blog';
 export const SUPPORT_EMAIL = 'support@xverse.app';
 export const BTC_TRANSACTION_STATUS_URL = 'https://mempool.space/tx/';
 export const BTC_TRANSACTION_TESTNET_STATUS_URL = 'https://mempool.space/testnet/tx/';
+export const BTC_TRANSACTION_SIGNET_STATUS_URL = 'https://mempool.space/signet/tx/';
 export const TRANSACTION_STATUS_URL = 'https://explorer.stacks.co/txid/';
 export const XVERSE_WEB_POOL_URL = 'https://pool.xverse.app';
 export const XVERSE_EXPLORE_URL = 'https://wallet.xverse.app/explore';
 export const XVERSE_POOL_ADDRESS = 'SPXVRSEH2BKSXAEJ00F1BY562P45D5ERPSKR4Q33';
 
+const ordiViewSuffixMap: Record<NetworkType, string> = {
+  Mainnet: '',
+  Testnet: '-testnet',
+  Signet: '-signet',
+};
 export const XVERSE_ORDIVIEW_URL = (network: NetworkType) =>
-  `https://ord${network === 'Mainnet' ? '' : '-testnet'}.xverse.app`;
+  `https://ord${ordiViewSuffixMap[network]}.xverse.app`;
 
 export const TRANSAC_URL = 'https://global.transak.com';
 export const TRANSAC_API_KEY = process.env.TRANSAC_API_KEY;

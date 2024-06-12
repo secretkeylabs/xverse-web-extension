@@ -6,6 +6,7 @@ import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useDebounce from '@hooks/useDebounce';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { FadersHorizontal } from '@phosphor-icons/react';
 import type { BRC20ErrorCode, SettingsNetwork } from '@secretkeylabs/xverse-core';
@@ -22,7 +23,7 @@ import {
   ExecuteBrc20TransferState,
   getFeeValuesForBrc20OneStepTransfer,
 } from '@utils/brc20';
-import { isInOptions, isLedgerAccount } from '@utils/helper';
+import { isInOptions } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
@@ -136,15 +137,8 @@ const useConfirmBrc20Transfer = (): {
 } => {
   /* hooks */
   const { t } = useTranslation('translation');
-  const {
-    network,
-
-    fiatCurrency,
-    selectedAccount,
-    btcAddress,
-    ordinalsAddress,
-    feeMultipliers,
-  } = useWalletSelector();
+  const { network, selectedAccount, fiatCurrency, btcAddress, ordinalsAddress, feeMultipliers } =
+    useWalletSelector();
   const { btcFiatRate } = useCoinRates();
   const navigate = useNavigate();
   const {
@@ -154,6 +148,7 @@ const useConfirmBrc20Transfer = (): {
     token,
   }: ConfirmBrc20TransferState = useLocation().state;
   const [showFeeWarning, setShowFeeWarning] = useState(false);
+  const transactionContext = useTransactionContext();
 
   useResetUserFlow('/confirm-brc20-tx');
 
@@ -170,9 +165,9 @@ const useConfirmBrc20Transfer = (): {
     errorCode,
   } = useBrc20TransferFees({
     ...estimateFeesParams,
-    network: network.type,
     feeRate: Number(debouncedUserInputFeeRate),
     skipInitialFetch: true,
+    context: transactionContext,
   });
 
   const { txFee, inscriptionFee, totalFee, transferUtxoValue } =
@@ -189,9 +184,6 @@ const useConfirmBrc20Transfer = (): {
   /* callbacks */
   const handleClickConfirm = () => {
     setIsConfirmLoading(true);
-    if (isLedgerAccount(selectedAccount)) {
-      // TODO ledger
-    }
     // validate brc20 balance again here
     if (estimateFeesParams.amount > Number(token.balance)) {
       setError(t('CONFIRM_BRC20.ERRORS.INSUFFICIENT_BALANCE'));
@@ -218,7 +210,7 @@ const useConfirmBrc20Transfer = (): {
     navigate(-1);
   };
 
-  const handleClickApplyFee: OnChangeFeeRate = (feeRate) => {
+  const handleClickApplyFee: OnChangeFeeRate = (feeRate: string) => {
     if (feeRate) {
       setUserInputFeeRate(feeRate);
     }
@@ -296,7 +288,7 @@ const useConfirmBrc20Transfer = (): {
   };
 };
 
-export function ConfirmBrc20Transaction() {
+function ConfirmBrc20Transaction() {
   const { t } = useTranslation('translation');
   const {
     callouts,

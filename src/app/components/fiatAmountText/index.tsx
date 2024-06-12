@@ -7,10 +7,12 @@ export function FiatAmountText({
   className,
   fiatAmount,
   fiatCurrency,
+  dataTestId,
 }: {
   className?: string;
   fiatAmount?: BigNumber;
   fiatCurrency: SupportedCurrency;
+  dataTestId?: string;
 }) {
   if (!fiatAmount || !fiatCurrency) {
     return null;
@@ -35,8 +37,9 @@ export function FiatAmountText({
       value={fiatAmount.toFixed(2).toString()}
       displayType="text"
       thousandSeparator
-      prefix={`~ ${currencySymbolMap[fiatCurrency]} `}
+      prefix={`~ ${currencySymbolMap[fiatCurrency]}`}
       suffix={` ${fiatCurrency}`}
+      data-testid={dataTestId}
     />
   );
 }

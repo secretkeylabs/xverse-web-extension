@@ -37,8 +37,9 @@ function FiatCurrencyScreen() {
     navigate('/settings');
   };
 
-  const onClick = (currency: SupportedCurrency) => {
+  const handleCurrencyClick = (currency: SupportedCurrency) => {
     dispatch(ChangeFiatCurrencyAction(currency));
+    navigate(-1);
   };
 
   function showDivider(index: number): boolean {
@@ -53,7 +54,7 @@ function FiatCurrencyScreen() {
           <CurrencyRow
             currency={coin}
             isSelected={coin.name === fiatCurrency}
-            onCurrencySelected={onClick}
+            onCurrencySelected={handleCurrencyClick}
             key={coin.name.toString()}
             showDivider={showDivider(index)}
           />
