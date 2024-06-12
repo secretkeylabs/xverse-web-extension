@@ -62,20 +62,13 @@ const LoadingContainer = styled.div((props) => ({
 function BackupWallet(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'BACKUP_WALLET_SCREEN' });
   const navigate = useNavigate();
-  const {
-    init: initSeedVault,
-    storeSeed,
-    unlockVault,
-    hasSeed,
-    clearVaultStorage,
-  } = useSeedVault();
+  const { storeSeed, unlockVault, hasSeed, clearVaultStorage } = useSeedVault();
   const [isLoading, setIsLoading] = useState(false);
 
   // TODO move this to SeedVault?
   const generateAndStoreSeedPhrase = async () => {
     const newSeedPhrase = generateMnemonic();
-    await initSeedVault('');
-    await storeSeed(newSeedPhrase);
+    await storeSeed(newSeedPhrase, '');
   };
 
   useEffect(() => {

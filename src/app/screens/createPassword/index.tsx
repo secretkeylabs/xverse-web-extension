@@ -49,7 +49,7 @@ function CreatePassword(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'CREATE_PASSWORD_SCREEN' });
   const { createWallet } = useWalletReducer();
   const { disableWalletExistsGuard } = useWalletExistsContext();
-  const { init, getSeed, storeSeed } = useSeedVault();
+  const { getSeed, storeSeed } = useSeedVault();
 
   const handleContinuePasswordCreation = () => {
     setCurrentStepIndex(1);
@@ -65,8 +65,7 @@ function CreatePassword(): JSX.Element {
         await chrome.storage.local.clear();
         await chrome.storage.session.clear();
 
-        await init(password);
-        await storeSeed(seed);
+        await storeSeed(seed, password);
         await createWallet(); // TODO move this somwhere else
         navigate('/wallet-success/create', { replace: true });
       } catch (err) {

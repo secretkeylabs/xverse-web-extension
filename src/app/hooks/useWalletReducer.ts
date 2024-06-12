@@ -139,8 +139,7 @@ const useWalletReducer = () => {
   const migrateLegacySeedStorage = async (password: string) => {
     const pHash = await generatePasswordHash(password);
     await decryptSeedPhraseCBC(encryptedSeed, pHash.hash).then(async (decrypted) => {
-      await seedVault.init(password);
-      await seedVault.storeSeed(decrypted);
+      await seedVault.storeSeed(decrypted, password);
       localStorage.removeItem('salt');
       dispatch(storeEncryptedSeedAction(''));
     });
@@ -228,8 +227,7 @@ const useWalletReducer = () => {
     if (hasSeed && !masterPubKey) {
       await seedVault.clearVaultStorage();
     }
-    await seedVault.init(password);
-    await seedVault.storeSeed(seed);
+    await seedVault.storeSeed(seed, password);
     trackMixPanel(AnalyticsEvents.RestoreWallet);
     const bnsName = await getBnsName(wallet.stxAddress, selectedNetwork);
     dispatch(setWalletAction(wallet));

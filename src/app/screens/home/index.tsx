@@ -20,7 +20,6 @@ import useSpamTokens from '@hooks/queries/useSpamTokens';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useHasFeature from '@hooks/useHasFeature';
 import useNotificationBanners from '@hooks/useNotificationBanners';
-import useSanityCheck from '@hooks/useSanityCheck';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowUp, Plus } from '@phosphor-icons/react';
@@ -127,7 +126,6 @@ function Home() {
     isLoading: loadingRunesData,
     isRefetching: refetchingRunesData,
   } = useVisibleRuneFungibleTokens();
-  const { getSanityCheck } = useSanityCheck();
 
   useFeeMultipliers();
   useAppConfig();
@@ -173,12 +171,6 @@ function Home() {
       dispatch(setSpamTokenAction(null));
     }
   }, [spamToken]);
-
-  useEffect(() => {
-    (async () => {
-      await getSanityCheck('X-Current-Version');
-    })();
-  }, [getSanityCheck]);
 
   const showNotificationBanner =
     notificationBannersArr?.length &&
