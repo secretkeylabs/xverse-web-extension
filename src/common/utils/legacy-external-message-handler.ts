@@ -5,15 +5,15 @@ import {
   InternalMethods,
   LegacyMessageFromContentScript,
   LegacyMessageToContentScript,
+  LockedBitcoinMessageFromContentScript,
+  LockedBitcoinMessageToContentScript,
+  LockedBitcoinMethods,
   MESSAGE_SOURCE,
   SatsConnectMessageFromContentScript,
   SatsConnectMessageToContentScript,
   SatsConnectMethods,
   SignatureResponseMessage,
   StacksLegacyMethods,
-  StakedMessageFromContentScript,
-  StakedMessageToContentScript,
-  StakesMethods,
 } from '../types/message-types';
 import { sendMessage } from '../types/messages';
 import popupCenter from './popup-center';
@@ -66,7 +66,7 @@ interface ListenForPopupCloseArgs {
     | LegacyMessageToContentScript
     | SatsConnectMessageToContentScript
     | RpcErrorResponse
-    | StakedMessageToContentScript;
+    | LockedBitcoinMessageToContentScript;
 }
 export function listenForPopupClose({ id, tabId, response }: ListenForPopupCloseArgs) {
   chrome.windows.onRemoved.addListener((winId) => {
@@ -109,7 +109,8 @@ export async function handleLegacyExternalMethodFormat(
   message:
     | LegacyMessageFromContentScript
     | SatsConnectMessageFromContentScript
-    | StakedMessageFromContentScript,
+    | LockedBitcoinMessageFromContentScript,
+
   port: chrome.runtime.Port,
 ) {
   const { payload } = message;
@@ -337,21 +338,22 @@ export async function handleLegacyExternalMethodFormat(
       listenForOriginTabClose({ tabId });
       break;
     }
-    case StakesMethods.addStakedBitcoinRequest: {
+
+    case LockedBitcoinMethods.addLockedBitcoinRequest: {
       const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
-        ['addStakedBitcoin', payload],
+        ['addLockedBitcoin', payload],
       ]);
-      const { id } = await triggerRequestWindowOpen(RequestsRoutes.AddStakedBitcoin, urlParams);
+      const { id } = await triggerRequestWindowOpen(RequestsRoutes.AddLockedBitcoin, urlParams);
       listenForPopupClose({
         id,
         tabId,
         response: {
           source: MESSAGE_SOURCE,
           payload: {
-            addStakedBitcoinRequest: payload,
-            addStakedBitcoinResponse: 'cancel',
+            addLockedBitcoinRequest: payload,
+            addLockedBitcoinResponse: 'cancel',
           },
-          method: StakesMethods.addStakedBitcoinResponse,
+          method: LockedBitcoinMethods.addLockedBitcoinResponse,
         },
       });
       listenForOriginTabClose({ tabId });

@@ -1,9 +1,9 @@
 import {
   LegacyMessageToContentScript,
+  LockedBitcoinMessageToContentScript,
   MESSAGE_SOURCE,
   SatsConnectMessageToContentScript,
   StacksLegacyMethods,
-  StakedMessageToContentScript,
 } from '@common/types/message-types';
 
 type CallableMethods = keyof typeof StacksLegacyMethods;
@@ -20,7 +20,7 @@ export const isValidLegacyEvent = (
   method:
     | SatsConnectMessageToContentScript['method']
     | LegacyMessageToContentScript['method']
-    | StakedMessageToContentScript['method'],
+    | LockedBitcoinMessageToContentScript['method'],
 ) => {
   const { data } = event;
   const correctSource = data.source === MESSAGE_SOURCE;

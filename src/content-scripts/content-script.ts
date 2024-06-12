@@ -1,11 +1,11 @@
 import {
-  AddStakedBitcoinEvent,
+  AddLockedBitcoinEvent,
   AuthenticationRequestEvent,
   CreateInscriptionEvent,
   CreateRepeatInscriptionsEvent,
   DomEventName,
   GetAddressRequestEvent,
-  GetStakedBitcoinEvent,
+  GetLockedBitcoinEvent,
   SendBtcRequestEvent,
   SignBatchPsbtRequestEvent,
   SignMessageRequestEvent,
@@ -17,12 +17,12 @@ import {
   CONTENT_SCRIPT_PORT,
   LegacyMessageFromContentScript,
   LegacyMessageToContentScript,
+  LockedBitcoinMessageFromContentScript,
+  LockedBitcoinMethods,
   MESSAGE_SOURCE,
   SatsConnectMessageFromContentScript,
   SatsConnectMethods,
   StacksLegacyMethods,
-  StakedMessageFromContentScript,
-  StakesMethods,
 } from '@common/types/message-types';
 import getEventSourceWindow from '@common/utils/get-event-source-window';
 import RequestsRoutes from '@common/utils/route-urls';
@@ -64,7 +64,7 @@ function sendMessageToBackground(
   message:
     | LegacyMessageFromContentScript
     | SatsConnectMessageFromContentScript
-    | StakedMessageFromContentScript,
+    | LockedBitcoinMessageFromContentScript,
 ) {
   backgroundPort.postMessage(message);
 }
@@ -82,7 +82,7 @@ interface ForwardDomEventToBackgroundArgs {
   method:
     | LegacyMessageFromContentScript['method']
     | SatsConnectMessageFromContentScript['method']
-    | StakedMessageFromContentScript['method'];
+    | LockedBitcoinMessageFromContentScript['method'];
   urlParam: string;
   path: RequestsRoutes;
 }
@@ -220,21 +220,21 @@ document.addEventListener(DomEventName.rpcRequest, (event: any) => {
 });
 
 // Listen for a CustomEvent (Add Staked Bitcoin Request) coming from the web app
-document.addEventListener(DomEventName.addStakedBitcoinRequest, ((event: AddStakedBitcoinEvent) => {
+document.addEventListener(DomEventName.addLockedBitcoinRequest, ((event: AddLockedBitcoinEvent) => {
   forwardDomEventToBackground({
-    path: RequestsRoutes.AddStakedBitcoin,
-    payload: event.detail.addStakedBitcoinRequest,
-    urlParam: 'addStakedBitcoinRequest',
-    method: StakesMethods.addStakedBitcoinRequest,
+    path: RequestsRoutes.AddLockedBitcoin,
+    payload: event.detail.addLockedBitcoinRequest,
+    urlParam: 'addLockedBitcoinRequest',
+    method: LockedBitcoinMethods.addLockedBitcoinRequest,
   });
 }) as EventListener);
 
-document.addEventListener(DomEventName.getStakedBitcoinRequest, ((event: GetStakedBitcoinEvent) => {
+document.addEventListener(DomEventName.getLockedBitcoinRequest, ((event: GetLockedBitcoinEvent) => {
   forwardDomEventToBackground({
-    path: RequestsRoutes.GetStakedBitcoin,
-    payload: event.detail.getStakedBitcoinRequest,
-    urlParam: 'addStakedBitcoinRequest',
-    method: StakesMethods.getStakedBitcoinRequest,
+    path: RequestsRoutes.GetLockedBitcoin,
+    payload: event.detail.getLockedBitcoinRequest,
+    urlParam: 'addLockedBitcoinRequest',
+    method: LockedBitcoinMethods.getLockedBitcoinRequest,
   });
 }) as EventListener);
 

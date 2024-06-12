@@ -1,6 +1,4 @@
 import ActionButton from '@components/button';
-
-import BigNumber from 'bignumber.js';
 import { ReactNode, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -35,12 +33,6 @@ const TransparentButtonContainer = styled.div((props) => ({
   width: '100%',
 }));
 
-const ReviewTransactionText = styled.h1((props) => ({
-  ...props.theme.headline_s,
-  color: props.theme.colors.white_0,
-  textAlign: 'left',
-}));
-
 const RequestedByText = styled.h1((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white_400,
@@ -58,21 +50,16 @@ interface Props {
   onConfirmClick: () => void;
   children: ReactNode;
   title?: string;
-  subTitle?: string;
 }
 
-function ConfirmAddStakedBitcoinComponent({
+function ConfirmAddLockedBitcoinComponent({
   loading,
   children,
   title,
-  subTitle,
   onConfirmClick,
   onCancelClick,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const { t: signatureRequestTranslate } = useTranslation('translation', {
-    keyPrefix: 'SIGNATURE_REQUEST',
-  });
   const [buttonLoading, setButtonLoading] = useState(loading);
 
   useEffect(() => {
@@ -86,9 +73,7 @@ function ConfirmAddStakedBitcoinComponent({
   return (
     <>
       <Container>
-        <TitleContainer>
-          {!!subTitle && <RequestedByText>{subTitle}</RequestedByText>}
-        </TitleContainer>
+        <TitleContainer>{!!title && <RequestedByText>{title}</RequestedByText>}</TitleContainer>
 
         {children}
       </Container>
@@ -112,4 +97,4 @@ function ConfirmAddStakedBitcoinComponent({
   );
 }
 
-export default ConfirmAddStakedBitcoinComponent;
+export default ConfirmAddLockedBitcoinComponent;

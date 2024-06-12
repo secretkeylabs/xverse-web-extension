@@ -18,39 +18,39 @@ export const CONTENT_SCRIPT_PORT = 'xverse-content-script';
  * Staked External Callable Methods
  * @enum {string}
  */
-export enum StakesMethods {
-  addStakedBitcoinResponse = 'addStakedBitcoinResponse',
-  addStakedBitcoinRequest = 'addStakedBitcoinRequest',
-  getStakedBitcoinResponse = 'getStakedBitcoinResponse',
-  getStakedBitcoinRequest = 'getStakedBitcoinRequest',
+export enum LockedBitcoinMethods {
+  addLockedBitcoinResponse = 'addLockedBitcoinResponse',
+  addLockedBitcoinRequest = 'addLockedBitcoinRequest',
+  getLockedBitcoinResponse = 'getLockedBitcoinResponse',
+  getLockedBitcoinRequest = 'getLockedBitcoinRequest',
 }
 
-type AddStakedBitcoinRequestMessage = Message<StakesMethods.addStakedBitcoinRequest, string>;
+type AddLockedBitcoinRequestMessage = Message<LockedBitcoinMethods.addLockedBitcoinRequest, string>;
 
-export type AddStakedBitcoinResponseMessage = Message<
-  StakesMethods.addStakedBitcoinResponse,
+export type AddLockedBitcoinResponseMessage = Message<
+  LockedBitcoinMethods.addLockedBitcoinResponse,
   {
-    addStakedBitcoinRequest: string;
-    addStakedBitcoinResponse: string;
+    addLockedBitcoinRequest: string;
+    addLockedBitcoinResponse: string;
   }
 >;
 
-type GetStakedBitcoinRequestMessage = Message<StakesMethods.getStakedBitcoinRequest, string>;
-export type GetStakedBitcoinResponseMessage = Message<
-  StakesMethods.getStakedBitcoinResponse,
+type GetLockedBitcoinRequestMessage = Message<LockedBitcoinMethods.getLockedBitcoinRequest, string>;
+export type GetLockedBitcoinResponseMessage = Message<
+  LockedBitcoinMethods.getLockedBitcoinResponse,
   {
-    getStakedBitcoinRequest: string;
-    getStakedBitcoinResponse: { address: string; script: string }[];
+    getLockedBitcoinRequest: string;
+    getLockedBitcoinResponse: { address: string; script: string }[];
   }
 >;
 
-export type StakedMessageFromContentScript =
-  | AddStakedBitcoinRequestMessage
-  | GetStakedBitcoinRequestMessage;
+export type LockedBitcoinMessageFromContentScript =
+  | AddLockedBitcoinRequestMessage
+  | GetLockedBitcoinRequestMessage;
 
-export type StakedMessageToContentScript =
-  | AddStakedBitcoinResponseMessage
-  | GetStakedBitcoinResponseMessage;
+export type LockedBitcoinMessageToContentScript =
+  | AddLockedBitcoinResponseMessage
+  | GetLockedBitcoinResponseMessage;
 
 /**
  * Stacks External Callable Methods
@@ -76,7 +76,7 @@ export enum InternalMethods {
 }
 
 export type ExtensionMethods =
-  | StakesMethods
+  | LockedBitcoinMethods
   | StacksLegacyMethods
   | SatsConnectMethods
   | InternalMethods

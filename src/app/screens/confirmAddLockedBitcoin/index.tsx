@@ -1,19 +1,16 @@
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
-import ConfirmAddStakedBitcoinComponent from '@components/confirmAddStakedBitcoinComponent';
+import ConfirmAddLockedBitcoinComponent from '@components/confirmAddLockedBitcoinComponent';
 import InfoContainer from '@components/infoContainer';
 import StakedAddressComponent from '@components/stakedAddressComponent';
 import TopRow from '@components/topRow';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import * as bitcoin from 'bitcoinjs-lib';
-
-import useStxWalletData from '@hooks/queries/useStxWalletData';
-import useAddStakedBitcoin from '@hooks/useAddStakedBitcoin';
+import useAddLockedBitcoin from '@hooks/useAddLockedBitcoin';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import useWalletSelector from '@hooks/useWalletSelector';
 import type { Account } from '@secretkeylabs/xverse-core';
 import { lockedBitcoins } from '@utils/locked';
-import BigNumber from 'bignumber.js';
+import * as bitcoin from 'bitcoinjs-lib';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -22,27 +19,18 @@ const AlertContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(12),
 }));
 
-function ConfirmAddStakedBitcoin() {
+function ConfirmAddLockedBitcoin() {
   const { t } = useTranslation('translation');
   const [hasTabClosed, setHasTabClosed] = useState(false);
   const [isScriptMatched, setIsScriptMatched] = useState(false);
   const { accountsList } = useWalletSelector();
-
-  const { refetch } = useStxWalletData();
-
-  const { approveAddStakedBitcoinRequest, cancelAddStakedBitcoinRequest, tabId, network, payload } =
-    useAddStakedBitcoin();
+  const { approveAddLockedBitcoinRequest, cancelAddLockedBitcoinRequest, tabId, network, payload } =
+    useAddLockedBitcoin();
 
   const bitcoinNetwork = useMemo(
     () => (network.type === 'Mainnet' ? bitcoin.networks.bitcoin : bitcoin.networks.testnet),
     [network],
   );
-
-  const txPayload = {
-    amount: 1000000000,
-  };
-
-  const amount = new BigNumber(txPayload.amount.toString(10));
 
   useOnOriginTabClose(Number(tabId), () => {
     setHasTabClosed(true);
@@ -51,19 +39,18 @@ function ConfirmAddStakedBitcoin() {
   const [isLoading, setIsLoading] = useState(false);
   const [lockTime, setLockTime] = useState(0);
   const [belongsToAccount, setBelongsToAccount] = useState<Account>();
-  const [isWitness, setIsWitness] = useState(false);
 
   const handleConfirmClick = async () => {
     setIsLoading(true);
     if (belongsToAccount && payload.address && payload.script) {
       await lockedBitcoins.add(payload.address, payload.script, belongsToAccount.btcAddress);
-      approveAddStakedBitcoinRequest();
+      approveAddLockedBitcoinRequest();
     }
     window.close();
   };
 
   const handleCancelClick = () => {
-    cancelAddStakedBitcoinRequest();
+    cancelAddLockedBitcoinRequest();
     window.close();
   };
 
@@ -132,7 +119,6 @@ function ConfirmAddStakedBitcoin() {
     if (!(payload.address.length === 34 || payload.address.length === 35)) {
       witness = true;
     }
-    setIsWitness(witness);
     const redeemScriptBuf = Buffer.from(payload.script.toString('hex'), 'hex');
     const script = (witness ? bitcoin.payments.p2wsh : bitcoin.payments.p2sh)({
       redeem: {
@@ -149,7 +135,7 @@ function ConfirmAddStakedBitcoin() {
       return true;
     }
     return false;
-  }, [setIsWitness, bitcoinNetwork, payload]);
+  }, [bitcoinNetwork, payload]);
 
   useEffect(() => {
     if (checkScriptAddress()) {
@@ -170,12 +156,13 @@ function ConfirmAddStakedBitcoin() {
     } else {
       setIsScriptMatched(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [payload, bitcoinNetwork, accountsList]);
   return (
     <>
       <TopRow title={t('STAKES.CONFIRM_ADD_STAKED_BITCOIN')} onClick={handleCancelClick} />
 
-      <ConfirmAddStakedBitcoinComponent
+      <ConfirmAddLockedBitcoinComponent
         loading={isLoading}
         onConfirmClick={handleConfirmClick}
         onCancelClick={handleCancelClick}
@@ -216,9 +203,9 @@ function ConfirmAddStakedBitcoin() {
             />
           </AlertContainer>
         )}
-      </ConfirmAddStakedBitcoinComponent>
+      </ConfirmAddLockedBitcoinComponent>
     </>
   );
 }
 
-export default ConfirmAddStakedBitcoin;
+export default ConfirmAddLockedBitcoin;

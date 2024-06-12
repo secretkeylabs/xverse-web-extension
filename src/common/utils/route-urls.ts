@@ -12,8 +12,8 @@ enum RequestsRoutes {
   SendBtcTx = '/btc-send-request',
   CreateInscription = '/create-inscription',
   CreateRepeatInscriptions = '/create-repeat-inscriptions',
-  AddStakedBitcoin = '/add-staked-bitcoin',
-  GetStakedBitcoin = '/get-staked-bitcoin',
+  AddLockedBitcoin = '/add-locked-bitcoin',
+  GetLockedBitcoin = '/get-locked-bitcoin',
 }
 
 export default RequestsRoutes;

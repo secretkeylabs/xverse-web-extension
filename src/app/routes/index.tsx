@@ -10,7 +10,7 @@ import BackupWalletSteps from '@screens/backupWalletSteps';
 import BtcSendScreen from '@screens/btcSendScreen';
 import Buy from '@screens/buy';
 import CoinDashboard from '@screens/coinDashboard';
-import ConfirmAddStakedBitcoin from '@screens/confirmAddStakedBitcoin';
+import ConfirmAddLockedBitcoin from '@screens/confirmAddLockedBitcoin';
 import ConfirmBrc20Transaction from '@screens/confirmBrc20Transaction';
 import ConfirmBtcTransaction from '@screens/confirmBtcTransaction';
 import ConfirmFtTransaction from '@screens/confirmFtTransaction';
@@ -548,10 +548,10 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'add-staked-bitcoin',
+        path: 'add-locked-bitcoin',
         element: (
           <AuthGuard>
-            <ConfirmAddStakedBitcoin />
+            <ConfirmAddLockedBitcoin />
           </AuthGuard>
         ),
       },
