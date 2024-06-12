@@ -1,27 +1,21 @@
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
-import { MESSAGE_SOURCE } from '@common/types/message-types';
-import {
-  sendInternalErrorMessage,
-  sendUserRejectionMessage,
-} from '@common/utils/rpc/stx/rpcResponseMessages';
-import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmAddStakedBitcoinComponent from '@components/confirmAddStakedBitcoinComponent';
 import InfoContainer from '@components/infoContainer';
 import StakedAddressComponent from '@components/stakedAddressComponent';
-import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import * as bitcoin from 'bitcoinjs-lib';
+
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useAddStakedBitcoin from '@hooks/useAddStakedBitcoin';
-
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
-import { microstacksToStx } from '@secretkeylabs/xverse-core';
-
+import useWalletSelector from '@hooks/useWalletSelector';
+import type { Account } from '@secretkeylabs/xverse-core';
 import { stakedBitcoins } from '@utils/stakes';
 import BigNumber from 'bignumber.js';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 const AlertContainer = styled.div((props) => ({
@@ -31,29 +25,40 @@ const AlertContainer = styled.div((props) => ({
 function ConfirmAddStakedBitcoin() {
   const { t } = useTranslation('translation');
   const [hasTabClosed, setHasTabClosed] = useState(false);
-  const navigate = useNavigate();
+  const [isScriptMatched, setIsScriptMatched] = useState(false);
+  const { accountsList } = useWalletSelector();
 
   const { refetch } = useStxWalletData();
 
   const { approveAddStakedBitcoinRequest, cancelAddStakedBitcoinRequest, tabId, network, payload } =
     useAddStakedBitcoin();
 
-  const recipient = '0XXXXXXX'; // addressToString(txPayload.recipient.address);
+  const bitcoinNetwork = useMemo(
+    () => (network.type === 'Mainnet' ? bitcoin.networks.bitcoin : bitcoin.networks.testnet),
+    [network],
+  );
+
   const txPayload = {
     amount: 1000000000,
   };
+
   const amount = new BigNumber(txPayload.amount.toString(10));
-  const locktime = 1718030949876;
+
   useOnOriginTabClose(Number(tabId), () => {
     setHasTabClosed(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [lockTime, setLockTime] = useState(0);
+  const [belongsToAccount, setBelongsToAccount] = useState<Account>();
+  const [isWitness, setIsWitness] = useState(false);
 
   const handleConfirmClick = async () => {
     setIsLoading(true);
-    await stakedBitcoins.add(payload.address, payload.script);
-    approveAddStakedBitcoinRequest();
+    if (belongsToAccount && payload.address && payload.script) {
+      await stakedBitcoins.add(payload.address, payload.script, belongsToAccount.btcAddress);
+      approveAddStakedBitcoinRequest();
+    }
     window.close();
   };
 
@@ -62,6 +67,110 @@ function ConfirmAddStakedBitcoin() {
     window.close();
   };
 
+  const parseCLTVScript = (cltvScript) => {
+    const unlockScript = Buffer.from(cltvScript.toString('hex'), 'hex');
+    // const OPS = bitcoin.script.OPS;
+    const options: {
+      lockTime: number;
+      n?: number;
+      m?: number;
+      pubkeys?: string[];
+      pubkey?: string;
+      pubkeyhash?: string;
+    } = {
+      lockTime: 0,
+    };
+
+    try {
+      const decompiled = bitcoin.script.decompile(unlockScript);
+      if (
+        decompiled &&
+        decompiled.length > 4 &&
+        decompiled[1] === bitcoin.script.OPS.OP_CHECKLOCKTIMEVERIFY &&
+        decompiled[2] === bitcoin.script.OPS.OP_DROP
+      ) {
+        options.lockTime = bitcoin.script.number.decode(decompiled[0] as Buffer);
+        if (
+          decompiled[decompiled.length - 1] === bitcoin.script.OPS.OP_CHECKMULTISIG &&
+          decompiled.length > 5
+        ) {
+          const n = +decompiled[decompiled.length - 6] - bitcoin.script.OPS.OP_RESERVED;
+          const m = +decompiled[3] - bitcoin.script.OPS.OP_RESERVED;
+          const publicKeys: any[] = decompiled.slice(4, 4 + n);
+          let isValidatePublicKey = true;
+          publicKeys.forEach((key: any) => {
+            if (key.length !== 33) {
+              isValidatePublicKey = false;
+            }
+          });
+          if (m < n && isValidatePublicKey) {
+            options.n = n;
+            options.m = m;
+            options.pubkeys = publicKeys;
+          }
+        } else if (decompiled[decompiled.length - 1] === bitcoin.script.OPS.OP_CHECKSIG) {
+          if (decompiled.length === 5) {
+            options.pubkey = Buffer.from(decompiled[3] as any).toString('hex');
+          } else if (
+            decompiled.length === 8 &&
+            decompiled[3] === bitcoin.script.OPS.OP_DUP &&
+            decompiled[4] === bitcoin.script.OPS.OP_HASH160 &&
+            decompiled[6] === bitcoin.script.OPS.OP_EQUALVERIFY
+          ) {
+            options.pubkeyhash = Buffer.from(decompiled[5] as any).toString('hex');
+          }
+        }
+      }
+      return options;
+    } catch (error: any) {
+      throw new Error(`Check MultisigScript: ${error}`);
+    }
+  };
+
+  const checkScriptAddress = useCallback(() => {
+    let witness = false;
+    if (!(payload.address.length === 34 || payload.address.length === 35)) {
+      witness = true;
+    }
+    setIsWitness(witness);
+    const redeemScriptBuf = Buffer.from(payload.script.toString('hex'), 'hex');
+    const script = (witness ? bitcoin.payments.p2wsh : bitcoin.payments.p2sh)({
+      redeem: {
+        output: redeemScriptBuf,
+        network: bitcoinNetwork,
+      },
+      network: bitcoinNetwork,
+    }).output;
+    if (!script) {
+      return false;
+    }
+    const scriptAddress: string = bitcoin.address.fromOutputScript(script, bitcoinNetwork);
+    if (scriptAddress === payload.address) {
+      return true;
+    }
+    return false;
+  }, [setIsWitness, bitcoinNetwork, payload]);
+
+  useEffect(() => {
+    if (checkScriptAddress()) {
+      setIsScriptMatched(true);
+      const lockOptions = parseCLTVScript(payload.script);
+      setLockTime(lockOptions.lockTime);
+
+      if (lockOptions.pubkey || lockOptions.pubkeyhash) {
+        const account = accountsList.find(
+          (acc) =>
+            lockOptions.pubkey === acc.btcPublicKey ||
+            lockOptions.pubkeyhash ===
+              bitcoin.crypto.hash160(Buffer.from(acc.btcPublicKey, 'hex')).toString('hex'),
+        );
+
+        setBelongsToAccount(account);
+      }
+    } else {
+      setIsScriptMatched(false);
+    }
+  }, [payload, bitcoinNetwork, accountsList]);
   return (
     <>
       <TopRow title={t('STAKES.CONFIRM_ADD_STAKED_BITCOIN')} onClick={handleCancelClick} />
@@ -74,15 +183,13 @@ function ConfirmAddStakedBitcoin() {
         <StakedAddressComponent
           address={payload.address}
           script={payload.script}
-          locktime={locktime}
+          locktime={lockTime}
+          account={belongsToAccount}
           value="0"
           icon={IconBitcoin}
           currencyType="BTC"
           title={t('CONFIRM_TRANSACTION.AMOUNT')}
         />
-        {/* {showSpendDelegateStxWarning && (
-          <SpendDelegatedStxWarning variant="warning" bodyText={t('SEND.SPEND_DELEGATED_STX')} />
-        )} */}
 
         <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
         {hasTabClosed && (
@@ -90,6 +197,22 @@ function ConfirmAddStakedBitcoin() {
             <InfoContainer
               titleText={t('WINDOW_CLOSED_ALERT.TITLE')}
               bodyText={t('WINDOW_CLOSED_ALERT.BODY')}
+            />
+          </AlertContainer>
+        )}
+        {!isScriptMatched && (
+          <AlertContainer>
+            <InfoContainer
+              titleText={t('STAKES.SCRIPT_MISMATCH_ALERT.TITLE')}
+              bodyText={t('STAKES.SCRIPT_MISMATCH_ALERT.BODY')}
+            />
+          </AlertContainer>
+        )}
+        {!belongsToAccount && (
+          <AlertContainer>
+            <InfoContainer
+              titleText={t('STAKES.ACCOUNT_MISMATCH_ALERT.TITLE')}
+              bodyText={t('STAKES.ACCOUNT_MISMATCH_ALERT.BODY')}
             />
           </AlertContainer>
         )}

@@ -1349,6 +1349,15 @@
     "ADDRESS": "Address",
     "AMOUNT": "Amount",
     "REDEEM_SCRIPT": "Redeem Script",
-    "LOCK_TIME": "Lock Time"
+    "LOCK_TIME": "Lock Time",
+    "ACCOUNT": "Account",
+    "SCRIPT_MISMATCH_ALERT": {
+      "TITLE": "Redeem script mismatch",
+      "BODY": "The redeem script does not match the address. This is usually caused by network issues or an incorrect address from the dapp."
+    },
+    "ACCOUNT_MISMATCH_ALERT": {
+      "TITLE": "Account mismatch",
+      "BODY": "The public key in the redeem script does not match any account in the wallets."
+    }
   }
 }

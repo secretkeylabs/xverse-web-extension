@@ -1,4 +1,4 @@
-const STAKED_BITCOIN_MAP_KEY = 'core_staked_bitcoin_key';
+const STAKED_BITCOIN_MAP_KEY = 'CORE_STAKED_BITCOIN_MAP_KEY';
 
 export const stakedBitcoins = {
   get: async () => {
@@ -8,14 +8,23 @@ export const stakedBitcoins = {
     }
     return {};
   },
-  add: async (address: string, script: string) => {
+  add: async (address: string, script: string, accountAddress: string) => {
     const old = await stakedBitcoins.get();
-    old[address] = script;
+    if (!old[accountAddress]) {
+      old[accountAddress] = {};
+    }
+    old[accountAddress][address] = script;
     localStorage.setItem(STAKED_BITCOIN_MAP_KEY, JSON.stringify(old));
   },
   remove: async (address: string) => {
     const old = await stakedBitcoins.get();
-    if (address in old) delete old[address];
+
+    // eslint-disable-next-line no-restricted-syntax, guard-for-in
+    for (const accountAddress in old) {
+      const accountMap = old[accountAddress];
+      if (address in accountMap) delete accountMap[address];
+    }
+
     localStorage.setItem(STAKED_BITCOIN_MAP_KEY, JSON.stringify(old));
   },
 };

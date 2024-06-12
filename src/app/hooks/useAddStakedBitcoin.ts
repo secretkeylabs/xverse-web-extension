@@ -33,32 +33,20 @@ const useAddStakedBitcoin = () => {
   }, [addStakedBitcoin]);
 
   const approveAddStakedBitcoinRequest = useCallback(() => {
-    // if (rpcMethod === 'addStakedBitcoin') {
-    //   chrome.tabs.sendMessage(+tabId, {
-    //     ...{
-    //       id: messageId,
-    //       result: '',
-    //       jsonrpc: '2.0',
-    //     },
-    //     source: MESSAGE_SOURCE,
-    //   });
-    //   return;
-    // }
-
     chrome.tabs.sendMessage(+tabId, {
       source: MESSAGE_SOURCE,
-      method: 'addStakedBitcoin',
-      payload: { addStakedBitcoinResponse: '' },
+      method: 'addStakedBitcoinResponse',
+      payload: { addStakedBitcoinResponse: 'success', addStakedBitcoinRequest: addStakedBitcoin },
     });
-  }, [tabId]);
+  }, [tabId, addStakedBitcoin]);
 
   const cancelAddStakedBitcoinRequest = useCallback(() => {
     chrome.tabs.sendMessage(+tabId, {
       source: MESSAGE_SOURCE,
-      method: 'addStakedBitcoin',
-      payload: { addStakedBitoinResponse: 'cancel' },
+      method: 'addStakedBitcoinResponse',
+      payload: { addStakedBitoinResponse: 'cancel', addStakedBitcoinRequest: addStakedBitcoin },
     });
-  }, [tabId]);
+  }, [tabId, addStakedBitcoin]);
 
   // if (rpcMethod === 'stx_getAddresses') {
   //   return {

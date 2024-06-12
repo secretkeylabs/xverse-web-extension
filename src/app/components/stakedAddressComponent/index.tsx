@@ -1,20 +1,34 @@
 import AddressIcon from '@assets/img/transactions/address.svg';
 import LockIcon from '@assets/img/transactions/Lock.svg';
-import OutputIcon from '@assets/img/transactions/output.svg';
 import ScriptIcon from '@assets/img/transactions/ScriptIcon.svg';
+import AccountRow from '@components/accountRow';
 import TokenImage from '@components/tokenImage';
 import TransferDetailView from '@components/transferDetailView';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CubeTransparent } from '@phosphor-icons/react';
+import type { Account } from '@secretkeylabs/xverse-core';
 import { currencySymbolMap, FungibleToken, getFiatEquivalent } from '@secretkeylabs/xverse-core';
-import { CurrencyTypes } from '@utils/constants';
+import { CurrencyTypes, MAX_ACC_NAME_LENGTH } from '@utils/constants';
+import { formatDate } from '@utils/date';
+import { getAccountGradient } from '@utils/gradient';
 import { getTicker } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
+
+const GradientCircle = styled.div<{
+  firstGradient: string;
+  secondGradient: string;
+  thirdGradient: string;
+}>((props) => ({
+  width: 32,
+  height: 32,
+  borderRadius: 25,
+  background: `linear-gradient(to bottom,${props.firstGradient}, ${props.secondGradient},${props.thirdGradient} )`,
+}));
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -39,6 +53,13 @@ const RowContainer = styled.div({
   alignItems: 'flex-start',
   marginBottom: 12,
 });
+const AccountContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'row',
+  width: '100%',
+  alignItems: 'center',
+  gap: 8,
+});
 
 const Icon = styled.img((props) => ({
   marginRight: props.theme.spacing(4),
@@ -59,7 +80,6 @@ const TitleText = styled.p((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white_200,
   textAlign: 'center',
-  marginTop: 5,
 }));
 
 const ValueText = styled.p((props) => ({
@@ -72,20 +92,6 @@ const SubValueText = styled.p((props) => ({
   fontSize: 12,
   color: props.theme.colors.white_400,
 }));
-
-const ColumnContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-  justifyContent: 'flex-end',
-  alignItems: 'flex-end',
-  paddingTop: 5,
-});
-
-const MultipleAddressContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-});
 
 const TokenContainer = styled.div({
   marginRight: 10,
@@ -103,6 +109,27 @@ const IconContainer = styled.div((props) => ({
   marginRight: props.theme.spacing(4),
 }));
 
+const LockTimeContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'row',
+  flex: 1,
+  alignItems: 'center',
+  justifyContent: 'flex-end',
+});
+
+function LockTimeRow({ icon, title, lockTime }: { icon: string; title: string; lockTime: number }) {
+  const date = formatDate(new Date(lockTime * 1000));
+  return (
+    <LockTimeContainer>
+      {icon && <Icon src={icon} />}
+      <TitleText>{title}</TitleText>
+      <LockTimeContainer>
+        <ValueText>{date}</ValueText>
+      </LockTimeContainer>
+    </LockTimeContainer>
+  );
+}
+
 interface Props {
   address?: string;
   value: string;
@@ -114,7 +141,7 @@ interface Props {
   icon?: string;
   fungibleToken?: FungibleToken;
   heading?: string;
-  showSenderAddress?: boolean;
+  account?: Account;
 }
 function StakedAddressComponent({
   address,
@@ -127,12 +154,13 @@ function StakedAddressComponent({
   icon,
   currencyType,
   heading,
-  showSenderAddress,
+  account,
 }: Props) {
-  const { t } = useTranslation('translation', { keyPrefix: 'STAKES' });
+  const { t } = useTranslation('translation');
   const [fiatAmount, setFiatAmount] = useState<string | undefined>('0');
-  const { fiatCurrency, ordinalsAddress } = useWalletSelector();
+  const { fiatCurrency } = useWalletSelector();
   const { btcFiatRate, stxBtcRate } = useCoinRates();
+  const gradient = getAccountGradient(account?.stxAddress || account?.btcAddress!);
 
   useEffect(() => {
     setFiatAmount(
@@ -199,15 +227,24 @@ function StakedAddressComponent({
     );
   };
 
+  const getName = () => {
+    const name =
+      account?.accountName ??
+      account?.bnsName ??
+      `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`;
+
+    return name.length > MAX_ACC_NAME_LENGTH ? `${name.slice(0, MAX_ACC_NAME_LENGTH)}...` : name;
+  };
+
   return (
     <Container>
       {heading && <RecipientTitleText>{heading}</RecipientTitleText>}
       {address && (
         <RowContainer>
-          <TransferDetailView icon={AddressIcon} title={t('ADDRESS')} address={address} />
+          <TransferDetailView icon={AddressIcon} title={t('STAKES.ADDRESS')} address={address} />
         </RowContainer>
       )}
-      {value && (
+      {/* {value && (
         <RowContainer>
           {renderIcon()}
           <TitleText>{title}</TitleText>
@@ -229,15 +266,33 @@ function StakedAddressComponent({
             </ColumnContainer>
           )}
         </RowContainer>
-      )}
+      )} */}
       {script && (
         <RowContainer>
-          <TransferDetailView icon={ScriptIcon} title={t('REDEEM_SCRIPT')} address={script} />
+          <TransferDetailView
+            icon={ScriptIcon}
+            title={t('STAKES.REDEEM_SCRIPT')}
+            address={script}
+          />
         </RowContainer>
       )}
       {locktime && (
+        <RowContainer>
+          <LockTimeRow icon={LockIcon} title={t('STAKES.LOCK_TIME')} lockTime={locktime} />
+          {/* <TransferDetailView icon={LockIcon} title={t('LOCK_TIME')} address={lockTime} /> */}
+        </RowContainer>
+      )}
+
+      {account && (
         <div>
-          <TransferDetailView icon={LockIcon} title={t('LOCK_TIME')} address={script} />
+          <AccountContainer>
+            <GradientCircle
+              firstGradient={gradient[0]}
+              secondGradient={gradient[1]}
+              thirdGradient={gradient[2]}
+            />
+            <TitleText>{getName()}</TitleText>
+          </AccountContainer>
         </div>
       )}
     </Container>

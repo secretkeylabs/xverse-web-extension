@@ -26,9 +26,7 @@ const StakesMethodsProvider: StakesProvider = {
           reject(eventMessage.data.payload.addStakedBitcoinResponse);
           return;
         }
-        if (typeof eventMessage.data.payload.addStakedBitcoinResponse !== 'string') {
-          resolve(eventMessage.data.payload.addStakedBitcoinResponse);
-        }
+        resolve(eventMessage.data.payload.addStakedBitcoinResponse);
       };
       window.addEventListener('message', handleMessage);
     });
