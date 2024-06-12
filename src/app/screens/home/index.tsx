@@ -432,6 +432,10 @@ function Home() {
     }
   };
 
+  // const handleLockedBtcPressed = () => {
+  //   navigate(`/lockedBtc`);
+  // };
+
   const onOrdinalsReceivePress = () => {
     navigate('/receive/ORD');
   };

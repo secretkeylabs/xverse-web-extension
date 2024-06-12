@@ -8,6 +8,7 @@ import SmallActionButton from '@components/smallActionButton';
 import TokenImage from '@components/tokenImage';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useCoinRates from '@hooks/queries/useCoinRates';
+import useLockedBtcData from '@hooks/queries/useLockedBtcData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
@@ -167,6 +168,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
   const { coin, fungibleToken } = props;
   const { fiatCurrency, selectedAccount } = useWalletSelector();
   const { data: btcBalance } = useBtcWalletData();
+  const { data: lockedBtcBalance } = useLockedBtcData();
   const { data: stxData } = useStxWalletData();
   const { btcFiatRate, stxBtcRate } = useCoinRates();
   const navigate = useNavigate();
@@ -188,6 +190,8 @@ export default function CoinHeader(props: CoinBalanceProps) {
         return microstacksToStx(new BigNumber(stxData?.balance ?? 0)).toString();
       case 'BTC':
         return satsToBtc(new BigNumber(btcBalance ?? 0)).toString();
+      case 'Locked-BTC':
+        return satsToBtc(new BigNumber(lockedBtcBalance ?? 0)).toString();
       default:
         return fungibleToken ? getFtBalance(fungibleToken) : '';
     }
@@ -206,6 +210,9 @@ export default function CoinHeader(props: CoinBalanceProps) {
     if (coin === 'STX' || coin === 'BTC') {
       return coin;
     }
+    if (coin === 'Locked-BTC') {
+      return 'BTC';
+    }
     if (coin === 'FT' && fungibleToken) {
       return getFtTicker(fungibleToken);
     }
@@ -222,6 +229,11 @@ export default function CoinHeader(props: CoinBalanceProps) {
           .toString();
       case 'BTC':
         return satsToBtc(new BigNumber(btcBalance ?? 0))
+          .multipliedBy(new BigNumber(btcFiatRate))
+          .toFixed(2)
+          .toString();
+      case 'Locked-BTC':
+        return satsToBtc(new BigNumber(lockedBtcBalance ?? 0))
           .multipliedBy(new BigNumber(btcFiatRate))
           .toFixed(2)
           .toString();
@@ -349,6 +361,9 @@ export default function CoinHeader(props: CoinBalanceProps) {
     if (coin === 'BTC') {
       return `Bitcoin ${t('BALANCE')}`;
     }
+    if (coin === 'Locked-BTC') {
+      return `Locked Bitcoin ${t('BALANCE')}`;
+    }
     if (coin) {
       return `${coin} ${t('BALANCE')}`;
     }
@@ -423,43 +438,49 @@ export default function CoinHeader(props: CoinBalanceProps) {
         </BalanceValuesContainer>
       </BalanceInfoContainer>
       {renderStackingBalances()}
-      <RowButtonContainer>
-        {/* ENG-4020 - Disable BRC20 Sending on Ledger */}
-        {!(fungibleToken?.protocol === 'brc-20' && isLedgerAccount(selectedAccount)) && (
-          <ButtonContainer>
-            <SmallActionButton src={ArrowUp} text={t('SEND')} onPress={() => goToSendScreen()} />
-          </ButtonContainer>
-        )}
-        {!fungibleToken ? (
-          <>
+      {coin !== 'Locked-BTC' && (
+        <RowButtonContainer>
+          {/* ENG-4020 - Disable BRC20 Sending on Ledger */}
+          {!(fungibleToken?.protocol === 'brc-20' && isLedgerAccount(selectedAccount)) && (
             <ButtonContainer>
+              <SmallActionButton src={ArrowUp} text={t('SEND')} onPress={() => goToSendScreen()} />
+            </ButtonContainer>
+          )}
+          {!fungibleToken ? (
+            <>
+              <ButtonContainer>
+                <SmallActionButton
+                  src={ArrowDown}
+                  text={t('RECEIVE')}
+                  onPress={() => {
+                    if (isReceivingAddressesVisible) {
+                      navigate(`/receive/${coin}`);
+                    } else {
+                      handleReceiveModalOpen();
+                    }
+                  }}
+                />
+              </ButtonContainer>
+              <SmallActionButton
+                src={Buy}
+                text={t('BUY')}
+                onPress={() => navigate(`/buy/${coin}`)}
+              />
+            </>
+          ) : (
+            <RecieveButtonContainer>
               <SmallActionButton
                 src={ArrowDown}
                 text={t('RECEIVE')}
-                onPress={() => {
-                  if (isReceivingAddressesVisible) {
-                    navigate(`/receive/${coin}`);
-                  } else {
-                    handleReceiveModalOpen();
-                  }
-                }}
+                // RUNES & BRC20s => ordinal wallet, SIP-10 => STX wallet
+                onPress={() =>
+                  navigate(`/receive/${fungibleToken?.protocol === 'stacks' ? 'STX' : 'ORD'}`)
+                }
               />
-            </ButtonContainer>
-            <SmallActionButton src={Buy} text={t('BUY')} onPress={() => navigate(`/buy/${coin}`)} />
-          </>
-        ) : (
-          <RecieveButtonContainer>
-            <SmallActionButton
-              src={ArrowDown}
-              text={t('RECEIVE')}
-              // RUNES & BRC20s => ordinal wallet, SIP-10 => STX wallet
-              onPress={() =>
-                navigate(`/receive/${fungibleToken?.protocol === 'stacks' ? 'STX' : 'ORD'}`)
-              }
-            />
-          </RecieveButtonContainer>
-        )}
-      </RowButtonContainer>
+            </RecieveButtonContainer>
+          )}
+        </RowButtonContainer>
+      )}
 
       <BottomModal
         visible={openReceiveModal}
