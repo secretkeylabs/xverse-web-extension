@@ -16,6 +16,7 @@ const keysTransformer = require('ts-transformer-keys/transformer').default;
 const aliases = {
   // alias stacks.js packages to their esm (default prefers /dist/polyfill)
   '@stacks/transactions': '@stacks/transactions/dist/esm',
+  '@secretkeylabs/xverse-core': '@secretkeylabs/xverse-core/dist',
 };
 
 const ASSET_PATH = process.env.ASSET_PATH || '/';
