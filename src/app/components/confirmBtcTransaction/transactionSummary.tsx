@@ -10,7 +10,6 @@ import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import { btcTransaction, getBtcFiatEquivalent, RuneSummary } from '@secretkeylabs/xverse-core';
 import SelectFeeRate from '@ui-components/selectFeeRate';
 import Callout from '@ui-library/callout';
-import { BLOG_LINK } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -68,7 +67,6 @@ function TransactionSummary({
   const { btcFiatRate } = useCoinRates();
   const { network, fiatCurrency } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const { t: rareSatsT } = useTranslation('translation', { keyPrefix: 'RARE_SATS' });
   const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
 
   const { btcAddress, ordinalsAddress } = useWalletSelector();
