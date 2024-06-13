@@ -1,9 +1,14 @@
 import { SeedVaultStorageKeys } from '@secretkeylabs/xverse-core';
+import { fetchAccountAction } from '@stores/wallet/actions/actionCreators';
 import ChromeStorage from '@utils/chromeStorage';
+import { useDispatch } from 'react-redux';
 import useSeedVault from './useSeedVault';
+import useWalletSelector from './useWalletSelector';
 
 const useSeedVaultMigration = () => {
   const SeedVault = useSeedVault();
+  const { selectedAccount, accountsList } = useWalletSelector();
+  const dispatch = useDispatch();
 
   const isVaultUpdated = async () => {
     const currentVaultVersion = await ChromeStorage.local.getItem<string>(
@@ -26,6 +31,8 @@ const useSeedVaultMigration = () => {
     await chrome.storage.local.clear();
     await SeedVault.restoreVault(encryptedKey, passwordSalt);
     localStorage.removeItem('SEED_VAULT_MIGRATION_BACKUP');
+    // triggers refreshing of the cached data
+    dispatch(fetchAccountAction(selectedAccount!, accountsList));
   };
 
   const migrateCachedStorage = async () => {
