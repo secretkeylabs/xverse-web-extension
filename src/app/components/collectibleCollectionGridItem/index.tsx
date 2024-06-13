@@ -72,7 +72,7 @@ export function CollectibleCollectionGridItem({
       : undefined;
 
   return (
-    <GridItemContainer onClick={handleOnClick}>
+    <GridItemContainer data-testid="collection-item" onClick={handleOnClick}>
       <ImageContainer>{children}</ImageContainer>
       <InfoContainer>
         <StyledItemId typography="body_bold_m" color="white_0">

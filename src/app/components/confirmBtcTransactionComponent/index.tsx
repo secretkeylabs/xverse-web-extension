@@ -371,6 +371,7 @@ function ConfirmBtcTransactionComponent({
         {currencyType !== 'BTC' && bundle && <SatsBundle bundle={bundle} />}
         {ordinalTxUtxo ? (
           <RecipientComponent
+            dataTestID="value-text"
             address={recipients[0]?.address}
             value={assetDetail ?? ''}
             valueDetail={assetDetailValue}
@@ -381,6 +382,7 @@ function ConfirmBtcTransactionComponent({
         ) : (
           recipients?.map((recipient, index) => (
             <RecipientComponent
+              dataTestID="value-text"
               key={recipient.address}
               recipientIndex={index + 1}
               address={recipient.address}

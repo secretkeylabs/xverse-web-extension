@@ -180,7 +180,7 @@ export default function CollectiblesTabs({
   return (
     <Tabs className={className} selectedIndex={tabIndex} onSelect={handleSelectTab}>
       {visibleTabButtons.length > 1 && (
-        <StickyStyledTabList>
+        <StickyStyledTabList data-testid="tab-list">
           {visibleTabButtons.map(({ key, label }) => (
             <StyledTab key={key}>{t(label)}</StyledTab>
           ))}
@@ -193,7 +193,11 @@ export default function CollectiblesTabs({
           ) : (
             <>
               {totalInscriptions > 0 && (
-                <StyledTotalItems typography="body_medium_m" color="white_200">
+                <StyledTotalItems
+                  data-testid="total-items"
+                  typography="body_medium_m"
+                  color="white_200"
+                >
                   {totalInscriptions === 1
                     ? t('TOTAL_ITEMS_ONE')
                     : t('TOTAL_ITEMS', { count: totalInscriptions })}
@@ -210,7 +214,11 @@ export default function CollectiblesTabs({
         ) : (
           <>
             {totalNfts > 0 && (
-              <StyledTotalItems typography="body_medium_m" color="white_200">
+              <StyledTotalItems
+                data-testid="total-items"
+                typography="body_medium_m"
+                color="white_200"
+              >
                 {totalNfts === 1 ? t('TOTAL_ITEMS_ONE') : t('TOTAL_ITEMS', { count: totalNfts })}
               </StyledTotalItems>
             )}
@@ -221,7 +229,11 @@ export default function CollectiblesTabs({
       {hasActivatedRareSatsKey && (
         <TabPanel>
           {!rareSatsQuery.isLoading && ordinalBundleCount > 0 && (
-            <StyledTotalItems typography="body_medium_m" color="white_200">
+            <StyledTotalItems
+              data-testid="total-items"
+              typography="body_medium_m"
+              color="white_200"
+            >
               {ordinalBundleCount === 1
                 ? t('TOTAL_ITEMS_ONE')
                 : t('TOTAL_ITEMS', { count: ordinalBundleCount })}
@@ -248,7 +260,7 @@ export default function CollectiblesTabs({
           {rareSatsQuery.isInitialLoading ? (
             <SkeletonLoader isGalleryOpen={isGalleryOpen} />
           ) : (
-            <RareSatsTabContainer isGalleryOpen={isGalleryOpen}>
+            <RareSatsTabContainer data-testid="rareSats-container" isGalleryOpen={isGalleryOpen}>
               {!rareSatsQuery.error &&
                 !rareSatsQuery.isLoading &&
                 rareSatsQuery.data?.pages

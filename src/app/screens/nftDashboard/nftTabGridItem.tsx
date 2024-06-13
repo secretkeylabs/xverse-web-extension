@@ -57,7 +57,7 @@ export function NftTabGridItem({
   const itemSubText = getNftsTabGridItemSubText(collection);
 
   return (
-    <CollectionContainer>
+    <CollectionContainer data-testid="collection-container">
       <ThumbnailContainer onClick={handleClickCollection}>
         {isLoading ? (
           <NftImage />

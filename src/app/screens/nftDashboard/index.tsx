@@ -122,7 +122,7 @@ function NftDashboard() {
             </StyledHeading>
             {!isGalleryOpen && <StyledWebGalleryButton onClick={openInGalleryView} />}
           </CollectibleContainer>
-          <ButtonContainer>
+          <ButtonContainer data-testid="receive-button">
             <ReceiveButtonContainer>
               <ActionButton
                 icon={<ArrowDown weight="bold" size={16} />}

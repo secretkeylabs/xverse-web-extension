@@ -197,7 +197,7 @@ function RecipientComponent({
           <TitleText>{title}</TitleText>
           {currencyType === 'NFT' || currencyType === 'Ordinal' || currencyType === 'RareSat' ? (
             <ColumnContainer>
-              <ValueText>{value}</ValueText>
+              <ValueText data-testid={dataTestID}>{value}</ValueText>
               {valueDetail && <SubValueText>{valueDetail}</SubValueText>}
             </ColumnContainer>
           ) : (

@@ -125,7 +125,7 @@ export default class Onboarding {
     // TODO: Selector outsource
     await expect(this.page.locator('div > h1:first-child')).toHaveText(/Legal/);
     // check that the links contain href values
-    // TODO better selectors for link selection
+    // TODO: better selectors for link selection
     const linkList = this.page.locator('#app a');
     for (let i = 0; i < (await linkList.count()); i++) {
       expect(await linkList.nth(i).getAttribute('href')).not.toBeNull();
