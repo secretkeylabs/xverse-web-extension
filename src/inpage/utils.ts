@@ -1,5 +1,6 @@
 import {
   LegacyMessageToContentScript,
+  LockedBitcoinMessageToContentScript,
   MESSAGE_SOURCE,
   SatsConnectMessageToContentScript,
   StacksLegacyMethods,
@@ -16,7 +17,10 @@ interface ExtensionResponse {
 
 export const isValidLegacyEvent = (
   event: MessageEvent,
-  method: SatsConnectMessageToContentScript['method'] | LegacyMessageToContentScript['method'],
+  method:
+    | SatsConnectMessageToContentScript['method']
+    | LegacyMessageToContentScript['method']
+    | LockedBitcoinMessageToContentScript['method'],
 ) => {
   const { data } = event;
   const correctSource = data.source === MESSAGE_SOURCE;

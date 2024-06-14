@@ -3,6 +3,7 @@ import type {
   AccountType,
   AppInfo,
   BaseWallet,
+  BtcAddressData,
   SettingsNetwork,
   SupportedCurrency,
 } from '@secretkeylabs/xverse-core';
@@ -34,6 +35,7 @@ export const SetWalletUnlockedKey = 'SetWalletUnlocked';
 export const RenameAccountKey = 'RenameAccountKey';
 export const SetAccountBalanceKey = 'SetAccountBalanceKey';
 export const SetWalletHideStxKey = 'SetWalletHideStx';
+export const SetLockedBtcBalanceKey = 'SetLockedBtcBalanceKey';
 
 export enum WalletSessionPeriods {
   LOW = 15,
@@ -77,6 +79,9 @@ export interface WalletState {
     [key: string]: string;
   };
   hideStx: boolean;
+  lockedBtcBalances: {
+    [key: string]: BtcAddressData;
+  };
 }
 
 export interface SetWallet {
@@ -226,6 +231,10 @@ export interface SetWalletHideStx {
   type: typeof SetWalletHideStxKey;
   hideStx: boolean;
 }
+export interface SetLockedBtcBalance {
+  type: typeof SetLockedBtcBalanceKey;
+  lockedBtcBalances: Record<string, BtcAddressData>;
+}
 
 export type WalletActions =
   | SetWallet
@@ -254,4 +263,5 @@ export type WalletActions =
   | SetWalletUnlocked
   | RenameAccount
   | SetAccountBalance
-  | SetWalletHideStx;
+  | SetWalletHideStx
+  | SetLockedBtcBalance;

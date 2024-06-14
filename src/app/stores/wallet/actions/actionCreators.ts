@@ -4,6 +4,7 @@ import type {
   AccountType,
   AppInfo,
   BaseWallet,
+  BtcAddressData,
   SettingsNetwork,
   SupportedCurrency,
 } from '@secretkeylabs/xverse-core';
@@ -267,5 +268,14 @@ export function setWalletHideStxAction(hideStx: boolean): actions.SetWalletHideS
   return {
     type: actions.SetWalletHideStxKey,
     hideStx,
+  };
+}
+
+export function setLockedBtcBalanceAction(
+  lockedBtcBalances: Record<string, BtcAddressData>,
+): actions.SetLockedBtcBalance {
+  return {
+    type: actions.SetLockedBtcBalanceKey,
+    lockedBtcBalances,
   };
 }

@@ -198,6 +198,7 @@
     "TOTAL_BALANCE": "total balance",
     "BITCOIN": "Bitcoin",
     "STACKS": "Stacks",
+    "LOCKED_BITCOIN": "Locked Bitcoin",
     "ACCOUNT_NAME": "Account",
     "RECEIVE": "Receive",
     "CANCEL": "Cancel",
@@ -864,6 +865,9 @@
     "TRANSACTIONS_LIST_ERROR": "Error fetching transaction history for this token",
     "TRANSACTION_SENT": "Sent",
     "TRANSACTION_RECEIVED": "Received",
+    "LOCKED_BTC_LIST_TITLE": "Locked Bitcoin",
+    "LOCKED_BTC_LIST_EMPTY": "No locked Bitcoin found.",
+    "LOCKED_BTC_LIST_ERROR": "Error fetching locked Bitcoin list",
     "MINT": "Mint",
     "SPEED_UP": "Speed up",
     "INSCRIBE_TRANSFER": "Inscribe Transfer",
@@ -1343,5 +1347,21 @@
     "NETWORK_MISMATCH": "There’s a mismatch between your active network and the network you’re logged with.",
     "PSBT_CANT_PARSE_ERROR_TITLE": "Transaction Error",
     "PSBT_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction is invalid and cannot be processed. Please contact the developer of the requesting app for support."
+  },
+  "LOCKED": {
+    "CONFIRM_ADD_LOCKED_BITCOIN": "Add locked bitcoin to wallet",
+    "ADDRESS": "Address",
+    "AMOUNT": "Amount",
+    "REDEEM_SCRIPT": "Redeem Script",
+    "LOCK_TIME": "Lock Time",
+    "ACCOUNT": "Account",
+    "SCRIPT_MISMATCH_ALERT": {
+      "TITLE": "Redeem script mismatch",
+      "BODY": "The redeem script does not match the address. This is usually caused by network issues or an incorrect address from the dapp."
+    },
+    "ACCOUNT_MISMATCH_ALERT": {
+      "TITLE": "Account mismatch",
+      "BODY": "The public key in the redeem script does not match any account in the wallets."
+    }
   }
 }

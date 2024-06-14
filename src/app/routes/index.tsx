@@ -10,6 +10,7 @@ import BackupWalletSteps from '@screens/backupWalletSteps';
 import BtcSendScreen from '@screens/btcSendScreen';
 import Buy from '@screens/buy';
 import CoinDashboard from '@screens/coinDashboard';
+import ConfirmAddLockedBitcoin from '@screens/confirmAddLockedBitcoin';
 import ConfirmBrc20Transaction from '@screens/confirmBrc20Transaction';
 import ConfirmBtcTransaction from '@screens/confirmBtcTransaction';
 import ConfirmFtTransaction from '@screens/confirmFtTransaction';
@@ -544,6 +545,14 @@ const router = createHashRouter([
           <OnboardingGuard>
             <RestoreWallet />
           </OnboardingGuard>
+        ),
+      },
+      {
+        path: 'add-locked-bitcoin',
+        element: (
+          <AuthGuard>
+            <ConfirmAddLockedBitcoin />
+          </AuthGuard>
         ),
       },
     ],

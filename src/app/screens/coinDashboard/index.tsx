@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import CoinHeader from './coinHeader';
+import LockedBtcList from './lockedBtcList';
 import TransactionsHistoryList from './transactionsHistoryList';
 
 const Container = styled.div((props) => ({
@@ -191,13 +192,14 @@ export default function CoinDashboard() {
             </ContractDeploymentButton>
           </TokenContractContainer>
         )}
-        {protocol !== 'runes' && (
+        {protocol !== 'runes' && currency !== 'Locked-BTC' && (
           <TransactionsHistoryList
             coin={currency as CurrencyTypes}
             txFilter={`${selectedFt?.principal}::${selectedFt?.assetName}`}
             brc20Token={protocol === 'brc-20' ? selectedFt?.principal || null : null}
           />
         )}
+        {currency === 'Locked-BTC' && <LockedBtcList />}
       </Container>
       <BottomBar tab="dashboard" />
     </>

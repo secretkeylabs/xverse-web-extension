@@ -2,6 +2,7 @@ import { StacksProvider } from '@stacks/connect';
 import { BitcoinProvider } from 'sats-connect';
 
 import { XverseProviderInfo } from '@utils/constants';
+import LockedBitcoinMethodsProvider, { LockedBitcoinProvider } from './locked.inpage';
 import SatsMethodsProvider from './sats.inpage';
 import StacksMethodsProvider from './stacks.inpage';
 
@@ -17,6 +18,8 @@ window.XverseProviders = {
   // @ts-ignore
   StacksProvider: StacksMethodsProvider as StacksProvider,
   BitcoinProvider: SatsMethodsProvider as BitcoinProvider,
+  // @ts-ignore
+  LockedBitcoinProvider: LockedBitcoinMethodsProvider as LockedBitcoinProvider,
 };
 
 // we inject these in case implementors call the default providers
@@ -46,6 +49,23 @@ try {
 } catch (e) {
   console.log(
     'Failed setting Xverse Bitcoin default provider. Another wallet may have already set it in an immutable way.',
+  );
+  console.error(e);
+}
+
+// we inject these in case implementors call the default providers
+try {
+  if (document.currentScript?.dataset.isPriority) {
+    Object.defineProperties(window, {
+      LockedBitcoinProvider: { get: () => LockedBitcoinMethodsProvider, set: () => {} },
+    });
+  } else {
+    // @ts-ignore
+    window.LockedBitcoinProvider = LockedBitcoinMethodsProvider as LockedBitcoinProvider;
+  }
+} catch (e) {
+  console.log(
+    'Failed setting Xverse Stakes default provider. Another wallet may have already set it in an immutable way.',
   );
   console.error(e);
 }

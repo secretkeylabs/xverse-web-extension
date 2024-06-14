@@ -17,6 +17,7 @@ import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10Fun
 import useAppConfig from '@hooks/queries/useAppConfig';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useFeeMultipliers from '@hooks/queries/useFeeMultipliers';
+import useLockedBtcData from '@hooks/queries/useLockedBtcData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useHasFeature from '@hooks/useHasFeature';
 import useNotificationBanners from '@hooks/useNotificationBanners';
@@ -32,6 +33,7 @@ import Divider from '@ui-library/divider';
 import Sheet from '@ui-library/sheet';
 import { CurrencyTypes } from '@utils/constants';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
+import { lockedBitcoins } from '@utils/locked';
 import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
@@ -233,11 +235,15 @@ function Home() {
   const [areReceivingAddressesVisible, setAreReceivingAddressesVisible] = useState(
     !isLedgerAccount(selectedAccount),
   );
+  const [hasBTCLocked, setHasBTCLocked] = useState(false);
+
   const [choseToVerifyAddresses, setChoseToVerifyAddresses] = useState(false);
   const { isInitialLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } =
     useStxWalletData();
   const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } =
     useBtcWalletData();
+  const { isLoading: loadingLockedBtcData, isRefetching: refetchingLockedBtcData } =
+    useLockedBtcData();
   const { data: notificationBannersArr } = useNotificationBanners();
   const {
     visible: sip10CoinsList,
@@ -270,6 +276,12 @@ function Home() {
       getSanityCheck('X-Current-Version');
     })();
   }, [getSanityCheck]);
+
+  useEffect(() => {
+    (async () => {
+      setHasBTCLocked(await lockedBitcoins.exist(selectedAccount?.btcAddress));
+    })();
+  }, [selectedAccount]);
 
   const showNotificationBanner =
     notificationBannersArr?.length &&
@@ -420,6 +432,10 @@ function Home() {
     }
   };
 
+  // const handleLockedBtcPressed = () => {
+  //   navigate(`/lockedBtc`);
+  // };
+
   const onOrdinalsReceivePress = () => {
     navigate('/receive/ORD');
   };
@@ -542,7 +558,8 @@ function Home() {
             refetchingBtcWalletData ||
             refetchingStxCoinData ||
             refetchingStxWalletData ||
-            refetchingRunesData
+            refetchingRunesData ||
+            refetchingLockedBtcData
           }
         />
         <RowButtonContainer data-testid="transaction-buttons-row">
@@ -587,6 +604,14 @@ function Home() {
               title={t('STACKS')}
               currency="STX"
               loading={loadingStxWalletData}
+              onPress={handleTokenPressed}
+            />
+          )}
+          {hasBTCLocked && (
+            <StyledTokenTile
+              title={t('LOCKED_BITCOIN')}
+              currency="Locked-BTC"
+              loading={loadingBtcWalletData}
               onPress={handleTokenPressed}
             />
           )}

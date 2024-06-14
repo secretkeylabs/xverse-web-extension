@@ -92,6 +92,9 @@ export default function TokenImage({
     if (currency === 'BTC') {
       return IconBitcoin;
     }
+    if (currency === 'Locked-BTC') {
+      return IconBitcoin;
+    }
   }, [currency]);
 
   const getProtocolIcon = () => {

@@ -5,6 +5,7 @@ import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10Fun
 import useAccountBalance from '@hooks/queries/useAccountBalance';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useCoinRates from '@hooks/queries/useCoinRates';
+import useLockedBtcData from '@hooks/queries/useLockedBtcData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core';
@@ -75,6 +76,7 @@ function BalanceCard(props: BalanceCardProps) {
     useWalletSelector();
   const { data: btcBalance } = useBtcWalletData();
   const { data: stxData } = useStxWalletData();
+  const { data: lockedBtcData } = useLockedBtcData();
   const { btcFiatRate, stxBtcRate } = useCoinRates();
   const { setAccountBalance } = useAccountBalance();
   const { isLoading, isRefetching } = props;
@@ -86,6 +88,7 @@ function BalanceCard(props: BalanceCardProps) {
   const balance = calculateTotalBalance({
     stxBalance: stxData?.balance.toString() ?? '0',
     btcBalance: btcBalance?.toString() ?? '0',
+    lockedBtcBalance: lockedBtcData?.toString() ?? '0',
     sipCoinsList: sip10CoinsList,
     brcCoinsList: brc20CoinsList,
     runesCoinList,

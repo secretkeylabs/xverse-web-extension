@@ -5,6 +5,9 @@ import {
   InternalMethods,
   LegacyMessageFromContentScript,
   LegacyMessageToContentScript,
+  LockedBitcoinMessageFromContentScript,
+  LockedBitcoinMessageToContentScript,
+  LockedBitcoinMethods,
   MESSAGE_SOURCE,
   SatsConnectMessageFromContentScript,
   SatsConnectMessageToContentScript,
@@ -59,7 +62,11 @@ interface ListenForPopupCloseArgs {
   id?: number;
   // TabID from requesting tab, to which request should be returned
   tabId?: number;
-  response: LegacyMessageToContentScript | SatsConnectMessageToContentScript | RpcErrorResponse;
+  response:
+    | LegacyMessageToContentScript
+    | SatsConnectMessageToContentScript
+    | RpcErrorResponse
+    | LockedBitcoinMessageToContentScript;
 }
 export function listenForPopupClose({ id, tabId, response }: ListenForPopupCloseArgs) {
   chrome.windows.onRemoved.addListener((winId) => {
@@ -99,7 +106,11 @@ export async function triggerRequestWindowOpen(path: RequestsRoutes, urlParams: 
 }
 
 export async function handleLegacyExternalMethodFormat(
-  message: LegacyMessageFromContentScript | SatsConnectMessageFromContentScript,
+  message:
+    | LegacyMessageFromContentScript
+    | SatsConnectMessageFromContentScript
+    | LockedBitcoinMessageFromContentScript,
+
   port: chrome.runtime.Port,
 ) {
   const { payload } = message;
@@ -322,6 +333,27 @@ export async function handleLegacyExternalMethodFormat(
             createRepeatInscriptionsResponse: 'cancel',
           },
           method: SatsConnectMethods.createRepeatInscriptionsResponse,
+        },
+      });
+      listenForOriginTabClose({ tabId });
+      break;
+    }
+
+    case LockedBitcoinMethods.addLockedBitcoinRequest: {
+      const { urlParams, tabId } = makeSearchParamsWithDefaults(port, [
+        ['addLockedBitcoin', payload],
+      ]);
+      const { id } = await triggerRequestWindowOpen(RequestsRoutes.AddLockedBitcoin, urlParams);
+      listenForPopupClose({
+        id,
+        tabId,
+        response: {
+          source: MESSAGE_SOURCE,
+          payload: {
+            addLockedBitcoinRequest: payload,
+            addLockedBitcoinResponse: 'cancel',
+          },
+          method: LockedBitcoinMethods.addLockedBitcoinResponse,
         },
       });
       listenForOriginTabClose({ tabId });

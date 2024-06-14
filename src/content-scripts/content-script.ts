@@ -1,20 +1,24 @@
 import {
+  AddLockedBitcoinEvent,
   AuthenticationRequestEvent,
   CreateInscriptionEvent,
   CreateRepeatInscriptionsEvent,
   DomEventName,
   GetAddressRequestEvent,
+  GetLockedBitcoinEvent,
   SendBtcRequestEvent,
-  SignatureRequestEvent,
   SignBatchPsbtRequestEvent,
   SignMessageRequestEvent,
   SignPsbtRequestEvent,
+  SignatureRequestEvent,
   TransactionRequestEvent,
 } from '@common/types/inpage-types';
 import {
   CONTENT_SCRIPT_PORT,
   LegacyMessageFromContentScript,
   LegacyMessageToContentScript,
+  LockedBitcoinMessageFromContentScript,
+  LockedBitcoinMethods,
   MESSAGE_SOURCE,
   SatsConnectMessageFromContentScript,
   SatsConnectMethods,
@@ -57,7 +61,10 @@ connect();
 
 // Sends message to background script that an event has fired
 function sendMessageToBackground(
-  message: LegacyMessageFromContentScript | SatsConnectMessageFromContentScript,
+  message:
+    | LegacyMessageFromContentScript
+    | SatsConnectMessageFromContentScript
+    | LockedBitcoinMessageFromContentScript,
 ) {
   backgroundPort.postMessage(message);
 }
@@ -72,7 +79,10 @@ chrome.runtime.onMessage.addListener((message: LegacyMessageToContentScript) => 
 
 interface ForwardDomEventToBackgroundArgs {
   payload: string;
-  method: LegacyMessageFromContentScript['method'] | SatsConnectMessageFromContentScript['method'];
+  method:
+    | LegacyMessageFromContentScript['method']
+    | SatsConnectMessageFromContentScript['method']
+    | LockedBitcoinMessageFromContentScript['method'];
   urlParam: string;
   path: RequestsRoutes;
 }
@@ -208,6 +218,24 @@ document.addEventListener(DomEventName.createRepeatInscriptionsRequest, ((
 document.addEventListener(DomEventName.rpcRequest, (event: any) => {
   sendMessageToBackground({ source: MESSAGE_SOURCE, ...event.detail });
 });
+// Listen for a CustomEvent (Add Locked Bitcoin Request) coming from the web app
+document.addEventListener(DomEventName.addLockedBitcoinRequest, ((event: AddLockedBitcoinEvent) => {
+  forwardDomEventToBackground({
+    path: RequestsRoutes.AddLockedBitcoin,
+    payload: event.detail.addLockedBitcoinRequest,
+    urlParam: 'addLockedBitcoinRequest',
+    method: LockedBitcoinMethods.addLockedBitcoinRequest,
+  });
+}) as EventListener);
+
+document.addEventListener(DomEventName.getLockedBitcoinRequest, ((event: GetLockedBitcoinEvent) => {
+  forwardDomEventToBackground({
+    path: RequestsRoutes.GetLockedBitcoin,
+    payload: event.detail.getLockedBitcoinRequest,
+    urlParam: 'getLockedBitcoinRequest',
+    method: LockedBitcoinMethods.getLockedBitcoinRequest,
+  });
+}) as EventListener);
 
 // Inject in-page script (Stacks and Bitcoin Providers)
 const injectInPageScript = (isPriority) => {

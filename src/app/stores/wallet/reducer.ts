@@ -18,6 +18,7 @@ import {
   SetAccountBalanceKey,
   SetBrc20ManageTokensKey,
   SetFeeMultiplierKey,
+  SetLockedBtcBalanceKey,
   SetNotificationBannersKey,
   SetRunesManageTokensKey,
   SetSip10ManageTokensKey,
@@ -89,6 +90,7 @@ export const initialWalletState: WalletState = {
   isUnlocked: false,
   hideStx: false,
   accountBalances: {},
+  lockedBtcBalances: {},
 };
 
 const walletReducer = (
@@ -268,6 +270,11 @@ const walletReducer = (
       return {
         ...state,
         hideStx: action.hideStx,
+      };
+    case SetLockedBtcBalanceKey:
+      return {
+        ...state,
+        lockedBtcBalances: action.lockedBtcBalances,
       };
     default:
       return state;

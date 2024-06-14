@@ -15,6 +15,44 @@ export const MESSAGE_SOURCE = 'xverse-wallet';
 export const CONTENT_SCRIPT_PORT = 'xverse-content-script';
 
 /**
+ * Locked External Callable Methods
+ * @enum {string}
+ */
+export enum LockedBitcoinMethods {
+  addLockedBitcoinResponse = 'addLockedBitcoinResponse',
+  addLockedBitcoinRequest = 'addLockedBitcoinRequest',
+  getLockedBitcoinResponse = 'getLockedBitcoinResponse',
+  getLockedBitcoinRequest = 'getLockedBitcoinRequest',
+}
+
+type AddLockedBitcoinRequestMessage = Message<LockedBitcoinMethods.addLockedBitcoinRequest, string>;
+
+export type AddLockedBitcoinResponseMessage = Message<
+  LockedBitcoinMethods.addLockedBitcoinResponse,
+  {
+    addLockedBitcoinRequest: string;
+    addLockedBitcoinResponse: string;
+  }
+>;
+
+type GetLockedBitcoinRequestMessage = Message<LockedBitcoinMethods.getLockedBitcoinRequest, string>;
+export type GetLockedBitcoinResponseMessage = Message<
+  LockedBitcoinMethods.getLockedBitcoinResponse,
+  {
+    getLockedBitcoinRequest: string;
+    getLockedBitcoinResponse: { address: string; script: string }[];
+  }
+>;
+
+export type LockedBitcoinMessageFromContentScript =
+  | AddLockedBitcoinRequestMessage
+  | GetLockedBitcoinRequestMessage;
+
+export type LockedBitcoinMessageToContentScript =
+  | AddLockedBitcoinResponseMessage
+  | GetLockedBitcoinResponseMessage;
+
+/**
  * Stacks External Callable Methods
  * @enum {string}
  */
@@ -38,6 +76,7 @@ export enum InternalMethods {
 }
 
 export type ExtensionMethods =
+  | LockedBitcoinMethods
   | StacksLegacyMethods
   | SatsConnectMethods
   | InternalMethods
