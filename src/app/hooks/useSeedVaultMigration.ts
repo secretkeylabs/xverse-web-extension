@@ -31,7 +31,10 @@ const useSeedVaultMigration = () => {
     await chrome.storage.local.clear();
     await SeedVault.restoreVault(encryptedKey, passwordSalt);
     localStorage.removeItem('SEED_VAULT_MIGRATION_BACKUP');
-    // triggers refreshing of the cached data
+    /**
+     * The migration clears the redux store cache, so if the user quits the extension without going to the home screen the cache would be empty for the next session,
+     * this is a workaround to trigger flushing the redux-store state to cache,
+     */
     dispatch(fetchAccountAction(selectedAccount!, accountsList));
   };
 
