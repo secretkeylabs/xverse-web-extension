@@ -1206,12 +1206,13 @@
     }
   },
   "CACHE_MIGRATION_SCREEN": {
-    "TITLE": "Your wallet data store needs to be updated in order to remain secure.",
-    "WARNING": "Please make sure you have your seed phrase backed up securely and restore your wallet after resetting it from settings",
+    "TITLE": "A data upgrade is required. This should only take a few seconds.",
+    "WARNING1": "You should make sure you have your seed phrase securely backed up before continuing.",
+    "WARNING2": " Do not close the wallet while the update is in progress.",
     "SUCCESS_TITLE": "Update Complete",
     "SKIP_BUTTON": "Do it later",
-    "CONFIRM_BUTTON": "Confirm",
-    "CLOSE_TAB": "I understand"
+    "CONFIRM_BUTTON": "Update",
+    "CLOSE_TAB": "Close"
   },
   "SWAP_SCREEN": {
     "SWAP": "Swap",

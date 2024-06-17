@@ -7,7 +7,7 @@ import TransferDetailView from '@components/transferDetailView';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CubeTransparent } from '@phosphor-icons/react';
-import { currencySymbolMap, FungibleToken, getFiatEquivalent } from '@secretkeylabs/xverse-core';
+import { FungibleToken, getFiatEquivalent } from '@secretkeylabs/xverse-core';
 import { CurrencyTypes } from '@utils/constants';
 import { getTicker } from '@utils/helper';
 import BigNumber from 'bignumber.js';

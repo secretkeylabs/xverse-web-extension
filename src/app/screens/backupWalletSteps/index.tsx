@@ -88,8 +88,7 @@ export default function BackupWalletSteps(): JSX.Element {
       await chrome.storage.local.clear();
       await chrome.storage.session.clear();
 
-      await seedVault.init(password);
-      await seedVault.storeSeed(seed);
+      await seedVault.storeSeed(seed, password);
 
       await createWallet(); // TODO move this somwhere else
       navigate('/wallet-success/create', { replace: true });

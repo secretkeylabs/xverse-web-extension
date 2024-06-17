@@ -10,7 +10,7 @@ on:
       - develop
 jobs:
   build:
-    if: ${{ !startsWith(github.head_ref, 'release/') && !startsWith(github.head_ref, 'e2etest/')}}
+    if: ${{ !startsWith(github.head_ref, 'release/') && !startsWith(github.head_ref, 'e2etest/') && !github.event.pull_request.draft == true }}
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4

@@ -1,8 +1,8 @@
 import {
   CryptoUtilsAdapter,
-  generateRandomKey,
-  SeedVault,
+  SeedVaultInstance as SeedVault,
   StorageAdapter,
+  generateRandomKey,
 } from '@secretkeylabs/xverse-core';
 import chromeStorage from '@utils/chromeStorage';
 import {
@@ -34,7 +34,7 @@ const commonStorageAdapter: StorageAdapter = {
 const useSeedVault = () => {
   const vault = useMemo(
     () =>
-      new SeedVault({
+      SeedVault({
         cryptoUtilsAdapter,
         secureStorageAdapter,
         commonStorageAdapter,

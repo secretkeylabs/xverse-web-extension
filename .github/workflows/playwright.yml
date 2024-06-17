@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    if: ${{ startsWith(github.head_ref, 'e2etest/') || github.event_name == 'workflow_dispatch' }}
+    if: ${{ (startsWith(github.head_ref, 'e2etest/') && github.event.pull_request && github.event.pull_request.draft == false) || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

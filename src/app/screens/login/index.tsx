@@ -1,11 +1,14 @@
 import Eye from '@assets/img/createPassword/Eye.svg';
 import EyeSlash from '@assets/img/createPassword/EyeSlash.svg';
 import logo from '@assets/img/xverse_logo.svg';
-import ActionButton from '@components/button';
+import useSanityCheck from '@hooks/useSanityCheck';
+import useSeedVaultMigration from '@hooks/useSeedVaultMigration';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { animated, useSpring } from '@react-spring/web';
 import MigrationConfirmation from '@screens/migrationConfirmation';
-import { addMinutes } from 'date-fns';
+import { AnalyticsEvents } from '@secretkeylabs/xverse-core';
+import Button from '@ui-library/button';
+import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -16,7 +19,7 @@ const Logo = styled.img({
   height: 57,
 });
 
-const Button = styled.button({
+const IconButton = styled.button({
   background: 'none',
 });
 
@@ -39,7 +42,7 @@ const ContentContainer = styled(animated.div)({
 });
 
 const AppVersion = styled.p((props) => ({
-  ...props.theme.body_xs,
+  ...props.theme.typography.body_s,
   color: props.theme.colors.white_0,
   textAlign: 'right',
   marginTop: props.theme.spacing(8),
@@ -55,7 +58,7 @@ const TopSectionContainer = styled.div((props) => ({
 }));
 
 const PasswordInputLabel = styled.h2((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   textAlign: 'left',
   marginTop: props.theme.spacing(15.5),
 }));
@@ -72,7 +75,7 @@ const PasswordInputContainer = styled.div((props) => ({
 }));
 
 const PasswordInput = styled.input((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   height: 44,
   backgroundColor: props.theme.colors.elevation0,
   color: props.theme.colors.white_0,
@@ -95,14 +98,14 @@ const ButtonContainer = styled.div((props) => ({
 }));
 
 const ErrorMessage = styled.h2((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   textAlign: 'left',
   color: props.theme.colors.feedback.error,
   marginTop: props.theme.spacing(4),
 }));
 
 const ForgotPasswordButton = styled.a((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   textAlign: 'center',
   marginTop: props.theme.spacing(12),
   color: props.theme.colors.white_0,
@@ -113,6 +116,8 @@ function Login(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'LOGIN_SCREEN' });
   const navigate = useNavigate();
   const { unlockWallet } = useWalletReducer();
+  const { getSanityCheck } = useSanityCheck();
+  const { migrateCachedStorage, isVaultUpdated } = useSeedVaultMigration();
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
@@ -132,16 +137,10 @@ function Login(): JSX.Element {
 
   const handleMigrateCache = async () => {
     try {
-      await unlockWallet(password);
-      setIsVerifying(false);
-      const skipTime = new Date().getTime();
-      const migrationReminder = addMinutes(skipTime, 10).getTime();
-      localStorage.setItem('migrationReminder', migrationReminder.toString());
-      navigate(-1);
+      await migrateCachedStorage();
+      trackMixPanel(AnalyticsEvents.WalletMigrated);
     } catch (err) {
-      setIsVerifying(false);
       setShowMigration(false);
-      setError(t('VERIFY_PASSWORD_ERROR'));
     }
   };
 
@@ -155,19 +154,28 @@ function Login(): JSX.Element {
     setPassword(event.currentTarget.value);
   };
 
-  const handleVerifyPassword = async () => {
-    setIsVerifying(true);
+  const onPasswordVerify = async () => {
+    // Check for SeedVault Migrations
     try {
-      const hasMigrated = localStorage.getItem('migrated');
-      const isReminderDue =
-        Number(localStorage.getItem('migrationReminder') || 0) <= new Date().getTime();
-      if (!hasMigrated && isReminderDue) {
+      const hasMigrated = await isVaultUpdated();
+      const sanityCheck = await getSanityCheck('X-Current-Version');
+      if (!hasMigrated && sanityCheck) {
         setShowMigration(true);
       } else {
-        await unlockWallet(password);
         setIsVerifying(false);
         navigate(-1);
       }
+    } catch (err) {
+      setIsVerifying(false);
+      navigate(-1);
+    }
+  };
+
+  const handleVerifyPassword = async () => {
+    setIsVerifying(true);
+    try {
+      await unlockWallet(password);
+      await onPasswordVerify();
     } catch (err) {
       setIsVerifying(false);
       setError(t('VERIFY_PASSWORD_ERROR'));
@@ -175,10 +183,10 @@ function Login(): JSX.Element {
   };
 
   useEffect(() => {
-    const keyDownHandler = (event) => {
+    const keyDownHandler = async (event) => {
       if (event.key === 'Enter') {
         event.preventDefault();
-        handleVerifyPassword();
+        await handleVerifyPassword();
       }
     };
     document.addEventListener('keydown', keyDownHandler);
@@ -211,16 +219,16 @@ function Login(): JSX.Element {
                 placeholder={t('PASSWORD_INPUT_PLACEHOLDER')}
                 autoFocus
               />
-              <Button type="button" onClick={handleTogglePasswordView}>
+              <IconButton type="button" onClick={handleTogglePasswordView}>
                 <img src={isPasswordVisible ? Eye : EyeSlash} alt="show-password" height={24} />
-              </Button>
+              </IconButton>
             </PasswordInputContainer>
             {error && <ErrorMessage>{error}</ErrorMessage>}
             <ButtonContainer>
-              <ActionButton
-                onPress={handleVerifyPassword}
-                text={t('VERIFY_PASSWORD_BUTTON')}
-                processing={isVerifying}
+              <Button
+                onClick={handleVerifyPassword}
+                title={t('VERIFY_PASSWORD_BUTTON')}
+                loading={isVerifying}
               />
             </ButtonContainer>
             <ForgotPasswordButton onClick={handleForgotPassword}>
