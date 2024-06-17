@@ -73,8 +73,8 @@ function MigrationConfirmation(props: Props): JSX.Element {
   };
 
   const handleSkip = async () => {
-    navigate('/');
     trackMixPanel(AnalyticsEvents.WalletSkippedMigration);
+    navigate('/');
   };
 
   return (
