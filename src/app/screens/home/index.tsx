@@ -495,7 +495,7 @@ function Home() {
           {!!stxAddress &&
             sip10CoinsList.map((coin) => (
               <StyledTokenTile
-                key={coin.name}
+                key={coin.principal}
                 title={coin.name}
                 currency="FT"
                 loading={loadingStxCoinData}
@@ -505,7 +505,7 @@ function Home() {
             ))}
           {brc20CoinsList.map((coin) => (
             <StyledTokenTile
-              key={coin.name}
+              key={coin.principal}
               title={coin.name}
               currency="FT"
               loading={loadingBtcCoinData}
@@ -516,7 +516,7 @@ function Home() {
           {showRunes &&
             runesCoinsList.map((coin) => (
               <StyledTokenTile
-                key={coin.name}
+                key={coin.principal}
                 title={coin.name}
                 currency="FT"
                 loading={loadingRunesData}
