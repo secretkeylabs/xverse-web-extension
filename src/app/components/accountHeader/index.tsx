@@ -9,7 +9,7 @@ import styled from 'styled-components';
 
 import OptionsDialog from '@components/optionsDialog/optionsDialog';
 import useSeedVault from '@hooks/useSeedVault';
-import useWalletSelector from '@hooks/useWalletSelector';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import { DotsThreeVertical } from '@phosphor-icons/react';
 import { OPTIONS_DIALOG_WIDTH } from '@utils/constants';
 
@@ -83,7 +83,7 @@ function AccountHeaderComponent({
   showBorderBottom = true,
 }: AccountHeaderComponentProps) {
   const navigate = useNavigate();
-  const { selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
 
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
   const { t: optionsDialogTranslation } = useTranslation('translation', {

@@ -1,5 +1,6 @@
 import useHasFeature from '@hooks/useHasFeature';
 import useRunesApi from '@hooks/useRunesApi';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { FungibleToken, getXverseApiClient, NetworkType } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
@@ -32,8 +33,8 @@ export const fetchRuneBalances =
   };
 
 export const useGetRuneFungibleTokens = () => {
-  const { ordinalsAddress, network, fiatCurrency, spamTokens, showSpamTokens } =
-    useWalletSelector();
+  const { ordinalsAddress } = useSelectedAccount();
+  const { network, fiatCurrency, spamTokens, showSpamTokens } = useWalletSelector();
   const showRunes = useHasFeature('RUNES_SUPPORT');
   const runesApi = useRunesApi();
   const queryFn = fetchRuneBalances(runesApi, network.type, ordinalsAddress, fiatCurrency);

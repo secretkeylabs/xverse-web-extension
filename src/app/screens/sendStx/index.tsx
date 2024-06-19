@@ -3,6 +3,7 @@ import BottomBar from '@components/tabBar';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   applyFeeMultiplier,
@@ -24,7 +25,8 @@ import TopRow from '../../components/topRow';
 function SendStxScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
-  const { stxAddress, stxPublicKey, network, feeMultipliers } = useWalletSelector();
+  const { stxAddress, stxPublicKey } = useSelectedAccount();
+  const { network, feeMultipliers } = useWalletSelector();
   const { data: stxData } = useStxWalletData();
   const [amountError, setAmountError] = useState('');
   const [addressError, setAddressError] = useState('');

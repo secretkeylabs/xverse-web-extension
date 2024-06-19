@@ -5,11 +5,10 @@ import {
   NonFungibleConditionCode,
   PostCondition,
 } from '@stacks/transactions';
-import { StoreState } from '@stores/index';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
 
 import TransferAmountComponent from '@components/transferAmountComponent';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import { getNameFromPostCondition, getSymbolFromPostCondition } from './helper';
 
 type Props = {
@@ -19,9 +18,7 @@ type Props = {
 };
 
 function PostConditionsView({ postCondition, amount, icon }: Props) {
-  const { stxAddress } = useSelector((state: StoreState) => ({
-    ...state.walletState,
-  }));
+  const { stxAddress } = useSelectedAccount();
   const { t } = useTranslation('translation', { keyPrefix: 'POST_CONDITION_MESSAGE' });
 
   const getTitleFromConditionCode = (code: FungibleConditionCode | NonFungibleConditionCode) => {

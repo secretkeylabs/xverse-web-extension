@@ -22,6 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import { FiatRow } from './fiatRow';
 import useClearFormOnAccountSwitch from './useClearFormOnAccountSwitch';
 
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import Button from '@ui-library/button';
 import {
   AmountInputContainer,
@@ -101,11 +102,16 @@ function SendForm({
   const [addressError, setAddressError] = useState<string | undefined>(recipientError);
   const navigate = useNavigate();
 
-  const { fiatCurrency, stxAddress, selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { fiatCurrency } = useWalletSelector();
   const { btcFiatRate, stxBtcRate } = useCoinRates();
   const debouncedSearchTerm = useDebounce(recipientAddress, 300);
   const associatedBnsName = useBnsName(recipientAddress);
-  const associatedAddress = useBnsResolver(debouncedSearchTerm, stxAddress, currencyType);
+  const associatedAddress = useBnsResolver(
+    debouncedSearchTerm,
+    selectedAccount.stxAddress,
+    currencyType,
+  );
   const { isAccountSwitched } = useClearFormOnAccountSwitch();
 
   useEffect(() => {

@@ -1,7 +1,7 @@
 import { delay } from '@common/utils/ledger';
 import ActionButton from '@components/button';
 import { Tab } from '@components/tabBar';
-import useWalletSelector from '@hooks/useWalletSelector';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import TransportFactory from '@ledgerhq/hw-transport-webusb';
 import { RuneSummary, Transport, btcTransaction } from '@secretkeylabs/xverse-core';
 import Callout from '@ui-library/callout';
@@ -113,7 +113,7 @@ function ConfirmBtcTransaction({
   const { t: signatureRequestTranslate } = useTranslation('translation', {
     keyPrefix: 'SIGNATURE_REQUEST',
   });
-  const { selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
 
   const hideBackButton = !onBackClick;
   const hasInsufficientRunes =

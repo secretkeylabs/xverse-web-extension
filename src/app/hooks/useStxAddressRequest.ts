@@ -5,6 +5,7 @@ import { GetAddressOptions } from '@sats-connect/core';
 import { decodeToken } from 'jsontokens';
 import { useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
+import useSelectedAccount from './useSelectedAccount';
 
 const useStxAddressRequest = () => {
   // Params
@@ -12,7 +13,8 @@ const useStxAddressRequest = () => {
   const params = new URLSearchParams(search);
 
   // Utils
-  const { stxAddress, stxPublicKey, network } = useWalletSelector();
+  const { stxAddress, stxPublicKey } = useSelectedAccount();
+  const { network } = useWalletSelector();
 
   // Related to WebBTC RPC request
   const messageId = params.get('messageId') ?? '';

@@ -2,10 +2,10 @@ import { isLedgerAccount } from '@utils/helper';
 import { getMixpanelInstance } from 'app/mixpanelSetup';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import useWalletSelector from './useWalletSelector';
+import useSelectedAccount from './useSelectedAccount';
 
 const useTrackMixPanelPageViewed = (properties?: any, deps: any[] = []) => {
-  const { selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
   const location = useLocation();
 
   useEffect(() => {

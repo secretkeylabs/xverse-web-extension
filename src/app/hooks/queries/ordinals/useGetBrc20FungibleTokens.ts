@@ -1,3 +1,4 @@
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   Brc20Token,
@@ -54,8 +55,8 @@ export const fetchBrc20FungibleTokens =
   };
 
 export const useGetBrc20FungibleTokens = () => {
-  const { ordinalsAddress, fiatCurrency, network, spamTokens, showSpamTokens } =
-    useWalletSelector();
+  const { ordinalsAddress } = useSelectedAccount();
+  const { fiatCurrency, network, spamTokens, showSpamTokens } = useWalletSelector();
   const queryFn = fetchBrc20FungibleTokens(ordinalsAddress, fiatCurrency, network);
 
   const query = useQuery({

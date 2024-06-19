@@ -1,10 +1,10 @@
 import useBtcClient from '@hooks/useBtcClient';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import type { BtcAddressMempool } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
-import useWalletSelector from '../useWalletSelector';
 
 const usePendingOrdinalTxs = (ordinalUtxoHash: string | undefined) => {
-  const { ordinalsAddress } = useWalletSelector();
+  const { ordinalsAddress } = useSelectedAccount();
   const btcClient = useBtcClient();
 
   const fetchOrdinalsMempoolTxs = async (): Promise<BtcAddressMempool[]> =>

@@ -4,15 +4,15 @@ import rootStore from '@stores/index';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-const Container = styled.div({
+const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
   height: '100%',
   width: '100%',
-  backgroundColor: '#12151E',
-});
+  backgroundColor: props.theme.colors.elevation0,
+}));
 
 function StartupLoadingScreen(): React.ReactNode {
   const [error, setError] = useState('');

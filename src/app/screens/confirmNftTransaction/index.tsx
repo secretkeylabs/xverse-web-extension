@@ -10,6 +10,7 @@ import useNftDetail from '@hooks/queries/useNftDetail';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import NftImage from '@screens/nftDashboard/nftImage';
 import {
@@ -70,7 +71,7 @@ const ReviewTransactionText = styled.h1((props) => ({
 function ConfirmNftTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
-  const { selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();

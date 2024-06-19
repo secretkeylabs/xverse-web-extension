@@ -2,6 +2,7 @@ import OrdinalsIcon from '@assets/img/nftDashboard/ordinals_icon.svg';
 import RuneIcon from '@assets/img/nftDashboard/rune_icon.svg';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { isHardwareAccount } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
@@ -27,7 +28,8 @@ const Container = styled.div({
 
 function RestoreFunds() {
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_FUND_SCREEN' });
-  const { hasActivatedOrdinalsKey, selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { hasActivatedOrdinalsKey } = useWalletSelector();
   const navigate = useNavigate();
 
   const handleOnCancelClick = () => {

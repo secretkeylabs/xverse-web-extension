@@ -1,8 +1,8 @@
-import useWalletSelector from '@hooks/useWalletSelector';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import { useEffect, useRef, useState } from 'react';
 
 export default function useClearFormOnAccountSwitch() {
-  const { selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
   const [isAccountSwitched, setIsAccountSwitched] = useState(false);
 
   const isFirstRender = useRef(false);

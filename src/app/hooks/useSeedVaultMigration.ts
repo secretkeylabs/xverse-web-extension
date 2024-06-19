@@ -1,13 +1,16 @@
 import { SeedVaultStorageKeys } from '@secretkeylabs/xverse-core';
-import { fetchAccountAction } from '@stores/wallet/actions/actionCreators';
 import ChromeStorage from '@utils/chromeStorage';
 import { useDispatch } from 'react-redux';
 import useSeedVault from './useSeedVault';
+import useSelectedAccount from './useSelectedAccount';
+import useWalletReducer from './useWalletReducer';
 import useWalletSelector from './useWalletSelector';
 
 const useSeedVaultMigration = () => {
   const SeedVault = useSeedVault();
-  const { selectedAccount, accountsList } = useWalletSelector();
+  const { accountsList } = useWalletSelector();
+  const { switchAccount } = useWalletReducer();
+  const selectedAccount = useSelectedAccount();
   const dispatch = useDispatch();
 
   const isVaultUpdated = async () => {
@@ -35,7 +38,7 @@ const useSeedVaultMigration = () => {
      * The migration clears the redux store cache, so if the user quits the extension without going to the home screen the cache would be empty for the next session,
      * this is a workaround to trigger flushing the redux-store state to cache,
      */
-    dispatch(fetchAccountAction(selectedAccount!, accountsList));
+    switchAccount(selectedAccount!);
   };
 
   const migrateCachedStorage = async () => {

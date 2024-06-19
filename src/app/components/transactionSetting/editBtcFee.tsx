@@ -4,6 +4,7 @@ import useBtcClient from '@hooks/useBtcClient';
 import useBtcFees from '@hooks/useBtcFees';
 import useDebounce from '@hooks/useDebounce';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Faders } from '@phosphor-icons/react';
 import {
@@ -178,8 +179,9 @@ function EditBtcFee({
 }: Props) {
   const { t } = useTranslation('translation');
 
-  const { network, btcAddress, fiatCurrency, selectedAccount, ordinalsAddress } =
-    useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { btcAddress, ordinalsAddress } = selectedAccount;
+  const { network, fiatCurrency } = useWalletSelector();
   const { btcFiatRate } = useCoinRates();
   const [totalFee, setTotalFee] = useState(fee);
   const [feeRateInput, setFeeRateInput] = useState(feeRate?.toString() ?? '');

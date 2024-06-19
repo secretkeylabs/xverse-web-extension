@@ -10,6 +10,7 @@ test.describe('Account Management', () => {
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.checkVisualsStartpage();
     await wallet.labelAccountName.click();
     await expect(page.url()).toContain('account-list');
     await expect(wallet.labelAccountName).toHaveCount(1);
@@ -30,6 +31,7 @@ test.describe('Account Management', () => {
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.checkVisualsStartpage();
     await wallet.labelAccountName.click();
     await expect(page.url()).toContain('account-list');
     await expect(wallet.labelAccountName).toHaveCount(1);
@@ -62,6 +64,7 @@ test.describe('Account Management', () => {
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.checkVisualsStartpage();
     await wallet.labelAccountName.click();
     await expect(page.url()).toContain('account-list');
     await expect(wallet.labelAccountName).toHaveCount(1);
@@ -89,6 +92,7 @@ test.describe('Account Management', () => {
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.checkVisualsStartpage();
     await wallet.labelAccountName.click();
     await expect(page.url()).toContain('account-list');
     await expect(wallet.labelAccountName).toHaveCount(1);
@@ -105,6 +109,7 @@ test.describe('Account Management', () => {
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.checkVisualsStartpage();
     await expect(wallet.labelAccountName).toHaveText('Account 1');
     await wallet.labelAccountName.click();
     await expect(page.url()).toContain('account-list');

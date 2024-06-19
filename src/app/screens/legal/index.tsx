@@ -1,6 +1,6 @@
 import LinkIcon from '@assets/img/linkIcon.svg';
 import Separator from '@components/separator';
-import useWalletSelector from '@hooks/useWalletSelector';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import { CustomSwitch } from '@screens/ledger/importLedgerAccount/steps/index.styled';
 import { changeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
 import Button from '@ui-library/button';
@@ -76,14 +76,14 @@ function Legal() {
   const { t } = useTranslation('translation', { keyPrefix: 'LEGAL_SCREEN' });
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
   const [searchParams] = useSearchParams();
   const theme = useTheme();
   const [isToggleEnabled, setIsToggleEnabled] = useState(true);
 
   const handleSwitchToggle = () => setIsToggleEnabled((prevEnabledState) => !prevEnabledState);
 
-  const handleLegalAccept = async () => {
+  const handleLegalAccept = () => {
     if (isToggleEnabled) {
       optInMixPanel(selectedAccount?.masterPubKey);
     } else {

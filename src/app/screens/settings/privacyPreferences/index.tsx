@@ -1,6 +1,6 @@
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import useWalletSelector from '@hooks/useWalletSelector';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import { hasOptedInMixPanelTracking, optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -43,7 +43,7 @@ const CustomSwitch = styled(Switch)`
 
 function PrivacyPreferencesScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
-  const { selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
   const navigate = useNavigate();
   const theme = useTheme();
   const [isEnabled, setIsEnabled] = useState(false);

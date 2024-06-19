@@ -3,6 +3,7 @@ import Transak from '@assets/img/dashboard/transak.svg';
 import InfoContainer from '@components/infoContainer';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getMoonPaySignedUrl } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
@@ -52,7 +53,8 @@ function Buy() {
   const { t } = useTranslation('translation', { keyPrefix: 'BUY_SCREEN' });
   const navigate = useNavigate();
   const { currency } = useParams();
-  const { stxAddress, btcAddress, network } = useWalletSelector();
+  const { stxAddress, btcAddress } = useSelectedAccount();
+  const { network } = useWalletSelector();
   const address = currency === 'STX' ? stxAddress : btcAddress;
   const [url, setUrl] = useState<string>('');
   const [loading, setLoading] = useState(false);

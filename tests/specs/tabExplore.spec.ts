@@ -10,6 +10,7 @@ test.describe('Explore Tab', () => {
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.checkVisualsStartpage();
     await wallet.navigationExplore.click();
     await expect(page.url()).toContain('explore');
     await expect(wallet.carouselApp).toBeVisible();

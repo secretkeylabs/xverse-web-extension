@@ -20,6 +20,7 @@ import useSpamTokens from '@hooks/queries/useSpamTokens';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useHasFeature from '@hooks/useHasFeature';
 import useNotificationBanners from '@hooks/useNotificationBanners';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowUp, Plus } from '@phosphor-icons/react';
@@ -78,11 +79,9 @@ function Home() {
   const { t } = useTranslation('translation', {
     keyPrefix: 'DASHBOARD_SCREEN',
   });
+  const selectedAccount = useSelectedAccount();
+  const { stxAddress, btcAddress, ordinalsAddress } = selectedAccount;
   const {
-    stxAddress,
-    btcAddress,
-    ordinalsAddress,
-    selectedAccount,
     showBtcReceiveAlert,
     showOrdinalReceiveAlert,
     showDataCollectionAlert,

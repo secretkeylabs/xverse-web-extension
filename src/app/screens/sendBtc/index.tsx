@@ -1,8 +1,8 @@
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useDebounce from '@hooks/useDebounce';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
-import useWalletSelector from '@hooks/useWalletSelector';
 import { AnalyticsEvents, btcTransaction, Transport } from '@secretkeylabs/xverse-core';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
@@ -26,7 +26,7 @@ function SendBtcScreen() {
   const location = useLocation();
 
   const { data: btcFeeRate, isLoading: feeRatesLoading } = useBtcFeeRate();
-  const { selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
   const [recipientAddress, setRecipientAddress] = useState(location.state?.recipientAddress || '');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -151,7 +151,7 @@ function SendBtcScreen() {
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
         protocol: 'bitcoin',
         action: 'transfer',
-        wallet_type: selectedAccount?.accountType || 'software',
+        wallet_type: selectedAccount.accountType || 'software',
       });
 
       navigate('/tx-status', {

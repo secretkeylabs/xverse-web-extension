@@ -2,22 +2,18 @@ import type {
   Account,
   AccountType,
   AppInfo,
-  BaseWallet,
   FungibleToken,
   SettingsNetwork,
   SupportedCurrency,
 } from '@secretkeylabs/xverse-core';
 
-export const SetWalletKey = 'SetWallet';
 export const ResetWalletKey = 'ResetWallet';
-export const FetchAccountKey = 'FetchAccount';
 export const SelectAccountKey = 'SelectAccount';
 export const StoreEncryptedSeedKey = 'StoreEncryptedSeed';
-export const AddAccountKey = 'AddAccount';
+export const UpdateSoftwareAccountsKey = 'UpdateSoftwareAccountsKey';
 export const SetFeeMultiplierKey = 'SetFeeMultiplierKey';
 export const ChangeFiatCurrencyKey = 'ChangeFiatCurrency';
 export const ChangeNetworkKey = 'ChangeNetwork';
-export const GetActiveAccountsKey = 'GetActiveAccounts';
 export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
 export const RareSatsNoticeDismissedKey = 'RareSatsNoticeDismissedKey';
 export const ChangeHasActivatedRareSatsKey = 'ChangeHasActivatedRareSatsKey';
@@ -32,7 +28,6 @@ export const SetRunesManageTokensKey = 'SetRunesManageTokens';
 export const SetNotificationBannersKey = 'SetNotificationBanners';
 export const SetWalletLockPeriodKey = 'SetWalletLockPeriod';
 export const SetWalletUnlockedKey = 'SetWalletUnlocked';
-export const RenameAccountKey = 'RenameAccountKey';
 export const SetAccountBalanceKey = 'SetAccountBalanceKey';
 export const SetWalletHideStxKey = 'SetWalletHideStx';
 export const SetSpamTokenKey = 'SetSpamTokenKey';
@@ -47,16 +42,10 @@ export enum WalletSessionPeriods {
 }
 
 export interface WalletState {
-  stxAddress: string;
-  btcAddress: string;
-  ordinalsAddress: string;
-  masterPubKey: string;
-  stxPublicKey: string;
-  btcPublicKey: string;
-  ordinalsPublicKey: string;
   accountsList: Account[];
   ledgerAccountsList: Account[];
-  selectedAccount: Account | null;
+  selectedAccountIndex: number;
+  selectedAccountType: AccountType;
   network: SettingsNetwork; // currently selected network urls and type
   savedNetworks: SettingsNetwork[]; // previously set network urls for type
   encryptedSeed: string;
@@ -73,8 +62,6 @@ export interface WalletState {
   showBtcReceiveAlert: boolean | null;
   showOrdinalReceiveAlert: boolean | null;
   showDataCollectionAlert: boolean | null;
-  accountType: AccountType | undefined;
-  accountName: string | undefined;
   walletLockPeriod: WalletSessionPeriods;
   isUnlocked: boolean;
   accountBalances: {
@@ -84,11 +71,6 @@ export interface WalletState {
   showSpamTokens: boolean;
   spamToken: FungibleToken | null;
   spamTokens: string[];
-}
-
-export interface SetWallet {
-  type: typeof SetWalletKey;
-  wallet: BaseWallet;
 }
 
 export interface StoreEncryptedSeed {
@@ -104,35 +86,18 @@ export interface ResetWallet {
   type: typeof ResetWalletKey;
 }
 
-export interface FetchAccount {
-  type: typeof FetchAccountKey;
-  selectedAccount: Account | null;
+export interface UpdateSoftwareAccounts {
+  type: typeof UpdateSoftwareAccountsKey;
   accountsList: Account[];
 }
-
-export interface AddAccount {
-  type: typeof AddAccountKey;
-  accountsList: Account[];
-}
-export interface AddLedgerAccount {
+export interface UpdateLedgerAccounts {
   type: typeof UpdateLedgerAccountsKey;
   ledgerAccountsList: Account[];
 }
 export interface SelectAccount {
   type: typeof SelectAccountKey;
-  selectedAccount: Account | null;
-  stxAddress: string;
-  btcAddress: string;
-  ordinalsAddress: string;
-  masterPubKey: string;
-  stxPublicKey: string;
-  btcPublicKey: string;
-  ordinalsPublicKey: string;
-  bnsName?: string;
-  network: SettingsNetwork;
-  // stackingState: StackingStateData;
-  accountType?: AccountType;
-  accountName: string | undefined;
+  selectedAccountIndex: number;
+  selectedAccountType: AccountType;
 }
 
 export interface ChangeFiatCurrency {
@@ -142,11 +107,6 @@ export interface ChangeFiatCurrency {
 export interface ChangeNetwork {
   type: typeof ChangeNetworkKey;
   network: SettingsNetwork;
-}
-
-export interface GetActiveAccounts {
-  type: typeof GetActiveAccountsKey;
-  accountsList: Account[];
 }
 
 export interface ChangeActivateOrdinals {
@@ -212,15 +172,10 @@ export interface SetWalletLockPeriod {
   type: typeof SetWalletLockPeriodKey;
   walletLockPeriod: WalletSessionPeriods;
 }
+
 export interface SetWalletUnlocked {
   type: typeof SetWalletUnlockedKey;
   isUnlocked: boolean;
-}
-
-export interface RenameAccount {
-  type: typeof RenameAccountKey;
-  accountsList: Account[];
-  selectedAccount: Account | null;
 }
 
 export interface SetAccountBalance {
@@ -250,17 +205,14 @@ export interface SetShowSpamTokens {
 }
 
 export type WalletActions =
-  | SetWallet
   | ResetWallet
-  | FetchAccount
-  | AddAccount
-  | AddLedgerAccount
+  | UpdateSoftwareAccounts
+  | UpdateLedgerAccounts
   | SelectAccount
   | StoreEncryptedSeed
   | SetFeeMultiplier
   | ChangeFiatCurrency
   | ChangeNetwork
-  | GetActiveAccounts
   | ChangeActivateOrdinals
   | ChangeActivateRareSats
   | ChangeActivateRBF
@@ -274,7 +226,6 @@ export type WalletActions =
   | SetWalletLockPeriod
   | SetRareSatsNoticeDismissed
   | SetWalletUnlocked
-  | RenameAccount
   | SetAccountBalance
   | SetWalletHideStx
   | SetSpamToken

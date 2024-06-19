@@ -4,6 +4,7 @@ import TopRow from '@components/topRow';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useNetworkSelector from '@hooks/useNetwork';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   StacksTransaction,
@@ -22,7 +23,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 function SendFtScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
-  const { stxAddress, stxPublicKey, network, feeMultipliers } = useWalletSelector();
+  const { stxAddress, stxPublicKey } = useSelectedAccount();
+  const { network, feeMultipliers } = useWalletSelector();
   const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
   const [amountError, setAmountError] = useState('');
   const [addressError, setAddressError] = useState('');

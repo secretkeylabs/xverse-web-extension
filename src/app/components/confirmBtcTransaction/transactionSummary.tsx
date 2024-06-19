@@ -7,6 +7,7 @@ import MintSection from '@components/confirmBtcTransaction/mintSection';
 import TransferFeeView from '@components/transferFeeView';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import { btcTransaction, getBtcFiatEquivalent, RuneSummary } from '@secretkeylabs/xverse-core';
 import SelectFeeRate from '@ui-components/selectFeeRate';
 import Callout from '@ui-library/callout';
@@ -71,7 +72,7 @@ function TransactionSummary({
   const { t: rareSatsT } = useTranslation('translation', { keyPrefix: 'RARE_SATS' });
   const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
 
-  const { btcAddress, ordinalsAddress } = useWalletSelector();
+  const { btcAddress, ordinalsAddress } = useSelectedAccount();
   const { data: recommendedFees } = useBtcFeeRate();
 
   const hasOutputScript = outputs.some((output) => isScriptOutput(output));

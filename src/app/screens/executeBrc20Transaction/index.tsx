@@ -1,5 +1,6 @@
 import { LoadingTransactionStatus } from '@components/loadingTransactionStatus';
 import { ConfirmationStatus } from '@components/loadingTransactionStatus/circularSvgAnimation';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import TransportFactory from '@ledgerhq/hw-transport-webusb';
@@ -34,7 +35,8 @@ const PERCENTAGE_PER_STEP = 1 / AMOUNT_OF_STEPS;
 
 function ExecuteBrc20Transaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'EXECUTE_BRC20' });
-  const { network, selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { network } = useWalletSelector();
   const navigate = useNavigate();
   const { recipientAddress, estimateFeesParams }: ExecuteBrc20TransferState = useLocation().state;
   const transactionContext = useTransactionContext();

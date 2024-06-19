@@ -1,5 +1,6 @@
 import stxIcon from '@assets/img/dashboard/stx_icon.svg';
 import ActionButton from '@components/button';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useStxAccountRequest from '@hooks/useStxAccountRequest';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { animated, useTransition } from '@react-spring/web';
@@ -29,7 +30,8 @@ function StxSelectAccountScreen() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'SELECT_BTC_ADDRESS_SCREEN' });
-  const { network, stxAddress, selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { network } = useWalletSelector();
   const [appIcon, setAppIcon] = useState<string>('');
   const [isLoadingIcon, setIsLoadingIcon] = useState(false);
   const { payload, origin, approveStxAccountRequest, cancelAccountRequest } =
@@ -112,7 +114,7 @@ function StxSelectAccountScreen() {
               purpose={AddressPurpose.Stacks}
               icon={stxIcon}
               title={t('STX_ADDRESS')}
-              address={stxAddress}
+              address={selectedAccount.stxAddress}
               bnsName={selectedAccount?.bnsName}
             />
           </AddressBoxContainer>

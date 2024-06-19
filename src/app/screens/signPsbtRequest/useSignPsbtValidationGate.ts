@@ -1,3 +1,4 @@
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { SignTransactionPayload } from '@sats-connect/core';
 import { btcTransaction } from '@secretkeylabs/xverse-core';
@@ -15,7 +16,8 @@ type ValidationError = {
 };
 
 const useSignPsbtValidationGate = ({ payload, parsedPsbt }: Props) => {
-  const { btcAddress, ordinalsAddress, network } = useWalletSelector();
+  const { btcAddress, ordinalsAddress } = useSelectedAccount();
+  const { network } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'REQUEST_ERRORS' });
   const [validationError, setValidationError] = useState<ValidationError | null>(null);
 

@@ -5,6 +5,7 @@ import PasswordInput from '@components/passwordInput';
 import BottomBar from '@components/tabBar';
 import useChromeLocalStorage from '@hooks/useChromeLocalStorage';
 import useSeedVault from '@hooks/useSeedVault';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
@@ -68,8 +69,8 @@ function Setting() {
     hasActivatedOrdinalsKey,
     hasActivatedRareSatsKey,
     hasActivatedRBFKey,
-    selectedAccount,
   } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
   const [isPriorityWallet, setIsPriorityWallet] = useChromeLocalStorage<boolean>(
     chromeLocalStorageKeys.isPriorityWallet,
     true,

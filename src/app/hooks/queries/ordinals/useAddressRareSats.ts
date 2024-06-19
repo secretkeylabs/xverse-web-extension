@@ -1,3 +1,4 @@
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   getAddressUtxoOrdinalBundles,
@@ -10,7 +11,8 @@ import { InvalidParamsError, handleRetries } from '@utils/query';
 const PAGE_SIZE = 30;
 
 export const useAddressRareSats = () => {
-  const { ordinalsAddress, network } = useWalletSelector();
+  const { ordinalsAddress } = useSelectedAccount();
+  const { network } = useWalletSelector();
 
   const getRareSatsByAddress = async ({ pageParam = 0 }) => {
     if (!ordinalsAddress) {

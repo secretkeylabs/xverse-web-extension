@@ -19,6 +19,7 @@ import useDelegationState from '@hooks/queries/useDelegationState';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { StxRequests } from '@sats-connect/core';
 import {
@@ -59,7 +60,8 @@ function ConfirmStxTransaction() {
   const [txRaw, setTxRaw] = useState('');
   const navigate = useNavigate();
   const selectedNetwork = useNetworkSelector();
-  const { network, selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { network } = useWalletSelector();
   const { data: stxData } = useStxWalletData();
   const { refetch } = useStxWalletData();
   const { data: delegateState } = useDelegationState();

@@ -1,6 +1,6 @@
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import TransferDetailView from '@components/transferDetailView';
-import useWalletSelector from '@hooks/useWalletSelector';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import { btcTransaction, satsToBtc } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { getTruncatedAddress } from '@utils/helper';
@@ -35,7 +35,7 @@ type Props = {
 };
 
 function TransactionInput({ input }: Props) {
-  const { btcAddress, ordinalsAddress } = useWalletSelector();
+  const { btcAddress, ordinalsAddress } = useSelectedAccount();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
 
   const isPaymentsAddress = input.extendedUtxo.address === btcAddress;

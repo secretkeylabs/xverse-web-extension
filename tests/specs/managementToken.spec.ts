@@ -53,6 +53,7 @@ test.describe('Token Management', () => {
 
     await test.step('Enable a random token', async () => {
       await page.goto(`chrome-extension://${extensionId}/popup.html`);
+      await wallet.checkVisualsStartpage();
       // Check balances
       await expect(wallet.balance).toBeVisible();
       await await expect(wallet.balance).toHaveText('$0.00');
@@ -97,6 +98,7 @@ test.describe('Token Management', () => {
 
     await test.step('Disable a random token', async () => {
       await page.goto(`chrome-extension://${extensionId}/popup.html`);
+      await wallet.checkVisualsStartpage();
       await wallet.manageTokenButton.click();
       await expect(page.url()).toContain('manage-tokens');
       await wallet.buttonBRC20.click();
@@ -123,6 +125,7 @@ test.describe('Token Management', () => {
 
     await test.step('Enable a random token', async () => {
       await page.goto(`chrome-extension://${extensionId}/popup.html`);
+      await wallet.checkVisualsStartpage();
       // Check balances
       await expect(wallet.balance).toBeVisible();
       await expect(wallet.balance).toHaveText('$0.00');
@@ -165,6 +168,7 @@ test.describe('Token Management', () => {
 
     await test.step('Disable a random token', async () => {
       await page.goto(`chrome-extension://${extensionId}/popup.html`);
+      await wallet.checkVisualsStartpage();
       await wallet.manageTokenButton.click();
       await expect(page.url()).toContain('manage-tokens');
       await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
@@ -190,6 +194,7 @@ test.describe('Token Management', () => {
 
     await test.step('Enable a all tokens', async () => {
       await page.goto(`chrome-extension://${extensionId}/popup.html`);
+      await wallet.checkVisualsStartpage();
       // Check balances
       await expect(wallet.balance).toBeVisible();
       await expect(wallet.balance).toHaveText('$0.00');
@@ -214,6 +219,7 @@ test.describe('Token Management', () => {
 
     await test.step('Disable all tokens', async () => {
       await page.goto(`chrome-extension://${extensionId}/popup.html`);
+      await wallet.checkVisualsStartpage();
       await wallet.manageTokenButton.click();
       await expect(page.url()).toContain('manage-tokens');
       await wallet.disableAllTokens();
@@ -237,6 +243,7 @@ test.describe('Token Management', () => {
 
     await test.step('Enable a all tokens', async () => {
       await page.goto(`chrome-extension://${extensionId}/popup.html`);
+      await wallet.checkVisualsStartpage();
       // Check balances
       await expect(wallet.balance).toBeVisible();
       await expect(wallet.balance).toHaveText('$0.00');
@@ -262,6 +269,7 @@ test.describe('Token Management', () => {
 
     await test.step('Disable all tokens', async () => {
       await page.goto(`chrome-extension://${extensionId}/popup.html`);
+      await wallet.checkVisualsStartpage();
       await wallet.manageTokenButton.click();
       await expect(page.url()).toContain('manage-tokens');
       await wallet.buttonBRC20.click();

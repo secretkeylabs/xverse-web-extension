@@ -5,6 +5,7 @@ import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useDebounce from '@hooks/useDebounce';
 import useNetworkSelector from '@hooks/useNetwork';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   StacksTransaction,
@@ -102,7 +103,8 @@ function SendNft() {
 
   const selectedNetwork = useNetworkSelector();
   const { data: stxPendingTxData } = useStxPendingTxData();
-  const { stxAddress, stxPublicKey, network, feeMultipliers } = useWalletSelector();
+  const { stxAddress, stxPublicKey } = useSelectedAccount();
+  const { network, feeMultipliers } = useWalletSelector();
   const debouncedSearchTerm = useDebounce(recipientAddress, 300);
   const associatedBnsName = useBnsName(debouncedSearchTerm);
   const associatedAddress = useBnsResolver(debouncedSearchTerm, stxAddress);

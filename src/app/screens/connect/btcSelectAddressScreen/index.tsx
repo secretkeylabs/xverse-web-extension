@@ -1,6 +1,7 @@
 import BitcoinIcon from '@assets/img/dashboard/bitcoin_icon.svg';
 import stxIcon from '@assets/img/dashboard/stx_icon.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { animated, useTransition } from '@react-spring/web';
 import { AddressPurpose } from '@sats-connect/core';
@@ -33,7 +34,9 @@ function BtcSelectAddressScreen() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'SELECT_BTC_ADDRESS_SCREEN' });
-  const { network, btcAddress, ordinalsAddress, stxAddress, selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { network } = useWalletSelector();
+  const { btcAddress, ordinalsAddress, stxAddress } = selectedAccount;
   const [appIcon, setAppIcon] = useState<string>('');
   const [isLoadingIcon, setIsLoadingIcon] = useState(false);
 

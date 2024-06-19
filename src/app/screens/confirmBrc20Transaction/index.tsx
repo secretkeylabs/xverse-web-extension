@@ -6,6 +6,7 @@ import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useDebounce from '@hooks/useDebounce';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { FadersHorizontal } from '@phosphor-icons/react';
@@ -137,8 +138,9 @@ const useConfirmBrc20Transfer = (): {
 } => {
   /* hooks */
   const { t } = useTranslation('translation');
-  const { network, selectedAccount, fiatCurrency, btcAddress, ordinalsAddress, feeMultipliers } =
-    useWalletSelector();
+  const { network, fiatCurrency, feeMultipliers } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { btcAddress, ordinalsAddress } = selectedAccount;
   const { btcFiatRate } = useCoinRates();
   const navigate = useNavigate();
   const {

@@ -2,10 +2,12 @@ import { btcTransaction, UtxoCache } from '@secretkeylabs/xverse-core';
 import { useMemo } from 'react';
 import useBtcClient from './useBtcClient';
 import useSeedVault from './useSeedVault';
+import useSelectedAccount from './useSelectedAccount';
 import useWalletSelector from './useWalletSelector';
 
 const useTransactionContext = () => {
-  const { selectedAccount, network } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { network } = useWalletSelector();
   const seedVault = useSeedVault();
   const btcClient = useBtcClient();
 

@@ -1,7 +1,7 @@
 import ScriptIcon from '@assets/img/transactions/ScriptIcon.svg';
 import OutputIcon from '@assets/img/transactions/output.svg';
 import TransferDetailView from '@components/transferDetailView';
-import useWalletSelector from '@hooks/useWalletSelector';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import { btcTransaction, satsToBtc } from '@secretkeylabs/xverse-core';
 import { getTruncatedAddress } from '@utils/helper';
 import BigNumber from 'bignumber.js';
@@ -37,7 +37,7 @@ type Props = {
 };
 
 function TransactionOutput({ output, scriptOutputCount }: Props) {
-  const { btcAddress, ordinalsAddress } = useWalletSelector();
+  const { btcAddress, ordinalsAddress } = useSelectedAccount();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const outputWithScript = isScriptOutput(output);
 

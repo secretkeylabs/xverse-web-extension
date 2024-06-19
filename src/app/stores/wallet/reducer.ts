@@ -1,7 +1,6 @@
 import { defaultMainnet, initialNetworksList } from '@secretkeylabs/xverse-core';
 import { REHYDRATE } from 'redux-persist';
 import {
-  AddAccountKey,
   ChangeFiatCurrencyKey,
   ChangeHasActivatedOrdinalsKey,
   ChangeHasActivatedRBFKey,
@@ -10,10 +9,7 @@ import {
   ChangeShowBtcReceiveAlertKey,
   ChangeShowDataCollectionAlertKey,
   ChangeShowOrdinalReceiveAlertKey,
-  FetchAccountKey,
-  GetActiveAccountsKey,
   RareSatsNoticeDismissedKey,
-  RenameAccountKey,
   ResetWalletKey,
   SelectAccountKey,
   SetAccountBalanceKey,
@@ -26,11 +22,11 @@ import {
   SetSpamTokenKey,
   SetSpamTokensKey,
   SetWalletHideStxKey,
-  SetWalletKey,
   SetWalletLockPeriodKey,
   SetWalletUnlockedKey,
   StoreEncryptedSeedKey,
   UpdateLedgerAccountsKey,
+  UpdateSoftwareAccountsKey,
   WalletActions,
   WalletSessionPeriods,
   WalletState,
@@ -50,7 +46,6 @@ import {
  *  - accountType: 'software',
  *  - accountName: undefined,
  *  - walletLockPeriod: WalletSessionPeriods.STANDARD,
- *  - isUnlocked: false,
  *  - fiatCurrency: 'USD',
  *
  * because we get many bugs around caching the wrong values when switching accounts,
@@ -61,18 +56,12 @@ import {
  * TODO refactor most of these values out of the store and use query cache instead
  */
 export const initialWalletState: WalletState = {
-  stxAddress: '',
-  btcAddress: '',
-  ordinalsAddress: '',
-  masterPubKey: '',
-  stxPublicKey: '',
-  btcPublicKey: '',
-  ordinalsPublicKey: '',
   network: { ...defaultMainnet },
   savedNetworks: initialNetworksList,
   accountsList: [],
   ledgerAccountsList: [],
-  selectedAccount: null,
+  selectedAccountIndex: 0,
+  selectedAccountType: 'software',
   encryptedSeed: '',
   fiatCurrency: 'USD',
   sip10ManageTokens: {},
@@ -87,8 +76,6 @@ export const initialWalletState: WalletState = {
   showBtcReceiveAlert: true,
   showOrdinalReceiveAlert: true,
   showDataCollectionAlert: true,
-  accountType: 'software',
-  accountName: undefined,
   walletLockPeriod: WalletSessionPeriods.STANDARD,
   isUnlocked: false,
   hideStx: false,
@@ -123,29 +110,11 @@ const walletReducer = (
         throw new Error('Failed to load state from storage.');
       }
       return state;
-    case SetWalletKey:
-      return {
-        ...state,
-        stxAddress: action.wallet.stxAddress,
-        btcAddress: action.wallet.btcAddress,
-        ordinalsAddress: action.wallet.ordinalsAddress,
-        masterPubKey: action.wallet.masterPubKey,
-        stxPublicKey: action.wallet.stxPublicKey,
-        btcPublicKey: action.wallet.btcPublicKey,
-        ordinalsPublicKey: action.wallet.ordinalsPublicKey,
-        accountType: action.wallet.accountType,
-      };
     case ResetWalletKey:
       return {
         ...initialWalletState,
       };
-    case FetchAccountKey:
-      return {
-        ...state,
-        selectedAccount: action.selectedAccount,
-        accountsList: action.accountsList,
-      };
-    case AddAccountKey:
+    case UpdateSoftwareAccountsKey:
       return {
         ...state,
         accountsList: action.accountsList,
@@ -158,17 +127,8 @@ const walletReducer = (
     case SelectAccountKey:
       return {
         ...state,
-        selectedAccount: action.selectedAccount,
-        stxAddress: action.stxAddress,
-        ordinalsAddress: action.ordinalsAddress,
-        btcAddress: action.btcAddress,
-        masterPubKey: action.masterPubKey,
-        stxPublicKey: action.stxPublicKey,
-        btcPublicKey: action.btcPublicKey,
-        ordinalsPublicKey: action.ordinalsPublicKey,
-        network: action.network,
-        accountType: action.accountType,
-        accountName: action.accountName,
+        selectedAccountIndex: action.selectedAccountIndex,
+        selectedAccountType: action.selectedAccountType,
       };
     case StoreEncryptedSeedKey:
       return {
@@ -194,12 +154,8 @@ const walletReducer = (
           ...state.savedNetworks.filter((n) => n.type !== action.network.type),
           action.network,
         ],
+        accountsList: [],
         accountBalances: {},
-      };
-    case GetActiveAccountsKey:
-      return {
-        ...state,
-        accountsList: action.accountsList,
       };
     case ChangeHasActivatedOrdinalsKey:
       return {
@@ -277,12 +233,6 @@ const walletReducer = (
       return {
         ...state,
         isUnlocked: action.isUnlocked,
-      };
-    case RenameAccountKey:
-      return {
-        ...state,
-        accountsList: action.accountsList,
-        selectedAccount: action.selectedAccount,
       };
     case SetAccountBalanceKey:
       return {

@@ -38,6 +38,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import {
   ConfirmTxIconBig,
   ConnectLedgerTextAdvanced,
@@ -80,7 +81,8 @@ function ConfirmLedgerTransaction(): JSX.Element {
   const location = useLocation();
   const selectedNetwork = useNetworkSelector();
 
-  const { network, selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { network } = useWalletSelector();
 
   const btcClient = useBtcClient();
 

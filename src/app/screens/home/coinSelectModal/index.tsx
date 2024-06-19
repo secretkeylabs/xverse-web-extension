@@ -1,4 +1,5 @@
 import TokenTile from '@components/tokenTile';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import Sheet from '@ui-library/sheet';
@@ -40,7 +41,9 @@ function CoinSelectModal({
   loadingWalletData,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
-  const { btcAddress, stxAddress, hideStx } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { btcAddress, stxAddress } = selectedAccount;
+  const { hideStx } = useWalletSelector();
   const handleOnBitcoinPress = () => {
     onSelectBitcoin?.();
     onClose();

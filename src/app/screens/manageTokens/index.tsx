@@ -7,6 +7,7 @@ import { useGetBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20Fu
 import { useGetRuneFungibleTokens } from '@hooks/queries/runes/useGetRuneFungibleTokens';
 import { useGetSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useHasFeature from '@hooks/useHasFeature';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Eye, EyeSlash } from '@phosphor-icons/react';
@@ -155,13 +156,9 @@ function Stacks() {
 function ManageTokens() {
   const { t } = useTranslation('translation', { keyPrefix: 'TOKEN_SCREEN' });
 
-  const {
-    sip10ManageTokens,
-    brc20ManageTokens,
-    runesManageTokens,
-    selectedAccount,
-    showSpamTokens,
-  } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { sip10ManageTokens, brc20ManageTokens, runesManageTokens, showSpamTokens } =
+    useWalletSelector();
   const { data: runesList, isError: runeError } = useGetRuneFungibleTokens();
   const { data: sip10List, isError: sip10Error } = useGetSip10FungibleTokens();
   const { data: brc20List, isError: brc20Error } = useGetBrc20FungibleTokens();

@@ -448,12 +448,13 @@ export default class Wallet {
   }
 
   async checkVisualsStartpage(network?: string) {
+    await expect(this.balance).toBeVisible();
+    await expect(this.manageTokenButton).toBeVisible();
+
     // Deny data collection --> modal window is not always appearing so when it does we deny the data collection
     if (await this.buttonDenyDataCollection.isVisible()) {
       await this.buttonDenyDataCollection.click();
     }
-    await expect(this.balance).toBeVisible();
-    await expect(this.manageTokenButton).toBeVisible();
 
     /*
 TODO: needs to be changed to be debending on network and feature enabled
