@@ -65,12 +65,7 @@ const useAccountBalance = () => {
         const setting = brc20ManageTokens[ft.principal];
         return setting === true || (setting === undefined && new BigNumber(ft.balance).gt(0));
       });
-      const runeBalances = fetchRuneBalances(
-        runesApi,
-        network.type,
-        account.ordinalsAddress,
-        fiatCurrency,
-      );
+      const runeBalances = fetchRuneBalances(runesApi, account.ordinalsAddress, fiatCurrency);
       finalRunesCoinsList = (await runeBalances()).filter((ft) => {
         const setting = runesManageTokens[ft.principal];
         return setting === true || (setting === undefined && new BigNumber(ft.balance).gt(0));

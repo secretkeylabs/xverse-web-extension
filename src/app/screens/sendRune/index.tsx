@@ -78,7 +78,7 @@ function SendRuneScreen() {
     }
     return generateTransaction(
       transactionContext,
-      fungibleToken.principal,
+      fungibleToken.name,
       recipientAddress,
       sendMax ? BigInt(realBalance.toFixed()) : BigInt(realAmountToSend.toFixed()),
       feeRateOverride ?? +feeRate,
