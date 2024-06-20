@@ -1,3 +1,4 @@
+import { PermissionsProvider } from '@components/permissionsManager';
 import StartupLoadingScreen from '@components/startupLoadingScreen';
 import { CheckCircle, XCircle } from '@phosphor-icons/react';
 import { setXClientVersion } from '@secretkeylabs/xverse-core';
@@ -38,51 +39,53 @@ function App(): React.ReactNode {
           <Provider store={rootStore.store}>
             <PersistGate persistor={rootStore.persistor} loading={<StartupLoadingScreen />}>
               <SessionGuard>
-                <RouterProvider router={router} />
-                <Toaster
-                  position="bottom-center"
-                  containerStyle={{ bottom: 32 }}
-                  toastOptions={{
-                    duration: 1500,
-                    success: {
-                      icon: (
-                        <StyledIcon>
-                          <CheckCircle size={20} weight="bold" />
-                        </StyledIcon>
-                      ),
-                      style: {
-                        ...Theme.typography.body_medium_m,
-                        backgroundColor: Theme.colors.success_medium,
-                        borderRadius: Theme.radius(2),
-                        padding: Theme.space.s,
-                        color: Theme.colors.elevation0,
+                <PermissionsProvider>
+                  <RouterProvider router={router} />
+                  <Toaster
+                    position="bottom-center"
+                    containerStyle={{ bottom: 32 }}
+                    toastOptions={{
+                      duration: 1500,
+                      success: {
+                        icon: (
+                          <StyledIcon>
+                            <CheckCircle size={20} weight="bold" />
+                          </StyledIcon>
+                        ),
+                        style: {
+                          ...Theme.typography.body_medium_m,
+                          backgroundColor: Theme.colors.success_medium,
+                          borderRadius: Theme.radius(2),
+                          padding: Theme.space.s,
+                          color: Theme.colors.elevation0,
+                        },
                       },
-                    },
-                    error: {
-                      icon: (
-                        <StyledIcon>
-                          <XCircle size={20} weight="bold" />
-                        </StyledIcon>
-                      ),
-                      style: {
-                        ...Theme.typography.body_medium_m,
-                        backgroundColor: Theme.colors.danger_dark,
-                        borderRadius: Theme.radius(2),
-                        padding: Theme.space.s,
-                        color: Theme.colors.white_0,
+                      error: {
+                        icon: (
+                          <StyledIcon>
+                            <XCircle size={20} weight="bold" />
+                          </StyledIcon>
+                        ),
+                        style: {
+                          ...Theme.typography.body_medium_m,
+                          backgroundColor: Theme.colors.danger_dark,
+                          borderRadius: Theme.radius(2),
+                          padding: Theme.space.s,
+                          color: Theme.colors.white_0,
+                        },
                       },
-                    },
-                    blank: {
-                      style: {
-                        ...Theme.typography.body_medium_m,
-                        backgroundColor: Theme.colors.white_0,
-                        borderRadius: Theme.radius(2),
-                        padding: Theme.space.s,
-                        color: Theme.colors.elevation0,
+                      blank: {
+                        style: {
+                          ...Theme.typography.body_medium_m,
+                          backgroundColor: Theme.colors.white_0,
+                          borderRadius: Theme.radius(2),
+                          padding: Theme.space.s,
+                          color: Theme.colors.elevation0,
+                        },
                       },
-                    },
-                  }}
-                />
+                    }}
+                  />
+                </PermissionsProvider>
               </SessionGuard>
             </PersistGate>
           </Provider>
