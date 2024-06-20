@@ -1,4 +1,5 @@
 import MoonPay from '@assets/img/dashboard/moonpay.svg';
+import PayPal from '@assets/img/dashboard/paypal.svg';
 import Transak from '@assets/img/dashboard/transak.svg';
 import InfoContainer from '@components/infoContainer';
 import BottomBar from '@components/tabBar';
@@ -67,7 +68,7 @@ function Buy() {
     }
   }, [url]);
 
-  const getMoonPayUrl = async () => {
+  const getMoonPayUrl = async (paymentMethod?: string) => {
     setLoading(true);
     try {
       const moonPayUrl = new URL(MOON_PAY_URL);
@@ -75,6 +76,7 @@ function Buy() {
       moonPayUrl.searchParams.append('currencyCode', currency!);
       moonPayUrl.searchParams.append('walletAddress', address);
       moonPayUrl.searchParams.append('colorCode', '#5546FF');
+      if (paymentMethod) moonPayUrl.searchParams.append('paymentMethod', paymentMethod);
       const signedUrl = await getMoonPaySignedUrl(network.type, moonPayUrl.href);
       setUrl(signedUrl?.signedUrl ?? '');
     } catch (e) {
@@ -113,6 +115,12 @@ function Buy() {
         <Text>{t('PURCHASE_CRYPTO')}</Text>
         <RedirectButton text={t('MOONPAY')} src={MoonPay} onClick={getMoonPayUrl} />
         <RedirectButton text={t('TRANSAK')} src={Transak} onClick={getTransacUrl} />
+        <RedirectButton
+          text={t('PAYPAL')}
+          subText={t('US_UK_EU_ONLY')}
+          src={PayPal}
+          onClick={() => getMoonPayUrl('paypal')}
+        />
         <InfoContainer titleText={t('DISCLAIMER')} bodyText={t('THIRD_PARTY_WARNING')} />
       </Container>
       <BottomBar tab="dashboard" />
