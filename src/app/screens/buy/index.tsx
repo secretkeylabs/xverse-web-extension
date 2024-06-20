@@ -55,18 +55,15 @@ function Buy() {
   const { currency } = useParams();
   const { stxAddress, btcAddress, network } = useWalletSelector();
   const address = currency === 'STX' ? stxAddress : btcAddress;
-  const [url, setUrl] = useState<string>('');
   const [loading, setLoading] = useState(false);
 
   const handleBackButtonClick = () => {
     navigate('/');
   };
 
-  useEffect(() => {
-    if (url !== '') {
-      window.open(url);
-    }
-  }, [url]);
+  const openUrl = (url) => {
+    window.open(url);
+  };
 
   const getMoonPayUrl = async (paymentMethod?: string) => {
     setLoading(true);
@@ -76,9 +73,10 @@ function Buy() {
       moonPayUrl.searchParams.append('currencyCode', currency!);
       moonPayUrl.searchParams.append('walletAddress', address);
       moonPayUrl.searchParams.append('colorCode', '#5546FF');
-      if (paymentMethod) moonPayUrl.searchParams.append('paymentMethod', paymentMethod);
+      if (typeof paymentMethod === 'string')
+        moonPayUrl.searchParams.append('paymentMethod', paymentMethod);
       const signedUrl = await getMoonPaySignedUrl(network.type, moonPayUrl.href);
-      setUrl(signedUrl?.signedUrl ?? '');
+      if (signedUrl) openUrl(signedUrl.signedUrl);
     } catch (e) {
       setLoading(false);
     } finally {
@@ -96,7 +94,7 @@ function Buy() {
       transacUrl.searchParams.append('walletAddress', address);
       transacUrl.searchParams.append('disableWalletAddressForm', 'true');
       transacUrl.searchParams.append('exchangeScreenTitle', `Buy ${currency}`);
-      setUrl(transacUrl.href);
+      openUrl(transacUrl.href);
       setLoading(false);
     } catch (e) {
       setLoading(false);
