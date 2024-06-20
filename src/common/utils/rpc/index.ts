@@ -1,5 +1,5 @@
 import { WebBtcMessage } from '@common/types/message-types';
-import { Requests, RpcErrorCode, RpcRequestMessage } from '@sats-connect/core';
+import { RpcErrorCode, RpcRequestMessage } from '@sats-connect/core';
 import { getTabIdFromPort } from '..';
 import {
   handleGetAccounts,
