@@ -13,12 +13,23 @@ const Button = styled.button((props) => ({
   border: `1px solid ${props.theme.colors.elevation3}`,
 }));
 
-const Text = styled.h1((props) => ({
-  ...props.theme.body_bold_l,
+const Text = styled.h1<{ marginTop?: boolean }>((props) => ({
+  ...props.theme.typography.body_bold_l,
   color: props.theme.colors.white_0,
-  textAlign: 'center',
+  marginTop: props.marginTop ? props.theme.spacing(4) : 0,
+}));
+
+const SubText = styled.h2((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_400,
+}));
+
+const TextContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  flex: 1,
   marginLeft: props.theme.spacing(8),
-  marginTop: props.theme.spacing(4),
+  textAlign: 'left',
 }));
 
 const RowContainer = styled.div({
@@ -30,15 +41,19 @@ const RowContainer = styled.div({
 interface Props {
   src: string;
   text: string;
+  subText?: string;
   onClick: () => void;
 }
 
-function RedirectButton({ src, text, onClick }: Props) {
+function RedirectButton({ src, text, subText, onClick }: Props) {
   return (
     <Button onClick={onClick}>
       <RowContainer>
         <img src={src} alt={text} />
-        <Text>{text}</Text>
+        <TextContainer>
+          <Text marginTop={!subText}>{text}</Text>
+          {subText && <SubText>{subText}</SubText>}
+        </TextContainer>
       </RowContainer>
       <img src={CaretRight} alt="arrow" />
     </Button>
