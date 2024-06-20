@@ -105,7 +105,7 @@ interface Props {
   title: string;
   loading: boolean;
   currency: CurrencyTypes;
-  onPress: (coin: CurrencyTypes, ftKey: string | undefined) => void;
+  onPress: (coin: CurrencyTypes, fungibleToken: FungibleToken | undefined) => void;
   fungibleToken?: FungibleToken;
   enlargeTicker?: boolean;
   className?: string;
@@ -162,7 +162,7 @@ function TokenTile({
     }
   };
 
-  const handleTokenPressed = () => onPress(currency, fungibleToken?.principal);
+  const handleTokenPressed = () => onPress(currency, fungibleToken);
 
   return (
     <TileContainer onClick={handleTokenPressed} className={className}>

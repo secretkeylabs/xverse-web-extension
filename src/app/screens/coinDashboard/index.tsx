@@ -10,6 +10,7 @@ import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useSpamTokens from '@hooks/queries/useSpamTokens';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import { Flag } from '@phosphor-icons/react';
+import { FungibleToken } from '@secretkeylabs/xverse-core';
 import {
   setBrc20ManageTokensAction,
   setRunesManageTokensAction,
@@ -155,7 +156,26 @@ export default function CoinDashboard() {
   const { visible: runesCoinsList } = useVisibleRuneFungibleTokens();
   const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
   const { visible: brc20CoinsList } = useVisibleBrc20FungibleTokens();
+
   const ftKey = searchParams.get('ftKey');
+  const protocol = searchParams.get('protocol');
+  let selectedFt: FungibleToken | undefined;
+
+  if (ftKey && protocol) {
+    switch (protocol) {
+      case 'stacks':
+        selectedFt = sip10CoinsList.find((ft) => ft.principal === ftKey);
+        break;
+      case 'brc-20':
+        selectedFt = brc20CoinsList.find((ft) => ft.principal === ftKey);
+        break;
+      case 'runes':
+        selectedFt = runesCoinsList.find((ft) => ft.principal === ftKey);
+        break;
+      default:
+        selectedFt = undefined;
+    }
+  }
 
   useBtcWalletData();
 
@@ -163,20 +183,6 @@ export default function CoinDashboard() {
     navigate(-1);
   };
 
-  let selectedFt = sip10CoinsList.find((ft) => ft.principal === ftKey);
-  let selectedProtocol = 'stacks';
-
-  if (!selectedFt) {
-    selectedFt = brc20CoinsList.find((ft) => ft.principal === ftKey);
-    selectedProtocol = 'brc-20';
-  }
-
-  if (!selectedFt) {
-    selectedFt = runesCoinsList.find((ft) => ft.principal === ftKey);
-    selectedProtocol = 'runes';
-  }
-
-  const protocol = selectedProtocol || selectedFt?.protocol;
   useTrackMixPanelPageViewed(
     protocol
       ? {
@@ -229,13 +235,11 @@ export default function CoinDashboard() {
                 handleGoBack();
                 return;
               }
-
               // set the visibility to false
               const payload = {
                 principal: selectedFt.principal,
                 isEnabled: false,
               };
-
               if (protocol === 'runes') {
                 dispatch(setRunesManageTokensAction(payload));
               } else if (protocol === 'stacks') {
@@ -278,7 +282,7 @@ export default function CoinDashboard() {
             </Button>
           </FtInfoContainer>
         )}
-        {protocol === 'stacks' && showFtContractDetails && (
+        {selectedFt && protocol === 'stacks' && showFtContractDetails && (
           <TokenContractContainer data-testid="coin-contract-container">
             <h1>{t('FT_CONTRACT_PREFIX')}</h1>
             <ContractAddressCopyButton onClick={handleCopyContractAddress}>
@@ -300,7 +304,7 @@ export default function CoinDashboard() {
           coin={currency as CurrencyTypes}
           stxTxFilter={
             selectedFt?.protocol === 'runes'
-              ? selectedFt.name
+              ? selectedFt?.name
               : `${selectedFt?.principal}::${selectedFt?.assetName}`
           }
           brc20Token={protocol === 'brc-20' ? selectedFt?.principal || null : null}

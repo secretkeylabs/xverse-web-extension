@@ -312,9 +312,11 @@ function Home() {
     if (showBtcReceiveAlert) setIsBtcReceiveAlertVisible(true);
   };
 
-  const handleTokenPressed = (currency: CurrencyTypes, ftKey?: string) => {
-    if (ftKey) {
-      navigate(`/coinDashboard/${currency}?ftKey=${ftKey}`);
+  const handleTokenPressed = (currency: CurrencyTypes, fungibleToken?: FungibleToken) => {
+    if (fungibleToken) {
+      navigate(
+        `/coinDashboard/${currency}?ftKey=${fungibleToken.principal}&protocol=${fungibleToken.protocol}`,
+      );
     } else {
       navigate(`/coinDashboard/${currency}`);
     }
