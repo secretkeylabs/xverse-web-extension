@@ -1,6 +1,6 @@
 import { RpcErrorResponse } from '@sats-connect/core';
 import { SignatureData } from '@stacks/connect';
-import { getTabIdFromPort } from '.';
+import { getOriginFromPort, getTabIdFromPort } from '.';
 import {
   InternalMethods,
   LegacyMessageFromContentScript,
@@ -21,11 +21,6 @@ export function isLegacyMessage(message: any): message is LegacyMessageFromConte
   // legacy message types by presence of an id
   const hasIdProp = 'id' in message;
   return !hasIdProp;
-}
-
-function getOriginFromPort(port: chrome.runtime.Port) {
-  if (port.sender?.url) return new URL(port.sender.url).origin;
-  return port.sender?.origin;
 }
 
 export type ParamsObject = Record<string, string | null | undefined>;

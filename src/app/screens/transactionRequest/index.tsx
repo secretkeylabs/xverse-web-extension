@@ -1,4 +1,4 @@
-import { sendInternalErrorMessage } from '@common/utils/rpc/stx/rpcResponseMessages';
+import { sendInternalErrorMessage } from '@common/utils/rpc/rpcResponseMessages';
 import ContractCallRequest from '@components/transactionsRequests/ContractCallRequest';
 import ContractDeployRequest from '@components/transactionsRequests/ContractDeployTransaction';
 import useNetworkSelector from '@hooks/useNetwork';

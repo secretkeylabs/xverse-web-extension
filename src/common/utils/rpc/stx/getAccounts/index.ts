@@ -8,7 +8,7 @@ import {
 } from '../../../legacy-external-message-handler';
 import RequestsRoutes from '../../../route-urls';
 import { makeRPCError } from '../../helpers';
-import { sendMissingParametersMessage } from '../rpcResponseMessages';
+import { sendMissingParametersMessage } from '../../rpcResponseMessages';
 
 const handleGetStxAccounts = async (
   message: WebBtcMessage<'stx_getAccounts'>,

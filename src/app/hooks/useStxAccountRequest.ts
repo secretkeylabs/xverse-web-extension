@@ -2,7 +2,7 @@ import { MESSAGE_SOURCE } from '@common/types/message-types';
 import {
   sendGetAccountsSuccessResponseMessage,
   sendUserRejectionMessage,
-} from '@common/utils/rpc/stx/rpcResponseMessages';
+} from '@common/utils/rpc/rpcResponseMessages';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { GetAddressOptions } from '@sats-connect/core';
 import { bip32, bip39, bs58 } from '@secretkeylabs/xverse-core';

@@ -8,7 +8,10 @@ import {
 import RequestsRoutes from '@common/utils/route-urls';
 import { RpcErrorCode } from '@sats-connect/core';
 import { makeRPCError } from '../../helpers';
-import { sendInvalidParametersMessage, sendMissingParametersMessage } from '../rpcResponseMessages';
+import {
+  sendInvalidParametersResponseMessage,
+  sendMissingParametersMessage,
+} from '../../rpcResponseMessages';
 import { rpcParamsSchema } from './paramsSchema';
 
 async function handleStacksSignMessage(
@@ -22,7 +25,7 @@ async function handleStacksSignMessage(
 
   const paramsParseResult = rpcParamsSchema.safeParse(message.params);
   if (!paramsParseResult.success) {
-    sendInvalidParametersMessage({
+    sendInvalidParametersResponseMessage({
       tabId: getTabIdFromPort(port),
       messageId: message.id,
       error: paramsParseResult.error,

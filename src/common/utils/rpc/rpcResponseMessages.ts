@@ -1,7 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { Return, RpcErrorCode, RpcId } from '@sats-connect/core';
-import { ZodError } from 'zod';
-import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '../helpers';
+import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from './helpers';
 
 type BaseArgs = {
   tabId: NonNullable<chrome.tabs.Tab['id']>;
@@ -19,9 +18,9 @@ export function sendMissingParametersMessage({ tabId, messageId }: BaseArgs) {
 }
 
 type InvalidParametersMessageArgs = BaseArgs & {
-  error: ZodError;
+  error?: unknown;
 };
-export function sendInvalidParametersMessage({
+export function sendInvalidParametersResponseMessage({
   tabId,
   messageId,
   error,
@@ -30,7 +29,8 @@ export function sendInvalidParametersMessage({
     tabId,
     makeRPCError(messageId, {
       code: RpcErrorCode.INVALID_PARAMS,
-      message: `Invalid parameters. ${error.toString()}`,
+      message: `Invalid parameters.`,
+      data: { error },
     }),
   );
 }
@@ -150,7 +150,6 @@ export function sendGetAddressesSuccessResponseMessage({
   sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
 }
 
-// Same as above, but for `stx_deployContract
 type DeployContractSuccessArgs = BaseArgs & {
   result: Return<'stx_deployContract'>;
 };

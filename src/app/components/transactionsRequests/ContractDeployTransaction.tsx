@@ -4,7 +4,7 @@ import {
   sendInternalErrorMessage,
   sendSignTransactionSuccessResponseMessage,
   sendUserRejectionMessage,
-} from '@common/utils/rpc/stx/rpcResponseMessages';
+} from '@common/utils/rpc/rpcResponseMessages';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmStxTransactionComponent from '@components/confirmStxTransactionComponent';
 import InfoContainer from '@components/infoContainer';

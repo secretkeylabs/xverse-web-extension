@@ -3,7 +3,23 @@ import { parse, stringify } from 'superjson';
 import { ZodSchema } from 'zod';
 
 export function getTabIdFromPort(port: chrome.runtime.Port) {
-  return port.sender?.tab?.id ?? 0;
+  const tabId = port.sender?.tab?.id;
+
+  if (!tabId) {
+    throw new Error('Could not determine tab id from port.');
+  }
+
+  return tabId;
+}
+
+export function getOriginFromPort(port: chrome.runtime.Port) {
+  const origin = port.sender?.url ? new URL(port.sender.url).origin : port.sender?.origin;
+
+  if (!origin) {
+    throw new Error('Could not determine origin from port.');
+  }
+
+  return origin;
 }
 
 export function isUndefined(value: unknown): value is undefined {

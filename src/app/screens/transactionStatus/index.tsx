@@ -5,7 +5,7 @@ import {
   sendAddressMismatchMessage,
   sendMissingFunctionArgumentsMessage,
   sendNetworkMismatchMessage,
-} from '@common/utils/rpc/stx/rpcResponseMessages';
+} from '@common/utils/rpc/rpcResponseMessages';
 import ActionButton from '@components/button';
 import CopyButton from '@components/copyButton';
 import InfoContainer from '@components/infoContainer';
