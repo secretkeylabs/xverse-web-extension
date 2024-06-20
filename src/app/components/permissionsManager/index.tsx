@@ -12,9 +12,9 @@ import {
 } from 'react';
 import { parse, stringify } from 'superjson';
 import * as v from 'valibot';
+import { permissionsPersistantStoreKeyName } from './constants';
+import { groupToRoleMap, roleToResourceMap } from './permissions';
 import { ClientId, Group, PermissionsStoreV1, Resource, permissionsStoreV1Schema } from './schemas';
-
-export const permissionsPersistantStoreKeyName = 'client-permissions';
 
 type TContext = {
   addClientToGroup: (clientId: ClientId, group: Group) => Promise<void>;
