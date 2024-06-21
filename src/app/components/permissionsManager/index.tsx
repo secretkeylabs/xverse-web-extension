@@ -13,15 +13,28 @@ import {
 import { parse, stringify } from 'superjson';
 import * as v from 'valibot';
 import { permissionsPersistantStoreKeyName } from './constants';
-import { groupToRoleMap, roleToResourceMap } from './permissions';
-import { ClientId, Group, PermissionsStoreV1, Resource, permissionsStoreV1Schema } from './schemas';
+import {
+  Client,
+  Permission,
+  PermissionsStoreV1,
+  Resource,
+  permissionsStoreV1Schema,
+} from './schemas';
+import * as utils from './utils';
 
 type TContext = {
-  addClientToGroup: (clientId: ClientId, group: Group) => Promise<void>;
-  removeClientFromGroup: (clientId: ClientId, group: Group) => Promise<void>;
-  clearClientGroups: (clientId: ClientId) => Promise<void>;
-  clearAllGroups: () => Promise<void>;
-  hasAccessToResource: (clientId: ClientId, resource: Resource) => boolean;
+  addClient: (client: Client) => Promise<void>;
+  addResource: (resource: Resource) => Promise<void>;
+  removeResource: (resourceId: Resource['id']) => Promise<void>;
+  setPermission: (permission: Permission) => Promise<void>;
+  removePermission: (clientId: Client['id'], resourceId: Resource['id']) => Promise<void>;
+  removeAllClientPermissions: (clientId: Client['id']) => Promise<void>;
+  getClientPermissions: (clientId: Client['id']) => Permission[];
+  getClientPermission: (
+    clientId: Client['id'],
+    resourceId: Resource['id'],
+  ) => Permission | undefined;
+  removeClient: (clientId: Client['id']) => void;
   hasLoadedPermissions: boolean;
   error: unknown | null;
 };
@@ -49,6 +62,8 @@ export function PermissionsProvider(props: { children: React.ReactNode }) {
         return;
       }
 
+      // TODO: initialize permissions store if it doesn't exist
+
       const hydrated = parse(data[permissionsPersistantStoreKeyName]);
       const parseResult = v.safeParse(permissionsStoreV1Schema, hydrated);
       if (!parseResult.success) {
@@ -66,129 +81,138 @@ export function PermissionsProvider(props: { children: React.ReactNode }) {
     };
   }, []);
 
-  const addClientToGroup = useCallback(async (clientId: ClientId, group: Group) => {
+  const savePermissions = useCallback(() => {
     if (!permissionStoreRef.current) return;
 
-    const clientPermissions = permissionStoreRef.current.permissions.get(clientId);
-    if (!clientPermissions) {
-      permissionStoreRef.current.permissions.set(clientId, {
-        groups: new Set([group]),
-      });
-    } else {
-      clientPermissions.groups.add(group);
-    }
-
-    const [e] = await safePromise(
-      chrome.storage.local.set({
-        [permissionsPersistantStoreKeyName]: stringify(permissionStoreRef.current),
-      }),
-    );
-
-    if (e) {
-      // eslint-disable-next-line no-console
-      console.error('Failed to save permissions');
-      // eslint-disable-next-line no-console
-      console.error(e);
-      setError(e);
-    }
+    return chrome.storage.local.set({
+      [permissionsPersistantStoreKeyName]: stringify(permissionStoreRef.current),
+    });
   }, []);
 
-  const removeClientFromGroup = useCallback(async (clientId: ClientId, group: Group) => {
+  const addClient = useCallback(
+    async (client: Client) => {
+      if (!permissionStoreRef.current) return;
+
+      const store = permissionStoreRef.current;
+      utils.addClient(store.clients, client);
+
+      await savePermissions();
+    },
+    [savePermissions],
+  );
+
+  const addResource = useCallback(
+    async (resource: Resource) => {
+      if (!permissionStoreRef.current) return;
+
+      const store = permissionStoreRef.current;
+      utils.addResource(store.resources, resource);
+
+      await savePermissions();
+    },
+    [savePermissions],
+  );
+
+  const removeResource = useCallback(
+    async (resourceId: Resource['id']) => {
+      if (!permissionStoreRef.current) return;
+
+      const store = permissionStoreRef.current;
+      utils.removeResource(store.resources, resourceId);
+
+      await savePermissions();
+    },
+    [savePermissions],
+  );
+
+  const setPermission = useCallback(
+    async (permission: Permission) => {
+      if (!permissionStoreRef.current) return;
+
+      const store = permissionStoreRef.current;
+      utils.setPermission(store.clients, store.resources, store.permissions, permission);
+
+      await savePermissions();
+    },
+    [savePermissions],
+  );
+
+  const removePermission = useCallback(
+    async (clientId: Client['id'], resourceId: Resource['id']) => {
+      if (!permissionStoreRef.current) return;
+
+      const store = permissionStoreRef.current;
+      utils.removePermission(store.permissions, clientId, resourceId);
+
+      await savePermissions();
+    },
+    [savePermissions],
+  );
+
+  const removeAllClientPermissions = useCallback(
+    async (clientId: Client['id']) => {
+      if (!permissionStoreRef.current) return;
+
+      const store = permissionStoreRef.current;
+      utils.removeAllClientPermissions(store.permissions, clientId);
+
+      await savePermissions();
+    },
+    [savePermissions],
+  );
+
+  const getClientPermissions = useCallback((clientId: Client['id']) => {
+    if (!permissionStoreRef.current) return [];
+
+    const store = permissionStoreRef.current;
+    return utils.getClientPermissions(store.permissions, clientId);
+  }, []);
+
+  const getClientPermission = useCallback((clientId: Client['id'], resourceId: Resource['id']) => {
     if (!permissionStoreRef.current) return;
 
-    const clientPermissions = permissionStoreRef.current.permissions.get(clientId);
-    if (!clientPermissions) return;
-
-    clientPermissions.groups.delete(group);
-
-    const [e] = await safePromise(
-      chrome.storage.local.set({
-        [permissionsPersistantStoreKeyName]: stringify(permissionStoreRef.current),
-      }),
-    );
-
-    if (e) {
-      // eslint-disable-next-line no-console
-      console.error('Failed to save permissions');
-      // eslint-disable-next-line no-console
-      console.error(e);
-      setError(e);
-    }
+    const store = permissionStoreRef.current;
+    return utils.getClientPermission(store.permissions, clientId, resourceId);
   }, []);
 
-  const clearClientGroups = useCallback(async (clientId: ClientId) => {
-    if (!permissionStoreRef.current) return;
+  const removeClient = useCallback(
+    async (clientId: Client['id']) => {
+      if (!permissionStoreRef.current) return;
 
-    permissionStoreRef.current.permissions.delete(clientId);
+      const store = permissionStoreRef.current;
+      utils.removeClient(store.clients, store.permissions, clientId);
 
-    const [e] = await safePromise(
-      chrome.storage.local.set({
-        [permissionsPersistantStoreKeyName]: stringify(permissionStoreRef.current),
-      }),
-    );
-
-    if (e) {
-      // eslint-disable-next-line no-console
-      console.error('Failed to save permissions');
-      // eslint-disable-next-line no-console
-      console.error(e);
-      setError(e);
-    }
-  }, []);
-
-  const clearAllGroups = useCallback(async () => {
-    permissionStoreRef.current = null;
-
-    const [e] = await safePromise(chrome.storage.local.remove(permissionsPersistantStoreKeyName));
-
-    if (e) {
-      // eslint-disable-next-line no-console
-      console.error('Failed to save permissions');
-      // eslint-disable-next-line no-console
-      console.error(e);
-      setError(e);
-    }
-  }, []);
-
-  const hasAccessToResource = useCallback((clientId: ClientId, resource: Resource) => {
-    if (!permissionStoreRef.current) return false;
-
-    const clientPermissions = permissionStoreRef.current.permissions.get(clientId);
-    if (!clientPermissions) return false;
-
-    for (const group of clientPermissions.groups) {
-      const roles = groupToRoleMap.get(group);
-      if (!roles) continue;
-
-      for (const role of roles) {
-        const resources = roleToResourceMap.get(role);
-        if (!resources) continue;
-
-        if (resources.has(resource)) return true;
-      }
-    }
-
-    return false;
-  }, []);
+      await savePermissions();
+    },
+    [savePermissions],
+  );
 
   const contextValue = useMemo(
     () => ({
-      addClientToGroup,
-      removeClientFromGroup,
-      clearClientGroups,
-      clearAllGroups,
-      hasAccessToResource,
+      addClient,
+      addResource,
+      removeResource,
+      setPermission,
+      removePermission,
+      removeAllClientPermissions,
+      getClientPermissions,
+      getClientPermission,
+      removeClient,
       hasLoadedPermissions,
       error,
     }),
     [
-      addClientToGroup,
-      clearAllGroups,
-      clearClientGroups,
-      error,
-      hasAccessToResource,
+      addClient,
+      addResource,
+      removeResource,
+      setPermission,
+      removePermission,
+      removeAllClientPermissions,
+      getClientPermissions,
+      getClientPermission,
+      removeClient,
       hasLoadedPermissions,
-      removeClientFromGroup,
+      error,
     ],
   );
 
