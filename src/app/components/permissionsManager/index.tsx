@@ -26,6 +26,7 @@ type TContext = {
   addClient: (client: Client) => Promise<void>;
   addResource: (resource: Resource) => Promise<void>;
   removeResource: (resourceId: Resource['id']) => Promise<void>;
+  getResource: (resourceId: Resource['id']) => Resource | undefined;
   setPermission: (permission: Permission) => Promise<void>;
   removePermission: (clientId: Client['id'], resourceId: Resource['id']) => Promise<void>;
   removeAllClientPermissions: (clientId: Client['id']) => Promise<void>;
@@ -35,6 +36,7 @@ type TContext = {
     resourceId: Resource['id'],
   ) => Permission | undefined;
   removeClient: (clientId: Client['id']) => void;
+  getPermissionsStore: () => PermissionsStoreV1 | null;
   hasLoadedPermissions: boolean;
   error: unknown | null;
 };
@@ -47,11 +49,26 @@ export function PermissionsProvider(props: { children: React.ReactNode }) {
   const [hasLoadedPermissions, setHasLoadedPermissions] = useState(false);
   const [error, setError] = useState<unknown | null>(null);
 
+  const savePermissions = useCallback(() => {
+    console.log('[ARY]: Inside savePermissions');
+    if (!permissionStoreRef.current) return;
+
+    console.log('[ARY]: Saving permission');
+
+    if (process.env.NODE_ENV === 'development') {
+      console.log(JSON.stringify(JSON.parse(stringify(permissionStoreRef.current)), null, 2));
+    }
+
+    return chrome.storage.local.set({
+      [permissionsPersistantStoreKeyName]: stringify(permissionStoreRef.current),
+    });
+  }, []);
+
   useEffect(() => {
     let isCurrent = true;
 
     (async () => {
-      const [e, data] = await safePromise(
+      const [e, getResult] = await safePromise(
         chrome.storage.local.get(permissionsPersistantStoreKeyName),
       );
 
@@ -63,31 +80,35 @@ export function PermissionsProvider(props: { children: React.ReactNode }) {
       }
 
       // TODO: initialize permissions store if it doesn't exist
+      console.log('[ARY]: data', getResult);
 
-      const hydrated = parse(data[permissionsPersistantStoreKeyName]);
+      const persistedData = getResult[permissionsPersistantStoreKeyName];
+      const hydrated = persistedData ? parse(persistedData) : utils.makePermissionsStoreV1();
       const parseResult = v.safeParse(permissionsStoreV1Schema, hydrated);
       if (!parseResult.success) {
         setError(parseResult.issues);
         return;
       }
+      permissionStoreRef.current = parseResult.output;
+
+      if (process.env.NODE_ENV === 'development') {
+        console.log(JSON.stringify(JSON.parse(stringify(permissionStoreRef.current)), null, 2));
+      }
+
+      await savePermissions();
+
+      if (!isCurrent) {
+        return;
+      }
 
       setError(null);
-      permissionStoreRef.current = parseResult.output;
       setHasLoadedPermissions(true);
     })();
 
     return () => {
       isCurrent = false;
     };
-  }, []);
-
-  const savePermissions = useCallback(() => {
-    if (!permissionStoreRef.current) return;
-
-    return chrome.storage.local.set({
-      [permissionsPersistantStoreKeyName]: stringify(permissionStoreRef.current),
-    });
-  }, []);
+  }, [savePermissions]);
 
   const addClient = useCallback(
     async (client: Client) => {
@@ -175,6 +196,8 @@ export function PermissionsProvider(props: { children: React.ReactNode }) {
     return utils.getClientPermission(store.permissions, clientId, resourceId);
   }, []);
 
+  const getPermissionsStore = useCallback(() => permissionStoreRef.current, []);
+
   const removeClient = useCallback(
     async (clientId: Client['id']) => {
       if (!permissionStoreRef.current) return;
@@ -185,6 +208,16 @@ export function PermissionsProvider(props: { children: React.ReactNode }) {
       await savePermissions();
     },
     [savePermissions],
+  );
+
+  const getResource = useCallback(
+    (resourceId: Resource['id']) => {
+      if (!permissionStoreRef.current) return;
+
+      const store = permissionStoreRef.current;
+      return utils.getResource(store.resources, resourceId);
+    },
+    [permissionStoreRef],
   );
 
   const contextValue = useMemo(
@@ -198,6 +231,8 @@ export function PermissionsProvider(props: { children: React.ReactNode }) {
       getClientPermissions,
       getClientPermission,
       removeClient,
+      getPermissionsStore,
+      getResource,
       hasLoadedPermissions,
       error,
     }),
@@ -211,6 +246,8 @@ export function PermissionsProvider(props: { children: React.ReactNode }) {
       getClientPermissions,
       getClientPermission,
       removeClient,
+      getPermissionsStore,
+      getResource,
       hasLoadedPermissions,
       error,
     ],

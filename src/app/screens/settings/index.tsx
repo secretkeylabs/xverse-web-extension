@@ -108,6 +108,10 @@ function Setting() {
     navigate('/backup-wallet');
   };
 
+  const openConnectedAppsAndPermissionsScreen = () => {
+    navigate('/connected-apps-and-permissions');
+  };
+
   const switchIsPriorityWallet = () => {
     setIsPriorityWallet(!isPriorityWallet);
   };
@@ -226,6 +230,12 @@ function Setting() {
         <SettingComponent
           text={t('BACKUP_WALLET')}
           onClick={openBackUpWalletScreen}
+          icon={ArrowIcon}
+          showDivider
+        />
+        <SettingComponent
+          text="Connected apps & permissions"
+          onClick={openConnectedAppsAndPermissionsScreen}
           icon={ArrowIcon}
           showDivider
         />

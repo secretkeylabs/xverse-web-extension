@@ -1,3 +1,4 @@
+import { Account } from '@secretkeylabs/xverse-core';
 import {
   Client,
   ClientsTable,
@@ -30,6 +31,9 @@ export function removeResource(resources: ResourcesTable, resourceId: Resource['
   if (resource) {
     resources.delete(resource);
   }
+}
+export function getResource(resources: ResourcesTable, resourceId: Resource['id']) {
+  return [...resources].find((r) => r.id === resourceId);
 }
 
 export function makePermissionsTable() {

@@ -63,6 +63,7 @@ import Setting from '@screens/settings';
 import BackupWalletScreen from '@screens/settings/backupWallet';
 import ChangeNetworkScreen from '@screens/settings/changeNetwork';
 import ChangePasswordScreen from '@screens/settings/changePassword';
+import ConnectedAppsAndPermissionsScreen from '@screens/settings/connectedAppsAndPermissions';
 import FiatCurrencyScreen from '@screens/settings/fiatCurrency';
 import LockCountdown from '@screens/settings/lockCountdown';
 import PrivacyPreferencesScreen from '@screens/settings/privacyPreferences';
@@ -364,6 +365,10 @@ const router = createHashRouter([
       {
         path: 'backup-wallet',
         element: <BackupWalletScreen />,
+      },
+      {
+        path: RequestsRoutes.ConnectedAppsAndPermissions,
+        element: <ConnectedAppsAndPermissionsScreen />,
       },
       {
         path: 'tx-status',
