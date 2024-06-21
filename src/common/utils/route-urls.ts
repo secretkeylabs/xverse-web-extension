@@ -12,6 +12,7 @@ enum RequestsRoutes {
   SendBtcTx = '/btc-send-request',
   CreateInscription = '/create-inscription',
   CreateRepeatInscriptions = '/create-repeat-inscriptions',
+  ConnectionRequest = '/connection-request',
 }
 
 export default RequestsRoutes;

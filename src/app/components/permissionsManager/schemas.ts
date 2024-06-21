@@ -1,9 +1,27 @@
 import * as v from 'valibot';
 
-export const resourceSchema = v.picklist(['default']);
+const permissionsSchema = v.picklist(['create', 'read', 'update', 'delete']);
+export type Permission = v.InferOutput<typeof permissionsSchema>;
+
+export const resourceSchema = v.object({
+  id: v.string(),
+  title: v.string(),
+  description: v.string(),
+});
 export type Resource = v.InferOutput<typeof resourceSchema>;
 
-export const roleSchema = v.picklist(['default']);
+// export const resourceInfo: Record<Resource, { title: string; description: string }> = {
+//   default: {
+//     title: 'Connect to wallet.',
+//     description:
+//       'Allows access to your addresses and balances. It does NOT allow performing actions on your behalf or spending your funds.',
+//   },
+// };
+
+export const roleSchema = v.object({
+  name: v.string(),
+  permissions: v.map(resourceSchema.entries.id, v.set(permissionsSchema)),
+});
 export type Role = v.InferOutput<typeof roleSchema>;
 
 export const groupSchema = v.picklist(['default']);

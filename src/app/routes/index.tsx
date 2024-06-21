@@ -21,6 +21,7 @@ import AuthenticationRequest from '@screens/connect/authenticationRequest';
 import BtcSelectAddressScreen from '@screens/connect/btcSelectAddressScreen';
 import StxSelectAccountScreen from '@screens/connect/stxSelectAccountScreen';
 import StxSelectAddressScreen from '@screens/connect/stxSelectAddressScreen';
+import { ConnectionRequest } from '@screens/connectionRequest';
 import CreateInscription from '@screens/createInscription';
 import CreatePassword from '@screens/createPassword';
 import CreateWalletSuccess from '@screens/createWalletSuccess';
@@ -429,6 +430,14 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <ConfirmNftTransaction />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: RequestsRoutes.ConnectionRequest,
+        element: (
+          <AuthGuard>
+            <ConnectionRequest />
           </AuthGuard>
         ),
       },

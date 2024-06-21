@@ -1,5 +1,5 @@
 import { WebBtcMessage } from '@common/types/message-types';
-import { RpcErrorCode, RpcRequestMessage } from '@sats-connect/core';
+import { RpcErrorCode, RpcRequestMessage, connectMethodName } from '@sats-connect/core';
 import { getTabIdFromPort } from '..';
 import {
   handleGetAccounts,
@@ -19,10 +19,16 @@ import handleStacksSignMessage from './stx/signMessage';
 import handleStacksSignStructuredMessage from './stx/signStructuredMessage';
 import signTransaction from './stx/signTransaction';
 import transferStx from './stx/transferStx';
+import { handleConnect } from './wallet/handle-connect';
 
 export async function handleRPCRequest(message: RpcRequestMessage, port: chrome.runtime.Port) {
   try {
     switch (message.method) {
+      case connectMethodName: {
+        await handleConnect(message, port);
+        break;
+      }
+
       case 'getInfo': {
         handleGetInfo(message.id as string, getTabIdFromPort(port));
         break;
