@@ -1,15 +1,15 @@
 import LinkIcon from '@assets/img/linkIcon.svg';
 import Separator from '@components/separator';
-import useSelectedAccount from '@hooks/useSelectedAccount';
+import useSeedVault from '@hooks/useSeedVault';
+import useWalletReducer from '@hooks/useWalletReducer';
 import { CustomSwitch } from '@screens/ledger/importLedgerAccount/steps/index.styled';
-import { changeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
+import { walletFromSeedPhrase } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import { PRIVACY_POLICY_LINK, TERMS_LINK } from '@utils/constants';
 import { saveIsTermsAccepted } from '@utils/localStorage';
 import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 
@@ -75,21 +75,33 @@ const DataCollectionDescription = styled.p((props) => ({
 function Legal() {
   const { t } = useTranslation('translation', { keyPrefix: 'LEGAL_SCREEN' });
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const selectedAccount = useSelectedAccount();
+  const { changeShowDataCollectionAlert } = useWalletReducer();
+  const seedVault = useSeedVault();
   const [searchParams] = useSearchParams();
   const theme = useTheme();
   const [isToggleEnabled, setIsToggleEnabled] = useState(true);
 
   const handleSwitchToggle = () => setIsToggleEnabled((prevEnabledState) => !prevEnabledState);
 
-  const handleLegalAccept = () => {
+  const handleLegalAccept = async () => {
     if (isToggleEnabled) {
-      optInMixPanel(selectedAccount?.masterPubKey);
+      try {
+        const seed = await seedVault.getSeed();
+        const wallet = await walletFromSeedPhrase({
+          mnemonic: seed,
+          index: 0n,
+          network: 'Mainnet',
+        });
+        optInMixPanel(wallet.masterPubKey);
+        changeShowDataCollectionAlert();
+      } catch (e) {
+        console.error(e);
+        // if this fails, user will be shown the data collection alert again on first start
+      }
     } else {
       optOutMixPanel();
+      changeShowDataCollectionAlert();
     }
-    dispatch(changeShowDataCollectionAlertAction(false));
     saveIsTermsAccepted(true);
     const isRestore = !!searchParams.get('restore');
     if (isRestore) {

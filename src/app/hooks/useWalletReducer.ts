@@ -17,6 +17,7 @@ import {
 import { StoreState } from '@stores/index';
 import {
   ChangeNetworkAction,
+  changeShowDataCollectionAlertAction,
   resetWalletAction,
   selectAccount,
   setWalletHideStxAction,
@@ -84,6 +85,10 @@ const useWalletReducer = () => {
   const softwareAccountsList = useSelector((state: StoreState) => state.walletState.accountsList);
   const ledgerAccountsList = useSelector(
     (state: StoreState) => state.walletState.ledgerAccountsList,
+  );
+
+  const showDataCollectionAlert = useSelector(
+    (state: StoreState) => state.walletState.showDataCollectionAlert,
   );
 
   const hideStx = useSelector((state: StoreState) => state.walletState.hideStx);
@@ -234,6 +239,10 @@ const useWalletReducer = () => {
     dispatch(setWalletHideStxAction(!hideStx));
   };
 
+  const changeShowDataCollectionAlert = (showDataCollectionAlertUpdate = false) => {
+    dispatch(changeShowDataCollectionAlertAction(showDataCollectionAlertUpdate));
+  };
+
   const resetWallet = async () => {
     await queryClient.cancelQueries();
     queryClient.clear();
@@ -260,6 +269,13 @@ const useWalletReducer = () => {
 
     await seedVault.storeSeed(seedPhrase, password);
 
+    // since we cleared up storage above, the store won't be populated in storage
+    // and the selected value of showDataCollectionAlert will be lost
+    // we need to set it back here, making sure it changes so that redux-persist will save it
+    if (showDataCollectionAlert !== null && showDataCollectionAlert !== undefined) {
+      changeShowDataCollectionAlert(!showDataCollectionAlert);
+      changeShowDataCollectionAlert(showDataCollectionAlert);
+    }
     localStorage.setItem('migrated', 'true');
     setSessionStartTime();
   };
@@ -380,6 +396,7 @@ const useWalletReducer = () => {
     updateLedgerAccounts,
     renameAccount,
     toggleStxVisibility,
+    changeShowDataCollectionAlert,
   };
 };
 
