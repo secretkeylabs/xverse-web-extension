@@ -1,4 +1,8 @@
-import { Account } from '@secretkeylabs/xverse-core';
+import { Result, safePromise } from '@common/utils/safe';
+import { Mutex } from 'async-mutex';
+import { parse, stringify } from 'superjson';
+import * as v from 'valibot';
+import { permissionsPersistantStoreKeyName } from './constants';
 import {
   Client,
   ClientsTable,
@@ -7,19 +11,86 @@ import {
   PermissionsTable,
   Resource,
   ResourcesTable,
+  permissionsStoreV1Schema,
 } from './schemas';
 
-export function makeClientsTable() {
-  return new Set<Client>();
+// Queries
+
+export function getResource(resources: ResourcesTable, resourceId: Resource['id']) {
+  return [...resources].find((r) => r.id === resourceId);
 }
+export function getClientPermissions(permissions: PermissionsTable, clientId: Client['id']) {
+  return [...permissions].filter((p) => p.clientId === clientId);
+}
+export function getClientPermission(
+  permissions: PermissionsTable,
+  clientId: Client['id'],
+  resourceId: Resource['id'],
+) {
+  return [...permissions].find((p) => p.clientId === clientId && p.resourceId === resourceId);
+}
+async function loadPermissionsStore(): Promise<Result<PermissionsStoreV1 | null>> {
+  const [error, getResult] = await safePromise(
+    chrome.storage.local.get(permissionsPersistantStoreKeyName),
+  );
+
+  if (error) {
+    return [error, null];
+  }
+
+  const persistedData = getResult[permissionsPersistantStoreKeyName];
+
+  if (!persistedData) {
+    return [null, null];
+  }
+
+  const hydrated = parse(persistedData);
+  const parseResult = v.safeParse(permissionsStoreV1Schema, hydrated);
+  if (!parseResult.success) {
+    return [new Error('Failed to parse permissions store.', { cause: parseResult.issues }), null];
+  }
+
+  return [null, parseResult.output];
+}
+function makeGetPermissionsStore() {
+  let permissionsStore: PermissionsStoreV1 | null = null;
+  return async (): Promise<Result<typeof permissionsStore>> => {
+    if (permissionsStore === null) {
+      const [error, store] = await loadPermissionsStore();
+      if (error) {
+        return [error, null];
+      }
+      permissionsStore = store;
+    }
+
+    console.log('[ARY]: make permissionsStore', permissionsStore);
+    return [null, permissionsStore];
+  };
+}
+export const getPermissionsStore = makeGetPermissionsStore();
+
+// Mutations
+
 export function addClient(clients: ClientsTable, client: Client) {
   if (![...clients].some((c) => c.id === client.id)) {
     clients.add(client);
   }
 }
+export function removeAllClientPermissions(permissions: PermissionsTable, clientId: Client['id']) {
+  const clientPermissions = [...permissions].filter((p) => p.clientId === clientId);
+  clientPermissions.forEach((p) => permissions.delete(p));
+}
+export function removeClient(
+  clients: ClientsTable,
+  permissions: PermissionsTable,
+  clientId: Client['id'],
+) {
+  removeAllClientPermissions(permissions, clientId);
 
-export function makeResourcesTable() {
-  return new Set<Resource>();
+  const client = [...clients].find((c) => c.id === clientId);
+  if (client) {
+    clients.delete(client);
+  }
 }
 export function addResource(resources: ResourcesTable, resource: Resource) {
   if (![...resources].some((r) => r.id === resource.id)) {
@@ -31,13 +102,6 @@ export function removeResource(resources: ResourcesTable, resourceId: Resource['
   if (resource) {
     resources.delete(resource);
   }
-}
-export function getResource(resources: ResourcesTable, resourceId: Resource['id']) {
-  return [...resources].find((r) => r.id === resourceId);
-}
-
-export function makePermissionsTable() {
-  return new Set<Permission>();
 }
 export function setPermission(
   clients: ClientsTable,
@@ -75,34 +139,22 @@ export function removePermission(
     permissions.delete(permission);
   }
 }
-export function removeAllClientPermissions(permissions: PermissionsTable, clientId: Client['id']) {
-  const clientPermissions = [...permissions].filter((p) => p.clientId === clientId);
-  clientPermissions.forEach((p) => permissions.delete(p));
-}
-export function getClientPermissions(permissions: PermissionsTable, clientId: Client['id']) {
-  return [...permissions].filter((p) => p.clientId === clientId);
-}
-export function getClientPermission(
-  permissions: PermissionsTable,
-  clientId: Client['id'],
-  resourceId: Resource['id'],
-) {
-  return [...permissions].find((p) => p.clientId === clientId && p.resourceId === resourceId);
+export function savePermissionsStore(permissionsStore: PermissionsStoreV1) {
+  return chrome.storage.local.set({
+    [permissionsPersistantStoreKeyName]: stringify(permissionsStore),
+  });
 }
 
-export function removeClient(
-  clients: ClientsTable,
-  permissions: PermissionsTable,
-  clientId: Client['id'],
-) {
-  removeAllClientPermissions(permissions, clientId);
-
-  const client = [...clients].find((c) => c.id === clientId);
-  if (client) {
-    clients.delete(client);
-  }
+// Helpers
+export function makeClientsTable() {
+  return new Set<Client>();
 }
-
+export function makeResourcesTable() {
+  return new Set<Resource>();
+}
+export function makePermissionsTable() {
+  return new Set<Permission>();
+}
 export function makePermissionsStoreV1(): PermissionsStoreV1 {
   return {
     version: 1,
@@ -111,3 +163,4 @@ export function makePermissionsStoreV1(): PermissionsStoreV1 {
     permissions: makePermissionsTable(),
   };
 }
+export const permissionsStoreMutex = new Mutex();

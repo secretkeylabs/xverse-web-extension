@@ -1,5 +1,10 @@
 import { WebBtcMessage } from '@common/types/message-types';
-import { RpcErrorCode, RpcRequestMessage, connectMethodName } from '@sats-connect/core';
+import {
+  RpcErrorCode,
+  RpcRequestMessage,
+  connectMethodName,
+  getBalanceMethodName,
+} from '@sats-connect/core';
 import { getTabIdFromPort } from '..';
 import {
   handleGetAccounts,
@@ -8,6 +13,7 @@ import {
   handleSignMessage,
   handleSignPsbt,
 } from './btc';
+import handleGetBalance from './btc/getBalance';
 import handleGetInfo from './getInfo';
 import { makeRPCError, sendRpcResponse } from './helpers';
 import handleGetRunesBalance from './runes/getBalance';
@@ -26,6 +32,10 @@ export async function handleRPCRequest(message: RpcRequestMessage, port: chrome.
     switch (message.method) {
       case connectMethodName: {
         await handleConnect(message, port);
+        break;
+      }
+      case getBalanceMethodName: {
+        await handleGetBalance(message, port);
         break;
       }
 

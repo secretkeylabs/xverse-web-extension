@@ -4,25 +4,7 @@ import { makeAccountPermissionDescription } from '@components/permissionsManager
 import { Client, Permission, Resource } from '@components/permissionsManager/schemas';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import { useCallback, useMemo } from 'react';
-import styled from 'styled-components';
-
-const Row = styled('div')({
-  display: 'flex',
-  justifyContent: 'space-around',
-});
-
-const PermissionContainer = styled('div')({
-  display: 'flex',
-  flexDirection: 'column',
-});
-
-const PermissionTitle = styled('div')({
-  fontWeight: 'bold',
-});
-
-const PermissionDescription = styled('div')({
-  paddingLeft: '10px',
-});
+import { PermissionContainer, PermissionDescription, PermissionTitle, Row } from './index.styles';
 
 /* eslint-disable import/prefer-default-export */
 export function ConnectionRequest() {
