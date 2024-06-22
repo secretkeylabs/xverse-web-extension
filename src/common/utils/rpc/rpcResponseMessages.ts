@@ -94,6 +94,15 @@ export function sendMissingFunctionArgumentsMessage({ tabId, messageId }: BaseAr
     }),
   );
 }
+export function sendAccessDeniedResponseMessage({ tabId, messageId }: BaseArgs) {
+  sendRpcResponse(
+    tabId,
+    makeRPCError(messageId, {
+      code: RpcErrorCode.ACCESS_DENIED,
+      message: 'This .',
+    }),
+  );
+}
 
 type SignTransactionSuccessArgs = BaseArgs & {
   result: Return<'stx_signTransaction'>;

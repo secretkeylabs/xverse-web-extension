@@ -99,7 +99,7 @@ export function PermissionsProvider(props: { children: React.ReactNode }) {
   // Mutations
 
   const addClient = useCallback(async (client: Client) => {
-    utils.permissionsStoreMutex.runExclusive(async () => {
+    await utils.permissionsStoreMutex.runExclusive(async () => {
       const [e, store] = await utils.getPermissionsStore();
 
       if (e) {
@@ -117,7 +117,7 @@ export function PermissionsProvider(props: { children: React.ReactNode }) {
     });
   }, []);
   const addResource = useCallback(async (resource: Resource) => {
-    utils.permissionsStoreMutex.runExclusive(async () => {
+    await utils.permissionsStoreMutex.runExclusive(async () => {
       const [e, store] = await utils.getPermissionsStore();
 
       if (e) {
@@ -135,7 +135,7 @@ export function PermissionsProvider(props: { children: React.ReactNode }) {
     });
   }, []);
   const removeResource = useCallback(async (resourceId: Resource['id']) => {
-    utils.permissionsStoreMutex.runExclusive(async () => {
+    await utils.permissionsStoreMutex.runExclusive(async () => {
       const [e, store] = await utils.getPermissionsStore();
 
       if (e) {
@@ -153,7 +153,7 @@ export function PermissionsProvider(props: { children: React.ReactNode }) {
     });
   }, []);
   const setPermission = useCallback(async (permission: Permission) => {
-    utils.permissionsStoreMutex.runExclusive(async () => {
+    await utils.permissionsStoreMutex.runExclusive(async () => {
       const [e, store] = await utils.getPermissionsStore();
 
       if (e) {
@@ -172,7 +172,7 @@ export function PermissionsProvider(props: { children: React.ReactNode }) {
   }, []);
   const removePermission = useCallback(
     async (clientId: Client['id'], resourceId: Resource['id']) => {
-      utils.permissionsStoreMutex.runExclusive(async () => {
+      await utils.permissionsStoreMutex.runExclusive(async () => {
         const [e, store] = await utils.getPermissionsStore();
 
         if (e) {
@@ -192,7 +192,7 @@ export function PermissionsProvider(props: { children: React.ReactNode }) {
     [],
   );
   const removeAllClientPermissions = useCallback(async (clientId: Client['id']) => {
-    utils.permissionsStoreMutex.runExclusive(async () => {
+    await utils.permissionsStoreMutex.runExclusive(async () => {
       const [e, store] = await utils.getPermissionsStore();
 
       if (e) {
@@ -210,7 +210,7 @@ export function PermissionsProvider(props: { children: React.ReactNode }) {
     });
   }, []);
   const removeClient = useCallback(async (clientId: Client['id']) => {
-    utils.permissionsStoreMutex.runExclusive(async () => {
+    await utils.permissionsStoreMutex.runExclusive(async () => {
       const [e, store] = await utils.getPermissionsStore();
 
       if (e) {

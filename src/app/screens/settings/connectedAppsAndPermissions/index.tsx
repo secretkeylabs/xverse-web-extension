@@ -17,17 +17,15 @@ function ConnectedAppsAndPermissionsScreen() {
   const { getPermissionsStore } = usePermissions();
   const { isFetching, data: store } = useQuery({
     queryKey: ['ConnectedAppsAndPermissionsScreen', 'permissionsStore'],
-    queryFn: async () => {
-      const s = await getPermissionsStore();
-      console.log('[ARY]: store inside qfun', s);
-      return s;
-    },
+    queryFn: getPermissionsStore,
   });
 
   const handleBackButtonClick = () => {
     navigate('/settings');
   };
 
+  // Due to how the React Query cache has been set up, the cached data can't be
+  // used. More details in the the README.
   if (isFetching) {
     return null;
   }
@@ -35,8 +33,6 @@ function ConnectedAppsAndPermissionsScreen() {
   if (!store) {
     return null;
   }
-
-  console.log('[ARY]: store not iterable?', store);
 
   return (
     <>

@@ -63,7 +63,6 @@ function makeGetPermissionsStore() {
       permissionsStore = store;
     }
 
-    console.log('[ARY]: make permissionsStore', permissionsStore);
     return [null, permissionsStore];
   };
 }
