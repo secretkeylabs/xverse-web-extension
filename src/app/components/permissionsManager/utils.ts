@@ -52,21 +52,6 @@ export async function loadPermissionsStore(): Promise<Result<PermissionsStoreV1 
 
   return [null, parseResult.output];
 }
-// function makeGetPermissionsStore() {
-//   let permissionsStore: PermissionsStoreV1 | null = null;
-//   return async (): Promise<Result<typeof permissionsStore>> => {
-//     if (permissionsStore === null) {
-//       const [error, store] = await loadPermissionsStore();
-//       if (error) {
-//         return [error, null];
-//       }
-//       permissionsStore = store;
-//     }
-
-//     return [null, permissionsStore];
-//   };
-// }
-// export const getPermissionsStore = makeGetPermissionsStore();
 
 // Mutations
 
