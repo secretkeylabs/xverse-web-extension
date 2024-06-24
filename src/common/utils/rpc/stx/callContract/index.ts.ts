@@ -11,7 +11,7 @@ import { makeRPCError } from '../../helpers';
 import {
   sendInvalidParametersResponseMessage,
   sendMissingParametersMessage,
-} from '../../rpcResponseMessages';
+} from '../../responseMessages/errors';
 import { callContractParamsSchema } from './paramsSchema';
 
 async function callContract(message: WebBtcMessage<'stx_callContract'>, port: chrome.runtime.Port) {

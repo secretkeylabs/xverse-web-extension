@@ -12,7 +12,7 @@ import { makeRPCError } from '../../helpers';
 import {
   sendInvalidParametersResponseMessage,
   sendMissingParametersMessage,
-} from '../../rpcResponseMessages';
+} from '../../responseMessages/errors';
 
 export const rpcParamsSchema = z.object({
   message: z.string(),

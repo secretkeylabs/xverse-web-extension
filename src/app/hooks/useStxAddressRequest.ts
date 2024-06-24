@@ -1,5 +1,5 @@
 import { MESSAGE_SOURCE } from '@common/types/message-types';
-import { sendGetAddressesSuccessResponseMessage } from '@common/utils/rpc/rpcResponseMessages';
+import { sendGetAddressesSuccessResponseMessage } from '@common/utils/rpc/responseMessages/stacks';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { GetAddressOptions } from '@sats-connect/core';
 import { decodeToken } from 'jsontokens';

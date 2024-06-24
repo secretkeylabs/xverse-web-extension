@@ -12,7 +12,7 @@ import {
   sendInvalidParametersResponseMessage,
   sendInvalidStacksTransactionMessage,
   sendMissingParametersMessage,
-} from '../../rpcResponseMessages';
+} from '../../responseMessages/errors';
 import paramsSchema from './paramsSchema';
 import { isValidStacksTransaction } from './utils';
 

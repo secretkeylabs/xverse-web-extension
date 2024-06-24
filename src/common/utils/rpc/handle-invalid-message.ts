@@ -1,5 +1,5 @@
 import { RpcRequestMessage } from '@sats-connect/core';
-import { sendInvalidParametersResponseMessage } from './rpcResponseMessages';
+import { sendInvalidParametersResponseMessage } from './responseMessages/errors';
 
 // eslint-disable-next-line import/prefer-default-export
 export function handleInvalidMessage(

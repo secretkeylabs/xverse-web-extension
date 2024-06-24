@@ -11,7 +11,7 @@ import { makeRPCError } from '../../helpers';
 import {
   sendInvalidParametersResponseMessage,
   sendMissingParametersMessage,
-} from '../../rpcResponseMessages';
+} from '../../responseMessages/errors';
 import paramsSchema from './paramsSchema';
 
 async function transferStx(message: WebBtcMessage<'stx_transferStx'>, port: chrome.runtime.Port) {
