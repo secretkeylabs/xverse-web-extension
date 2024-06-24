@@ -56,7 +56,7 @@ function PrivacyPreferencesScreen() {
     setIsEnabled(checked);
 
     if (checked) {
-      optInMixPanel(selectedAccount?.masterPubKey);
+      optInMixPanel(selectedAccount.masterPubKey);
     } else {
       optOutMixPanel();
     }
