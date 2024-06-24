@@ -1,5 +1,5 @@
 import { getPopupPayload } from '@common/utils/popup';
-import { usePermissions } from '@components/permissionsManager';
+import { usePermissionsUtils } from '@components/permissionsManager';
 import { makeAccountPermissionDescription } from '@components/permissionsManager/resources';
 import { Client, Permission, Resource } from '@components/permissionsManager/schemas';
 import useSelectedAccount from '@hooks/useSelectedAccount';
@@ -11,7 +11,7 @@ export function ConnectionRequest() {
   const [error, data] = getPopupPayload();
   const account = useSelectedAccount();
 
-  const { addClient, addResource, setPermission } = usePermissions();
+  const { addClient, addResource, setPermission } = usePermissionsUtils();
 
   const handleCancel = useCallback(() => {
     window.close();

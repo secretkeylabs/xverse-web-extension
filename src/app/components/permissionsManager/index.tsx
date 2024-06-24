@@ -1,187 +1,187 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { Client, Permission, Resource } from './schemas';
-import { TContext } from './types';
+import { parse } from 'superjson';
+import * as v from 'valibot';
+import { permissionsPersistantStoreKeyName } from './constants';
+import { Client, Permission, Resource, permissionsStoreV1Schema } from './schemas';
+import { TPermissionsStoreContext, TPermissionsUtilsContext } from './types';
 import * as utils from './utils';
 
-const PermissionsContext = createContext<TContext | undefined>(undefined);
-
-export function PermissionsProvider(props: { children: React.ReactNode }) {
-  const { children } = props;
-
-  const [hasLoadedPermissions, setHasLoadedPermissions] = useState(false);
-  const [error, setError] = useState<unknown | null>(null);
+const PermissionsStoreContext = createContext<TPermissionsStoreContext>({
+  isLoading: true,
+  error: undefined,
+  store: undefined,
+});
+function PermissionsStoreProvider({ children }: { children: React.ReactNode }) {
+  const [value, setValue] = useState<TPermissionsStoreContext>({
+    isLoading: true,
+    error: undefined,
+    store: undefined,
+  });
 
   useEffect(() => {
     utils.permissionsStoreMutex.runExclusive(async () => {
-      const [e, store] = await utils.getPermissionsStore();
+      const [e, loadedStore] = await utils.loadPermissionsStore();
 
       if (e) {
-        setError(e);
+        setValue({
+          isLoading: false,
+          error: e,
+          store: undefined,
+        });
         return;
       }
 
-      if (!store) {
+      if (!loadedStore) {
         const newStore = utils.makePermissionsStoreV1();
         await utils.savePermissionsStore(newStore);
-        setError(null);
-        setHasLoadedPermissions(true);
+        setValue({
+          isLoading: false,
+          error: undefined,
+          store: newStore,
+        });
         return;
       }
 
-      setError(null);
-      setHasLoadedPermissions(true);
+      setValue({
+        isLoading: false,
+        error: undefined,
+        store: loadedStore,
+      });
     });
   }, []);
 
-  // Queries
-
-  const getClientPermissions = useCallback(async (clientId: Client['id']) => {
-    const [e, store] = await utils.getPermissionsStore();
-
-    if (e) {
-      setError(e);
-      return [];
-    }
-
-    if (!store) {
-      setError(new Error('Expected `store` to be defined to get client permissions.'));
-      return [];
-    }
-
-    return utils.getClientPermissions(store.permissions, clientId);
-  }, []);
-  const getClientPermission = useCallback(
-    async (clientId: Client['id'], resourceId: Resource['id']) => {
-      // if (!permissionStoreRef.current) return;
-
-      const [e, store] = await utils.getPermissionsStore();
-
-      if (e) {
-        setError(e);
+  const callback = useCallback((changes: { [key: string]: chrome.storage.StorageChange }) => {
+    const permissionsStoreChanges = changes[permissionsPersistantStoreKeyName];
+    if (permissionsStoreChanges) {
+      const { newValue } = permissionsStoreChanges;
+      const hydrated = parse(newValue);
+      const parseResult = v.safeParse(permissionsStoreV1Schema, hydrated);
+      if (!parseResult.success) {
+        setValue({
+          isLoading: false,
+          error: parseResult.issues,
+          store: undefined,
+        });
         return;
       }
 
+      setValue({
+        isLoading: false,
+        error: undefined,
+        store: parseResult.output,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    chrome.storage.onChanged.addListener(callback);
+
+    return () => {
+      chrome.storage.onChanged.removeListener(callback);
+    };
+  }, [callback]);
+
+  return (
+    <PermissionsStoreContext.Provider value={value}>{children}</PermissionsStoreContext.Provider>
+  );
+}
+export const usePermissionsStore = () => useContext(PermissionsStoreContext);
+
+const PermissionsUtilsContext = createContext<TPermissionsUtilsContext | undefined>(undefined);
+function PermissionsUtilsProvider({ children }: { children: React.ReactNode }) {
+  const { store } = usePermissionsStore();
+
+  // Queries
+
+  const getClientPermissions = useCallback(
+    async (clientId: Client['id']) => {
       if (!store) {
-        setError(new Error('Expected `store` to be defined to get client permission.'));
-        return;
+        return [];
+      }
+
+      return utils.getClientPermissions(store.permissions, clientId);
+    },
+    [store],
+  );
+  const getClientPermission = useCallback(
+    async (clientId: Client['id'], resourceId: Resource['id']) => {
+      if (!store) {
+        return undefined;
       }
 
       return utils.getClientPermission(store.permissions, clientId, resourceId);
     },
-    [],
+    [store],
   );
-  const getPermissionsStore = useCallback(async () => {
-    const [e, store] = await utils.getPermissionsStore();
+  const getResource = useCallback(
+    async (resourceId: Resource['id']) => {
+      if (!store) {
+        return undefined;
+      }
 
-    if (e) {
-      setError(e);
-      return null;
-    }
-
-    return store;
-  }, []);
-  const getResource = useCallback(async (resourceId: Resource['id']) => {
-    const [e, store] = await utils.getPermissionsStore();
-
-    if (e) {
-      setError(e);
-      return;
-    }
-
-    if (!store) {
-      setError(new Error('Expected `store` to be defined to get resource.'));
-      return;
-    }
-
-    return utils.getResource(store.resources, resourceId);
-  }, []);
+      return utils.getResource(store.resources, resourceId);
+    },
+    [store],
+  );
 
   // Mutations
 
-  const addClient = useCallback(async (client: Client) => {
-    await utils.permissionsStoreMutex.runExclusive(async () => {
-      const [e, store] = await utils.getPermissionsStore();
-
-      if (e) {
-        setError(e);
-        return;
-      }
-
-      if (!store) {
-        setError(new Error('Expected `store` to be defined to add client.'));
-        return;
-      }
-
-      utils.addClient(store.clients, client);
-      await utils.savePermissionsStore(store);
-    });
-  }, []);
-  const addResource = useCallback(async (resource: Resource) => {
-    await utils.permissionsStoreMutex.runExclusive(async () => {
-      const [e, store] = await utils.getPermissionsStore();
-
-      if (e) {
-        setError(e);
-        return;
-      }
-
-      if (!store) {
-        setError(new Error('Expected `store` to be defined to add resource.'));
-        return;
-      }
-
-      utils.addResource(store.resources, resource);
-      await utils.savePermissionsStore(store);
-    });
-  }, []);
-  const removeResource = useCallback(async (resourceId: Resource['id']) => {
-    await utils.permissionsStoreMutex.runExclusive(async () => {
-      const [e, store] = await utils.getPermissionsStore();
-
-      if (e) {
-        setError(e);
-        return;
-      }
-
-      if (!store) {
-        setError(new Error('Expected `store` to be defined to remove resource.'));
-        return;
-      }
-
-      utils.removeResource(store.resources, resourceId);
-      await utils.savePermissionsStore(store);
-    });
-  }, []);
-  const setPermission = useCallback(async (permission: Permission) => {
-    await utils.permissionsStoreMutex.runExclusive(async () => {
-      const [e, store] = await utils.getPermissionsStore();
-
-      if (e) {
-        setError(e);
-        return;
-      }
-
-      if (!store) {
-        setError(new Error('Expected `store` to be defined to set permission.'));
-        return;
-      }
-
-      utils.setPermission(store.clients, store.resources, store.permissions, permission);
-      await utils.savePermissionsStore(store);
-    });
-  }, []);
-  const removePermission = useCallback(
-    async (clientId: Client['id'], resourceId: Resource['id']) => {
+  const addClient = useCallback(
+    async (client: Client) => {
       await utils.permissionsStoreMutex.runExclusive(async () => {
-        const [e, store] = await utils.getPermissionsStore();
-
-        if (e) {
-          setError(e);
+        if (!store) {
           return;
         }
 
+        utils.addClient(store.clients, client);
+        await utils.savePermissionsStore(store);
+      });
+    },
+    [store],
+  );
+  const addResource = useCallback(
+    async (resource: Resource) => {
+      await utils.permissionsStoreMutex.runExclusive(async () => {
         if (!store) {
-          setError(new Error('Expected `store` to be defined to remove permission.'));
+          return;
+        }
+
+        utils.addResource(store.resources, resource);
+        await utils.savePermissionsStore(store);
+      });
+    },
+    [store],
+  );
+  const removeResource = useCallback(
+    async (resourceId: Resource['id']) => {
+      await utils.permissionsStoreMutex.runExclusive(async () => {
+        if (!store) {
+          return;
+        }
+
+        utils.removeResource(store.resources, resourceId);
+        await utils.savePermissionsStore(store);
+      });
+    },
+    [store],
+  );
+  const setPermission = useCallback(
+    async (permission: Permission) => {
+      await utils.permissionsStoreMutex.runExclusive(async () => {
+        if (!store) {
+          return;
+        }
+
+        utils.setPermission(store.clients, store.resources, store.permissions, permission);
+        await utils.savePermissionsStore(store);
+      });
+    },
+    [store],
+  );
+  const removePermission = useCallback(
+    async (clientId: Client['id'], resourceId: Resource['id']) => {
+      await utils.permissionsStoreMutex.runExclusive(async () => {
+        if (!store) {
           return;
         }
 
@@ -189,44 +189,34 @@ export function PermissionsProvider(props: { children: React.ReactNode }) {
         await utils.savePermissionsStore(store);
       });
     },
-    [],
+    [store],
   );
-  const removeAllClientPermissions = useCallback(async (clientId: Client['id']) => {
-    await utils.permissionsStoreMutex.runExclusive(async () => {
-      const [e, store] = await utils.getPermissionsStore();
+  const removeAllClientPermissions = useCallback(
+    async (clientId: Client['id']) => {
+      await utils.permissionsStoreMutex.runExclusive(async () => {
+        if (!store) {
+          return;
+        }
 
-      if (e) {
-        setError(e);
-        return;
-      }
+        utils.removeAllClientPermissions(store.permissions, clientId);
+        await utils.savePermissionsStore(store);
+      });
+    },
+    [store],
+  );
+  const removeClient = useCallback(
+    async (clientId: Client['id']) => {
+      await utils.permissionsStoreMutex.runExclusive(async () => {
+        if (!store) {
+          return;
+        }
 
-      if (!store) {
-        setError(new Error('Expected `store` to be defined to remove all client permissions.'));
-        return;
-      }
-
-      utils.removeAllClientPermissions(store.permissions, clientId);
-      await utils.savePermissionsStore(store);
-    });
-  }, []);
-  const removeClient = useCallback(async (clientId: Client['id']) => {
-    await utils.permissionsStoreMutex.runExclusive(async () => {
-      const [e, store] = await utils.getPermissionsStore();
-
-      if (e) {
-        setError(e);
-        return;
-      }
-
-      if (!store) {
-        setError(new Error('Expected `store` to be defined to remove client.'));
-        return;
-      }
-
-      utils.removeClient(store.clients, store.permissions, clientId);
-      await utils.savePermissionsStore(store);
-    });
-  }, []);
+        utils.removeClient(store.clients, store.permissions, clientId);
+        await utils.savePermissionsStore(store);
+      });
+    },
+    [store],
+  );
 
   const contextValue = useMemo(
     () => ({
@@ -239,10 +229,7 @@ export function PermissionsProvider(props: { children: React.ReactNode }) {
       getClientPermissions,
       getClientPermission,
       removeClient,
-      getPermissionsStore,
       getResource,
-      hasLoadedPermissions,
-      error,
     }),
     [
       addClient,
@@ -254,20 +241,29 @@ export function PermissionsProvider(props: { children: React.ReactNode }) {
       getClientPermissions,
       getClientPermission,
       removeClient,
-      getPermissionsStore,
       getResource,
-      hasLoadedPermissions,
-      error,
     ],
   );
 
-  return <PermissionsContext.Provider value={contextValue}>{children}</PermissionsContext.Provider>;
+  return (
+    <PermissionsUtilsContext.Provider value={contextValue}>
+      {children}
+    </PermissionsUtilsContext.Provider>
+  );
 }
 
-export const usePermissions = () => {
-  const context = useContext(PermissionsContext);
+export const usePermissionsUtils = () => {
+  const context = useContext(PermissionsUtilsContext);
   if (context === undefined) {
     throw new Error('usePermissions must be used within a PermissionsProvider');
   }
   return context;
 };
+
+export function PermissionsProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <PermissionsStoreProvider>
+      <PermissionsUtilsProvider>{children}</PermissionsUtilsProvider>
+    </PermissionsStoreProvider>
+  );
+}

@@ -1,6 +1,15 @@
 import { Client, Permission, PermissionsStoreV1, Resource } from './schemas';
 
-export type TContext = {
+export type TPermissionsStoreContext<TError = unknown> =
+  | {
+      isLoading: true;
+      error: undefined;
+      store: undefined;
+    }
+  | { isLoading: false; error: TError; store: undefined }
+  | { isLoading: false; error: undefined; store: PermissionsStoreV1 };
+
+export type TPermissionsUtilsContext = {
   // Queries
   getResource: (resourceId: Resource['id']) => Promise<Resource | undefined>;
   getClientPermissions: (clientId: Client['id']) => Promise<Permission[]>;
@@ -8,7 +17,6 @@ export type TContext = {
     clientId: Client['id'],
     resourceId: Resource['id'],
   ) => Promise<Permission | undefined>;
-  getPermissionsStore: () => Promise<PermissionsStoreV1 | null>;
 
   // Mutations
   addClient: (client: Client) => Promise<void>;
@@ -18,8 +26,4 @@ export type TContext = {
   setPermission: (permission: Permission) => Promise<void>;
   removePermission: (clientId: Client['id'], resourceId: Resource['id']) => Promise<void>;
   removeAllClientPermissions: (clientId: Client['id']) => Promise<void>;
-
-  // Vars
-  hasLoadedPermissions: boolean;
-  error: unknown | null;
 };

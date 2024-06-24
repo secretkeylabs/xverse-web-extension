@@ -1,12 +1,13 @@
-import { usePermissions } from '@components/permissionsManager';
+import { usePermissionsStore, usePermissionsUtils } from '@components/permissionsManager';
 import * as utils from '@components/permissionsManager/utils';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import { useQuery } from '@tanstack/react-query';
-import Button from '@ui-library/button';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
+  Button,
+  ClientHeader,
+  ClientName,
   Container,
   PermissionContainer,
   PermissionDescription,
@@ -16,25 +17,12 @@ import {
 
 function ConnectedAppsAndPermissionsScreen() {
   const navigate = useNavigate();
-  const { getPermissionsStore } = usePermissions();
-  const { isFetching, data: store } = useQuery({
-    queryKey: ['ConnectedAppsAndPermissionsScreen', 'permissionsStore'],
-    queryFn: getPermissionsStore,
-  });
+  const { removeAllClientPermissions } = usePermissionsUtils();
+  const { store } = usePermissionsStore();
 
   const handleBackButtonClick = useCallback(() => {
     navigate('/settings');
   }, [navigate]);
-
-  const handleClearPermissionsClick = useCallback(async () => {
-    //
-  }, []);
-
-  // Due to how the React Query cache has been set up, the cached data can't be
-  // used. More details in the the README.
-  if (isFetching) {
-    return null;
-  }
 
   if (!store) {
     return null;
@@ -43,11 +31,20 @@ function ConnectedAppsAndPermissionsScreen() {
   return (
     <>
       <TopRow title="Connected apps & permissions" onClick={handleBackButtonClick} />
-      <Button title="Clear permissions" type="button" onClick={handleClearPermissionsClick} />
       <Container>
         {[...store.clients].map((client) => (
           <div key={client.id}>
-            <div>{client.name}</div>
+            <ClientHeader>
+              <ClientName>{client.name}</ClientName>
+              <Button
+                type="button"
+                onClick={() => {
+                  removeAllClientPermissions(client.id);
+                }}
+              >
+                Disconnect
+              </Button>
+            </ClientHeader>
             {utils.getClientPermissions(store.permissions, client.id).map((p) => (
               <div key={p.resourceId}>
                 {(() => {

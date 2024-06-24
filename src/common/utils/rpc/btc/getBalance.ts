@@ -55,7 +55,7 @@ const handleGetBalance = async (message: RpcRequestMessage, port: chrome.runtime
   }
 
   const { origin, tabId } = makeContext(port);
-  const [error, store] = await utils.getPermissionsStore();
+  const [error, store] = await utils.loadPermissionsStore();
 
   if (error) {
     sendInternalErrorMessage({ tabId, messageId: parseResult.output.id });

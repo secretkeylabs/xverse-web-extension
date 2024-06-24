@@ -11,6 +11,11 @@ export const Container = styled.div((props) => ({
   paddingRight: props.theme.spacing(8),
 }));
 
+export const ClientHeader = styled('div')({
+  display: 'flex',
+  justifyContent: 'space-between',
+});
+
 export const ClientName = styled('div')({
   fontWeight: 'bold',
 });
@@ -30,4 +35,9 @@ export const PermissionTitle = styled('div')({
 
 export const PermissionDescription = styled('div')({
   paddingLeft: '10px',
+});
+
+export const Button = styled('button')({
+  borderRadius: '4px',
+  padding: '0.2em 0.5em',
 });
