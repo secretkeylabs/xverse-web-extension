@@ -66,6 +66,11 @@ const LoaderContainer = styled.div`
   flex: 1;
 `;
 
+const StyledFiatAmountText = styled(FiatAmountText)`
+  ${(props) => props.theme.typography.body_medium_s}
+  color: ${(props) => props.theme.colors.white_200};
+`;
+
 type FeePriority = 'high' | 'medium' | 'low';
 
 type Props = {
@@ -151,7 +156,7 @@ function FeeItem({
               {`${totalFee} Sats`}
             </StyledHeading>
           )}
-          <FiatAmountText fiatAmount={fiatAmount} fiatCurrency={fiatCurrency} />
+          <StyledFiatAmountText fiatAmount={fiatAmount} fiatCurrency={fiatCurrency} />
           {error && (
             <StyledSubText typography="body_medium_s" color="danger_medium">
               {getErrorMessage(error)}
