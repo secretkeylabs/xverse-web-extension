@@ -28,7 +28,12 @@ import {
 } from '@stores/wallet/actions/actionCreators';
 import { useQueryClient } from '@tanstack/react-query';
 import { generatePasswordHash } from '@utils/encryptionUtils';
-import { resetMixPanel, trackMixPanel } from '@utils/mixpanel';
+import {
+  hasOptedInMixPanelTracking,
+  optInMixPanel,
+  resetMixPanel,
+  trackMixPanel,
+} from '@utils/mixpanel';
 import { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import useSeedVault from './useSeedVault';
@@ -275,6 +280,17 @@ const useWalletReducer = () => {
     if (showDataCollectionAlert !== null && showDataCollectionAlert !== undefined) {
       changeShowDataCollectionAlert(!showDataCollectionAlert);
       changeShowDataCollectionAlert(showDataCollectionAlert);
+
+      // reinitialise with masterpubkey hash now that we have it
+      if (hasOptedInMixPanelTracking()) {
+        const seed = await seedVault.getSeed();
+        const wallet = await walletFromSeedPhrase({
+          mnemonic: seed,
+          index: 0n,
+          network: 'Mainnet',
+        });
+        optInMixPanel(wallet.masterPubKey);
+      }
     }
     localStorage.setItem('migrated', 'true');
     setSessionStartTime();

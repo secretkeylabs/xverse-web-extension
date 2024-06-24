@@ -1,9 +1,7 @@
 import LinkIcon from '@assets/img/linkIcon.svg';
 import Separator from '@components/separator';
-import useSeedVault from '@hooks/useSeedVault';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { CustomSwitch } from '@screens/ledger/importLedgerAccount/steps/index.styled';
-import { walletFromSeedPhrase } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import { PRIVACY_POLICY_LINK, TERMS_LINK } from '@utils/constants';
 import { saveIsTermsAccepted } from '@utils/localStorage';
@@ -76,7 +74,6 @@ function Legal() {
   const { t } = useTranslation('translation', { keyPrefix: 'LEGAL_SCREEN' });
   const navigate = useNavigate();
   const { changeShowDataCollectionAlert } = useWalletReducer();
-  const seedVault = useSeedVault();
   const [searchParams] = useSearchParams();
   const theme = useTheme();
   const [isToggleEnabled, setIsToggleEnabled] = useState(true);
@@ -85,23 +82,12 @@ function Legal() {
 
   const handleLegalAccept = async () => {
     if (isToggleEnabled) {
-      try {
-        const seed = await seedVault.getSeed();
-        const wallet = await walletFromSeedPhrase({
-          mnemonic: seed,
-          index: 0n,
-          network: 'Mainnet',
-        });
-        optInMixPanel(wallet.masterPubKey);
-        changeShowDataCollectionAlert();
-      } catch (e) {
-        console.error(e);
-        // if this fails, user will be shown the data collection alert again on first start
-      }
+      optInMixPanel();
     } else {
       optOutMixPanel();
-      changeShowDataCollectionAlert();
     }
+
+    changeShowDataCollectionAlert();
     saveIsTermsAccepted(true);
     const isRestore = !!searchParams.get('restore');
     if (isRestore) {
