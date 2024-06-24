@@ -17,7 +17,7 @@ import {
 
 function ConnectedAppsAndPermissionsScreen() {
   const navigate = useNavigate();
-  const { removeAllClientPermissions } = usePermissionsUtils();
+  const { removeClient } = usePermissionsUtils();
   const { store } = usePermissionsStore();
 
   const handleBackButtonClick = useCallback(() => {
@@ -39,7 +39,7 @@ function ConnectedAppsAndPermissionsScreen() {
               <Button
                 type="button"
                 onClick={() => {
-                  removeAllClientPermissions(client.id);
+                  removeClient(client.id);
                 }}
               >
                 Disconnect
