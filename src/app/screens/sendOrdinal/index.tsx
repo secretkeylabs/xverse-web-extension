@@ -4,6 +4,7 @@ import useCoinRates from '@hooks/queries/useCoinRates';
 import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSeedVault from '@hooks/useSeedVault';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   ErrorCodes,
@@ -98,7 +99,8 @@ function SendOrdinal() {
   const location = useLocation();
   const { id } = useParams();
   const { data: selectedOrdinal } = useAddressInscription(id!);
-  const { network, ordinalsAddress, btcAddress, selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { network } = useWalletSelector();
   const { btcFiatRate } = useCoinRates();
 
   const { getSeed } = useSeedVault();
@@ -116,7 +118,7 @@ function SendOrdinal() {
   } = useMutation<SignedBtcTx | undefined, ResponseError, string>({
     mutationFn: async (recipient) => {
       const seedPhrase = await getSeed();
-      const addressUtxos = await btcClient.getUnspentUtxos(ordinalsAddress);
+      const addressUtxos = await btcClient.getUnspentUtxos(selectedAccount.ordinalsAddress);
       const ordUtxo = addressUtxos.find(
         (utxo) => `${utxo.txid}:${utxo.vout}` === selectedOrdinal?.output,
       );
@@ -125,8 +127,8 @@ function SendOrdinal() {
         const signedTx = await signOrdinalSendTransaction(
           recipient,
           ordUtxo,
-          btcAddress,
-          Number(selectedAccount?.id),
+          selectedAccount.btcAddress,
+          Number(selectedAccount.id),
           seedPhrase,
           btcClient,
           network.type,
@@ -171,7 +173,7 @@ function SendOrdinal() {
   };
 
   const activeAccountOwnsOrdinal =
-    selectedOrdinal && selectedAccount && isOrdinalOwnedByAccount(selectedOrdinal, selectedAccount);
+    selectedOrdinal && isOrdinalOwnedByAccount(selectedOrdinal, selectedAccount);
 
   const validateRecipientAddress = (address: string): boolean => {
     if (!activeAccountOwnsOrdinal) {
@@ -191,7 +193,7 @@ function SendOrdinal() {
       setRecipientError({ variant: 'danger', message: t('ERRORS.ADDRESS_INVALID') });
       return false;
     }
-    if (address === ordinalsAddress || address === btcAddress) {
+    if (address === selectedAccount.ordinalsAddress || address === selectedAccount.btcAddress) {
       setRecipientError({ variant: 'info', message: t('YOU_ARE_TRANSFERRING_TO_YOURSELF') });
       return true;
     }

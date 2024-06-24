@@ -7,6 +7,7 @@ import TopRow from '@components/topRow';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   AnalyticsEvents,
@@ -36,7 +37,8 @@ function ConfirmFtTransaction() {
   } = location.state;
   const unsignedTx = useMemo(() => deserializeTransaction(unsignedTxHex), [unsignedTxHex]);
   const { refetch } = useStxWalletData();
-  const { network, selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { network } = useWalletSelector();
 
   const {
     isLoading,

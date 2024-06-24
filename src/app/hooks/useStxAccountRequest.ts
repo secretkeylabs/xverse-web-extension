@@ -11,6 +11,7 @@ import { decodeToken } from 'jsontokens';
 import { useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import useSeedVault from './useSeedVault';
+import useSelectedAccount from './useSelectedAccount';
 
 const useStxAccountRequest = () => {
   // Params
@@ -18,7 +19,8 @@ const useStxAccountRequest = () => {
   const params = new URLSearchParams(search);
 
   // Utils
-  const { stxAddress, stxPublicKey, network } = useWalletSelector();
+  const { stxAddress, stxPublicKey } = useSelectedAccount();
+  const { network } = useWalletSelector();
   const { getSeed } = useSeedVault();
 
   // Related to WebBTC RPC request

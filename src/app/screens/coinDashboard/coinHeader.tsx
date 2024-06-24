@@ -11,6 +11,7 @@ import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useHasFeature from '@hooks/useHasFeature';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   currencySymbolMap,
@@ -52,7 +53,8 @@ interface Props {
 }
 
 export default function CoinHeader({ coin, fungibleToken }: Props) {
-  const { fiatCurrency, selectedAccount, network } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { fiatCurrency, network } = useWalletSelector();
   const { data: btcBalance } = useBtcWalletData();
   const { data: stxData } = useStxWalletData();
   const { btcFiatRate, stxBtcRate } = useCoinRates();

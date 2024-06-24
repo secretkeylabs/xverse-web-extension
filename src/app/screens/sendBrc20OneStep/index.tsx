@@ -3,6 +3,7 @@ import TopRow from '@components/topRow';
 import { useGetBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
@@ -28,7 +29,8 @@ function SendBrc20Screen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND_BRC20' });
   const navigate = useNavigate();
   const location = useLocation();
-  const { btcAddress, ordinalsAddress, network } = useWalletSelector();
+  const { btcAddress, ordinalsAddress } = useSelectedAccount();
+  const { network } = useWalletSelector();
   const { data: brc20CoinsList } = useGetBrc20FungibleTokens();
   const { data: feeRate } = useBtcFeeRate();
   const [amountError, setAmountError] = useState<InputFeedbackProps | null>(null);

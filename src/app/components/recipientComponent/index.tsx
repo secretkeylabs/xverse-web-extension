@@ -5,6 +5,7 @@ import FiatAmountText from '@components/fiatAmountText';
 import TokenImage from '@components/tokenImage';
 import TransferDetailView from '@components/transferDetailView';
 import useCoinRates from '@hooks/queries/useCoinRates';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CubeTransparent } from '@phosphor-icons/react';
 import { FungibleToken, getFiatEquivalent } from '@secretkeylabs/xverse-core';
@@ -133,7 +134,8 @@ function RecipientComponent({
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [fiatAmount, setFiatAmount] = useState<string | undefined>('0');
-  const { fiatCurrency, ordinalsAddress } = useWalletSelector();
+  const { ordinalsAddress } = useSelectedAccount();
+  const { fiatCurrency } = useWalletSelector();
   const { btcFiatRate, stxBtcRate } = useCoinRates();
 
   useEffect(() => {
@@ -197,7 +199,7 @@ function RecipientComponent({
           <TitleText>{title}</TitleText>
           {currencyType === 'NFT' || currencyType === 'Ordinal' || currencyType === 'RareSat' ? (
             <ColumnContainer>
-              <ValueText>{value}</ValueText>
+              <ValueText data-testid={dataTestID}>{value}</ValueText>
               {valueDetail && <SubValueText>{valueDetail}</SubValueText>}
             </ColumnContainer>
           ) : (

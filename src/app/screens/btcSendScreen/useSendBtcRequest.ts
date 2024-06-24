@@ -1,3 +1,4 @@
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import {
   BitcoinNetworkType,
   SendBtcTransactionOptions,
@@ -50,8 +51,12 @@ const useSendBtcRequestParams = (btcAddress: string, network: SettingsNetwork) =
 function useSendBtcRequest() {
   const btcClient = useBtcClient();
   const { getSeed } = useSeedVault();
-  const { network, selectedAccount, btcAddress } = useWalletSelector();
-  const { payload, tabId, requestToken, requestId } = useSendBtcRequestParams(btcAddress, network);
+  const selectedAccount = useSelectedAccount();
+  const { network } = useWalletSelector();
+  const { payload, tabId, requestToken, requestId } = useSendBtcRequestParams(
+    selectedAccount.btcAddress,
+    network,
+  );
   const [recipient, setRecipient] = useState<Recipient[]>([]);
 
   const generateSignedTransaction = async () => {
@@ -67,7 +72,7 @@ function useSendBtcRequest() {
     setRecipient(recipients);
     const signedTx = await signBtcTransaction(
       recipients,
-      payload.senderAddress || btcAddress,
+      payload.senderAddress || selectedAccount.btcAddress,
       selectedAccount?.id ?? 0,
       seedPhrase,
       btcClient,

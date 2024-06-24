@@ -1,5 +1,6 @@
 import { makeRPCError, sendRpcResponse } from '@common/utils/rpc/helpers';
 import useCoinRates from '@hooks/queries/useCoinRates';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { RpcErrorCode } from '@sats-connect/core';
 import { ErrorCodes, getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
@@ -28,7 +29,8 @@ function BtcSendScreen() {
   const { payload, signedTx, isLoading, tabId, requestToken, requestId, error, recipient } =
     useSendBtcRequest();
   const navigate = useNavigate();
-  const { btcAddress, network } = useWalletSelector();
+  const { btcAddress } = useSelectedAccount();
+  const { network } = useWalletSelector();
   const { btcFiatRate } = useCoinRates();
   const { t } = useTranslation('translation');
 

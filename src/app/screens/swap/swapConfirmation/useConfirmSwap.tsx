@@ -1,7 +1,7 @@
 import { TokenImageProps } from '@components/tokenImage';
 import useNetworkSelector from '@hooks/useNetwork';
 import useSeedVault from '@hooks/useSeedVault';
-import useWalletSelector from '@hooks/useWalletSelector';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import { SwapToken } from '@screens/swap/types';
 import {
   ApiResponseError,
@@ -43,7 +43,7 @@ export type SwapConfirmationOutput = Omit<SwapConfirmationInput, 'unsignedTx'> &
 };
 
 export function useConfirmSwap(input: SwapConfirmationInput): SwapConfirmationOutput {
-  const { selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
   const selectedNetwork = useNetworkSelector();
   const { isSponsored, sponsorTransaction, isSponsorDisabled } = useAlexSponsoredTransaction(
     input.userOverrideSponsorValue,

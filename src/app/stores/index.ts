@@ -1,4 +1,4 @@
-import { Coin, FungibleToken } from '@secretkeylabs/xverse-core';
+import { Account, AccountType, Coin, FungibleToken } from '@secretkeylabs/xverse-core';
 import chromeStorage from '@utils/chromeStorage';
 import { applyMiddleware, combineReducers, createStore } from 'redux';
 import { PersistConfig, createMigrate, persistReducer, persistStore } from 'redux-persist';
@@ -53,10 +53,29 @@ const migrations = {
     coinsList: undefined,
     brcCoinsList: undefined,
   }),
+  4: (
+    state: WalletState & {
+      stxAddress: string;
+      btcAddress: string;
+      ordinalsAddress: string;
+      masterPubKey: string;
+      stxPublicKey: string;
+      btcPublicKey: string;
+      ordinalsPublicKey: string;
+      selectedAccount: Account | null;
+      accountType: AccountType | undefined;
+      accountName: string | undefined;
+    },
+  ) => ({
+    ...state,
+    selectedAccountIndex:
+      state.selectedAccount?.deviceAccountIndex ?? state.selectedAccount?.id ?? 0,
+    selectedAccountType: state.selectedAccount?.accountType ?? 'software',
+  }),
 };
 
 const WalletPersistConfig: PersistConfig<WalletState> = {
-  version: 3,
+  version: 4,
   key: 'walletState',
   storage: chromeStorage.local,
   migrate: createMigrate(migrations as any, { debug: false }),

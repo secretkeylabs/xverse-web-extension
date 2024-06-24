@@ -28,13 +28,13 @@
   },
   "LEDGER_IMPORT_SCREEN": {
     "LEDGER_IMPORT_1_TITLE": "Secure Your Assets with Ledger",
-    "LEDGER_IMPORT_1_SUBTITLE": "Connecting a Ledger hardware wallet to Xverse is the most secure way to store your Bitcoin, Ordinals, Stacks, BRC-20 and SIP-10 tokens, and more.",
+    "LEDGER_IMPORT_1_SUBTITLE": "Connecting a Ledger hardware wallet to Xverse is the most secure way to store your Bitcoin, Runes, Ordinals, Stacks, BRC-20 and SIP-10 tokens, and more.",
     "LEDGER_IMPORT_1_BUTTON": "Get started",
     "LEDGER_IMPORT_2_TITLE": "Select assets",
     "LEDGER_IMPORT_2_SUBTITLE": "Choose the assets you want to manage with this wallet.",
     "LEDGER_IMPORT_2_FOOTNOTE": "If you don’t want to set a Stacks address now, you have the possibility to set it up later.",
     "LEDGER_IMPORT_2_SELECT": {
-      "BTC_TITLE": "Bitcoin & Ordinals (default)",
+      "BTC_TITLE": "Bitcoin, Runes & Ordinals (default)",
       "BTC_SUBTITLE": "Native SegWit and Taproot addresses",
       "STACKS_TITLE": "Stacks (optional)",
       "STACKS_SUBTITLE": "SIP-10 address"
@@ -66,11 +66,11 @@
       "SUBTITLE_CANCELLED": "The account import process was cancelled on the device."
     },
     "LEDGER_ADDRESS_ADDED": {
-      "TITLE_BTC_ORDINALS": "Bitcoin & Ordinals wallets added",
+      "TITLE_BTC_ORDINALS": "Bitcoin, Runes & Ordinals wallets added",
       "TITLE_BTC": "Bitcoin wallet added",
       "TITLE_ORDINALS": "Ordinals wallet added",
       "TITLE_STX": "Stacks wallet added",
-      "SUBTITLE": "You can now receive & send Bitcoin, Ordinals and BRC-20 tokens using Xverse and Ledger.",
+      "SUBTITLE": "You can now receive & send Bitcoin, Runes, Ordinals and BRC-20 tokens using Xverse and Ledger.",
       "SUBTITLE_STX": "You can now receive & send STX, Stacks NFTs and SIP-10 tokens using Xverse and Ledger."
     },
     "LEDGER_ADD_ACCOUNT_NAME": {
@@ -996,7 +996,7 @@
         "TITLE": "Connect Your Ledger",
         "SUBTITLE": "To continue, connect your Ledger device, make sure it's unlocked, and open the {{name}} app.",
         "ERROR_TITLE": "Connection error",
-        "ERROR_SUBTITLE": "We weren't been able to connect to your device.",
+        "ERROR_SUBTITLE": "We weren't able to connect to your device.",
         "ERROR_SUBTITLE_DEVICE_LOCKED": "Your Ledger device is locked. Please unlock it to continue."
       },
       "CONFIRM": {

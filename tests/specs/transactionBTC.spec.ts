@@ -5,7 +5,7 @@ import Wallet from '../pages/wallet';
 const BTCMain = '3HEcJNAry4C8raqvM4cCPKbZpivTon7hMY';
 const BTCTest = '2MySeYxLrpGg47oqZGJUGBu53cVSy7WKGWf';
 
-// TODO add API_TIMEOUT_MILLI for timeout --> needs invetigation as playwright itself didn't accept the import of the module
+// TODO: add API_TIMEOUT_MILLI for timeout --> needs invetigation as playwright itself didn't accept the import of the module
 
 const strongPW = Onboarding.generateSecurePasswordCrypto();
 const amountBTCSend = 0.000001;
@@ -124,7 +124,10 @@ test.describe('Transaction BTC', () => {
     await expect(initalBTCBalance).toEqual(balanceAfterCancel);
   });
 
-  test.skip('Send BTC - confirm transaction testnet', async ({ page, extensionId }) => {
+  test.skip('Send BTC - confirm transaction testnet #broadtransaction', async ({
+    page,
+    extensionId,
+  }) => {
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
 
@@ -179,7 +182,8 @@ test.describe('Transaction BTC', () => {
     // Check correct amounts
     await wallet.checkAmountsSendingBTC(selfBTCTest, BTCTest, amountBTCSend);
 
-    await wallet.confirmSendTransaction('testnet');
+    await wallet.confirmSendTransaction();
+    await wallet.checkVisualsStartpage('testnet');
 
     // Check BTC Balance after the transaction
     const balanceAfterCancel = await wallet.getTokenBalance('Bitcoin');

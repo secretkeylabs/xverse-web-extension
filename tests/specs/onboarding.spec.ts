@@ -171,6 +171,7 @@ test.describe('onboarding flow', () => {
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.checkVisualsStartpage();
     await expect(wallet.buttonMenu).toBeVisible();
     await wallet.buttonMenu.click();
     await expect(wallet.buttonLock).toBeVisible();

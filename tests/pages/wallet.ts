@@ -1,4 +1,7 @@
 import { expect, type Locator, type Page } from '@playwright/test';
+import Onboarding from './onboarding';
+
+const strongPW = Onboarding.generateSecurePasswordCrypto();
 
 export default class Wallet {
   readonly balance: Locator;
@@ -147,6 +150,20 @@ export default class Wallet {
 
   readonly selectCurrency: Locator;
 
+  readonly totalItem: Locator;
+
+  readonly tabsCollectiblesItems: Locator;
+
+  readonly containersCollectibleItem: Locator;
+
+  readonly containerRareSats: Locator;
+
+  readonly containerInscription: Locator;
+
+  readonly nameInscription: Locator;
+
+  readonly amountInscription: Locator;
+
   readonly buttonNext: Locator;
 
   readonly inputMemo: Locator;
@@ -212,6 +229,36 @@ export default class Wallet {
   readonly textCoinTitle: Locator;
 
   readonly sendSTXValue: Locator;
+
+  readonly buttonEnable: Locator;
+
+  readonly buttonSend: Locator;
+
+  readonly labelSatsValue: Locator;
+
+  readonly labelOwnedBy: Locator;
+
+  readonly labelRareSats: Locator;
+
+  readonly buttonSupportRarity: Locator;
+
+  readonly itemCollenction: Locator;
+
+  readonly buttonShare: Locator;
+
+  readonly buttonOpenOrdinalViewer: Locator;
+
+  readonly textValueReviewPage: Locator;
+
+  readonly numberOrdinal: Locator;
+
+  readonly containersCollectibleItemCollection: Locator;
+
+  readonly containersCollectibleItemSingle: Locator;
+
+  readonly nameInscriptionCollection: Locator;
+
+  readonly nameInscriptionSingle: Locator;
 
   constructor(readonly page: Page) {
     this.page = page;
@@ -292,8 +339,40 @@ export default class Wallet {
     this.coinContractAddress = page.getByTestId('coin-contract-address');
     this.textCoinTitle = page.getByTestId('coin-title-text');
 
-    //
-    // data-id="coin-contract-container"
+    // Collectibles
+    this.totalItem = page.getByTestId('total-items');
+    this.tabsCollectiblesItems = page.getByTestId('tab-list').locator('li');
+    this.containerRareSats = page.getByTestId('rareSats-container');
+    this.nameInscription = page.getByTestId('inscription-name');
+    this.containersCollectibleItem = page.getByTestId('collection-container');
+    this.amountInscription = page.getByTestId('inscription-amount');
+    this.containersCollectibleItemCollection = this.containersCollectibleItem.filter({
+      has: this.amountInscription.filter({
+        hasText: /\d+\s+item(s)?/i,
+      }),
+    });
+    this.containersCollectibleItemSingle = this.containersCollectibleItem.filter({
+      has: this.amountInscription.filter({
+        hasText: /^$/,
+      }),
+    });
+    this.nameInscriptionCollection =
+      this.containersCollectibleItemCollection.getByTestId('inscription-name');
+    this.nameInscriptionSingle =
+      this.containersCollectibleItemSingle.getByTestId('inscription-name');
+    this.buttonEnable = page.getByRole('button', { name: 'Enable' });
+    this.containerInscription = page.getByTestId('inscription-container');
+
+    this.itemCollenction = page.getByTestId('collection-item');
+    this.buttonSend = page.getByRole('button', { name: 'Send' });
+    this.buttonShare = page.getByRole('button', { name: 'Share' });
+    this.buttonOpenOrdinalViewer = page.getByRole('button', { name: 'Open in Ordinal Viewer' });
+    this.labelSatsValue = page.locator('h1').filter({ hasText: 'Sats value' });
+    this.labelOwnedBy = page.locator('h1').filter({ hasText: 'Owned by' });
+    this.labelRareSats = page.locator('p').filter({ hasText: 'Rare Sats' });
+    this.buttonSupportRarity = page.getByRole('button', { name: 'See supported rarity scale' });
+    this.textValueReviewPage = page.getByTestId('value-text');
+    this.numberOrdinal = page.getByTestId('ordinal-number');
 
     // Explore
     this.carouselApp = page.getByTestId('app-carousel');
@@ -358,13 +437,24 @@ export default class Wallet {
     this.infoTextStacking = page.locator('h1').filter({ hasText: 'STX with other stackers' });
   }
 
+  // Helper function to restore the wallet and switch it to testnet
+  async setupTestnetTest(extensionId, wallet) {
+    const onboardingpage = new Onboarding(this.page);
+    await onboardingpage.restoreWallet(strongPW, wallet);
+    await this.page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await this.checkVisualsStartpage();
+    await this.navigationSettings.click();
+    await this.switchtoTestnetNetwork();
+  }
+
   async checkVisualsStartpage(network?: string) {
+    await expect(this.balance).toBeVisible();
+    await expect(this.manageTokenButton).toBeVisible();
+
     // Deny data collection --> modal window is not always appearing so when it does we deny the data collection
     if (await this.buttonDenyDataCollection.isVisible()) {
       await this.buttonDenyDataCollection.click();
     }
-    await expect(this.balance).toBeVisible();
-    await expect(this.manageTokenButton).toBeVisible();
 
     /*
 TODO: needs to be changed to be debending on network and feature enabled
@@ -403,6 +493,18 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(this.inputMemo).toBeVisible();
     await expect(this.imageToken).toBeVisible();
     await expect(this.buttonBack).toBeVisible();
+  }
+
+  async navigateToCollectibles() {
+    await this.navigationNFT.click();
+    await expect(this.page.url()).toContain('nft-dashboard');
+    // If 'enable' rare sats pop up is appearing
+    if (await this.buttonEnable.isVisible()) {
+      await this.buttonEnable.click();
+    }
+    // Check visuals on opening Collectibles page
+    await expect(this.tabsCollectiblesItems.first()).toBeVisible();
+    await expect(this.totalItem).toBeVisible();
   }
 
   // had to disable this rule as my first assertion was always changed to a wrong assertion
@@ -451,13 +553,12 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(num1).toEqual(roundedResult);
   }
 
-  async confirmSendTransaction(network?: string) {
+  async confirmSendTransaction() {
     await expect(this.buttonConfirm).toBeEnabled();
     await this.buttonConfirm.click();
     await expect(this.buttonClose).toBeVisible();
     await expect(this.sendTransactionID).toBeVisible();
     await this.buttonClose.click();
-    await this.checkVisualsStartpage(network);
   }
 
   async getAddress(button: Locator, ClickConfirm = true): Promise<string> {
@@ -488,6 +589,15 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     const specificToken = this.page
       .getByRole('button')
       .filter({ has: this.labelTokenSubtitle.getByText(tokenname, { exact: true }) });
+    await specificToken.last().click();
+  }
+
+  async clickOnSpecificInscription(inscriptionname) {
+    const specificToken = this.containersCollectibleItem
+      .filter({
+        has: this.nameInscription.getByText(inscriptionname, { exact: true }),
+      })
+      .getByTestId('inscription-container');
     await specificToken.last().click();
   }
 

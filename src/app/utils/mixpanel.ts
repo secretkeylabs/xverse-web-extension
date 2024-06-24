@@ -1,7 +1,7 @@
 import { AnalyticsEventProperties, AnalyticsEvents } from '@secretkeylabs/xverse-core';
-import { getMixpanelInstance, mixpanelInstances } from 'app/mixpanelSetup';
 import { sha256 } from 'js-sha256';
 import { Callback, RequestOptions } from 'mixpanel-browser';
+import { getMixpanelInstance, mixpanelInstances } from '../mixpanelSetup';
 
 // Overload definitions
 export function trackMixPanel<E extends keyof AnalyticsEventProperties>(

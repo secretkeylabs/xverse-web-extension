@@ -10,6 +10,7 @@ import TransactionSettingAlert from '@components/transactionSetting';
 import TransferFeeView from '@components/transferFeeView';
 import useNetworkSelector from '@hooks/useNetwork';
 import useSeedVault from '@hooks/useSeedVault';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import type { StacksTransaction } from '@secretkeylabs/xverse-core';
@@ -43,7 +44,7 @@ const Container = styled.div`
   }
 `;
 
-export const ButtonContainer = styled.div((props) => ({
+const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   paddingTop: props.theme.spacing(12),
@@ -154,7 +155,8 @@ function ConfirmStxTransactionComponent({
   const selectedNetwork = useNetworkSelector();
   const { getSeed } = useSeedVault();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
-  const { selectedAccount, feeMultipliers } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { feeMultipliers } = useWalletSelector();
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(loading);
   const [isModalVisible, setIsModalVisible] = useState(false);

@@ -116,7 +116,10 @@ test.describe('Transaction STX', () => {
   });
 
   // TODO: need to add Stack funds to the wallet, testnet is currently not avaiable
-  test.skip('Send STX - confirm transaction testnet', async ({ page, extensionId }) => {
+  test.skip('Send STX - confirm transaction testnet #broadtransaction', async ({
+    page,
+    extensionId,
+  }) => {
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
 
@@ -160,7 +163,8 @@ test.describe('Transaction STX', () => {
     await wallet.checkAmountsSendingSTX(amountSTXSend, STXTest);
 
     // Confirm the transaction
-    await wallet.confirmSendTransaction('testnet');
+    await wallet.confirmSendTransaction();
+    await wallet.checkVisualsStartpage('testnet');
 
     // Check STX Balance after cancel the transaction with the initial STX Balance
     const balanceAfterCancel = await wallet.getTokenBalance('Stacks');

@@ -30,6 +30,7 @@ import ConfirmScreen from '@components/confirmScreen';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useConfirmedBtcBalance from '@hooks/queries/useConfirmedBtcBalance';
 import useBtcClient from '@hooks/useBtcClient';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Button from '@ui-library/button';
@@ -293,8 +294,9 @@ function CreateInscription() {
   const [feeRates, setFeeRates] = useState<BtcFeeResponse>();
   const btcClient = useBtcClient();
 
-  const { ordinalsAddress, network, btcAddress, selectedAccount, fiatCurrency } =
-    useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { ordinalsAddress, btcAddress } = selectedAccount;
+  const { network, fiatCurrency } = useWalletSelector();
   const { btcFiatRate } = useCoinRates();
 
   const transactionContext = useTransactionContext();

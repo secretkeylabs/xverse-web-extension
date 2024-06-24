@@ -2,7 +2,7 @@ import { parseData } from '@common/utils';
 import { callContractParamsSchema } from '@common/utils/rpc/stx/callContract/paramsSchema';
 import { deployContractParamsSchema } from '@common/utils/rpc/stx/deployContract/paramsSchema';
 import useNetworkSelector from '@hooks/useNetwork';
-import useWalletSelector from '@hooks/useWalletSelector';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import { txPayloadToRequest } from '@secretkeylabs/xverse-core';
 import { ContractCallPayload, ContractDeployPayload, TransactionTypes } from '@stacks/connect';
 import { AuthType, PayloadType, deserializeTransaction } from '@stacks/transactions';
@@ -17,7 +17,7 @@ const useStxTransactionRequest = (): Return => {
   const params = new URLSearchParams(search);
 
   // Utils
-  const { stxAddress, stxPublicKey } = useWalletSelector();
+  const { stxAddress, stxPublicKey } = useSelectedAccount();
   const network = useNetworkSelector();
 
   // Common to all WebBTC RPC methods

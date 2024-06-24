@@ -2,6 +2,7 @@ import Eye from '@assets/img/createPassword/Eye.svg';
 import EyeSlash from '@assets/img/createPassword/EyeSlash.svg';
 import logo from '@assets/img/xverse_logo.svg';
 import useSanityCheck from '@hooks/useSanityCheck';
+import useSeedVault from '@hooks/useSeedVault';
 import useSeedVaultMigration from '@hooks/useSeedVaultMigration';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { animated, useSpring } from '@react-spring/web';
@@ -116,6 +117,7 @@ function Login(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'LOGIN_SCREEN' });
   const navigate = useNavigate();
   const { unlockWallet } = useWalletReducer();
+  const { hasSeed } = useSeedVault();
   const { getSanityCheck } = useSanityCheck();
   const { migrateCachedStorage, isVaultUpdated } = useSeedVaultMigration();
   const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
@@ -134,6 +136,14 @@ function Login(): JSX.Element {
     },
     delay: 100,
   });
+
+  useEffect(() => {
+    hasSeed().then((hasSeedPhrase) => {
+      if (!hasSeedPhrase) {
+        navigate('/landing');
+      }
+    });
+  }, [hasSeed, navigate]);
 
   const handleMigrateCache = async () => {
     try {

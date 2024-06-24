@@ -2,6 +2,7 @@ import { makeRPCError, sendRpcResponse } from '@common/utils/rpc/helpers';
 import ConfirmBitcoinTransaction from '@components/confirmBtcTransaction';
 import RequestError from '@components/requests/requestError';
 import useHasFeature from '@hooks/useHasFeature';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -25,7 +26,7 @@ type PSBTSummary = Awaited<ReturnType<btcTransaction.EnhancedPsbt['getSummary']>
 
 function SignPsbtRequest() {
   const navigate = useNavigate();
-  const { selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const txnContext = useTransactionContext();
 

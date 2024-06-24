@@ -1,10 +1,10 @@
 import useNetworkSelector from '@hooks/useNetwork';
-import useWalletSelector from '@hooks/useWalletSelector';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import { fetchDelegationState } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 
 const useDelegationState = () => {
-  const { stxAddress } = useWalletSelector();
+  const { stxAddress } = useSelectedAccount();
   const selectedNetwork = useNetworkSelector();
   const networkType = selectedNetwork.isMainnet() ? 'Mainnet' : 'Testnet';
 

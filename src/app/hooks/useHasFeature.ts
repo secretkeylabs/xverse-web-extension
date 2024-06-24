@@ -1,9 +1,11 @@
 import { FeatureId, getXverseApiClient } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
+import useSelectedAccount from './useSelectedAccount';
 import useWalletSelector from './useWalletSelector';
 
 const useAppFeatures = () => {
-  const { network, masterPubKey } = useWalletSelector();
+  const { masterPubKey } = useSelectedAccount();
+  const { network } = useWalletSelector();
 
   return useQuery({
     queryKey: ['appFeatures', network.type, masterPubKey],

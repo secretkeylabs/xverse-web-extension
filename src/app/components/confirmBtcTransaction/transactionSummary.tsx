@@ -7,10 +7,10 @@ import MintSection from '@components/confirmBtcTransaction/mintSection';
 import TransferFeeView from '@components/transferFeeView';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import { btcTransaction, getBtcFiatEquivalent, RuneSummary } from '@secretkeylabs/xverse-core';
 import SelectFeeRate from '@ui-components/selectFeeRate';
 import Callout from '@ui-library/callout';
-import { BLOG_LINK } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -68,10 +68,9 @@ function TransactionSummary({
   const { btcFiatRate } = useCoinRates();
   const { network, fiatCurrency } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const { t: rareSatsT } = useTranslation('translation', { keyPrefix: 'RARE_SATS' });
   const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
 
-  const { btcAddress, ordinalsAddress } = useWalletSelector();
+  const { btcAddress, ordinalsAddress } = useSelectedAccount();
   const { data: recommendedFees } = useBtcFeeRate();
 
   const hasOutputScript = outputs.some((output) => isScriptOutput(output));
@@ -84,22 +83,6 @@ function TransactionSummary({
   });
 
   const isUnConfirmedInput = inputs.some((input) => !input.extendedUtxo.utxo.status.confirmed);
-
-  // if transaction is not final, we don't know where the rare sats will go, so check inputs instead of outputs
-  const paymentHasInscribedRareSats = !transactionIsFinal
-    ? inputs.some(
-        (input) =>
-          input.extendedUtxo.address === btcAddress &&
-          (input.inscriptions.length || input.satributes.length),
-      )
-    : outputs.some(
-        (output) =>
-          isSpendOutput(output) &&
-          (output.inscriptions.some((inscription) => inscription.fromAddress === btcAddress) ||
-            output.satributes.some((satribute) => satribute.fromAddress === btcAddress)),
-      );
-  const feesHaveInscribedRareSats = feeOutput?.inscriptions.length || feeOutput?.satributes.length;
-  const showInscribeRareSatWarning = paymentHasInscribedRareSats || feesHaveInscribedRareSats;
 
   const satsToFiat = (sats: string) =>
     getBtcFiatEquivalent(new BigNumber(sats), new BigNumber(btcFiatRate)).toNumber().toFixed(2);
@@ -118,15 +101,6 @@ function TransactionSummary({
             id: inscriptionToShow.id,
             inscription_number: inscriptionToShow.number,
           }}
-        />
-      )}
-
-      {!!showInscribeRareSatWarning && (
-        <WarningCallout
-          variant="warning"
-          bodyText={t('INSCRIBED_RARE_SATS_WARNING')}
-          redirectText={rareSatsT('RARITY_DETAIL.LEARN_MORE')}
-          anchorRedirect={`${BLOG_LINK}/rare-satoshis`}
         />
       )}
       {isUnConfirmedInput && (

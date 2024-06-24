@@ -9,6 +9,7 @@ import ConfirmScreen from '@components/confirmScreen';
 import InfoContainer from '@components/infoContainer';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import RequestError from '@components/requests/requestError';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { Return, RpcErrorCode } from '@sats-connect/core';
@@ -107,7 +108,8 @@ const SuccessActionsContainer = styled.div((props) => ({
 
 function SignMessageRequest() {
   const { t } = useTranslation('translation');
-  const { accountsList, selectedAccount, network } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { accountsList, network } = useWalletSelector();
   const { payload, tabId, requestToken, confirmSignMessage, requestId } = useSignMessageRequest();
   const { validationError } = useSignMessageValidation(payload);
 

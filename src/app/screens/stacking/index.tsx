@@ -1,7 +1,7 @@
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomBar from '@components/tabBar';
 import useStackingData from '@hooks/queries/useStackingData';
-import useWalletSelector from '@hooks/useWalletSelector';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import Spinner from '@ui-library/spinner';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -29,7 +29,7 @@ const Text = styled.h1((props) => ({
 function Stacking() {
   const { t } = useTranslation('translation', { keyPrefix: 'STACKING_SCREEN' });
   const { isStackingLoading, stackingData } = useStackingData();
-  const { stxAddress } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
 
   const isStacking = stackingData?.stackerInfo?.stacked || stackingData?.delegationInfo?.delegated;
 
@@ -38,8 +38,8 @@ function Stacking() {
   return (
     <>
       <AccountHeaderComponent />
-      {!stxAddress && <Text>{t('NO_EARN_OPTION')}</Text>}
-      {isStackingLoading && stxAddress && (
+      {!selectedAccount.stxAddress && <Text>{t('NO_EARN_OPTION')}</Text>}
+      {isStackingLoading && selectedAccount.stxAddress && (
         <LoaderContainer>
           <Spinner color="white" size={30} />
         </LoaderContainer>

@@ -2,6 +2,7 @@ import { sendInternalErrorMessage } from '@common/utils/rpc/stx/rpcResponseMessa
 import ContractCallRequest from '@components/transactionsRequests/ContractCallRequest';
 import ContractDeployRequest from '@components/transactionsRequests/ContractDeployTransaction';
 import useNetworkSelector from '@hooks/useNetwork';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -36,7 +37,8 @@ const LoaderContainer = styled.div((props) => ({
 }));
 
 function TransactionRequest() {
-  const { network, feeMultipliers, accountsList, selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { network, feeMultipliers, accountsList } = useWalletSelector();
   const txReq = useStxTransactionRequest();
   const navigate = useNavigate();
   const selectedNetwork = useNetworkSelector();

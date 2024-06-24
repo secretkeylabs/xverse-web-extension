@@ -1,5 +1,6 @@
 import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types';
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   Address,
@@ -61,16 +62,10 @@ const useAddressRequestParams = (network: SettingsNetwork) => {
 };
 
 const useBtcAddressRequest = () => {
-  const {
-    btcAddress,
-    ordinalsAddress,
-    btcPublicKey,
-    ordinalsPublicKey,
-    stxAddress,
-    stxPublicKey,
-    selectedAccount,
-    network,
-  } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey, stxAddress, stxPublicKey } =
+    selectedAccount;
+  const { network } = useWalletSelector();
   const { tabId, origin, payload, requestToken, requestId, rpcMethod } =
     useAddressRequestParams(network);
 

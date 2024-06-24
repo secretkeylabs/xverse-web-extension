@@ -8,6 +8,7 @@ import ActionButton from '@components/button';
 import ConfirmScreen from '@components/confirmScreen';
 import InfoContainer from '@components/infoContainer';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useSignatureRequest, {
   isStructuredMessage,
   isUtf8Message,
@@ -56,7 +57,8 @@ function SignatureRequest(): JSX.Element {
   const [isTxApproved, setIsTxApproved] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
   const [isTxInvalid, setIsTxInvalid] = useState(false);
-  const { selectedAccount, accountsList, network } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { accountsList, network } = useWalletSelector();
   const [addressType, setAddressType] = useState('');
   const { switchAccount } = useWalletReducer();
   const { messageType, requestToken, payload, tabId, domain, requestId } = useSignatureRequest();

@@ -1,7 +1,7 @@
 {
   "name": "xverse-web-extension",
   "description": "A Bitcoin wallet for Web3",
-  "version": "0.37.1",
+  "version": "0.37.2",
   "private": true,
   "engines": {
     "node": "^18.18.2"
@@ -14,9 +14,10 @@
     "test": "vitest ./src",
     "style": "prettier --write \"src/**/*.{ts,tsx}\"",
     "prepare": "husky install",
-    "e2etest": "npx playwright test",
+    "e2etest": "npx playwright test -g \"\" --grep-invert \"broadtransaction\"",
     "e2etest:ui": "npx playwright test --ui",
-    "smoketest": "npx playwright test --grep \"#smoketest\"",
+    "e2etest:smoketest": "npx playwright test --grep \"#smoketest\"",
+    "e2etest:skipped": "npx playwright test --grep \"#broadtransaction\"",
     "e2etest:report": "playwright show-report",
     "find-deadcode": "ts-prune -p tsconfig.tsPrune.json",
     "ts-check": "tsc --noEmit",

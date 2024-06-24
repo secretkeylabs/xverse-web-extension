@@ -9,6 +9,7 @@ import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useBtcClient from '@hooks/useBtcClient';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import useSeedVault from '@hooks/useSeedVault';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   Bundle,
@@ -135,7 +136,9 @@ function ConfirmBtcTransactionComponent({
 }: Props) {
   const { t } = useTranslation('translation');
   const [loading, setLoading] = useState(false);
-  const { btcAddress, selectedAccount, network, feeMultipliers } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { btcAddress } = selectedAccount;
+  const { network, feeMultipliers } = useWalletSelector();
   const { btcFiatRate } = useCoinRates();
   const { selectedSatBundle } = useNftDataSelector();
   const { getSeed } = useSeedVault();
@@ -371,6 +374,7 @@ function ConfirmBtcTransactionComponent({
         {currencyType !== 'BTC' && bundle && <SatsBundle bundle={bundle} />}
         {ordinalTxUtxo ? (
           <RecipientComponent
+            dataTestID="value-text"
             address={recipients[0]?.address}
             value={assetDetail ?? ''}
             valueDetail={assetDetailValue}
@@ -381,6 +385,7 @@ function ConfirmBtcTransactionComponent({
         ) : (
           recipients?.map((recipient, index) => (
             <RecipientComponent
+              dataTestID="value-text"
               key={recipient.address}
               recipientIndex={index + 1}
               address={recipient.address}

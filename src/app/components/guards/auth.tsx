@@ -1,54 +1,86 @@
 import useSeedVault from '@hooks/useSeedVault';
+import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { setWalletUnlockedAction } from '@stores/wallet/actions/actionCreators';
+import Spinner from '@ui-library/spinner';
 import { PropsWithChildren, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
+
+const CenterChildContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+`;
+
+// we only want to initialise this once on load for all instances of this component
+// if we add this as a state variable, it will show a loader every time a new instance of the component is created
+// which will happen between route changes as the component is unmounted and remounted
+const isInitialised = {
+  current: false,
+};
 
 function AuthGuard({ children }: PropsWithChildren) {
   const navigate = useNavigate();
-  const { encryptedSeed, isUnlocked } = useWalletSelector();
-  const { getSeed, hasSeed, unlockVault } = useSeedVault();
-  const dispatch = useDispatch();
-
-  const tryAuthenticating = async () => {
-    try {
-      await getSeed();
-      dispatch(setWalletUnlockedAction(true));
-    } catch (error) {
-      navigate('/login');
-    }
-  };
+  const { encryptedSeed, isUnlocked, accountsList } = useWalletSelector();
+  const { loadWallet, lockWallet } = useWalletReducer();
+  const seedVault = useSeedVault();
 
   const restoreSession = async () => {
+    const unlocked = await seedVault.isVaultUnlocked();
+
+    if (!unlocked && isUnlocked) {
+      // ensure lock state is in sync before proceeding
+      await lockWallet();
+      return;
+    }
+
     if (encryptedSeed) {
+      // this is a legacy seed store. If it exists, we need to migrate
+      // it to the new seed vault which happens on login
       navigate('/login');
       return;
     }
-    const hasSeedPhrase = await hasSeed();
+
+    const hasSeedPhrase = await seedVault.hasSeed();
     if (!hasSeedPhrase) {
+      // wallet has not been set up yet
       navigate('/landing');
       return;
     }
+
     try {
       // if we successfully unlock with empty pwd, then the wallet is not set up yet
-      await unlockVault('');
+      await seedVault.unlockVault('');
       navigate('/landing');
       return;
     } catch (e) {
-      // no-op
+      // no-op - if we can't unlock with empty pwd, then the wallet is set up and we should check if logged in
     }
 
-    await tryAuthenticating();
+    try {
+      await seedVault.getSeed();
+    } catch (error) {
+      navigate('/login');
+    }
+
+    await loadWallet();
   };
 
   useEffect(() => {
-    restoreSession();
+    restoreSession().finally(() => {
+      isInitialised.current = true;
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isUnlocked]);
 
-  if (!isUnlocked) {
-    return null;
+  if (!isInitialised.current || !isUnlocked || accountsList.length === 0) {
+    return (
+      <CenterChildContainer>
+        <Spinner size={50} />
+      </CenterChildContainer>
+    );
   }
   // fragment is required here because without it, the router thinks there could be more than 1 child node
   // eslint-disable-next-line react/jsx-no-useless-fragment

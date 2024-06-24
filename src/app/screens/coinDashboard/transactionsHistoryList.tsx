@@ -4,6 +4,7 @@ import StxTransactionHistoryItem from '@components/transactions/stxTransaction';
 import useTransactions from '@hooks/queries/useTransactions';
 import useBtcClient from '@hooks/useBtcClient';
 import useSeedVault from '@hooks/useSeedVault';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { animated, config, useSpring } from '@react-spring/web';
 import { BtcTransactionData, GetRunesActivityForAddressEvent } from '@secretkeylabs/xverse-core';
@@ -187,7 +188,8 @@ const filterStxTxs = (
 
 export default function TransactionsHistoryList(props: TransactionsHistoryListProps) {
   const { coin, stxTxFilter, brc20Token, runeToken, runeSymbol } = props;
-  const { network, selectedAccount, accountType } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { network, selectedAccountType } = useWalletSelector();
   const btcClient = useBtcClient();
   const seedVault = useSeedVault();
   const { data, isLoading, isFetching, error } = useTransactions(
@@ -208,7 +210,7 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
   const wallet = selectedAccount
     ? {
         ...selectedAccount,
-        accountType: accountType || 'software',
+        accountType: selectedAccountType || 'software',
         accountId:
           isLedgerAccount(selectedAccount) && selectedAccount.deviceAccountIndex
             ? selectedAccount.deviceAccountIndex

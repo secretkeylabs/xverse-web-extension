@@ -10,6 +10,7 @@ test.describe('Settings Tab', () => {
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.checkVisualsStartpage();
     await wallet.navigationSettings.click();
     await expect(page.url()).toContain('settings');
     await expect(wallet.buttonUpdatePassword).toBeVisible();
@@ -30,6 +31,7 @@ test.describe('Settings Tab', () => {
 
     // generate extra account
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.checkVisualsStartpage();
     await wallet.labelAccountName.click();
     await expect(page.url()).toContain('account-list');
     await expect(wallet.labelAccountName).toHaveCount(1);
@@ -61,6 +63,7 @@ test.describe('Settings Tab', () => {
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.checkVisualsStartpage();
     await wallet.navigationSettings.click();
     await expect(wallet.buttonUpdatePassword).toBeVisible();
     await wallet.buttonUpdatePassword.click();
@@ -95,6 +98,7 @@ test.describe('Settings Tab', () => {
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.checkVisualsStartpage();
     await wallet.navigationSettings.click();
     await expect(page.url()).toContain('settings');
     await expect(wallet.buttonBackupWallet).toBeVisible();
@@ -114,6 +118,7 @@ test.describe('Settings Tab', () => {
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.checkVisualsStartpage();
     await expect(wallet.textCurrency).toHaveText('USD');
     await wallet.navigationSettings.click();
     await expect(page.url()).toContain('settings');

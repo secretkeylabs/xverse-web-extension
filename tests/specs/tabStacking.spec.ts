@@ -10,6 +10,7 @@ test.describe('Stacking Tab', () => {
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.checkVisualsStartpage();
     await wallet.navigationStacking.click();
     await expect(page.url()).toContain('stacking');
     await expect(wallet.buttonStartStacking).toBeVisible();

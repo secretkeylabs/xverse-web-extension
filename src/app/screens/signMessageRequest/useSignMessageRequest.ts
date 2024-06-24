@@ -1,4 +1,5 @@
 import useSeedVault from '@hooks/useSeedVault';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { BitcoinNetworkType, SignMessageOptions, SignMessagePayload } from '@sats-connect/core';
@@ -51,7 +52,8 @@ type ValidationError = {
 export const useSignMessageValidation = (requestPayload: SignMessagePayload | undefined) => {
   const [validationError, setValidationError] = useState<ValidationError | null>(null);
   const { t } = useTranslation('translation', { keyPrefix: 'REQUEST_ERRORS' });
-  const { accountsList, selectedAccount, network } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { accountsList, network } = useWalletSelector();
   const { switchAccount } = useWalletReducer();
 
   const checkAddressAvailability = () => {

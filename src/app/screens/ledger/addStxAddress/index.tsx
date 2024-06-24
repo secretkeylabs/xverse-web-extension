@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { Credential } from '../importLedgerAccount';
 
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import {
   Container,
   OnBoardingActionsContainer,
@@ -50,7 +51,8 @@ function AddStxAddress(): JSX.Element {
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isAddressRejected, setIsAddressRejected] = useState(false);
   const [stacksCredentials, setStacksCredentials] = useState<Credential | undefined>(undefined);
-  const { network, selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { network } = useWalletSelector();
   const { updateLedgerAccounts } = useWalletReducer();
   const { search } = useLocation();
   const params = new URLSearchParams(search);

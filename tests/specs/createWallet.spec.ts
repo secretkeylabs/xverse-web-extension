@@ -48,7 +48,7 @@ test.describe('Create and Restore Wallet Flow', () => {
 
       const filteredValues = buttonValues.filter((value) => value !== seedword);
       const randomValue = filteredValues[Math.floor(Math.random() * filteredValues.length)];
-      await page.locator(`button[value="${randomValue}"]`).click();
+      await page.locator(`button[value="${randomValue}"]`).first().click();
 
       // Check if error message is displayed when clicking the wrong seedword
       await expect(page.locator('p:has-text("This word is not")')).toBeVisible();
@@ -87,7 +87,7 @@ test.describe('Create and Restore Wallet Flow', () => {
       // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
       await page.reload();
       // click close for the modal window
-      // TODO find better locator for close button --> issue https://linear.app/xverseapp/issue/ENG-4039/adjust-id-or-add-titles-for-copy-address-button-for-receive-menu
+      // TODO: find better locator for close button --> issue https://linear.app/xverseapp/issue/ENG-4039/adjust-id-or-add-titles-for-copy-address-button-for-receive-menu
       // await expect(page.locator('button.sc-hceviv > svg')).toBeVisible();
       // await page.locator('button.sc-hceviv > svg').click();
 
