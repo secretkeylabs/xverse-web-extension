@@ -3,6 +3,8 @@ import * as utils from '@components/permissionsManager/utils';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import { useQuery } from '@tanstack/react-query';
+import Button from '@ui-library/button';
+import { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Container,
@@ -20,9 +22,13 @@ function ConnectedAppsAndPermissionsScreen() {
     queryFn: getPermissionsStore,
   });
 
-  const handleBackButtonClick = () => {
+  const handleBackButtonClick = useCallback(() => {
     navigate('/settings');
-  };
+  }, [navigate]);
+
+  const handleClearPermissionsClick = useCallback(async () => {
+    //
+  }, []);
 
   // Due to how the React Query cache has been set up, the cached data can't be
   // used. More details in the the README.
@@ -37,6 +43,7 @@ function ConnectedAppsAndPermissionsScreen() {
   return (
     <>
       <TopRow title="Connected apps & permissions" onClick={handleBackButtonClick} />
+      <Button title="Clear permissions" type="button" onClick={handleClearPermissionsClick} />
       <Container>
         {[...store.clients].map((client) => (
           <div key={client.id}>
