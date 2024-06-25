@@ -1,6 +1,9 @@
 import { WebBtcMessage } from '@common/types/message-types';
 import { getTabIdFromPort } from '@common/utils';
+import getSelectedAccount from '@common/utils/getSelectedAccount';
+import { makeContext } from '@common/utils/popup';
 import { AddressPurpose, RpcErrorCode } from '@sats-connect/core';
+import rootStore from '@stores/index';
 import { z } from 'zod';
 import {
   ParamsKeyValueArray,
@@ -11,6 +14,8 @@ import {
 } from '../../legacy-external-message-handler';
 import RequestsRoutes from '../../route-urls';
 import { makeRPCError, sendRpcResponse } from '../helpers';
+import { sendGetAddressesSuccessResponseMessage } from '../responseMessages/stacks';
+import { accountPurposeAddresses, hasPermissions } from './getAddresses.utils';
 
 const AddressPurposeSchema = z.enum([AddressPurpose.Ordinals, AddressPurpose.Payment]);
 
@@ -34,6 +39,35 @@ export const handleGetAddresses = async (
     return;
   }
 
+  const { origin, tabId } = makeContext(port);
+  if (await hasPermissions(origin)) {
+    const {
+      selectedAccountIndex,
+      selectedAccountType,
+      accountsList: softwareAccountsList,
+      ledgerAccountsList,
+    } = rootStore.store.getState().walletState;
+
+    const account = getSelectedAccount({
+      selectedAccountIndex,
+      selectedAccountType,
+      softwareAccountsList,
+      ledgerAccountsList,
+    });
+
+    if (account) {
+      const addresses = accountPurposeAddresses(account, message.params.purposes);
+      sendGetAddressesSuccessResponseMessage({
+        tabId,
+        messageId: message.id,
+        result: {
+          addresses,
+        },
+      });
+      return;
+    }
+  }
+
   const requestParams: ParamsKeyValueArray = [
     ['purposes', message.params.purposes.toString()],
     ['requestId', message.id as string],
@@ -44,7 +78,7 @@ export const handleGetAddresses = async (
     requestParams.push(['message', message.params.message]);
   }
 
-  const { urlParams, tabId } = makeSearchParamsWithDefaults(port, requestParams);
+  const { urlParams } = makeSearchParamsWithDefaults(port, requestParams);
 
   const { id } = await triggerRequestWindowOpen(RequestsRoutes.AddressRequest, urlParams);
   listenForPopupClose({

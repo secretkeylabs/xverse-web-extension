@@ -1,4 +1,5 @@
 import { Result, safePromise } from '@common/utils/safe';
+import { NetworkType } from '@secretkeylabs/xverse-core';
 import { Mutex } from 'async-mutex';
 import { parse, stringify } from 'superjson';
 import * as v from 'valibot';
@@ -130,6 +131,7 @@ export function savePermissionsStore(permissionsStore: PermissionsStoreV1) {
 }
 
 // Helpers
+
 export function makeClientsTable() {
   return new Set<Client>();
 }

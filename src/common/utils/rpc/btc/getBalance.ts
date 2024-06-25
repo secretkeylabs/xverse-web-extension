@@ -1,6 +1,7 @@
 import { getTabIdFromPort } from '@common/utils';
 import getSelectedAccount from '@common/utils/getSelectedAccount';
 import { makeContext } from '@common/utils/popup';
+import { makeAccountResourceId } from '@components/permissionsManager/resources';
 import * as utils from '@components/permissionsManager/utils';
 import { RpcRequestMessage, getBalanceSchema } from '@sats-connect/core';
 import { UTXO } from '@secretkeylabs/xverse-core';
@@ -11,7 +12,6 @@ import { sendGetBalanceSuccessResponseMessage } from '../responseMessages/bitcoi
 import {
   sendAccessDeniedResponseMessage,
   sendInternalErrorMessage,
-  sendUnsupportedNetworkResponseMessage,
 } from '../responseMessages/errors';
 
 async function getBtcAddressUtxos(address: string): Promise<Array<UTXO>> {
@@ -19,6 +19,8 @@ async function getBtcAddressUtxos(address: string): Promise<Array<UTXO>> {
   const res = await fetch(url);
   const data = (await res.json()) as Array<UTXO>;
 
+  // Need to check for having no UTXOs due to
+  // https://linear.app/xverseapp/issue/ENG-4372
   if (data.length === 0) {
     // eslint-disable-next-line no-console
     console.warn(
@@ -72,19 +74,13 @@ const handleGetBalance = async (message: RpcRequestMessage, port: chrome.runtime
     selectedAccountType,
     accountsList: softwareAccountsList,
     ledgerAccountsList,
-    // TODO accounts depend on the network, so should perms. For now, only support mainnet.
     network,
   } = rootStore.store.getState().walletState;
-
-  if (network.type !== 'Mainnet') {
-    sendUnsupportedNetworkResponseMessage({ tabId, messageId: parseResult.output.id });
-    return;
-  }
 
   const permission = utils.getClientPermission(
     store.permissions,
     origin,
-    `account-${selectedAccountIndex}`,
+    makeAccountResourceId({ accountId: selectedAccountIndex, networkType: network.type }),
   );
   if (!permission) {
     sendAccessDeniedResponseMessage({ tabId, messageId: parseResult.output.id });

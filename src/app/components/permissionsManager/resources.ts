@@ -1,9 +1,16 @@
-import { Account } from '@secretkeylabs/xverse-core';
+import { Account, NetworkType } from '@secretkeylabs/xverse-core';
 import { Action, Client, Resource } from './schemas';
 
-export function makeAccountResource(accountId: Account['id']): Resource {
+export function makeAccountResourceId(args: {
+  accountId: Account['id'];
+  networkType: NetworkType;
+}) {
+  return `account-${args.accountId}-${args.networkType}`;
+}
+
+export function makeAccountResource(accountId: Account['id'], networkType: NetworkType): Resource {
   return {
-    id: `account-${accountId}`,
+    id: makeAccountResourceId({ accountId, networkType }),
     name: `Account ${accountId}`,
   };
 }
