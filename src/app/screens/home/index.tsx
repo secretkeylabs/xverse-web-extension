@@ -526,10 +526,6 @@ function Home() {
               />
             ))}
         </ColumnContainer>
-        <Sheet visible={openReceiveModal} title={t('RECEIVE')} onClose={onReceiveModalClose}>
-          {areReceivingAddressesVisible ? receiveContent : verifyOrViewAddresses}
-        </Sheet>
-
         <TokenListButtonContainer>
           <TokenListButton onClick={handleManageTokenListOnClick}>
             <>
@@ -538,7 +534,9 @@ function Home() {
             </>
           </TokenListButton>
         </TokenListButtonContainer>
-
+        <Sheet visible={openReceiveModal} title={t('RECEIVE')} onClose={onReceiveModalClose}>
+          {areReceivingAddressesVisible ? receiveContent : verifyOrViewAddresses}
+        </Sheet>
         <CoinSelectModal
           onSelectBitcoin={onBtcSendClick}
           onSelectStacks={onStxSendClick}

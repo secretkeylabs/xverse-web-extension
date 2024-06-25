@@ -23,6 +23,9 @@ const ButtonImage = styled.button({
 const CustomisedModal = styled(Modal)`
   overflow-y: auto;
   position: absolute;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const BodyContainer = styled.div`
@@ -62,7 +65,7 @@ function Sheet({
     },
     content: {
       width: '100vw',
-      maxWidth: isGalleryOpen ? 330 : 360,
+      maxWidth: 360,
       maxHeight: '90vh',
       border: 'transparent',
       background: theme.colors.elevation6_600,
