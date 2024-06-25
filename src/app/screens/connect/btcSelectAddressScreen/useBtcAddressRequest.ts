@@ -1,12 +1,10 @@
 import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types';
-import { accountPurposeAddresses } from '@common/utils/rpc/btc/getAddresses.utils';
+import { accountPurposeAddresses } from '@common/utils/rpc/btc/getAddresses/utils';
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  Address,
   AddressPurpose,
-  AddressType,
   BitcoinNetworkType,
   GetAddressOptions,
   GetAddressPayload,

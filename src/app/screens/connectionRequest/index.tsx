@@ -1,14 +1,23 @@
 import { getPopupPayload } from '@common/utils/popup';
+import { sendRequestPermissionsSuccessResponseMessage } from '@common/utils/rpc/responseMessages/wallet';
 import { usePermissionsUtils } from '@components/permissionsManager';
-import { makeAccountPermissionDescription } from '@components/permissionsManager/resources';
+import {
+  makeAccountPermissionDescription,
+  makeAccountResourceId,
+} from '@components/permissionsManager/resources';
 import { Client, Permission, Resource } from '@components/permissionsManager/schemas';
+import useNetworkSelector from '@hooks/useNetwork';
 import useSelectedAccount from '@hooks/useSelectedAccount';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { connectSchema } from '@sats-connect/core';
 import { useCallback, useMemo } from 'react';
+import * as v from 'valibot';
 import { PermissionContainer, PermissionDescription, PermissionTitle, Row } from './index.styles';
 
 /* eslint-disable import/prefer-default-export */
 export function ConnectionRequest() {
-  const [error, data] = getPopupPayload();
+  const { network } = useWalletSelector();
+  const [error, data] = getPopupPayload((maybeData) => v.parse(connectSchema, maybeData));
   const account = useSelectedAccount();
 
   const { addClient, addResource, setPermission } = usePermissionsUtils();
@@ -37,10 +46,10 @@ export function ConnectionRequest() {
     }
 
     return {
-      id: `account-${account.id}`,
-      name: `Account ${account.id}`,
+      id: makeAccountResourceId({ accountId: account.id, networkType: network.type }),
+      name: `Account ${account.id} (${network.type})`,
     };
-  }, [account.id, data?.context.origin]);
+  }, [account.id, data?.context.origin, network.type]);
 
   const permission: Permission | null = useMemo(() => {
     if (!client || !resource) {
@@ -55,6 +64,12 @@ export function ConnectionRequest() {
   }, [client, resource]);
 
   const handleAccept = useCallback(async () => {
+    const messageId = data?.data.id;
+    if (!messageId) return;
+
+    const tabId = data?.context.tabId;
+    if (typeof tabId !== 'number') return;
+
     if (!client || !resource || !permission) {
       return;
     }
@@ -63,8 +78,23 @@ export function ConnectionRequest() {
     await addResource(resource);
     await setPermission(permission);
 
+    sendRequestPermissionsSuccessResponseMessage({
+      messageId,
+      tabId,
+      result: undefined,
+    });
+
     window.close();
-  }, [addClient, addResource, client, permission, resource, setPermission]);
+  }, [
+    addClient,
+    addResource,
+    client,
+    data?.context.tabId,
+    data?.data.id,
+    permission,
+    resource,
+    setPermission,
+  ]);
 
   if (error) {
     return <div>Error processing connection request.</div>;

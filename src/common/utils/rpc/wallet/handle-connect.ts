@@ -17,6 +17,7 @@ export const handleConnect = async (message: RpcRequestMessage, port: chrome.run
 
   await openPopup({
     path: RequestsRoutes.ConnectionRequest,
+    data: parseResult.output,
     context: makeContext(port),
     onClose: makeSendPopupClosedUserRejectionMessage({
       tabId: getTabIdFromPort(port),

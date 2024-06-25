@@ -32,9 +32,8 @@ export function accountPurposeAddresses(account: Account, purposes: AddressPurpo
   });
 }
 
-export async function hasPermissions(origin: string) {
+export async function hasPermissions(origin: string): Promise<boolean> {
   const [error, store] = await utils.loadPermissionsStore();
-
   if (error) {
     return false;
   }
@@ -57,4 +56,6 @@ export async function hasPermissions(origin: string) {
   if (!permission.actions.has('read')) {
     return false;
   }
+
+  return true;
 }

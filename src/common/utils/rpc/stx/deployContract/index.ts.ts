@@ -41,7 +41,7 @@ async function deployContract(
 
     // Metadata
     rpcMethod: 'stx_deployContract',
-    messageId: message.id,
+    messageId: String(message.id),
   };
 
   const { urlParams, tabId } = makeSearchParamsWithDefaults(port, popupParams);

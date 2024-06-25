@@ -11,11 +11,11 @@ import {
   listenForPopupClose,
   makeSearchParamsWithDefaults,
   triggerRequestWindowOpen,
-} from '../../legacy-external-message-handler';
-import RequestsRoutes from '../../route-urls';
-import { makeRPCError, sendRpcResponse } from '../helpers';
-import { sendGetAddressesSuccessResponseMessage } from '../responseMessages/stacks';
-import { accountPurposeAddresses, hasPermissions } from './getAddresses.utils';
+} from '../../../legacy-external-message-handler';
+import RequestsRoutes from '../../../route-urls';
+import { makeRPCError, sendRpcResponse } from '../../helpers';
+import { sendGetAddressesSuccessResponseMessage } from '../../responseMessages/stacks';
+import { accountPurposeAddresses, hasPermissions } from './utils';
 
 const AddressPurposeSchema = z.enum([AddressPurpose.Ordinals, AddressPurpose.Payment]);
 

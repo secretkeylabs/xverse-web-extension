@@ -31,20 +31,22 @@ async function getBtcAddressUtxos(address: string): Promise<Array<UTXO>> {
 }
 
 async function getBalance(address: string): Promise<{
-  confirmedBalance: bigint;
-  unconfirmedUtxosBalance: bigint;
+  confirmed: bigint;
+  unconfirmed: bigint;
+  total: bigint;
 }> {
   const utxos = await getBtcAddressUtxos(address);
   const confirmedBalance = utxos
     .filter((utxo) => utxo.status.confirmed)
     .reduce((acc, utxo) => acc + BigInt(utxo.value), 0n);
-  const unconfirmedUtxosBalance = utxos
+  const unconfirmedBalance = utxos
     .filter((utxo) => !utxo.status.confirmed)
     .reduce((acc, utxo) => acc + BigInt(utxo.value), 0n);
 
   return {
-    confirmedBalance,
-    unconfirmedUtxosBalance,
+    confirmed: confirmedBalance,
+    unconfirmed: unconfirmedBalance,
+    total: confirmedBalance + unconfirmedBalance,
   };
 }
 

@@ -46,7 +46,7 @@ async function callContract(message: WebBtcMessage<'stx_callContract'>, port: ch
 
     // Metadata
     rpcMethod: 'stx_callContract',
-    messageId: message.id,
+    messageId: String(message.id),
   };
 
   const { urlParams, tabId } = makeSearchParamsWithDefaults(port, popupParams);

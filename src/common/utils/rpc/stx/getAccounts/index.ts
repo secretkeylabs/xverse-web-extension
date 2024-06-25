@@ -20,7 +20,7 @@ const handleGetStxAccounts = async (
   }
 
   const popupParams = {
-    messageId: message.id,
+    messageId: String(message.id),
     rpcMethod: 'stx_getAccounts',
   };
 
