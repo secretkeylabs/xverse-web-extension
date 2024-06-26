@@ -12,6 +12,7 @@ const CenterChildContainer = styled.div`
   align-items: center;
   height: 100%;
   width: 100%;
+  min-height: 600px;
 `;
 
 // we only want to initialise this once on load for all instances of this component
