@@ -82,7 +82,9 @@ function TransactionSummary({
     ordinalsAddress,
   });
 
-  const isUnConfirmedInput = inputs.some((input) => !input.extendedUtxo.utxo.status.confirmed);
+  const isUnConfirmedInput = inputs.some(
+    (input) => !input.extendedUtxo.utxo.status.confirmed && input.walletWillSign,
+  );
 
   const satsToFiat = (sats: string) =>
     getBtcFiatEquivalent(new BigNumber(sats), new BigNumber(btcFiatRate)).toNumber().toFixed(2);
