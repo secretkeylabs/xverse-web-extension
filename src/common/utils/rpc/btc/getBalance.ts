@@ -112,7 +112,11 @@ const handleGetBalance = async (message: RpcRequestMessage, port: chrome.runtime
   sendGetBalanceSuccessResponseMessage({
     tabId,
     messageId: parseResult.output.id,
-    result: balances,
+    result: {
+      confirmed: balances.confirmed.toString(),
+      unconfirmed: balances.unconfirmed.toString(),
+      total: balances.total.toString(),
+    },
   });
 };
 
