@@ -20,7 +20,7 @@ import AmountWithInscriptionSatribute from './itemRow/amountWithInscriptionSatri
 import ReceiveSection from './receiveSection';
 import TransferSection from './transferSection';
 import TxInOutput from './txInOutput/txInOutput';
-import { getNetAmount, isScriptOutput, isSpendOutput } from './utils';
+import { getNetAmount, isScriptOutput } from './utils';
 
 const Container = styled.div((props) => ({
   background: props.theme.colors.elevation1,
