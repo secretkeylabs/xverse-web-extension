@@ -6,7 +6,6 @@ import {
   makeAccountResourceId,
 } from '@components/permissionsManager/resources';
 import { Client, Permission, Resource } from '@components/permissionsManager/schemas';
-import useNetworkSelector from '@hooks/useNetwork';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { connectSchema } from '@sats-connect/core';
