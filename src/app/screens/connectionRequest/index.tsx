@@ -80,7 +80,7 @@ export function ConnectionRequest() {
     sendRequestPermissionsSuccessResponseMessage({
       messageId,
       tabId,
-      result: undefined,
+      result: true,
     });
 
     window.close();
