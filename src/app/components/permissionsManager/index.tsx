@@ -96,6 +96,8 @@ function PermissionsUtilsProvider({ children }: { children: React.ReactNode }) {
   const getClientPermissions = useCallback(
     async (clientId: Client['id']) => {
       if (!store) {
+        // eslint-disable-next-line no-console
+        console.warn("[PermissionsUtilsProvider.getClientPermissions]: Store is not loaded yet.")
         return [];
       }
 
@@ -106,6 +108,8 @@ function PermissionsUtilsProvider({ children }: { children: React.ReactNode }) {
   const getClientPermission = useCallback(
     async (clientId: Client['id'], resourceId: Resource['id']) => {
       if (!store) {
+        // eslint-disable-next-line no-console
+        console.warn("[PermissionsUtilsProvider.getClientPermission]: Store is not loaded yet.")
         return undefined;
       }
 
@@ -130,6 +134,8 @@ function PermissionsUtilsProvider({ children }: { children: React.ReactNode }) {
     async (client: Client) => {
       await utils.permissionsStoreMutex.runExclusive(async () => {
         if (!store) {
+          // eslint-disable-next-line no-console
+          console.warn("[PermissionsUtilsProvider.addClient]: Store is not loaded yet.")
           return;
         }
 
@@ -143,6 +149,8 @@ function PermissionsUtilsProvider({ children }: { children: React.ReactNode }) {
     async (resource: Resource) => {
       await utils.permissionsStoreMutex.runExclusive(async () => {
         if (!store) {
+          // eslint-disable-next-line no-console
+          console.warn("[PermissionsUtilsProvider.addResource]: Store is not loaded yet.")
           return;
         }
 
@@ -156,6 +164,8 @@ function PermissionsUtilsProvider({ children }: { children: React.ReactNode }) {
     async (resourceId: Resource['id']) => {
       await utils.permissionsStoreMutex.runExclusive(async () => {
         if (!store) {
+          // eslint-disable-next-line no-console
+          console.warn("[PermissionsUtilsProvider.removeResource]: Store is not loaded yet.")
           return;
         }
 
@@ -169,6 +179,8 @@ function PermissionsUtilsProvider({ children }: { children: React.ReactNode }) {
     async (permission: Permission) => {
       await utils.permissionsStoreMutex.runExclusive(async () => {
         if (!store) {
+          // eslint-disable-next-line no-console
+          console.warn("[PermissionsUtilsProvider.setPermission]: Store is not loaded yet.")
           return;
         }
 
@@ -182,6 +194,8 @@ function PermissionsUtilsProvider({ children }: { children: React.ReactNode }) {
     async (clientId: Client['id'], resourceId: Resource['id']) => {
       await utils.permissionsStoreMutex.runExclusive(async () => {
         if (!store) {
+          // eslint-disable-next-line no-console
+          console.warn("[PermissionsUtilsProvider.removePermission]: Store is not loaded yet.")
           return;
         }
 
@@ -195,6 +209,8 @@ function PermissionsUtilsProvider({ children }: { children: React.ReactNode }) {
     async (clientId: Client['id']) => {
       await utils.permissionsStoreMutex.runExclusive(async () => {
         if (!store) {
+          // eslint-disable-next-line no-console
+          console.warn("[PermissionsUtilsProvider.removeAllClientPermissions]: Store is not loaded yet.")
           return;
         }
 
@@ -208,6 +224,8 @@ function PermissionsUtilsProvider({ children }: { children: React.ReactNode }) {
     async (clientId: Client['id']) => {
       await utils.permissionsStoreMutex.runExclusive(async () => {
         if (!store) {
+          // eslint-disable-next-line no-console
+          console.warn("[PermissionsUtilsProvider.removeClient]: Store is not loaded yet.")
           return;
         }
 
