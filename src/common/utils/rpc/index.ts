@@ -102,7 +102,7 @@ export async function handleRPCRequest(message: RpcRequestMessage, port: chrome.
         break;
       }
       case 'runes_getBalance': {
-        await handleGetRunesBalance(message.id as string, getTabIdFromPort(port));
+        await handleGetRunesBalance(message, port);
         break;
       }
       default:
