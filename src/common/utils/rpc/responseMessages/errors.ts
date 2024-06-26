@@ -105,7 +105,7 @@ export function sendAccessDeniedResponseMessage({ tabId, messageId }: BaseArgs) 
     tabId,
     makeRPCError(messageId, {
       code: RpcErrorCode.ACCESS_DENIED,
-      message: 'This .',
+      message: 'Access denied.',
     }),
   );
 }
