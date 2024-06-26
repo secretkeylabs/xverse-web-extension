@@ -13,3 +13,15 @@ export function sendRequestPermissionsSuccessResponseMessage({
 }: RequestPermissionsSuccessArgs) {
   sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
 }
+
+// Remove permissions
+type RequestRemovePermissionsSuccessArgs = BaseArgs & {
+  result: Return<'wallet_disconnect'>;
+};
+export function sendRequestRemovePermissionsSuccessResponseMessage({
+  tabId,
+  messageId,
+  result,
+}: RequestRemovePermissionsSuccessArgs) {
+  sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
+}

@@ -8,7 +8,7 @@ import {
 import { Client, Permission, Resource } from '@components/permissionsManager/schemas';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { connectSchema } from '@sats-connect/core';
+import { connectRequestMessageSchema } from '@sats-connect/core';
 import { useCallback, useMemo } from 'react';
 import * as v from 'valibot';
 import { PermissionContainer, PermissionDescription, PermissionTitle, Row } from './index.styles';
@@ -16,7 +16,9 @@ import { PermissionContainer, PermissionDescription, PermissionTitle, Row } from
 /* eslint-disable import/prefer-default-export */
 export function ConnectionRequest() {
   const { network } = useWalletSelector();
-  const [error, data] = getPopupPayload((maybeData) => v.parse(connectSchema, maybeData));
+  const [error, data] = getPopupPayload((maybeData) =>
+    v.parse(connectRequestMessageSchema, maybeData),
+  );
   const account = useSelectedAccount();
 
   const { addClient, addResource, setPermission } = usePermissionsUtils();
