@@ -3,7 +3,7 @@ import getSelectedAccount from '@common/utils/getSelectedAccount';
 import { makeContext } from '@common/utils/popup';
 import { makeAccountResourceId } from '@components/permissionsManager/resources';
 import * as utils from '@components/permissionsManager/utils';
-import { RpcRequestMessage, getBalanceSchema } from '@sats-connect/core';
+import { RpcRequestMessage, getBalanceRequestMessageSchema } from '@sats-connect/core';
 import { UTXO } from '@secretkeylabs/xverse-core';
 import rootStore from '@stores/index';
 import * as v from 'valibot';
@@ -51,7 +51,7 @@ async function getBalance(address: string): Promise<{
 }
 
 const handleGetBalance = async (message: RpcRequestMessage, port: chrome.runtime.Port) => {
-  const parseResult = v.safeParse(getBalanceSchema, message);
+  const parseResult = v.safeParse(getBalanceRequestMessageSchema, message);
 
   if (!parseResult.success) {
     handleInvalidMessage(message, getTabIdFromPort(port), parseResult.issues);
