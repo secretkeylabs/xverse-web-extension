@@ -4,7 +4,7 @@ import { makeContext } from '@common/utils/popup';
 import { makeAccountResourceId } from '@components/permissionsManager/resources';
 import * as utils from '@components/permissionsManager/utils';
 import { RpcRequestMessage, getBalanceRequestMessageSchema } from '@sats-connect/core';
-import { UTXO } from '@secretkeylabs/xverse-core';
+import { BtcAddressBalanceResponse } from '@secretkeylabs/xverse-core';
 import rootStore from '@stores/index';
 import * as v from 'valibot';
 import { handleInvalidMessage } from '../handle-invalid-message';
@@ -14,34 +14,22 @@ import {
   sendInternalErrorMessage,
 } from '../responseMessages/errors';
 
-async function getBtcAddressUtxos(address: string): Promise<Array<UTXO>> {
-  const url = `https://btc-1.xverse.app/address/${address}/utxo`;
-  const res = await fetch(url);
-  const data = (await res.json()) as Array<UTXO>;
-
-  // Need to check for having no UTXOs due to
-  // https://linear.app/xverseapp/issue/ENG-4372
-  if (data.length === 0) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      'The API returned no UTXOs. The address may have more UTXOs than the API can handle.',
-    );
-  }
-  return data;
-}
-
 async function getBalance(address: string): Promise<{
-  confirmed: bigint;
-  unconfirmed: bigint;
-  total: bigint;
+  confirmed: number;
+  unconfirmed: number;
+  total: number;
 }> {
-  const utxos = await getBtcAddressUtxos(address);
-  const confirmedBalance = utxos
-    .filter((utxo) => utxo.status.confirmed)
-    .reduce((acc, utxo) => acc + BigInt(utxo.value), 0n);
-  const unconfirmedBalance = utxos
-    .filter((utxo) => !utxo.status.confirmed)
-    .reduce((acc, utxo) => acc + BigInt(utxo.value), 0n);
+  const url = `https://btc-1.xverse.app/address/${address}`;
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch address data for ${address}`);
+  }
+
+  const data = (await res.json()) as BtcAddressBalanceResponse;
+
+  const confirmedBalance = data.chain_stats.funded_txo_sum - data.chain_stats.spent_txo_sum;
+  const unconfirmedBalance = data.mempool_stats.funded_txo_sum - data.mempool_stats.spent_txo_sum;
 
   return {
     confirmed: confirmedBalance,
