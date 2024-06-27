@@ -15,6 +15,7 @@ import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useGetRuneFun
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useAppConfig from '@hooks/queries/useAppConfig';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useFeeMultipliers from '@hooks/queries/useFeeMultipliers';
 import useSpamTokens from '@hooks/queries/useSpamTokens';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
@@ -25,7 +26,7 @@ import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowUp, Plus } from '@phosphor-icons/react';
 import CoinSelectModal from '@screens/home/coinSelectModal';
-import { type FungibleToken } from '@secretkeylabs/xverse-core';
+import { getFiatEquivalent, type FungibleToken } from '@secretkeylabs/xverse-core';
 import {
   changeShowDataCollectionAlertAction,
   setBrc20ManageTokensAction,
@@ -39,6 +40,7 @@ import SnackBar from '@ui-library/snackBar';
 import { CurrencyTypes } from '@utils/constants';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
+import { getBalanceAmount } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -102,27 +104,28 @@ function Home() {
     !isLedgerAccount(selectedAccount),
   );
   const [choseToVerifyAddresses, setChoseToVerifyAddresses] = useState(false);
+  const { isInitialLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } =
+    useBtcWalletData();
   const { isInitialLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } =
     useStxWalletData();
-  const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } =
-    useBtcWalletData();
+  const { btcFiatRate, stxBtcRate } = useCoinRates();
   const { data: notificationBannersArr } = useNotificationBanners();
   const {
     unfilteredData: fullSip10CoinsList,
     visible: sip10CoinsList,
-    isLoading: loadingStxCoinData,
+    isInitialLoading: loadingStxCoinData,
     isRefetching: refetchingStxCoinData,
   } = useVisibleSip10FungibleTokens();
   const {
     unfilteredData: fullBrc20CoinsList,
     visible: brc20CoinsList,
-    isLoading: loadingBtcCoinData,
-    isRefetching: refetchingBtcCoinData,
+    isInitialLoading: loadingBrcCoinData,
+    isRefetching: refetchingBrcCoinData,
   } = useVisibleBrc20FungibleTokens();
   const {
     unfilteredData: fullRunesCoinsList,
     visible: runesCoinsList,
-    isLoading: loadingRunesData,
+    isInitialLoading: loadingRunesData,
     isRefetching: refetchingRunesData,
   } = useVisibleRuneFungibleTokens();
 
@@ -171,6 +174,35 @@ function Home() {
     }
   }, [spamToken]);
 
+  const combinedFtList = sip10CoinsList
+    .concat(brc20CoinsList)
+    .concat(runesCoinsList)
+    .filter((ft) => new BigNumber(ft.balance).gt(0))
+    .sort((a, b) => {
+      const aFiatAmount = getFiatEquivalent(
+        Number(getBalanceAmount('FT', a)),
+        'FT',
+        BigNumber(stxBtcRate),
+        BigNumber(btcFiatRate),
+        a,
+      );
+      const bFiatAmount = getFiatEquivalent(
+        Number(getBalanceAmount('FT', b)),
+        'FT',
+        BigNumber(stxBtcRate),
+        BigNumber(btcFiatRate),
+        b,
+      );
+      // Handle empty values explicitly
+      if (aFiatAmount === '' && bFiatAmount === '') return 0;
+      if (aFiatAmount === '') return 1;
+      if (bFiatAmount === '') return -1;
+
+      const aAmount = BigNumber(aFiatAmount || 0);
+      const bAmount = BigNumber(bFiatAmount || 0);
+      return aAmount.isLessThan(bAmount) ? 1 : aAmount.isGreaterThan(bAmount) ? -1 : 0;
+    });
+
   const showNotificationBanner =
     notificationBannersArr?.length &&
     notificationBannersArr.length > 0 &&
@@ -204,11 +236,6 @@ function Home() {
   const onBuyModalClose = () => {
     setOpenBuyModal(false);
   };
-
-  const sendSheetCoinsList = (stxAddress ? sip10CoinsList : [])
-    .concat(brc20CoinsList)
-    .concat(runesCoinsList)
-    .filter((ft) => new BigNumber(ft.balance).gt(0));
 
   const handleManageTokenListOnClick = () => {
     navigate('/manage-tokens');
@@ -426,7 +453,6 @@ function Home() {
 
   const showSwaps =
     useHasFeature('SWAPS') && !isLedgerAccount(selectedAccount) && network.type === 'Mainnet';
-  const showRunes = useHasFeature('RUNES_SUPPORT');
 
   return (
     <>
@@ -441,10 +467,10 @@ function Home() {
         <BalanceCard
           isLoading={loadingStxWalletData || loadingBtcWalletData}
           isRefetching={
-            refetchingBtcCoinData ||
             refetchingBtcWalletData ||
-            refetchingStxCoinData ||
             refetchingStxWalletData ||
+            refetchingStxCoinData ||
+            refetchingBrcCoinData ||
             refetchingRunesData
           }
         />
@@ -493,38 +519,19 @@ function Home() {
               onPress={handleTokenPressed}
             />
           )}
-          {!!stxAddress &&
-            sip10CoinsList.map((coin) => (
+          {combinedFtList.map((coin) => {
+            const isLoading = loadingStxCoinData || loadingBrcCoinData || loadingRunesData;
+            return (
               <StyledTokenTile
                 key={coin.principal}
                 title={coin.name}
                 currency="FT"
-                loading={loadingStxCoinData}
+                loading={isLoading}
                 fungibleToken={coin}
                 onPress={handleTokenPressed}
               />
-            ))}
-          {brc20CoinsList.map((coin) => (
-            <StyledTokenTile
-              key={coin.principal}
-              title={coin.name}
-              currency="FT"
-              loading={loadingBtcCoinData}
-              fungibleToken={coin}
-              onPress={handleTokenPressed}
-            />
-          ))}
-          {showRunes &&
-            runesCoinsList.map((coin) => (
-              <StyledTokenTile
-                key={coin.principal}
-                title={coin.name}
-                currency="FT"
-                loading={loadingRunesData}
-                fungibleToken={coin}
-                onPress={handleTokenPressed}
-              />
-            ))}
+            );
+          })}
         </ColumnContainer>
         <TokenListButtonContainer>
           <TokenListButton onClick={handleManageTokenListOnClick}>
@@ -543,7 +550,7 @@ function Home() {
           onClose={onSendModalClose}
           onSelectCoin={onSendFtSelect}
           visible={openSendModal}
-          coins={sendSheetCoinsList}
+          coins={combinedFtList}
           title={t('SEND')}
           loadingWalletData={loadingStxWalletData || loadingBtcWalletData}
         />

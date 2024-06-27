@@ -262,7 +262,7 @@ export default function CoinDashboard() {
         </OptionsDialog>
       )}
       <Container>
-        <CoinHeader coin={currency as CurrencyTypes} fungibleToken={selectedFt} />
+        <CoinHeader currency={currency as CurrencyTypes} fungibleToken={selectedFt} />
         {protocol === 'stacks' && (
           <FtInfoContainer>
             <Button

@@ -14,14 +14,15 @@ import useHasFeature from '@hooks/useHasFeature';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  currencySymbolMap,
   FungibleToken,
+  currencySymbolMap,
+  getFiatEquivalent,
   microstacksToStx,
   satsToBtc,
 } from '@secretkeylabs/xverse-core';
 import { CurrencyTypes } from '@utils/constants';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
-import { getFtBalance, getFtTicker } from '@utils/tokens';
+import { getBalanceAmount, getFtBalance, getFtTicker } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -48,11 +49,11 @@ import {
 } from './coinHeader.styled';
 
 interface Props {
-  coin: CurrencyTypes;
+  currency: CurrencyTypes;
   fungibleToken?: FungibleToken;
 }
 
-export default function CoinHeader({ coin, fungibleToken }: Props) {
+export default function CoinHeader({ currency, fungibleToken }: Props) {
   const selectedAccount = useSelectedAccount();
   const { fiatCurrency, network } = useWalletSelector();
   const { data: btcBalance } = useBtcWalletData();
@@ -64,7 +65,7 @@ export default function CoinHeader({ coin, fungibleToken }: Props) {
   const isReceivingAddressesVisible = !isLedgerAccount(selectedAccount);
   const showSwaps =
     useHasFeature('SWAPS') &&
-    coin === 'STX' &&
+    currency === 'STX' &&
     !isLedgerAccount(selectedAccount) &&
     network.type !== 'Testnet';
 
@@ -76,58 +77,18 @@ export default function CoinHeader({ coin, fungibleToken }: Props) {
     setOpenReceiveModal(false);
   };
 
-  const getBalanceAmount = () => {
-    switch (coin) {
-      case 'STX':
-        return microstacksToStx(new BigNumber(stxData?.balance ?? 0)).toString();
-      case 'BTC':
-        return satsToBtc(new BigNumber(btcBalance ?? 0)).toString();
-      default:
-        return fungibleToken ? getFtBalance(fungibleToken) : '';
-    }
-  };
-
-  const getFtFiatEquivalent = () => {
-    if (fungibleToken?.tokenFiatRate) {
-      const balance = new BigNumber(getFtBalance(fungibleToken));
-      const rate = new BigNumber(fungibleToken.tokenFiatRate);
-      return balance.multipliedBy(rate).toFixed(2).toString();
-    }
-    return '';
-  };
-
   const getTokenTicker = () => {
-    if (coin === 'STX' || coin === 'BTC') {
-      return coin;
+    if (currency === 'STX' || currency === 'BTC') {
+      return currency;
     }
-    if (coin === 'FT' && fungibleToken) {
+    if (currency === 'FT' && fungibleToken) {
       return getFtTicker(fungibleToken);
     }
     return '';
   };
 
-  const getFiatEquivalent = () => {
-    switch (coin) {
-      case 'STX':
-        return microstacksToStx(new BigNumber(stxData?.balance ?? '0'))
-          .multipliedBy(new BigNumber(stxBtcRate))
-          .multipliedBy(new BigNumber(btcFiatRate))
-          .toFixed(2)
-          .toString();
-      case 'BTC':
-        return satsToBtc(new BigNumber(btcBalance ?? 0))
-          .multipliedBy(new BigNumber(btcFiatRate))
-          .toFixed(2)
-          .toString();
-      case 'FT':
-        return getFtFiatEquivalent();
-      default:
-        return '';
-    }
-  };
-
   const renderStackingBalances = () => {
-    if (!new BigNumber(stxData?.locked ?? 0).eq(0) && coin === 'STX') {
+    if (!new BigNumber(stxData?.locked ?? 0).eq(0) && currency === 'STX') {
       return (
         <>
           <HeaderSeparator />
@@ -159,7 +120,7 @@ export default function CoinHeader({ coin, fungibleToken }: Props) {
 
   const goToSendScreen = async () => {
     if (isLedgerAccount(selectedAccount) && !isInOptions()) {
-      switch (coin) {
+      switch (currency) {
         case 'BTC':
           await chrome.tabs.create({
             url: chrome.runtime.getURL('options.html#/send-btc'),
@@ -197,10 +158,10 @@ export default function CoinHeader({ coin, fungibleToken }: Props) {
           break;
       }
     }
-    switch (coin) {
+    switch (currency) {
       case 'BTC':
       case 'STX':
-        navigate(`/send-${coin}`);
+        navigate(`/send-${currency}`);
         break;
       default:
         break;
@@ -237,24 +198,24 @@ export default function CoinHeader({ coin, fungibleToken }: Props) {
       return `${fungibleToken.name} ${t('BALANCE')}`;
     }
 
-    if (!coin) {
+    if (!currency) {
       return '';
     }
 
-    if (coin === 'STX') {
+    if (currency === 'STX') {
       return `Stacks ${t('BALANCE')}`;
     }
-    if (coin === 'BTC') {
+    if (currency === 'BTC') {
       return `Bitcoin ${t('BALANCE')}`;
     }
-    return `${coin} ${t('BALANCE')}`;
+    return `${currency} ${t('BALANCE')}`;
   };
 
   return (
     <Container>
       <BalanceInfoContainer>
         <TokenImage
-          currency={coin || undefined}
+          currency={currency || undefined}
           loading={false}
           fungibleToken={fungibleToken || undefined}
         />
@@ -270,7 +231,7 @@ export default function CoinHeader({ coin, fungibleToken }: Props) {
         </RowContainer>
         <BalanceValuesContainer>
           <NumericFormat
-            value={getBalanceAmount()}
+            value={getBalanceAmount(currency, fungibleToken, stxData, btcBalance)}
             displayType="text"
             thousandSeparator
             renderText={(value: string) => (
@@ -278,7 +239,13 @@ export default function CoinHeader({ coin, fungibleToken }: Props) {
             )}
           />
           <NumericFormat
-            value={getFiatEquivalent()}
+            value={getFiatEquivalent(
+              Number(getBalanceAmount(currency, fungibleToken, stxData, btcBalance)),
+              currency,
+              BigNumber(stxBtcRate),
+              BigNumber(btcFiatRate),
+              fungibleToken,
+            )}
             displayType="text"
             thousandSeparator
             prefix={`${currencySymbolMap[fiatCurrency]}`}
@@ -297,7 +264,7 @@ export default function CoinHeader({ coin, fungibleToken }: Props) {
               text={t('RECEIVE')}
               onPress={() => {
                 if (isReceivingAddressesVisible) {
-                  navigate(`/receive/${coin}`);
+                  navigate(`/receive/${currency}`);
                 } else {
                   handleReceiveModalOpen();
                 }
@@ -307,10 +274,14 @@ export default function CoinHeader({ coin, fungibleToken }: Props) {
               <SmallActionButton
                 src={ArrowSwap}
                 text={t('SWAP')}
-                onPress={() => navigate(`/swap?from=${coin}`)}
+                onPress={() => navigate(`/swap?from=${currency}`)}
               />
             )}
-            <SmallActionButton src={Buy} text={t('BUY')} onPress={() => navigate(`/buy/${coin}`)} />
+            <SmallActionButton
+              src={Buy}
+              text={t('BUY')}
+              onPress={() => navigate(`/buy/${currency}`)}
+            />
           </>
         ) : (
           <RecieveButtonContainer>
@@ -339,7 +310,11 @@ export default function CoinHeader({ coin, fungibleToken }: Props) {
                 await chrome.tabs.create({
                   url: chrome.runtime.getURL(
                     `options.html#/verify-ledger?currency=${
-                      !fungibleToken ? coin : fungibleToken?.protocol === 'stacks' ? 'STX' : 'ORD'
+                      !fungibleToken
+                        ? currency
+                        : fungibleToken?.protocol === 'stacks'
+                        ? 'STX'
+                        : 'ORD'
                     }`,
                   ),
                 });
@@ -352,7 +327,7 @@ export default function CoinHeader({ coin, fungibleToken }: Props) {
             onPress={() => {
               navigate(
                 `/receive/${
-                  !fungibleToken ? coin : fungibleToken?.protocol === 'stacks' ? 'STX' : 'ORD'
+                  !fungibleToken ? currency : fungibleToken?.protocol === 'stacks' ? 'STX' : 'ORD'
                 }`,
               );
             }}
