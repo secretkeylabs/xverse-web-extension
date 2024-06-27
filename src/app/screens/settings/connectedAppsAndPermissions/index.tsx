@@ -45,30 +45,33 @@ function ConnectedAppsAndPermissionsScreen() {
                 Disconnect
               </Button>
             </ClientHeader>
-            {utils.getClientPermissions(store.permissions, client.id).map((p) => (
-              <div key={p.resourceId}>
-                {(() => {
-                  const resource = utils.getResource(store.resources, p.resourceId);
+            {utils
+              .getClientPermissions(store.permissions, client.id)
+              .sort((p1, p2) => p1.resourceId.localeCompare(p2.resourceId))
+              .map((p) => (
+                <div key={p.resourceId}>
+                  {(() => {
+                    const resource = utils.getResource(store.resources, p.resourceId);
 
-                  if (!resource) {
-                    return null;
-                  }
+                    if (!resource) {
+                      return null;
+                    }
 
-                  return (
-                    <Row key={p.resourceId}>
-                      <PermissionContainer>
-                        <PermissionTitle>{resource.name}</PermissionTitle>
-                        <PermissionDescription>
-                          {[...p.actions].map((a) => (
-                            <div key={a}>{a}</div>
-                          ))}
-                        </PermissionDescription>
-                      </PermissionContainer>
-                    </Row>
-                  );
-                })()}
-              </div>
-            ))}
+                    return (
+                      <Row key={p.resourceId}>
+                        <PermissionContainer>
+                          <PermissionTitle>{resource.name}</PermissionTitle>
+                          <PermissionDescription>
+                            {[...p.actions].map((a) => (
+                              <div key={a}>{a}</div>
+                            ))}
+                          </PermissionDescription>
+                        </PermissionContainer>
+                      </Row>
+                    );
+                  })()}
+                </div>
+              ))}
           </div>
         ))}
       </Container>
