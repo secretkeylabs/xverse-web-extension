@@ -2,7 +2,7 @@
 import { getTabIdFromPort } from '@common/utils';
 import { makeContext } from '@common/utils/popup';
 import * as utils from '@components/permissionsManager/utils';
-import { RpcRequestMessage, disconnectRequestMessageSchema } from '@sats-connect/core';
+import { RpcRequestMessage, renouncePermissionsRequestMessageSchema } from '@sats-connect/core';
 import * as v from 'valibot';
 import { handleInvalidMessage } from '../handle-invalid-message';
 import {
@@ -11,8 +11,11 @@ import {
 } from '../responseMessages/errors';
 import { sendRequestPermissionsSuccessResponseMessage } from '../responseMessages/wallet';
 
-export const handleDisconnect = async (message: RpcRequestMessage, port: chrome.runtime.Port) => {
-  const parseResult = v.safeParse(disconnectRequestMessageSchema, message);
+export const handleRenouncePermissions = async (
+  message: RpcRequestMessage,
+  port: chrome.runtime.Port,
+) => {
+  const parseResult = v.safeParse(renouncePermissionsRequestMessageSchema, message);
 
   if (!parseResult.success) {
     handleInvalidMessage(message, getTabIdFromPort(port), parseResult.issues);

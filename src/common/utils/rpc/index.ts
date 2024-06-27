@@ -2,9 +2,9 @@ import { WebBtcMessage } from '@common/types/message-types';
 import {
   RpcErrorCode,
   RpcRequestMessage,
-  connectMethodName,
-  disconnectMethodName,
   getBalanceMethodName,
+  renouncePermissionsMethodName,
+  requestPermissionsMethodName,
 } from '@sats-connect/core';
 import { getTabIdFromPort } from '..';
 import {
@@ -26,18 +26,18 @@ import handleStacksSignMessage from './stx/signMessage';
 import handleStacksSignStructuredMessage from './stx/signStructuredMessage';
 import signTransaction from './stx/signTransaction';
 import transferStx from './stx/transferStx';
-import { handleConnect } from './wallet/handle-connect';
-import { handleDisconnect } from './wallet/handle-disconnect';
+import { handleRequestPermissions } from './wallet/handle-connect';
+import { handleRenouncePermissions } from './wallet/handle-disconnect';
 
 export async function handleRPCRequest(message: RpcRequestMessage, port: chrome.runtime.Port) {
   try {
     switch (message.method) {
-      case connectMethodName: {
-        await handleConnect(message, port);
+      case requestPermissionsMethodName: {
+        await handleRequestPermissions(message, port);
         break;
       }
-      case disconnectMethodName: {
-        await handleDisconnect(message, port);
+      case renouncePermissionsMethodName: {
+        await handleRenouncePermissions(message, port);
         break;
       }
       case getBalanceMethodName: {
