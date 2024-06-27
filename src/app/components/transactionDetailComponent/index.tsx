@@ -16,7 +16,7 @@ const Container = styled.div((props) => ({
 
 const TitleText = styled.h1((props) => ({
   ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_200,
+  color: props.theme.colors.white_400,
 }));
 
 const ValueText = styled.h1((props) => ({

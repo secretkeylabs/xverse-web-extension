@@ -1,6 +1,5 @@
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import AssetIcon from '@assets/img/transactions/Assets.svg';
-import ActionButton from '@components/button';
 import RecipientComponent from '@components/recipientComponent';
 import TransactionSettingAlert from '@components/transactionSetting';
 import TransferFeeView from '@components/transferFeeView';
@@ -25,6 +24,7 @@ import {
   UTXO,
 } from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
+import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
 import { CurrencyTypes } from '@utils/constants';
@@ -41,7 +41,7 @@ const OuterContainer = styled.div`
   flex-direction: column;
 `;
 
-const Button = styled.button((props) => ({
+const EditFeesButton = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
@@ -75,7 +75,7 @@ const ErrorText = styled.p((props) => ({
   color: props.theme.colors.danger_medium,
 }));
 
-const ReviewTransactionText = styled.h1<{
+const ReviewTransactionText = styled.span<{
   centerAligned: boolean;
 }>((props) => ({
   ...props.theme.typography.headline_s,
@@ -411,10 +411,10 @@ function ConfirmBtcTransactionComponent({
             subTitle={t('CONFIRM_TRANSACTION.AMOUNT_PLUS_FEES')}
           />
         )}
-        <Button onClick={onAdvancedSettingClick}>
+        <EditFeesButton onClick={onAdvancedSettingClick}>
           <ButtonImage src={SettingIcon} />
           <ButtonText>{t('CONFIRM_TRANSACTION.EDIT_FEES')}</ButtonText>
-        </Button>
+        </EditFeesButton>
         <TransactionSettingAlert
           visible={showFeeSettings}
           fee={new BigNumber(currentFee).toString()}
@@ -437,10 +437,10 @@ function ConfirmBtcTransactionComponent({
         )}
       </OuterContainer>
       <StickyHorizontalSplitButtonContainer>
-        <ActionButton
-          text={t('CONFIRM_TRANSACTION.CANCEL')}
-          transparent
-          onPress={onCancelClick}
+        <Button
+          title={t('CONFIRM_TRANSACTION.CANCEL')}
+          variant="secondary"
+          onClick={onCancelClick}
           disabled={
             loadingBroadcastedTx ||
             isLoading ||
@@ -449,8 +449,8 @@ function ConfirmBtcTransactionComponent({
             ordinalsLoading
           }
         />
-        <ActionButton
-          text={t('CONFIRM_TRANSACTION.CONFIRM')}
+        <Button
+          title={t('CONFIRM_TRANSACTION.CONFIRM')}
           disabled={
             loadingBroadcastedTx ||
             isLoading ||
@@ -458,14 +458,14 @@ function ConfirmBtcTransactionComponent({
             isLoadingNonOrdinalBtcSend ||
             ordinalsLoading
           }
-          processing={
+          loading={
             loadingBroadcastedTx ||
             isLoading ||
             isLoadingOrdData ||
             isLoadingNonOrdinalBtcSend ||
             ordinalsLoading
           }
-          onPress={handleOnConfirmClick}
+          onClick={handleOnConfirmClick}
         />
       </StickyHorizontalSplitButtonContainer>
     </>

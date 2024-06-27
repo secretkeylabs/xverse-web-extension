@@ -16,14 +16,18 @@ const RowCenter = styled.div<{ spaceBetween?: boolean }>((props) => ({
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: props.spaceBetween ? 'space-between' : 'initial',
+  columnGap: props.theme.space.m,
 }));
 
 const NumberTypeContainer = styled.div`
   text-align: right;
 `;
 
-const AvatarContainer = styled.div`
-  margin-right: ${(props) => props.theme.space.xs};
+const StyledFiatAmountText = styled(FiatAmountText)`
+  display: block;
+  ${(props) => props.theme.typography.body_medium_s}
+  color: ${(props) => props.theme.colors.white_400};
+  margin-top: ${(props) => props.theme.space.xxxs};
 `;
 
 type Props = {
@@ -37,12 +41,12 @@ export default function Amount({ amount }: Props) {
 
   return (
     <RowCenter>
-      <AvatarContainer>
+      <div>
         <Avatar src={<TokenImage currency="BTC" loading={false} size={32} />} />
-      </AvatarContainer>
+      </div>
       <RowCenter spaceBetween>
         <div>
-          <StyledP typography="body_medium_m" color="white_200">
+          <StyledP typography="body_medium_m" color="white_0">
             {t('CONFIRM_TRANSACTION.AMOUNT')}
           </StyledP>
         </div>
@@ -58,7 +62,7 @@ export default function Amount({ amount }: Props) {
               </StyledP>
             )}
           />
-          <FiatAmountText
+          <StyledFiatAmountText
             fiatAmount={getBtcFiatEquivalent(BigNumber(amount), BigNumber(btcFiatRate))}
             fiatCurrency={fiatCurrency}
             dataTestId="confirm-currency-amount"

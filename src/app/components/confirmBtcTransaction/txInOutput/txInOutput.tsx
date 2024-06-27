@@ -72,7 +72,7 @@ function TxInOutput({ inputs, outputs }: Props) {
     <Container>
       <Button type="button" onClick={() => setIsExpanded((prevState) => !prevState)}>
         <Row>
-          <StyledP typography="body_medium_m" color="white_200">
+          <StyledP typography="body_medium_m" color="white_400">
             {isExpanded ? t('INPUT') : t('INPUT_AND_OUTPUT')}
           </StyledP>
         </Row>
@@ -83,7 +83,7 @@ function TxInOutput({ inputs, outputs }: Props) {
           {inputs.map((input) => (
             <TransactionInput input={input} key={input.extendedUtxo.outpoint} />
           ))}
-          <OutputTitleText typography="body_medium_m" color="white_200">
+          <OutputTitleText typography="body_medium_m" color="white_400">
             {t('OUTPUT')}
           </OutputTitleText>
           {outputs.map((output, index) => (

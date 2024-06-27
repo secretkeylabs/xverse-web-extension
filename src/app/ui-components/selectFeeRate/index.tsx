@@ -110,7 +110,7 @@ function SelectFeeRate({
   return (
     <div>
       <RowContainer>
-        <Label $size="m" $variant="mid">
+        <Label $size="m" $variant="light">
           {t('TRANSACTION_SETTING.NETWORK_FEE')}
         </Label>
         <NumericFormat

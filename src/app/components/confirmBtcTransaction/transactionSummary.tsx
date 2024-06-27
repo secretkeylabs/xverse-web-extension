@@ -33,6 +33,13 @@ const WarningCallout = styled(Callout)`
   margin-bottom: ${(props) => props.theme.space.m};
 `;
 
+const Subtitle = styled.p`
+  ${(props) => props.theme.typography.body_medium_m};
+  color: ${(props) => props.theme.colors.white_200};
+  margin-top: ${(props) => props.theme.space.s};
+  margin-bottom: ${(props) => props.theme.space.xs};
+`;
+
 type Props = {
   transactionIsFinal: boolean;
   showCenotaphCallout: boolean;
@@ -118,6 +125,10 @@ function TransactionSummary({
         <WarningCallout bodyText={t('RUNE_IS_CLOSED')} variant="danger" />
       )}
       {hasRuneDelegation && <DelegateSection delegations={runeSummary?.transfers} />}
+
+      {/* TODO: Change the text to match the action */}
+      <Subtitle>{t('YOU_WILL_SEND')}</Subtitle>
+
       <TransferSection
         outputs={outputs}
         inputs={inputs}
@@ -135,9 +146,12 @@ function TransactionSummary({
       />
       {!hasRuneDelegation && <BurnSection burns={runeSummary?.burns} />}
       <MintSection mints={[runeSummary?.mint]} />
+
+      <Subtitle>{t('TRANSACTION_DETAILS')}</Subtitle>
+
+      <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
       <TxInOutput inputs={inputs} outputs={outputs} />
       {hasOutputScript && !runeSummary && <WarningCallout bodyText={t('SCRIPT_OUTPUT_TX')} />}
-      <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
       {feeOutput && !showFeeSelector && (
         <TransferFeeView
           fee={new BigNumber(feeOutput.amount)}
@@ -147,11 +161,14 @@ function TransactionSummary({
           onShowInscription={setInscriptionToShow}
         />
       )}
+
+      <Subtitle>{t('FEES')}</Subtitle>
+
       {feeOutput && showFeeSelector && (
         <Container>
           <SelectFeeRate
             fee={feeOutput.amount.toString()}
-            feeUnits="Sats"
+            feeUnits="sats"
             feeRate={feeRate.toString()}
             feeRateUnits={tUnits('SATS_PER_VB')}
             setFeeRate={(newFeeRate) => onFeeRateSet(+newFeeRate)}

@@ -87,9 +87,12 @@ function TransferSection({
   return (
     <Container>
       <Header spaceBetween>
-        <StyledP typography="body_medium_m" color="white_200">
-          {t('YOU_WILL_TRANSFER')}
+        <StyledP typography="body_medium_m" color="white_400">
+          {/* TODO: This component is also used in SignBatchPsbtRequest, make the needed changes */}
+          {/* {t('YOU_WILL_TRANSFER')} */}
+          To
         </StyledP>
+        {/* TODO: Add the recipient address */}
       </Header>
       {
         // if transaction is not final, then runes will be delegated and will show up in the delegation section
