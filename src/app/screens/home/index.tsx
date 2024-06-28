@@ -177,7 +177,6 @@ function Home() {
   const combinedFtList = sip10CoinsList
     .concat(brc20CoinsList)
     .concat(runesCoinsList)
-    .filter((ft) => new BigNumber(ft.balance).gt(0))
     .sort((a, b) => {
       const aFiatAmount = getFiatEquivalent(
         Number(getBalanceAmount('FT', a)),
@@ -550,7 +549,7 @@ function Home() {
           onClose={onSendModalClose}
           onSelectCoin={onSendFtSelect}
           visible={openSendModal}
-          coins={combinedFtList}
+          coins={combinedFtList.filter((ft) => new BigNumber(ft.balance).gt(0))}
           title={t('SEND')}
           loadingWalletData={loadingStxWalletData || loadingBtcWalletData}
         />
