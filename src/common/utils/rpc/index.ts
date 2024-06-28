@@ -17,6 +17,7 @@ import {
 import handleGetBalance from './btc/getBalance';
 import handleGetInfo from './getInfo';
 import { makeRPCError, sendRpcResponse } from './helpers';
+import handleGetInscriptions from './ordinals.ts/getInscriptions';
 import handleGetRunesBalance from './runes/getBalance';
 import callContract from './stx/callContract/index.ts';
 import deployContract from './stx/deployContract/index.ts';
@@ -29,7 +30,7 @@ import transferStx from './stx/transferStx';
 import { handleConnect } from './wallet/handle-connect';
 import { handleDisconnect } from './wallet/handle-disconnect';
 
-export async function handleRPCRequest(message: RpcRequestMessage, port: chrome.runtime.Port) {
+async function handleRPCRequest(message: RpcRequestMessage, port: chrome.runtime.Port) {
   try {
     switch (message.method) {
       case connectMethodName: {
@@ -109,6 +110,10 @@ export async function handleRPCRequest(message: RpcRequestMessage, port: chrome.
       }
       case 'runes_getBalance': {
         await handleGetRunesBalance(message, port);
+        break;
+      }
+      case 'ord_getInscriptions': {
+        await handleGetInscriptions(message, port);
         break;
       }
       default:
