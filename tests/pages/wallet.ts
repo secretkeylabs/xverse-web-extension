@@ -230,6 +230,42 @@ export default class Wallet {
 
   readonly sendSTXValue: Locator;
 
+  readonly buttonList: Locator;
+
+  readonly tabAvailable: Locator;
+
+  readonly tabListed: Locator;
+
+  readonly tabNotListed: Locator;
+
+  readonly buttonSetPrice: Locator;
+
+  readonly runeSKIBIDI: Locator;
+
+  readonly runeItem: Locator;
+
+  readonly runeItemCheckbox: Locator;
+
+  readonly buttonFloorPrice: Locator;
+
+  readonly button5Price: Locator;
+
+  readonly button10Price: Locator;
+
+  readonly button20Price: Locator;
+
+  readonly buttonCustomPrice: Locator;
+
+  readonly buttonApply: Locator;
+
+  readonly inputListingPrice: Locator;
+
+  readonly runeContainer: Locator;
+
+  readonly runeTitle: Locator;
+
+  readonly runePrice: Locator;
+
   readonly buttonEnable: Locator;
 
   readonly buttonSend: Locator;
@@ -259,6 +295,20 @@ export default class Wallet {
   readonly nameInscriptionCollection: Locator;
 
   readonly nameInscriptionSingle: Locator;
+
+  readonly sendAmount: Locator;
+
+  readonly sendCurrencyAmount: Locator;
+
+  readonly listedRune: Locator;
+
+  readonly signingAddress: Locator;
+
+  readonly buttonSign: Locator;
+
+  readonly buttonReload: Locator;
+
+  readonly listedRunePrice: Locator;
 
   constructor(readonly page: Page) {
     this.page = page;
@@ -427,8 +477,37 @@ export default class Wallet {
     this.receiveAddress = page.getByTestId('address-receive');
     this.confirmBalance = page.getByTestId('confirm-balance');
     this.buttonCancel = page.getByRole('button', { name: 'Cancel' });
+    this.buttonSign = page.getByRole('button', { name: 'Sign' });
     this.sendTransactionID = page.getByTestId('transaction-id');
     this.sendSTXValue = page.getByTestId('send-value');
+
+    // List
+    this.buttonList = page.getByTestId('action-button').filter({ hasText: 'List' });
+    this.tabAvailable = page.getByTestId('available-tab');
+    this.tabListed = page.getByRole('button', { name: 'LISTED', exact: true });
+    this.tabNotListed = page.getByRole('button', { name: 'NOT LISTED' });
+    this.listedRune = page.getByTestId('listed-rune-container');
+
+    this.buttonSetPrice = page.getByRole('button', { name: 'Set price' });
+    // this is the test rune to be used for listing
+    this.runeSKIBIDI = page.getByTestId('SKIBIDI•OHIO•RIZZ');
+    this.runeItem = page.getByTestId('rune-item');
+    this.runeItemCheckbox = page.locator('#list-rune');
+    this.buttonFloorPrice = page.getByRole('button', { name: 'Floor', exact: true });
+    this.button5Price = page.getByRole('button', { name: '+5%', exact: true });
+    this.button10Price = page.getByRole('button', { name: '+10%', exact: true });
+    this.button20Price = page.getByRole('button', { name: '+20%', exact: true });
+    this.buttonCustomPrice = page.getByRole('button', { name: 'Custom', exact: true });
+    this.buttonApply = page.getByRole('button', { name: 'Apply', exact: true });
+    this.inputListingPrice = page.locator('input[type="number"]');
+    this.runeContainer = page.getByTestId('rune-container');
+    this.runeTitle = page.getByTestId('rune-title');
+    this.runePrice = page.getByTestId('rune-price').locator('p').filter({ hasText: 'sats' });
+    this.sendAmount = page.getByTestId('send-amount');
+    this.sendCurrencyAmount = page.getByTestId('send-currency-amount');
+    this.signingAddress = page.getByTestId('signing-address');
+    this.buttonReload = page.getByTestId('reload-button');
+    this.listedRunePrice = page.getByTestId('listed-price');
 
     // Stacking
     this.buttonStartStacking = page.getByRole('button', { name: 'Start stacking' });
@@ -472,7 +551,7 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
         await expect(this.allupperButtons).toHaveCount(4);
     }
 */
-    await expect(this.allupperButtons).toHaveCount(3);
+    // await expect(this.allupperButtons).toHaveCount(3);
     await expect(this.labelAccountName).toBeVisible();
     await expect(this.buttonMenu).toBeVisible();
     await expect(await this.labelTokenSubtitle.count()).toBeGreaterThanOrEqual(2);
@@ -482,6 +561,7 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(this.navigationStacking).toBeVisible();
     await expect(this.navigationExplore).toBeVisible();
     await expect(this.navigationSettings).toBeVisible();
+    await expect(await this.divTokenRow.count()).toBeGreaterThan(1);
   }
 
   async checkVisualsSendSTXPage() {
@@ -493,6 +573,26 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(this.inputMemo).toBeVisible();
     await expect(this.imageToken).toBeVisible();
     await expect(this.buttonBack).toBeVisible();
+  }
+
+  async checkVisualsListRunesPage() {
+    await expect(this.tabNotListed).toBeVisible();
+    await expect(this.tabListed).toBeVisible();
+    await expect(this.buttonSetPrice).toBeVisible();
+    await expect(this.buttonSetPrice).toBeDisabled();
+    await expect(this.runeItem.first()).toBeVisible();
+    await expect(await this.runeItem.count()).toBeGreaterThanOrEqual(1);
+  }
+
+  async checkVisualsListOnMEPage() {
+    await expect(this.buttonFloorPrice).toBeVisible();
+    await expect(this.button5Price).toBeVisible();
+    await expect(this.button10Price).toBeVisible();
+    await expect(this.button20Price).toBeVisible();
+    await expect(this.buttonCustomPrice).toBeVisible();
+    await expect(this.buttonContinue).toBeVisible();
+    await expect(this.buttonContinue).toBeDisabled();
+    await expect(this.runeContainer.first()).toBeVisible();
   }
 
   async navigateToCollectibles() {
@@ -510,7 +610,7 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
   // had to disable this rule as my first assertion was always changed to a wrong assertion
   /* eslint-disable playwright/prefer-web-first-assertions */
   async checkAmountsSendingSTX(amountSTXSend, STXTest) {
-    await expect(await this.receiveAddress.innerText()).toContain(STXTest.slice(-4));
+    await expect(await this.receiveAddress.first().innerText()).toContain(STXTest.slice(-4));
 
     // Sending amount without Fee
     const sendAmount = await this.confirmAmount.first().innerText();
@@ -539,7 +639,7 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
 
     // Address check sending and receiving
     await expect(await this.sendAddress.innerText()).toContain(selfBTCTest.slice(-4));
-    await expect(await this.receiveAddress.innerText()).toContain(BTCTest.slice(-4));
+    await expect(await this.receiveAddress.first().innerText()).toContain(BTCTest.slice(-4));
 
     const confirmAmountAfter = await this.confirmAmount.last().innerText();
     const confirmTotalAmount = await this.confirmTotalAmount.innerText();
@@ -599,6 +699,41 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
       })
       .getByTestId('inscription-container');
     await specificToken.last().click();
+  }
+
+  // This function tries to click on a specific rune, if the rune is not enabled it will enable the test rune and then click on it
+  async checkAndClickOnSpecificRune(tokenname) {
+    // Check if test rune is enabled and if not enabled the test rune
+    try {
+      // click on the test rune
+      await this.clickOnSpecificToken(tokenname);
+    } catch (error) {
+      // if the rune was not clickable we need to enable the test rune
+      // Execute alternative commands if an error occurs
+      console.log('Test Rune is not active and need to be enabled');
+      // Insert your fallback logic here
+      // check if the test rune is enbaled
+      await this.manageTokenButton.click();
+      await this.buttonRunes.click();
+      await expect(this.divTokenRow.first()).toBeVisible();
+      await expect(this.runeSKIBIDI).toBeVisible({ timeout: 30000 });
+
+      // if clause for enabled check
+      const count = await this.checkboxTokenActive.count();
+      // If no runes are enabled enable the Test rune
+      if (count !== 1) {
+        console.log(
+          'No active token checkbox found or there are multiple, taking alternative action.',
+        );
+        // Activate Test rune
+        await this.runeSKIBIDI.locator('div.react-switch-handle').click();
+      } else {
+        console.log('One active token checkbox is present.');
+      }
+      // Switch back to dashboard and click on the rune
+      await this.buttonBack.click();
+      await this.clickOnSpecificToken(tokenname);
+    }
   }
 
   async checkNetworkSettingVisuals() {

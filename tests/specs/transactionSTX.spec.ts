@@ -47,8 +47,8 @@ test.describe('Transaction STX', () => {
     // Recipient address send self check
     await wallet.inputRecipientAdress.fill(selfSTXMain);
     await wallet.buttonNext.click();
-    await expect(wallet.errorMessageSendSelf).toBeVisible();
     await expect(wallet.buttonNext).toBeEnabled();
+    await expect(wallet.errorMessageSendSelf).toBeVisible();
     // Fill in correct Receiver Address
     await wallet.inputRecipientAdress.fill(STXMain);
     await wallet.buttonNext.click();
@@ -56,8 +56,7 @@ test.describe('Transaction STX', () => {
     await expect(wallet.errorInsufficientBalance).toBeVisible();
   });
 
-  // TODO: need to add STX funds to the wallet, testnet is currently not available
-  test.skip('Send STX - Cancel transaction testnet', async ({ page, extensionId }) => {
+  test('Send STX - Cancel transaction testnet', async ({ page, extensionId }) => {
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
 
@@ -116,10 +115,7 @@ test.describe('Transaction STX', () => {
   });
 
   // TODO: need to add Stack funds to the wallet, testnet is currently not avaiable
-  test.skip('Send STX - confirm transaction testnet #broadtransaction', async ({
-    page,
-    extensionId,
-  }) => {
+  test('Send STX - confirm transaction testnet #localexecution', async ({ page, extensionId }) => {
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
 
@@ -173,8 +169,7 @@ test.describe('Transaction STX', () => {
 
   // TODO: add test where we change the fees for a STX transaction
 
-  // TODO: need to add Stack funds to the wallet, testnet is currently not avaiable
-  test.skip('Visual Check STX Transaction history testnet', async ({ page, extensionId }) => {
+  test('Visual Check STX Transaction history testnet', async ({ page, extensionId }) => {
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
 

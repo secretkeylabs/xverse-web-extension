@@ -18,7 +18,7 @@ import BigNumber from 'bignumber.js';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { fetchBrc20FungibleTokens } from './ordinals/useGetBrc20FungibleTokens';
-import { fetchRuneBalances } from './runes/useGetRuneFungibleTokens';
+import { fetchRuneBalances } from './runes/useRuneFungibleTokensQuery';
 import { fetchSip10FungibleTokens } from './stx/useGetSip10FungibleTokens';
 
 const useAccountBalance = () => {

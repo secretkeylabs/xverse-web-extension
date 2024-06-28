@@ -69,11 +69,6 @@ export const RowButtonContainer = styled.div((props) => ({
   columnGap: props.theme.space.l,
 }));
 
-export const RecieveButtonContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-});
-
 export const HeaderSeparator = styled.div((props) => ({
   border: `0.5px solid ${props.theme.colors.white_400}`,
   width: '50%',

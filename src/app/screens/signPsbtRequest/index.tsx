@@ -1,12 +1,14 @@
 import { makeRPCError, sendRpcResponse } from '@common/utils/rpc/helpers';
 import ConfirmBitcoinTransaction from '@components/confirmBtcTransaction';
 import RequestError from '@components/requests/requestError';
+import useSubmitRuneSellPsbt from '@hooks/queries/runes/useSubmitRuneSellPsbt';
 import useHasFeature from '@hooks/useHasFeature';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { RpcErrorCode } from '@sats-connect/core';
+import { SigHash } from '@scure/btc-signer';
 import {
   AnalyticsEvents,
   RuneSummary,
@@ -17,7 +19,7 @@ import {
 import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import useSignPsbt from './useSignPsbt';
 import useSignPsbtValidationGate from './useSignPsbtValidationGate';
 
@@ -29,7 +31,10 @@ function SignPsbtRequest() {
   const selectedAccount = useSelectedAccount();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const txnContext = useTransactionContext();
-
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const magicEdenPsbt = searchParams.get('magicEdenPsbt');
+  const runeId = searchParams.get('runeId');
   const [isLoading, setIsLoading] = useState(true);
   const [isSigning, setIsSigning] = useState(false);
   const [summary, setSummary] = useState<PSBTSummary | undefined>();
@@ -42,11 +47,16 @@ function SignPsbtRequest() {
     parsedPsbt,
   });
 
+  // extend in future if necessary
+  const isInAppPsbt = magicEdenPsbt && runeId;
+
   useTrackMixPanelPageViewed();
 
   useSignPsbtValidationGate({ payload, parsedPsbt });
 
   const { network } = useWalletSelector();
+
+  const { submitRuneSellPsbt } = useSubmitRuneSellPsbt();
 
   useEffect(() => {
     if (!parsedPsbt) return;
@@ -80,20 +90,38 @@ function SignPsbtRequest() {
       const signedPsbt = await parsedPsbt?.getSignedPsbtBase64({
         finalize: payload.broadcast,
         ledgerTransport,
+        allowedSigHash: magicEdenPsbt && runeId ? [SigHash.SINGLE_ANYONECANPAY] : undefined,
       });
-
       const response = await confirmSignPsbt(signedPsbt);
-
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
         protocol: 'bitcoin',
         action: 'sign-psbt',
         wallet_type: selectedAccount?.accountType || 'software',
       });
-
       if (ledgerTransport) {
         await ledgerTransport?.close();
       }
-      setIsSigning(false);
+      if (signedPsbt && magicEdenPsbt && runeId) {
+        return await submitRuneSellPsbt(signedPsbt, location.state.selectedRune?.name ?? '')
+          .then((res) => {
+            if (res.orderIds) {
+              navigate('/tx-status', {
+                state: {
+                  runeListed: location.state.selectedRune,
+                },
+              });
+            }
+          })
+          .catch((_) => {
+            navigate('/tx-status', {
+              state: {
+                txid: '',
+                error: '',
+                browserTx: true,
+              },
+            });
+          });
+      }
       if (payload.broadcast) {
         navigate('/tx-status', {
           state: {
@@ -120,11 +148,16 @@ function SignPsbtRequest() {
         });
       }
     }
+    setIsSigning(false);
   };
 
   const onCancel = () => {
-    cancelSignPsbt();
-    window.close();
+    if (magicEdenPsbt) {
+      navigate(`/coinDashboard/FT?ftKey=${runeId}&protocol=runes`);
+    } else {
+      cancelSignPsbt();
+      window.close();
+    }
   };
 
   const onCloseClick = () => {
@@ -132,13 +165,17 @@ function SignPsbtRequest() {
     window.close();
   };
 
-  return validationError ? (
-    <RequestError
-      error={validationError.error}
-      errorTitle={validationError.errorTitle}
-      onClose={onCloseClick}
-    />
-  ) : (
+  if (validationError) {
+    return (
+      <RequestError
+        error={validationError.error}
+        errorTitle={validationError.errorTitle}
+        onClose={onCloseClick}
+      />
+    );
+  }
+
+  return (
     <ConfirmBitcoinTransaction
       inputs={summary?.inputs ?? []}
       outputs={summary?.outputs ?? []}
@@ -155,8 +192,13 @@ function SignPsbtRequest() {
       cancelText={t('CANCEL')}
       onCancel={onCancel}
       onConfirm={onConfirm}
+      onBackClick={
+        isInAppPsbt
+          ? () => navigate(`/list-rune/${runeId}`, { state: location.state.listRunesState })
+          : undefined
+      }
       hideBottomBar
-      showAccountHeader
+      showAccountHeader={!isInAppPsbt}
     />
   );
 }

@@ -1,6 +1,7 @@
 import ArrowDown from '@assets/img/dashboard/arrow_down.svg';
 import ArrowUp from '@assets/img/dashboard/arrow_up.svg';
 import Buy from '@assets/img/dashboard/black_plus.svg';
+import List from '@assets/img/dashboard/list.svg';
 import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import Lock from '@assets/img/transactions/Lock.svg';
 import BottomModal from '@components/bottomModal';
@@ -18,11 +19,10 @@ import {
   currencySymbolMap,
   getFiatEquivalent,
   microstacksToStx,
-  satsToBtc,
 } from '@secretkeylabs/xverse-core';
 import { CurrencyTypes } from '@utils/constants';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
-import { getBalanceAmount, getFtBalance, getFtTicker } from '@utils/tokens';
+import { getBalanceAmount, getFtTicker } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -39,7 +39,6 @@ import {
   HeaderSeparator,
   LockedStxContainer,
   ProtocolText,
-  RecieveButtonContainer,
   RowButtonContainer,
   RowContainer,
   StacksLockedInfoText,
@@ -48,10 +47,10 @@ import {
   VerifyOrViewContainer,
 } from './coinHeader.styled';
 
-interface Props {
+type Props = {
   currency: CurrencyTypes;
   fungibleToken?: FungibleToken;
-}
+};
 
 export default function CoinHeader({ currency, fungibleToken }: Props) {
   const selectedAccount = useSelectedAccount();
@@ -68,6 +67,8 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
     currency === 'STX' &&
     !isLedgerAccount(selectedAccount) &&
     network.type !== 'Testnet';
+
+  const showRunesListing = useHasFeature('RUNES_LISTING') || process.env.NODE_ENV === 'development';
 
   const handleReceiveModalOpen = () => {
     setOpenReceiveModal(true);
@@ -257,7 +258,25 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
       {renderStackingBalances()}
       <RowButtonContainer>
         <SmallActionButton src={ArrowUp} text={t('SEND')} onPress={() => goToSendScreen()} />
-        {!fungibleToken ? (
+        {fungibleToken ? (
+          <>
+            <SmallActionButton
+              src={ArrowDown}
+              text={t('RECEIVE')}
+              // RUNES & BRC20s => ordinal wallet, SIP-10 => STX wallet
+              onPress={() =>
+                navigate(`/receive/${fungibleToken?.protocol === 'stacks' ? 'STX' : 'ORD'}`)
+              }
+            />
+            {showRunesListing && fungibleToken.protocol === 'runes' && (
+              <SmallActionButton
+                src={List}
+                text={t('LIST')}
+                onPress={() => navigate(`/list-rune/${fungibleToken.principal}`)}
+              />
+            )}
+          </>
+        ) : (
           <>
             <SmallActionButton
               src={ArrowDown}
@@ -283,20 +302,8 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
               onPress={() => navigate(`/buy/${currency}`)}
             />
           </>
-        ) : (
-          <RecieveButtonContainer>
-            <SmallActionButton
-              src={ArrowDown}
-              text={t('RECEIVE')}
-              // RUNES & BRC20s => ordinal wallet, SIP-10 => STX wallet
-              onPress={() =>
-                navigate(`/receive/${fungibleToken?.protocol === 'stacks' ? 'STX' : 'ORD'}`)
-              }
-            />
-          </RecieveButtonContainer>
         )}
       </RowButtonContainer>
-
       <BottomModal
         visible={openReceiveModal}
         header={t('RECEIVE')}

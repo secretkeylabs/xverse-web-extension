@@ -1,18 +1,20 @@
 import AlertMessage from '@components/alertMessage';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { ChangeShowBtcReceiveAlertAction } from '@stores/wallet/actions/actionCreators';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 
-interface Props {
+type Props = {
   onReceiveAlertClose: () => void;
-}
+};
 
 function ShowBtcReceiveAlert({ onReceiveAlertClose }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'ADDRESS_RECEIVE_ALERT_MESSAGE' });
+  const { showBtcReceiveAlert } = useWalletSelector();
   const dispatch = useDispatch();
 
-  const onToggleReceiveBtcAlert = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(ChangeShowBtcReceiveAlertAction(!e.target.checked));
+  const onToggleReceiveBtcAlert = () => {
+    dispatch(ChangeShowBtcReceiveAlertAction(!showBtcReceiveAlert));
   };
 
   return (
@@ -24,6 +26,7 @@ function ShowBtcReceiveAlert({ onReceiveAlertClose }: Props) {
       onButtonClick={onReceiveAlertClose}
       tickMarkButtonText={t('DO_NOT_SHOW_MESSAGE')}
       tickMarkButtonClick={onToggleReceiveBtcAlert}
+      tickMarkButtonChecked={!showBtcReceiveAlert ?? false}
     />
   );
 }

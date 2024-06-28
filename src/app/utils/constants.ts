@@ -31,6 +31,8 @@ export const MOON_PAY_API_KEY = process.env.MOON_PAY_API_KEY;
 export const MIX_PANEL_TOKEN = process.env.MIX_PANEL_TOKEN;
 export const MIX_PANEL_EXPLORE_APP_TOKEN = process.env.MIX_PANEL_EXPLORE_APP_TOKEN;
 
+export const MAGIC_EDEN_RUNES_URL = 'https://magiceden.io/runes';
+
 export type CurrencyTypes = 'STX' | 'BTC' | 'FT' | 'NFT' | 'Ordinal' | 'brc20-Ordinal' | 'RareSat';
 export enum LoaderSize {
   SMALLEST,

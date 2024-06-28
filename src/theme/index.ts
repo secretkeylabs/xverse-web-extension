@@ -24,6 +24,9 @@ export const devices = {
 };
 
 const Theme = {
+  /**
+   * @deprecated use theme.space object
+   */
   spacing: (multiple: number) => multiple * 2,
   space: {
     xxxs: '2px',

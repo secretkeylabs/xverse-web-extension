@@ -1,4 +1,4 @@
-import { useGetRuneFungibleTokens } from '@hooks/queries/runes/useGetRuneFungibleTokens';
+import { useRuneFungibleTokensQuery } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useHasFeature from '@hooks/useHasFeature';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
@@ -35,7 +35,7 @@ function SendRuneScreen() {
   const { data: btcFeeRate, isLoading: feeRatesLoading } = useBtcFeeRate();
   const selectedAccount = useSelectedAccount();
   const { network } = useWalletSelector();
-  const { data: runesCoinsList } = useGetRuneFungibleTokens();
+  const { data: runesCoinsList } = useRuneFungibleTokensQuery();
   const context = useTransactionContext();
   const [recipientAddress, setRecipientAddress] = useState(location.state?.recipientAddress || '');
   const [amountError, setAmountError] = useState('');

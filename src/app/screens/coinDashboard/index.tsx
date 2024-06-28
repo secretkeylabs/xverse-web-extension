@@ -4,10 +4,11 @@ import OptionsDialog from '@components/optionsDialog/optionsDialog';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import { useVisibleBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
-import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useGetRuneFungibleTokens';
+import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useSpamTokens from '@hooks/queries/useSpamTokens';
+import useResetUserFlow, { broadcastResetUserFlow } from '@hooks/useResetUserFlow';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import { Flag } from '@phosphor-icons/react';
 import { FungibleToken } from '@secretkeylabs/xverse-core';
@@ -23,7 +24,7 @@ import { getExplorerUrl } from '@utils/helper';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import Theme from 'theme';
 import CoinHeader from './coinHeader';
@@ -143,7 +144,6 @@ const TokenText = styled(StyledP)`
 
 export default function CoinDashboard() {
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
-  const navigate = useNavigate();
   const [showFtContractDetails, setShowFtContractDetails] = useState(false);
   const [showOptionsDialog, setShowOptionsDialog] = useState(false);
   const [optionsDialogIndents, setOptionsDialogIndents] = useState<
@@ -177,11 +177,10 @@ export default function CoinDashboard() {
     }
   }
 
+  useResetUserFlow('/coinDashboard');
   useBtcWalletData();
 
-  const handleGoBack = () => {
-    navigate(-1);
-  };
+  const handleGoBack = () => broadcastResetUserFlow();
 
   useTrackMixPanelPageViewed(
     protocol

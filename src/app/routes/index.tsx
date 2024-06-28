@@ -67,6 +67,7 @@ import LockCountdown from '@screens/settings/lockCountdown';
 import PrivacyPreferencesScreen from '@screens/settings/privacyPreferences';
 import SignBatchPsbtRequest from '@screens/signBatchPsbtRequest';
 import SignMessageRequest from '@screens/signMessageRequest';
+import SignMessageRequestInApp from '@screens/signMessageRequestInApp';
 import SignPsbtRequest from '@screens/signPsbtRequest';
 import SignatureRequest from '@screens/signatureRequest';
 import SpeedUpTransactionScreen from '@screens/speedUpTransaction';
@@ -75,7 +76,9 @@ import SwapScreen from '@screens/swap';
 import SwapConfirmScreen from '@screens/swap/swapConfirmation';
 import TransactionRequest from '@screens/transactionRequest';
 import TransactionStatus from '@screens/transactionStatus';
+import UnlistRuneScreen from '@screens/unlistRune';
 import WalletExists from '@screens/walletExists';
+import ListRuneScreen from 'app/screens/listRune';
 import { createHashRouter } from 'react-router-dom';
 
 const router = createHashRouter([
@@ -373,6 +376,14 @@ const router = createHashRouter([
         element: <Buy />,
       },
       {
+        path: 'list-rune/:runeId',
+        element: <ListRuneScreen />,
+      },
+      {
+        path: 'unlist-rune/:runeId',
+        element: <UnlistRuneScreen />,
+      },
+      {
         path: 'coinDashboard/:currency',
         element: <CoinDashboard />,
       },
@@ -389,6 +400,14 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <SignMessageRequest />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: RequestsRoutes.SignMessageRequestInApp,
+        element: (
+          <AuthGuard>
+            <SignMessageRequestInApp />
           </AuthGuard>
         ),
       },

@@ -30,9 +30,6 @@ const BackButton = styled.button((props) => ({
   '&:hover': {
     backgroundColor: props.theme.colors.white_900,
   },
-  '&:focus': {
-    backgroundColor: props.theme.colors.white_850,
-  },
 }));
 
 const MenuButton = styled.button((props) => ({

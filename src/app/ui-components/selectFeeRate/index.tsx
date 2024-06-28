@@ -29,7 +29,8 @@ const Label = styled.span<{
       : props.$variant === 'mid'
       ? props.theme.colors.white_200
       : props.theme.colors.white_400};
-  margin-bottom: ${(props) => props.theme.spacing(2)}px;
+  transition: color 0.1s ease;
+  margin-bottom: ${(props) => props.theme.space.xxs};
   cursor: ${(props) => (props.$clickable ? 'pointer' : 'default')};
 
   user-select: ${(props) => (props.$clickable ? 'none' : 'auto')};
@@ -44,7 +45,7 @@ const Label = styled.span<{
   display: inline-flex;
   flex-direction: row;
   align-items: center;
-  gap: 2px;
+  gap: ${(props) => props.theme.space.xxxs};
 `;
 
 const EditRow = styled.span`
