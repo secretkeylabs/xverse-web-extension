@@ -1,6 +1,7 @@
 import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
 import XverseLogo from '@assets/img/full_logo_horizontal.svg';
 import ArrowIcon from '@assets/img/settings/arrow.svg';
+import RequestsRoutes from '@common/utils/route-urls';
 import PasswordInput from '@components/passwordInput';
 import BottomBar from '@components/tabBar';
 import useChromeLocalStorage from '@hooks/useChromeLocalStorage';
@@ -109,7 +110,7 @@ function Setting() {
   };
 
   const openConnectedAppsAndPermissionsScreen = () => {
-    navigate('/connected-apps-and-permissions');
+    navigate(RequestsRoutes.ConnectedAppsAndPermissions);
   };
 
   const switchIsPriorityWallet = () => {
@@ -233,12 +234,14 @@ function Setting() {
           icon={ArrowIcon}
           showDivider
         />
-        <SettingComponent
-          text="Connected apps & permissions"
-          onClick={openConnectedAppsAndPermissionsScreen}
-          icon={ArrowIcon}
-          showDivider
-        />
+        {process.env.NODE_ENV !== 'production' && (
+          <SettingComponent
+            text="Connected apps & permissions"
+            onClick={openConnectedAppsAndPermissionsScreen}
+            icon={ArrowIcon}
+            showDivider
+          />
+        )}
         <SettingComponent
           text={t('LOCK_COUNTDOWN')}
           onClick={openLockCountdownScreen}
