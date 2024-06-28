@@ -269,48 +269,28 @@ function Home() {
   };
 
   const onSendFtSelect = async (fungibleToken: FungibleToken) => {
-    if (fungibleToken.protocol === 'brc-20') {
-      if (isLedgerAccount(selectedAccount) && !isInOptions()) {
-        await chrome.tabs.create({
-          url: chrome.runtime.getURL(
-            `options.html#/send-brc20-one-step?coinName=${fungibleToken.ticker}`,
-          ),
-        });
-        return;
-      }
-      navigate('/send-brc20-one-step', {
-        state: {
-          fungibleToken,
-        },
-      });
-      return;
+    let route = '';
+    switch (fungibleToken?.protocol) {
+      case 'stacks':
+        // TODO refactor to use principal
+        route = `/send-sip10?ticker=${fungibleToken?.ticker}`;
+        break;
+      case 'brc-20':
+        route = `/send-brc20-one-step?principal=${fungibleToken?.principal}`;
+        break;
+      case 'runes':
+        route = `/send-rune?principal=${fungibleToken?.principal}`;
+        break;
+      default:
+        break;
     }
-    if (fungibleToken.protocol === 'stacks') {
-      if (isLedgerAccount(selectedAccount) && !isInOptions()) {
-        await chrome.tabs.create({
-          // TODO - check why use coin ticker when its kinda risky? shouldnt fungibalToken.principal be the main identifier?
-          url: chrome.runtime.getURL(`options.html#/send-sip10?coinTicker=${fungibleToken.ticker}`),
-        });
-        return;
-      }
-      navigate('/send-sip10', {
-        state: {
-          fungibleToken,
-        },
+
+    if (isLedgerAccount(selectedAccount) && !isInOptions()) {
+      await chrome.tabs.create({
+        url: chrome.runtime.getURL(`options.html#${route}`),
       });
-    }
-    if (fungibleToken.protocol === 'runes') {
-      if (isLedgerAccount(selectedAccount) && !isInOptions()) {
-        await chrome.tabs.create({
-          url: chrome.runtime.getURL(`options.html#/send-rune?coinTicker=${fungibleToken.name}`),
-        });
-        return;
-      }
-      navigate('/send-rune', {
-        state: {
-          fungibleToken,
-        },
-      });
+    } else {
+      navigate(route);
     }
   };
 

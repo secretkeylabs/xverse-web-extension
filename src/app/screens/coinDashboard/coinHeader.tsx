@@ -120,77 +120,32 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
   };
 
   const goToSendScreen = async () => {
-    if (isLedgerAccount(selectedAccount) && !isInOptions()) {
-      switch (currency) {
-        case 'BTC':
-          await chrome.tabs.create({
-            url: chrome.runtime.getURL('options.html#/send-btc'),
-          });
-          return;
-        case 'STX':
-          await chrome.tabs.create({
-            url: chrome.runtime.getURL('options.html#/send-stx'),
-          });
-          return;
-        default:
-          break;
-      }
+    let route = '';
+    if (currency === 'BTC' || currency === 'STX') {
+      route = `/send-${currency}`;
+    } else {
       switch (fungibleToken?.protocol) {
         case 'stacks':
-          await chrome.tabs.create({
-            url: chrome.runtime.getURL(
-              `options.html#/send-sip10?coinTicker=${fungibleToken?.ticker}`,
-            ),
-          });
-          return;
+          // TODO refactor to use principal
+          route = `/send-sip10?ticker=${fungibleToken?.ticker}`;
+          break;
         case 'brc-20':
-          await chrome.tabs.create({
-            url: chrome.runtime.getURL(
-              `options.html#/send-brc20-one-step?coinName=${fungibleToken?.ticker}`,
-            ),
-          });
-          return;
+          route = `/send-brc20-one-step?principal=${fungibleToken?.principal}`;
+          break;
         case 'runes':
-          await chrome.tabs.create({
-            url: chrome.runtime.getURL(`options.html#/send-rune?coinTicker=${fungibleToken?.name}`),
-          });
-          return;
+          route = `/send-rune?principal=${fungibleToken?.principal}`;
+          break;
         default:
           break;
       }
     }
-    switch (currency) {
-      case 'BTC':
-      case 'STX':
-        navigate(`/send-${currency}`);
-        break;
-      default:
-        break;
-    }
-    switch (fungibleToken?.protocol) {
-      case 'stacks':
-        navigate('/send-sip10', {
-          state: {
-            fungibleToken,
-          },
-        });
-        break;
-      case 'brc-20':
-        navigate('/send-brc20-one-step', {
-          state: {
-            fungibleToken,
-          },
-        });
-        break;
-      case 'runes':
-        navigate('/send-rune', {
-          state: {
-            fungibleToken,
-          },
-        });
-        break;
-      default:
-        break;
+
+    if (isLedgerAccount(selectedAccount) && !isInOptions()) {
+      await chrome.tabs.create({
+        url: chrome.runtime.getURL(`options.html#${route}`),
+      });
+    } else {
+      navigate(route);
     }
   };
 
