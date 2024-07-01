@@ -6,6 +6,7 @@ type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'danger';
 
 const StyledButton = styled.button`
   width: 100%;
+  min-height: 44px;
   user-select: none;
   transition: all 0.1s ease;
   min-height: 44px;
@@ -13,6 +14,7 @@ const StyledButton = styled.button`
   display: flex;
   justify-content: center;
   align-items: center;
+
   gap: ${(props) => props.theme.space.xs};
 
   padding: ${(props) => props.theme.space.s} ${(props) => props.theme.space.m};

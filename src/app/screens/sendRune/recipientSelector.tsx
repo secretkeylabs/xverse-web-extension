@@ -74,6 +74,7 @@ function RecipientSelector({
           onChange={handleAddressChange}
           variant={addressIsValid ? 'default' : 'danger'}
           feedback={inputFeedback}
+          autoFocus
         />
       </div>
       <Buttons>

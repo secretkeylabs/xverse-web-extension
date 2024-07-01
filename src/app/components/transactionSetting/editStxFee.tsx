@@ -1,15 +1,10 @@
 import FiatAmountText from '@components/fiatAmountText';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
-import {
-  currencySymbolMap,
-  getStxFiatEquivalent,
-  stxToMicrostacks,
-} from '@secretkeylabs/xverse-core';
+import { getStxFiatEquivalent, stxToMicrostacks } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
@@ -65,16 +60,11 @@ const InputField = styled.input((props) => ({
   },
 }));
 
-const SubText = styled.p((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.white_400,
-}));
-
 const FeeButton = styled.button<{
   isSelected: boolean;
   isLastInRow?: boolean;
 }>((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   color: `${props.isSelected ? props.theme.colors.elevation2 : props.theme.colors.white_400}`,
   background: `${props.isSelected ? props.theme.colors.white : 'transparent'}`,
   border: `1px solid ${props.isSelected ? 'transparent' : props.theme.colors.elevation6}`,
@@ -107,7 +97,7 @@ const TickerContainer = styled.div({
   flex: 1,
 });
 
-const ErrorText = styled.h1((props) => ({
+const ErrorText = styled.p((props) => ({
   ...props.theme.body_xs,
   color: props.theme.colors.feedback.error,
   marginBottom: props.theme.spacing(2),

@@ -2,10 +2,6 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import CollapsableContainer from './collapsableContainer';
 
-interface SignatureRequestMessageProps {
-  message: string;
-}
-
 const RequestMessage = styled.p((props) => ({
   ...props.theme.typography.body_medium_m,
   textAlign: 'left',
@@ -13,7 +9,11 @@ const RequestMessage = styled.p((props) => ({
   color: props.theme.colors.white_0,
 }));
 
-export default function SignatureRequestMessage(props: SignatureRequestMessageProps) {
+type Props = {
+  message: string;
+};
+
+export default function SignatureRequestMessage(props: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SIGNATURE_REQUEST' });
   const { message } = props;
 

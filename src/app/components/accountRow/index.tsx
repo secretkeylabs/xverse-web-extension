@@ -1,6 +1,5 @@
 import LedgerBadge from '@assets/img/ledger/ledger_badge.svg';
 import BarLoader from '@components/barLoader';
-import BottomModal from '@components/bottomModal';
 import OptionsDialog from '@components/optionsDialog/optionsDialog';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -8,13 +7,9 @@ import { CaretDown, DotsThreeVertical } from '@phosphor-icons/react';
 import { Account, currencySymbolMap } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import Input from '@ui-library/input';
+import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
-import {
-  EMPTY_LABEL,
-  LoaderSize,
-  MAX_ACC_NAME_LENGTH,
-  OPTIONS_DIALOG_WIDTH,
-} from '@utils/constants';
+import { EMPTY_LABEL, LoaderSize, OPTIONS_DIALOG_WIDTH } from '@utils/constants';
 import { getAccountGradient } from '@utils/gradient';
 import { isLedgerAccount, validateAccountName } from '@utils/helper';
 import { useEffect, useRef, useState } from 'react';
@@ -63,10 +58,14 @@ const CurrentAccountTextContainer = styled.div((props) => ({
   gap: props.theme.space.xs,
 }));
 
-const AccountName = styled.h1<{ isSelected: boolean }>((props) => ({
+const AccountName = styled.span<{ isSelected: boolean }>((props) => ({
   ...props.theme.typography.body_bold_m,
   color: props.isSelected ? props.theme.colors.white_0 : props.theme.colors.white_400,
   textAlign: 'start',
+  maxWidth: 160,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
 }));
 
 const BarLoaderContainer = styled.div((props) => ({
@@ -87,8 +86,6 @@ const OptionsButton = styled.button({
 });
 
 const ModalContent = styled.form((props) => ({
-  padding: props.theme.space.m,
-  paddingTop: props.theme.space.m,
   paddingBottom: props.theme.space.xxl,
 }));
 
@@ -217,15 +214,6 @@ function AccountRow({
     }
   }, [accountName]);
 
-  const getName = () => {
-    const name =
-      account?.accountName ??
-      account?.bnsName ??
-      `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`;
-
-    return name.length > MAX_ACC_NAME_LENGTH ? `${name.slice(0, MAX_ACC_NAME_LENGTH)}...` : name;
-  };
-
   const handleClick = () => {
     onAccountSelected(account!);
   };
@@ -341,7 +329,9 @@ function AccountRow({
             <TransparentSpan>
               <CurrentAccountTextContainer>
                 <AccountName aria-label="Account Name" isSelected={isSelected}>
-                  {getName()}
+                  {account?.accountName ??
+                    account?.bnsName ??
+                    `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`}
                 </AccountName>
                 {isLedgerAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
                 {isSelected && !disabledAccountSelect && !isAccountListView && (
@@ -399,9 +389,9 @@ function AccountRow({
       )}
 
       {showRemoveAccountModal && (
-        <BottomModal
+        <Sheet
           visible={showRemoveAccountModal}
-          header={t('REMOVE_FROM_LIST_TITLE')}
+          title={t('REMOVE_FROM_LIST_TITLE')}
           onClose={handleRemoveAccountModalClose}
         >
           <ModalContent>
@@ -423,13 +413,13 @@ function AccountRow({
               </ModalButtonContainer>
             </ModalControlsContainer>
           </ModalContent>
-        </BottomModal>
+        </Sheet>
       )}
 
       {showRenameAccountModal && (
-        <BottomModal
+        <Sheet
           visible={showRenameAccountModal}
-          header={optionsDialogTranslation('RENAME_ACCOUNT')}
+          title={optionsDialogTranslation('RENAME_ACCOUNT')}
           onClose={handleRenameAccountModalClose}
         >
           <ModalContent>
@@ -467,7 +457,7 @@ function AccountRow({
               </ModalButtonContainer>
             </ModalControlsContainer>
           </ModalContent>
-        </BottomModal>
+        </Sheet>
       )}
     </TopSectionContainer>
   );

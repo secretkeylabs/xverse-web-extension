@@ -57,7 +57,7 @@ const ToastDismissButton = styled.h1<{ type: ToastType }>`
   cursor: pointer;
 `;
 
-export function SnackBar({ text, type, actionButtonText, actionButtonCallback }: ToastProps) {
+function SnackBar({ text, type, actionButtonText, actionButtonCallback }: ToastProps) {
   const { t } = useTranslation('translation');
 
   const dismissToast = () => {

@@ -27,14 +27,23 @@ const useSignPsbtParams = (network: SettingsNetwork) => {
   const params = new URLSearchParams(search);
   const tabId = params.get('tabId') ?? '0';
   const requestId = params.get('requestId') ?? '';
+  const location = useLocation();
 
   const { requestToken, payload } = useMemo(() => {
     const token = params.get('signPsbtRequest') ?? '';
+    const magicEdenPsbt = params.get('magicEdenPsbt') ?? '';
     if (token) {
       const request = decodeToken(token) as any as SignTransactionOptions;
       return {
         payload: request.payload,
         requestToken: token,
+      };
+    }
+    if (magicEdenPsbt) {
+      const { payload: magicEdenPayload } = location.state;
+      return {
+        payload: magicEdenPayload,
+        requestToken: null,
       };
     }
     const allowedSigHash = params.get('allowedSigHash') ?? '';

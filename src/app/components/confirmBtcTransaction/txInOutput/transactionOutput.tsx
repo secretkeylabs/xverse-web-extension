@@ -73,7 +73,9 @@ function TransactionOutput({ output, scriptOutputCount }: Props) {
       return (
         <TxIdContainer>
           <YourAddressText>({t('YOUR_ADDRESS')})</YourAddressText>
-          <SubValueText>{getTruncatedAddress(output.address)}</SubValueText>
+          <SubValueText data-testid="address-receive">
+            {getTruncatedAddress(output.address)}
+          </SubValueText>
         </TxIdContainer>
       );
     }

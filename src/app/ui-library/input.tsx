@@ -33,13 +33,13 @@ const InputContainer = styled.div`
   position: relative;
 `;
 
-const InputField = styled.input`
+const InputField = styled.input<{ $bgColor?: string }>`
   ${(props) => props.theme.typography.body_medium_m}
 
   width: 100%;
 
   color: ${(props) => props.theme.colors.white_200};
-  background-color: ${(props) => props.theme.colors.elevation_n1};
+  background-color: ${(props) => props.$bgColor || props.theme.colors.elevation_n1};
   padding: ${(props) => props.theme.spacing(5)}px ${(props) => props.theme.space.m};
   border-radius: 8px;
 
@@ -62,10 +62,6 @@ const InputField = styled.input`
     }
   }
 
-  ::placeholder {
-    color: ${(props) => props.theme.colors.white_400};
-  }
-
   ::selection {
     background-color: ${(props) => props.theme.colors.tangerine};
     color: ${(props) => props.theme.colors.elevation0};
@@ -85,6 +81,9 @@ const InputField = styled.input`
 
   :-moz-placeholder {
     color: ${(props) => props.theme.colors.tangerine};
+  }
+  ::placeholder {
+    color: ${(props) => props.theme.colors.white_400};
   }
 `;
 
@@ -119,6 +118,7 @@ const ClearButton = styled.div<{ $hasSiblings?: boolean }>`
   color: ${(props) => props.theme.colors.elevation_n1};
   border-radius: 50%;
   margin-right: ${(props) => (props.$hasSiblings ? props.theme.spacing(4) : 0)}px;
+  transition: opacity 0.1s ease;
 
   :before,
   :after {
@@ -134,6 +134,14 @@ const ClearButton = styled.div<{ $hasSiblings?: boolean }>`
   }
   :after {
     transform: rotate(-45deg);
+  }
+
+  :hover {
+    opacity: 0.8;
+  }
+
+  :active {
+    opacity: 0.6;
   }
 `;
 
@@ -167,6 +175,7 @@ type Props = {
     variant?: FeedbackVariant;
   }[];
   autoFocus?: boolean;
+  bgColor?: string;
 };
 
 function Input({
@@ -186,6 +195,7 @@ function Input({
   feedback,
   disabled = false,
   autoFocus = false,
+  bgColor,
 }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const complicationsRef = useRef<HTMLDivElement>(null);
@@ -243,6 +253,7 @@ function Input({
           placeholder={placeholder}
           disabled={disabled}
           autoFocus={autoFocus}
+          $bgColor={bgColor}
         />
         <ComplicationsContainer ref={complicationsRef}>
           {!hideClear && value && (
@@ -275,9 +286,10 @@ export const ConvertComplication = styled.button`
   cursor: pointer;
   background-color: transparent;
   color: ${(props) => props.theme.colors.white_200};
+  transition: opacity 0.1s ease;
 
   &:hover:enabled {
-    color: ${(props) => props.theme.colors.white_400};
+    opacity: 0.8;
   }
 
   &:disabled {
@@ -293,7 +305,7 @@ export const VertRule = styled.div`
   margin: 0 8px;
 `;
 
-export const MaxButton = styled.button<{ $sendMax: boolean }>`
+export const MaxButton = styled.button`
   ${(props) => props.theme.typography.body_medium_m}
   user-select: none;
   margin-right: ${(props) => props.theme.space.xxs};
@@ -301,15 +313,14 @@ export const MaxButton = styled.button<{ $sendMax: boolean }>`
   cursor: pointer;
   background-color: transparent;
   color: ${(props) => props.theme.colors.tangerine};
-
-  ${(props) => props.$sendMax && `color: ${props.theme.colors.tangerine_400};`}
+  transition: color 0.1s ease;
 
   &:hover:enabled {
     color: ${(props) => props.theme.colors.tangerine_400};
   }
 
   &:disabled {
-    color: ${(props) => props.theme.colors.tangerine_dark};
+    color: ${(props) => props.theme.colors.tangerine_400};
     cursor: not-allowed;
   }
 `;

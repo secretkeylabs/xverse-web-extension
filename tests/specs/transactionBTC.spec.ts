@@ -104,7 +104,7 @@ test.describe('Transaction BTC', () => {
     // Show input and output and check visuals
     await wallet.buttonExpand.click();
     await expect(wallet.sendAddress).toBeVisible();
-    await expect(wallet.receiveAddress).toBeVisible();
+    await expect(wallet.receiveAddress.first()).toBeVisible();
     await expect(wallet.confirmAmount.first()).toBeVisible();
     await expect(wallet.confirmTotalAmount.first()).toBeVisible();
     await expect(wallet.confirmBalance.first()).toBeVisible();
@@ -124,10 +124,7 @@ test.describe('Transaction BTC', () => {
     await expect(initalBTCBalance).toEqual(balanceAfterCancel);
   });
 
-  test.skip('Send BTC - confirm transaction testnet #broadtransaction', async ({
-    page,
-    extensionId,
-  }) => {
+  test('Send BTC - confirm transaction testnet #localexecution', async ({ page, extensionId }) => {
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
 
@@ -174,7 +171,7 @@ test.describe('Transaction BTC', () => {
     // Show input and output and check visuals
     await wallet.buttonExpand.click();
     await expect(wallet.sendAddress).toBeVisible();
-    await expect(wallet.receiveAddress).toBeVisible();
+    await expect(wallet.receiveAddress.first()).toBeVisible();
     await expect(wallet.confirmAmount.first()).toBeVisible();
     await expect(wallet.confirmTotalAmount.first()).toBeVisible();
     await expect(wallet.confirmBalance.first()).toBeVisible();
@@ -192,21 +189,13 @@ test.describe('Transaction BTC', () => {
 
   // TODO: add test where we change the fees for a BTC transaction
 
-  test('Visual Check BTC Transaction history testnet #transaction', async ({
-    page,
-    extensionId,
-  }) => {
+  test('Visual Check BTC Transaction history #transaction', async ({ page, extensionId }) => {
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
 
     await onboardingpage.restoreWallet(strongPW, 'SEED_WORDS1');
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
     await wallet.checkVisualsStartpage();
-    await wallet.navigationSettings.click();
-    await wallet.switchtoTestnetNetwork();
-    await wallet.navigationDashboard.click();
-    // Check if switch to testnet was successfull and all visuals are correct
-    await wallet.checkVisualsStartpage('testnet');
     await wallet.divTokenRow.first().click();
     await expect(page.url()).toContain('BTC');
     // Check token detail page for token image and coin title

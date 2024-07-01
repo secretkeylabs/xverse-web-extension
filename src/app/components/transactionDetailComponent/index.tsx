@@ -7,24 +7,24 @@ const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   background: props.theme.colors.elevation1,
-  borderRadius: 12,
-  padding: '12px 16px',
+  borderRadius: props.theme.radius(2),
+  padding: props.theme.space.m,
   justifyContent: 'center',
   alignItems: 'center',
   marginBottom: props.theme.space.s,
 }));
 
-const TitleText = styled.h1((props) => ({
+const TitleText = styled.p((props) => ({
   ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_400,
 }));
 
-const ValueText = styled.h1((props) => ({
+const ValueText = styled.p((props) => ({
   ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_0,
 }));
 
-const SubValueText = styled.h1((props) => ({
+const SubValueText = styled.p((props) => ({
   ...props.theme.typography.body_s,
   textAlign: 'right',
   color: props.theme.colors.white_400,

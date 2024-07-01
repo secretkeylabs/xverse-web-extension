@@ -1,6 +1,7 @@
 import {
   APIGetRunesActivityForAddressResponse,
   API_TIMEOUT_MILLI,
+  AppInfo,
   Brc20HistoryTransactionData,
   BtcTransactionData,
   GetRunesActivityForAddressEvent,
@@ -16,14 +17,14 @@ import {
 } from '@stacks/stacks-blockchain-api-types';
 import axios from 'axios';
 
-export interface PaginatedResults<T> {
+interface PaginatedResults<T> {
   limit: number;
   offset: number;
   total: number;
   results: T[];
 }
 
-export async function getTransferTransactions(reqParams: {
+async function getTransferTransactions(reqParams: {
   stxAddress: string;
   network: StacksNetwork;
   limit: number;
@@ -136,6 +137,32 @@ export function isBrc20Transaction(
   return (tx as Brc20HistoryTransactionData).txType === 'brc20';
 }
 
+// todo: move this to xverse-core
+export const modifyRecommendedStxFees = (
+  baseFees: {
+    low: number;
+    medium: number;
+    high: number;
+  },
+  appInfo: AppInfo | undefined | null,
+): { low: number; medium: number; high: number } => {
+  const multiplier = appInfo?.stxSendTxMultiplier || 1;
+  const highCap = appInfo?.thresholdHighStacksFee;
+
+  let adjustedLow = Math.round(baseFees.low * multiplier);
+  let adjustedMedium = Math.round(baseFees.medium * multiplier);
+  let adjustedHigh = Math.round(baseFees.high * multiplier);
+
+  if (highCap && highCap < adjustedMedium) {
+    adjustedLow = adjustedLow < highCap ? adjustedLow : Math.round(highCap * 0.75);
+    adjustedMedium = highCap;
+    adjustedHigh = Math.round(highCap * 1.25);
+  } else if (highCap && highCap < adjustedHigh) {
+    adjustedHigh = highCap;
+  }
+
+  return { low: adjustedLow, medium: adjustedMedium, high: adjustedHigh };
+};
 export function isRuneTransactionArr(
   txs:
     | (AddressTransactionWithTransfers | MempoolTransaction)[]

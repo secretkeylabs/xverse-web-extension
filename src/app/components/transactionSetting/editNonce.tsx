@@ -1,53 +1,26 @@
-import InfoContainer from '@components/infoContainer';
+import Callout from '@ui-library/callout';
+import Input from '@ui-library/input';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import Theme from 'theme';
 
-const NonceContainer = styled.div((props) => ({
+const Container = styled.div({
   display: 'flex',
   flexDirection: 'column',
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-}));
+});
 
-const DetailText = styled.h1((props) => ({
-  ...props.theme.body_m,
+const Description = styled.p((props) => ({
+  ...props.theme.typography.body_m,
   color: props.theme.colors.white_200,
-  marginTop: props.theme.spacing(8),
+  marginBottom: props.theme.space.l,
 }));
 
-const Text = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
-  marginTop: props.theme.spacing(8),
-}));
-
-const InputContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginTop: props.theme.spacing(4),
-  marginBottom: props.theme.spacing(6),
-  border: `1px solid ${props.theme.colors.elevation6}`,
-  backgroundColor: props.theme.colors.elevation1,
-  borderRadius: 8,
-  paddingLeft: props.theme.spacing(5),
-  paddingRight: props.theme.spacing(5),
-  paddingTop: props.theme.spacing(5),
-  paddingBottom: props.theme.spacing(5),
-}));
-
-const InputField = styled.input((props) => ({
-  ...props.theme.body_m,
-  backgroundColor: props.theme.colors.elevation1,
-  color: props.theme.colors.white_400,
-  width: '100%',
-  border: 'transparent',
-}));
-
-interface Props {
+type Props = {
   nonce: string;
   setNonce: (nonce: string) => void;
-}
+};
+
 function EditNonce({ nonce, setNonce }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'TRANSACTION_SETTING' });
   const [nonceInput, setNonceInput] = useState(nonce);
@@ -61,14 +34,20 @@ function EditNonce({ nonce, setNonce }: Props) {
   }, [nonceInput, setNonce]);
 
   return (
-    <NonceContainer>
-      <DetailText>{t('NONCE_INFO')}</DetailText>
-      <Text>{t('NONCE')}</Text>
-      <InputContainer>
-        <InputField value={nonceInput} onChange={onInputEditNonceChange} placeholder="0" />
-      </InputContainer>
-      <InfoContainer bodyText={t('NONCE_WARNING')} />
-    </NonceContainer>
+    <Container>
+      <Description>{t('NONCE_INFO')}</Description>
+      <Input
+        title={t('NONCE')}
+        value={nonceInput}
+        onChange={onInputEditNonceChange}
+        placeholder="0"
+        hideClear
+        autoFocus
+        bgColor={Theme.colors.elevation2}
+      />
+      <br />
+      <Callout bodyText={t('NONCE_WARNING')} />
+    </Container>
   );
 }
 

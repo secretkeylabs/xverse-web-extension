@@ -29,7 +29,7 @@ export enum StacksLegacyMethods {
   structuredDataSignatureResponse = 'structuredDataSignatureResponse',
 }
 
-export enum RpcMethods {
+enum RpcMethods {
   request = 'request',
 }
 

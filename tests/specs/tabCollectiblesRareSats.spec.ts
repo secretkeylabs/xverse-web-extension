@@ -57,8 +57,8 @@ test.describe('Collectibles Tab - Rare sats', () => {
     await wallet.buttonNext.click();
 
     // Transaction Review Page
-    await expect(wallet.receiveAddress).toBeVisible();
-    await expect(await wallet.receiveAddress.innerText()).toContain(
+    await expect(wallet.receiveAddress.first()).toBeVisible();
+    await expect(await wallet.receiveAddress.first().innerText()).toContain(
       TEST_ORDINALS_ADDRESS.slice(-4),
     );
     await expect(wallet.buttonCancel).toBeEnabled();
@@ -81,7 +81,7 @@ test.describe('Collectibles Tab - Rare sats', () => {
      */
   });
 
-  test.skip('Send rare stats testnet #broadtransaction', async ({ page, extensionId }) => {
+  test('Send rare stats testnet #localexecution', async ({ page, extensionId }) => {
     const wallet = new Wallet(page);
     await wallet.setupTestnetTest(extensionId, 'SEED_WORDS1');
 
@@ -112,8 +112,8 @@ test.describe('Collectibles Tab - Rare sats', () => {
     await wallet.buttonNext.click();
 
     // Transaction Review Page
-    await expect(wallet.receiveAddress).toBeVisible();
-    await expect(await wallet.receiveAddress.innerText()).toContain(
+    await expect(wallet.receiveAddress.first()).toBeVisible();
+    await expect(await wallet.receiveAddress.first().innerText()).toContain(
       TEST_ORDINALS_ADDRESS.slice(-4),
     );
     await expect(wallet.buttonCancel).toBeEnabled();
