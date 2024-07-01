@@ -1,5 +1,5 @@
+import useRunesApi from '@hooks/apiClients/useRunesApi';
 import useHasFeature from '@hooks/useHasFeature';
-import useRunesApi from '@hooks/useRunesApi';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { FeatureId, FungibleToken } from '@secretkeylabs/xverse-core';

@@ -1,4 +1,4 @@
-import useRunesApi from '@hooks/useRunesApi';
+import useRunesApi from '@hooks/apiClients/useRunesApi';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';

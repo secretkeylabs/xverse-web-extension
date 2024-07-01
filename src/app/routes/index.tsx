@@ -25,6 +25,7 @@ import CreateInscription from '@screens/createInscription';
 import CreatePassword from '@screens/createPassword';
 import CreateWalletSuccess from '@screens/createWalletSuccess';
 import ErrorBoundary from '@screens/error';
+import EtchRune from '@screens/etchRune';
 import ExecuteBrc20Transaction from '@screens/executeBrc20Transaction';
 import Explore from '@screens/explore';
 import ForgotPassword from '@screens/forgotPassword';
@@ -37,6 +38,7 @@ import VerifyLedger from '@screens/ledger/verifyLedgerAccountAddress';
 import Legal from '@screens/legal';
 import Login from '@screens/login';
 import ManageTokens from '@screens/manageTokens';
+import MintRune from '@screens/mintRune';
 import NftCollection from '@screens/nftCollection';
 import NftDashboard from '@screens/nftDashboard';
 import SupportedRarities from '@screens/nftDashboard/supportedRarities';
@@ -444,6 +446,22 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <ConfirmNftTransaction />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: RequestsRoutes.MintRune,
+        element: (
+          <AuthGuard>
+            <MintRune />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: RequestsRoutes.EtchRune,
+        element: (
+          <AuthGuard>
+            <EtchRune />
           </AuthGuard>
         ),
       },

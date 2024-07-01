@@ -1,6 +1,6 @@
 import { btcTransaction, UtxoCache } from '@secretkeylabs/xverse-core';
 import { useMemo } from 'react';
-import useBtcClient from './useBtcClient';
+import useBtcClient from './apiClients/useBtcClient';
 import useSeedVault from './useSeedVault';
 import useSelectedAccount from './useSelectedAccount';
 import useWalletSelector from './useWalletSelector';

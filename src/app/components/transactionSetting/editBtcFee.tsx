@@ -1,6 +1,6 @@
+import useBtcClient from '@hooks/apiClients/useBtcClient';
 import FiatAmountText from '@components/fiatAmountText';
 import useCoinRates from '@hooks/queries/useCoinRates';
-import useBtcClient from '@hooks/useBtcClient';
 import useBtcFees from '@hooks/useBtcFees';
 import useDebounce from '@hooks/useDebounce';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';

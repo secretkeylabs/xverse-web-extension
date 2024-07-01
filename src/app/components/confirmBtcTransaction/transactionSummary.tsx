@@ -8,7 +8,12 @@ import TransferFeeView from '@components/transferFeeView';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useSelectedAccount from '@hooks/useSelectedAccount';
-import { btcTransaction, getBtcFiatEquivalent, RuneSummary } from '@secretkeylabs/xverse-core';
+import {
+  btcTransaction,
+  getBtcFiatEquivalent,
+  RuneSummary,
+  RuneSummaryActions,
+} from '@secretkeylabs/xverse-core';
 import SelectFeeRate from '@ui-components/selectFeeRate';
 import Callout from '@ui-library/callout';
 import BigNumber from 'bignumber.js';
@@ -16,6 +21,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import DelegateSection from './delegateSection';
+import EtchSection from './etchSection';
 import AmountWithInscriptionSatribute from './itemRow/amountWithInscriptionSatribute';
 import ReceiveSection from './receiveSection';
 import TransferSection from './transferSection';
@@ -39,7 +45,7 @@ type Props = {
   inputs: btcTransaction.EnhancedInput[];
   outputs: btcTransaction.EnhancedOutput[];
   feeOutput?: btcTransaction.TransactionFeeOutput;
-  runeSummary?: RuneSummary;
+  runeSummary?: RuneSummaryActions | RuneSummary;
   getFeeForFeeRate?: (
     feeRate: number,
     useEffectiveFeeRate?: boolean,
@@ -135,6 +141,7 @@ function TransactionSummary({
       />
       {!hasRuneDelegation && <BurnSection burns={runeSummary?.burns} />}
       <MintSection mints={[runeSummary?.mint]} />
+      <EtchSection etch={(runeSummary as RuneSummaryActions)?.etch} />
       <TxInOutput inputs={inputs} outputs={outputs} />
       {hasOutputScript && !runeSummary && <WarningCallout bodyText={t('SCRIPT_OUTPUT_TX')} />}
       <TransactionDetailComponent title={t('NETWORK')} value={network.type} />

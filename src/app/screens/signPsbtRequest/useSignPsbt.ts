@@ -19,7 +19,7 @@ import {
 import { decodeToken } from 'jsontokens';
 import { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import useBtcClient from '../../hooks/useBtcClient';
+import useBtcClient from '../../hooks/apiClients/useBtcClient';
 import useSeedVault from '../../hooks/useSeedVault';
 
 const useSignPsbtParams = (network: SettingsNetwork) => {

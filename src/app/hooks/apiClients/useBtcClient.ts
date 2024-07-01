@@ -1,6 +1,6 @@
 import { BitcoinEsploraApiProvider } from '@secretkeylabs/xverse-core';
 import { useMemo } from 'react';
-import useWalletSelector from './useWalletSelector';
+import useWalletSelector from '../useWalletSelector';
 
 const useBtcClient = () => {
   const { network } = useWalletSelector();

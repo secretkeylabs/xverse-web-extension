@@ -5,7 +5,7 @@ import ConfirmScreen from '@components/confirmScreen';
 import InfoContainer from '@components/infoContainer';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import TopRow from '@components/topRow';
-import useRunesApi from '@hooks/useRunesApi';
+import useRunesApi from '@hooks/apiClients/useRunesApi';
 import useSeedVault from '@hooks/useSeedVault';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';

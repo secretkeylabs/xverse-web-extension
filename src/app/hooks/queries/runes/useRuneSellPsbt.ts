@@ -1,4 +1,4 @@
-import useRunesApi from '@hooks/useRunesApi';
+import useRunesApi from '@hooks/apiClients/useRunesApi';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { BitcoinNetworkType } from '@sats-connect/core';
