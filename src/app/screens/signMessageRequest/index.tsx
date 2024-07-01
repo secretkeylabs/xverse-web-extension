@@ -22,89 +22,19 @@ import { getTruncatedAddress, isHardwareAccount } from '@utils/helper';
 import { handleBip322LedgerMessageSigning } from '@utils/ledger';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
+import {
+  ActionDisclaimer,
+  MainContainer,
+  MessageHash,
+  RequestType,
+  SigningAddress,
+  SigningAddressContainer,
+  SigningAddressTitle,
+  SigningAddressType,
+  SigningAddressValue,
+  SuccessActionsContainer,
+} from './index.styled';
 import { useSignMessageRequest, useSignMessageValidation } from './useSignMessageRequest';
-
-const MainContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-}));
-
-const RequestType = styled.h1((props) => ({
-  ...props.theme.typography.headline_s,
-  marginTop: props.theme.spacing(11),
-  color: props.theme.colors.white_0,
-  textAlign: 'left',
-  marginBottom: props.theme.spacing(12),
-}));
-
-const MessageHash = styled.p((props) => ({
-  ...props.theme.typography.body_medium_m,
-  textAlign: 'left',
-  lineHeight: 1.6,
-  wordWrap: 'break-word',
-  color: props.theme.colors.white_0,
-  marginBottom: props.theme.spacing(4),
-}));
-
-const SigningAddressContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  background: props.theme.colors.elevation1,
-  borderRadius: 12,
-  padding: '12px 16px',
-  marginBottom: props.theme.spacing(6),
-  flex: 1,
-}));
-
-const SigningAddressTitle = styled.p((props) => ({
-  ...props.theme.typography.body_medium_m,
-  wordWrap: 'break-word',
-  color: props.theme.colors.white_200,
-  marginBottom: props.theme.spacing(4),
-}));
-
-const SigningAddress = styled.div({
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-});
-
-const SigningAddressType = styled.p((props) => ({
-  ...props.theme.typography.body_medium_m,
-  textAlign: 'left',
-  wordWrap: 'break-word',
-  color: props.theme.colors.white_0,
-  marginBottom: props.theme.spacing(4),
-}));
-
-const SigningAddressValue = styled.p((props) => ({
-  ...props.theme.typography.body_medium_m,
-  textAlign: 'left',
-  wordWrap: 'break-word',
-  color: props.theme.colors.white_0,
-  marginBottom: props.theme.spacing(4),
-}));
-
-const ActionDisclaimer = styled.p((props) => ({
-  ...props.theme.typography.body_m,
-  color: props.theme.colors.white_400,
-  marginTop: props.theme.spacing(4),
-  marginBottom: props.theme.spacing(8),
-}));
-
-const SuccessActionsContainer = styled.div((props) => ({
-  width: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: props.theme.spacing(6),
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(20),
-  marginTop: props.theme.spacing(20),
-}));
 
 function SignMessageRequest() {
   const { t } = useTranslation('translation');
@@ -284,7 +214,11 @@ function SignMessageRequest() {
     setCurrentStepIndex(0);
   };
 
-  return !validationError ? (
+  if (validationError) {
+    return <RequestError error={validationError.error} />;
+  }
+
+  return (
     <>
       <ConfirmScreen
         onConfirm={confirmCallback}
@@ -363,8 +297,6 @@ function SignMessageRequest() {
         </SuccessActionsContainer>
       </BottomModal>
     </>
-  ) : (
-    <RequestError error={validationError.error} />
   );
 }
 

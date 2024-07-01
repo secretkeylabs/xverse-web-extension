@@ -31,7 +31,7 @@ export const fetchRuneBalances =
     }
   };
 
-export const useGetRuneFungibleTokens = () => {
+export const useRuneFungibleTokensQuery = (backgroundRefetch = true) => {
   const { ordinalsAddress } = useSelectedAccount();
   const { network, fiatCurrency, spamTokens, showSpamTokens } = useWalletSelector();
   const showRunes = useHasFeature('RUNES_SUPPORT');
@@ -40,6 +40,8 @@ export const useGetRuneFungibleTokens = () => {
   const query = useQuery({
     queryKey: ['get-rune-fungible-tokens', network.type, ordinalsAddress, fiatCurrency],
     enabled: Boolean(network && ordinalsAddress && showRunes),
+    refetchOnWindowFocus: backgroundRefetch,
+    refetchOnReconnect: backgroundRefetch,
     queryFn,
   });
 
@@ -59,11 +61,13 @@ export const useGetRuneFungibleTokens = () => {
 /*
  * This hook is used to get the list of runes which the user has not hidden
  */
-export const useVisibleRuneFungibleTokens = (): ReturnType<typeof useGetRuneFungibleTokens> & {
+export const useVisibleRuneFungibleTokens = (
+  backgroundRefetch = true,
+): ReturnType<typeof useRuneFungibleTokensQuery> & {
   visible: FungibleToken[];
 } => {
   const { runesManageTokens } = useWalletSelector();
-  const runesQuery = useGetRuneFungibleTokens();
+  const runesQuery = useRuneFungibleTokensQuery(backgroundRefetch);
   return {
     ...runesQuery,
     visible: (runesQuery.data ?? []).filter((ft) => {

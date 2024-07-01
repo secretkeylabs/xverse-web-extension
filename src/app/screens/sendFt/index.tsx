@@ -30,7 +30,7 @@ function SendFtScreen() {
   const [addressError, setAddressError] = useState('');
   const [memoError, setMemoError] = useState('');
   const [amountToSend, setAmountToSend] = useState('');
-  const [recepientAddress, setRecepientAddress] = useState('');
+  const [recipientAddress, setRecipientAddress] = useState('');
   const [txMemo, setTxMemo] = useState<string | undefined>(undefined);
   const { data: stxPendingTxData } = useStxPendingTxData();
   const location = useLocation();
@@ -40,12 +40,12 @@ function SendFtScreen() {
   const fungibleToken =
     location.state?.fungibleToken || sip10CoinsList.find((coin) => coin.ticker === coinTicker);
 
-  let recipientAddress: string | undefined;
+  let recipient: string | undefined;
   let ftAmountToSend: string | undefined;
   let stxMemo: string | undefined;
 
   if (location.state) {
-    recipientAddress = location.state.recipientAddress;
+    recipient = location.state.recipientAddress;
     ftAmountToSend = location.state.amountToSend;
     stxMemo = location.state.stxMemo;
   }
@@ -61,7 +61,7 @@ function SendFtScreen() {
       }
       setAmountToSend(amount);
       setTxMemo(memo);
-      setRecepientAddress(associatedAddress);
+      setRecipientAddress(associatedAddress);
       const { principal } = fungibleToken;
       const contractInfo: string[] = principal.split('.');
       const unsginedTx: UnsignedStacksTransation = {
@@ -90,7 +90,7 @@ function SendFtScreen() {
           amount: amountToSend.toString(),
           fungibleToken,
           memo: txMemo,
-          recepientAddress,
+          recipientAddress,
         },
       });
     }
@@ -193,9 +193,9 @@ function SendFtScreen() {
         fungibleToken={fungibleToken}
         balance={getBalance()}
         onPressSend={onPressSendSTX}
-        recipient={recipientAddress!}
-        amountToSend={ftAmountToSend!}
-        stxMemo={stxMemo!}
+        recipient={recipient}
+        amountToSend={ftAmountToSend}
+        stxMemo={stxMemo}
       />
       <BottomBar tab="dashboard" />
     </>

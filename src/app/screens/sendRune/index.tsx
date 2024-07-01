@@ -1,4 +1,4 @@
-import { useGetRuneFungibleTokens } from '@hooks/queries/runes/useGetRuneFungibleTokens';
+import { useRuneFungibleTokensQuery } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useHasFeature from '@hooks/useHasFeature';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
@@ -7,7 +7,6 @@ import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   AnalyticsEvents,
-  FungibleToken,
   RuneSummary,
   Transport,
   btcTransaction,
@@ -19,7 +18,7 @@ import { getFtBalance } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { generateTransaction, type TransactionSummary } from './helpers';
 import StepDisplay from './stepDisplay';
 import { Step, getPreviousStep } from './steps';
@@ -35,7 +34,7 @@ function SendRuneScreen() {
   const { data: btcFeeRate, isLoading: feeRatesLoading } = useBtcFeeRate();
   const selectedAccount = useSelectedAccount();
   const { network } = useWalletSelector();
-  const { data: runesCoinsList } = useGetRuneFungibleTokens();
+  const { data: runesCoinsList } = useRuneFungibleTokensQuery();
   const context = useTransactionContext();
   const [recipientAddress, setRecipientAddress] = useState(location.state?.recipientAddress || '');
   const [amountError, setAmountError] = useState('');
@@ -49,21 +48,25 @@ function SendRuneScreen() {
   const [transaction, setTransaction] = useState<btcTransaction.EnhancedTransaction | undefined>();
   const [summary, setSummary] = useState<TransactionSummary | undefined>();
   const [runeSummary, setRuneSummary] = useState<RuneSummary | undefined>();
-
-  const coinTicker = location.search
-    ? decodeURIComponent(location.search.split('coinTicker=')[1])
-    : undefined;
-  const fungibleToken: FungibleToken =
-    location.state?.fungibleToken || runesCoinsList?.find((coin) => coin.name === coinTicker);
+  const [searchParams] = useSearchParams();
   const hasRunesSupport = useHasFeature('RUNES_SUPPORT');
 
+  const principal = searchParams.get('principal');
+  const fungibleToken = runesCoinsList?.find((coin) => coin.principal === principal);
+
   useEffect(() => {
+    if (!fungibleToken) {
+      return;
+    }
     if (!feeRate && btcFeeRate && !feeRatesLoading) {
       setFeeRate(btcFeeRate.regular.toString());
     }
   }, [btcFeeRate, feeRatesLoading]);
 
   const generateTransactionAndSummary = async (feeRateOverride?: number) => {
+    if (!fungibleToken) {
+      return;
+    }
     const balance = BigNumber(getFtBalance(fungibleToken));
     const decimalsToBase = BigNumber(10 ** (fungibleToken.decimals || 0));
 
@@ -108,6 +111,7 @@ function SendRuneScreen() {
       try {
         const transactionDetails = await generateTransactionAndSummary();
         if (!isActiveEffect) return;
+        if (!transactionDetails) return;
         setTransaction(transactionDetails.transaction);
         if (transactionDetails.summary) {
           setSummary(transactionDetails.summary);
@@ -134,6 +138,11 @@ function SendRuneScreen() {
     };
   }, [transactionContext, recipientAddress, amountToSend, feeRate, sendMax]);
 
+  if (!fungibleToken) {
+    navigate('/');
+    return null;
+  }
+
   const handleCancel = () => {
     if (isLedgerAccount(selectedAccount) && isInOption) {
       window.close();
@@ -151,7 +160,10 @@ function SendRuneScreen() {
   };
 
   const calculateFeeForFeeRate = async (desiredFeeRate: number): Promise<number | undefined> => {
-    const { summary: tempSummary } = await generateTransactionAndSummary(desiredFeeRate);
+    const transactionDetails = await generateTransactionAndSummary(desiredFeeRate);
+    if (!transactionDetails) return;
+
+    const { summary: tempSummary } = transactionDetails;
     if (tempSummary) return Number(tempSummary.fee);
 
     return undefined;

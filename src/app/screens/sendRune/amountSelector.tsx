@@ -71,7 +71,7 @@ function AmountSelector({
   const balance = getFtBalance(token);
 
   const satsToFiat = (sats: string) =>
-    getBtcFiatEquivalent(new BigNumber(sats), BigNumber(btcFiatRate)).toNumber().toFixed(2);
+    getBtcFiatEquivalent(new BigNumber(sats), BigNumber(btcFiatRate)).toString();
 
   const amountIsPositiveNumber =
     amountToSend !== '' && !Number.isNaN(Number(amountToSend)) && +amountToSend > 0;

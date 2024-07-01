@@ -1,10 +1,11 @@
 import getSelectedAccount from '@common/utils/getSelectedAccount';
+import { Account } from '@secretkeylabs/xverse-core';
 import { StoreState } from '@stores/index';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import useWalletReducer from './useWalletReducer';
 
-const useSelectedAccount = () => {
+const useSelectedAccount = (): Account => {
   const { switchAccount } = useWalletReducer();
 
   const selectedAccountIndex = useSelector(
@@ -32,7 +33,9 @@ const useSelectedAccount = () => {
 
     const fallbackAccount = softwareAccountsList[0];
 
-    switchAccount(fallbackAccount);
+    if (fallbackAccount) {
+      switchAccount(fallbackAccount);
+    }
 
     return fallbackAccount;
   }, [

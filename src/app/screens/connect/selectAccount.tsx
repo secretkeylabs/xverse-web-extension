@@ -30,18 +30,21 @@ const CurrentAccountTextContainer = styled.div((props) => ({
   paddingLeft: props.theme.space.xs,
 }));
 
-const CurrentSelectedAccountText = styled.h1((props) => ({
+const CurrentAccountName = styled.span((props) => ({
   ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_0,
   textAlign: 'start',
+  maxWidth: 160,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
 }));
 
-interface GradientCircleProps {
+const GradientCircle = styled.div<{
   firstGradient: string;
   secondGradient: string;
   thirdGradient: string;
-}
-const GradientCircle = styled.div<GradientCircleProps>((props) => ({
+}>((props) => ({
   width: 20,
   height: 20,
   borderRadius: '50%',
@@ -57,6 +60,7 @@ const SwitchAccountContainer = styled.div(() => ({
   display: 'flex',
   alignItems: 'center',
 }));
+
 const SwitchAccountText = styled.p((props) => ({
   ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_0,
@@ -64,27 +68,15 @@ const SwitchAccountText = styled.p((props) => ({
   textAlign: 'start',
 }));
 
-type SelectAccountProps = {
+type Props = {
   account: Account;
   handlePressAccount: () => void;
 };
 
-function SelectAccount({ account, handlePressAccount }: SelectAccountProps) {
+function SelectAccount({ account, handlePressAccount }: Props) {
   const gradient = getAccountGradient(account?.stxAddress || account?.btcAddress!);
   const { t } = useTranslation('translation', { keyPrefix: 'SELECT_BTC_ADDRESS_SCREEN' });
   const theme = useTheme();
-  const getName = () => {
-    const maxNameCharacters = isHardwareAccount(account) || account.bnsName ? 12 : 20;
-    const maxLength =
-      account?.accountName && account?.accountName?.length > maxNameCharacters ? '...' : '';
-    if (account.accountName) {
-      return `${account?.accountName?.slice(0, maxNameCharacters)}${maxLength}`;
-    }
-    if (account.bnsName) {
-      return `${account.bnsName.slice(0, maxNameCharacters)}${maxLength}`;
-    }
-    return `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`;
-  };
 
   return (
     <AccountInfoContainer onClick={handlePressAccount}>
@@ -97,7 +89,11 @@ function SelectAccount({ account, handlePressAccount }: SelectAccountProps) {
           />
           {account && (
             <CurrentAccountTextContainer>
-              <CurrentSelectedAccountText>{getName()}</CurrentSelectedAccountText>
+              <CurrentAccountName>
+                {account?.accountName ??
+                  account?.bnsName ??
+                  `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`}
+              </CurrentAccountName>
               {isHardwareAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
             </CurrentAccountTextContainer>
           )}

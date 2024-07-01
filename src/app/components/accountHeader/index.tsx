@@ -71,17 +71,17 @@ const WarningButton = styled(ButtonRow)`
   color: ${(props) => props.theme.colors.feedback.error};
 `;
 
-interface AccountHeaderComponentProps {
+type Props = {
   disableMenuOption?: boolean;
   disableAccountSwitch?: boolean;
   showBorderBottom?: boolean;
-}
+};
 
 function AccountHeaderComponent({
   disableMenuOption = false,
   disableAccountSwitch = false,
   showBorderBottom = true,
-}: AccountHeaderComponentProps) {
+}: Props) {
   const navigate = useNavigate();
   const selectedAccount = useSelectedAccount();
 

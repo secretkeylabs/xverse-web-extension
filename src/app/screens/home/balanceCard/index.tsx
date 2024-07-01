@@ -1,6 +1,6 @@
 import BarLoader from '@components/barLoader';
 import { useVisibleBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
-import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useGetRuneFungibleTokens';
+import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useAccountBalance from '@hooks/queries/useAccountBalance';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';

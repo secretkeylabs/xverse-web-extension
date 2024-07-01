@@ -2,6 +2,7 @@ import AmountWithInscriptionSatribute from '@components/confirmBtcTransaction/it
 import FiatAmountText from '@components/fiatAmountText';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { PencilSimple } from '@phosphor-icons/react';
 import {
   btcTransaction,
   getBtcFiatEquivalent,
@@ -12,11 +13,12 @@ import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
+import Theme from 'theme';
 
 const Container = styled.div((props) => ({
   background: props.theme.colors.elevation1,
-  borderRadius: 12,
-  padding: '12px 16px',
+  borderRadius: props.theme.radius(2),
+  padding: props.theme.space.m,
   marginBottom: props.theme.space.s,
 }));
 
@@ -38,6 +40,23 @@ const FeeContainer = styled.div({
   alignItems: 'flex-end',
 });
 
+const CustomRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`;
+
+const EditButton = styled.button`
+  display: flex;
+  flex-direction: row;
+  background: transparent;
+  align-items: center;
+  gap: ${(props) => props.theme.space.xxs};
+  cursor: ${(props) => (props.onClick ? 'pointer' : 'initial')};
+  width: 100%;
+  margin-left: ${(props) => props.theme.space.xs};
+`;
+
 type Props = {
   feePerVByte?: BigNumber;
   fee: BigNumber;
@@ -45,6 +64,8 @@ type Props = {
   title?: string;
   inscriptions?: btcTransaction.IOInscription[];
   satributes?: btcTransaction.IOSatribute[];
+  customFeeClick?: () => void;
+  subtitle?: string;
   onShowInscription?: (inscription: btcTransaction.IOInscription) => void;
 };
 
@@ -55,6 +76,8 @@ function TransferFeeView({
   title,
   inscriptions = [],
   satributes = [],
+  customFeeClick,
+  subtitle,
   onShowInscription = () => {},
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
@@ -70,6 +93,24 @@ function TransferFeeView({
           <StyledP typography="body_medium_m" color="white_200">
             {title ?? t('FEES')}
           </StyledP>
+          {customFeeClick && (
+            <CustomRow>
+              <StyledP typography="body_medium_m" color="white_400">
+                Custom
+              </StyledP>
+              <EditButton onClick={() => {}}>
+                <StyledP typography="body_medium_m" color="tangerine">
+                  Edit
+                </StyledP>
+                <PencilSimple size="16" color={Theme.colors.tangerine} weight="fill" />
+              </EditButton>
+            </CustomRow>
+          )}
+          {subtitle && (
+            <StyledP typography="body_s" color="white_400">
+              {subtitle}
+            </StyledP>
+          )}
         </FeeTitleContainer>
         <FeeContainer>
           <NumericFormat
@@ -100,8 +141,8 @@ function TransferFeeView({
             <FiatAmountText
               fiatAmount={
                 currency === 'sats'
-                  ? getBtcFiatEquivalent(new BigNumber(fee), BigNumber(btcFiatRate))
-                  : new BigNumber(
+                  ? getBtcFiatEquivalent(BigNumber(fee), BigNumber(btcFiatRate))
+                  : BigNumber(
                       getFiatEquivalent(
                         Number(fee),
                         'STX',

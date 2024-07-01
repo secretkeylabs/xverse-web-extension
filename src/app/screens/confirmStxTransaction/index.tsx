@@ -48,7 +48,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 const AlertContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(12),
+  marginTop: props.theme.space.l,
 }));
 
 const SpendDelegatedStxWarning = styled(Callout)((props) => ({
@@ -57,7 +57,6 @@ const SpendDelegatedStxWarning = styled(Callout)((props) => ({
 
 function ConfirmStxTransaction() {
   const { t } = useTranslation('translation');
-  const [customFee, setCustomFee] = useState(new BigNumber(0));
   const [hasTabClosed, setHasTabClosed] = useState(false);
   const [txRaw, setTxRaw] = useState('');
   const navigate = useNavigate();
@@ -77,6 +76,7 @@ function ConfirmStxTransaction() {
     messageId,
     rpcMethod,
     requestToken,
+    fee: stateFee,
   } = location.state as {
     tabId?: chrome.tabs.Tab['id'];
     messageId?: string;
@@ -84,6 +84,10 @@ function ConfirmStxTransaction() {
     [key: string]: any;
   };
   const unsignedTx = useMemo(() => deserializeTransaction(stringHex), [stringHex]);
+
+  const [feeRate, setFeeRate] = useState(
+    stateFee ? microstacksToStx(new BigNumber(stateFee)).toString() : '',
+  );
 
   const txPayload = unsignedTx.payload as TokenTransferPayload;
   const recipient = addressToString(txPayload.recipient.address);
@@ -106,9 +110,7 @@ function ConfirmStxTransaction() {
     );
     // stacking contract locks 1stx less from what user delegates to let them revoke delegation. counting this doesn't harm cause probably no one will top up just 1stx and min amount to first delegation is 100stx.
 
-    const fee = customFee.gt(0)
-      ? customFee
-      : new BigNumber(unsignedTx?.auth?.spendingCondition?.fee.toString() ?? '0');
+    const fee = new BigNumber(unsignedTx?.auth?.spendingCondition?.fee.toString() ?? '0');
     const total = amount.plus(fee);
     return (
       hasDelegationNotLocked &&
@@ -136,7 +138,7 @@ function ConfirmStxTransaction() {
     isLoading,
     error: txError,
     data: stxTxBroadcastData,
-    mutate,
+    mutate: broadcastTransaction,
   } = useMutation<string, Error, { signedTx: StacksTransaction }>({
     mutationFn: async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork),
   });
@@ -236,7 +238,7 @@ function ConfirmStxTransaction() {
             sendStxTransferSuccessResponseMessage({
               tabId,
               messageId,
-              result: { transaction: txRaw, txid: stxTxBroadcastData ?? '' },
+              result: { transaction: rawTx, txid: stxTxBroadcastData ?? '' },
             });
             break;
           }
@@ -260,8 +262,18 @@ function ConfirmStxTransaction() {
         wallet_type: selectedAccount?.accountType || 'software',
       });
 
-      mutate({ signedTx: txs[0] });
+      broadcastTransaction({ signedTx: txs[0] });
     }
+  };
+
+  const handleGoBack = () => {
+    navigate('/send-stx', {
+      state: {
+        recipientAddress: recipient,
+        amountToSend: microstacksToStx(amount).toString(),
+        stxMemo: memo,
+      },
+    });
   };
 
   const handleCancelClick = () => {
@@ -274,13 +286,7 @@ function ConfirmStxTransaction() {
       }
       window.close();
     } else {
-      navigate('/send-stx', {
-        state: {
-          recipientAddress: recipient,
-          amountToSend: microstacksToStx(amount).toString(),
-          stxMemo: memo,
-        },
-      });
+      navigate('/');
     }
   };
 
@@ -291,17 +297,18 @@ function ConfirmStxTransaction() {
       {isBrowserTx ? (
         <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       ) : (
-        <TopRow title={t('CONFIRM_TRANSACTION.CONFIRM_TX')} onClick={handleCancelClick} />
+        <TopRow onClick={handleGoBack} />
       )}
       <ConfirmStxTransactionComponent
-        initialStxTransactions={[unsignedTx]}
+        initialStxTransactions={[unsignedTx]} // TODO: Refactor this to pass a single element instead of an array?
         loading={isLoading}
         onConfirmClick={handleConfirmClick}
         onCancelClick={handleCancelClick}
         isSponsored={sponsored}
         skipModal={isLedgerAccount(selectedAccount)}
         hasSignatures={hasSignatures}
-        onFeeChange={setCustomFee}
+        fee={feeRate}
+        setFeeRate={setFeeRate}
       >
         {showSpendDelegateStxWarning && (
           <SpendDelegatedStxWarning variant="warning" bodyText={t('SEND.SPEND_DELEGATED_STX')} />
