@@ -140,10 +140,6 @@ const router = createHashRouter([
         element: <Receive />,
       },
       {
-        path: 'send-stx',
-        element: <SendStxScreen />,
-      },
-      {
         path: 'send-sip10',
         element: <SendSip10Screen />,
       },
@@ -461,6 +457,10 @@ const router = createHashRouter([
       {
         path: 'send-btc',
         element: <SendBtcScreen />,
+      },
+      {
+        path: 'send-stx',
+        element: <SendStxScreen />,
       },
       {
         path: 'confirm-btc-tx',

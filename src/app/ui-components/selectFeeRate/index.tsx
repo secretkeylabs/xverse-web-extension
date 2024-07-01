@@ -1,10 +1,12 @@
+import { StyledFiatAmountText } from '@components/fiatAmountText';
 import { PencilSimple } from '@phosphor-icons/react';
-import { currencySymbolMap } from '@secretkeylabs/xverse-core';
-import { useMemo, useState } from 'react';
+import { SupportedCurrency } from '@secretkeylabs/xverse-core';
+import BigNumber from 'bignumber.js';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
-import FeeSelectPopup from './feeSelectPopup';
+import FeeSelectPopup, { FeePriority } from './feeSelectPopup';
 
 const RowContainer = styled.div`
   display: flex;
@@ -32,6 +34,7 @@ const Label = styled.span<{
   transition: color 0.1s ease;
   margin-bottom: ${(props) => props.theme.space.xxs};
   cursor: ${(props) => (props.$clickable ? 'pointer' : 'default')};
+  transition: color 0.1s ease;
 
   user-select: ${(props) => (props.$clickable ? 'none' : 'auto')};
 
@@ -55,25 +58,29 @@ const EditRow = styled.span`
   gap: 7px;
 `;
 
+export type FeeRates = {
+  low?: number;
+  medium?: number;
+  high?: number;
+};
+
 type Props = {
   fee: string | undefined;
   feeUnits: string;
   feeRate: string;
   setFeeRate: (feeRate: string) => void;
-  feeRateUnits: string;
+  feeRateUnits?: string;
   fiatUnit: string;
   baseToFiat: (base: string) => string;
   getFeeForFeeRate: (feeRate: number) => Promise<number | undefined>;
   isLoading?: boolean;
-  feeRates: {
-    low?: number;
-    medium?: number;
-    high?: number;
-  };
+  feeRates: FeeRates;
   feeRateLimits?: {
     min?: number;
     max?: number;
   };
+  absoluteBalance?: number;
+  amount?: number;
 };
 
 function SelectFeeRate({
@@ -88,26 +95,38 @@ function SelectFeeRate({
   feeRates,
   feeRateLimits,
   isLoading,
+  absoluteBalance,
+  amount,
 }: Props) {
   const { t } = useTranslation('translation');
   const [editing, setEditing] = useState(false);
+  const [selected, setSelected] = useState<FeePriority | 'custom' | null>(null);
 
-  const feeRateSpeed = useMemo(() => {
+  useEffect(() => {
     if (feeRate) {
       if (feeRate === feeRates.high?.toString()) {
-        return t('TRANSACTION_SETTING.PRIORITIES.HIGH');
+        if (!selected) {
+          setSelected('high');
+        }
       }
       if (feeRate === feeRates.medium?.toString()) {
-        return t('TRANSACTION_SETTING.PRIORITIES.MEDIUM');
+        if (!selected) {
+          setSelected('medium');
+        }
       }
       if (feeRate === feeRates.low?.toString()) {
-        return t('TRANSACTION_SETTING.PRIORITIES.LOW');
+        if (!selected) {
+          setSelected('low');
+        }
       }
     }
+  }, [feeRates, feeRate, selected]);
 
-    return t('TRANSACTION_SETTING.PRIORITIES.CUSTOM');
-  }, [feeRates, feeRate]);
+  let feeRateSpeed = '';
 
+  if (selected) {
+    feeRateSpeed = t(`TRANSACTION_SETTING.PRIORITIES.${selected.toUpperCase()}`);
+  }
   return (
     <div>
       <RowContainer>
@@ -127,9 +146,11 @@ function SelectFeeRate({
       </RowContainer>
       <RowContainer>
         <EditRow>
-          <Label $size="m" $variant="dark">
-            {feeRateSpeed}{' '}
-          </Label>
+          {feeRateSpeed && (
+            <Label $size="m" $variant="dark">
+              {feeRateSpeed}{' '}
+            </Label>
+          )}
           <Label
             $size="m"
             $variant="action"
@@ -139,35 +160,29 @@ function SelectFeeRate({
             {t('COMMON.EDIT')} <PencilSimple size={16} weight="fill" />
           </Label>
         </EditRow>
-        <Label $size="s" $variant="dark">
-          <NumericFormat
-            value={feeRate}
-            displayType="text"
-            thousandSeparator
-            renderText={(value: string) => (
-              <>
-                {value} {feeRateUnits}
-              </>
-            )}
+        {/* Fee can either be an absolute amount or a rate */}
+        {/* If feeRateUnits is not defined, therefore an absolute fee is used */}
+        {feeRateUnits && (
+          <Label $size="s" $variant="dark">
+            <NumericFormat
+              value={feeRate}
+              displayType="text"
+              thousandSeparator
+              renderText={(value: string) => (
+                <>
+                  {value} {feeRateUnits}
+                </>
+              )}
+            />
+          </Label>
+        )}
+        {fee && (
+          <StyledFiatAmountText
+            fiatAmount={BigNumber(baseToFiat(fee))}
+            fiatCurrency={fiatUnit as SupportedCurrency}
           />
-        </Label>
+        )}
       </RowContainer>
-      {fee && (
-        <RowContainer>
-          <div />
-          <NumericFormat
-            value={baseToFiat(fee)}
-            displayType="text"
-            prefix={`~ ${currencySymbolMap[fiatUnit]}`}
-            thousandSeparator
-            renderText={(value: string) => (
-              <Label $size="s" $variant="dark">
-                {value} {fiatUnit}
-              </Label>
-            )}
-          />
-        </RowContainer>
-      )}
       {editing && (
         <FeeSelectPopup
           currentFeeRate={feeRate}
@@ -180,6 +195,10 @@ function SelectFeeRate({
           baseToFiat={baseToFiat}
           setFeeRate={setFeeRate}
           getFeeForFeeRate={getFeeForFeeRate}
+          absoluteBalance={absoluteBalance}
+          amount={amount}
+          selected={selected}
+          setSelected={setSelected}
         />
       )}
     </div>

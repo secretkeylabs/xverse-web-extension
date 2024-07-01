@@ -28,10 +28,10 @@ function getOriginFromPort(port: chrome.runtime.Port) {
   return port.sender?.origin;
 }
 
-export type ParamsObject = Record<string, string | null | undefined>;
+type ParamsObject = Record<string, string | null | undefined>;
 export type ParamsKeyValueArray = [string, string | null | undefined][];
 
-export type Params = ParamsObject | ParamsKeyValueArray;
+type Params = ParamsObject | ParamsKeyValueArray;
 export function makeSearchParamsWithDefaults(port: chrome.runtime.Port, additionalParams?: Params) {
   const urlParams = new URLSearchParams();
   // All actions must have a corresponding `origin` and `tabId`
@@ -73,7 +73,7 @@ interface FormatMessageSigningResponseArgs {
   request: string;
   response: SignatureData | string;
 }
-export function formatMessageSigningResponse({
+function formatMessageSigningResponse({
   request,
   response,
 }: FormatMessageSigningResponseArgs): SignatureResponseMessage {

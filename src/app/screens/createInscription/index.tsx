@@ -6,7 +6,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import { useLocation } from 'react-router-dom';
-import styled from 'styled-components';
 
 import { CreateInscriptionPayload, CreateRepeatInscriptionsPayload } from '@sats-connect/core';
 import {
@@ -34,7 +33,6 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Button from '@ui-library/button';
-import Callout from '@ui-library/callout';
 import { StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
@@ -46,209 +44,28 @@ import EditFee from './EditFee';
 import ErrorModal from './ErrorModal';
 import LedgerStepView from './ledgerStepView';
 
-const SATS_PER_BTC = 100e6;
-
-type CardRowProps = {
-  topMargin?: boolean;
-  center?: boolean;
-};
-const CardRow = styled.div<CardRowProps>((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: props.center ? 'center' : 'flex-start',
-  justifyContent: 'space-between',
-  marginTop: props.topMargin ? props.theme.spacing(8) : 0,
-}));
-
-const SuccessActionsContainer = styled.div((props) => ({
-  width: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: props.theme.space.s,
-  paddingLeft: props.theme.space.m,
-  paddingRight: props.theme.space.m,
-  marginBottom: props.theme.space.xxl,
-  marginTop: props.theme.space.xxl,
-}));
-
-const NumberWithSuffixContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'space-between',
-  alignItems: 'flex-end',
-  color: props.theme.colors.white_0,
-}));
-
-const NumberSuffix = styled.div((props) => ({
-  ...props.theme.typography.body_s,
-  color: props.theme.colors.white_400,
-}));
-
-const StyledPillLabel = styled.p`
-  display: flex;
-  align-items: center;
-  gap: ${(props) => props.theme.space.s};
-`;
-
-const Pill = styled.span`
-  ${(props) => props.theme.typography.body_bold_s}
-  color: ${(props) => props.theme.colors.elevation0};
-  background-color: ${(props) => props.theme.colors.white_0};
-  padding: 3px 6px;
-  border-radius: 40px;
-`;
-
-function FeeRow({
-  label,
-  subLabel,
-  value = 0,
-  fiatCurrency,
-  fiatRate,
-  repeat,
-}: {
-  label: string;
-  subLabel?: string;
-  value?: number | string | null;
-  fiatCurrency: string;
-  fiatRate: string;
-  repeat?: number;
-}) {
-  if (!value) {
-    return null;
-  }
-  const fiatValue = new BigNumber(value || 0)
-    .dividedBy(SATS_PER_BTC)
-    .multipliedBy(fiatRate)
-    .toFixed(2);
-
-  return (
-    <CardRow>
-      <div>
-        <StyledPillLabel>
-          {label}
-          {repeat && <Pill>{`x${repeat}`}</Pill>}
-        </StyledPillLabel>
-        {!!subLabel && <NumberSuffix>{subLabel}</NumberSuffix>}
-      </div>
-      <NumberWithSuffixContainer>
-        <NumericFormat value={value} displayType="text" thousandSeparator suffix=" sats" />
-        <NumericFormat
-          value={fiatValue}
-          displayType="text"
-          thousandSeparator
-          prefix={`~ ${currencySymbolMap[fiatCurrency]}`}
-          suffix={` ${fiatCurrency}`}
-          renderText={(val: string) => <NumberSuffix>{val}</NumberSuffix>}
-        />
-      </NumberWithSuffixContainer>
-    </CardRow>
-  );
-}
-
-const YourAddress = styled.div`
-  text-align: right;
-`;
-
-const OuterContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-  height: '100%',
-});
-
-const MainContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-  flex: 1,
-  overflowY: 'auto',
-  '&::-webkit-scrollbar': {
-    display: 'none',
-  },
-}));
-
-const Title = styled.h1((props) => ({
-  ...props.theme.typography.headline_s,
-  marginTop: props.theme.spacing(11),
-  color: props.theme.colors.white_0,
-  textAlign: 'left',
-}));
-
-const SubTitle = styled.h1((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_400,
-  marginTop: props.theme.spacing(4),
-  textAlign: 'left',
-  marginBottom: props.theme.spacing(12),
-}));
-
-const StyledCallout = styled(Callout)`
-  margin-bottom: ${(props) => props.theme.space.m};
-`;
-
-const CardContainer = styled.div<{ bottomPadding?: boolean }>((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_200,
-  display: 'flex',
-  flexDirection: 'column',
-  gap: props.theme.space.m,
-  background: props.theme.colors.elevation1,
-  borderRadius: 12,
-  padding: props.theme.spacing(8),
-  paddingBottom: props.bottomPadding ? props.theme.spacing(12) : props.theme.spacing(8),
-  justifyContent: 'center',
-  marginBottom: props.theme.spacing(6),
-  fontSize: 14,
-}));
-
-const IconLabel = styled.div((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_200,
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'center',
-}));
-
-const ButtonIcon = styled.img((props) => ({
-  width: 32,
-  height: 32,
-  marginRight: props.theme.spacing(4),
-}));
-
-const InfoIconContainer = styled.div((props) => ({
-  background: props.theme.colors.white_0,
-  color: props.theme.colors.elevation0,
-  width: 32,
-  height: 32,
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: '50%',
-  marginRight: props.theme.spacing(5),
-}));
-
-const EditFeesButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: 'transparent',
-  width: '100%',
-  marginTop: props.theme.spacing(10),
-}));
-
-const ButtonText = styled.div((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_0,
-  textAlign: 'center',
-}));
-
-const ButtonImage = styled.img((props) => ({
-  marginRight: props.theme.spacing(3),
-  alignSelf: 'center',
-  transform: 'all',
-}));
+import FeeRow, { SATS_PER_BTC } from './feeRow';
+import {
+  ButtonIcon,
+  ButtonImage,
+  ButtonText,
+  CardContainer,
+  CardRow,
+  EditFeesButton,
+  IconLabel,
+  InfoIconContainer,
+  MainContainer,
+  NumberSuffix,
+  NumberWithSuffixContainer,
+  OuterContainer,
+  Pill,
+  StyledCallout,
+  StyledPillLabel,
+  SubTitle,
+  SuccessActionsContainer,
+  Title,
+  YourAddress,
+} from './index.styled';
 
 const DEFAULT_FEE_RATE = 8;
 const MAX_REPEATS = 24;

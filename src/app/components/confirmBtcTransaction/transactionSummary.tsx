@@ -87,7 +87,7 @@ function TransactionSummary({
   );
 
   const satsToFiat = (sats: string) =>
-    getBtcFiatEquivalent(new BigNumber(sats), new BigNumber(btcFiatRate)).toNumber().toFixed(2);
+    getBtcFiatEquivalent(new BigNumber(sats), new BigNumber(btcFiatRate)).toString();
 
   const showFeeSelector = !!(feeRate && getFeeForFeeRate && onFeeRateSet);
 

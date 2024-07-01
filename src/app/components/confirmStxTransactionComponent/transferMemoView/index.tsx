@@ -6,19 +6,19 @@ const Container = styled.div((props) => ({
   flexDirection: 'column',
   background: props.theme.colors.elevation1,
   borderRadius: 12,
-  padding: '12px 16px',
+  padding: props.theme.space.m,
   justifyContent: 'center',
-  marginBottom: 12,
+  marginBottom: props.theme.space.s,
 }));
 
-const TitleText = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
+const TitleText = styled.p((props) => ({
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_200,
 }));
 
-const DescriptionText = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
-  marginTop: props.theme.spacing(2),
+const DescriptionText = styled.p((props) => ({
+  ...props.theme.typography.body_medium_m,
+  marginTop: props.theme.space.xs,
   color: props.theme.colors.white_0,
 }));
 
@@ -29,9 +29,9 @@ const RowContainer = styled.div({
   alignItems: 'center',
 });
 
-interface Props {
+type Props = {
   memo: string;
-}
+};
 
 function TransferMemoView({ memo }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });

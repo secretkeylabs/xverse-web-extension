@@ -259,6 +259,9 @@
       "NO_FUNDS": "You don't have any funds to send. You can purchase crypto quickly and deposit directly into your Xverse wallet.",
       "BUY_BTC": "Buy Bitcoin"
     },
+    "STX": {
+      "BUY_STX": "Buy Stacks"
+    },
     "SEND_TO": "Send to",
     "SEND": "Send",
     "AMOUNT": "Amount",
@@ -266,10 +269,11 @@
     "RECIPIENT": "Recipient",
     "RECIPIENT_PLACEHOLDER": "STX Address or .btc domain",
     "ORDINAL_RECIPIENT_PLACEHOLDER": "Enter address",
-    "MEMO": "Add a memo (optional)",
+    "MEMO": "Memo (optional)",
     "MEMO_PLACEHOLDER": "Memo",
     "ASSOCIATED_ADDRESS": "Associated Address",
-    "MEMO_INFO": "Adding a memo can have an impact on the transaction fee",
+    "ASSOCIATED_DOMAIN": "Associated Domain",
+    "MEMO_INFO": "Adding a memo can have an impact on the transaction fee.",
     "NEXT": "Next",
     "NO_FUNDS": "You don't have any funds to send.",
     "BUY_CRYPTO": "Buy crypto",
@@ -306,7 +310,8 @@
     "INSUFFICIENT_FUNDS": "Insufficient funds",
     "RATE_TOO_LOW": "Set fee is below minimum of {{minFee}} Sats/vByte",
     "RATE_TOO_HIGH": "Set fee is above maximum of {{maxFee}} Sats/vByte",
-    "SPEND_DELEGATED_STX": "You are transferring some STX that is registered for the next stacking cycle. The amount transferred will be subtracted from your current stacking pool delegation, and will not be locked to generate rewards in the next cycle."
+    "SPEND_DELEGATED_STX": "You are transferring some STX that is registered for the next stacking cycle. The amount transferred will be subtracted from your current stacking pool delegation, and will not be locked to generate rewards in the next cycle.",
+    "INVALID_FEE_RATE": "Invalid fee rate"
   },
   "CONFIRM_TRANSACTION": {
     "SEND": "Confirm Transaction",

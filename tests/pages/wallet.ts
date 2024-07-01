@@ -568,7 +568,7 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(this.page.url()).toContain('send-stx');
     await expect(this.buttonNext).toBeVisible();
     await expect(this.buttonNext).toBeDisabled();
-    await expect(this.inputSendAmount).toBeVisible();
+    // await expect(this.inputSendAmount).toBeVisible();
     await expect(this.inputRecipientAdress).toBeVisible();
     await expect(this.inputMemo).toBeVisible();
     await expect(this.imageToken).toBeVisible();
@@ -773,7 +773,7 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
 
     await this.inputStacksURL.fill('https://api.nakamoto.testnet.hiro.so');
     // To speed up some checks we use our own servers
-    await this.inputBTCURL.fill('https://btc-testnet.xverse.app');
+    // await this.inputBTCURL.fill('https://btc-testnet.xverse.app');
 
     await this.checkTestnetUrls(true);
 

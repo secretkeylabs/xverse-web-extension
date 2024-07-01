@@ -42,7 +42,7 @@ const RowContainer = styled.div({
 });
 
 const Icon = styled.img((props) => ({
-  marginRight: props.theme.spacing(4),
+  marginRight: props.theme.space.xs,
   width: 32,
   height: 32,
   borderRadius: 30,
@@ -51,9 +51,9 @@ const Icon = styled.img((props) => ({
 const DownArrowIcon = styled.img((props) => ({
   width: 16,
   height: 16,
-  marginTop: props.theme.spacing(4),
-  marginLeft: props.theme.spacing(4),
-  marginBottom: props.theme.spacing(4),
+  marginTop: props.theme.space.xs,
+  marginLeft: props.theme.space.xs,
+  marginBottom: props.theme.space.xs,
 }));
 
 const TitleText = styled.p((props) => ({
@@ -100,7 +100,7 @@ const IconContainer = styled.div((props) => ({
   backgroundColor: props.theme.colors.elevation3,
   width: 32,
   height: 32,
-  marginRight: props.theme.spacing(4),
+  marginRight: props.theme.space.xs,
 }));
 
 type Props = {

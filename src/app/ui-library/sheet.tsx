@@ -3,7 +3,22 @@ import { isInOptions } from '@utils/helper';
 import Modal from 'react-modal';
 import styled, { useTheme } from 'styled-components';
 
-const BottomModalTitleText = styled.h1((props) => ({
+export const CrossButton = styled.button`
+  background-color: transparent;
+  cursor: pointer;
+  display: flex;
+  transition: opacity 0.1s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &:active {
+    opacity: 0.6;
+  }
+`;
+
+const Title = styled.h1((props) => ({
   ...props.theme.typography.body_bold_l,
   flex: 1,
 }));
@@ -15,10 +30,6 @@ const RowContainer = styled.div((props) => ({
   justifyContent: 'space-between',
   margin: props.theme.space.m,
 }));
-
-const ButtonImage = styled.button({
-  backgroundColor: 'transparent',
-});
 
 const CustomisedModal = styled(Modal)`
   overflow-y: auto;
@@ -90,11 +101,11 @@ function Sheet({
       className={className}
     >
       <RowContainer>
-        <BottomModalTitleText>{title}</BottomModalTitleText>
+        <Title>{title}</Title>
         {onClose && (
-          <ButtonImage onClick={onClose}>
+          <CrossButton onClick={onClose}>
             <XCircle color={theme.colors.white_200} weight="fill" size="28" />
-          </ButtonImage>
+          </CrossButton>
         )}
       </RowContainer>
       <BodyContainer>{children}</BodyContainer>
