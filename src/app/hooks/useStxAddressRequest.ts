@@ -1,7 +1,7 @@
 import { MESSAGE_SOURCE } from '@common/types/message-types';
 import { sendGetAddressesSuccessResponseMessage } from '@common/utils/rpc/responseMessages/stacks';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { GetAddressOptions } from '@sats-connect/core';
+import { AddressPurpose, AddressType, GetAddressOptions } from '@sats-connect/core';
 import { decodeToken } from 'jsontokens';
 import { useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -34,6 +34,8 @@ const useStxAddressRequest = () => {
       {
         address: stxAddress,
         publicKey: stxPublicKey,
+        addressType: AddressType.stacks,
+        purpose: AddressPurpose.Stacks,
       },
     ];
 

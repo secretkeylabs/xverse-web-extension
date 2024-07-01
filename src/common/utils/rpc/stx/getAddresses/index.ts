@@ -1,7 +1,7 @@
 import { WebBtcMessage } from '@common/types/message-types';
 import getSelectedAccount from '@common/utils/getSelectedAccount';
 import { makeContext } from '@common/utils/popup';
-import { RpcErrorCode } from '@sats-connect/core';
+import { AddressPurpose, AddressType, RpcErrorCode } from '@sats-connect/core';
 import rootStore from '@stores/index';
 import {
   listenForPopupClose,
@@ -47,6 +47,8 @@ const handleGetStxAddresses = async (
             {
               address: account.stxAddress,
               publicKey: account.btcPublicKey,
+              addressType: AddressType.stacks,
+              purpose: AddressPurpose.Stacks,
             },
           ],
         },
