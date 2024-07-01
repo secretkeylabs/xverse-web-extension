@@ -32,7 +32,7 @@ export default function useRuneUtxosQuery(
   return useQuery({
     refetchOnWindowFocus: backgroundRefetch,
     refetchOnReconnect: backgroundRefetch,
-    queryKey: ['get-rune-utxos', ordinalsAddress, runeName],
+    queryKey: ['get-rune-utxos', ordinalsAddress, runeName, filter],
     enabled: Boolean(ordinalsAddress && runeName),
     queryFn,
   });
