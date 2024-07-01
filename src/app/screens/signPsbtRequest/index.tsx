@@ -11,6 +11,7 @@ import { RpcErrorCode } from '@sats-connect/core';
 import { SigHash } from '@scure/btc-signer';
 import {
   AnalyticsEvents,
+  FeatureId,
   RuneSummary,
   Transport,
   btcTransaction,
@@ -39,7 +40,7 @@ function SignPsbtRequest() {
   const [isSigning, setIsSigning] = useState(false);
   const [summary, setSummary] = useState<PSBTSummary | undefined>();
   const [runeSummary, setRuneSummary] = useState<RuneSummary | undefined>(undefined);
-  const hasRunesSupport = useHasFeature('RUNES_SUPPORT');
+  const hasRunesSupport = useHasFeature(FeatureId.RUNES_SUPPORT);
   const { payload, parsedPsbt, confirmSignPsbt, cancelSignPsbt, onCloseError, requestId, tabId } =
     useSignPsbt();
   const { validationError, setValidationError } = useSignPsbtValidationGate({

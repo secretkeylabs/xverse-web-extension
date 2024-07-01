@@ -44,7 +44,7 @@
     "@react-spring/web": "^9.6.1",
     "@sats-connect/core": "0.0.11",
     "@scure/btc-signer": "1.2.1",
-    "@secretkeylabs/xverse-core": "16.0.1",
+    "@secretkeylabs/xverse-core": "17.0.0",
     "@stacks/connect": "7.4.1",
     "@stacks/stacks-blockchain-api-types": "6.1.1",
     "@stacks/transactions": "6.13.1",

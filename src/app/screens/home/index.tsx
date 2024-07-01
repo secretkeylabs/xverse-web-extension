@@ -26,7 +26,7 @@ import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowUp, Plus } from '@phosphor-icons/react';
 import CoinSelectModal from '@screens/home/coinSelectModal';
-import { getFiatEquivalent, type FungibleToken } from '@secretkeylabs/xverse-core';
+import { FeatureId, getFiatEquivalent, type FungibleToken } from '@secretkeylabs/xverse-core';
 import {
   changeShowDataCollectionAlertAction,
   setBrc20ManageTokensAction,
@@ -431,7 +431,9 @@ function Home() {
   };
 
   const showSwaps =
-    useHasFeature('SWAPS') && !isLedgerAccount(selectedAccount) && network.type === 'Mainnet';
+    useHasFeature(FeatureId.SWAPS) &&
+    !isLedgerAccount(selectedAccount) &&
+    network.type === 'Mainnet';
 
   return (
     <>

@@ -7,6 +7,8 @@ import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   AnalyticsEvents,
+  FeatureId,
+  FungibleToken,
   RuneSummary,
   Transport,
   btcTransaction,
@@ -49,7 +51,7 @@ function SendRuneScreen() {
   const [summary, setSummary] = useState<TransactionSummary | undefined>();
   const [runeSummary, setRuneSummary] = useState<RuneSummary | undefined>();
   const [searchParams] = useSearchParams();
-  const hasRunesSupport = useHasFeature('RUNES_SUPPORT');
+  const hasRunesSupport = useHasFeature(FeatureId.RUNES_SUPPORT);
 
   const principal = searchParams.get('principal');
   const fungibleToken = runesCoinsList?.find((coin) => coin.principal === principal);
