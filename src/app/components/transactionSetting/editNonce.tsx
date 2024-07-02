@@ -25,7 +25,7 @@ function EditNonce({ nonce, setNonce }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'TRANSACTION_SETTING' });
   const [nonceInput, setNonceInput] = useState(nonce);
 
-  const onInputEditNonceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNonceInput(e.target.value);
   };
 
@@ -39,7 +39,7 @@ function EditNonce({ nonce, setNonce }: Props) {
       <Input
         title={t('NONCE')}
         value={nonceInput}
-        onChange={onInputEditNonceChange}
+        onChange={handleOnChange}
         placeholder="0"
         hideClear
         autoFocus
