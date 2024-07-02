@@ -14,7 +14,7 @@ import {
 } from '../../../legacy-external-message-handler';
 import RequestsRoutes from '../../../route-urls';
 import { hasPermissions, makeRPCError, sendRpcResponse } from '../../helpers';
-import { sendGetAddressesSuccessResponseMessage } from '../../responseMessages/stacks';
+import { sendGetAddressesSuccessResponseMessage } from '../../responseMessages/bitcoin';
 import { accountPurposeAddresses } from './utils';
 
 const AddressPurposeSchema = z.enum([AddressPurpose.Ordinals, AddressPurpose.Payment]);
