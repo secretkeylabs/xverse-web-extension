@@ -1,9 +1,6 @@
 /* eslint-disable import/prefer-default-export */
-import { makeAccountResourceId } from '@components/permissionsManager/resources';
-import * as utils from '@components/permissionsManager/utils';
 import { AddressPurpose, AddressType } from '@sats-connect/core';
 import { Account } from '@secretkeylabs/xverse-core';
-import rootStore from '@stores/index';
 
 export function accountPurposeAddresses(account: Account, purposes: AddressPurpose[]) {
   return purposes.map((purpose) => {
@@ -30,32 +27,4 @@ export function accountPurposeAddresses(account: Account, purposes: AddressPurpo
       addressType: account?.accountType === 'ledger' ? AddressType.p2wpkh : AddressType.p2sh,
     };
   });
-}
-
-export async function hasPermissions(origin: string): Promise<boolean> {
-  const [error, store] = await utils.loadPermissionsStore();
-  if (error) {
-    return false;
-  }
-
-  if (!store) {
-    return false;
-  }
-
-  const { selectedAccountIndex, network } = rootStore.store.getState().walletState;
-
-  const permission = utils.getClientPermission(
-    store.permissions,
-    origin,
-    makeAccountResourceId({ accountId: selectedAccountIndex, networkType: network.type }),
-  );
-  if (!permission) {
-    return false;
-  }
-
-  if (!permission.actions.has('read')) {
-    return false;
-  }
-
-  return true;
 }

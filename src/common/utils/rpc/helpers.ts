@@ -1,4 +1,6 @@
 import { MESSAGE_SOURCE } from '@common/types/message-types';
+import { makeAccountResourceId } from '@components/permissionsManager/resources';
+import * as utils from '@components/permissionsManager/utils';
 import {
   Requests,
   Return,
@@ -8,6 +10,7 @@ import {
   RpcId,
   RpcSuccessResponse,
 } from '@sats-connect/core';
+import rootStore from '@stores/index';
 
 export const makeRPCError = (id: RpcId, error: RpcError): RpcErrorResponse => ({
   jsonrpc: '2.0',
@@ -49,4 +52,32 @@ export function makeSendPopupClosedUserRejectionMessage({
   return () => {
     chrome.tabs.sendMessage(tabId, message);
   };
+}
+
+export async function hasPermissions(origin: string): Promise<boolean> {
+  const [error, store] = await utils.loadPermissionsStore();
+  if (error) {
+    return false;
+  }
+
+  if (!store) {
+    return false;
+  }
+
+  const { selectedAccountIndex, network } = rootStore.store.getState().walletState;
+
+  const permission = utils.getClientPermission(
+    store.permissions,
+    origin,
+    makeAccountResourceId({ accountId: selectedAccountIndex, networkType: network.type }),
+  );
+  if (!permission) {
+    return false;
+  }
+
+  if (!permission.actions.has('read')) {
+    return false;
+  }
+
+  return true;
 }

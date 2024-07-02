@@ -9,9 +9,8 @@ import {
   triggerRequestWindowOpen,
 } from '../../../legacy-external-message-handler';
 import RequestsRoutes from '../../../route-urls';
-import { makeRPCError } from '../../helpers';
+import { hasPermissions, makeRPCError } from '../../helpers';
 import { sendGetAddressesSuccessResponseMessage } from '../../responseMessages/stacks';
-import { hasPermissions } from './utils';
 
 const handleGetStxAddresses = async (
   message: WebBtcMessage<'stx_getAddresses'>,

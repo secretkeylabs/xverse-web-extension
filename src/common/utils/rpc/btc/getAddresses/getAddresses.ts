@@ -13,9 +13,9 @@ import {
   triggerRequestWindowOpen,
 } from '../../../legacy-external-message-handler';
 import RequestsRoutes from '../../../route-urls';
-import { makeRPCError, sendRpcResponse } from '../../helpers';
+import { hasPermissions, makeRPCError, sendRpcResponse } from '../../helpers';
 import { sendGetAddressesSuccessResponseMessage } from '../../responseMessages/stacks';
-import { accountPurposeAddresses, hasPermissions } from './utils';
+import { accountPurposeAddresses } from './utils';
 
 const AddressPurposeSchema = z.enum([AddressPurpose.Ordinals, AddressPurpose.Payment]);
 
