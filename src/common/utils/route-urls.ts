@@ -14,7 +14,6 @@ enum RequestsRoutes {
   CreateInscription = '/create-inscription',
   CreateRepeatInscriptions = '/create-repeat-inscriptions',
   ConnectionRequest = '/connection-request',
-  ConnectedAppsAndPermissions = '/connected-apps-and-permissions',
 }
 
 export default RequestsRoutes;

@@ -17,6 +17,7 @@ import {
 import { chromeLocalStorageKeys } from '@utils/chromeLocalStorage';
 import { PRIVACY_POLICY_LINK, SUPPORT_LINK, TERMS_LINK } from '@utils/constants';
 import { getLockCountdownLabel, isInOptions, isLedgerAccount } from '@utils/helper';
+import RoutePaths from 'app/routes/paths';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -110,7 +111,7 @@ function Setting() {
   };
 
   const openConnectedAppsAndPermissionsScreen = () => {
-    navigate(RequestsRoutes.ConnectedAppsAndPermissions);
+    navigate(RoutePaths.ConnectedAppsAndPermissions);
   };
 
   const switchIsPriorityWallet = () => {

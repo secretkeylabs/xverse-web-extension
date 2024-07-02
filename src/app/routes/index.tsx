@@ -82,6 +82,7 @@ import UnlistRuneScreen from '@screens/unlistRune';
 import WalletExists from '@screens/walletExists';
 import ListRuneScreen from 'app/screens/listRune';
 import { createHashRouter } from 'react-router-dom';
+import RoutePaths from './paths';
 
 const router = createHashRouter([
   {
@@ -366,7 +367,7 @@ const router = createHashRouter([
         element: <BackupWalletScreen />,
       },
       {
-        path: RequestsRoutes.ConnectedAppsAndPermissions,
+        path: RoutePaths.ConnectedAppsAndPermissions,
         element: <ConnectedAppsAndPermissionsScreen />,
       },
       {
