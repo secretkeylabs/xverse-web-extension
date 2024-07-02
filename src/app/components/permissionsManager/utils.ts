@@ -1,4 +1,5 @@
 import { Result, safePromise } from '@common/utils/safe';
+import storage from '@utils/chromeStorage';
 import { Mutex } from 'async-mutex';
 import { parse, stringify } from 'superjson';
 import * as v from 'valibot';
@@ -30,15 +31,13 @@ export function getClientPermission(
   return [...permissions].find((p) => p.clientId === clientId && p.resourceId === resourceId);
 }
 export async function loadPermissionsStore(): Promise<Result<PermissionsStoreV1 | null>> {
-  const [error, getResult] = await safePromise(
-    chrome.storage.local.get(permissionsPersistantStoreKeyName),
+  const [error, persistedData] = await safePromise(
+    storage.local.getItem(permissionsPersistantStoreKeyName),
   );
 
   if (error) {
     return [error, null];
   }
-
-  const persistedData = getResult[permissionsPersistantStoreKeyName];
 
   if (!persistedData) {
     return [null, null];
