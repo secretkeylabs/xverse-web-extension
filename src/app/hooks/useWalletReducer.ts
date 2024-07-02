@@ -46,7 +46,7 @@ const createSingleAccount = async (
   accountIndex: number,
   btcNetwork: NetworkType,
   stacksNetwork: StacksNetwork,
-  savedNames: { id: number; name?: string }[],
+  savedNames: { id: number; name?: string }[] = [],
 ) => {
   const {
     stxAddress,
@@ -62,9 +62,7 @@ const createSingleAccount = async (
     network: btcNetwork,
   });
   const bnsName = await getBnsName(stxAddress, stacksNetwork);
-  const customName = savedNames?.length
-    ? savedNames.find((name) => name.id === accountIndex)?.name
-    : undefined;
+  const customName = savedNames.find((name) => name.id === accountIndex)?.name;
   const account: Account = {
     id: accountIndex,
     stxAddress,
@@ -160,6 +158,7 @@ const useWalletReducer = () => {
       selectedAccountType,
       selectedNetwork,
       softwareAccountsList,
+      savedNames,
     ],
   );
 
@@ -178,9 +177,9 @@ const useWalletReducer = () => {
     );
 
     // Load custom account names for the new network
-    const savedCustomAccountNames = savedNames[currentNetwork.type] || [];
+    const savedCustomAccountNames = savedNames[currentNetwork.type];
     walletAccounts.forEach((account) => {
-      const savedAccount = savedCustomAccountNames.find((acc) => acc.id === account.id);
+      const savedAccount = savedCustomAccountNames?.find((acc) => acc.id === account.id);
       if (savedAccount) {
         account.accountName = savedAccount.name;
       }
@@ -433,14 +432,17 @@ const useWalletReducer = () => {
     );
 
     dispatch(updateSoftwareAccountsAction(newAccountsList));
-    dispatch(
-      updateSavedNamesAction(
-        network.type,
-        savedNames[network.type].map((item) =>
-          item.id === updatedAccount.id ? { ...item, name: updatedAccount.accountName } : item,
-        ),
-      ),
-    );
+
+    const updatedSavedNames =
+      savedNames[network.type]?.map((item) =>
+        item.id === updatedAccount.id ? { ...item, name: updatedAccount.accountName } : item,
+      ) || [];
+
+    if (!updatedSavedNames.find((item) => item.id === updatedAccount.id)) {
+      updatedSavedNames.push({ id: updatedAccount.id, name: updatedAccount.accountName });
+    }
+
+    dispatch(updateSavedNamesAction(network.type, updatedSavedNames));
   };
 
   return {
