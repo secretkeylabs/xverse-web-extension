@@ -16,7 +16,7 @@ export function getOriginFromPort(port: chrome.runtime.Port) {
   const origin = port.sender?.url ? new URL(port.sender.url).origin : port.sender?.origin;
 
   if (!origin) {
-    throw new Error('Could not determine origin from port.');
+    throw new Error('Could not determine origin from port.', { cause: port });
   }
 
   return origin;
