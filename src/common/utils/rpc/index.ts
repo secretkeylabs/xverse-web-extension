@@ -26,8 +26,8 @@ import handleStacksSignMessage from './stx/signMessage';
 import handleStacksSignStructuredMessage from './stx/signStructuredMessage';
 import signTransaction from './stx/signTransaction';
 import transferStx from './stx/transferStx';
-import { handleRequestPermissions } from './wallet/handle-connect';
-import { handleRenouncePermissions } from './wallet/handle-disconnect';
+import { handleRequestPermissions } from './wallet/handleConnect';
+import { handleRenouncePermissions } from './wallet/handleDisconnect';
 
 export async function handleRPCRequest(message: RpcRequestMessage, port: chrome.runtime.Port) {
   try {
