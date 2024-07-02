@@ -6,7 +6,7 @@ export function getTabIdFromPort(port: chrome.runtime.Port) {
   const tabId = port.sender?.tab?.id;
 
   if (!tabId) {
-    throw new Error('Could not determine tab id from port.');
+    throw new Error('Could not determine tab id from port.', { cause: port });
   }
 
   return tabId;
