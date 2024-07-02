@@ -24,7 +24,7 @@ export function accountPurposeAddresses(account: Account, purposes: AddressPurpo
       address: account.btcAddress,
       publicKey: account.btcPublicKey,
       purpose: AddressPurpose.Payment,
-      addressType: account?.accountType === 'ledger' ? AddressType.p2wpkh : AddressType.p2sh,
+      addressType: account.accountType === 'ledger' ? AddressType.p2wpkh : AddressType.p2sh,
     };
   });
 }
