@@ -26,20 +26,6 @@ export function isUndefined(value: unknown): value is undefined {
   return typeof value === 'undefined';
 }
 
-type ExtractedParam = ReturnType<URLSearchParams['get']>;
-export function getParams<T extends Array<string>>(
-  paramNames: T,
-  params: URLSearchParams,
-): Record<T[number], ExtractedParam> {
-  const obj: Record<T[number], ExtractedParam> = {} as Record<T[number], ExtractedParam>;
-
-  paramNames.forEach((name) => {
-    obj[name] = params.get(name);
-  });
-
-  return obj;
-}
-
 export function stringifyData(data: unknown) {
   return createUnsecuredToken(stringify(data));
 }
