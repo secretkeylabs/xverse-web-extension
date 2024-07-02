@@ -2,8 +2,8 @@
 import { Context, getPopupPayload } from '@common/utils/popup';
 import { sendRequestPermissionsSuccessResponseMessage } from '@common/utils/rpc/responseMessages/wallet';
 import { usePermissionsUtils } from '@components/permissionsManager';
-import { makeAccountResourceId } from '@components/permissionsManager/resources';
-import { Client, Permission, Resource } from '@components/permissionsManager/schemas';
+import { makeAccountResource } from '@components/permissionsManager/resources';
+import { Client, Permission } from '@components/permissionsManager/schemas';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { requestPermissionsRequestMessageSchema } from '@sats-connect/core';
@@ -42,10 +42,9 @@ function ConnectionRequestInner({ data, context }: ConnectionRequestInnerProps) 
       id: context.origin,
       name: context.origin,
     };
-    const resource: Resource = {
-      id: makeAccountResourceId({ accountId: account.id, networkType: network.type }),
-      name: `Account ${account.id} (${network.type})`,
-    };
+
+    const resource = makeAccountResource(account.id, network.type);
+
     const permission: Permission = {
       clientId: client.id,
       resourceId: resource.id,
