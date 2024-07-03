@@ -1,10 +1,11 @@
 import { getTabIdFromPort } from '@common/utils';
 import getSelectedAccount from '@common/utils/getSelectedAccount';
 import { makeContext } from '@common/utils/popup';
+import { Result, safePromise } from '@common/utils/safe';
 import { makeAccountResourceId } from '@components/permissionsManager/resources';
 import * as utils from '@components/permissionsManager/utils';
 import { RpcRequestMessage, getBalanceRequestMessageSchema } from '@sats-connect/core';
-import { BtcAddressBalanceResponse } from '@secretkeylabs/xverse-core';
+import { BitcoinEsploraApiProvider, NetworkType } from '@secretkeylabs/xverse-core';
 import rootStore from '@stores/index';
 import * as v from 'valibot';
 import { handleInvalidMessage } from '../handle-invalid-message';
@@ -14,28 +15,34 @@ import {
   sendInternalErrorMessage,
 } from '../responseMessages/errors';
 
-async function getBalance(address: string): Promise<{
-  confirmed: number;
-  unconfirmed: number;
-  total: number;
-}> {
-  const url = `https://btc-1.xverse.app/address/${address}`;
-  const res = await fetch(url);
+async function getBalance(
+  address: string,
+  networkType: NetworkType,
+): Promise<
+  Result<{
+    confirmed: number;
+    unconfirmed: number;
+    total: number;
+  }>
+> {
+  const api = new BitcoinEsploraApiProvider({ network: networkType });
 
-  if (!res.ok) {
-    throw new Error(`Failed to fetch address data for ${address}`);
+  const [error, data] = await safePromise(api.getBalance(address));
+  if (error) {
+    return [error, null];
   }
 
-  const data = (await res.json()) as BtcAddressBalanceResponse;
+  const confirmedBalance = data.finalBalance;
+  const { unconfirmedBalance } = data;
 
-  const confirmedBalance = data.chain_stats.funded_txo_sum - data.chain_stats.spent_txo_sum;
-  const unconfirmedBalance = data.mempool_stats.funded_txo_sum - data.mempool_stats.spent_txo_sum;
-
-  return {
-    confirmed: confirmedBalance,
-    unconfirmed: unconfirmedBalance,
-    total: confirmedBalance + unconfirmedBalance,
-  };
+  return [
+    null,
+    {
+      confirmed: confirmedBalance,
+      unconfirmed: unconfirmedBalance,
+      total: confirmedBalance + unconfirmedBalance,
+    },
+  ];
 }
 
 const handleGetBalance = async (message: RpcRequestMessage, port: chrome.runtime.Port) => {
@@ -95,7 +102,11 @@ const handleGetBalance = async (message: RpcRequestMessage, port: chrome.runtime
   }
 
   const address = existingAccount.btcAddress;
-  const balances = await getBalance(address);
+  const [getBalanceError, balances] = await getBalance(address, network.type);
+  if (getBalanceError) {
+    sendInternalErrorMessage({ tabId, messageId: parseResult.output.id });
+    return;
+  }
 
   sendGetBalanceSuccessResponseMessage({
     tabId,
