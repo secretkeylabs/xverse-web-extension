@@ -1,11 +1,10 @@
 import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types';
+import { accountPurposeAddresses } from '@common/utils/rpc/btc/getAddresses/utils';
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  Address,
   AddressPurpose,
-  AddressType,
   BitcoinNetworkType,
   GetAddressOptions,
   GetAddressPayload,
@@ -63,38 +62,12 @@ const useAddressRequestParams = (network: SettingsNetwork) => {
 
 const useBtcAddressRequest = () => {
   const selectedAccount = useSelectedAccount();
-  const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey, stxAddress, stxPublicKey } =
-    selectedAccount;
   const { network } = useWalletSelector();
   const { tabId, origin, payload, requestToken, requestId, rpcMethod } =
     useAddressRequestParams(network);
 
   const approveBtcAddressRequest = () => {
-    const addressesResponse: Address[] = payload.purposes.map((purpose: AddressPurpose) => {
-      if (purpose === AddressPurpose.Ordinals) {
-        return {
-          address: ordinalsAddress,
-          publicKey: ordinalsPublicKey,
-          purpose: AddressPurpose.Ordinals,
-          addressType: AddressType.p2tr,
-        };
-      }
-      if (purpose === AddressPurpose.Stacks) {
-        return {
-          address: stxAddress,
-          publicKey: stxPublicKey,
-          purpose: AddressPurpose.Stacks,
-          addressType: AddressType.stacks,
-        };
-      }
-      return {
-        address: btcAddress,
-        publicKey: btcPublicKey,
-        purpose: AddressPurpose.Payment,
-        addressType:
-          selectedAccount?.accountType === 'ledger' ? AddressType.p2wpkh : AddressType.p2sh,
-      };
-    });
+    const addressesResponse = accountPurposeAddresses(selectedAccount, payload.purposes);
     if (requestToken) {
       const response: GetAddressResponse = {
         addresses: addressesResponse,

@@ -21,6 +21,7 @@ import AuthenticationRequest from '@screens/connect/authenticationRequest';
 import BtcSelectAddressScreen from '@screens/connect/btcSelectAddressScreen';
 import StxSelectAccountScreen from '@screens/connect/stxSelectAccountScreen';
 import StxSelectAddressScreen from '@screens/connect/stxSelectAddressScreen';
+import { ConnectionRequest } from '@screens/connectionRequest';
 import CreateInscription from '@screens/createInscription';
 import CreatePassword from '@screens/createPassword';
 import CreateWalletSuccess from '@screens/createWalletSuccess';
@@ -64,6 +65,7 @@ import Setting from '@screens/settings';
 import BackupWalletScreen from '@screens/settings/backupWallet';
 import ChangeNetworkScreen from '@screens/settings/changeNetwork';
 import ChangePasswordScreen from '@screens/settings/changePassword';
+import ConnectedAppsAndPermissionsScreen from '@screens/settings/connectedAppsAndPermissions';
 import FiatCurrencyScreen from '@screens/settings/fiatCurrency';
 import LockCountdown from '@screens/settings/lockCountdown';
 import PrivacyPreferencesScreen from '@screens/settings/privacyPreferences';
@@ -82,6 +84,7 @@ import UnlistRuneScreen from '@screens/unlistRune';
 import WalletExists from '@screens/walletExists';
 import ListRuneScreen from 'app/screens/listRune';
 import { createHashRouter } from 'react-router-dom';
+import RoutePaths from './paths';
 
 const router = createHashRouter([
   {
@@ -366,6 +369,10 @@ const router = createHashRouter([
         element: <BackupWalletScreen />,
       },
       {
+        path: RoutePaths.ConnectedAppsAndPermissions,
+        element: <ConnectedAppsAndPermissionsScreen />,
+      },
+      {
         path: 'tx-status',
         element: <TransactionStatus />,
       },
@@ -446,6 +453,14 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <ConfirmNftTransaction />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: RequestsRoutes.ConnectionRequest,
+        element: (
+          <AuthGuard>
+            <ConnectionRequest />
           </AuthGuard>
         ),
       },

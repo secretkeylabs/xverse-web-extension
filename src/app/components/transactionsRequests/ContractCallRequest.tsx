@@ -1,9 +1,11 @@
 import {
-  sendCallContractSuccessResponseMessage,
   sendInternalErrorMessage,
-  sendSignTransactionSuccessResponseMessage,
   sendUserRejectionMessage,
-} from '@common/utils/rpc/stx/rpcResponseMessages';
+} from '@common/utils/rpc/responseMessages/errors';
+import {
+  sendCallContractSuccessResponseMessage,
+  sendSignTransactionSuccessResponseMessage,
+} from '@common/utils/rpc/responseMessages/stacks';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmStxTransactionComponent from '@components/confirmStxTransactionComponent';
 import InfoContainer from '@components/infoContainer';

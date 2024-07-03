@@ -2,10 +2,12 @@ import IconStacks from '@assets/img/dashboard/stx_icon.svg';
 import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import {
   sendInternalErrorMessage,
+  sendUserRejectionMessage,
+} from '@common/utils/rpc/responseMessages/errors';
+import {
   sendSignTransactionSuccessResponseMessage,
   sendStxTransferSuccessResponseMessage,
-  sendUserRejectionMessage,
-} from '@common/utils/rpc/stx/rpcResponseMessages';
+} from '@common/utils/rpc/responseMessages/stacks';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmStxTransactionComponent from '@components/confirmStxTransactionComponent';
 import TransferMemoView from '@components/confirmStxTransactionComponent/transferMemoView';

@@ -1,10 +1,13 @@
 import DownloadImage from '@assets/img/webInteractions/ArrowLineDown.svg';
+
+import {
+  sendInternalErrorMessage,
+  sendUserRejectionMessage,
+} from '@common/utils/rpc/responseMessages/errors';
 import {
   sendDeployContractSuccessResponseMessage,
-  sendInternalErrorMessage,
   sendSignTransactionSuccessResponseMessage,
-  sendUserRejectionMessage,
-} from '@common/utils/rpc/stx/rpcResponseMessages';
+} from '@common/utils/rpc/responseMessages/stacks';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmStxTransactionComponent from '@components/confirmStxTransactionComponent';
 import InfoContainer from '@components/infoContainer';

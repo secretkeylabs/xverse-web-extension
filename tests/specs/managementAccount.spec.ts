@@ -19,8 +19,7 @@ test.describe('Account Management', () => {
     await expect(wallet.buttonBack).toBeVisible();
     await expect(wallet.buttonAccountOptions).toBeVisible();
     await expect(wallet.accountBalance).toBeVisible();
-    const balanceText = await wallet.accountBalance.innerText();
-    await expect(balanceText).toBe('$0.00');
+    await expect(wallet.accountBalance).toHaveText('$0.00');
     await wallet.buttonBack.click();
     await wallet.checkVisualsStartpage();
     await expect(wallet.labelAccountName).toHaveText('Account 1');
