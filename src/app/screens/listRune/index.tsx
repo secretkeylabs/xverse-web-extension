@@ -13,7 +13,12 @@ import { ArrowClockwise } from '@phosphor-icons/react';
 import ListRuneItem from '@screens/listRune/listRuneItem';
 import { ListRunesReducer, initialListRunesState } from '@screens/listRune/reducer';
 import SetRunePriceItem from '@screens/listRune/setRunePriceItem';
-import { currencySymbolMap, getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core';
+import {
+  FeatureId,
+  currencySymbolMap,
+  getBtcFiatEquivalent,
+  satsToBtc,
+} from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import { StickyButtonContainer, StyledP } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
@@ -59,7 +64,8 @@ export default function ListRuneScreen() {
   const { fiatCurrency } = useWalletSelector();
   const { btcFiatRate } = useCoinRates();
   const location = useLocation();
-  const showRunesListing = useHasFeature('RUNES_LISTING') || process.env.NODE_ENV === 'development';
+  const showRunesListing =
+    useHasFeature(FeatureId.RUNES_LISTING) || process.env.NODE_ENV === 'development';
 
   if (!showRunesListing) {
     navigate(-1);

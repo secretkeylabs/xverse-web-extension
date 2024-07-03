@@ -17,7 +17,9 @@ import {
 import handleGetBalance from './btc/getBalance';
 import handleGetInfo from './getInfo';
 import { makeRPCError, sendRpcResponse } from './helpers';
+import handleEtchRune from './runes/etch';
 import handleGetRunesBalance from './runes/getBalance';
+import handleMintRune from './runes/mint';
 import callContract from './stx/callContract/index.ts';
 import deployContract from './stx/deployContract/index.ts';
 import handleGetStxAccounts from './stx/getAccounts';
@@ -29,7 +31,7 @@ import transferStx from './stx/transferStx';
 import { handleRenouncePermissions } from './wallet/renouncePermissions';
 import { handleRequestPermissions } from './wallet/requestPermissions';
 
-export async function handleRPCRequest(message: RpcRequestMessage, port: chrome.runtime.Port) {
+async function handleRPCRequest(message: RpcRequestMessage, port: chrome.runtime.Port) {
   try {
     switch (message.method) {
       case requestPermissionsMethodName: {
@@ -109,6 +111,14 @@ export async function handleRPCRequest(message: RpcRequestMessage, port: chrome.
       }
       case 'runes_getBalance': {
         await handleGetRunesBalance(message, port);
+        break;
+      }
+      case 'runes_mint': {
+        await handleMintRune(message as unknown as WebBtcMessage<'runes_mint'>, port);
+        break;
+      }
+      case 'runes_etch': {
+        await handleEtchRune(message as unknown as WebBtcMessage<'runes_etch'>, port);
         break;
       }
       default:

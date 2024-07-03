@@ -12,7 +12,7 @@ import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Eye, EyeSlash } from '@phosphor-icons/react';
 import CoinItem from '@screens/manageTokens/coinItem';
-import { FungibleToken, FungibleTokenProtocol } from '@secretkeylabs/xverse-core';
+import { FeatureId, FungibleToken, FungibleTokenProtocol } from '@secretkeylabs/xverse-core';
 import {
   setBrc20ManageTokensAction,
   setRunesManageTokensAction,
@@ -166,7 +166,7 @@ function ManageTokens() {
   const [selectedProtocol, setSelectedProtocol] = useState<FungibleTokenProtocol>(
     selectedAccount?.stxAddress ? 'stacks' : 'brc-20',
   );
-  const showRunes = useHasFeature('RUNES_SUPPORT');
+  const showRunes = useHasFeature(FeatureId.RUNES_SUPPORT);
   const [showOptionsDialog, setShowOptionsDialog] = useState(false);
 
   const [optionsDialogIndents, setOptionsDialogIndents] = useState<

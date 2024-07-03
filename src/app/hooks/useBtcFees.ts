@@ -6,7 +6,7 @@ import {
   UTXO,
 } from '@secretkeylabs/xverse-core';
 import { useEffect, useMemo, useState } from 'react';
-import useBtcClient from './useBtcClient';
+import useBtcClient from './apiClients/useBtcClient';
 import useOrdinalsByAddress from './useOrdinalsByAddress';
 import useSelectedAccount from './useSelectedAccount';
 import useWalletSelector from './useWalletSelector';

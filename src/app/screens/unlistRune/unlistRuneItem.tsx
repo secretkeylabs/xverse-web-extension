@@ -1,6 +1,6 @@
 import RequestsRoutes from '@common/utils/route-urls';
+import useRunesApi from '@hooks/apiClients/useRunesApi';
 import useCoinRates from '@hooks/queries/useCoinRates';
-import useRunesApi from '@hooks/useRunesApi';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core';

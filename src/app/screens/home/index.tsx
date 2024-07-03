@@ -26,7 +26,7 @@ import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowUp, Plus } from '@phosphor-icons/react';
 import CoinSelectModal from '@screens/home/coinSelectModal';
-import { getFiatEquivalent, type FungibleToken } from '@secretkeylabs/xverse-core';
+import { FeatureId, getFiatEquivalent, type FungibleToken } from '@secretkeylabs/xverse-core';
 import {
   changeShowDataCollectionAlertAction,
   setBrc20ManageTokensAction,
@@ -272,8 +272,7 @@ function Home() {
     let route = '';
     switch (fungibleToken?.protocol) {
       case 'stacks':
-        // TODO refactor to use principal
-        route = `/send-sip10?ticker=${fungibleToken?.ticker}`;
+        route = `/send-sip10?principal=${fungibleToken?.principal}`;
         break;
       case 'brc-20':
         route = `/send-brc20-one-step?principal=${fungibleToken?.principal}`;
@@ -431,7 +430,9 @@ function Home() {
   };
 
   const showSwaps =
-    useHasFeature('SWAPS') && !isLedgerAccount(selectedAccount) && network.type === 'Mainnet';
+    useHasFeature(FeatureId.SWAPS) &&
+    !isLedgerAccount(selectedAccount) &&
+    network.type === 'Mainnet';
 
   return (
     <>

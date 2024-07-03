@@ -3,7 +3,12 @@ import ActionButton from '@components/button';
 import { Tab } from '@components/tabBar';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import TransportFactory from '@ledgerhq/hw-transport-webusb';
-import { RuneSummary, Transport, btcTransaction } from '@secretkeylabs/xverse-core';
+import {
+  RuneSummary,
+  RuneSummaryActions,
+  Transport,
+  btcTransaction,
+} from '@secretkeylabs/xverse-core';
 import Callout from '@ui-library/callout';
 import { StickyHorizontalSplitButtonContainer, StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
@@ -47,7 +52,7 @@ type Props = {
   inputs: btcTransaction.EnhancedInput[];
   outputs: btcTransaction.EnhancedOutput[];
   feeOutput?: btcTransaction.TransactionFeeOutput;
-  runeSummary?: RuneSummary;
+  runeSummary?: RuneSummaryActions | RuneSummary;
   showCenotaphCallout: boolean;
   isLoading: boolean;
   isSubmitting: boolean;

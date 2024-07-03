@@ -13,6 +13,7 @@ import {
   TabContainer,
 } from '@screens/listRune/index.styled';
 import UnlistRuneItem from '@screens/unlistRune/unlistRuneItem';
+import { FeatureId } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
 import { ftDecimals } from '@utils/helper';
@@ -29,7 +30,8 @@ export default function UnlistRuneScreen() {
   const { runeId } = useParams();
   const { visible: runesCoinsList } = useVisibleRuneFungibleTokens();
   const selectedRune = runesCoinsList.find((ft) => ft.principal === runeId);
-  const showRunesListing = useHasFeature('RUNES_LISTING') || process.env.NODE_ENV === 'development';
+  const showRunesListing =
+    useHasFeature(FeatureId.RUNES_LISTING) || process.env.NODE_ENV === 'development';
 
   if (!showRunesListing) {
     navigate(-1);

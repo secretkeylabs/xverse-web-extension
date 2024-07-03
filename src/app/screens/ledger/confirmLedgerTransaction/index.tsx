@@ -15,7 +15,7 @@ import LedgerConnectionView, {
 import LedgerFailView from '@components/ledger/failLedgerView';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
 import Stepper from '@components/stepper';
-import useBtcClient from '@hooks/useBtcClient';
+import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';

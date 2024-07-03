@@ -1,6 +1,6 @@
 import { BtcOrdinal, getOrdinalsByAddress } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
-import useBtcClient from './useBtcClient';
+import useBtcClient from './apiClients/useBtcClient';
 import useWalletSelector from './useWalletSelector';
 
 const useOrdinalsByAddress = (address: string) => {

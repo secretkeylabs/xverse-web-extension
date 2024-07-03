@@ -1,10 +1,6 @@
 import Callout from '@ui-library/callout';
 import styled from 'styled-components';
 
-export const YourAddress = styled.div`
-  text-align: right;
-`;
-
 export const OuterContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
@@ -55,33 +51,6 @@ export const CardContainer = styled.div<{ bottomPadding?: boolean }>((props) => 
   justifyContent: 'center',
   marginBottom: props.theme.spacing(6),
   fontSize: 14,
-}));
-
-export const IconLabel = styled.div((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_200,
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'center',
-}));
-
-export const ButtonIcon = styled.img((props) => ({
-  width: 32,
-  height: 32,
-  marginRight: props.theme.spacing(4),
-}));
-
-export const InfoIconContainer = styled.div((props) => ({
-  background: props.theme.colors.white_0,
-  color: props.theme.colors.elevation0,
-  width: 32,
-  height: 32,
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: '50%',
-  marginRight: props.theme.spacing(5),
 }));
 
 export const EditFeesButton = styled.button((props) => ({

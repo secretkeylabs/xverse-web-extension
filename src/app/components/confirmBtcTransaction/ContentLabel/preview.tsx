@@ -2,6 +2,8 @@ import { X } from '@phosphor-icons/react';
 import { useLayoutEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
+import useWalletSelector from '@hooks/useWalletSelector';
+import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
 import { ContentType } from './common';
 
 const MIN_FONT_SIZE = 9;
@@ -73,12 +75,22 @@ type Props = {
   contentType: ContentType;
   contentTypeRaw: string;
   visible: boolean;
+  inscriptionId?: string;
 };
 
-function Preview({ onClick, type, content, contentType, contentTypeRaw, visible }: Props) {
+function Preview({
+  onClick,
+  type,
+  content,
+  contentType,
+  contentTypeRaw,
+  visible,
+  inscriptionId,
+}: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLPreElement>(null);
   const [fontSize, setFontSize] = useState<number>(24);
+  const { network } = useWalletSelector();
 
   useLayoutEffect(() => {
     // this decreases the font size until the preview text fits in the container
@@ -121,7 +133,17 @@ function Preview({ onClick, type, content, contentType, contentTypeRaw, visible 
       </PreviewTextContainer>
     );
   } else if (contentType === ContentType.IMAGE) {
-    preview = <PreviewImg src={`data:${contentTypeRaw};base64,${content}`} alt="Inscription" />;
+    // workaround to show the inscription preview for an already inscribed inscription
+    if (inscriptionId) {
+      preview = (
+        <PreviewImg
+          src={`${XVERSE_ORDIVIEW_URL(network.type)}/content/${inscriptionId}`}
+          alt="Inscription"
+        />
+      );
+    } else {
+      preview = <PreviewImg src={`data:${contentTypeRaw};base64,${content}`} alt="Inscription" />;
+    }
   } else if (contentType === ContentType.VIDEO) {
     preview = (
       <PreviewVideo controls>

@@ -1,8 +1,8 @@
+import useRunesApi from '@hooks/apiClients/useRunesApi';
 import useHasFeature from '@hooks/useHasFeature';
-import useRunesApi from '@hooks/useRunesApi';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { FungibleToken } from '@secretkeylabs/xverse-core';
+import { FeatureId, FungibleToken } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
 
@@ -34,7 +34,7 @@ export const fetchRuneBalances =
 export const useRuneFungibleTokensQuery = (backgroundRefetch = true) => {
   const { ordinalsAddress } = useSelectedAccount();
   const { network, fiatCurrency, spamTokens, showSpamTokens } = useWalletSelector();
-  const showRunes = useHasFeature('RUNES_SUPPORT');
+  const showRunes = useHasFeature(FeatureId.RUNES_SUPPORT);
   const runesApi = useRunesApi();
   const queryFn = fetchRuneBalances(runesApi, ordinalsAddress, fiatCurrency);
   const query = useQuery({

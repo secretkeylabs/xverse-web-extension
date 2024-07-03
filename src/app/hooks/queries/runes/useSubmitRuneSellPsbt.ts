@@ -1,4 +1,4 @@
-import useRunesApi from '@hooks/useRunesApi';
+import useRunesApi from '@hooks/apiClients/useRunesApi';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import { SubmitRuneSellRequest } from '@secretkeylabs/xverse-core';
 import { useCallback } from 'react';
