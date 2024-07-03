@@ -65,7 +65,7 @@ function RequestError({ error, errorTitle, onClose }: RequestErrorProps) {
       <Image src={Failure} />
       <HeadingText>{errorTitle || t('INVALID_REQUEST')}</HeadingText>
       <BodyText>{error}</BodyText>
-      <CloseButton onClick={handleClose} title="Close" variant="secondary" />
+      <CloseButton onClick={handleClose} title="Close" variant="primary" />
     </Container>
   );
 }

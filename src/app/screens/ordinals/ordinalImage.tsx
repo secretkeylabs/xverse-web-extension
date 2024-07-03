@@ -133,7 +133,7 @@ const ContentTypeThumbnailContainer = styled.div`
   background-color: ${(props) => props.theme.colors.white_0};
 `;
 
-export const StyledBarLoader = styled(BetterBarLoader)((props) => ({
+const StyledBarLoader = styled(BetterBarLoader)((props) => ({
   padding: 0,
   borderRadius: props.theme.radius(1),
   marginBottom: 0,

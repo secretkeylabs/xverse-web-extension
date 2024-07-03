@@ -1,7 +1,7 @@
+import useBtcClient from '@hooks/apiClients/useBtcClient';
+import useRunesApi from '@hooks/apiClients/useRunesApi';
 import useCoinRates from '@hooks/queries/useCoinRates';
-import useBtcClient from '@hooks/useBtcClient';
 import useNetworkSelector from '@hooks/useNetwork';
-import useRunesApi from '@hooks/useRunesApi';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   Account,

@@ -1,5 +1,4 @@
 import TransportFactory from '@ledgerhq/hw-transport-webusb';
-import { ArrowDown } from '@phosphor-icons/react';
 import BigNumber from 'bignumber.js';
 import { decodeToken } from 'jsontokens';
 import { useEffect, useMemo, useState } from 'react';
@@ -22,49 +21,44 @@ import {
 } from '@secretkeylabs/xverse-core';
 
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
-import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmScreen from '@components/confirmScreen';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { isLedgerAccount } from '@utils/helper';
+
+import InscribeSection from '@components/confirmBtcTransaction/inscribeSection';
+import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useConfirmedBtcBalance from '@hooks/queries/useConfirmedBtcBalance';
-import useBtcClient from '@hooks/useBtcClient';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
-import useWalletSelector from '@hooks/useWalletSelector';
 import Button from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
-import { getShortTruncatedAddress, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import CompleteScreen from './CompleteScreen';
-import ContentLabel from './ContentLabel';
 import EditFee from './EditFee';
 import ErrorModal from './ErrorModal';
 import LedgerStepView from './ledgerStepView';
 
 import FeeRow, { SATS_PER_BTC } from './feeRow';
+
 import {
-  ButtonIcon,
   ButtonImage,
   ButtonText,
   CardContainer,
   CardRow,
   EditFeesButton,
-  IconLabel,
-  InfoIconContainer,
   MainContainer,
   NumberSuffix,
   NumberWithSuffixContainer,
   OuterContainer,
-  Pill,
   StyledCallout,
-  StyledPillLabel,
   SubTitle,
   SuccessActionsContainer,
   Title,
-  YourAddress,
 } from './index.styled';
 
 const DEFAULT_FEE_RATE = 8;
@@ -371,44 +365,16 @@ function CreateInscription() {
           {showConfirmedBalanceError && (
             <StyledCallout variant="danger" bodyText={t('ERRORS.UNCONFIRMED_UTXO')} />
           )}
-          <CardContainer bottomPadding>
-            <CardRow>
-              <StyledPillLabel>
-                {t('SUMMARY.TITLE')}
-                {repeat && <Pill>{`x${repeat}`}</Pill>}
-              </StyledPillLabel>
-            </CardRow>
-            <CardRow center>
-              <IconLabel>
-                <div>
-                  <ButtonIcon src={OrdinalsIcon} />
-                </div>
-                <div>{t('SUMMARY.ORDINAL')}</div>
-              </IconLabel>
-              <ContentLabel
-                contentType={contentType}
-                content={content}
-                type={payloadType}
-                repeat={repeat}
-              />
-            </CardRow>
-            <CardRow center>
-              <IconLabel>
-                <InfoIconContainer>
-                  <ArrowDown size={16} weight="bold" />
-                </InfoIconContainer>
-                {t('SUMMARY.TO')}
-              </IconLabel>
-              <YourAddress>
-                <StyledP typography="body_medium_m" color="white_0">
-                  {getShortTruncatedAddress(ordinalsAddress)}
-                </StyledP>
-                <StyledP typography="body_medium_s" color="white_400">
-                  {t('SUMMARY.YOUR_ADDRESS')}
-                </StyledP>
-              </YourAddress>
-            </CardRow>
-          </CardContainer>
+          {isLedgerAccount(selectedAccount) && (
+            <StyledCallout variant="danger" bodyText={t('ERRORS.LEDGER_INSCRIPTION')} />
+          )}
+          <InscribeSection
+            content={content}
+            contentType={contentType}
+            repeat={repeat}
+            payloadType={payloadType}
+            ordinalsAddress={ordinalsAddress}
+          />
           <CardContainer>
             <CardRow>
               <div>{t('NETWORK')}</div>

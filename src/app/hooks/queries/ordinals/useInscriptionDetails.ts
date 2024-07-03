@@ -1,4 +1,4 @@
-import useOrdinalsApi from '@hooks/useOrdinalsApi';
+import useOrdinalsApi from '@hooks/apiClients/useOrdinalsApi';
 import { useQuery } from '@tanstack/react-query';
 
 const useInscriptionDetails = (id: string) => {

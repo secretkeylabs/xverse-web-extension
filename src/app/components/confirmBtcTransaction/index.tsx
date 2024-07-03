@@ -2,7 +2,12 @@ import { delay } from '@common/utils/ledger';
 import { Tab } from '@components/tabBar';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import TransportFactory from '@ledgerhq/hw-transport-webusb';
-import { RuneSummary, Transport, btcTransaction } from '@secretkeylabs/xverse-core';
+import {
+  RuneSummary,
+  RuneSummaryActions,
+  Transport,
+  btcTransaction,
+} from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
 import { StickyHorizontalSplitButtonContainer, StyledP } from '@ui-library/common.styled';
@@ -47,7 +52,7 @@ type Props = {
   inputs: btcTransaction.EnhancedInput[];
   outputs: btcTransaction.EnhancedOutput[];
   feeOutput?: btcTransaction.TransactionFeeOutput;
-  runeSummary?: RuneSummary;
+  runeSummary?: RuneSummaryActions | RuneSummary;
   showCenotaphCallout: boolean;
   isLoading: boolean;
   isSubmitting: boolean;
