@@ -70,7 +70,8 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
     network.type !== 'Testnet';
 
   const showRunesListing =
-    useHasFeature(FeatureId.RUNES_LISTING) || process.env.NODE_ENV === 'development';
+    (useHasFeature(FeatureId.RUNES_LISTING) || process.env.NODE_ENV === 'development') &&
+    network.type === 'Mainnet';
 
   const handleReceiveModalOpen = () => {
     setOpenReceiveModal(true);

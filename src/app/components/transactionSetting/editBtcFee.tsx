@@ -1,5 +1,5 @@
-import useBtcClient from '@hooks/apiClients/useBtcClient';
 import FiatAmountText from '@components/fiatAmountText';
+import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useBtcFees from '@hooks/useBtcFees';
 import useDebounce from '@hooks/useDebounce';
@@ -28,8 +28,6 @@ import FeeItem from './feeItem';
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  marginLeft: props.theme.space.m,
-  marginRight: props.theme.space.m,
   paddingBottom: props.theme.space.m,
 }));
 
