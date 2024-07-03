@@ -91,6 +91,9 @@ const handleGetInscriptions = async (message: RpcRequestMessage, port: chrome.ru
     sendRpcResponse(
       tabId,
       makeRpcSuccessResponse<'ord_getInscriptions'>(message.id, {
+        total: inscriptionsList.total,
+        limit: inscriptionsList.limit,
+        offset: inscriptionsList.offset,
         inscriptions: inscriptionsList.results.map((inscription) => ({
           inscriptionId: inscription.id,
           inscriptionNumber: String(inscription.number),
@@ -101,7 +104,7 @@ const handleGetInscriptions = async (message: RpcRequestMessage, port: chrome.ru
           output: inscription.output,
           offset: Number(inscription.offset),
           postage: inscription.value,
-          genesisTransaction: inscription.genesis_address,
+          genesisTransaction: inscription.genesis_tx_id,
           timestamp: inscription.genesis_timestamp,
         })),
       }),
