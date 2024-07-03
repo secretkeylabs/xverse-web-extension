@@ -101,7 +101,6 @@ const handleGetInscriptions = async (message: RpcRequestMessage, port: chrome.ru
           output: inscription.output,
           offset: Number(inscription.offset),
           postage: inscription.value,
-          genesisTransactionId: inscription.genesis_tx_id,
           genesisTransaction: inscription.genesis_address,
           timestamp: inscription.genesis_timestamp,
         })),
