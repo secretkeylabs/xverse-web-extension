@@ -68,6 +68,7 @@ function ConnectionRequestInner({ data, context }: ConnectionRequestInnerProps) 
     window.close();
   }, [
     account.id,
+    account.masterPubKey,
     addClient,
     addResource,
     context.origin,
