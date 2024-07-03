@@ -38,9 +38,9 @@ interface TabProps<T> {
 function Tabs<T extends unknown>({ tabs, activeTab, onTabClick, className }: TabProps<T>) {
   return (
     <TabContainer className={className}>
-      {tabs.map((tab: { label: string; value: T }) => (
+      {tabs.map((tab) => (
         <TabItem
-          key={String(tab.value)}
+          key={tab.label}
           $active={activeTab === tab.value}
           onClick={() => onTabClick(tab.value)}
         >
