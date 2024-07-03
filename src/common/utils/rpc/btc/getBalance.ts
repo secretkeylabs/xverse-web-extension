@@ -74,21 +74,6 @@ const handleGetBalance = async (message: RpcRequestMessage, port: chrome.runtime
     network,
   } = rootStore.store.getState().walletState;
 
-  const permission = utils.getClientPermission(
-    store.permissions,
-    origin,
-    makeAccountResourceId({ accountId: selectedAccountIndex, networkType: network.type }),
-  );
-  if (!permission) {
-    sendAccessDeniedResponseMessage({ tabId, messageId: parseResult.output.id });
-    return;
-  }
-
-  if (!permission.actions.has('read')) {
-    sendAccessDeniedResponseMessage({ tabId, messageId: parseResult.output.id });
-    return;
-  }
-
   const existingAccount = getSelectedAccount({
     selectedAccountIndex,
     selectedAccountType,
@@ -98,6 +83,25 @@ const handleGetBalance = async (message: RpcRequestMessage, port: chrome.runtime
 
   if (!existingAccount) {
     sendInternalErrorMessage({ tabId, messageId: parseResult.output.id });
+    return;
+  }
+
+  const permission = utils.getClientPermission(
+    store.permissions,
+    origin,
+    makeAccountResourceId({
+      accountId: selectedAccountIndex,
+      networkType: network.type,
+      masterPubKey: existingAccount.masterPubKey,
+    }),
+  );
+  if (!permission) {
+    sendAccessDeniedResponseMessage({ tabId, messageId: parseResult.output.id });
+    return;
+  }
+
+  if (!permission.actions.has('read')) {
+    sendAccessDeniedResponseMessage({ tabId, messageId: parseResult.output.id });
     return;
   }
 

@@ -1,16 +1,19 @@
 import { Account, NetworkType } from '@secretkeylabs/xverse-core';
 import { Resource } from './schemas';
 
-export function makeAccountResourceId(args: {
+type AccountResourceIdArgs = {
+  masterPubKey: Account['masterPubKey'];
   accountId: Account['id'];
   networkType: NetworkType;
-}) {
-  return `account-${args.accountId}-${args.networkType}`;
+};
+
+export function makeAccountResourceId(args: AccountResourceIdArgs) {
+  return `account-${args.masterPubKey}-${args.accountId}-${args.networkType}`;
 }
 
-export function makeAccountResource(accountId: Account['id'], networkType: NetworkType): Resource {
+export function makeAccountResource(args: AccountResourceIdArgs): Resource {
   return {
-    id: makeAccountResourceId({ accountId, networkType }),
-    name: `Account ${accountId} (${networkType})`,
+    id: makeAccountResourceId(args),
+    name: `Account ${args.accountId}, ${args.masterPubKey.slice(0, 6)}… (${args.networkType})`,
   };
 }

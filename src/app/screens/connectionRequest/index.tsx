@@ -43,7 +43,11 @@ function ConnectionRequestInner({ data, context }: ConnectionRequestInnerProps) 
       name: context.origin,
     };
 
-    const resource = makeAccountResource(account.id, network.type);
+    const resource = makeAccountResource({
+      accountId: account.id,
+      networkType: network.type,
+      masterPubKey: account.masterPubKey,
+    });
 
     const permission: Permission = {
       clientId: client.id,
