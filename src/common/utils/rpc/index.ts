@@ -17,7 +17,7 @@ import {
 import handleGetBalance from './btc/getBalance';
 import handleGetInfo from './getInfo';
 import { makeRPCError, sendRpcResponse } from './helpers';
-import handleGetInscriptions from './ordinals.ts/getInscriptions';
+import handleGetInscriptions from './ordinals/getInscriptions';
 import handleGetRunesBalance from './runes/getBalance';
 import callContract from './stx/callContract/index.ts';
 import deployContract from './stx/deployContract/index.ts';
