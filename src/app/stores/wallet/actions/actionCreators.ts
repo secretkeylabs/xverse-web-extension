@@ -4,6 +4,7 @@ import type {
   AccountType,
   AppInfo,
   FungibleToken,
+  NetworkType,
   SettingsNetwork,
   SupportedCurrency,
 } from '@secretkeylabs/xverse-core';
@@ -236,3 +237,12 @@ export function setShowSpamTokensAction(showSpamTokens: boolean): actions.SetSho
     showSpamTokens,
   };
 }
+
+export const updateSavedNamesAction = (
+  networkType: NetworkType,
+  names: { id: number; name?: string }[],
+): actions.UpdateSavedNames => ({
+  type: actions.UpdateSavedNamesKey,
+  networkType,
+  names,
+});

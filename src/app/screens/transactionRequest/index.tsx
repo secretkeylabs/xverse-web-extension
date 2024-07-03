@@ -1,6 +1,6 @@
 import { sendInternalErrorMessage } from '@common/utils/rpc/responseMessages/errors';
 import ContractCallRequest from '@components/transactionsRequests/ContractCallRequest';
-import ContractDeployRequest from '@components/transactionsRequests/ContractDeployTransaction';
+import ContractDeployRequest from '@components/transactionsRequests/ContractDeployRequest';
 import useNetworkSelector from '@hooks/useNetwork';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';

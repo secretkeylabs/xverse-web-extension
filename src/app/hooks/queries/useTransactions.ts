@@ -1,4 +1,4 @@
-import useBtcClient from '@hooks/useBtcClient';
+import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {

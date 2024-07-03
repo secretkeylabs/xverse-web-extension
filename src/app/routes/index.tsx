@@ -26,6 +26,7 @@ import CreateInscription from '@screens/createInscription';
 import CreatePassword from '@screens/createPassword';
 import CreateWalletSuccess from '@screens/createWalletSuccess';
 import ErrorBoundary from '@screens/error';
+import EtchRune from '@screens/etchRune';
 import ExecuteBrc20Transaction from '@screens/executeBrc20Transaction';
 import Explore from '@screens/explore';
 import ForgotPassword from '@screens/forgotPassword';
@@ -38,6 +39,7 @@ import VerifyLedger from '@screens/ledger/verifyLedgerAccountAddress';
 import Legal from '@screens/legal';
 import Login from '@screens/login';
 import ManageTokens from '@screens/manageTokens';
+import MintRune from '@screens/mintRune';
 import NftCollection from '@screens/nftCollection';
 import NftDashboard from '@screens/nftDashboard';
 import SupportedRarities from '@screens/nftDashboard/supportedRarities';
@@ -69,6 +71,7 @@ import LockCountdown from '@screens/settings/lockCountdown';
 import PrivacyPreferencesScreen from '@screens/settings/privacyPreferences';
 import SignBatchPsbtRequest from '@screens/signBatchPsbtRequest';
 import SignMessageRequest from '@screens/signMessageRequest';
+import SignMessageRequestInApp from '@screens/signMessageRequestInApp';
 import SignPsbtRequest from '@screens/signPsbtRequest';
 import SignatureRequest from '@screens/signatureRequest';
 import SpeedUpTransactionScreen from '@screens/speedUpTransaction';
@@ -77,8 +80,11 @@ import SwapScreen from '@screens/swap';
 import SwapConfirmScreen from '@screens/swap/swapConfirmation';
 import TransactionRequest from '@screens/transactionRequest';
 import TransactionStatus from '@screens/transactionStatus';
+import UnlistRuneScreen from '@screens/unlistRune';
 import WalletExists from '@screens/walletExists';
+import ListRuneScreen from 'app/screens/listRune';
 import { createHashRouter } from 'react-router-dom';
+import RoutePaths from './paths';
 
 const router = createHashRouter([
   {
@@ -137,10 +143,6 @@ const router = createHashRouter([
       {
         path: 'receive/:currency',
         element: <Receive />,
-      },
-      {
-        path: 'send-stx',
-        element: <SendStxScreen />,
       },
       {
         path: 'send-sip10',
@@ -367,7 +369,7 @@ const router = createHashRouter([
         element: <BackupWalletScreen />,
       },
       {
-        path: RequestsRoutes.ConnectedAppsAndPermissions,
+        path: RoutePaths.ConnectedAppsAndPermissions,
         element: <ConnectedAppsAndPermissionsScreen />,
       },
       {
@@ -377,6 +379,14 @@ const router = createHashRouter([
       {
         path: 'buy/:currency',
         element: <Buy />,
+      },
+      {
+        path: 'list-rune/:runeId',
+        element: <ListRuneScreen />,
+      },
+      {
+        path: 'unlist-rune/:runeId',
+        element: <UnlistRuneScreen />,
       },
       {
         path: 'coinDashboard/:currency',
@@ -395,6 +405,14 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <SignMessageRequest />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: RequestsRoutes.SignMessageRequestInApp,
+        element: (
+          <AuthGuard>
+            <SignMessageRequestInApp />
           </AuthGuard>
         ),
       },
@@ -446,6 +464,22 @@ const router = createHashRouter([
           </AuthGuard>
         ),
       },
+      {
+        path: RequestsRoutes.MintRune,
+        element: (
+          <AuthGuard>
+            <MintRune />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: RequestsRoutes.EtchRune,
+        element: (
+          <AuthGuard>
+            <EtchRune />
+          </AuthGuard>
+        ),
+      },
     ],
   },
   {
@@ -456,6 +490,10 @@ const router = createHashRouter([
       {
         path: 'send-btc',
         element: <SendBtcScreen />,
+      },
+      {
+        path: 'send-stx',
+        element: <SendStxScreen />,
       },
       {
         path: 'confirm-btc-tx',

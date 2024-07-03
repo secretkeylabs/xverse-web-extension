@@ -4,7 +4,7 @@ import { makeRpcSuccessResponse, sendRpcResponse } from '../helpers';
 import { BaseArgs } from './types';
 
 type RequestPermissionsSuccessArgs = BaseArgs & {
-  result: Return<'wallet_connect'>;
+  result: Return<'wallet_requestPermissions'>;
 };
 export function sendRequestPermissionsSuccessResponseMessage({
   tabId,
@@ -16,9 +16,9 @@ export function sendRequestPermissionsSuccessResponseMessage({
 
 // Remove permissions
 type RequestRemovePermissionsSuccessArgs = BaseArgs & {
-  result: Return<'wallet_disconnect'>;
+  result: Return<'wallet_renouncePermissions'>;
 };
-export function sendRequestRemovePermissionsSuccessResponseMessage({
+function sendRequestRemovePermissionsSuccessResponseMessage({
   tabId,
   messageId,
   result,

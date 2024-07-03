@@ -40,7 +40,7 @@ const StyledItemSub = styled(StyledP)`
   width: 100%;
 `;
 
-export function NftTabGridItem({
+function NftTabGridItem({
   item: collection,
   isLoading = false,
 }: {
@@ -78,4 +78,5 @@ export function NftTabGridItem({
     </CollectionContainer>
   );
 }
+
 export default NftTabGridItem;

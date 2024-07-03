@@ -15,12 +15,12 @@ const contextSchema = v.object({
   tabId: v.number(),
 });
 
-type Context = v.InferOutput<typeof contextSchema>;
+export type Context = v.InferOutput<typeof contextSchema>;
 
 /**
  * Options to configure a popup's behavior.
  */
-export interface Options<TPopupData> {
+interface Options<TPopupData> {
   /** The path the popup is opened to. */
   path: string;
 
@@ -36,7 +36,7 @@ export interface Options<TPopupData> {
   onClose?: (popupWindow: chrome.windows.Window) => void;
 }
 
-export async function createCenteredPopupOptions(
+async function createCenteredPopupOptions(
   options: Pick<chrome.windows.CreateData, 'url' | 'height' | 'width'>,
 ): Promise<chrome.windows.CreateData> {
   const { url, width: popupWidth = 360, height: popupHeight = 600 } = options;

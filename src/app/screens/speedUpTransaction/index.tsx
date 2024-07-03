@@ -8,9 +8,9 @@ import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import SpeedUpBtcTransaction from '@components/speedUpTransaction/btc';
 import SpeedUpStxTransaction from '@components/speedUpTransaction/stx';
 import TopRow from '@components/topRow';
+import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useTransaction from '@hooks/queries/useTransaction';
-import useBtcClient from '@hooks/useBtcClient';
 import useNetworkSelector from '@hooks/useNetwork';
 import useRbfTransactionData, {
   getLatestNonce,

@@ -1,10 +1,10 @@
 import { ConfirmOrdinalsTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionComponent';
+import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useAddressInscription from '@hooks/queries/ordinals/useAddressInscription';
 import { useGetUtxoOrdinalBundle } from '@hooks/queries/ordinals/useAddressRareSats';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
-import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';

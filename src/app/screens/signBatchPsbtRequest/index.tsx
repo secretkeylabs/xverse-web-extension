@@ -25,6 +25,7 @@ import { ArrowLeft, ArrowRight } from '@phosphor-icons/react';
 import { SignMultiplePsbtPayload } from '@sats-connect/core';
 import {
   AnalyticsEvents,
+  FeatureId,
   RuneSummary,
   btcTransaction,
   parseSummaryForRunes,
@@ -154,7 +155,7 @@ function SignBatchPsbtRequest() {
   const [inscriptionToShow, setInscriptionToShow] = useState<
     btcTransaction.IOInscription | undefined
   >(undefined);
-  const hasRunesSupport = useHasFeature('RUNES_SUPPORT');
+  const hasRunesSupport = useHasFeature(FeatureId.RUNES_SUPPORT);
   useTrackMixPanelPageViewed();
 
   const [parsedPsbts, setParsedPsbts] = useState<

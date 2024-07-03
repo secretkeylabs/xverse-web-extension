@@ -2,9 +2,9 @@ import { WebBtcMessage } from '@common/types/message-types';
 import {
   RpcErrorCode,
   RpcRequestMessage,
-  connectMethodName,
-  disconnectMethodName,
   getBalanceMethodName,
+  renouncePermissionsMethodName,
+  requestPermissionsMethodName,
 } from '@sats-connect/core';
 import { getTabIdFromPort } from '..';
 import {
@@ -18,7 +18,9 @@ import handleGetBalance from './btc/getBalance';
 import handleGetInfo from './getInfo';
 import { makeRPCError, sendRpcResponse } from './helpers';
 import handleGetInscriptions from './ordinals/getInscriptions';
+import handleEtchRune from './runes/etch';
 import handleGetRunesBalance from './runes/getBalance';
+import handleMintRune from './runes/mint';
 import callContract from './stx/callContract/index.ts';
 import deployContract from './stx/deployContract/index.ts';
 import handleGetStxAccounts from './stx/getAccounts';
@@ -27,18 +29,18 @@ import handleStacksSignMessage from './stx/signMessage';
 import handleStacksSignStructuredMessage from './stx/signStructuredMessage';
 import signTransaction from './stx/signTransaction';
 import transferStx from './stx/transferStx';
-import { handleConnect } from './wallet/handle-connect';
-import { handleDisconnect } from './wallet/handle-disconnect';
+import { handleRenouncePermissions } from './wallet/renouncePermissions';
+import { handleRequestPermissions } from './wallet/requestPermissions';
 
 async function handleRPCRequest(message: RpcRequestMessage, port: chrome.runtime.Port) {
   try {
     switch (message.method) {
-      case connectMethodName: {
-        await handleConnect(message, port);
+      case requestPermissionsMethodName: {
+        await handleRequestPermissions(message, port);
         break;
       }
-      case disconnectMethodName: {
-        await handleDisconnect(message, port);
+      case renouncePermissionsMethodName: {
+        await handleRenouncePermissions(message, port);
         break;
       }
       case getBalanceMethodName: {
@@ -114,6 +116,14 @@ async function handleRPCRequest(message: RpcRequestMessage, port: chrome.runtime
       }
       case 'ord_getInscriptions': {
         await handleGetInscriptions(message, port);
+        break;
+      }
+      case 'runes_mint': {
+        await handleMintRune(message as unknown as WebBtcMessage<'runes_mint'>, port);
+        break;
+      }
+      case 'runes_etch': {
+        await handleEtchRune(message as unknown as WebBtcMessage<'runes_etch'>, port);
         break;
       }
       default:

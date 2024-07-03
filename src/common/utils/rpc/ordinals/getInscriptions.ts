@@ -42,22 +42,6 @@ const handleGetInscriptions = async (message: RpcRequestMessage, port: chrome.ru
     network,
   } = rootStore.store.getState().walletState;
 
-  const permission = utils.getClientPermission(
-    store.permissions,
-    origin,
-    makeAccountResourceId({ accountId: selectedAccountIndex, networkType: network.type }),
-  );
-
-  if (!permission) {
-    sendAccessDeniedResponseMessage({ tabId, messageId: message.id });
-    return;
-  }
-
-  if (!permission.actions.has('read')) {
-    sendAccessDeniedResponseMessage({ tabId, messageId: message.id });
-    return;
-  }
-
   const existingAccount = getSelectedAccount({
     selectedAccountIndex,
     selectedAccountType,
@@ -73,6 +57,26 @@ const handleGetInscriptions = async (message: RpcRequestMessage, port: chrome.ru
         message: 'Could not find selected account.',
       }),
     );
+    return;
+  }
+
+  const permission = utils.getClientPermission(
+    store.permissions,
+    origin,
+    makeAccountResourceId({
+      accountId: selectedAccountIndex,
+      networkType: network.type,
+      masterPubKey: existingAccount.masterPubKey,
+    }),
+  );
+
+  if (!permission) {
+    sendAccessDeniedResponseMessage({ tabId, messageId: message.id });
+    return;
+  }
+
+  if (!permission.actions.has('read')) {
+    sendAccessDeniedResponseMessage({ tabId, messageId: message.id });
     return;
   }
 

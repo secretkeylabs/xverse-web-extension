@@ -1,10 +1,11 @@
 import { getTabIdFromPort } from '@common/utils';
 import getSelectedAccount from '@common/utils/getSelectedAccount';
 import { makeContext } from '@common/utils/popup';
+import { Result, safePromise } from '@common/utils/safe';
 import { makeAccountResourceId } from '@components/permissionsManager/resources';
 import * as utils from '@components/permissionsManager/utils';
 import { RpcRequestMessage, getBalanceRequestMessageSchema } from '@sats-connect/core';
-import { UTXO } from '@secretkeylabs/xverse-core';
+import { BitcoinEsploraApiProvider, NetworkType } from '@secretkeylabs/xverse-core';
 import rootStore from '@stores/index';
 import * as v from 'valibot';
 import { handleInvalidMessage } from '../handle-invalid-message';
@@ -14,40 +15,34 @@ import {
   sendInternalErrorMessage,
 } from '../responseMessages/errors';
 
-async function getBtcAddressUtxos(address: string): Promise<Array<UTXO>> {
-  const url = `https://btc-1.xverse.app/address/${address}/utxo`;
-  const res = await fetch(url);
-  const data = (await res.json()) as Array<UTXO>;
+async function getBalance(
+  address: string,
+  networkType: NetworkType,
+): Promise<
+  Result<{
+    confirmed: number;
+    unconfirmed: number;
+    total: number;
+  }>
+> {
+  const api = new BitcoinEsploraApiProvider({ network: networkType });
 
-  // Need to check for having no UTXOs due to
-  // https://linear.app/xverseapp/issue/ENG-4372
-  if (data.length === 0) {
-    // eslint-disable-next-line no-console
-    console.warn(
-      'The API returned no UTXOs. The address may have more UTXOs than the API can handle.',
-    );
+  const [error, data] = await safePromise(api.getBalance(address));
+  if (error) {
+    return [error, null];
   }
-  return data;
-}
 
-async function getBalance(address: string): Promise<{
-  confirmed: bigint;
-  unconfirmed: bigint;
-  total: bigint;
-}> {
-  const utxos = await getBtcAddressUtxos(address);
-  const confirmedBalance = utxos
-    .filter((utxo) => utxo.status.confirmed)
-    .reduce((acc, utxo) => acc + BigInt(utxo.value), 0n);
-  const unconfirmedBalance = utxos
-    .filter((utxo) => !utxo.status.confirmed)
-    .reduce((acc, utxo) => acc + BigInt(utxo.value), 0n);
+  const confirmedBalance = data.finalBalance;
+  const { unconfirmedBalance } = data;
 
-  return {
-    confirmed: confirmedBalance,
-    unconfirmed: unconfirmedBalance,
-    total: confirmedBalance + unconfirmedBalance,
-  };
+  return [
+    null,
+    {
+      confirmed: confirmedBalance,
+      unconfirmed: unconfirmedBalance,
+      total: confirmedBalance + unconfirmedBalance,
+    },
+  ];
 }
 
 const handleGetBalance = async (message: RpcRequestMessage, port: chrome.runtime.Port) => {
@@ -79,21 +74,6 @@ const handleGetBalance = async (message: RpcRequestMessage, port: chrome.runtime
     network,
   } = rootStore.store.getState().walletState;
 
-  const permission = utils.getClientPermission(
-    store.permissions,
-    origin,
-    makeAccountResourceId({ accountId: selectedAccountIndex, networkType: network.type }),
-  );
-  if (!permission) {
-    sendAccessDeniedResponseMessage({ tabId, messageId: parseResult.output.id });
-    return;
-  }
-
-  if (!permission.actions.has('read')) {
-    sendAccessDeniedResponseMessage({ tabId, messageId: parseResult.output.id });
-    return;
-  }
-
   const existingAccount = getSelectedAccount({
     selectedAccountIndex,
     selectedAccountType,
@@ -106,8 +86,31 @@ const handleGetBalance = async (message: RpcRequestMessage, port: chrome.runtime
     return;
   }
 
+  const permission = utils.getClientPermission(
+    store.permissions,
+    origin,
+    makeAccountResourceId({
+      accountId: selectedAccountIndex,
+      networkType: network.type,
+      masterPubKey: existingAccount.masterPubKey,
+    }),
+  );
+  if (!permission) {
+    sendAccessDeniedResponseMessage({ tabId, messageId: parseResult.output.id });
+    return;
+  }
+
+  if (!permission.actions.has('read')) {
+    sendAccessDeniedResponseMessage({ tabId, messageId: parseResult.output.id });
+    return;
+  }
+
   const address = existingAccount.btcAddress;
-  const balances = await getBalance(address);
+  const [getBalanceError, balances] = await getBalance(address, network.type);
+  if (getBalanceError) {
+    sendInternalErrorMessage({ tabId, messageId: parseResult.output.id });
+    return;
+  }
 
   sendGetBalanceSuccessResponseMessage({
     tabId,

@@ -44,11 +44,7 @@ const StyledItemSub = styled(StyledP)`
   width: 100%;
 `;
 
-export function InscriptionsTabGridItem({
-  item: collection,
-}: {
-  item: InscriptionCollectionsData;
-}) {
+function InscriptionsTabGridItem({ item: collection }: { item: InscriptionCollectionsData }) {
   const navigate = useNavigate();
 
   const handleClickCollectionId = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -97,4 +93,5 @@ export function InscriptionsTabGridItem({
     </CollectionContainer>
   );
 }
+
 export default InscriptionsTabGridItem;

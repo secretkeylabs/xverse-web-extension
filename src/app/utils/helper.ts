@@ -40,6 +40,23 @@ export const convertAmountToFtDecimalPlaces = (
   return amount.shiftedBy(+decimals).toNumber();
 };
 
+/**
+ * return if < x decimals - otherwise return up to x decimals
+ */
+export const formatToXDecimalPlaces = (num: number, decimals: number): number => {
+  // Convert the number to a string
+  const numStr = num.toString();
+  // Find the decimal point
+  const decimalIndex = numStr.indexOf('.');
+  // Check if there are more than x decimal places
+  if (decimalIndex !== -1 && numStr.length - decimalIndex - 1 > decimals) {
+    // Convert to 10 decimal places and return as a number
+    return parseFloat(num.toFixed(decimals));
+  }
+  // Return the number as it is if it has 10 or fewer decimal places
+  return num;
+};
+
 export const replaceCommaByDot = (amount: string) => amount.replace(/,/g, '.');
 
 /**

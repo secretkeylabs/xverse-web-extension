@@ -4,9 +4,10 @@ import Transak from '@assets/img/dashboard/transak.svg';
 import InfoContainer from '@components/infoContainer';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import useHasFeature from '@hooks/useHasFeature';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getMoonPaySignedUrl } from '@secretkeylabs/xverse-core';
+import { FeatureId, getMoonPaySignedUrl } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
 import { MOON_PAY_API_KEY, MOON_PAY_URL, TRANSAC_API_KEY, TRANSAC_URL } from '@utils/constants';
 import { useEffect, useState } from 'react';
@@ -58,6 +59,7 @@ function Buy() {
   const { network } = useWalletSelector();
   const address = currency === 'STX' ? stxAddress : btcAddress;
   const [loading, setLoading] = useState(false);
+  const showPaypal = useHasFeature(FeatureId.PAYPAL);
 
   const handleBackButtonClick = () => {
     navigate('/');
@@ -115,12 +117,14 @@ function Buy() {
         <Text>{t('PURCHASE_CRYPTO')}</Text>
         <RedirectButton text={t('MOONPAY')} src={MoonPay} onClick={getMoonPayUrl} />
         <RedirectButton text={t('TRANSAK')} src={Transak} onClick={getTransacUrl} />
-        <RedirectButton
-          text={t('PAYPAL')}
-          subText={t('US_UK_EU_ONLY')}
-          src={PayPal}
-          onClick={() => getMoonPayUrl('paypal')}
-        />
+        {showPaypal && (
+          <RedirectButton
+            text={t('PAYPAL')}
+            subText={t('US_UK_EU_ONLY')}
+            src={PayPal}
+            onClick={() => getMoonPayUrl('paypal')}
+          />
+        )}
         <InfoContainer titleText={t('DISCLAIMER')} bodyText={t('THIRD_PARTY_WARNING')} />
       </Container>
       <BottomBar tab="dashboard" />

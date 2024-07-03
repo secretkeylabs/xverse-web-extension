@@ -30,9 +30,6 @@ const BackButton = styled.button((props) => ({
   '&:hover': {
     backgroundColor: props.theme.colors.white_900,
   },
-  '&:focus': {
-    backgroundColor: props.theme.colors.white_850,
-  },
 }));
 
 const MenuButton = styled.button((props) => ({
@@ -44,13 +41,13 @@ const MenuButton = styled.button((props) => ({
   right: props.theme.space.xxs,
 }));
 
-interface Props {
+type Props = {
   title?: string;
   onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
   showBackButton?: boolean;
   className?: string;
   onMenuClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
-}
+};
 
 function TopRow({ title, onClick, showBackButton = true, className, onMenuClick }: Props) {
   return (

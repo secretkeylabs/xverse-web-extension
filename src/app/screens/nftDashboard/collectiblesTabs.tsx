@@ -28,7 +28,7 @@ export const GridContainer = styled.div<{
     : 'repeat(auto-fill,minmax(150px,1fr))',
 }));
 
-export const RareSatsTabContainer = styled.div<{
+const RareSatsTabContainer = styled.div<{
   isGalleryOpen: boolean;
 }>((props) => ({
   marginTop: props.theme.space.l,

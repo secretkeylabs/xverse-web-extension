@@ -56,7 +56,7 @@ const RedirectButton = styled.button`
   text-transform: capitalize;
 `;
 
-export const AnchorLink = styled.a((props) => ({
+const AnchorLink = styled.a((props) => ({
   display: 'inline-flex',
   alignItems: 'center',
   gap: props.theme.space.xxxs,
@@ -77,7 +77,8 @@ export type CalloutProps = {
   onClickRedirect?: () => void;
   anchorRedirect?: string;
 };
-export function Callout({
+
+function Callout({
   className,
   dataTestID,
   titleText,

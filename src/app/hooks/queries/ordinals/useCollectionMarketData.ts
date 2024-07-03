@@ -1,7 +1,7 @@
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CollectionMarketDataResponse, getCollectionMarketData } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
-import { handleRetries, InvalidParamsError } from '@utils/query';
+import { InvalidParamsError, handleRetries } from '@utils/query';
 
 /**
  * Get inscription collection market data

@@ -2,11 +2,10 @@ import InfoIcon from '@assets/img/info.svg';
 import WarningIcon from '@assets/img/Warning.svg';
 import styled from 'styled-components';
 
-interface ContainerProps {
+const Container = styled.div<{
   type: 'Info' | 'Warning' | undefined;
   showWarningBackground?: boolean;
-}
-const Container = styled.div<ContainerProps>((props) => ({
+}>((props) => ({
   display: 'flex',
   flexDirection: 'row',
   borderRadius: 12,
@@ -56,14 +55,14 @@ const RedirectButton = styled.button((props) => ({
   alignItems: 'flex-start',
 }));
 
-interface Props {
+type Props = {
   titleText?: string;
   bodyText: string;
   type?: 'Info' | 'Warning';
   onClick?: () => void;
   redirectText?: string;
   showWarningBackground?: boolean;
-}
+};
 
 function InfoContainer({
   titleText,
@@ -97,4 +96,7 @@ function InfoContainer({
   );
 }
 
+/**
+ * @deprecated use @ui-library/callout
+ */
 export default InfoContainer;

@@ -3,6 +3,7 @@ import type {
   AccountType,
   AppInfo,
   FungibleToken,
+  NetworkType,
   SettingsNetwork,
   SupportedCurrency,
 } from '@secretkeylabs/xverse-core';
@@ -33,6 +34,7 @@ export const SetWalletHideStxKey = 'SetWalletHideStx';
 export const SetSpamTokenKey = 'SetSpamTokenKey';
 export const SetSpamTokensKey = 'SetSpamTokensKey';
 export const SetShowSpamTokensKey = 'SetShowSpamTokensKey';
+export const UpdateSavedNamesKey = 'UpdateSavedNamesKey';
 
 export enum WalletSessionPeriods {
   LOW = 15,
@@ -71,6 +73,9 @@ export interface WalletState {
   showSpamTokens: boolean;
   spamToken: FungibleToken | null;
   spamTokens: string[];
+  savedNames: {
+    [key in NetworkType]: { id: number; name?: string }[];
+  };
 }
 
 export interface StoreEncryptedSeed {
@@ -204,6 +209,12 @@ export interface SetShowSpamTokens {
   showSpamTokens: boolean;
 }
 
+export interface UpdateSavedNames {
+  type: typeof UpdateSavedNamesKey;
+  networkType: NetworkType;
+  names: { id: number; name?: string }[];
+}
+
 export type WalletActions =
   | ResetWallet
   | UpdateSoftwareAccounts
@@ -230,4 +241,5 @@ export type WalletActions =
   | SetWalletHideStx
   | SetSpamToken
   | SetSpamTokens
-  | SetShowSpamTokens;
+  | SetShowSpamTokens
+  | UpdateSavedNames;

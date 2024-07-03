@@ -29,7 +29,7 @@ export enum StacksLegacyMethods {
   structuredDataSignatureResponse = 'structuredDataSignatureResponse',
 }
 
-export enum RpcMethods {
+enum RpcMethods {
   request = 'request',
 }
 
@@ -200,7 +200,7 @@ export type CreateRepeatInscriptionsResponseMessage = Message<
   }
 >;
 
-export type BaseWebBtcMessage = {
+type BaseWebBtcMessage = {
   id: RpcId;
   method: string;
 };

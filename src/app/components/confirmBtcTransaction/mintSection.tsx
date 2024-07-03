@@ -1,45 +1,32 @@
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import { ArrowRight } from '@phosphor-icons/react';
-import { RuneSummary } from '@secretkeylabs/xverse-core';
+import { MintActionDetails, RuneSummary } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
-import { ftDecimals } from '@utils/helper';
+import { ftDecimals, getShortTruncatedAddress } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
-import styled from 'styled-components';
 import Theme from '../../../theme';
-
-const Container = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  background: props.theme.colors.elevation1,
-  borderRadius: 12,
-  paddingTop: props.theme.space.m,
-  justifyContent: 'center',
-  marginBottom: props.theme.space.s,
-}));
-
-const RowCenter = styled.div({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-});
-
-const AddressLabel = styled(StyledP)((props) => ({
-  marginLeft: props.theme.space.xxs,
-}));
-
-const Header = styled(RowCenter)((props) => ({
-  marginBottom: props.theme.space.m,
-  padding: `0 ${props.theme.space.m}`,
-}));
+import {
+  AddressLabel,
+  Container,
+  Header,
+  Pill,
+  RowCenter,
+  RuneAmount,
+  RuneData,
+  RuneImage,
+  RuneSymbol,
+  RuneValue,
+  StyledPillLabel,
+} from './runes';
 
 type Props = {
-  mints?: RuneSummary['mint'][];
+  mints?: RuneSummary['mint'][] | MintActionDetails[];
 };
 
 function MintSection({ mints }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-
+  const { ordinalsAddress } = useSelectedAccount();
   if (!mints) return null;
 
   return (
@@ -47,46 +34,57 @@ function MintSection({ mints }: Props) {
       {mints.map(
         (mint) =>
           mint && (
-            <Container key={mint?.runeName}>
+            <Container key={mint.runeName}>
               <Header>
-                <StyledP typography="body_medium_m" color="white_200">
+                <StyledPillLabel>
                   {t('YOU_WILL_MINT')}
-                </StyledP>
+                  {mint.repeats && <Pill>{`x${mint.repeats}`}</Pill>}
+                </StyledPillLabel>
                 <RowCenter>
                   <ArrowRight weight="bold" color={Theme.colors.white_0} size={16} />
                   <AddressLabel typography="body_medium_m">
-                    {t('YOUR_ORDINAL_ADDRESS')}
+                    {mint.destinationAddress && mint.destinationAddress !== ordinalsAddress
+                      ? getShortTruncatedAddress(mint.destinationAddress)
+                      : t('YOUR_ORDINAL_ADDRESS')}
                   </AddressLabel>
                 </RowCenter>
               </Header>
               <Header>
-                <StyledP typography="body_medium_m" color="white_200">
-                  {t('NAME')}
-                </StyledP>
                 <StyledP typography="body_medium_m" color="white_0">
                   {mint?.runeName}
                 </StyledP>
               </Header>
               <Header>
-                <StyledP typography="body_medium_m" color="white_200">
-                  {t('SYMBOL')}
-                </StyledP>
-                <StyledP typography="body_medium_m" color="white_0">
-                  {mint?.symbol}
-                </StyledP>
-              </Header>
-              <Header>
-                <StyledP typography="body_medium_m" color="white_200">
-                  {t('AMOUNT')}
-                </StyledP>
+                <RuneData>
+                  <RuneImage>
+                    <StyledP typography="body_bold_l" color="white_0">
+                      {mint?.symbol}
+                    </StyledP>
+                  </RuneImage>
+                  <RuneAmount>
+                    <StyledP typography="body_medium_m" color="white_0">
+                      {t('AMOUNT')}
+                    </StyledP>
+                    {mint.runeSize && ( // This is the only place where runeSize is used
+                      <StyledP typography="body_medium_s" color="white_400">
+                        {t('RUNE_SIZE')}: {mint.runeSize} Sats
+                      </StyledP>
+                    )}
+                  </RuneAmount>
+                </RuneData>
                 <NumericFormat
                   value={ftDecimals(mint?.amount.toString(10), mint?.divisibility)}
                   displayType="text"
                   thousandSeparator
                   renderText={(value: string) => (
-                    <StyledP typography="body_medium_m" color="white_0">
-                      {value}
-                    </StyledP>
+                    <RuneValue>
+                      <StyledP typography="body_medium_m" color="white_0">
+                        {value}
+                      </StyledP>
+                      <RuneSymbol typography="body_medium_m" color="white_0">
+                        {mint?.symbol}
+                      </RuneSymbol>
+                    </RuneValue>
                   )}
                 />
               </Header>

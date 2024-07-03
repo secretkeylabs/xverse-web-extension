@@ -60,8 +60,16 @@ const BottomBarContainer = styled.div({
 
 const Button = styled.button`
   display: flex;
+  justify-content: center;
+  align-items: center;
   background-color: transparent;
+  border-radius: 24px;
+  padding: 5px;
+  width: 30px;
   margin-bottom: ${(props) => props.theme.space.l};
+  :hover {
+    background-color: ${(props) => props.theme.colors.white_900};
+  }
 `;
 
 function SendLayout({

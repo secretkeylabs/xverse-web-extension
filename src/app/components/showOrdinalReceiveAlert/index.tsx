@@ -1,18 +1,20 @@
 import AlertMessage from '@components/alertMessage';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { ChangeShowOrdinalReceiveAlertAction } from '@stores/wallet/actions/actionCreators';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 
-interface Props {
+type Props = {
   onOrdinalReceiveAlertClose: () => void;
-}
+};
 
 function ShowOrdinalReceiveAlert({ onOrdinalReceiveAlertClose }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'ADDRESS_RECEIVE_ALERT_MESSAGE' });
+  const { showOrdinalReceiveAlert } = useWalletSelector();
   const dispatch = useDispatch();
 
-  const onToggleReceiveOrdinalAlert = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch(ChangeShowOrdinalReceiveAlertAction(!e.target.checked));
+  const onToggleReceiveOrdinalAlert = () => {
+    dispatch(ChangeShowOrdinalReceiveAlertAction(!showOrdinalReceiveAlert));
   };
 
   return (
@@ -24,6 +26,7 @@ function ShowOrdinalReceiveAlert({ onOrdinalReceiveAlertClose }: Props) {
       onButtonClick={onOrdinalReceiveAlertClose}
       tickMarkButtonText={t('DO_NOT_SHOW_MESSAGE')}
       tickMarkButtonClick={onToggleReceiveOrdinalAlert}
+      tickMarkButtonChecked={!showOrdinalReceiveAlert ?? false}
     />
   );
 }
