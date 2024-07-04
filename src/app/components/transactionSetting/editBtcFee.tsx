@@ -28,8 +28,6 @@ import FeeItem from './feeItem';
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  marginLeft: props.theme.space.m,
-  marginRight: props.theme.space.m,
   paddingBottom: props.theme.space.m,
 }));
 

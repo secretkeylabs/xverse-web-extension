@@ -169,7 +169,12 @@ function Brc20TransferForm(props: Props) {
           </RowContainer>
           <AmountInputContainer error={isDangerFeedback(amountError)}>
             <InputFieldContainer>
-              <InputField value={amountToSend} placeholder="0" onChange={onAmountChange} />
+              <InputField
+                value={amountToSend}
+                placeholder="0"
+                onChange={onAmountChange}
+                autoFocus
+              />
             </InputFieldContainer>
             <Text>{tokenCurrency}</Text>
           </AmountInputContainer>

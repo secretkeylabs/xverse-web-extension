@@ -238,6 +238,7 @@ function SendOrdinal() {
                   value={recipientAddress}
                   placeholder={t('ORDINAL_RECIPIENT_PLACEHOLDER')}
                   onChange={handleAddressChange}
+                  autoFocus
                 />
               </InputFieldContainer>
             </AmountInputContainer>

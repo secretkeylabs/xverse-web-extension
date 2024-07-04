@@ -84,11 +84,7 @@ export const initialWalletState: WalletState = {
   spamToken: null,
   spamTokens: [],
   showSpamTokens: false,
-  savedNames: {
-    Mainnet: [],
-    Testnet: [],
-    Signet: [],
-  },
+  savedNames: {},
 };
 
 /**
