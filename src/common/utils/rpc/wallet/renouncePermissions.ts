@@ -9,7 +9,7 @@ import {
   sendAccessDeniedResponseMessage,
   sendInternalErrorMessage,
 } from '../responseMessages/errors';
-import { sendRequestPermissionsSuccessResponseMessage } from '../responseMessages/wallet';
+import { sendRenouncePermissionsSuccessResponseMessage } from '../responseMessages/wallet';
 
 export const handleRenouncePermissions = async (
   message: RpcRequestMessage,
@@ -40,7 +40,7 @@ export const handleRenouncePermissions = async (
     utils.savePermissionsStore(store);
   });
 
-  sendRequestPermissionsSuccessResponseMessage({
+  sendRenouncePermissionsSuccessResponseMessage({
     tabId,
     messageId: parseResult.output.id,
     result: true,

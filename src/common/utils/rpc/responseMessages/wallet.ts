@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import { Return } from '@sats-connect/core';
 import { makeRpcSuccessResponse, sendRpcResponse } from '../helpers';
 import { BaseArgs } from './types';
@@ -14,14 +13,13 @@ export function sendRequestPermissionsSuccessResponseMessage({
   sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
 }
 
-// Remove permissions
-type RequestRemovePermissionsSuccessArgs = BaseArgs & {
+type RenouncePermissionsSuccessArgs = BaseArgs & {
   result: Return<'wallet_renouncePermissions'>;
 };
-export function sendRequestRemovePermissionsSuccessResponseMessage({
+export function sendRenouncePermissionsSuccessResponseMessage({
   tabId,
   messageId,
   result,
-}: RequestRemovePermissionsSuccessArgs) {
+}: RenouncePermissionsSuccessArgs) {
   sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
 }
