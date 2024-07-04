@@ -4,7 +4,7 @@ import useRunesApi from '@hooks/apiClients/useRunesApi';
 import useTransactionContext from '@hooks/useTransactionContext';
 import { Params, RpcErrorCode } from '@sats-connect/core';
 import { TransactionBuildPayload, generateTransaction } from '@screens/sendBtc/helpers';
-import { Rune } from '@secretkeylabs/xverse-core';
+import { Rune, Transport } from '@secretkeylabs/xverse-core';
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import SuperJSON from 'superjson';
@@ -123,10 +123,11 @@ const useMintRequest = () => {
     }
   };
 
-  const payAndConfirmMintRequest = async () => {
+  const payAndConfirmMintRequest = async (ledgerTransport?: Transport) => {
     try {
       setIsExecuting(true);
       const txid = await orderTx?.transaction.broadcast({
+        ledgerTransport,
         rbfEnabled: false,
       });
       if (!txid) {
