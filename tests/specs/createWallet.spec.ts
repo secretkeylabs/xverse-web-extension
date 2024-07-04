@@ -73,8 +73,7 @@ test.describe('Create and Restore Wallet Flow', () => {
       const newWallet = new Wallet(page);
       await newWallet.checkVisualsStartpage();
 
-      const balanceText = await newWallet.balance.innerText();
-      await expect(balanceText).toBe('$0.00');
+      await expect(newWallet.balance).toHaveText('$0.00');
 
       // TODO: find better selector for the receive button
       await newWallet.allupperButtons.nth(1).click();
@@ -147,8 +146,8 @@ test.describe('Create and Restore Wallet Flow', () => {
       const newWallet = new Wallet(newPage);
       await newWallet.checkVisualsStartpage();
 
-      const balanceText = await newWallet.balance.innerText();
-      await expect(balanceText).toBe('$0.00');
+      const balanceText = newWallet.balance;
+      await await expect(balanceText).toHaveText('$0.00');
 
       await newWallet.allupperButtons.nth(1).click();
 

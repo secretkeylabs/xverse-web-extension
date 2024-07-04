@@ -200,9 +200,11 @@ export type CreateRepeatInscriptionsResponseMessage = Message<
   }
 >;
 
-export type WebBtcMessage<Method extends keyof Requests> = {
+type BaseWebBtcMessage = {
   id: RpcId;
-  method: Method;
+  method: string;
+};
+export type WebBtcMessage<Method extends keyof Requests> = BaseWebBtcMessage & {
   params: Params<Method>;
 };
 

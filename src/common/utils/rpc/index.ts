@@ -1,5 +1,11 @@
 import { WebBtcMessage } from '@common/types/message-types';
-import { Requests, RpcErrorCode } from '@sats-connect/core';
+import {
+  RpcErrorCode,
+  RpcRequestMessage,
+  getBalanceMethodName,
+  renouncePermissionsMethodName,
+  requestPermissionsMethodName,
+} from '@sats-connect/core';
 import { getTabIdFromPort } from '..';
 import {
   handleGetAccounts,
@@ -8,6 +14,7 @@ import {
   handleSignMessage,
   handleSignPsbt,
 } from './btc';
+import handleGetBalance from './btc/getBalance';
 import handleGetInfo from './getInfo';
 import { makeRPCError, sendRpcResponse } from './helpers';
 import handleEtchRune from './runes/etch';
@@ -21,85 +28,97 @@ import handleStacksSignMessage from './stx/signMessage';
 import handleStacksSignStructuredMessage from './stx/signStructuredMessage';
 import signTransaction from './stx/signTransaction';
 import transferStx from './stx/transferStx';
+import { handleRenouncePermissions } from './wallet/renouncePermissions';
+import { handleRequestPermissions } from './wallet/requestPermissions';
 
-const handleRPCRequest = async (
-  message: WebBtcMessage<keyof Requests>,
-  port: chrome.runtime.Port,
-) => {
+async function handleRPCRequest(message: RpcRequestMessage, port: chrome.runtime.Port) {
   try {
     switch (message.method) {
+      case requestPermissionsMethodName: {
+        await handleRequestPermissions(message, port);
+        break;
+      }
+      case renouncePermissionsMethodName: {
+        await handleRenouncePermissions(message, port);
+        break;
+      }
+      case getBalanceMethodName: {
+        await handleGetBalance(message, port);
+        break;
+      }
+
       case 'getInfo': {
-        handleGetInfo(message.id, getTabIdFromPort(port));
+        handleGetInfo(message.id as string, getTabIdFromPort(port));
         break;
       }
       case 'getAddresses': {
-        await handleGetAddresses(message as WebBtcMessage<'getAddresses'>, port);
+        await handleGetAddresses(message as unknown as WebBtcMessage<'getAddresses'>, port);
         break;
       }
       case 'getAccounts': {
-        await handleGetAccounts(message as WebBtcMessage<'getAccounts'>, port);
+        await handleGetAccounts(message as unknown as WebBtcMessage<'getAccounts'>, port);
         break;
       }
       case 'signMessage': {
-        await handleSignMessage(message as WebBtcMessage<'signMessage'>, port);
+        await handleSignMessage(message as unknown as WebBtcMessage<'signMessage'>, port);
         break;
       }
       case 'sendTransfer': {
-        await handleSendTransfer(message as WebBtcMessage<'sendTransfer'>, port);
+        await handleSendTransfer(message as unknown as WebBtcMessage<'sendTransfer'>, port);
         break;
       }
       case 'signPsbt': {
-        await handleSignPsbt(message as WebBtcMessage<'signPsbt'>, port);
+        await handleSignPsbt(message as unknown as WebBtcMessage<'signPsbt'>, port);
         break;
       }
 
       // Stacks methods
 
       case 'stx_callContract': {
-        await callContract(message as WebBtcMessage<'stx_callContract'>, port);
+        await callContract(message as unknown as WebBtcMessage<'stx_callContract'>, port);
         break;
       }
       case 'stx_deployContract': {
-        await deployContract(message as WebBtcMessage<'stx_deployContract'>, port);
+        await deployContract(message as unknown as WebBtcMessage<'stx_deployContract'>, port);
         break;
       }
       case 'stx_getAccounts': {
-        await handleGetStxAccounts(message as WebBtcMessage<'stx_getAccounts'>, port);
+        await handleGetStxAccounts(message as unknown as WebBtcMessage<'stx_getAccounts'>, port);
         break;
       }
       case 'stx_getAddresses': {
-        await handleGetStxAddresses(message as WebBtcMessage<'stx_getAddresses'>, port);
+        await handleGetStxAddresses(message as unknown as WebBtcMessage<'stx_getAddresses'>, port);
         break;
       }
       case 'stx_signTransaction': {
-        await signTransaction(message as WebBtcMessage<'stx_signTransaction'>, port);
+        await signTransaction(message as unknown as WebBtcMessage<'stx_signTransaction'>, port);
         break;
       }
       case 'stx_transferStx': {
-        await transferStx(message as WebBtcMessage<'stx_transferStx'>, port);
+        await transferStx(message as unknown as WebBtcMessage<'stx_transferStx'>, port);
         break;
       }
       case 'stx_signMessage': {
-        await handleStacksSignMessage(message as WebBtcMessage<'stx_signMessage'>, port);
+        await handleStacksSignMessage(message as unknown as WebBtcMessage<'stx_signMessage'>, port);
         break;
       }
       case 'stx_signStructuredMessage': {
         await handleStacksSignStructuredMessage(
-          message as WebBtcMessage<'stx_signStructuredMessage'>,
+          message as unknown as WebBtcMessage<'stx_signStructuredMessage'>,
           port,
         );
         break;
       }
       case 'runes_getBalance': {
-        await handleGetRunesBalance(message.id, getTabIdFromPort(port));
+        await handleGetRunesBalance(message, port);
         break;
       }
       case 'runes_mint': {
-        await handleMintRune(message as WebBtcMessage<'runes_mint'>, port);
+        await handleMintRune(message as unknown as WebBtcMessage<'runes_mint'>, port);
         break;
       }
       case 'runes_etch': {
-        await handleEtchRune(message as WebBtcMessage<'runes_etch'>, port);
+        await handleEtchRune(message as unknown as WebBtcMessage<'runes_etch'>, port);
         break;
       }
       default:
@@ -113,6 +132,7 @@ const handleRPCRequest = async (
         break;
     }
   } catch (e: any) {
+    // eslint-disable-next-line no-console
     console.error(e);
     sendRpcResponse(
       getTabIdFromPort(port),
@@ -122,6 +142,6 @@ const handleRPCRequest = async (
       }),
     );
   }
-};
+}
 
 export default handleRPCRequest;

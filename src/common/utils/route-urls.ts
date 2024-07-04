@@ -13,6 +13,7 @@ enum RequestsRoutes {
   SendBtcTx = '/btc-send-request',
   CreateInscription = '/create-inscription',
   CreateRepeatInscriptions = '/create-repeat-inscriptions',
+  ConnectionRequest = '/connection-request',
   MintRune = '/mint-rune',
   EtchRune = '/etch-rune',
 }
