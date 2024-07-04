@@ -74,7 +74,7 @@ export interface WalletState {
   spamToken: FungibleToken | null;
   spamTokens: string[];
   savedNames: {
-    [key in NetworkType]: { id: number; name?: string }[];
+    [key in NetworkType]?: { id: number; name?: string }[];
   };
 }
 

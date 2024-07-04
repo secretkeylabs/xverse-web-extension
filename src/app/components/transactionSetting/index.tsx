@@ -115,8 +115,13 @@ function TransactionSettingAlert({
         return;
       }
     }
-    setShowNonceSettings(false);
     setShowFeeSettings(false);
+    setError('');
+    onApplyClick({ fee: feeInput.toString(), nonce: nonceInput });
+  };
+
+  const applyClickForNonceStx = () => {
+    setShowNonceSettings(false);
     setError('');
     onApplyClick({ fee: feeInput.toString(), nonce: nonceInput });
   };
@@ -262,7 +267,7 @@ function TransactionSettingAlert({
           <Button title="Back" onClick={onClosePress} variant="secondary" />
           <Button
             title={t('TRANSACTION_SETTING.APPLY')}
-            onClick={type === 'STX' ? applyClickForStx : applyClickForBtc}
+            onClick={showNonceSettings || nonceSettings ? applyClickForNonceStx : applyClickForStx}
             loading={isLoading}
             disabled={isLoading || !!error}
           />

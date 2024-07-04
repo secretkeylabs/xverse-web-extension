@@ -17,6 +17,7 @@ import {
 import handleGetBalance from './btc/getBalance';
 import handleGetInfo from './getInfo';
 import { makeRPCError, sendRpcResponse } from './helpers';
+import handleGetInscriptions from './ordinals/getInscriptions';
 import handleEtchRune from './runes/etch';
 import handleGetRunesBalance from './runes/getBalance';
 import handleMintRune from './runes/mint';
@@ -111,6 +112,10 @@ async function handleRPCRequest(message: RpcRequestMessage, port: chrome.runtime
       }
       case 'runes_getBalance': {
         await handleGetRunesBalance(message, port);
+        break;
+      }
+      case 'ord_getInscriptions': {
+        await handleGetInscriptions(message, port);
         break;
       }
       case 'runes_mint': {

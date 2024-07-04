@@ -300,7 +300,7 @@
     "ASSOCIATED_BNS_DOMAIN": "Associated BNS Name",
     "SWITCH_TO": "Switch to",
     "SEND_ORDINAL_TITLE": "Send Ordinal",
-    "MAKE_SURE_THE_RECIPIENT": "Make sure the recipient address support Ordinals. Items sent to the wrong address cannot be recovered.",
+    "MAKE_SURE_THE_RECIPIENT": "Make sure the recipient address supports Ordinals. Items sent to the wrong address cannot be recovered.",
     "SEND_BRC20_ORDINAL_WALLET_WARNING": "Transferring this Ordinal inscription will initiate the transfer of your BRC-20 tokens.",
     "SEND_ORDINAL_TO_SELF_WARNING": "You are about to transfer an Ordinal to yourself",
     "SEND_BRC20_ORDINAL_TO_SELF_WARNING": "You are about to transfer BRC-20 tokens to yourself",
