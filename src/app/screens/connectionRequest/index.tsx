@@ -17,6 +17,7 @@ import { Host } from './host';
 import {
   AccountSwitcherContainer,
   Container,
+  ContentContainer,
   PermissionDescriptionsContainer,
 } from './index.styles';
 import * as Permissions from './permissions';
@@ -80,18 +81,20 @@ function ConnectionRequestInner({ data, context }: ConnectionRequestInnerProps) 
 
   return (
     <Container>
-      <DappLogo />
-      <Title />
-      <Host url={context.origin} />
+      <ContentContainer>
+        <DappLogo />
+        <Title />
+        <Host url={context.origin} />
 
-      <AccountSwitcherContainer>
-        <SelectAccountPrompt />
-      </AccountSwitcherContainer>
+        <AccountSwitcherContainer>
+          <SelectAccountPrompt />
+        </AccountSwitcherContainer>
 
-      <PermissionDescriptionsContainer>
-        <Permissions.Title />
-        <Permissions.Description description={t('PERMISSION_WALLET_BALANCE')} />
-      </PermissionDescriptionsContainer>
+        <PermissionDescriptionsContainer>
+          <Permissions.Title />
+          <Permissions.Description description={t('PERMISSION_WALLET_BALANCE')} />
+        </PermissionDescriptionsContainer>
+      </ContentContainer>
 
       <StickyHorizontalSplitButtonContainer>
         <Button type="button" variant="secondary" onClick={handleCancel} title="Deny" />
