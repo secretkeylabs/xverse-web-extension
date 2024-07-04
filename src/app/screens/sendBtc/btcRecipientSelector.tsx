@@ -2,6 +2,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { validateBtcAddress } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import Input from '@ui-library/input';
+import { FeedbackVariant } from '@ui-library/inputFeedback';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -15,7 +16,7 @@ const Container = styled.div`
 `;
 
 const Buttons = styled.div`
-  margin: ${(props) => props.theme.spacing(12)}px 0;
+  margin: ${(props) => props.theme.space.l} 0;
 `;
 
 type Props = {
@@ -44,17 +45,20 @@ function RecipientSelector({ recipientAddress, setRecipientAddress, onNext, head
     setAddressIsValid(true);
   };
 
-  const inputFeedback = useMemo(() => {
+  const inputFeedback: {
+    message: string;
+    variant?: FeedbackVariant;
+  }[] = useMemo(() => {
     if (addressIsValid) {
       return [];
     }
     return [
       {
-        variant: 'danger' as const,
         message: t('ERRORS.ADDRESS_INVALID'),
+        variant: 'danger',
       },
     ];
-  }, [addressIsValid]);
+  }, [addressIsValid, t]);
 
   return (
     <Container>
@@ -67,6 +71,7 @@ function RecipientSelector({ recipientAddress, setRecipientAddress, onNext, head
           onChange={handleAddressChange}
           variant={addressIsValid ? 'default' : 'danger'}
           feedback={inputFeedback}
+          autoFocus
         />
       </div>
       <Buttons>

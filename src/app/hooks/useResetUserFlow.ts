@@ -28,6 +28,7 @@ const userFlowConfig: Record<string, { resetTo: string }> = {
   '/verify-ledger': { resetTo: '/verify-ledger?mismatch=true' },
   '/add-stx-address-ledger': { resetTo: '/add-stx-address-ledger?mismatch=true' },
   '/send-rune': { resetTo: '/' },
+  '/coinDashboard': { resetTo: '/' },
 };
 type UserFlowConfigKey = keyof typeof userFlowConfig;
 

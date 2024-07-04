@@ -1,165 +1,149 @@
-import SendForm from '@components/sendForm';
-import BottomBar from '@components/tabBar';
-import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
-import useStxWalletData from '@hooks/queries/useStxWalletData';
-import useNetworkSelector from '@hooks/useNetwork';
-import useSelectedAccount from '@hooks/useSelectedAccount';
-import useWalletSelector from '@hooks/useWalletSelector';
-import {
-  applyFeeMultiplier,
-  buf2hex,
-  generateUnsignedStxTokenTransferTransaction,
-  microstacksToStx,
-  StacksTransaction,
-  stxToMicrostacks,
-  validateStxAddress,
-} from '@secretkeylabs/xverse-core';
-import { useMutation } from '@tanstack/react-query';
-import { replaceCommaByDot } from '@utils/helper';
+import TokenImage from '@components/tokenImage';
+import useResetUserFlow from '@hooks/useResetUserFlow';
+import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core';
+import { isInOptions } from '@utils/helper';
+import SendLayout from 'app/layouts/sendLayout';
 import BigNumber from 'bignumber.js';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import TopRow from '../../components/topRow';
+import styled from 'styled-components';
+import { Step, getNextStep, getPreviousStep } from './stepResolver';
+import Step1SelectRecipientAndMemo from './steps/Step1SelectRecipient';
+import Step2SelectAmount from './steps/Step2SelectAmount';
+import Step3Confirm from './steps/Step3Confirm';
+
+const Container = styled.div`
+  display: flex;
+  flex: 1 1 100%;
+  min-height: 370px;
+`;
+
+const TitleContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 0 0;
+`;
+
+const Title = styled.div`
+  ${(props) => props.theme.typography.headline_xs}
+  margin-top: ${(props) => props.theme.space.s};
+  margin-bottom: ${(props) => props.theme.space.l};
+`;
 
 function SendStxScreen() {
-  const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
+  const isInOption = isInOptions();
   const navigate = useNavigate();
-  const { stxAddress, stxPublicKey } = useSelectedAccount();
-  const { network, feeMultipliers } = useWalletSelector();
-  const { data: stxData } = useStxWalletData();
-  const [amountError, setAmountError] = useState('');
-  const [addressError, setAddressError] = useState('');
-  const [memoError, setMemoError] = useState('');
-  const selectedNetwork = useNetworkSelector();
-  const { data: stxPendingTxData } = useStxPendingTxData();
+  const { t } = useTranslation('translation');
+
+  useResetUserFlow('/send-stx');
+
   const location = useLocation();
-  let recipientAddress: string | undefined;
-  let amountToSend: string | undefined;
-  let stxMemo: string | undefined;
+  const {
+    recipientAddress: stateAddress,
+    amountToSend,
+    stxMemo,
+    fee: previousFee,
+  } = location.state || {};
 
-  if (location.state) {
-    recipientAddress = location.state.recipientAddress;
-    amountToSend = location.state.amountToSend;
-    stxMemo = location.state.stxMemo;
-  }
+  const [currentStep, setCurrentStep] = useState<Step>(
+    stateAddress ? Step.SelectAmount : Step.SelectRecipient,
+  );
 
-  const { isLoading, data, mutate } = useMutation<
-    StacksTransaction,
-    Error,
-    { associatedAddress: string; amount: string; memo?: string }
-  >({
-    mutationFn: async ({ associatedAddress, amount, memo }) => {
-      const unsignedSendStxTx: StacksTransaction =
-        await generateUnsignedStxTokenTransferTransaction(
-          associatedAddress,
-          stxToMicrostacks(new BigNumber(amount)).toString(),
-          memo!,
-          stxPendingTxData?.pendingTransactions ?? [],
-          stxPublicKey,
-          selectedNetwork,
-        );
-      applyFeeMultiplier(unsignedSendStxTx, feeMultipliers);
-      return unsignedSendStxTx;
-    },
-  });
+  // Shared states
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (data) {
-      navigate('/confirm-stx-tx', {
-        state: {
-          unsignedTx: buf2hex(data.serialize()),
-        },
-      });
+  // Step 1 states
+  const [recipientAddress, setRecipientAddress] = useState(stateAddress ?? '');
+  // Will be used in the future when the summary screen is refactored
+  const [, setRecipientDomain] = useState('');
+  const [memo, setMemo] = useState(stxMemo ?? '');
+
+  // Step 2 states
+  const [amount, setAmount] = useState(
+    amountToSend ? stxToMicrostacks(new BigNumber(amountToSend)).toString() : '',
+  );
+  const [sendMax, setSendMax] = useState(false);
+  const [feeRate, setFeeRate] = useState(
+    previousFee ? microstacksToStx(new BigNumber(previousFee)).toString() : '',
+  );
+  const [unsignedSendStxTx, setUnsignedSendStxTx] = useState('');
+
+  const handleCancel = () => {
+    if (isInOption) {
+      window.close();
+      return;
     }
-  }, [data]);
-
-  const handleBackButtonClick = () => {
-    // redirect to homepage to avoid looping back to confrim screen
     navigate('/');
   };
 
-  const validateFields = (associatedAddress: string, amount: string, memo?: string): boolean => {
-    if (!associatedAddress) {
-      setAddressError(t('ERRORS.ADDRESS_REQUIRED'));
-      return false;
-    }
-
-    if (!amount) {
-      setAmountError(t('ERRORS.AMOUNT_REQUIRED'));
-      return false;
-    }
-    if (!validateStxAddress({ stxAddress: associatedAddress, network: network.type })) {
-      setAddressError(t('ERRORS.ADDRESS_INVALID'));
-      return false;
-    }
-
-    if (associatedAddress === stxAddress) {
-      setAddressError(t('ERRORS.SEND_TO_SELF'));
-      return false;
-    }
-
-    let parsedAmount = new BigNumber(0);
-    try {
-      if (!Number.isNaN(Number(amount))) {
-        parsedAmount = new BigNumber(amount);
-      } else {
-        setAmountError(t('ERRORS.INVALID_AMOUNT'));
-        return false;
-      }
-    } catch (e) {
-      setAmountError(t('ERRORS.INVALID_AMOUNT'));
-      return false;
-    }
-
-    if (stxToMicrostacks(parsedAmount).lt(1)) {
-      setAmountError(t('ERRORS.MINIMUM_AMOUNT'));
-      return false;
-    }
-
-    if (stxToMicrostacks(parsedAmount).gt(stxData?.availableBalance ?? new BigNumber(0))) {
-      setAmountError(t('ERRORS.INSUFFICIENT_BALANCE'));
-      return false;
-    }
-
-    if (memo) {
-      if (Buffer.from(memo).byteLength >= 34) {
-        setMemoError(t('ERRORS.MEMO_LENGTH'));
-        return false;
-      }
-    }
-    return true;
-  };
-
-  const onPressSendSTX = async (associatedAddress: string, amount: string, memo?: string) => {
-    const modifyAmount = replaceCommaByDot(amount);
-    const addMemo = memo ?? '';
-    if (validateFields(associatedAddress.trim(), modifyAmount, memo)) {
-      setAddressError('');
-      setMemoError('');
-      setAmountError('');
-      mutate({ amount, associatedAddress, memo: addMemo });
+  const handleBackButtonClick = () => {
+    if (currentStep > 0) {
+      setCurrentStep(getPreviousStep(currentStep, true));
+    } else {
+      handleCancel();
     }
   };
 
-  return (
-    <>
-      <TopRow title={t('SEND')} onClick={handleBackButtonClick} />
-      <SendForm
-        processing={isLoading}
-        currencyType="STX"
-        amountError={amountError}
-        recipientError={addressError}
-        memoError={memoError}
-        balance={Number(microstacksToStx(new BigNumber(stxData?.availableBalance || 0)))}
-        onPressSend={onPressSendSTX}
-        recipient={recipientAddress}
-        amountToSend={amountToSend}
-        stxMemo={stxMemo}
-      />
-      <BottomBar tab="dashboard" />
-    </>
+  const header = (
+    <TitleContainer>
+      <TokenImage currency="STX" />
+      <Title>{t('SEND.SEND')}</Title>
+    </TitleContainer>
   );
+
+  switch (currentStep) {
+    case Step.SelectRecipient:
+      return (
+        <SendLayout selectedBottomTab="dashboard" onClickBack={handleBackButtonClick}>
+          <Container>
+            <Step1SelectRecipientAndMemo
+              header={header}
+              recipientAddress={recipientAddress}
+              setRecipientAddress={setRecipientAddress}
+              setRecipientDomain={setRecipientDomain}
+              memo={memo}
+              setMemo={setMemo}
+              onNext={() => {
+                setIsLoading(false);
+                setCurrentStep(getNextStep(Step.SelectRecipient, true));
+              }}
+              isLoading={isLoading}
+            />
+          </Container>
+        </SendLayout>
+      );
+    case Step.SelectAmount:
+      return (
+        <SendLayout selectedBottomTab="dashboard" onClickBack={handleBackButtonClick}>
+          <Container>
+            <Step2SelectAmount
+              header={header}
+              amount={amount}
+              setAmount={setAmount}
+              setFeeRate={setFeeRate}
+              sendMax={sendMax}
+              setSendMax={setSendMax}
+              fee={feeRate}
+              getFeeForFeeRate={(fee) => Promise.resolve(fee)}
+              dustFiltered={false}
+              onNext={() => setCurrentStep(getNextStep(Step.SelectAmount, true))}
+              isLoading={isLoading}
+              setIsLoading={setIsLoading}
+              unsignedSendStxTx={unsignedSendStxTx}
+              setUnsignedSendStxTx={setUnsignedSendStxTx}
+              recipientAddress={recipientAddress}
+              memo={memo}
+            />
+          </Container>
+        </SendLayout>
+      );
+    case Step.Confirm:
+      return <Step3Confirm unsignedSendStxTx={unsignedSendStxTx} fee={feeRate} />;
+    default:
+      throw new Error(`Unknown step: ${currentStep}`);
+  }
 }
 
 export default SendStxScreen;

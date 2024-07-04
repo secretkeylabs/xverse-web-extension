@@ -13,22 +13,18 @@ import {
   validateBtcAddress,
 } from '@secretkeylabs/xverse-core';
 import { InputFeedbackProps, isDangerFeedback } from '@ui-library/inputFeedback';
-import {
-  Brc20TransferEstimateFeesParams,
-  ConfirmBrc20TransferState,
-  SendBrc20TransferState,
-} from '@utils/brc20';
+import { Brc20TransferEstimateFeesParams, ConfirmBrc20TransferState } from '@utils/brc20';
 import { isInOptions, replaceCommaByDot } from '@utils/helper';
 import { getFtTicker } from '@utils/tokens';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Brc20TransferForm from './brc20TransferForm';
 
 function SendBrc20Screen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND_BRC20' });
   const navigate = useNavigate();
-  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { btcAddress, ordinalsAddress } = useSelectedAccount();
   const { network } = useWalletSelector();
   const { data: brc20CoinsList } = useGetBrc20FungibleTokens();
@@ -44,15 +40,18 @@ function SendBrc20Screen() {
 
   useResetUserFlow('/send-brc20-one-step');
 
+  const principal = searchParams.get('principal');
+  const fungibleToken = brc20CoinsList?.find((coin) => coin.principal === principal);
+  if (!fungibleToken) {
+    navigate('/');
+    return null;
+  }
+
   const isNextEnabled =
     !isDangerFeedback(amountError) &&
     !isDangerFeedback(recipientError) &&
     !!recipientAddress &&
     amountToSend !== '';
-
-  const { fungibleToken: ft }: SendBrc20TransferState = location.state || {};
-  const coinName = location.search ? location.search.split('coinName=')[1] : undefined;
-  const fungibleToken = ft || brc20CoinsList?.find((coin) => coin.name === coinName);
 
   const handleBackButtonClick = () => {
     navigate(-1);
@@ -60,7 +59,7 @@ function SendBrc20Screen() {
 
   const validateAmount = (amountInput: string): boolean => {
     const amount = Number(replaceCommaByDot(amountInput));
-    const balance = Number(fungibleToken.balance);
+    const balance = Number(fungibleToken?.balance);
     if (!Number.isFinite(amount) || amount === 0) {
       setAmountError({ variant: 'danger', message: t('ERRORS.AMOUNT_REQUIRED') });
       return false;

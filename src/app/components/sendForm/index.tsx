@@ -47,7 +47,7 @@ import {
   TokenContainer,
 } from './index.styled';
 
-interface Props {
+type Props = {
   onPressSend: (recipientID: string, amount: string, memo?: string) => void;
   currencyType: CurrencyTypes;
   amountError?: string;
@@ -68,7 +68,7 @@ interface Props {
   onAddressInputChange?: (recipientAddress: string) => void;
   warning?: string;
   info?: string;
-}
+};
 
 function SendForm({
   onPressSend,

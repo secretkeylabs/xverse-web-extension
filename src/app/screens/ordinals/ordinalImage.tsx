@@ -133,7 +133,7 @@ const ContentTypeThumbnailContainer = styled.div`
   background-color: ${(props) => props.theme.colors.white_0};
 `;
 
-export const StyledBarLoader = styled(BetterBarLoader)((props) => ({
+const StyledBarLoader = styled(BetterBarLoader)((props) => ({
   padding: 0,
   borderRadius: props.theme.radius(1),
   marginBottom: 0,
@@ -244,10 +244,13 @@ function OrdinalImage({
   if (contentType.includes('image')) {
     return renderImage(t('ORDINAL'), `${XVERSE_ORDIVIEW_URL(network.type)}/content/${ordinal.id}`);
   }
-  
+
   // if content type is undefined or "", we fall back to ordiview thumbnail
   if (!contentType) {
-    return renderImage(t('ORDINAL'), `${XVERSE_ORDIVIEW_URL(network.type)}/thumbnail/${ordinal.id}`);
+    return renderImage(
+      t('ORDINAL'),
+      `${XVERSE_ORDIVIEW_URL(network.type)}/thumbnail/${ordinal.id}`,
+    );
   }
 
   if (textContent?.includes('brc-721e')) {

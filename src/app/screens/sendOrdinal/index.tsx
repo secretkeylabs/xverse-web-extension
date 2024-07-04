@@ -1,7 +1,7 @@
 import ActionButton from '@components/button';
+import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useAddressInscription from '@hooks/queries/ordinals/useAddressInscription';
 import useCoinRates from '@hooks/queries/useCoinRates';
-import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSeedVault from '@hooks/useSeedVault';
 import useSelectedAccount from '@hooks/useSelectedAccount';
@@ -238,6 +238,7 @@ function SendOrdinal() {
                   value={recipientAddress}
                   placeholder={t('ORDINAL_RECIPIENT_PLACEHOLDER')}
                   onChange={handleAddressChange}
+                  autoFocus
                 />
               </InputFieldContainer>
             </AmountInputContainer>

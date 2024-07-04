@@ -17,7 +17,7 @@ import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import useBtcClient from './useBtcClient';
+import useBtcClient from './apiClients/useBtcClient';
 import useNetworkSelector from './useNetwork';
 import useSelectedAccount from './useSelectedAccount';
 import useWalletSelector from './useWalletSelector';

@@ -4,12 +4,14 @@ import OptionsDialog from '@components/optionsDialog/optionsDialog';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import { useVisibleBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
-import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useGetRuneFungibleTokens';
+import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useSpamTokens from '@hooks/queries/useSpamTokens';
+import useResetUserFlow, { broadcastResetUserFlow } from '@hooks/useResetUserFlow';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import { Flag } from '@phosphor-icons/react';
+import { FungibleToken } from '@secretkeylabs/xverse-core';
 import {
   setBrc20ManageTokensAction,
   setRunesManageTokensAction,
@@ -22,7 +24,7 @@ import { getExplorerUrl } from '@utils/helper';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import Theme from 'theme';
 import CoinHeader from './coinHeader';
@@ -142,7 +144,6 @@ const TokenText = styled(StyledP)`
 
 export default function CoinDashboard() {
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
-  const navigate = useNavigate();
   const [showFtContractDetails, setShowFtContractDetails] = useState(false);
   const [showOptionsDialog, setShowOptionsDialog] = useState(false);
   const [optionsDialogIndents, setOptionsDialogIndents] = useState<
@@ -155,28 +156,32 @@ export default function CoinDashboard() {
   const { visible: runesCoinsList } = useVisibleRuneFungibleTokens();
   const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
   const { visible: brc20CoinsList } = useVisibleBrc20FungibleTokens();
-  const ftKey = searchParams.get('ftKey');
 
+  const ftKey = searchParams.get('ftKey');
+  const protocol = searchParams.get('protocol');
+  let selectedFt: FungibleToken | undefined;
+
+  if (ftKey && protocol) {
+    switch (protocol) {
+      case 'stacks':
+        selectedFt = sip10CoinsList.find((ft) => ft.principal === ftKey);
+        break;
+      case 'brc-20':
+        selectedFt = brc20CoinsList.find((ft) => ft.principal === ftKey);
+        break;
+      case 'runes':
+        selectedFt = runesCoinsList.find((ft) => ft.principal === ftKey);
+        break;
+      default:
+        selectedFt = undefined;
+    }
+  }
+
+  useResetUserFlow('/coinDashboard');
   useBtcWalletData();
 
-  const handleGoBack = () => {
-    navigate(-1);
-  };
+  const handleGoBack = () => broadcastResetUserFlow();
 
-  let selectedFt = sip10CoinsList.find((ft) => ft.principal === ftKey);
-  let selectedProtocol = 'stacks';
-
-  if (!selectedFt) {
-    selectedFt = brc20CoinsList.find((ft) => ft.principal === ftKey);
-    selectedProtocol = 'brc-20';
-  }
-
-  if (!selectedFt) {
-    selectedFt = runesCoinsList.find((ft) => ft.principal === ftKey);
-    selectedProtocol = 'runes';
-  }
-
-  const protocol = selectedProtocol || selectedFt?.protocol;
   useTrackMixPanelPageViewed(
     protocol
       ? {
@@ -229,13 +234,11 @@ export default function CoinDashboard() {
                 handleGoBack();
                 return;
               }
-
               // set the visibility to false
               const payload = {
                 principal: selectedFt.principal,
                 isEnabled: false,
               };
-
               if (protocol === 'runes') {
                 dispatch(setRunesManageTokensAction(payload));
               } else if (protocol === 'stacks') {
@@ -258,7 +261,7 @@ export default function CoinDashboard() {
         </OptionsDialog>
       )}
       <Container>
-        <CoinHeader coin={currency as CurrencyTypes} fungibleToken={selectedFt} />
+        <CoinHeader currency={currency as CurrencyTypes} fungibleToken={selectedFt} />
         {protocol === 'stacks' && (
           <FtInfoContainer>
             <Button
@@ -278,7 +281,7 @@ export default function CoinDashboard() {
             </Button>
           </FtInfoContainer>
         )}
-        {protocol === 'stacks' && showFtContractDetails && (
+        {selectedFt && protocol === 'stacks' && showFtContractDetails && (
           <TokenContractContainer data-testid="coin-contract-container">
             <h1>{t('FT_CONTRACT_PREFIX')}</h1>
             <ContractAddressCopyButton onClick={handleCopyContractAddress}>
@@ -300,7 +303,7 @@ export default function CoinDashboard() {
           coin={currency as CurrencyTypes}
           stxTxFilter={
             selectedFt?.protocol === 'runes'
-              ? selectedFt.name
+              ? selectedFt?.name
               : `${selectedFt?.principal}::${selectedFt?.assetName}`
           }
           brc20Token={protocol === 'brc-20' ? selectedFt?.principal || null : null}

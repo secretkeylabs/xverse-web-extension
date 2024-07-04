@@ -21,12 +21,12 @@ const Container = styled.div`
 `;
 
 const FeeRateContainer = styled.div`
-  margin-top: ${(props) => props.theme.spacing(12)}px;
-  margin-bottom: ${(props) => props.theme.spacing(8)}px;
+  margin-top: ${(props) => props.theme.space.l};
+  margin-bottom: ${(props) => props.theme.space.m};
 `;
 
 const Buttons = styled.div`
-  margin: ${(props) => props.theme.spacing(12)}px 0;
+  margin: ${(props) => props.theme.space.l} 0;
 `;
 
 type Props = {
@@ -71,7 +71,7 @@ function AmountSelector({
   const { data: recommendedFees } = useBtcFeeRate();
 
   const satsToFiat = (sats: string) =>
-    getBtcFiatEquivalent(new BigNumber(sats), BigNumber(btcFiatRate)).toNumber().toFixed(2);
+    getBtcFiatEquivalent(new BigNumber(sats), BigNumber(btcFiatRate)).toString();
 
   if (btcBalanceLoading || btcBalance === undefined) {
     return null;

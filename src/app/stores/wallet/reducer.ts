@@ -26,6 +26,7 @@ import {
   SetWalletUnlockedKey,
   StoreEncryptedSeedKey,
   UpdateLedgerAccountsKey,
+  UpdateSavedNamesKey,
   UpdateSoftwareAccountsKey,
   WalletActions,
   WalletSessionPeriods,
@@ -83,6 +84,7 @@ export const initialWalletState: WalletState = {
   spamToken: null,
   spamTokens: [],
   showSpamTokens: false,
+  savedNames: {},
 };
 
 /**
@@ -261,6 +263,14 @@ const walletReducer = (
       return {
         ...state,
         showSpamTokens: action.showSpamTokens,
+      };
+    case UpdateSavedNamesKey:
+      return {
+        ...state,
+        savedNames: {
+          ...state.savedNames,
+          [action.networkType]: action.names,
+        },
       };
     default:
       return state;

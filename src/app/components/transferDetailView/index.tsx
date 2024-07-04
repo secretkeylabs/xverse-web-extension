@@ -95,7 +95,7 @@ const ShowScriptBackgroundContainer = styled.div((props) => ({
   flexDirection: 'column',
 }));
 
-interface Props {
+type Props = {
   icon?: string;
   title?: string;
   amount?: string;
@@ -106,7 +106,7 @@ interface Props {
   hideCopyButton?: boolean;
   outputScript?: Array<any>;
   outputScriptIndex?: number;
-}
+};
 
 function TransferDetailView({
   icon,

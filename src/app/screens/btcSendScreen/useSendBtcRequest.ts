@@ -10,7 +10,7 @@ import BigNumber from 'bignumber.js';
 import { decodeToken } from 'jsontokens';
 import { useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import useBtcClient from '../../hooks/useBtcClient';
+import useBtcClient from '../../hooks/apiClients/useBtcClient';
 import useSeedVault from '../../hooks/useSeedVault';
 import useWalletSelector from '../../hooks/useWalletSelector';
 

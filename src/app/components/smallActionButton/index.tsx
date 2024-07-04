@@ -74,7 +74,7 @@ function SmallActionButton({ src, text, onPress, isOpaque, isDisabled }: Props) 
   };
 
   return (
-    <ButtonContainer isDisabled={isDisabled} onClick={handleOnPress}>
+    <ButtonContainer data-testid="action-button" isDisabled={isDisabled} onClick={handleOnPress}>
       <Button isOpaque={isOpaque}>{src && <ButtonImage src={src} />}</Button>
       <ButtonText>{text}</ButtonText>
     </ButtonContainer>

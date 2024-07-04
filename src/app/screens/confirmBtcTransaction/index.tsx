@@ -4,8 +4,8 @@ import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/u
 import AlertMessage from '@components/alertMessage';
 import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionComponent';
 import InfoContainer from '@components/infoContainer';
+import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useBtcClient from '@hooks/useBtcClient';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';

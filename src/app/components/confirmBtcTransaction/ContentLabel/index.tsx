@@ -101,9 +101,16 @@ type Props = {
   contentType: string;
   content: string;
   repeat?: number;
+  inscriptionId?: string;
 };
 
-function ContentIcon({ type, content, contentType: inputContentType, repeat = 1 }: Props) {
+function ContentIcon({
+  type,
+  content,
+  contentType: inputContentType,
+  repeat = 1,
+  inscriptionId,
+}: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'INSCRIPTION_REQUEST.PREVIEW' });
   const [showPreview, setShowPreview] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -245,6 +252,7 @@ function ContentIcon({ type, content, contentType: inputContentType, repeat = 1 
         contentTypeRaw={inputContentType}
         type={type}
         visible={showPreview}
+        inscriptionId={inscriptionId}
         onClick={() => setShowPreview(false)}
       />
     </>

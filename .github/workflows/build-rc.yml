@@ -83,7 +83,7 @@ jobs:
         env:
           SEED_WORDS1: ${{ secrets.SEED_WORDS1 }}
           SEED_WORDS2: ${{ secrets.SEED_WORDS2 }}
-        run: xvfb-run --auto-servernum --server-args="-screen 0 360x360x24" npm run e2etest --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+        run: xvfb-run --auto-servernum --server-args="-screen 0 360x360x24" npx playwright test --grep-invert "#localexecution" --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
       - name: Upload Playwright report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v3

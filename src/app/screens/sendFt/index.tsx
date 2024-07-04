@@ -18,7 +18,7 @@ import { useMutation } from '@tanstack/react-query';
 import { convertAmountToFtDecimalPlaces, ftDecimals, replaceCommaByDot } from '@utils/helper';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 function SendFtScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
@@ -30,39 +30,40 @@ function SendFtScreen() {
   const [addressError, setAddressError] = useState('');
   const [memoError, setMemoError] = useState('');
   const [amountToSend, setAmountToSend] = useState('');
-  const [recepientAddress, setRecepientAddress] = useState('');
+  const [recipientAddress, setRecipientAddress] = useState('');
   const [txMemo, setTxMemo] = useState<string | undefined>(undefined);
   const { data: stxPendingTxData } = useStxPendingTxData();
   const location = useLocation();
   const selectedNetwork = useNetworkSelector();
+  const [searchParams] = useSearchParams();
 
-  const coinTicker = location.search ? location.search.split('coinTicker=')[1] : undefined;
-  const fungibleToken =
-    location.state?.fungibleToken || sip10CoinsList.find((coin) => coin.ticker === coinTicker);
+  const principal = searchParams.get('principal');
+  const fungibleToken = sip10CoinsList?.find((coin) => coin.principal === principal);
 
-  let recipientAddress: string | undefined;
+  let recipient: string | undefined;
   let ftAmountToSend: string | undefined;
   let stxMemo: string | undefined;
 
   if (location.state) {
-    recipientAddress = location.state.recipientAddress;
+    recipient = location.state.recipientAddress;
     ftAmountToSend = location.state.amountToSend;
     stxMemo = location.state.stxMemo;
   }
   const { isLoading, data, mutate } = useMutation<
-    StacksTransaction,
+    StacksTransaction | undefined,
     Error,
     { associatedAddress: string; amount: string; memo?: string }
   >({
     mutationFn: async ({ associatedAddress, amount, memo }) => {
+      if (!principal || !fungibleToken) return;
+
       let convertedAmount = amount;
       if (fungibleToken?.decimals) {
         convertedAmount = convertAmountToFtDecimalPlaces(amount, fungibleToken.decimals).toString();
       }
       setAmountToSend(amount);
       setTxMemo(memo);
-      setRecepientAddress(associatedAddress);
-      const { principal } = fungibleToken;
+      setRecipientAddress(associatedAddress);
       const contractInfo: string[] = principal.split('.');
       const unsginedTx: UnsignedStacksTransation = {
         amount: convertedAmount,
@@ -90,7 +91,7 @@ function SendFtScreen() {
           amount: amountToSend.toString(),
           fungibleToken,
           memo: txMemo,
-          recepientAddress,
+          recipientAddress,
         },
       });
     }
@@ -181,6 +182,11 @@ function SendFtScreen() {
     }
   };
 
+  if (!fungibleToken) {
+    navigate('/');
+    return null;
+  }
+
   return (
     <>
       <TopRow title={t('SEND')} onClick={handleBackButtonClick} />
@@ -191,11 +197,11 @@ function SendFtScreen() {
         recipientError={addressError}
         memoError={memoError}
         fungibleToken={fungibleToken}
-        balance={getBalance()}
+        balance={Number(getBalance())}
         onPressSend={onPressSendSTX}
-        recipient={recipientAddress!}
-        amountToSend={ftAmountToSend!}
-        stxMemo={stxMemo!}
+        recipient={recipient}
+        amountToSend={ftAmountToSend}
+        stxMemo={stxMemo}
       />
       <BottomBar tab="dashboard" />
     </>

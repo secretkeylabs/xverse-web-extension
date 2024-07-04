@@ -1,15 +1,14 @@
+import useRunesApi from '@hooks/apiClients/useRunesApi';
 import useHasFeature from '@hooks/useHasFeature';
-import useRunesApi from '@hooks/useRunesApi';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { FungibleToken, getXverseApiClient, NetworkType } from '@secretkeylabs/xverse-core';
+import { FeatureId, FungibleToken } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
 
 export const fetchRuneBalances =
   (
     runesApi: ReturnType<typeof useRunesApi>,
-    network: NetworkType,
     ordinalsAddress: string,
     fiatCurrency: string,
   ): (() => Promise<FungibleToken[]>) =>
@@ -20,27 +19,29 @@ export const fetchRuneBalances =
       return [];
     }
 
-    const runeNames = runeBalances.map((runeBalanceFt: FungibleToken) => runeBalanceFt.name);
-    return getXverseApiClient(network)
-      .getRuneFiatRates(runeNames, fiatCurrency)
-      .then((runeFiatRates) =>
-        runeBalances.map((runeBalanceFt: FungibleToken) => ({
-          ...runeBalanceFt,
-          tokenFiatRate: runeFiatRates[runeBalanceFt.name]?.[fiatCurrency],
-        })),
-      )
-      .catch(() => runeBalances);
+    const runeIds = runeBalances.map((runeBalanceFt: FungibleToken) => runeBalanceFt.principal);
+    try {
+      const runeFiatRates = await runesApi.getRuneFiatRatesByRuneIds(runeIds, fiatCurrency);
+      return runeBalances.map((runeBalanceFt: FungibleToken) => ({
+        ...runeBalanceFt,
+        tokenFiatRate: runeFiatRates[runeBalanceFt.principal]?.[fiatCurrency],
+      }));
+    } catch (error) {
+      return runeBalances;
+    }
   };
 
-export const useGetRuneFungibleTokens = () => {
+export const useRuneFungibleTokensQuery = (backgroundRefetch = true) => {
   const { ordinalsAddress } = useSelectedAccount();
   const { network, fiatCurrency, spamTokens, showSpamTokens } = useWalletSelector();
-  const showRunes = useHasFeature('RUNES_SUPPORT');
+  const showRunes = useHasFeature(FeatureId.RUNES_SUPPORT);
   const runesApi = useRunesApi();
-  const queryFn = fetchRuneBalances(runesApi, network.type, ordinalsAddress, fiatCurrency);
+  const queryFn = fetchRuneBalances(runesApi, ordinalsAddress, fiatCurrency);
   const query = useQuery({
     queryKey: ['get-rune-fungible-tokens', network.type, ordinalsAddress, fiatCurrency],
     enabled: Boolean(network && ordinalsAddress && showRunes),
+    refetchOnWindowFocus: backgroundRefetch,
+    refetchOnReconnect: backgroundRefetch,
     queryFn,
   });
 
@@ -60,11 +61,13 @@ export const useGetRuneFungibleTokens = () => {
 /*
  * This hook is used to get the list of runes which the user has not hidden
  */
-export const useVisibleRuneFungibleTokens = (): ReturnType<typeof useGetRuneFungibleTokens> & {
+export const useVisibleRuneFungibleTokens = (
+  backgroundRefetch = true,
+): ReturnType<typeof useRuneFungibleTokensQuery> & {
   visible: FungibleToken[];
 } => {
   const { runesManageTokens } = useWalletSelector();
-  const runesQuery = useGetRuneFungibleTokens();
+  const runesQuery = useRuneFungibleTokensQuery(backgroundRefetch);
   return {
     ...runesQuery,
     visible: (runesQuery.data ?? []).filter((ft) => {

@@ -18,7 +18,12 @@ export const isScriptOutput = (
 ): output is btcTransaction.TransactionScriptOutput =>
   (output as btcTransaction.TransactionScriptOutput).script !== undefined;
 
-export const isSpendOutput = (
+export const isPubKeyOutput = (
+  output: btcTransaction.EnhancedOutput,
+): output is btcTransaction.TransactionPubKeyOutput =>
+  !!(output as btcTransaction.TransactionPubKeyOutput).pubKeys?.length;
+
+export const isAddressOutput = (
   output: btcTransaction.EnhancedOutput,
 ): output is btcTransaction.TransactionOutput =>
   (output as btcTransaction.TransactionOutput).address !== undefined;
@@ -48,7 +53,7 @@ export const getNetAmount = ({
 
   const totalUserReceive = outputs.reduce((accumulator: number, output) => {
     const isToUserAddress =
-      isSpendOutput(output) && [btcAddress, ordinalsAddress].includes(output.address);
+      isAddressOutput(output) && [btcAddress, ordinalsAddress].includes(output.address);
     if (isToUserAddress) {
       return accumulator + output.amount;
     }
@@ -64,8 +69,14 @@ export const getOutputsWithAssetsFromUserAddress = ({
   outputs,
 }: Omit<CommonInputOutputUtilProps, 'inputs'>) => {
   // we want to discard outputs that are script, are not from user address and do not have inscriptions or satributes
-  const outputsFromPayment: btcTransaction.TransactionOutput[] = [];
-  const outputsFromOrdinal: btcTransaction.TransactionOutput[] = [];
+  const outputsFromPayment: (
+    | btcTransaction.TransactionOutput
+    | btcTransaction.TransactionPubKeyOutput
+  )[] = [];
+  const outputsFromOrdinal: (
+    | btcTransaction.TransactionOutput
+    | btcTransaction.TransactionPubKeyOutput
+  )[] = [];
   outputs.forEach((output) => {
     if (isScriptOutput(output)) {
       return;
@@ -126,7 +137,11 @@ export const getOutputsWithAssetsToUserAddress = ({
   const outputsToOrdinal: btcTransaction.TransactionOutput[] = [];
   outputs.forEach((output) => {
     // we want to discard outputs that are not spendable or are not to user address
-    if (isScriptOutput(output) || ![btcAddress, ordinalsAddress].includes(output.address)) {
+    if (
+      isScriptOutput(output) ||
+      isPubKeyOutput(output) ||
+      ![btcAddress, ordinalsAddress].includes(output.address)
+    ) {
       return;
     }
 
