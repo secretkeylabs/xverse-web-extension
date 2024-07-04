@@ -3,6 +3,7 @@ import useOrdinalsServiceApi from '@hooks/apiClients/useOrdinalsServiceApi';
 import useTransactionContext from '@hooks/useTransactionContext';
 import { Params, RpcErrorCode } from '@sats-connect/core';
 import { TransactionBuildPayload, generateTransaction } from '@screens/sendBtc/helpers';
+import { Transport } from '@secretkeylabs/xverse-core';
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import SuperJSON from 'superjson';
@@ -98,10 +99,11 @@ const useEtchRequest = () => {
     }
   };
 
-  const payAndConfirmEtchRequest = async () => {
+  const payAndConfirmEtchRequest = async (ledgerTransport?: Transport) => {
     try {
       setIsExecuting(true);
       const txid = await orderTx?.transaction.broadcast({
+        ledgerTransport,
         rbfEnabled: false,
       });
       if (!txid) {
