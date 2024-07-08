@@ -213,7 +213,8 @@ function ManageTokens() {
       case 'stacks':
         coins = (sip10List ?? []).map((ft) => ({
           ...ft,
-          visible: sip10ManageTokens[ft.principal] ?? new BigNumber(ft.balance).gt(0),
+          visible:
+            sip10ManageTokens[ft.principal] ?? (ft.supported && new BigNumber(ft.balance).gt(0)),
         }));
         error = sip10Error;
         break;
