@@ -1,5 +1,6 @@
 import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RequestError from '@components/requests/requestError';
+import { Transport } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
 import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -41,8 +42,8 @@ function EtchRune() {
     window.close();
   };
 
-  const onClickConfirm = async () => {
-    const txid = await payAndConfirmEtchRequest();
+  const onClickConfirm = async (ledgerTransport?: Transport) => {
+    const txid = await payAndConfirmEtchRequest(ledgerTransport);
     navigate('/tx-status', {
       state: {
         txid,

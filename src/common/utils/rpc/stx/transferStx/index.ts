@@ -8,7 +8,10 @@ import {
 import RequestsRoutes from '@common/utils/route-urls';
 import { RpcErrorCode } from '@sats-connect/core';
 import { makeRPCError } from '../../helpers';
-import { sendInvalidParametersMessage, sendMissingParametersMessage } from '../rpcResponseMessages';
+import {
+  sendInvalidParametersResponseMessage,
+  sendMissingParametersMessage,
+} from '../../responseMessages/errors';
 import paramsSchema from './paramsSchema';
 
 async function transferStx(message: WebBtcMessage<'stx_transferStx'>, port: chrome.runtime.Port) {
@@ -19,7 +22,7 @@ async function transferStx(message: WebBtcMessage<'stx_transferStx'>, port: chro
 
   const paramsParseResult = paramsSchema.safeParse(message.params);
   if (!paramsParseResult.success) {
-    sendInvalidParametersMessage({
+    sendInvalidParametersResponseMessage({
       tabId: getTabIdFromPort(port),
       messageId: message.id,
       error: paramsParseResult.error,
