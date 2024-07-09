@@ -52,6 +52,7 @@ type Props = {
   inputs: btcTransaction.EnhancedInput[];
   outputs: btcTransaction.EnhancedOutput[];
   feeOutput?: btcTransaction.TransactionFeeOutput;
+  recipientAddress?: string;
   runeSummary?: RuneSummaryActions | RuneSummary;
   getFeeForFeeRate?: (
     feeRate: number,
@@ -68,6 +69,7 @@ function TransactionSummary({
   inputs,
   outputs,
   feeOutput,
+  recipientAddress,
   runeSummary,
   isSubmitting,
   getFeeForFeeRate,
@@ -138,6 +140,7 @@ function TransactionSummary({
       <TransferSection
         outputs={outputs}
         inputs={inputs}
+        recipientAddress={recipientAddress}
         transactionIsFinal={transactionIsFinal}
         runeTransfers={runeSummary?.transfers}
         onShowInscription={setInscriptionToShow}

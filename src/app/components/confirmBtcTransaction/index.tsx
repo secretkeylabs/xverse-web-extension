@@ -52,6 +52,7 @@ type Props = {
   inputs: btcTransaction.EnhancedInput[];
   outputs: btcTransaction.EnhancedOutput[];
   feeOutput?: btcTransaction.TransactionFeeOutput;
+  recipientAddress?: string;
   runeSummary?: RuneSummaryActions | RuneSummary;
   showCenotaphCallout: boolean;
   isLoading: boolean;
@@ -84,6 +85,7 @@ function ConfirmBtcTransaction({
   inputs,
   outputs,
   feeOutput,
+  recipientAddress, // TODO - ensure this logic works for PSBT
   runeSummary,
   showCenotaphCallout,
   isLoading,
@@ -213,6 +215,7 @@ function ConfirmBtcTransaction({
           inputs={inputs}
           outputs={outputs}
           feeOutput={feeOutput}
+          recipientAddress={recipientAddress}
           transactionIsFinal={isFinal}
           showCenotaphCallout={showCenotaphCallout}
           getFeeForFeeRate={getFeeForFeeRate}

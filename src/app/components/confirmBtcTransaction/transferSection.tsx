@@ -2,7 +2,7 @@ import RuneAmount from '@components/confirmBtcTransaction/itemRow/runeAmount';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import { btcTransaction, RuneSummary } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
-import { useTranslation } from 'react-i18next';
+import { getTruncatedAddress } from '@utils/helper';
 import styled from 'styled-components';
 import Amount from './itemRow/amount';
 import AmountWithInscriptionSatribute from './itemRow/amountWithInscriptionSatribute';
@@ -38,6 +38,7 @@ const Header = styled(RowCenter)((props) => ({
 type Props = {
   outputs: btcTransaction.EnhancedOutput[];
   inputs: btcTransaction.EnhancedInput[];
+  recipientAddress?: string;
   transactionIsFinal: boolean;
   runeTransfers?: RuneSummary['transfers'];
   netAmount: number;
@@ -48,13 +49,13 @@ type Props = {
 function TransferSection({
   outputs,
   inputs,
+  recipientAddress,
   transactionIsFinal,
   runeTransfers,
   netAmount,
   onShowInscription,
 }: Props) {
   const { btcAddress, ordinalsAddress } = useSelectedAccount();
-  const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
 
   const { inputFromPayment, inputFromOrdinal } = getInputsWitAssetsFromUserAddress({
     inputs,
@@ -92,7 +93,13 @@ function TransferSection({
           {/* {t('YOU_WILL_TRANSFER')} */}
           To
         </StyledP>
-        {/* TODO: Add the recipient address */}
+        {recipientAddress && (
+          <StyledP typography="body_medium_m" color="white_0">
+            {/* TODO: This component is also used in SignBatchPsbtRequest, make the needed changes */}
+            {/* {t('YOU_WILL_TRANSFER')} */}
+            {getTruncatedAddress(recipientAddress, 6)}
+          </StyledP>
+        )}
       </Header>
       {
         // if transaction is not final, then runes will be delegated and will show up in the delegation section
