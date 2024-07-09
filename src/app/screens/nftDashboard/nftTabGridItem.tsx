@@ -40,7 +40,7 @@ const StyledItemSub = styled(StyledP)`
   width: 100%;
 `;
 
-export function NftTabGridItem({
+function NftTabGridItem({
   item: collection,
   isLoading = false,
 }: {
@@ -57,7 +57,7 @@ export function NftTabGridItem({
   const itemSubText = getNftsTabGridItemSubText(collection);
 
   return (
-    <CollectionContainer>
+    <CollectionContainer data-testid="collection-container">
       <ThumbnailContainer onClick={handleClickCollection}>
         {isLoading ? (
           <NftImage />
@@ -78,4 +78,5 @@ export function NftTabGridItem({
     </CollectionContainer>
   );
 }
+
 export default NftTabGridItem;

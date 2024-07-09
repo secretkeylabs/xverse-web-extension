@@ -4,11 +4,10 @@ import TokenImage from '@components/tokenImage';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
-import type { FungibleToken } from '@secretkeylabs/xverse-core';
-import { microstacksToStx, satsToBtc } from '@secretkeylabs/xverse-core';
+import { FungibleToken, getFiatEquivalent } from '@secretkeylabs/xverse-core';
 import { StoreState } from '@stores/index';
 import { CurrencyTypes } from '@utils/constants';
-import { getFtBalance, getFtTicker } from '@utils/tokens';
+import { getBalanceAmount, getFtTicker } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { NumericFormat } from 'react-number-format';
 import { useSelector } from 'react-redux';
@@ -105,7 +104,7 @@ interface Props {
   title: string;
   loading: boolean;
   currency: CurrencyTypes;
-  onPress: (coin: CurrencyTypes, ftKey: string | undefined) => void;
+  onPress: (coin: CurrencyTypes, fungibleToken: FungibleToken | undefined) => void;
   fungibleToken?: FungibleToken;
   enlargeTicker?: boolean;
   className?: string;
@@ -127,41 +126,26 @@ function TokenTile({
   const { data: stxData } = useStxWalletData();
   const { data: btcBalance } = useBtcWalletData();
 
-  function getTickerTitle() {
+  const getTickerTitle = () => {
     if (currency === 'STX' || currency === 'BTC') return `${currency}`;
     return `${getFtTicker(fungibleToken as FungibleToken)}`;
-  }
+  };
 
-  function getBalanceAmount() {
-    switch (currency) {
-      case 'STX':
-        return microstacksToStx(new BigNumber(stxData?.balance ?? 0)).toString();
-      case 'BTC':
-        return satsToBtc(new BigNumber(btcBalance ?? 0)).toString();
-      case 'FT':
-        return fungibleToken ? getFtBalance(fungibleToken) : '';
-      default:
+  const handleTokenPressed = () => onPress(currency, fungibleToken);
+
+  const getFiatAmount = () => {
+    const fiatAmount = getFiatEquivalent(
+      Number(getBalanceAmount(currency, fungibleToken, stxData, btcBalance)),
+      currency,
+      BigNumber(stxBtcRate),
+      BigNumber(btcFiatRate),
+      fungibleToken,
+    );
+    if (fiatAmount) {
+      return BigNumber(fiatAmount);
     }
-  }
-
-  function getFiatEquivalent(): BigNumber | undefined {
-    switch (currency) {
-      case 'STX':
-        return microstacksToStx(new BigNumber(stxData?.balance ?? 0))
-          .multipliedBy(stxBtcRate)
-          .multipliedBy(btcFiatRate);
-      case 'BTC':
-        return satsToBtc(new BigNumber(btcBalance ?? 0)).multipliedBy(btcFiatRate);
-      case 'FT':
-        return fungibleToken?.tokenFiatRate
-          ? new BigNumber(getFtBalance(fungibleToken)).multipliedBy(fungibleToken.tokenFiatRate)
-          : undefined;
-      default:
-        return undefined;
-    }
-  }
-
-  const handleTokenPressed = () => onPress(currency, fungibleToken?.principal);
+    return undefined;
+  };
 
   return (
     <TileContainer onClick={handleTokenPressed} className={className}>
@@ -185,12 +169,12 @@ function TokenTile({
       ) : (
         <AmountContainer aria-label="CoinBalance Container">
           <NumericFormat
-            value={getBalanceAmount()}
+            value={getBalanceAmount(currency, fungibleToken, stxData, btcBalance)}
             displayType="text"
             thousandSeparator
             renderText={(value: string) => <CoinBalanceText>{value}</CoinBalanceText>}
           />
-          <StyledFiatAmountText fiatAmount={getFiatEquivalent()} fiatCurrency={fiatCurrency} />
+          <StyledFiatAmountText fiatAmount={getFiatAmount()} fiatCurrency={fiatCurrency} />
         </AmountContainer>
       )}
     </TileContainer>

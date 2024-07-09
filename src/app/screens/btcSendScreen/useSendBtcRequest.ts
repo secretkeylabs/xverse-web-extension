@@ -1,15 +1,16 @@
+import useSelectedAccount from '@hooks/useSelectedAccount';
+import {
+  BitcoinNetworkType,
+  SendBtcTransactionOptions,
+  SendBtcTransactionPayload,
+} from '@sats-connect/core';
 import { Recipient, SettingsNetwork, signBtcTransaction } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
 import { decodeToken } from 'jsontokens';
 import { useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import {
-  BitcoinNetworkType,
-  SendBtcTransactionOptions,
-  SendBtcTransactionPayload,
-} from 'sats-connect';
-import useBtcClient from '../../hooks/useBtcClient';
+import useBtcClient from '../../hooks/apiClients/useBtcClient';
 import useSeedVault from '../../hooks/useSeedVault';
 import useWalletSelector from '../../hooks/useWalletSelector';
 
@@ -36,10 +37,7 @@ const useSendBtcRequestParams = (btcAddress: string, network: SettingsNetwork) =
     const rpcPayload: SendBtcTransactionPayload = {
       senderAddress: btcAddress,
       recipients: transferRecipients,
-      network:
-        network.type === 'Mainnet'
-          ? { type: BitcoinNetworkType.Mainnet }
-          : { type: BitcoinNetworkType.Testnet },
+      network: { type: BitcoinNetworkType[network.type] },
     };
     return {
       payload: rpcPayload,
@@ -53,8 +51,12 @@ const useSendBtcRequestParams = (btcAddress: string, network: SettingsNetwork) =
 function useSendBtcRequest() {
   const btcClient = useBtcClient();
   const { getSeed } = useSeedVault();
-  const { network, selectedAccount, btcAddress } = useWalletSelector();
-  const { payload, tabId, requestToken, requestId } = useSendBtcRequestParams(btcAddress, network);
+  const selectedAccount = useSelectedAccount();
+  const { network } = useWalletSelector();
+  const { payload, tabId, requestToken, requestId } = useSendBtcRequestParams(
+    selectedAccount.btcAddress,
+    network,
+  );
   const [recipient, setRecipient] = useState<Recipient[]>([]);
 
   const generateSignedTransaction = async () => {
@@ -70,7 +72,7 @@ function useSendBtcRequest() {
     setRecipient(recipients);
     const signedTx = await signBtcTransaction(
       recipients,
-      payload.senderAddress || btcAddress,
+      payload.senderAddress || selectedAccount.btcAddress,
       selectedAccount?.id ?? 0,
       seedPhrase,
       btcClient,

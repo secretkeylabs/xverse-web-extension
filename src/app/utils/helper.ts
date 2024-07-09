@@ -15,6 +15,7 @@ import { getFtBalance } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { TFunction } from 'react-i18next';
 import {
+  BTC_TRANSACTION_SIGNET_STATUS_URL,
   BTC_TRANSACTION_STATUS_URL,
   BTC_TRANSACTION_TESTNET_STATUS_URL,
   MAX_ACC_NAME_LENGTH,
@@ -39,12 +40,24 @@ export const convertAmountToFtDecimalPlaces = (
   return amount.shiftedBy(+decimals).toNumber();
 };
 
-export const replaceCommaByDot = (amount: string) => amount.replace(/,/g, '.');
-
-export const microStxToStx = (mStx: number | string | BigNumber) => {
-  const microStacks = initBigNumber(mStx);
-  return microStacks.shiftedBy(-6);
+/**
+ * return if < x decimals - otherwise return up to x decimals
+ */
+export const formatToXDecimalPlaces = (num: number, decimals: number): number => {
+  // Convert the number to a string
+  const numStr = num.toString();
+  // Find the decimal point
+  const decimalIndex = numStr.indexOf('.');
+  // Check if there are more than x decimal places
+  if (decimalIndex !== -1 && numStr.length - decimalIndex - 1 > decimals) {
+    // Convert to 10 decimal places and return as a number
+    return parseFloat(num.toFixed(decimals));
+  }
+  // Return the number as it is if it has 10 or fewer decimal places
+  return num;
 };
+
+export const replaceCommaByDot = (amount: string) => amount.replace(/,/g, '.');
 
 /**
  * get ticker from name
@@ -75,19 +88,6 @@ export const getShortTruncatedAddress = (address: string) => {
   }
 };
 
-export const getAddressDetail = (account: Account) => {
-  if (account.btcAddress && account.stxAddress) {
-    return `${getTruncatedAddress(account.btcAddress)} / ${getTruncatedAddress(
-      account.stxAddress,
-    )}`;
-  }
-  if (account.btcAddress || account.stxAddress) {
-    const existingAddress = account.btcAddress || account.stxAddress;
-    return getTruncatedAddress(existingAddress);
-  }
-  return '';
-};
-
 export const getExplorerUrl = (stxAddress: string): string =>
   `https://explorer.stacks.co/address/${stxAddress}?chain=mainnet`;
 
@@ -97,6 +97,9 @@ export const getStxTxStatusUrl = (transactionId: string, currentNetwork: Setting
 export const getBtcTxStatusUrl = (txId: string, network: SettingsNetwork) => {
   if (network.type === 'Testnet') {
     return `${BTC_TRANSACTION_TESTNET_STATUS_URL}${txId}`;
+  }
+  if (network.type === 'Signet') {
+    return `${BTC_TRANSACTION_SIGNET_STATUS_URL}${txId}`;
   }
   return `${BTC_TRANSACTION_STATUS_URL}${txId}`;
 };
@@ -323,3 +326,12 @@ export const getLockCountdownLabel = (
   const hours = period / 60;
   return t('LOCK_COUNTDOWN_HS', { count: hours });
 };
+
+export const isFungibleToken = (token: any): token is FungibleToken =>
+  token &&
+  typeof token === 'object' &&
+  'balance' in token &&
+  'total_sent' in token &&
+  'total_received' in token &&
+  'principal' in token &&
+  'assetName' in token;

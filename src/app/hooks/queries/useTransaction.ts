@@ -1,10 +1,10 @@
-import useBtcClient from '@hooks/useBtcClient';
-import useWalletSelector from '@hooks/useWalletSelector';
+import useBtcClient from '@hooks/apiClients/useBtcClient';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import { fetchBtcTransaction } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 
 export default function useTransaction(id?: string) {
-  const { selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
   const btcClient = useBtcClient();
 
   const fetchTransaction = async () => {

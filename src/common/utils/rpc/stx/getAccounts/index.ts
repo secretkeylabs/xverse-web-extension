@@ -1,6 +1,6 @@
 import { WebBtcMessage } from '@common/types/message-types';
 import { getTabIdFromPort, isUndefined } from '@common/utils';
-import { RpcErrorCode } from 'sats-connect';
+import { RpcErrorCode } from '@sats-connect/core';
 import {
   listenForPopupClose,
   makeSearchParamsWithDefaults,
@@ -8,7 +8,7 @@ import {
 } from '../../../legacy-external-message-handler';
 import RequestsRoutes from '../../../route-urls';
 import { makeRPCError } from '../../helpers';
-import { sendMissingParametersMessage } from '../rpcResponseMessages';
+import { sendMissingParametersMessage } from '../../responseMessages/errors';
 
 const handleGetStxAccounts = async (
   message: WebBtcMessage<'stx_getAccounts'>,
@@ -20,7 +20,7 @@ const handleGetStxAccounts = async (
   }
 
   const popupParams = {
-    messageId: message.id,
+    messageId: String(message.id),
     rpcMethod: 'stx_getAccounts',
   };
 

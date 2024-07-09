@@ -1,11 +1,12 @@
 import BarLoader from '@components/barLoader';
 import { useVisibleBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
-import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useGetRuneFungibleTokens';
+import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useAccountBalance from '@hooks/queries/useAccountBalance';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
@@ -71,14 +72,14 @@ interface BalanceCardProps {
 
 function BalanceCard(props: BalanceCardProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
-  const { fiatCurrency, btcAddress, hideStx, selectedAccount, accountBalances } =
-    useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { fiatCurrency, hideStx, accountBalances } = useWalletSelector();
   const { data: btcBalance } = useBtcWalletData();
   const { data: stxData } = useStxWalletData();
   const { btcFiatRate, stxBtcRate } = useCoinRates();
   const { setAccountBalance } = useAccountBalance();
   const { isLoading, isRefetching } = props;
-  const oldTotalBalance = accountBalances[btcAddress];
+  const oldTotalBalance = accountBalances[selectedAccount.btcAddress];
   const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
   const { visible: brc20CoinsList } = useVisibleBrc20FungibleTokens();
   const { visible: runesCoinList } = useVisibleRuneFungibleTokens();

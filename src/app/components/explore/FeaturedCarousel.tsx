@@ -7,6 +7,7 @@ import FeaturedCard, { FeaturedCardProps } from './FeaturedCard';
 
 const CarouselContainer = styled.div`
   margin-top: ${({ theme }) => theme.space.l};
+  margin-bottom: ${({ theme }) => theme.space.xl};
 
   .swiper {
     padding-bottom: 35px;

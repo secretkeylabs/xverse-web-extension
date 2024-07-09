@@ -740,7 +740,9 @@ function OrdinalDetailScreen() {
                 ? t('BRC20_INSCRIPTION')
                 : ordinal?.collection_name || t('INSCRIPTION')}
             </GalleryCollectibleText>
-            <OrdinalGalleryTitleText>{ordinal?.number}</OrdinalGalleryTitleText>
+            <OrdinalGalleryTitleText data-testid="ordinal-number">
+              {ordinal?.number}
+            </OrdinalGalleryTitleText>
             {satributesIcons}
             <RowContainer>
               <ButtonText>{t('OWNED_BY')}</ButtonText>

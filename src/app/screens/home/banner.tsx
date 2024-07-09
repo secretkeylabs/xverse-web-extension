@@ -1,6 +1,7 @@
 import { XCircle } from '@phosphor-icons/react';
-import { NotificationBanner } from '@secretkeylabs/xverse-core';
+import { AnalyticsEvents, NotificationBanner } from '@secretkeylabs/xverse-core';
 import { setNotificationBannersAction } from '@stores/wallet/actions/actionCreators';
+import { CrossButton } from '@ui-library/sheet';
 import { trackMixPanel } from '@utils/mixpanel';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
@@ -51,22 +52,11 @@ const BannerText = styled.div`
   overflow: hidden;
 `;
 
-const CrossButton = styled.div`
+const StyledCrossButton = styled(CrossButton)`
   z-index: 1;
-  cursor: pointer;
   position: absolute;
   top: -${(props) => props.theme.space.xs};
   right: -${(props) => props.theme.space.xxs};
-  display: flex;
-  transition: opacity 0.1s ease;
-
-  &:hover {
-    opacity: 0.8;
-  }
-
-  &:active {
-    opacity: 0.6;
-  }
 `;
 
 function Banner({ id, name, url, icon, description }: NotificationBanner) {
@@ -78,13 +68,13 @@ function Banner({ id, name, url, icon, description }: NotificationBanner) {
 
   return (
     <Container>
-      <CrossButton onClick={dismissBanner}>
+      <StyledCrossButton onClick={dismissBanner}>
         <XCircle size={24} weight="fill" color={Theme.colors.white_200} />
-      </CrossButton>
+      </StyledCrossButton>
       <BannerContent
         onClick={() => {
           trackMixPanel(
-            'click_app',
+            AnalyticsEvents.ClickApp,
             {
               link: url,
               source: 'web-extension',

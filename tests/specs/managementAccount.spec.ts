@@ -5,26 +5,12 @@ import Wallet from '../pages/wallet';
 const strongPW = Onboarding.generateSecurePasswordCrypto();
 
 test.describe('Account Management', () => {
-  test.beforeEach(async ({ page, extensionId, context }) => {
-    await page.goto(`chrome-extension://${extensionId}/options.html#/landing`);
-    // TODO: this fixes a temporary issue with two tabs at the start see technical debt https://linear.app/xverseapp/issue/ENG-3992/two-tabs-open-instead-of-one-since-version-0323-for-start-extension
-    const pages = await context.pages();
-    if (pages.length === 2) {
-      await pages[1].close(); // pages[1] is the second (newest) page
-    }
-  });
-  test.afterEach(async ({ context }) => {
-    if (context.pages().length > 0) {
-      // Close the context only if there are open pages
-      await context.close();
-    }
-  });
-
   test('Check account page #smoketest', async ({ page, extensionId }) => {
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.checkVisualsStartpage();
     await wallet.labelAccountName.click();
     await expect(page.url()).toContain('account-list');
     await expect(wallet.labelAccountName).toHaveCount(1);
@@ -33,8 +19,7 @@ test.describe('Account Management', () => {
     await expect(wallet.buttonBack).toBeVisible();
     await expect(wallet.buttonAccountOptions).toBeVisible();
     await expect(wallet.accountBalance).toBeVisible();
-    const balanceText = await wallet.accountBalance.innerText();
-    await expect(balanceText).toBe('$0.00');
+    await expect(wallet.accountBalance).toHaveText('$0.00');
     await wallet.buttonBack.click();
     await wallet.checkVisualsStartpage();
     await expect(wallet.labelAccountName).toHaveText('Account 1');
@@ -45,6 +30,7 @@ test.describe('Account Management', () => {
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.checkVisualsStartpage();
     await wallet.labelAccountName.click();
     await expect(page.url()).toContain('account-list');
     await expect(wallet.labelAccountName).toHaveCount(1);
@@ -77,6 +63,7 @@ test.describe('Account Management', () => {
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.checkVisualsStartpage();
     await wallet.labelAccountName.click();
     await expect(page.url()).toContain('account-list');
     await expect(wallet.labelAccountName).toHaveCount(1);
@@ -104,6 +91,7 @@ test.describe('Account Management', () => {
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.checkVisualsStartpage();
     await wallet.labelAccountName.click();
     await expect(page.url()).toContain('account-list');
     await expect(wallet.labelAccountName).toHaveCount(1);
@@ -120,6 +108,7 @@ test.describe('Account Management', () => {
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.checkVisualsStartpage();
     await expect(wallet.labelAccountName).toHaveText('Account 1');
     await wallet.labelAccountName.click();
     await expect(page.url()).toContain('account-list');

@@ -1,10 +1,10 @@
 import ArrowIcon from '@assets/img/settings/arrow.svg';
-import BottomModal from '@components/bottomModal';
-import ActionButton from '@components/button';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { isCustomFeesAllowed, Recipient, stxToMicrostacks, UTXO } from '@secretkeylabs/xverse-core';
+import Button from '@ui-library/button';
+import Sheet from '@ui-library/sheet';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,37 +14,15 @@ import EditBtcFee from './editBtcFee';
 import EditNonce from './editNonce';
 import EditStxFee from './editStxFee';
 
-const ButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  marginTop: props.theme.spacing(10),
-  marginBottom: props.theme.spacing(20),
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-}));
-
 const ButtonsContainer = styled.div`
   display: flex;
-  flex-direction: row;
-  margin-left: ${(props) => props.theme.space.m};
-  margin-right: ${(props) => props.theme.space.m};
-  margin-bottom: ${(props) => props.theme.space.m};
-`;
-
-const LeftButton = styled.div`
-  display: flex;
-  margin-right: ${(props) => props.theme.space.xs};
-  flex: 1;
-`;
-
-const RightButton = styled.div`
-  display: flex;
-  margin-left: ${(props) => props.theme.space.xs};
-  flex: 1;
+  column-gap: ${(props) => props.theme.space.s};
+  margin-top: ${(props) => props.theme.space.l};
+  margin-bottom: ${(props) => props.theme.space.xxl};
 `;
 
 const TransactionSettingOptionText = styled.h1((props) => ({
-  ...props.theme.body_medium_l,
+  ...props.theme.typography.body_medium_l,
   color: props.theme.colors.white_200,
 }));
 
@@ -55,8 +33,6 @@ const TransactionSettingOptionButton = styled.button((props) => ({
   width: '100%',
   marginTop: props.theme.spacing(16),
   marginBottom: props.theme.spacing(16),
-  paddingLeft: props.theme.spacing(12),
-  paddingRight: props.theme.spacing(12),
   justifyContent: 'space-between',
 }));
 
@@ -66,14 +42,12 @@ const TransactionSettingNonceOptionButton = styled.button((props) => ({
   flexDirection: 'row',
   width: '100%',
   marginBottom: props.theme.spacing(20),
-  paddingLeft: props.theme.spacing(12),
-  paddingRight: props.theme.spacing(12),
   justifyContent: 'space-between',
 }));
 
 type TxType = 'STX' | 'BTC' | 'Ordinals';
 
-interface Props {
+type Props = {
   visible: boolean;
   fee: string;
   feePerVByte?: BigNumber;
@@ -87,8 +61,9 @@ interface Props {
   isRestoreFlow?: boolean;
   nonOrdinalUtxos?: UTXO[];
   showFeeSettings: boolean;
+  nonceSettings?: boolean;
   setShowFeeSettings: (value: boolean) => void;
-}
+};
 
 function TransactionSettingAlert({
   visible,
@@ -104,6 +79,7 @@ function TransactionSettingAlert({
   isRestoreFlow,
   nonOrdinalUtxos,
   showFeeSettings,
+  nonceSettings = false,
   setShowFeeSettings,
 }: Props) {
   const { t } = useTranslation('translation');
@@ -139,8 +115,13 @@ function TransactionSettingAlert({
         return;
       }
     }
-    setShowNonceSettings(false);
     setShowFeeSettings(false);
+    setError('');
+    onApplyClick({ fee: feeInput.toString(), nonce: nonceInput });
+  };
+
+  const applyClickForNonceStx = () => {
+    setShowNonceSettings(false);
     setError('');
     onApplyClick({ fee: feeInput.toString(), nonce: nonceInput });
   };
@@ -202,7 +183,7 @@ function TransactionSettingAlert({
   };
 
   const renderContent = () => {
-    if (showNonceSettings) {
+    if (showNonceSettings || nonceSettings) {
       return <EditNonce nonce={nonce!} setNonce={setNonceInput} />;
     }
 
@@ -254,14 +235,14 @@ function TransactionSettingAlert({
           <TransactionSettingOptionText>
             {t('TRANSACTION_SETTING.ADVANCED_SETTING_FEE_OPTION')}
           </TransactionSettingOptionText>
-          <img src={ArrowIcon} alt="Arrow " />
+          <img src={ArrowIcon} alt="Arrow" />
         </TransactionSettingOptionButton>
         {type === 'STX' && (
           <TransactionSettingNonceOptionButton onClick={onEditNoncePress}>
             <TransactionSettingOptionText>
               {t('TRANSACTION_SETTING.ADVANCED_SETTING_NONCE_OPTION')}
             </TransactionSettingOptionText>
-            <img src={ArrowIcon} alt="Arrow " />
+            <img src={ArrowIcon} alt="Arrow" />
           </TransactionSettingNonceOptionButton>
         )}
       </>
@@ -269,58 +250,47 @@ function TransactionSettingAlert({
   };
 
   return (
-    <BottomModal
+    <Sheet
       visible={visible}
-      header={
-        showFeeSettings
-          ? t('TRANSACTION_SETTING.ADVANCED_SETTING_FEE_OPTION')
-          : showNonceSettings
+      title={
+        showNonceSettings || nonceSettings
           ? t('TRANSACTION_SETTING.ADVANCED_SETTING_NONCE_OPTION')
+          : showFeeSettings
+          ? t('TRANSACTION_SETTING.ADVANCED_SETTING_FEE_OPTION')
           : t('TRANSACTION_SETTING.ADVANCED_SETTING')
       }
       onClose={onClosePress}
-      overlayStylesOverriding={{
-        height: 600,
-      }}
-      contentStylesOverriding={{
-        background: Theme.colors.elevation6_600,
-        backdropFilter: 'blur(10px)',
-        paddingBottom: Theme.spacing(8),
-      }}
     >
       {renderContent()}
-      {type === 'STX' && (showFeeSettings || showNonceSettings) && (
-        <ButtonContainer>
-          <ActionButton
-            text={t('TRANSACTION_SETTING.APPLY')}
-            processing={isLoading}
+      {type === 'STX' && (showFeeSettings || showNonceSettings || nonceSettings) && (
+        <ButtonsContainer>
+          <Button title="Back" onClick={onClosePress} variant="secondary" />
+          <Button
+            title={t('TRANSACTION_SETTING.APPLY')}
+            onClick={showNonceSettings || nonceSettings ? applyClickForNonceStx : applyClickForStx}
+            loading={isLoading}
             disabled={isLoading || !!error}
-            onPress={type === 'STX' ? applyClickForStx : applyClickForBtc}
           />
-        </ButtonContainer>
+        </ButtonsContainer>
       )}
       {customFeeSelected && (
         <ButtonsContainer>
-          <LeftButton>
-            <ActionButton
-              text="Back"
-              onPress={() => {
-                setCustomFeeSelected(false);
-              }}
-              transparent
-            />
-          </LeftButton>
-          <RightButton>
-            <ActionButton
-              text={t('TRANSACTION_SETTING.APPLY')}
-              processing={isLoading}
-              disabled={isLoading || !!error}
-              onPress={applyClickForBtc}
-            />
-          </RightButton>
+          <Button
+            title="Back"
+            onClick={() => {
+              setCustomFeeSelected(false);
+            }}
+            variant="secondary"
+          />
+          <Button
+            title={t('TRANSACTION_SETTING.APPLY')}
+            onClick={applyClickForBtc}
+            loading={isLoading}
+            disabled={isLoading || !!error}
+          />
         </ButtonsContainer>
       )}
-    </BottomModal>
+    </Sheet>
   );
 }
 

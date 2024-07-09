@@ -1,3 +1,4 @@
+import { AnalyticsEvents } from '@secretkeylabs/xverse-core';
 import { trackMixPanel } from '@utils/mixpanel';
 import styled from 'styled-components';
 
@@ -48,7 +49,7 @@ function FeaturedCard({ url, banner, description }: FeaturedCardProps) {
     <Card
       onClick={() => {
         trackMixPanel(
-          'click_app',
+          AnalyticsEvents.ClickApp,
           {
             link: url,
             section: 'featured',

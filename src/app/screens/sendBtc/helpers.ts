@@ -4,7 +4,7 @@ export type TransactionSummary = btcTransaction.TransactionSummary & {
   dustFiltered?: boolean;
 };
 
-type TransactionBuildPayload = {
+export type TransactionBuildPayload = {
   transaction: btcTransaction.EnhancedTransaction;
   summary?: TransactionSummary;
 };

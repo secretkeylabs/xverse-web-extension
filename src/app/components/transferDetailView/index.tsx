@@ -95,22 +95,24 @@ const ShowScriptBackgroundContainer = styled.div((props) => ({
   flexDirection: 'column',
 }));
 
-interface Props {
+type Props = {
   icon?: string;
   title?: string;
   amount?: string;
+  dataTestID?: string;
   children?: ReactNode;
   address: string;
   hideAddress?: boolean;
   hideCopyButton?: boolean;
   outputScript?: Array<any>;
   outputScriptIndex?: number;
-}
+};
 
 function TransferDetailView({
   icon,
   title,
   amount,
+  dataTestID,
   children,
   address,
   hideAddress,
@@ -156,7 +158,7 @@ function TransferDetailView({
         {icon && <Icon src={icon} />}
         {amount ? (
           <ColumnContainer>
-            <AmountText>{amount}</AmountText>
+            <AmountText data-testid={dataTestID}>{amount}</AmountText>
             {children}
           </ColumnContainer>
         ) : (
@@ -168,7 +170,9 @@ function TransferDetailView({
               <img src={Eye} alt="show-script" height={24} />
             </Button>
           )}
-          {!hideAddress && <ValueText>{getTruncatedAddress(address)}</ValueText>}
+          {!hideAddress && (
+            <ValueText data-testid="address-receive">{getTruncatedAddress(address)}</ValueText>
+          )}
           {!hideCopyButton && <CopyButton text={address} />}
         </AddressContainer>
       </RowContainer>

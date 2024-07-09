@@ -1,4 +1,5 @@
 import RuneAmount from '@components/confirmBtcTransaction/itemRow/runeAmount';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowRight } from '@phosphor-icons/react';
 import { btcTransaction, RuneSummary } from '@secretkeylabs/xverse-core';
@@ -54,7 +55,8 @@ function ReceiveSection({
   runeReceipts,
   transactionIsFinal,
 }: Props) {
-  const { btcAddress, ordinalsAddress, hasActivatedRareSatsKey } = useWalletSelector();
+  const { btcAddress, ordinalsAddress } = useSelectedAccount();
+  const { hasActivatedRareSatsKey } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
 
   const { outputsToPayment, outputsToOrdinal } = getOutputsWithAssetsToUserAddress({
@@ -116,11 +118,7 @@ function ReceiveSection({
           {showOrdinalRunes &&
             ordinalRuneReceipts.map((receipt) => (
               <RowContainer key={receipt.runeName}>
-                <RuneAmount
-                  tokenName={receipt.runeName}
-                  amount={String(receipt.amount)}
-                  divisibility={receipt.divisibility}
-                />
+                <RuneAmount rune={receipt} />
               </RowContainer>
             ))}
           {areInscriptionRareSatsInOrdinal && (
@@ -157,11 +155,7 @@ function ReceiveSection({
           {showPaymentRunes &&
             paymentRuneReceipts.map((receipt) => (
               <RowContainer key={receipt.runeName}>
-                <RuneAmount
-                  tokenName={receipt.runeName}
-                  amount={String(receipt.amount)}
-                  divisibility={receipt.divisibility}
-                />
+                <RuneAmount rune={receipt} />
               </RowContainer>
             ))}
           {amountIsBiggerThanZero && (

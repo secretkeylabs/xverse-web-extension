@@ -2,15 +2,22 @@ import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10Fun
 import {
   Brc20HistoryTransactionData,
   BtcTransactionData,
+  GetRunesActivityForAddressEvent,
   StxTransactionData,
   TransactionData,
 } from '@secretkeylabs/xverse-core';
 import { SEND_MANY_TOKEN_TRANSFER_CONTRACT_PRINCIPAL } from '@utils/constants';
+import { isRuneTransaction } from '@utils/transactions/transactions';
+import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 interface TransactionTitleProps {
-  transaction: StxTransactionData | BtcTransactionData | Brc20HistoryTransactionData;
+  transaction:
+    | StxTransactionData
+    | BtcTransactionData
+    | Brc20HistoryTransactionData
+    | GetRunesActivityForAddressEvent;
 }
 
 const TransactionTitleText = styled.p((props) => ({
@@ -23,17 +30,18 @@ export default function TransactionTitle(props: TransactionTitleProps) {
   const { transaction } = props;
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
   const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
-  const isPending = transaction.txStatus === 'pending';
 
-  const getTokenTransferTitle = (tx: TransactionData): string => {
-    if (isPending) {
+  const getTokenTransferTitle = (
+    tx: StxTransactionData | BtcTransactionData | Brc20HistoryTransactionData,
+  ): string => {
+    if (tx.txStatus === 'pending') {
       return tx.incoming ? t('TRANSACTION_PENDING_RECEIVING') : t('TRANSACTION_PENDING_SENDING');
     }
     return tx.incoming ? t('TRANSACTION_RECEIVED') : t('TRANSACTION_SENT');
   };
 
   const getBrc20TokenTitle = (tx: Brc20HistoryTransactionData): string => {
-    if (isPending) {
+    if (tx.txStatus === 'pending') {
       return tx.incoming ? t('TRANSACTION_PENDING_RECEIVING') : t('TRANSACTION_PENDING_SENDING');
     }
     if (tx.operation === 'transfer_send') {
@@ -48,8 +56,24 @@ export default function TransactionTitle(props: TransactionTitleProps) {
     return tx.operation;
   };
 
+  const getRuneTokenTitle = (tx: GetRunesActivityForAddressEvent): string => {
+    if (tx.burned) {
+      return t('BURNED');
+    }
+    if (tx.amount === '0') {
+      return t('TRANSACTION_RUNE_RESTRUCTURED');
+    }
+    if (BigNumber(tx.amount).gt(0)) {
+      return t('TRANSACTION_RECEIVED');
+    }
+    if (BigNumber(tx.amount).lt(0)) {
+      return t('TRANSACTION_SENT');
+    }
+    return t('TRANSACTION_STATUS_UNKNOWN');
+  };
+
   const getBtcTokenTransferTitle = (tx: BtcTransactionData): string => {
-    if (isPending) {
+    if (tx.txStatus === 'pending') {
       if (tx.isOrdinal) {
         return tx.incoming
           ? t('ORDINAL_TRANSACTION_PENDING_RECEIVING')
@@ -91,10 +115,21 @@ export default function TransactionTitle(props: TransactionTitleProps) {
     }
   };
 
-  const getTransactionTitle = (tx: TransactionData): string => {
+  const getTransactionTitle = (
+    tx:
+      | StxTransactionData
+      | BtcTransactionData
+      | Brc20HistoryTransactionData
+      | GetRunesActivityForAddressEvent,
+  ): string => {
+    if (isRuneTransaction(tx)) {
+      return getRuneTokenTitle(tx);
+    }
     switch (tx.txType) {
       case 'token_transfer':
-        return getTokenTransferTitle(transaction);
+        return getTokenTransferTitle(
+          transaction as StxTransactionData | BtcTransactionData | Brc20HistoryTransactionData,
+        );
       case 'coinbase':
         return t('TRANSACTION_COINBASE');
       case 'contract_call':

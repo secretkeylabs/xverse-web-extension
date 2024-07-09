@@ -1,5 +1,5 @@
 import RuneAmount from '@components/confirmBtcTransaction/itemRow/runeAmount';
-import useWalletSelector from '@hooks/useWalletSelector';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import { btcTransaction, RuneSummary } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { useTranslation } from 'react-i18next';
@@ -53,7 +53,7 @@ function TransferSection({
   netAmount,
   onShowInscription,
 }: Props) {
-  const { btcAddress, ordinalsAddress } = useWalletSelector();
+  const { btcAddress, ordinalsAddress } = useSelectedAccount();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
 
   const { inputFromPayment, inputFromOrdinal } = getInputsWitAssetsFromUserAddress({
@@ -96,12 +96,7 @@ function TransferSection({
         transactionIsFinal &&
           runeTransfers?.map((transfer) => (
             <RowContainer key={transfer.runeName}>
-              <RuneAmount
-                tokenName={transfer.runeName}
-                amount={String(transfer.amount)}
-                divisibility={transfer.divisibility}
-                hasSufficientBalance={transfer.hasSufficientBalance}
-              />
+              <RuneAmount rune={transfer} hasSufficientBalance={transfer.hasSufficientBalance} />
             </RowContainer>
           ))
       }

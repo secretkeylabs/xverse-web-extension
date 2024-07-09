@@ -3,6 +3,7 @@ import { useGetUtxoOrdinalBundle } from '@hooks/queries/ordinals/useAddressRareS
 import useInscriptionCollectionMarketData from '@hooks/queries/ordinals/useCollectionMarketData';
 import usePendingOrdinalTxs from '@hooks/queries/usePendingOrdinalTx';
 import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getBrc20Details } from '@secretkeylabs/xverse-core';
@@ -19,8 +20,8 @@ import { useTheme } from 'styled-components';
 
 export default function useOrdinalDetail() {
   const navigate = useNavigate();
-  const { ordinalsAddress, network, selectedAccount, hasActivatedRareSatsKey } =
-    useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { network, hasActivatedRareSatsKey } = useWalletSelector();
   const { id } = useParams();
   const { data: ordinalData, isLoading } = useAddressInscription(id!);
   const { data: collectionMarketData } = useInscriptionCollectionMarketData(
@@ -118,7 +119,7 @@ export default function useOrdinalDetail() {
     ordinal: ordinalData,
     collectionMarketData,
     isLoading,
-    ordinalsAddress,
+    ordinalsAddress: selectedAccount.ordinalsAddress,
     showSendOridnalsAlert,
     brc20Details,
     isPartOfABundle: isPartOfABundle && hasActivatedRareSatsKey,

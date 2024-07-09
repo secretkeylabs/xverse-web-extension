@@ -2,6 +2,9 @@ import { expect, type Locator, type Page } from '@playwright/test';
 import crypto from 'crypto';
 import Landing from './landing';
 
+import fs from 'fs';
+import path from 'path';
+
 export default class Onboarding {
   readonly linkTOS: Locator;
 
@@ -122,7 +125,7 @@ export default class Onboarding {
     // TODO: Selector outsource
     await expect(this.page.locator('div > h1:first-child')).toHaveText(/Legal/);
     // check that the links contain href values
-    // TODO better selectors for link selection
+    // TODO: better selectors for link selection
     const linkList = this.page.locator('#app a');
     for (let i = 0; i < (await linkList.count()); i++) {
       expect(await linkList.nth(i).getAttribute('href')).not.toBeNull();
@@ -205,6 +208,56 @@ export default class Onboarding {
     await this.inputPassword.fill(password);
     await this.buttonContinue.click();
     await expect(this.imageSuccess).toBeVisible();
+  }
+
+  async restoreWallet(password, envVarName) {
+    const landingpage = new Landing(this.page);
+    await landingpage.buttonRestoreWallet.click();
+    await expect(this.page.url()).toContain('legal');
+    await this.buttonAccept.click();
+    await expect(this.page.url()).toContain('restore');
+    await this.checkRestoreWalletSeedPhrasePage();
+
+    const seedWords = await this.getSeedWords(envVarName);
+
+    for (let i = 0; i < seedWords.length; i++) {
+      await this.inputWord(i).fill(seedWords[i]);
+    }
+    await expect(this.buttonContinue).toBeEnabled();
+    await this.buttonContinue.click();
+    await this.inputPassword.fill(password);
+    await this.buttonContinue.click();
+    await this.inputPassword.fill(password);
+    await this.buttonContinue.click();
+    await expect(this.imageSuccess).toBeVisible();
+    await expect(this.headingWalletRestored).toBeVisible();
+    await expect(this.buttonCloseTab).toBeVisible();
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  async getSeedWords(envVarName) {
+    let seedWords;
+    // Check if the specified environment variable is set and valid
+    const envContent = process.env[envVarName]?.replace(/^'|'$/g, ''); // Dynamic access to environment variable based on `envVarName`
+    if (envContent) {
+      try {
+        seedWords = JSON.parse(envContent);
+        return seedWords;
+      } catch (error) {
+        console.error('Invalid JSON in SEED_WORD environment variable:', error);
+        // If JSON parsing fails, the function will continue to try reading from the file.
+      }
+    }
+
+    // If Env Variable for SEED_WORD is not set or invalid, read from a file
+    const filePathSeedWords = path.join(__dirname, 'seedWords.json');
+    try {
+      seedWords = JSON.parse(fs.readFileSync(filePathSeedWords, 'utf8'));
+      return seedWords;
+    } catch (error) {
+      console.error('Error reading or parsing seed words from file:', error);
+      throw error; // Re-throw the error or handle it as needed
+    }
   }
 
   async testPasswordInput({ password, expectations }) {

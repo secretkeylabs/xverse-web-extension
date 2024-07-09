@@ -1,10 +1,12 @@
 import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
 import XverseLogo from '@assets/img/full_logo_horizontal.svg';
 import ArrowIcon from '@assets/img/settings/arrow.svg';
+import RequestsRoutes from '@common/utils/route-urls';
 import PasswordInput from '@components/passwordInput';
 import BottomBar from '@components/tabBar';
 import useChromeLocalStorage from '@hooks/useChromeLocalStorage';
 import useSeedVault from '@hooks/useSeedVault';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
@@ -15,6 +17,7 @@ import {
 import { chromeLocalStorageKeys } from '@utils/chromeLocalStorage';
 import { PRIVACY_POLICY_LINK, SUPPORT_LINK, TERMS_LINK } from '@utils/constants';
 import { getLockCountdownLabel, isInOptions, isLedgerAccount } from '@utils/helper';
+import RoutePaths from 'app/routes/paths';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -68,8 +71,8 @@ function Setting() {
     hasActivatedOrdinalsKey,
     hasActivatedRareSatsKey,
     hasActivatedRBFKey,
-    selectedAccount,
   } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
   const [isPriorityWallet, setIsPriorityWallet] = useChromeLocalStorage<boolean>(
     chromeLocalStorageKeys.isPriorityWallet,
     true,
@@ -105,6 +108,10 @@ function Setting() {
 
   const openBackUpWalletScreen = () => {
     navigate('/backup-wallet');
+  };
+
+  const openConnectedAppsAndPermissionsScreen = () => {
+    navigate(RoutePaths.ConnectedAppsAndPermissions);
   };
 
   const switchIsPriorityWallet = () => {
@@ -228,6 +235,14 @@ function Setting() {
           icon={ArrowIcon}
           showDivider
         />
+        {process.env.NODE_ENV !== 'production' && (
+          <SettingComponent
+            text="Connected apps & permissions"
+            onClick={openConnectedAppsAndPermissionsScreen}
+            icon={ArrowIcon}
+            showDivider
+          />
+        )}
         <SettingComponent
           text={t('LOCK_COUNTDOWN')}
           onClick={openLockCountdownScreen}

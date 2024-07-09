@@ -18,8 +18,8 @@ const TitleContainer = styled.div`
 
 const Title = styled.div`
   ${(props) => props.theme.typography.headline_xs}
-  margin-top: ${(props) => props.theme.spacing(6)}px;
-  margin-bottom: ${(props) => props.theme.spacing(12)}px;
+  margin-top: ${(props) => props.theme.space.s};
+  margin-bottom: ${(props) => props.theme.space.l};
 `;
 
 const Container = styled.div`
@@ -28,7 +28,7 @@ const Container = styled.div`
   min-height: 370px;
 `;
 
-type StepDisplayProps = {
+type Props = {
   token: FungibleToken;
   summary: TransactionSummary | undefined;
   runeSummary: RuneSummary | undefined;
@@ -72,7 +72,7 @@ function StepDisplay({
   onCancel,
   isLoading,
   isSubmitting,
-}: StepDisplayProps) {
+}: Props) {
   const { t } = useTranslation('translation');
   const header = (
     <TitleContainer>

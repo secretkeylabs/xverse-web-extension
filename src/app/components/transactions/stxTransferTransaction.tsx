@@ -89,7 +89,7 @@ export default function StxTransferTransaction({
     window.open(getStxTxStatusUrl(transaction.txid, network), '_blank', 'noopener,noreferrer');
   };
   return (
-    <TransactionContainer onClick={openTxStatusUrl}>
+    <TransactionContainer data-testid="transaction-container" onClick={openTxStatusUrl}>
       <TransactionStatusIcon transaction={transaction} currency="STX" />
       <TransactionInfoContainer>
         <TransactionRow>
@@ -97,7 +97,7 @@ export default function StxTransferTransaction({
             <TransactionTitle transaction={transaction} />
             <TransactionRecipient transaction={transaction} />
           </div>
-          <TransactionAmountContainer>
+          <TransactionAmountContainer data-testid="transaction-amount">
             <TransactionAmount transaction={transaction} currency={transactionCoin} />
             {showAccelerateButton && (
               <StyledButton

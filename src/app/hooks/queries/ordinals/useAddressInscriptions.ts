@@ -1,3 +1,4 @@
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getCollectionSpecificInscriptions } from '@secretkeylabs/xverse-core';
 import { useInfiniteQuery } from '@tanstack/react-query';
@@ -9,7 +10,8 @@ const PAGE_SIZE = 30;
  * Get inscriptions belonging to an address, filtered by collection id
  */
 const useAddressInscriptions = (collectionId?: string) => {
-  const { ordinalsAddress, network } = useWalletSelector();
+  const { ordinalsAddress } = useSelectedAccount();
+  const { network } = useWalletSelector();
 
   const getInscriptionsByAddress = async ({ pageParam = 0 }) => {
     if (!ordinalsAddress || !collectionId) {

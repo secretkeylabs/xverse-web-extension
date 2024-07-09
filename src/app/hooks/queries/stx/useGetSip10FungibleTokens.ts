@@ -1,4 +1,5 @@
 import useNetworkSelector from '@hooks/useNetwork';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   FungibleToken,
@@ -56,7 +57,8 @@ export const fetchSip10FungibleTokens =
   };
 
 export const useGetSip10FungibleTokens = () => {
-  const { stxAddress, fiatCurrency, network } = useWalletSelector();
+  const { stxAddress } = useSelectedAccount();
+  const { fiatCurrency, network, spamTokens, showSpamTokens } = useWalletSelector();
   const currentNetworkInstance = useNetworkSelector();
 
   const queryFn = fetchSip10FungibleTokens(
@@ -66,11 +68,23 @@ export const useGetSip10FungibleTokens = () => {
     currentNetworkInstance,
   );
 
-  return useQuery({
+  const query = useQuery({
     queryKey: ['sip10-fungible-tokens', network.type, stxAddress, fiatCurrency],
     queryFn,
     enabled: Boolean(network && stxAddress),
   });
+
+  return {
+    ...query,
+    unfilteredData: query.data,
+    data: query.data?.filter((ft) => {
+      let passedSpamCheck = true;
+      if (spamTokens?.length) {
+        passedSpamCheck = showSpamTokens || !spamTokens.includes(ft.principal);
+      }
+      return passedSpamCheck;
+    }),
+  };
 };
 
 export const useVisibleSip10FungibleTokens = (): ReturnType<typeof useGetSip10FungibleTokens> & {
@@ -78,11 +92,21 @@ export const useVisibleSip10FungibleTokens = (): ReturnType<typeof useGetSip10Fu
 } => {
   const { sip10ManageTokens } = useWalletSelector();
   const sip10Query = useGetSip10FungibleTokens();
+  // set visible false for unsupported tokens
+  const sip10FTList = sip10Query.data || [];
+  sip10FTList.forEach((ft) => {
+    ft.visible = !!ft.supported;
+  });
+
   return {
     ...sip10Query,
-    visible: (sip10Query.data ?? []).filter((ft) => {
+    visible: sip10FTList.filter((ft) => {
       const userSetting = sip10ManageTokens[ft.principal];
-      return userSetting === true || (userSetting === undefined && new BigNumber(ft.balance).gt(0));
+
+      return (
+        userSetting === true ||
+        (userSetting === undefined && ft.supported && new BigNumber(ft.balance).gt(0))
+      );
     }),
   };
 };

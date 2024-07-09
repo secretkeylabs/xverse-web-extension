@@ -1,17 +1,17 @@
+import FiatAmountText from '@components/fiatAmountText';
 import { Bicycle, CarProfile, RocketLaunch } from '@phosphor-icons/react';
-import { currencySymbolMap } from '@secretkeylabs/xverse-core';
+import { SupportedCurrency } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
+import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NumericFormat } from 'react-number-format';
 import styled, { useTheme } from 'styled-components';
 
-interface FeeContainer {
+export const FeeItemContainer = styled.button<{
   $isSelected: boolean;
-}
-
-export const FeeItemContainer = styled.button<FeeContainer>`
+  $insufficientFunds?: boolean;
+}>`
   display: flex;
   padding: ${(props) => props.theme.space.s} ${(props) => props.theme.space.m};
   align-items: center;
@@ -20,15 +20,19 @@ export const FeeItemContainer = styled.button<FeeContainer>`
   border-radius: ${(props) => props.theme.space.s};
   border: 1px solid ${(props) => props.theme.colors.white_850};
   flex-direction: row;
-  background: ${(props) => (props.$isSelected ? props.theme.colors.elevation6_600 : 'transparent')};
   flex: 1;
+  background-color: ${(props) =>
+    props.$isSelected ? props.theme.colors.elevation6_600 : 'transparent'};
+  transition: background-color 0.1s ease;
+
+  ${(props) => props.$insufficientFunds && 'cursor: not-allowed;'}
 
   &:hover:enabled {
-    background: ${(props) => props.theme.colors.elevation6_400};
+    background-color: ${(props) => props.theme.colors.elevation6_400};
   }
 
   &:active:enabled {
-    background: ${(props) => props.theme.colors.elevation6_600};
+    background-color: ${(props) => props.theme.colors.elevation6_600};
   }
 `;
 
@@ -63,15 +67,16 @@ const StyledHeading = styled(StyledP)`
   margin-bottom: ${(props) => props.theme.space.xxs};
 `;
 
-const StyledSubText = styled(StyledP)`
-  margin-bottom: ${(props) => props.theme.space.xxs};
-`;
-
 const LoaderContainer = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
   flex: 1;
+`;
+
+const StyledFiatAmountText = styled(FiatAmountText)<{ $color: string }>`
+  ${(props) => props.theme.typography.body_medium_s}
+  color: ${(props) => props.theme.colors[props.$color]};
 `;
 
 type FeePriority = 'high' | 'medium' | 'low';
@@ -82,18 +87,20 @@ const priorityTimeMap: Record<FeePriority, number> = {
   low: 60,
 };
 
-interface FeeItemProps {
+type Props = {
   priority: FeePriority;
   time?: string;
   feeRate: number;
   feeUnits: string;
-  feeRateUnits: string;
+  feeRateUnits?: string;
   fiatUnit: string;
   baseToFiat: (base: string) => string;
   getFeeForFeeRate: (feeRate: number) => Promise<number | undefined>;
   selected: boolean;
   onClick?: () => void;
-}
+  absoluteBalance?: number;
+  amount?: number;
+};
 
 function FeeItem({
   priority,
@@ -106,7 +113,9 @@ function FeeItem({
   getFeeForFeeRate,
   selected,
   onClick,
-}: FeeItemProps) {
+  absoluteBalance,
+  amount,
+}: Props) {
   const { t } = useTranslation('translation');
   const theme = useTheme();
 
@@ -130,7 +139,7 @@ function FeeItem({
     };
 
     getFee();
-  }, [feeRate, getFeeForFeeRate, baseToFiat]);
+  }, [feeRate]);
 
   const getIcon = () => {
     const color = totalFee ? theme.colors.tangerine : theme.colors.white_600;
@@ -160,39 +169,47 @@ function FeeItem({
   const mainColor = totalFee ? 'white_0' : 'white_400';
   const secondaryColor = totalFee ? 'white_200' : 'white_400';
 
+  const feesExceedBalance = Boolean(
+    totalFee && absoluteBalance && absoluteBalance + Number(amount ?? 0) < Number(totalFee),
+  );
+  const insufficientFunds = totalFee === undefined || feesExceedBalance;
+
   return (
-    <FeeItemContainer onClick={onClick} $isSelected={selected} disabled={!totalFee}>
+    <FeeItemContainer
+      onClick={onClick}
+      $isSelected={selected}
+      disabled={!totalFee || feesExceedBalance}
+      $insufficientFunds={insufficientFunds}
+    >
       <IconContainer>{getIcon()}</IconContainer>
       <TextsContainer>
         <ColumnsTexts>
           <StyledHeading typography="body_medium_m" color={mainColor}>
             {getLabel()}
           </StyledHeading>
-          <StyledSubText typography="body_medium_s" color={secondaryColor}>
+          <StyledP typography="body_medium_s" color={secondaryColor}>
             {time ?? `~${priorityTimeMap[priority]} mins`}
-          </StyledSubText>
-          <StyledP
-            typography="body_medium_s"
-            color={secondaryColor}
-          >{`${feeRate} ${feeRateUnits}`}</StyledP>
+          </StyledP>
+          {feeRateUnits && (
+            <StyledP
+              typography="body_medium_s"
+              color={secondaryColor}
+            >{`${feeRate} ${feeRateUnits}`}</StyledP>
+          )}
         </ColumnsTexts>
         {!isLoading ? (
-          <EndColumnTexts $insufficientFunds={totalFee === undefined}>
+          <EndColumnTexts $insufficientFunds={insufficientFunds}>
             <StyledHeading typography="body_medium_m" color={mainColor}>
               {`${totalFee || '-'} ${feeUnits}`}
             </StyledHeading>
-            {fiat && (
-              <StyledP typography="body_medium_s" color={secondaryColor}>
-                <NumericFormat
-                  value={fiat}
-                  displayType="text"
-                  prefix={`~${currencySymbolMap[fiatUnit]}`}
-                  thousandSeparator
-                  renderText={(value: string) => `${value} ${fiatUnit}`}
-                />
-              </StyledP>
+            {totalFee !== undefined && (
+              <StyledFiatAmountText
+                $color={secondaryColor}
+                fiatAmount={fiat ? BigNumber(fiat) : undefined}
+                fiatCurrency={fiatUnit as SupportedCurrency}
+              />
             )}
-            {!totalFee && (
+            {(!totalFee || feesExceedBalance) && (
               <StyledP typography="body_medium_s" color="danger_light">
                 {t('SEND.INSUFFICIENT_FUNDS')}
               </StyledP>

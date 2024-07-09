@@ -1,236 +1,65 @@
-import { ArrowDown } from '@phosphor-icons/react';
+import TransportFactory from '@ledgerhq/hw-transport-webusb';
 import BigNumber from 'bignumber.js';
 import { decodeToken } from 'jsontokens';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import { useLocation } from 'react-router-dom';
-import styled from 'styled-components';
 
+import { CreateInscriptionPayload, CreateRepeatInscriptionsPayload } from '@sats-connect/core';
 import {
+  AnalyticsEvents,
   BtcFeeResponse,
+  InscriptionErrorCode,
+  Transport,
+  UTXO,
   currencySymbolMap,
   fetchBtcFeeRate,
   getNonOrdinalUtxo,
-  InscriptionErrorCode,
   useInscriptionExecute,
   useInscriptionFees,
-  UTXO,
 } from '@secretkeylabs/xverse-core';
-import { CreateInscriptionPayload, CreateRepeatInscriptionsPayload } from 'sats-connect';
 
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
-import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmScreen from '@components/confirmScreen';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getShortTruncatedAddress, isLedgerAccount } from '@utils/helper';
+import { isLedgerAccount } from '@utils/helper';
 
+import InscribeSection from '@components/confirmBtcTransaction/inscribeSection';
+import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useConfirmedBtcBalance from '@hooks/queries/useConfirmedBtcBalance';
-import useBtcClient from '@hooks/useBtcClient';
-import useSeedVault from '@hooks/useSeedVault';
-import Callout from '@ui-library/callout';
+import useSelectedAccount from '@hooks/useSelectedAccount';
+import useTransactionContext from '@hooks/useTransactionContext';
+import Button from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
+import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
+import { trackMixPanel } from '@utils/mixpanel';
 import CompleteScreen from './CompleteScreen';
-import ContentLabel from './ContentLabel';
 import EditFee from './EditFee';
 import ErrorModal from './ErrorModal';
+import LedgerStepView from './ledgerStepView';
 
-const SATS_PER_BTC = 100e6;
+import FeeRow, { SATS_PER_BTC } from './feeRow';
 
-type CardRowProps = {
-  topMargin?: boolean;
-  center?: boolean;
-};
-const CardRow = styled.div<CardRowProps>((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: props.center ? 'center' : 'flex-start',
-  justifyContent: 'space-between',
-  marginTop: props.topMargin ? props.theme.spacing(8) : 0,
-}));
-
-const NumberWithSuffixContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'space-between',
-  alignItems: 'flex-end',
-  color: props.theme.colors.white_0,
-}));
-
-const NumberSuffix = styled.div((props) => ({
-  ...props.theme.typography.body_s,
-  color: props.theme.colors.white_400,
-}));
-
-const StyledPillLabel = styled.p`
-  display: flex;
-  align-items: center;
-  gap: ${(props) => props.theme.space.s};
-`;
-
-const Pill = styled.span`
-  ${(props) => props.theme.typography.body_bold_s}
-  color: ${(props) => props.theme.colors.elevation0};
-  background-color: ${(props) => props.theme.colors.white_0};
-  padding: 3px 6px;
-  border-radius: 40px;
-`;
-
-function FeeRow({
-  label,
-  subLabel,
-  value = 0,
-  fiatCurrency,
-  fiatRate,
-  repeat,
-}: {
-  label: string;
-  subLabel?: string;
-  value?: number | string | null;
-  fiatCurrency: string;
-  fiatRate: string;
-  repeat?: number;
-}) {
-  if (!value) {
-    return null;
-  }
-  const fiatValue = new BigNumber(value || 0)
-    .dividedBy(SATS_PER_BTC)
-    .multipliedBy(fiatRate)
-    .toFixed(2);
-
-  return (
-    <CardRow>
-      <div>
-        <StyledPillLabel>
-          {label}
-          {repeat && <Pill>{`x${repeat}`}</Pill>}
-        </StyledPillLabel>
-        {!!subLabel && <NumberSuffix>{subLabel}</NumberSuffix>}
-      </div>
-      <NumberWithSuffixContainer>
-        <NumericFormat value={value} displayType="text" thousandSeparator suffix=" sats" />
-        <NumericFormat
-          value={fiatValue}
-          displayType="text"
-          thousandSeparator
-          prefix={`~ ${currencySymbolMap[fiatCurrency]}`}
-          suffix={` ${fiatCurrency}`}
-          renderText={(val: string) => <NumberSuffix>{val}</NumberSuffix>}
-        />
-      </NumberWithSuffixContainer>
-    </CardRow>
-  );
-}
-
-const YourAddress = styled.div`
-  text-align: right;
-`;
-
-const OuterContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-  height: '100%',
-});
-
-const MainContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-  flex: 1,
-  overflowY: 'auto',
-  '&::-webkit-scrollbar': {
-    display: 'none',
-  },
-}));
-
-const Title = styled.h1((props) => ({
-  ...props.theme.typography.headline_s,
-  marginTop: props.theme.spacing(11),
-  color: props.theme.colors.white_0,
-  textAlign: 'left',
-}));
-
-const SubTitle = styled.h1((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_400,
-  marginTop: props.theme.spacing(4),
-  textAlign: 'left',
-  marginBottom: props.theme.spacing(12),
-}));
-
-const StyledCallout = styled(Callout)`
-  margin-bottom: ${(props) => props.theme.space.m};
-`;
-
-const CardContainer = styled.div<{ bottomPadding?: boolean }>((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_200,
-  display: 'flex',
-  flexDirection: 'column',
-  gap: props.theme.space.m,
-  background: props.theme.colors.elevation1,
-  borderRadius: 12,
-  padding: props.theme.spacing(8),
-  paddingBottom: props.bottomPadding ? props.theme.spacing(12) : props.theme.spacing(8),
-  justifyContent: 'center',
-  marginBottom: props.theme.spacing(6),
-  fontSize: 14,
-}));
-
-const IconLabel = styled.div((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_200,
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'center',
-}));
-
-const ButtonIcon = styled.img((props) => ({
-  width: 32,
-  height: 32,
-  marginRight: props.theme.spacing(4),
-}));
-
-const InfoIconContainer = styled.div((props) => ({
-  background: props.theme.colors.white_0,
-  color: props.theme.colors.elevation0,
-  width: 32,
-  height: 32,
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: '50%',
-  marginRight: props.theme.spacing(5),
-}));
-
-const Button = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: 'transparent',
-  width: '100%',
-  marginTop: props.theme.spacing(10),
-}));
-
-const ButtonText = styled.div((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_0,
-  textAlign: 'center',
-}));
-
-const ButtonImage = styled.img((props) => ({
-  marginRight: props.theme.spacing(3),
-  alignSelf: 'center',
-  transform: 'all',
-}));
+import {
+  ButtonImage,
+  ButtonText,
+  CardContainer,
+  CardRow,
+  EditFeesButton,
+  MainContainer,
+  NumberSuffix,
+  NumberWithSuffixContainer,
+  OuterContainer,
+  StyledCallout,
+  SubTitle,
+  SuccessActionsContainer,
+  Title,
+} from './index.styled';
 
 const DEFAULT_FEE_RATE = 8;
 const MAX_REPEATS = 24;
@@ -274,12 +103,14 @@ function CreateInscription() {
   const [showConfirmedBalanceError, setShowConfirmedBalanceError] = useState(false);
   const [feeRate, setFeeRate] = useState(suggestedMinerFeeRate ?? DEFAULT_FEE_RATE);
   const [feeRates, setFeeRates] = useState<BtcFeeResponse>();
-  const { getSeed } = useSeedVault();
   const btcClient = useBtcClient();
 
-  const { ordinalsAddress, network, btcAddress, selectedAccount, fiatCurrency } =
-    useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { ordinalsAddress, btcAddress } = selectedAccount;
+  const { network, fiatCurrency } = useWalletSelector();
   const { btcFiatRate } = useCoinRates();
+
+  const transactionContext = useTransactionContext();
 
   useEffect(() => {
     getNonOrdinalUtxo(btcAddress, btcClient, requestedNetwork.type).then(setUtxos);
@@ -321,14 +152,13 @@ function CreateInscription() {
     errorCode: feeErrorCode,
     isLoading: inscriptionFeesLoading,
   } = useInscriptionFees({
-    addressUtxos: utxos,
+    context: transactionContext,
     content,
     contentType,
     feeRate,
     revealAddress: ordinalsAddress,
     serviceFee: appFee,
     serviceFeeAddress: appFeeAddress,
-    network: network.type,
     repetitions: repeat,
   });
 
@@ -339,20 +169,23 @@ function CreateInscription() {
     revealTransactionId,
     isExecuting,
   } = useInscriptionExecute({
-    addressUtxos: utxos || [],
-    accountIndex: selectedAccount!.id,
-    changeAddress: btcAddress,
+    context: transactionContext,
     contentType,
     feeRate,
-    network: requestedNetwork.type,
     revealAddress: ordinalsAddress,
-    getSeedPhrase: getSeed,
     contentBase64: payloadType === 'BASE_64' ? content : undefined,
     contentString: payloadType === 'PLAIN_TEXT' ? content : undefined,
     serviceFee: appFee,
     serviceFeeAddress: appFeeAddress,
     repetitions: repeat,
   });
+
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [isConnectSuccess, setIsConnectSuccess] = useState(false);
+  const [isConnectFailed, setIsConnectFailed] = useState(false);
+  const [isLedgerConnectVisible, setIsLedgerConnectVisible] = useState(false);
+
+  const isLedger = isLedgerAccount(selectedAccount);
 
   const cancelCallback = () => {
     const response = {
@@ -403,7 +236,14 @@ function CreateInscription() {
     .plus(new BigNumber(totalInscriptionValue ?? 0))
     .toString();
 
-  const errorCode = feeErrorCode || executeErrorCode;
+  const nonLedgerExecuteErrorCode =
+    executeErrorCode &&
+    (executeErrorCode === InscriptionErrorCode.DEVICE_LOCKED ||
+      executeErrorCode === InscriptionErrorCode.USER_REJECTED ||
+      executeErrorCode === InscriptionErrorCode.GENERAL_LEDGER_ERROR)
+      ? undefined
+      : executeErrorCode;
+  const errorCode = feeErrorCode || nonLedgerExecuteErrorCode;
 
   const isLoading = utxos === undefined || inscriptionFeesLoading;
 
@@ -445,16 +285,65 @@ function CreateInscription() {
     return <CompleteScreen txId={revealTransactionId} onClose={onClose} network={network} />;
   }
 
+  const handleExecuteMint = (ledgerTransport?: Transport) => {
+    trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
+      protocol: 'ordinals',
+      action: 'inscribe',
+      wallet_type: selectedAccount?.accountType || 'software',
+      repeat,
+    });
+
+    executeMint({ ledgerTransport });
+  };
+
+  const handleLedgerConnect = async () => {
+    try {
+      setIsConnectSuccess(false);
+      setIsConnectFailed(false);
+      setIsConnecting(true);
+
+      const ledgerTransport = await TransportFactory.create();
+
+      if (!ledgerTransport) {
+        setIsConnectSuccess(false);
+        setIsConnectFailed(true);
+        return;
+      }
+
+      setIsConnectSuccess(true);
+      setIsConnecting(false);
+      handleExecuteMint(ledgerTransport);
+    } catch (error) {
+      console.error(error);
+      setIsConnectSuccess(false);
+      setIsConnectFailed(true);
+    } finally {
+      setIsConnecting(false);
+    }
+  };
+
+  const handleLedgerConnectCancel = () => {
+    setIsLedgerConnectVisible(false);
+  };
+
+  const handleClickConfirm = () => {
+    if (!isLedger) {
+      handleExecuteMint();
+    } else {
+      setIsLedgerConnectVisible(true);
+    }
+  };
+
   const disableConfirmButton =
-    !!errorCode ||
-    isExecuting ||
-    showOver24RepeatsError ||
-    showConfirmedBalanceError ||
-    isLedgerAccount(selectedAccount);
+    !!errorCode || isExecuting || showOver24RepeatsError || showConfirmedBalanceError;
+
+  const canLedgerRetry =
+    executeErrorCode === InscriptionErrorCode.USER_REJECTED ||
+    executeErrorCode === InscriptionErrorCode.GENERAL_LEDGER_ERROR;
 
   return (
     <ConfirmScreen
-      onConfirm={executeMint}
+      onConfirm={handleClickConfirm}
       onCancel={cancelCallback}
       cancelText={t('CANCEL_BUTTON')}
       confirmText={!errorCode ? t('CONFIRM_BUTTON') : t(`ERRORS.SHORT.${errorCode}`)}
@@ -479,44 +368,13 @@ function CreateInscription() {
           {isLedgerAccount(selectedAccount) && (
             <StyledCallout variant="danger" bodyText={t('ERRORS.LEDGER_INSCRIPTION')} />
           )}
-          <CardContainer bottomPadding>
-            <CardRow>
-              <StyledPillLabel>
-                {t('SUMMARY.TITLE')}
-                {repeat && <Pill>{`x${repeat}`}</Pill>}
-              </StyledPillLabel>
-            </CardRow>
-            <CardRow center>
-              <IconLabel>
-                <div>
-                  <ButtonIcon src={OrdinalsIcon} />
-                </div>
-                <div>{t('SUMMARY.ORDINAL')}</div>
-              </IconLabel>
-              <ContentLabel
-                contentType={contentType}
-                content={content}
-                type={payloadType}
-                repeat={repeat}
-              />
-            </CardRow>
-            <CardRow center>
-              <IconLabel>
-                <InfoIconContainer>
-                  <ArrowDown size={16} weight="bold" />
-                </InfoIconContainer>
-                {t('SUMMARY.TO')}
-              </IconLabel>
-              <YourAddress>
-                <StyledP typography="body_medium_m" color="white_0">
-                  {getShortTruncatedAddress(ordinalsAddress)}
-                </StyledP>
-                <StyledP typography="body_medium_s" color="white_400">
-                  {t('SUMMARY.YOUR_ADDRESS')}
-                </StyledP>
-              </YourAddress>
-            </CardRow>
-          </CardContainer>
+          <InscribeSection
+            content={content}
+            contentType={contentType}
+            repeat={repeat}
+            payloadType={payloadType}
+            ordinalsAddress={ordinalsAddress}
+          />
           <CardContainer>
             <CardRow>
               <div>{t('NETWORK')}</div>
@@ -595,10 +453,10 @@ function CreateInscription() {
               fiatRate={btcFiatRate}
             />
           </CardContainer>
-          <Button onClick={onAdvancedSettingClick}>
+          <EditFeesButton onClick={onAdvancedSettingClick}>
             <ButtonImage src={SettingIcon} />
             <ButtonText>{t('EDIT_FEES')}</ButtonText>
-          </Button>
+          </EditFeesButton>
           {showFeeSettings && (
             <EditFee
               feeRate={feeRate}
@@ -618,10 +476,42 @@ function CreateInscription() {
             <ErrorModal
               key={errorCode}
               errorCode={errorCode}
-              onRetrySubmit={executeErrorCode ? executeMint : undefined}
+              onRetrySubmit={executeErrorCode ? handleClickConfirm : undefined}
               onEnd={cancelCallback}
             />
           )}
+          <Sheet
+            title=""
+            visible={isLedgerConnectVisible}
+            onClose={isConnectSuccess ? undefined : handleLedgerConnectCancel}
+          >
+            <LedgerStepView
+              isConnectSuccess={isConnectSuccess}
+              isConnectFailed={isConnectFailed || !!executeErrorCode}
+              errorCode={executeErrorCode}
+            />
+            <SuccessActionsContainer>
+              {(!isConnectSuccess || canLedgerRetry) && (
+                <>
+                  <Button
+                    onClick={handleLedgerConnect}
+                    title={t(
+                      isConnectFailed || canLedgerRetry
+                        ? 'LEDGER.RETRY_BUTTON'
+                        : 'LEDGER.CONNECT_BUTTON',
+                    )}
+                    disabled={isConnecting}
+                    loading={isConnecting}
+                  />
+                  <Button
+                    onClick={handleLedgerConnectCancel}
+                    title={t('LEDGER.CANCEL_BUTTON')}
+                    variant="tertiary"
+                  />
+                </>
+              )}
+            </SuccessActionsContainer>
+          </Sheet>
         </MainContainer>
       </OuterContainer>
     </ConfirmScreen>

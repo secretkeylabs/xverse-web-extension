@@ -5,11 +5,13 @@ import {
   sendAddressMismatchMessage,
   sendMissingFunctionArgumentsMessage,
   sendNetworkMismatchMessage,
-} from '@common/utils/rpc/stx/rpcResponseMessages';
+} from '@common/utils/rpc/responseMessages/errors';
 import ActionButton from '@components/button';
 import CopyButton from '@components/copyButton';
 import InfoContainer from '@components/infoContainer';
 import useWalletSelector from '@hooks/useWalletSelector';
+import Button from '@ui-library/button';
+import { MAGIC_EDEN_RUNES_URL } from '@utils/constants';
 import { getBtcTxStatusUrl, getStxTxStatusUrl } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -135,7 +137,7 @@ const ButtonImage = styled.img((props) => ({
   marginRight: props.theme.spacing(3),
 }));
 
-const Button = styled.button((props) => ({
+const CustomButton = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
   backgroundColor: 'transparent',
@@ -160,6 +162,7 @@ function TransactionStatus() {
     isRareSat,
     errorTitle,
     isBrc20TokenFlow,
+    runeListed,
     isSponsorServiceError,
     isSwapTransaction,
     tabId,
@@ -200,11 +203,11 @@ function TransactionStatus() {
         sendAddressMismatchMessage({ tabId, messageId });
       if (error === tReqErrors('MISSING_ARGUMENTS') && tabId && messageId)
         sendMissingFunctionArgumentsMessage({ tabId, messageId });
-
       window.close();
     } else if (isRareSat) navigate('/nft-dashboard?tab=rareSats');
     else if (isOrdinal) navigate('/nft-dashboard?tab=inscriptions');
     else if (isNft) navigate('/nft-dashboard?tab=nfts');
+    else if (runeListed) navigate(`/coinDashboard/FT?ftKey=${runeListed.principal}&protocol=runes`);
     else navigate('/');
   };
 
@@ -215,10 +218,10 @@ function TransactionStatus() {
   const renderLink = (
     <RowContainer>
       <BeforeButtonText>{t('SEE_ON')}</BeforeButtonText>
-      <Button onClick={openTransactionInBrowser}>
+      <CustomButton onClick={openTransactionInBrowser}>
         <ButtonText>{currency === 'BTC' ? t('BITCOIN_EXPLORER') : t('STACKS_EXPLORER')}</ButtonText>
         <ButtonImage src={ArrowSquareOut} />
-      </Button>
+      </CustomButton>
     </RowContainer>
   );
 
@@ -226,7 +229,7 @@ function TransactionStatus() {
     <TransactionIDContainer>
       <TxIDText>{t('TRANSACTION_ID')}</TxIDText>
       <TxIDContainer>
-        <IDText>{txid}</IDText>
+        <IDText data-testid="transaction-id">{txid}</IDText>
         <CopyButtonContainer>
           <CopyButton text={txid} />
         </CopyButtonContainer>
@@ -234,8 +237,30 @@ function TransactionStatus() {
     </TransactionIDContainer>
   );
 
+  if (runeListed) {
+    return (
+      <TxStatusContainer data-testid="transaction-container">
+        <OuterContainer>{renderTransactionSuccessStatus}</OuterContainer>
+        <ButtonContainer>
+          <Button variant="primary" title={t('CLOSE')} onClick={onCloseClick} />
+          <Button
+            variant="secondary"
+            title={t('SEE_ON_MAGICEDEN', { runeSymbol: runeListed?.runeSymbol ?? '' })}
+            onClick={() => {
+              window.open(
+                `${MAGIC_EDEN_RUNES_URL}/${runeListed?.name}`,
+                '_blank',
+                'noopener,noreferrer',
+              );
+            }}
+          />
+        </ButtonContainer>
+      </TxStatusContainer>
+    );
+  }
+
   return (
-    <TxStatusContainer>
+    <TxStatusContainer data-testid="transaction-container">
       <OuterContainer>
         {txid ? renderTransactionSuccessStatus : renderTransactionFailureStatus}
         {txid && renderLink}

@@ -1,4 +1,4 @@
-import useWalletSelector from '@hooks/useWalletSelector';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import { parseStxTransactionData } from '@secretkeylabs/xverse-core';
 import { AddressTransactionWithTransfers } from '@stacks/stacks-blockchain-api-types';
 import { CurrencyTypes } from '@utils/constants';
@@ -17,7 +17,7 @@ export default function StxTransactionHistoryItem({
   transactionCoin,
   txFilter,
 }: TransactionHistoryItemProps) {
-  const { selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
   if (!isAddressTransactionWithTransfers(transaction)) {
     return (
       <StxTransferTransaction

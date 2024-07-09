@@ -1,12 +1,14 @@
 import ArrowIcon from '@assets/img/transactions/ArrowDown.svg';
 import OutputIcon from '@assets/img/transactions/output.svg';
 import WalletIcon from '@assets/img/transactions/wallet.svg';
+import FiatAmountText from '@components/fiatAmountText';
 import TokenImage from '@components/tokenImage';
 import TransferDetailView from '@components/transferDetailView';
 import useCoinRates from '@hooks/queries/useCoinRates';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CubeTransparent } from '@phosphor-icons/react';
-import { currencySymbolMap, FungibleToken, getFiatEquivalent } from '@secretkeylabs/xverse-core';
+import { FungibleToken, getFiatEquivalent } from '@secretkeylabs/xverse-core';
 import { CurrencyTypes } from '@utils/constants';
 import { getTicker } from '@utils/helper';
 import BigNumber from 'bignumber.js';
@@ -26,7 +28,7 @@ const Container = styled.div((props) => ({
 }));
 
 const RecipientTitleText = styled.p((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_200,
   marginBottom: props.theme.space.xs,
 }));
@@ -40,7 +42,7 @@ const RowContainer = styled.div({
 });
 
 const Icon = styled.img((props) => ({
-  marginRight: props.theme.spacing(4),
+  marginRight: props.theme.space.xs,
   width: 32,
   height: 32,
   borderRadius: 30,
@@ -49,26 +51,25 @@ const Icon = styled.img((props) => ({
 const DownArrowIcon = styled.img((props) => ({
   width: 16,
   height: 16,
-  marginTop: props.theme.spacing(4),
-  marginLeft: props.theme.spacing(4),
-  marginBottom: props.theme.spacing(4),
+  marginTop: props.theme.space.xs,
+  marginLeft: props.theme.space.xs,
+  marginBottom: props.theme.space.xs,
 }));
 
 const TitleText = styled.p((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_200,
   textAlign: 'center',
   marginTop: 5,
 }));
 
 const ValueText = styled.p((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_0,
 }));
 
 const SubValueText = styled.p((props) => ({
-  ...props.theme.body_m,
-  fontSize: 12,
+  ...props.theme.typography.body_s,
   color: props.theme.colors.white_400,
 }));
 
@@ -99,28 +100,31 @@ const IconContainer = styled.div((props) => ({
   backgroundColor: props.theme.colors.elevation3,
   width: 32,
   height: 32,
-  marginRight: props.theme.spacing(4),
+  marginRight: props.theme.space.xs,
 }));
 
-interface Props {
+type Props = {
   address?: string;
   value: string;
   title: string;
   currencyType: CurrencyTypes;
   valueDetail?: string;
+  dataTestID?: string;
   recipientIndex?: number;
   totalRecipient?: number;
   icon?: string;
   fungibleToken?: FungibleToken;
   heading?: string;
   showSenderAddress?: boolean;
-}
+};
+
 function RecipientComponent({
   recipientIndex,
   address,
   value,
   totalRecipient,
   valueDetail,
+  dataTestID,
   title,
   fungibleToken,
   icon,
@@ -130,7 +134,8 @@ function RecipientComponent({
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [fiatAmount, setFiatAmount] = useState<string | undefined>('0');
-  const { fiatCurrency, ordinalsAddress } = useWalletSelector();
+  const { ordinalsAddress } = useSelectedAccount();
+  const { fiatCurrency } = useWalletSelector();
   const { btcFiatRate, stxBtcRate } = useCoinRates();
 
   useEffect(() => {
@@ -145,30 +150,12 @@ function RecipientComponent({
     );
   }, [value]);
 
-  function getFtTicker() {
+  const getFtTicker = () => {
     if (fungibleToken?.ticker) {
       return fungibleToken?.ticker.toUpperCase();
     }
     if (fungibleToken?.name) {
       return getTicker(fungibleToken.name).toUpperCase();
-    }
-    return '';
-  }
-
-  const getFiatAmountString = (amount: BigNumber) => {
-    if (amount) {
-      if (amount.isLessThan(0.01)) {
-        return `<${currencySymbolMap[fiatCurrency]}0.01 ${fiatCurrency}`;
-      }
-      return (
-        <NumericFormat
-          value={amount.toFixed(2).toString()}
-          displayType="text"
-          thousandSeparator
-          prefix={`~ ${currencySymbolMap[fiatCurrency]} `}
-          suffix={` ${fiatCurrency}`}
-        />
-      );
     }
     return '';
   };
@@ -212,7 +199,7 @@ function RecipientComponent({
           <TitleText>{title}</TitleText>
           {currencyType === 'NFT' || currencyType === 'Ordinal' || currencyType === 'RareSat' ? (
             <ColumnContainer>
-              <ValueText>{value}</ValueText>
+              <ValueText data-testid={dataTestID}>{value}</ValueText>
               {valueDetail && <SubValueText>{valueDetail}</SubValueText>}
             </ColumnContainer>
           ) : (
@@ -222,9 +209,9 @@ function RecipientComponent({
                 displayType="text"
                 thousandSeparator
                 suffix={currencyType === 'FT' ? ` ${getFtTicker()} ` : ` ${currencyType}`}
-                renderText={(amount) => <ValueText>{amount}</ValueText>}
+                renderText={(amount) => <ValueText data-testid={dataTestID}>{amount}</ValueText>}
               />
-              <SubValueText>{getFiatAmountString(new BigNumber(fiatAmount!))}</SubValueText>
+              <FiatAmountText fiatAmount={BigNumber(fiatAmount!)} fiatCurrency={fiatCurrency} />
             </ColumnContainer>
           )}
         </RowContainer>

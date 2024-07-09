@@ -5,6 +5,7 @@ import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Check, Copy } from '@phosphor-icons/react';
 import QrCode from '@screens/receive/qrCode';
@@ -99,14 +100,9 @@ function Receive() {
   const [isBtcReceiveAlertVisible, setIsBtcReceiveAlertVisible] = useState(false);
   const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible] = useState(false);
   const navigate = useNavigate();
-  const {
-    stxAddress,
-    btcAddress,
-    ordinalsAddress,
-    selectedAccount,
-    showBtcReceiveAlert,
-    showOrdinalReceiveAlert,
-  } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { stxAddress, btcAddress, ordinalsAddress } = selectedAccount;
+  const { showBtcReceiveAlert, showOrdinalReceiveAlert } = useWalletSelector();
 
   const { currency } = useParams<{ currency: SupportedAddresses }>();
 

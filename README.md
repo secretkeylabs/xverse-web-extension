@@ -45,7 +45,7 @@ npm run e2etest
 If you only want to run the smoke test suite, run
 
 ```
-npm run smoketest
+npm run e2etest:smoketest
 ```
 
 If you want to run the e2e test in UI Mode:

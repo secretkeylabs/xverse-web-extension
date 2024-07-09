@@ -1,6 +1,6 @@
 import { WebBtcMessage } from '@common/types/message-types';
 import { getTabIdFromPort } from '@common/utils';
-import { AddressPurpose, RpcErrorCode } from 'sats-connect';
+import { AddressPurpose, RpcErrorCode } from '@sats-connect/core';
 import { z } from 'zod';
 import {
   ParamsKeyValueArray,

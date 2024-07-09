@@ -1,8 +1,10 @@
 import stxIcon from '@assets/img/dashboard/stx_icon.svg';
 import ActionButton from '@components/button';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useStxAddressRequest from '@hooks/useStxAddressRequest';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { animated, useTransition } from '@react-spring/web';
+import { AddressPurpose } from '@sats-connect/core';
 import SelectAccount from '@screens/connect/selectAccount';
 import { getAppIconFromWebManifest } from '@secretkeylabs/xverse-core';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
@@ -10,7 +12,6 @@ import Spinner from '@ui-library/spinner';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { AddressPurpose } from 'sats-connect';
 import AddressPurposeBox from '../addressPurposeBox';
 import {
   AddressBoxContainer,
@@ -29,7 +30,8 @@ function StxSelectAddressScreen() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'SELECT_BTC_ADDRESS_SCREEN' });
-  const { network, stxAddress, selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { network } = useWalletSelector();
   const [appIcon, setAppIcon] = useState<string>('');
   const [isLoadingIcon, setIsLoadingIcon] = useState(false);
   const { payload, origin, approveStxAddressRequest, cancelAddressRequest } =
@@ -112,8 +114,8 @@ function StxSelectAddressScreen() {
               purpose={AddressPurpose.Stacks}
               icon={stxIcon}
               title={t('STX_ADDRESS')}
-              address={stxAddress}
-              bnsName={selectedAccount?.bnsName}
+              address={selectedAccount.stxAddress}
+              bnsName={selectedAccount.bnsName}
             />
           </AddressBoxContainer>
           <PermissionsContainer>

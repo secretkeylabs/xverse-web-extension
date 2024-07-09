@@ -1,6 +1,6 @@
+import Dots from '@components/dots';
 import { useWalletExistsContext } from '@components/guards/onboarding';
 import PasswordInput from '@components/passwordInput';
-import Steps from '@components/steps';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { useEffect, useState } from 'react';
@@ -38,14 +38,14 @@ export default function BackupWalletSteps(): JSX.Element {
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const navigate = useNavigate();
   const [seedPhrase, setSeedPhrase] = useState<string>('');
-  const { getSeed, changePassword } = useSeedVault();
-  const { createWallet } = useWalletReducer();
+  const seedVault = useSeedVault();
   const { disableWalletExistsGuard } = useWalletExistsContext();
+  const { createWallet } = useWalletReducer();
 
   useEffect(() => {
     (async () => {
       try {
-        const seed = await getSeed();
+        const seed = await seedVault.getSeed();
         setSeedPhrase(seed);
       } catch (e) {
         navigate('/backup');
@@ -83,8 +83,10 @@ export default function BackupWalletSteps(): JSX.Element {
   const handleConfirmPasswordContinue = async () => {
     if (confirmPassword === password) {
       disableWalletExistsGuard?.();
-      await createWallet(); // TODO move this somwhere else
-      await changePassword('', password);
+      const seed = await seedVault.getSeed();
+
+      await createWallet(seed, password);
+
       navigate('/wallet-success/create', { replace: true });
     } else {
       setError(t('CONFIRM_PASSWORD_MATCH_ERROR'));
@@ -129,7 +131,7 @@ export default function BackupWalletSteps(): JSX.Element {
 
   return (
     <Container>
-      <Steps data={backupSteps} activeIndex={currentActiveIndex} />
+      <Dots numDots={backupSteps.length} activeIndex={currentActiveIndex} />
       {backupSteps[currentActiveIndex]}
     </Container>
   );

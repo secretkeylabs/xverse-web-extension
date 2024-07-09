@@ -1,12 +1,13 @@
+import FiatAmountText from '@components/fiatAmountText';
+import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useCoinRates from '@hooks/queries/useCoinRates';
-import useBtcClient from '@hooks/useBtcClient';
 import useBtcFees from '@hooks/useBtcFees';
 import useDebounce from '@hooks/useDebounce';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Faders } from '@phosphor-icons/react';
 import {
-  currencySymbolMap,
   ErrorCodes,
   getBtcFees,
   getBtcFeesForNonOrdinalBtcSend,
@@ -27,8 +28,6 @@ import FeeItem from './feeItem';
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  marginLeft: props.theme.space.m,
-  marginRight: props.theme.space.m,
   paddingBottom: props.theme.space.m,
 }));
 
@@ -37,10 +36,9 @@ const DetailText = styled.h1((props) => ({
   color: props.theme.colors.white_200,
 }));
 
-interface InputContainerProps {
+const InputContainer = styled.div<{
   withError?: boolean;
-}
-const InputContainer = styled.div<InputContainerProps>((props) => ({
+}>((props) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
@@ -74,7 +72,7 @@ const InputField = styled.input((props) => ({
   },
 }));
 
-const FeeText = styled.h1((props) => ({
+const FeeText = styled.span((props) => ({
   ...props.theme.typography.body_m,
   color: props.theme.colors.white_0,
 }));
@@ -96,11 +94,9 @@ const FeePrioritiesContainer = styled.div`
   flex-direction: column;
 `;
 
-interface FeeContainerProps {
+const FeeItemContainer = styled.button<{
   isSelected: boolean;
-}
-
-const FeeItemContainer = styled.button<FeeContainerProps>`
+}>`
   display: flex;
   padding: ${(props) => props.theme.space.s} ${(props) => props.theme.space.m};
   align-items: center;
@@ -138,7 +134,7 @@ const TotalFeeText = styled(StyledP)`
   margin-right: ${(props) => props.theme.space.xxs};
 `;
 
-interface Props {
+type Props = {
   type?: string;
   fee: string;
   feeRate?: BigNumber | string;
@@ -157,7 +153,8 @@ interface Props {
   setError: (error: string) => void;
   setCustomFeeSelected: (selected: boolean) => void;
   feeOptionSelected: (feeRate: string, totalFee: string) => void;
-}
+};
+
 function EditBtcFee({
   type,
   fee,
@@ -180,8 +177,9 @@ function EditBtcFee({
 }: Props) {
   const { t } = useTranslation('translation');
 
-  const { network, btcAddress, fiatCurrency, selectedAccount, ordinalsAddress } =
-    useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { btcAddress, ordinalsAddress } = selectedAccount;
+  const { network, fiatCurrency } = useWalletSelector();
   const { btcFiatRate } = useCoinRates();
   const [totalFee, setTotalFee] = useState(fee);
   const [feeRateInput, setFeeRateInput] = useState(feeRate?.toString() ?? '');
@@ -281,33 +279,6 @@ function EditBtcFee({
     }
   }, [debouncedFeeRateInput]);
 
-  function getFiatEquivalent() {
-    return getBtcFiatEquivalent(new BigNumber(totalFee), BigNumber(btcFiatRate));
-  }
-
-  const getFiatAmountString = (fiatAmount: BigNumber) => {
-    if (fiatAmount) {
-      if (fiatAmount.isLessThan(0.01)) {
-        return `<${currencySymbolMap[fiatCurrency]}0.01 ${fiatCurrency}`;
-      }
-      return (
-        <NumericFormat
-          value={fiatAmount.toFixed(2).toString()}
-          displayType="text"
-          thousandSeparator
-          prefix={`~ ${currencySymbolMap[fiatCurrency]}`}
-          suffix={` ${fiatCurrency}`}
-          renderText={(value: string) => (
-            <StyledP typography="body_medium_m" color="white_200">
-              {value}
-            </StyledP>
-          )}
-        />
-      );
-    }
-    return '';
-  };
-
   const onInputEditFeesChange = ({ target: { value } }: React.ChangeEvent<HTMLInputElement>) => {
     if (error) {
       setError('');
@@ -336,8 +307,9 @@ function EditBtcFee({
             time="~10 mins"
             feeRate={feeData?.highFeeRate}
             totalFee={feeData?.highTotalFee}
-            fiat={getFiatAmountString(
-              getBtcFiatEquivalent(new BigNumber(feeData.highTotalFee), BigNumber(btcFiatRate)),
+            fiatAmount={getBtcFiatEquivalent(
+              new BigNumber(feeData.highTotalFee),
+              BigNumber(btcFiatRate),
             )}
             onClick={() => {
               feeOptionSelected(feeData?.highFeeRate?.toString() || '', feeData?.highTotalFee);
@@ -351,8 +323,9 @@ function EditBtcFee({
             time="~30 mins"
             feeRate={feeData?.standardFeeRate}
             totalFee={feeData?.standardTotalFee}
-            fiat={getFiatAmountString(
-              getBtcFiatEquivalent(new BigNumber(feeData.standardTotalFee), BigNumber(btcFiatRate)),
+            fiatAmount={getBtcFiatEquivalent(
+              new BigNumber(feeData.standardTotalFee),
+              BigNumber(btcFiatRate),
             )}
             onClick={() => {
               feeOptionSelected(
@@ -411,9 +384,10 @@ function EditBtcFee({
                 )}
               />
             </Row>
-            <StyledP typography="body_medium_m" color="white_200">
-              {getFiatAmountString(getFiatEquivalent())}
-            </StyledP>
+            <FiatAmountText
+              fiatAmount={getBtcFiatEquivalent(BigNumber(totalFee), BigNumber(btcFiatRate))}
+              fiatCurrency={fiatCurrency}
+            />
           </CustomTextsContainer>
           {error && <ErrorText>{error}</ErrorText>}
         </FeeContainer>

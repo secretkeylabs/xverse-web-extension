@@ -22,6 +22,7 @@ import { useNavigate } from 'react-router-dom';
 import { FiatRow } from './fiatRow';
 import useClearFormOnAccountSwitch from './useClearFormOnAccountSwitch';
 
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import Button from '@ui-library/button';
 import {
   AmountInputContainer,
@@ -46,7 +47,7 @@ import {
   TokenContainer,
 } from './index.styled';
 
-interface Props {
+type Props = {
   onPressSend: (recipientID: string, amount: string, memo?: string) => void;
   currencyType: CurrencyTypes;
   amountError?: string;
@@ -67,7 +68,7 @@ interface Props {
   onAddressInputChange?: (recipientAddress: string) => void;
   warning?: string;
   info?: string;
-}
+};
 
 function SendForm({
   onPressSend,
@@ -101,11 +102,16 @@ function SendForm({
   const [addressError, setAddressError] = useState<string | undefined>(recipientError);
   const navigate = useNavigate();
 
-  const { fiatCurrency, stxAddress, selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { fiatCurrency } = useWalletSelector();
   const { btcFiatRate, stxBtcRate } = useCoinRates();
   const debouncedSearchTerm = useDebounce(recipientAddress, 300);
   const associatedBnsName = useBnsName(recipientAddress);
-  const associatedAddress = useBnsResolver(debouncedSearchTerm, stxAddress, currencyType);
+  const associatedAddress = useBnsResolver(
+    debouncedSearchTerm,
+    selectedAccount.stxAddress,
+    currencyType,
+  );
   const { isAccountSwitched } = useClearFormOnAccountSwitch();
 
   useEffect(() => {
@@ -224,12 +230,17 @@ function SendForm({
           value={balance}
           displayType="text"
           thousandSeparator
-          renderText={(value: string) => <Text>{value}</Text>}
+          renderText={(value: string) => <Text data-testid="balance-label">{value}</Text>}
         />
       </RowContainer>
       <AmountInputContainer error={amountError !== ''}>
         <InputFieldContainer>
-          <InputField value={amount} placeholder="0" onChange={onInputChange} />
+          <InputField
+            data-testid="send-input"
+            value={amount}
+            placeholder="0"
+            onChange={onInputChange}
+          />
         </InputFieldContainer>
         <Text>{getAmountLabel()}</Text>
         {switchToFiat && <CurrencyFlag src={getCurrencyFlag(fiatCurrency)} />}
@@ -266,6 +277,7 @@ function SendForm({
       <AmountInputContainer error={addressError !== ''}>
         <InputFieldContainer>
           <InputField
+            data-testid="recipient-adress"
             value={recipientAddress}
             placeholder={getAddressInputPlaceholder()}
             onChange={handleAddressInputChange}
@@ -368,6 +380,7 @@ function SendForm({
                   <MemoInputContainer error={memoError !== ''}>
                     <InputFieldContainer>
                       <InputField
+                        data-testid="memo-input"
                         value={memo}
                         placeholder={t('MEMO_PLACEHOLDER')}
                         onChange={(e: { target: { value: SetStateAction<string> } }) =>

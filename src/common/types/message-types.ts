@@ -1,4 +1,3 @@
-import { FinishedTxPayload, SignatureData, SponsoredFinishedTxPayload } from '@stacks/connect';
 import {
   CreateInscriptionResponse,
   CreateRepeatInscriptionsResponse,
@@ -8,7 +7,8 @@ import {
   SignTransactionResponse,
   type Params,
   type Requests,
-} from 'sats-connect';
+} from '@sats-connect/core';
+import { FinishedTxPayload, SignatureData, SponsoredFinishedTxPayload } from '@stacks/connect';
 
 export const MESSAGE_SOURCE = 'xverse-wallet';
 
@@ -29,7 +29,7 @@ export enum StacksLegacyMethods {
   structuredDataSignatureResponse = 'structuredDataSignatureResponse',
 }
 
-export enum RpcMethods {
+enum RpcMethods {
   request = 'request',
 }
 
@@ -200,9 +200,11 @@ export type CreateRepeatInscriptionsResponseMessage = Message<
   }
 >;
 
-export type WebBtcMessage<Method extends keyof Requests> = {
+type BaseWebBtcMessage = {
   id: RpcId;
-  method: Method;
+  method: string;
+};
+export type WebBtcMessage<Method extends keyof Requests> = BaseWebBtcMessage & {
   params: Params<Method>;
 };
 

@@ -3,15 +3,14 @@ import BigNumber from 'bignumber.js';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 
-export function FiatAmountText({
-  className,
-  fiatAmount,
-  fiatCurrency,
-}: {
+type Props = {
   className?: string;
   fiatAmount?: BigNumber;
   fiatCurrency: SupportedCurrency;
-}) {
+  dataTestId?: string;
+};
+
+export function FiatAmountText({ className, fiatAmount, fiatCurrency, dataTestId }: Props) {
   if (!fiatAmount || !fiatCurrency) {
     return null;
   }
@@ -35,8 +34,9 @@ export function FiatAmountText({
       value={fiatAmount.toFixed(2).toString()}
       displayType="text"
       thousandSeparator
-      prefix={`~ ${currencySymbolMap[fiatCurrency]} `}
+      prefix={`~ ${currencySymbolMap[fiatCurrency]}`}
       suffix={` ${fiatCurrency}`}
+      data-testid={dataTestId}
     />
   );
 }

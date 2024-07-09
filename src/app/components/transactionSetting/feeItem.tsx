@@ -1,16 +1,17 @@
+import FiatAmountText from '@components/fiatAmountText';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { Bicycle, CarProfile, RocketLaunch } from '@phosphor-icons/react';
 import { ErrorCodes } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
+import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import Theme from 'theme';
 
-interface FeeContainer {
+const FeeItemContainer = styled.button<{
   isSelected: boolean;
-}
-
-const FeeItemContainer = styled.button<FeeContainer>`
+}>`
   display: flex;
   padding: ${(props) => props.theme.space.s} ${(props) => props.theme.space.m};
   align-items: center;
@@ -65,30 +66,37 @@ const LoaderContainer = styled.div`
   flex: 1;
 `;
 
+const StyledFiatAmountText = styled(FiatAmountText)`
+  ${(props) => props.theme.typography.body_medium_s}
+  color: ${(props) => props.theme.colors.white_200};
+`;
+
 type FeePriority = 'high' | 'medium' | 'low';
 
-interface FeeItemProps {
+type Props = {
   priority: FeePriority;
   time: string;
   feeRate: string;
   totalFee: string;
-  fiat: string | JSX.Element;
+  fiatAmount: BigNumber;
   selected: boolean;
   onClick?: () => void;
   error?: string;
-}
+};
 
 function FeeItem({
   priority,
   time,
   feeRate,
   totalFee,
-  fiat,
+  fiatAmount,
   selected,
   error,
   onClick,
-}: FeeItemProps) {
+}: Props) {
   const { t } = useTranslation('translation');
+  const { fiatCurrency } = useWalletSelector();
+
   const getIcon = () => {
     switch (priority) {
       case 'high':
@@ -148,9 +156,7 @@ function FeeItem({
               {`${totalFee} Sats`}
             </StyledHeading>
           )}
-          <StyledSubText typography="body_medium_s" color="white_200">
-            {fiat}
-          </StyledSubText>
+          <StyledFiatAmountText fiatAmount={fiatAmount} fiatCurrency={fiatCurrency} />
           {error && (
             <StyledSubText typography="body_medium_s" color="danger_medium">
               {getErrorMessage(error)}

@@ -21,12 +21,12 @@ const Container = styled.div`
 `;
 
 const FeeRateContainer = styled.div`
-  margin-top: ${(props) => props.theme.spacing(12)}px;
-  margin-bottom: ${(props) => props.theme.spacing(8)}px;
+  margin-top: ${(props) => props.theme.space.l};
+  margin-bottom: ${(props) => props.theme.space.m};
 `;
 
 const Buttons = styled.div`
-  margin: ${(props) => props.theme.spacing(12)}px 0;
+  margin: ${(props) => props.theme.space.l} 0;
 `;
 
 type Props = {
@@ -71,7 +71,7 @@ function AmountSelector({
   const { data: recommendedFees } = useBtcFeeRate();
 
   const satsToFiat = (sats: string) =>
-    getBtcFiatEquivalent(new BigNumber(sats), BigNumber(btcFiatRate)).toNumber().toFixed(2);
+    getBtcFiatEquivalent(new BigNumber(sats), BigNumber(btcFiatRate)).toString();
 
   if (btcBalanceLoading || btcBalance === undefined) {
     return null;
@@ -83,6 +83,7 @@ function AmountSelector({
       <div>
         {header}
         <BtcAmountSelector
+          data-testid="test-container"
           amountSats={amountSats}
           setAmountSats={setAmountSats}
           sendMax={sendMax}
@@ -90,7 +91,7 @@ function AmountSelector({
           disabled={!hasBtc}
         />
         {hasBtc && (
-          <FeeRateContainer>
+          <FeeRateContainer data-testid="feerate-container">
             <SelectFeeRate
               fee={fee}
               feeUnits="Sats"
@@ -123,6 +124,7 @@ function AmountSelector({
         )}
         {!hasBtc && (
           <Callout
+            dataTestID="no-funds-message"
             titleText={t('BTC.NO_FUNDS_TITLE')}
             bodyText={t('BTC.NO_FUNDS')}
             redirectText={t('BTC.BUY_BTC')}

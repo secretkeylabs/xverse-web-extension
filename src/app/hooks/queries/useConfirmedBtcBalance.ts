@@ -1,10 +1,10 @@
-import useBtcClient from '@hooks/useBtcClient';
+import useBtcClient from '@hooks/apiClients/useBtcClient';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import { useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import useWalletSelector from '../useWalletSelector';
 
 const useConfirmBtcBalance = () => {
-  const { btcAddress } = useWalletSelector();
+  const { btcAddress } = useSelectedAccount();
   const btcClient = useBtcClient();
 
   const fetchBtcAddressData = async () => btcClient.getAddressData(btcAddress);

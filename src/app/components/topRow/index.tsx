@@ -1,4 +1,4 @@
-import { ArrowLeft } from '@phosphor-icons/react';
+import { ArrowLeft, DotsThreeVertical } from '@phosphor-icons/react';
 import styled from 'styled-components';
 import Theme from 'theme';
 
@@ -30,19 +30,26 @@ const BackButton = styled.button((props) => ({
   '&:hover': {
     backgroundColor: props.theme.colors.white_900,
   },
-  '&:focus': {
-    backgroundColor: props.theme.colors.white_850,
-  },
 }));
 
-interface Props {
+const MenuButton = styled.button((props) => ({
+  display: 'flex',
+  justifyContent: 'flex-end',
+  backgroundColor: 'transparent',
+  padding: props.theme.space.xxs,
+  position: 'absolute',
+  right: props.theme.space.xxs,
+}));
+
+type Props = {
   title?: string;
   onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
   showBackButton?: boolean;
   className?: string;
-}
+  onMenuClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+};
 
-function TopRow({ title, onClick, showBackButton = true, className }: Props) {
+function TopRow({ title, onClick, showBackButton = true, className, onMenuClick }: Props) {
   return (
     <TopSectionContainer className={className}>
       {showBackButton && (
@@ -51,6 +58,11 @@ function TopRow({ title, onClick, showBackButton = true, className }: Props) {
         </BackButton>
       )}
       {title && <HeaderText>{title}</HeaderText>}
+      {onMenuClick && (
+        <MenuButton onClick={onMenuClick}>
+          <DotsThreeVertical size={20} color={Theme.colors.white_200} />
+        </MenuButton>
+      )}
     </TopSectionContainer>
   );
 }

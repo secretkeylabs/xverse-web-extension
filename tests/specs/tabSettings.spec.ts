@@ -5,26 +5,12 @@ import Wallet from '../pages/wallet';
 const strongPW = Onboarding.generateSecurePasswordCrypto();
 
 test.describe('Settings Tab', () => {
-  test.beforeEach(async ({ page, extensionId, context }) => {
-    await page.goto(`chrome-extension://${extensionId}/options.html#/landing`);
-    // TODO: this fixes a temporary issue with two tabs at the start see technical debt https://linear.app/xverseapp/issue/ENG-3992/two-tabs-open-instead-of-one-since-version-0323-for-start-extension
-    const pages = await context.pages();
-    if (pages.length === 2) {
-      await pages[1].close(); // pages[1] is the second (newest) page
-    }
-  });
-  test.afterEach(async ({ context }) => {
-    if (context.pages().length > 0) {
-      // Close the context only if there are open pages
-      await context.close();
-    }
-  });
-
   test('Check settings page', async ({ page, extensionId }) => {
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.checkVisualsStartpage();
     await wallet.navigationSettings.click();
     await expect(page.url()).toContain('settings');
     await expect(wallet.buttonUpdatePassword).toBeVisible();
@@ -33,20 +19,51 @@ test.describe('Settings Tab', () => {
     await expect(wallet.buttonBackupWallet).toBeVisible();
   });
 
-  test('switch to testnet and back to mainnet', async ({ page, extensionId }) => {
+  test('switch to testnet and back to mainnet', async ({
+    page,
+    extensionId,
+    disableOverridePageRoutes,
+  }) => {
+    await disableOverridePageRoutes(page);
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
-    await page.goto(`chrome-extension://${extensionId}/popup.html#/settings`);
 
+    // generate extra account
+    await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.checkVisualsStartpage();
+    await wallet.labelAccountName.click();
+    await expect(page.url()).toContain('account-list');
+    await expect(wallet.labelAccountName).toHaveCount(1);
+    await wallet.buttonGenerateAccount.click();
+    await expect(wallet.labelAccountName).toHaveCount(2);
+
+    // should always reset to first account after switching to testnet
+    await wallet.labelAccountName.last().click();
+    await wallet.checkVisualsStartpage();
+    await expect(wallet.labelAccountName).toHaveText('Account 2');
+    await page.goto(`chrome-extension://${extensionId}/popup.html#/settings`);
     await wallet.switchtoTestnetNetwork();
+    await wallet.navigationDashboard.click();
+    await expect(wallet.labelAccountName).toHaveText('Account 1');
+
+    // should always reset to first account after switching to mainnet
+    await wallet.labelAccountName.click();
+    await expect(page.url()).toContain('account-list');
+    await wallet.labelAccountName.last().click();
+    await wallet.checkVisualsStartpage('testnet');
+    await expect(wallet.labelAccountName).toHaveText('Account 2');
+    await page.goto(`chrome-extension://${extensionId}/popup.html#/settings`);
     await wallet.switchtoMainnetNetwork();
+    await wallet.navigationDashboard.click();
+    await expect(wallet.labelAccountName).toHaveText('Account 1');
   });
   test('Update password', async ({ page, extensionId }) => {
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.checkVisualsStartpage();
     await wallet.navigationSettings.click();
     await expect(wallet.buttonUpdatePassword).toBeVisible();
     await wallet.buttonUpdatePassword.click();
@@ -81,6 +98,7 @@ test.describe('Settings Tab', () => {
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.checkVisualsStartpage();
     await wallet.navigationSettings.click();
     await expect(page.url()).toContain('settings');
     await expect(wallet.buttonBackupWallet).toBeVisible();
@@ -100,6 +118,7 @@ test.describe('Settings Tab', () => {
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.checkVisualsStartpage();
     await expect(wallet.textCurrency).toHaveText('USD');
     await wallet.navigationSettings.click();
     await expect(page.url()).toContain('settings');
@@ -109,7 +128,6 @@ test.describe('Settings Tab', () => {
     await expect(await wallet.selectCurrency.count()).toBeGreaterThanOrEqual(5);
     await expect(await wallet.iconFlag.count()).toBeGreaterThanOrEqual(5);
     await wallet.selectCurrency.filter({ hasText: 'SGD' }).click();
-    await wallet.buttonBack.click();
     await expect(wallet.buttonCurrency).toBeVisible();
     await expect(wallet.buttonCurrency).toHaveText('Fiat CurrencySGD');
     await wallet.navigationDashboard.click();

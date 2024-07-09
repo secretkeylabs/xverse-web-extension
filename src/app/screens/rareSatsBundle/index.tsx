@@ -10,6 +10,7 @@ import usePendingOrdinalTxs from '@hooks/queries/usePendingOrdinalTx';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
 import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowRight, ArrowUp } from '@phosphor-icons/react';
 import { BundleSatRange } from '@secretkeylabs/xverse-core';
@@ -165,7 +166,8 @@ function RareSatsBundle() {
   const navigate = useNavigate();
   const location = useLocation();
   const { source } = location.state || {};
-  const { network, selectedAccount, ordinalsAddress } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { network } = useWalletSelector();
   const { selectedSatBundle: bundle } = useNftDataSelector();
   const { isPending, pendingTxHash } = usePendingOrdinalTxs(bundle?.txid);
   const [showSendOrdinalsAlert, setShowSendOrdinalsAlert] = useState<boolean>(false);
@@ -298,7 +300,7 @@ function RareSatsBundle() {
                 />
                 <OrdinalAttributeComponent
                   title={t('NFT_DETAIL_SCREEN.OWNED_BY')}
-                  value={getTruncatedAddress(ordinalsAddress, 6)}
+                  value={getTruncatedAddress(selectedAccount.ordinalsAddress, 6)}
                   isAddress
                 />
               </DetailSection>

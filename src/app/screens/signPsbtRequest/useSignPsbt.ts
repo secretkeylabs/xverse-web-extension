@@ -3,6 +3,13 @@ import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/u
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  BitcoinNetworkType,
+  Return,
+  RpcErrorCode,
+  SignTransactionOptions,
+  SignTransactionPayload,
+} from '@sats-connect/core';
+import {
   InputToSign,
   SettingsNetwork,
   btcTransaction,
@@ -10,16 +17,9 @@ import {
   signPsbt,
 } from '@secretkeylabs/xverse-core';
 import { decodeToken } from 'jsontokens';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import {
-  BitcoinNetworkType,
-  Return,
-  RpcErrorCode,
-  SignTransactionOptions,
-  SignTransactionPayload,
-} from 'sats-connect';
-import useBtcClient from '../../hooks/useBtcClient';
+import useBtcClient from '../../hooks/apiClients/useBtcClient';
 import useSeedVault from '../../hooks/useSeedVault';
 
 const useSignPsbtParams = (network: SettingsNetwork) => {
@@ -27,14 +27,23 @@ const useSignPsbtParams = (network: SettingsNetwork) => {
   const params = new URLSearchParams(search);
   const tabId = params.get('tabId') ?? '0';
   const requestId = params.get('requestId') ?? '';
+  const location = useLocation();
 
   const { requestToken, payload } = useMemo(() => {
     const token = params.get('signPsbtRequest') ?? '';
+    const magicEdenPsbt = params.get('magicEdenPsbt') ?? '';
     if (token) {
       const request = decodeToken(token) as any as SignTransactionOptions;
       return {
         payload: request.payload,
         requestToken: token,
+      };
+    }
+    if (magicEdenPsbt) {
+      const { payload: magicEdenPayload } = location.state;
+      return {
+        payload: magicEdenPayload,
+        requestToken: null,
       };
     }
     const allowedSigHash = params.get('allowedSigHash') ?? '';
@@ -49,14 +58,9 @@ const useSignPsbtParams = (network: SettingsNetwork) => {
       inputsToSign,
       broadcast: Boolean(params.get('broadcast')) ?? false,
       message: params.get('message') ?? '',
-      network:
-        network.type === 'Mainnet'
-          ? {
-              type: BitcoinNetworkType.Mainnet,
-            }
-          : {
-              type: BitcoinNetworkType.Testnet,
-            },
+      network: {
+        type: BitcoinNetworkType[network.type],
+      },
     };
     return {
       payload: rpcPayload,

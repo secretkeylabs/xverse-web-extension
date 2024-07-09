@@ -3,29 +3,12 @@ import type {
   Account,
   AccountType,
   AppInfo,
-  BaseWallet,
+  FungibleToken,
+  NetworkType,
   SettingsNetwork,
   SupportedCurrency,
 } from '@secretkeylabs/xverse-core';
-import BigNumber from 'bignumber.js';
 import * as actions from './types';
-
-type NumberLike = string | number | bigint | BigNumber;
-
-function numberLikeToStringOrThrow(value: NumberLike, name: string): string {
-  if (typeof value !== 'bigint' && BigNumber(value).isNaN()) {
-    throw new Error(`Invalid value for ${name}: ${value}`);
-  }
-
-  return `${value}`;
-}
-
-export function setWalletAction(wallet: BaseWallet): actions.SetWallet {
-  return {
-    type: actions.SetWalletKey,
-    wallet,
-  };
-}
 
 export function storeEncryptedSeedAction(encryptedSeed: string): actions.StoreEncryptedSeed {
   return {
@@ -42,63 +25,45 @@ export function resetWalletAction(): actions.ResetWallet {
   };
 }
 
-export function fetchAccountAction(
-  selectedAccount: Account,
+export function updateSoftwareAccountsAction(
   accountsList: Account[],
-): actions.FetchAccount {
+): actions.UpdateSoftwareAccounts {
   return {
-    type: actions.FetchAccountKey,
-    selectedAccount,
-    accountsList,
-  };
-}
-
-export function addAccountAction(accountsList: Account[]): actions.AddAccount {
-  return {
-    type: actions.AddAccountKey,
+    type: actions.UpdateSoftwareAccountsKey,
     accountsList,
   };
 }
 
 export function updateLedgerAccountsAction(
   ledgerAccountsList: Account[],
-): actions.AddLedgerAccount {
+): actions.UpdateLedgerAccounts {
   return {
     type: actions.UpdateLedgerAccountsKey,
     ledgerAccountsList,
   };
 }
 
+export function selectAccount(selectedAccount: Account): actions.SelectAccount;
 export function selectAccount(
-  selectedAccount: Account,
-  stxAddress: string,
-  btcAddress: string,
-  ordinalsAddress: string,
-  masterPubKey: string,
-  stxPublicKey: string,
-  btcPublicKey: string,
-  ordinalsPublicKey: string,
-  network: SettingsNetwork,
-  // stackingState: StackingStateData,
-  bnsName?: string,
+  selectedAccountIdx: number,
+  accountType: AccountType,
+): actions.SelectAccount;
+export function selectAccount(
+  selectedAccountOrIdx: Account | number,
   accountType?: AccountType,
-  accountName?: string,
 ): actions.SelectAccount {
+  let selectedAccountIndex = selectedAccountOrIdx;
+  let selectedAccountType = accountType ?? 'software';
+
+  if (typeof selectedAccountIndex === 'object') {
+    selectedAccountType = selectedAccountIndex.accountType ?? 'software';
+    selectedAccountIndex = selectedAccountIndex.id;
+  }
+
   return {
     type: actions.SelectAccountKey,
-    selectedAccount,
-    stxAddress,
-    btcAddress,
-    ordinalsAddress,
-    masterPubKey,
-    stxPublicKey,
-    btcPublicKey,
-    ordinalsPublicKey,
-    network,
-    // stackingState,
-    bnsName,
-    accountType,
-    accountName,
+    selectedAccountIndex,
+    selectedAccountType,
   };
 }
 
@@ -122,13 +87,6 @@ export function ChangeNetworkAction(network: SettingsNetwork): actions.ChangeNet
   return {
     type: actions.ChangeNetworkKey,
     network,
-  };
-}
-
-export function getActiveAccountsAction(accountsList: Account[]): actions.GetActiveAccounts {
-  return {
-    type: actions.GetActiveAccountsKey,
-    accountsList,
   };
 }
 
@@ -241,17 +199,6 @@ export function setWalletUnlockedAction(isUnlocked: boolean): actions.SetWalletU
   };
 }
 
-export function renameAccountAction(
-  accountsList: Account[],
-  selectedAccount: Account | null,
-): actions.RenameAccount {
-  return {
-    type: actions.RenameAccountKey,
-    accountsList,
-    selectedAccount,
-  };
-}
-
 export function setAccountBalanceAction(
   btcAddress: string,
   totalBalance: string,
@@ -269,3 +216,33 @@ export function setWalletHideStxAction(hideStx: boolean): actions.SetWalletHideS
     hideStx,
   };
 }
+
+export function setSpamTokenAction(spamToken: FungibleToken | null): actions.SetSpamToken {
+  return {
+    type: actions.SetSpamTokenKey,
+    spamToken,
+  };
+}
+
+export function setSpamTokensAction(spamTokens: string[]): actions.SetSpamTokens {
+  return {
+    type: actions.SetSpamTokensKey,
+    spamTokens,
+  };
+}
+
+export function setShowSpamTokensAction(showSpamTokens: boolean): actions.SetShowSpamTokens {
+  return {
+    type: actions.SetShowSpamTokensKey,
+    showSpamTokens,
+  };
+}
+
+export const updateSavedNamesAction = (
+  networkType: NetworkType,
+  names: { id: number; name?: string }[],
+): actions.UpdateSavedNames => ({
+  type: actions.UpdateSavedNamesKey,
+  networkType,
+  names,
+});

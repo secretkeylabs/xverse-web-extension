@@ -18,8 +18,8 @@ import { useIsVisible } from 'react-is-visible';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { GridContainer } from './collectiblesTabs';
-import { InscriptionsTabGridItem } from './inscriptionsTabGridItem';
-import { NftTabGridItem } from './nftTabGridItem';
+import InscriptionsTabGridItem from './inscriptionsTabGridItem';
+import NftTabGridItem from './nftTabGridItem';
 
 const NoCollectiblesText = styled.h1((props) => ({
   ...props.theme.typography.body_bold_m,
@@ -96,7 +96,7 @@ export type NftDashboardState = {
   totalInscriptions: number;
 };
 
-export const useNftDashboard = (): NftDashboardState => {
+const useNftDashboard = (): NftDashboardState => {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const dispatch = useDispatch();
   const { hasActivatedOrdinalsKey, hasActivatedRareSatsKey, rareSatsNoticeDismissed } =

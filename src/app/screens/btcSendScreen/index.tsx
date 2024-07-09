@@ -1,5 +1,8 @@
+import { makeRPCError, sendRpcResponse } from '@common/utils/rpc/helpers';
 import useCoinRates from '@hooks/queries/useCoinRates';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { RpcErrorCode } from '@sats-connect/core';
 import { ErrorCodes, getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
 import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
@@ -26,7 +29,8 @@ function BtcSendScreen() {
   const { payload, signedTx, isLoading, tabId, requestToken, requestId, error, recipient } =
     useSendBtcRequest();
   const navigate = useNavigate();
-  const { btcAddress, network } = useWalletSelector();
+  const { btcAddress } = useSelectedAccount();
+  const { network } = useWalletSelector();
   const { btcFiatRate } = useCoinRates();
   const { t } = useTranslation('translation');
 
@@ -81,6 +85,11 @@ function BtcSendScreen() {
         Number(error) === ErrorCodes.InSufficientBalanceWithTxFee ||
         Number(error) === ErrorCodes.InSufficientBalance
       ) {
+        const errorResponse = makeRPCError(requestId, {
+          code: RpcErrorCode.INTERNAL_ERROR,
+          message: 'Insufficient balance',
+        });
+        sendRpcResponse(+tabId, errorResponse);
         navigate('/tx-status', {
           state: {
             txid: '',

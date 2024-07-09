@@ -1,7 +1,7 @@
+import useBtcClient from '@hooks/apiClients/useBtcClient';
+import useRunesApi from '@hooks/apiClients/useRunesApi';
 import useCoinRates from '@hooks/queries/useCoinRates';
-import useBtcClient from '@hooks/useBtcClient';
 import useNetworkSelector from '@hooks/useNetwork';
-import useRunesApi from '@hooks/useRunesApi';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   Account,
@@ -18,7 +18,7 @@ import BigNumber from 'bignumber.js';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { fetchBrc20FungibleTokens } from './ordinals/useGetBrc20FungibleTokens';
-import { fetchRuneBalances } from './runes/useGetRuneFungibleTokens';
+import { fetchRuneBalances } from './runes/useRuneFungibleTokensQuery';
 import { fetchSip10FungibleTokens } from './stx/useGetSip10FungibleTokens';
 
 const useAccountBalance = () => {
@@ -50,56 +50,56 @@ const useAccountBalance = () => {
     let finalBrcCoinsList: FungibleToken[] = [];
     let finalRunesCoinsList: FungibleToken[] = [];
 
-    if (account.btcAddress) {
-      const btcData: BtcAddressData = await btcClient.getBalance(account.btcAddress);
-      btcBalance = btcData.finalBalance.toString();
+    try {
+      if (account.btcAddress) {
+        const btcData: BtcAddressData = await btcClient.getBalance(account.btcAddress);
+        btcBalance = btcData.finalBalance.toString();
+      }
+
+      if (account.ordinalsAddress) {
+        const fetchBrc20Balances = fetchBrc20FungibleTokens(
+          account.ordinalsAddress,
+          fiatCurrency,
+          network,
+        );
+        finalBrcCoinsList = (await fetchBrc20Balances()).filter((ft) => {
+          const setting = brc20ManageTokens[ft.principal];
+          return setting === true || (setting === undefined && new BigNumber(ft.balance).gt(0));
+        });
+        const runeBalances = fetchRuneBalances(runesApi, account.ordinalsAddress, fiatCurrency);
+        finalRunesCoinsList = (await runeBalances()).filter((ft) => {
+          const setting = runesManageTokens[ft.principal];
+          return setting === true || (setting === undefined && new BigNumber(ft.balance).gt(0));
+        });
+      }
+      if (account.stxAddress) {
+        const apiUrl = `${getNetworkURL(stacksNetwork)}/extended/v1/address/${
+          account.stxAddress
+        }/balances`;
+
+        const response = await axios.get<TokensResponse>(apiUrl, {
+          timeout: API_TIMEOUT_MILLI,
+        });
+
+        const availableBalance = new BigNumber(response.data.stx.balance);
+        const lockedBalance = new BigNumber(response.data.stx.locked);
+        stxBalance = availableBalance.plus(lockedBalance).toString();
+
+        const fetchSip10Balances = fetchSip10FungibleTokens(
+          account.stxAddress,
+          fiatCurrency,
+          network,
+          stacksNetwork,
+        );
+        finalSipCoinsList = (await fetchSip10Balances()).filter((ft) => {
+          const setting = sip10ManageTokens[ft.principal];
+          return setting === true || (setting === undefined && new BigNumber(ft.balance).gt(0));
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch balances:', error);
     }
 
-    if (account.ordinalsAddress) {
-      const fetchBrc20Balances = fetchBrc20FungibleTokens(
-        account.ordinalsAddress,
-        fiatCurrency,
-        network,
-      );
-      finalBrcCoinsList = (await fetchBrc20Balances()).filter((ft) => {
-        const setting = brc20ManageTokens[ft.principal];
-        return setting === true || (setting === undefined && new BigNumber(ft.balance).gt(0));
-      });
-      const runeBalances = fetchRuneBalances(
-        runesApi,
-        network.type,
-        account.ordinalsAddress,
-        fiatCurrency,
-      );
-      finalRunesCoinsList = (await runeBalances()).filter((ft) => {
-        const setting = runesManageTokens[ft.principal];
-        return setting === true || (setting === undefined && new BigNumber(ft.balance).gt(0));
-      });
-    }
-    if (account.stxAddress) {
-      const apiUrl = `${getNetworkURL(stacksNetwork)}/extended/v1/address/${
-        account.stxAddress
-      }/balances`;
-
-      const response = await axios.get<TokensResponse>(apiUrl, {
-        timeout: API_TIMEOUT_MILLI,
-      });
-
-      const availableBalance = new BigNumber(response.data.stx.balance);
-      const lockedBalance = new BigNumber(response.data.stx.locked);
-      stxBalance = availableBalance.plus(lockedBalance).toString();
-
-      const fetchSip10Balances = fetchSip10FungibleTokens(
-        account.stxAddress,
-        fiatCurrency,
-        network,
-        stacksNetwork,
-      );
-      finalSipCoinsList = (await fetchSip10Balances()).filter((ft) => {
-        const setting = sip10ManageTokens[ft.principal];
-        return setting === true || (setting === undefined && new BigNumber(ft.balance).gt(0));
-      });
-    }
     const totalBalance = calculateTotalBalance({
       stxBalance,
       btcBalance,

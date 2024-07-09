@@ -8,14 +8,17 @@ import ActionButton from '@components/button';
 import ConfirmScreen from '@components/confirmScreen';
 import InfoContainer from '@components/infoContainer';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useSignatureRequest, {
   isStructuredMessage,
   isUtf8Message,
   useSignMessage,
 } from '@hooks/useSignatureRequest';
+import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
+import { Return } from '@sats-connect/core';
 import { buf2hex, hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
 import { SignaturePayload, StructuredDataSignaturePayload } from '@stacks/connect';
 import { getNetworkType, getTruncatedAddress, isHardwareAccount } from '@utils/helper';
@@ -23,7 +26,6 @@ import { signatureVrsToRsv } from '@utils/ledger';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { Return } from 'sats-connect';
 import CollapsableContainer from './collapsableContainer';
 import {
   ActionDisclaimer,
@@ -55,13 +57,19 @@ function SignatureRequest(): JSX.Element {
   const [isTxApproved, setIsTxApproved] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
   const [isTxInvalid, setIsTxInvalid] = useState(false);
-  const { selectedAccount, accountsList, network } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { accountsList, network } = useWalletSelector();
   const [addressType, setAddressType] = useState('');
   const { switchAccount } = useWalletReducer();
   const { messageType, requestToken, payload, tabId, domain, requestId } = useSignatureRequest();
   const navigate = useNavigate();
   const isMessageSigningDisabled =
     isHardwareAccount(selectedAccount) && !selectedAccount?.stxAddress;
+
+  useTrackMixPanelPageViewed({
+    protocol: 'stacks',
+    structured: !!isStructuredMessage(messageType),
+  });
 
   const checkAddressAvailability = () => {
     const account = accountsList.filter((acc) => {

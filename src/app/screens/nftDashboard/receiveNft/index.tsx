@@ -4,6 +4,7 @@ import stacksIcon from '@assets/img/dashboard/stx_icon.svg';
 import ordinalsIcon from '@assets/img/nftDashboard/ordinals_icon.svg';
 import ActionButton from '@components/button';
 import UpdatedBottomModal from '@components/updatedBottomModal';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Plus } from '@phosphor-icons/react';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
@@ -89,8 +90,9 @@ interface Props {
 function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAlert }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const navigate = useNavigate();
-  const { stxAddress, ordinalsAddress, showOrdinalReceiveAlert, selectedAccount } =
-    useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { stxAddress, ordinalsAddress } = selectedAccount;
+  const { showOrdinalReceiveAlert } = useWalletSelector();
   const [isReceivingAddressesVisible, setIsReceivingAddressesVisible] = useState(
     !isLedgerAccount(selectedAccount),
   );

@@ -86,6 +86,7 @@ interface Props {
   onButtonClick?: () => void;
   onSecondButtonClick?: () => void;
   tickMarkButtonClick?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  tickMarkButtonChecked?: boolean;
 }
 
 function AlertMessage({
@@ -99,6 +100,7 @@ function AlertMessage({
   onButtonClick,
   onSecondButtonClick,
   tickMarkButtonClick,
+  tickMarkButtonChecked,
 }: Props) {
   return (
     <>
@@ -134,6 +136,7 @@ function AlertMessage({
               checkboxId={`${title}-ticker`}
               text={tickMarkButtonText}
               onChange={tickMarkButtonClick}
+              checked={tickMarkButtonChecked}
             />
           </TickMarkButtonContainer>
         )}

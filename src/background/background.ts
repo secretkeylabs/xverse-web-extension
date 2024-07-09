@@ -1,27 +1,25 @@
 /* eslint-disable no-void */
-import type { LegacyMessageFromContentScript, WebBtcMessage } from '@common/types/message-types';
 import { CONTENT_SCRIPT_PORT } from '@common/types/message-types';
-import {
-  handleLegacyExternalMethodFormat,
-  isLegacyMessage,
-} from '@common/utils/legacy-external-message-handler';
+import { handleLegacyExternalMethodFormat } from '@common/utils/legacy-external-message-handler';
 import internalBackgroundMessageHandler from '@common/utils/messageHandlers';
 import handleRPCRequest from '@common/utils/rpc';
-import { Requests } from 'sats-connect';
+import { rpcRequestMessageSchema } from '@sats-connect/core';
+import * as v from 'valibot';
 
 // Listen for connection to the content-script - port for two-way communication
 chrome.runtime.onConnect.addListener((port) => {
   if (port.name !== CONTENT_SCRIPT_PORT) return;
-  port.onMessage.addListener(
-    (message: LegacyMessageFromContentScript | WebBtcMessage<keyof Requests>, messagingPort) => {
-      if (isLegacyMessage(message)) {
-        void handleLegacyExternalMethodFormat(message, messagingPort);
-        // eslint-disable-next-line no-useless-return
-        return;
-      }
-      void handleRPCRequest(message, port);
-    },
-  );
+  port.onMessage.addListener((message, messagingPort) => {
+    const parseResult = v.safeParse(rpcRequestMessageSchema, message);
+
+    if (!parseResult.success) {
+      // Assume it's a legacy message when parsing fails.
+      handleLegacyExternalMethodFormat(message, messagingPort);
+      return;
+    }
+
+    handleRPCRequest(parseResult.output, port);
+  });
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {

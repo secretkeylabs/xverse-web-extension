@@ -1,16 +1,16 @@
 import { MESSAGE_SOURCE } from '@common/types/message-types';
-import {
-  sendGetAccountsSuccessResponseMessage,
-  sendUserRejectionMessage,
-} from '@common/utils/rpc/stx/rpcResponseMessages';
+
+import { sendUserRejectionMessage } from '@common/utils/rpc/responseMessages/errors';
+import { sendGetAccountsSuccessResponseMessage } from '@common/utils/rpc/responseMessages/stacks';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { GetAddressOptions } from '@sats-connect/core';
 import { bip32, bip39, bs58 } from '@secretkeylabs/xverse-core';
 import { GAIA_HUB_URL } from '@secretkeylabs/xverse-core/constant';
 import { decodeToken } from 'jsontokens';
 import { useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { GetAddressOptions } from 'sats-connect';
 import useSeedVault from './useSeedVault';
+import useSelectedAccount from './useSelectedAccount';
 
 const useStxAccountRequest = () => {
   // Params
@@ -18,7 +18,8 @@ const useStxAccountRequest = () => {
   const params = new URLSearchParams(search);
 
   // Utils
-  const { stxAddress, stxPublicKey, network } = useWalletSelector();
+  const { stxAddress, stxPublicKey } = useSelectedAccount();
+  const { network } = useWalletSelector();
   const { getSeed } = useSeedVault();
 
   // Related to WebBTC RPC request

@@ -50,7 +50,7 @@ jobs:
           if-no-files-found: error
   UItest:
     needs: [build]
-    name: UI Test ${{ matrix.shardIndex }} of ${{ matrix.shardTotal }}
+    name: E2E Test ${{ matrix.shardIndex }} of ${{ matrix.shardTotal }}
     timeout-minutes: 10
     runs-on: ubuntu-20.04
     strategy:
@@ -79,8 +79,11 @@ jobs:
         run: npm install playwright
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps
-      - name: Run UI test suite
-        run: xvfb-run --auto-servernum --server-args="-screen 0 360x360x24" npx playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+      - name: Run E2E test suite
+        env:
+          SEED_WORDS1: ${{ secrets.SEED_WORDS1 }}
+          SEED_WORDS2: ${{ secrets.SEED_WORDS2 }}
+        run: xvfb-run --auto-servernum --server-args="-screen 0 360x360x24" npx playwright test --grep-invert "#localexecution" --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
       - name: Upload Playwright report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v3
@@ -122,7 +125,7 @@ jobs:
         with:
           name: html-report--attempt-${{ github.run_attempt }}
           path: playwright-report
-          retention-days: 5
+          retention-days: 4
 
   publish-rc:
     # TODO also keep the develop PR description up to date

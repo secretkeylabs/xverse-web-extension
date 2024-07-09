@@ -1,4 +1,5 @@
-import LoadingScreen from '@components/loadingScreen';
+import { PermissionsProvider } from '@components/permissionsManager';
+import StartupLoadingScreen from '@components/startupLoadingScreen';
 import { CheckCircle, XCircle } from '@phosphor-icons/react';
 import { setXClientVersion } from '@secretkeylabs/xverse-core';
 import rootStore from '@stores/index';
@@ -28,66 +29,68 @@ const StyledIcon = styled.div`
   justify-content: center;
 `;
 
-function App(): JSX.Element {
+function App(): React.ReactNode {
   return (
     <>
       <GlobalStyle />
-      <QueryClientProvider client={queryClient}>
-        <ReactQueryDevtools initialIsOpen={false} />
-        <Provider store={rootStore.store}>
-          <PersistGate persistor={rootStore.persistedStore} loading={<LoadingScreen />}>
-            <SessionGuard>
-              <ThemeProvider theme={Theme}>
-                <RouterProvider router={router} />
-                <Toaster
-                  position="bottom-center"
-                  containerStyle={{ bottom: 80 }}
-                  toastOptions={{
-                    success: {
-                      icon: (
-                        <StyledIcon>
-                          <CheckCircle size={20} weight="bold" />
-                        </StyledIcon>
-                      ),
-                      style: {
-                        ...Theme.typography.body_medium_m,
-                        backgroundColor: Theme.colors.success_medium,
-                        borderRadius: Theme.radius(2),
-                        padding: Theme.space.s,
-                        color: Theme.colors.elevation0,
+      <ThemeProvider theme={Theme}>
+        <QueryClientProvider client={queryClient}>
+          <ReactQueryDevtools initialIsOpen={false} />
+          <Provider store={rootStore.store}>
+            <PersistGate persistor={rootStore.persistor} loading={<StartupLoadingScreen />}>
+              <SessionGuard>
+                <PermissionsProvider>
+                  <RouterProvider router={router} />
+                  <Toaster
+                    position="bottom-center"
+                    containerStyle={{ bottom: 32 }}
+                    toastOptions={{
+                      duration: 1500,
+                      success: {
+                        icon: (
+                          <StyledIcon>
+                            <CheckCircle size={20} weight="bold" />
+                          </StyledIcon>
+                        ),
+                        style: {
+                          ...Theme.typography.body_medium_m,
+                          backgroundColor: Theme.colors.success_medium,
+                          borderRadius: Theme.radius(2),
+                          padding: Theme.space.s,
+                          color: Theme.colors.elevation0,
+                        },
                       },
-                    },
-                    error: {
-                      icon: (
-                        <StyledIcon>
-                          <XCircle size={20} weight="bold" />
-                        </StyledIcon>
-                      ),
-                      style: {
-                        ...Theme.typography.body_medium_m,
-                        backgroundColor: Theme.colors.danger_dark,
-                        borderRadius: Theme.radius(2),
-                        padding: Theme.space.s,
-                        color: Theme.colors.white_0,
+                      error: {
+                        icon: (
+                          <StyledIcon>
+                            <XCircle size={20} weight="bold" />
+                          </StyledIcon>
+                        ),
+                        style: {
+                          ...Theme.typography.body_medium_m,
+                          backgroundColor: Theme.colors.danger_dark,
+                          borderRadius: Theme.radius(2),
+                          padding: Theme.space.s,
+                          color: Theme.colors.white_0,
+                        },
                       },
-                    },
-                    blank: {
-                      style: {
-                        ...Theme.typography.body_medium_m,
-                        backgroundColor: Theme.colors.white_0,
-                        borderRadius: Theme.radius(2),
-                        padding: Theme.space.s,
-                        color: Theme.colors.elevation0,
+                      blank: {
+                        style: {
+                          ...Theme.typography.body_medium_m,
+                          backgroundColor: Theme.colors.white_0,
+                          borderRadius: Theme.radius(2),
+                          padding: Theme.space.s,
+                          color: Theme.colors.elevation0,
+                        },
                       },
-                      duration: 2000,
-                    },
-                  }}
-                />
-              </ThemeProvider>
-            </SessionGuard>
-          </PersistGate>
-        </Provider>
-      </QueryClientProvider>
+                    }}
+                  />
+                </PermissionsProvider>
+              </SessionGuard>
+            </PersistGate>
+          </Provider>
+        </QueryClientProvider>
+      </ThemeProvider>
     </>
   );
 }

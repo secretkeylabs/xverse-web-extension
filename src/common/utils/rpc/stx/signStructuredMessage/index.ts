@@ -6,10 +6,13 @@ import {
   triggerRequestWindowOpen,
 } from '@common/utils/legacy-external-message-handler';
 import RequestsRoutes from '@common/utils/route-urls';
-import { RpcErrorCode } from 'sats-connect';
+import { RpcErrorCode } from '@sats-connect/core';
 import { z } from 'zod';
 import { makeRPCError } from '../../helpers';
-import { sendInvalidParametersMessage, sendMissingParametersMessage } from '../rpcResponseMessages';
+import {
+  sendInvalidParametersResponseMessage,
+  sendMissingParametersMessage,
+} from '../../responseMessages/errors';
 
 export const rpcParamsSchema = z.object({
   message: z.string(),
@@ -29,7 +32,7 @@ async function handleStacksSignStructuredMessage(
 
   const paramsParseResult = rpcParamsSchema.safeParse(message.params);
   if (!paramsParseResult.success) {
-    sendInvalidParametersMessage({
+    sendInvalidParametersResponseMessage({
       tabId: getTabIdFromPort(port),
       messageId: message.id,
       error: paramsParseResult.error,

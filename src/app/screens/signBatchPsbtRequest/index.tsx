@@ -16,19 +16,28 @@ import LoadingTransactionStatus from '@components/loadingTransactionStatus';
 import { ConfirmationStatus } from '@components/loadingTransactionStatus/circularSvgAnimation';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useHasFeature from '@hooks/useHasFeature';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useSignBatchPsbtTx from '@hooks/useSignBatchPsbtTx';
+import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowLeft, ArrowRight } from '@phosphor-icons/react';
-import { RuneSummary, btcTransaction, parseSummaryForRunes } from '@secretkeylabs/xverse-core';
+import { SignMultiplePsbtPayload } from '@sats-connect/core';
+import {
+  AnalyticsEvents,
+  FeatureId,
+  RuneSummary,
+  btcTransaction,
+  parseSummaryForRunes,
+} from '@secretkeylabs/xverse-core';
 import Callout from '@ui-library/callout';
 import Spinner from '@ui-library/spinner';
 import { isLedgerAccount } from '@utils/helper';
+import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { SignMultiplePsbtPayload } from 'sats-connect';
 import styled from 'styled-components';
 
 const OuterContainer = styled.div`
@@ -128,7 +137,8 @@ interface TxResponse {
 type PsbtSummary = Awaited<ReturnType<btcTransaction.EnhancedPsbt['getSummary']>>;
 
 function SignBatchPsbtRequest() {
-  const { btcAddress, ordinalsAddress, selectedAccount, network } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { network } = useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { payload, confirmSignPsbt, cancelSignPsbt, requestToken } = useSignBatchPsbtTx();
@@ -145,7 +155,8 @@ function SignBatchPsbtRequest() {
   const [inscriptionToShow, setInscriptionToShow] = useState<
     btcTransaction.IOInscription | undefined
   >(undefined);
-  const hasRunesSupport = useHasFeature('RUNES_SUPPORT');
+  const hasRunesSupport = useHasFeature(FeatureId.RUNES_SUPPORT);
+  useTrackMixPanelPageViewed();
 
   const [parsedPsbts, setParsedPsbts] = useState<
     { summary: PsbtSummary; runeSummary: RuneSummary | undefined }[]
@@ -190,7 +201,10 @@ function SignBatchPsbtRequest() {
   }, [payload.psbts.length, handlePsbtParsing]);
 
   const checkAddressMismatch = (input) => {
-    if (input.address !== btcAddress && input.address !== ordinalsAddress) {
+    if (
+      input.address !== selectedAccount.btcAddress &&
+      input.address !== selectedAccount.ordinalsAddress
+    ) {
       navigate('/tx-status', {
         state: {
           txid: '',
@@ -247,6 +261,13 @@ function SignBatchPsbtRequest() {
         }
       }
 
+      trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
+        protocol: 'bitcoin',
+        action: 'sign-psbt',
+        wallet_type: selectedAccount.accountType || 'software',
+        batch: payload.psbts.length,
+      });
+
       setIsSigningComplete(true);
       setIsSigning(false);
 
@@ -295,8 +316,8 @@ function SignBatchPsbtRequest() {
               getNetAmount({
                 inputs: psbt.summary.inputs,
                 outputs: psbt.summary.outputs,
-                btcAddress,
-                ordinalsAddress,
+                btcAddress: selectedAccount.btcAddress,
+                ordinalsAddress: selectedAccount.ordinalsAddress,
               }),
             ),
           )
