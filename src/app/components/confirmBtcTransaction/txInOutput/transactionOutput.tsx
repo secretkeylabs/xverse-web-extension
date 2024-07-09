@@ -22,15 +22,11 @@ const HighlightText = styled(StyledP)((props) => ({
   color: props.theme.colors.white_0,
 }));
 
-const YourAddressText = styled(StyledP)((props) => ({
-  color: props.theme.colors.white_0,
-  marginRight: props.theme.space.xxs,
-}));
-
 const TxIdContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   gap: props.theme.space.xxs,
+  marginTop: props.theme.space.xxxs,
 }));
 
 type Props = {
@@ -53,7 +49,7 @@ function TransactionOutput({ output, scriptOutputCount }: Props) {
   const detailView = () => {
     if (isOutputWithScript) {
       return (
-        <SubValueText typography="body_s">{`${t(
+        <SubValueText typography="body_medium_s">{`${t(
           'SCRIPT_OUTPUT',
         )} #${scriptOutputCount}`}</SubValueText>
       );
@@ -64,9 +60,9 @@ function TransactionOutput({ output, scriptOutputCount }: Props) {
         output.pubKeys?.includes(btcPublicKey) || output.pubKeys?.includes(ordinalsPublicKey);
       const toOwnString = toOwnKey ? ` (${t('YOUR_PUBLIC_KEY')})` : '';
       return (
-        <SubValueText typography="body_s">
+        <SubValueText typography="body_medium_s">
           {outputType}
-          <HighlightText typography="body_s">{toOwnString}</HighlightText>
+          <HighlightText typography="body_medium_s">{toOwnString}</HighlightText>
         </SubValueText>
       );
     }
@@ -74,16 +70,16 @@ function TransactionOutput({ output, scriptOutputCount }: Props) {
     if (output.address === btcAddress || output.address === ordinalsAddress) {
       return (
         <TxIdContainer>
-          <SubValueText data-testid="address-receive" typography="body_s">
+          <SubValueText data-testid="address-receive" typography="body_medium_s">
             {getTruncatedAddress(output.address)}
           </SubValueText>
-          <YourAddressText typography="body_s">({t('YOUR_ADDRESS')})</YourAddressText>
+          <HighlightText typography="body_medium_s">({t('YOUR_ADDRESS')})</HighlightText>
         </TxIdContainer>
       );
     }
 
     return (
-      <SubValueText data-testid="address-receive" typography="body_s">
+      <SubValueText data-testid="address-receive" typography="body_medium_s">
         {getTruncatedAddress(output.address)}
       </SubValueText>
     );

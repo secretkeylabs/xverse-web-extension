@@ -16,19 +16,11 @@ const SubValueText = styled(StyledP)((props) => ({
   color: props.theme.colors.white_400,
 }));
 
-const TxIdText = styled(StyledP)((props) => ({
-  marginLeft: props.theme.space.xxs,
-}));
-
-const YourAddressText = styled(StyledP)((props) => ({
-  marginRight: props.theme.space.xxs,
-}));
-
 const TxIdContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  justifyContent: 'space-between',
   gap: props.theme.space.xxs,
+  marginTop: props.theme.space.xxxs,
 }));
 
 type Props = {
@@ -50,13 +42,15 @@ function TransactionInput({ input }: Props) {
   const renderAddress = (addressToBeDisplayed: string) =>
     addressToBeDisplayed === btcAddress || addressToBeDisplayed === ordinalsAddress ? (
       <TxIdContainer>
-        <SubValueText data-testid="address-send" typography="body_s">
+        <SubValueText data-testid="address-send" typography="body_medium_s">
           {getTruncatedAddress(addressToBeDisplayed)}
         </SubValueText>
-        <YourAddressText typography="body_s">({t('YOUR_ADDRESS')})</YourAddressText>
+        <StyledP typography="body_medium_s">({t('YOUR_ADDRESS')})</StyledP>
       </TxIdContainer>
     ) : (
-      <SubValueText typography="body_s">{getTruncatedAddress(addressToBeDisplayed)}</SubValueText>
+      <SubValueText typography="body_medium_s">
+        {getTruncatedAddress(addressToBeDisplayed)}
+      </SubValueText>
     );
 
   return (
@@ -73,10 +67,10 @@ function TransactionInput({ input }: Props) {
       >
         {isExternalInput ? (
           <TxIdContainer>
-            <SubValueText typography="body_s">
+            <SubValueText typography="body_medium_s">
               {getTruncatedAddress(input.extendedUtxo.utxo.txid)}
             </SubValueText>
-            <TxIdText typography="body_s">(txid)</TxIdText>
+            <StyledP typography="body_medium_s">(txid)</StyledP>
           </TxIdContainer>
         ) : (
           renderAddress(input.extendedUtxo.address)
