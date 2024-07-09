@@ -3,6 +3,7 @@ import OutputIcon from '@assets/img/transactions/output.svg';
 import TransferDetailView from '@components/transferDetailView';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import { btcTransaction, satsToBtc } from '@secretkeylabs/xverse-core';
+import { StyledP } from '@ui-library/common.styled';
 import { getTruncatedAddress } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
@@ -10,30 +11,27 @@ import styled from 'styled-components';
 import { isAddressOutput, isPubKeyOutput, isScriptOutput } from '../utils';
 
 const TransferDetailContainer = styled.div((props) => ({
-  paddingBottom: props.theme.spacing(8),
+  paddingBottom: props.theme.space.m,
 }));
 
-const SubValueText = styled.h1((props) => ({
-  ...props.theme.typography.body_m,
-  fontSize: 12,
+const SubValueText = styled(StyledP)((props) => ({
   color: props.theme.colors.white_400,
 }));
 
-const HighlightText = styled.h1((props) => ({
+const HighlightText = styled(StyledP)((props) => ({
   color: props.theme.colors.white_0,
 }));
 
-const YourAddressText = styled.h1((props) => ({
-  ...props.theme.typography.body_m,
-  fontSize: 12,
+const YourAddressText = styled(StyledP)((props) => ({
   color: props.theme.colors.white_0,
-  marginRight: props.theme.spacing(2),
+  marginRight: props.theme.space.xxs,
 }));
 
-const TxIdContainer = styled.div({
+const TxIdContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-});
+  gap: props.theme.space.xxs,
+}));
 
 type Props = {
   output: btcTransaction.EnhancedOutput;
@@ -54,7 +52,11 @@ function TransactionOutput({ output, scriptOutputCount }: Props) {
 
   const detailView = () => {
     if (isOutputWithScript) {
-      return <SubValueText>{`${t('SCRIPT_OUTPUT')} #${scriptOutputCount}`}</SubValueText>;
+      return (
+        <SubValueText typography="body_s">{`${t(
+          'SCRIPT_OUTPUT',
+        )} #${scriptOutputCount}`}</SubValueText>
+      );
     }
     if (isOutputWithPubKey) {
       const outputType = output.type === 'pk' ? t('PUBLIC_KEY') : t('MULTISIG');
@@ -62,9 +64,9 @@ function TransactionOutput({ output, scriptOutputCount }: Props) {
         output.pubKeys?.includes(btcPublicKey) || output.pubKeys?.includes(ordinalsPublicKey);
       const toOwnString = toOwnKey ? ` (${t('YOUR_PUBLIC_KEY')})` : '';
       return (
-        <SubValueText>
+        <SubValueText typography="body_s">
           {outputType}
-          <HighlightText>{toOwnString}</HighlightText>
+          <HighlightText typography="body_s">{toOwnString}</HighlightText>
         </SubValueText>
       );
     }
@@ -72,16 +74,16 @@ function TransactionOutput({ output, scriptOutputCount }: Props) {
     if (output.address === btcAddress || output.address === ordinalsAddress) {
       return (
         <TxIdContainer>
-          <YourAddressText>({t('YOUR_ADDRESS')})</YourAddressText>
-          <SubValueText data-testid="address-receive">
+          <SubValueText data-testid="address-receive" typography="body_s">
             {getTruncatedAddress(output.address)}
           </SubValueText>
+          <YourAddressText typography="body_s">({t('YOUR_ADDRESS')})</YourAddressText>
         </TxIdContainer>
       );
     }
 
     return (
-      <SubValueText data-testid="address-receive">
+      <SubValueText data-testid="address-receive" typography="body_s">
         {getTruncatedAddress(output.address)}
       </SubValueText>
     );

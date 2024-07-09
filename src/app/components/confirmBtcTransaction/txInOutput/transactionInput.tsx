@@ -24,11 +24,12 @@ const YourAddressText = styled(StyledP)((props) => ({
   marginRight: props.theme.space.xxs,
 }));
 
-const TxIdContainer = styled.div({
+const TxIdContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'space-between',
-});
+  gap: props.theme.space.xxs,
+}));
 
 type Props = {
   input: btcTransaction.EnhancedInput;
@@ -49,10 +50,10 @@ function TransactionInput({ input }: Props) {
   const renderAddress = (addressToBeDisplayed: string) =>
     addressToBeDisplayed === btcAddress || addressToBeDisplayed === ordinalsAddress ? (
       <TxIdContainer>
-        <YourAddressText typography="body_s">({t('YOUR_ADDRESS')})</YourAddressText>
         <SubValueText data-testid="address-send" typography="body_s">
           {getTruncatedAddress(addressToBeDisplayed)}
         </SubValueText>
+        <YourAddressText typography="body_s">({t('YOUR_ADDRESS')})</YourAddressText>
       </TxIdContainer>
     ) : (
       <SubValueText typography="body_s">{getTruncatedAddress(addressToBeDisplayed)}</SubValueText>

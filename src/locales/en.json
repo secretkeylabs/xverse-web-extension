@@ -342,7 +342,7 @@
     "SIGN_TRANSACTIONS": "Sign {{count}} transactions",
     "AMOUNT": "Amount",
     "INSUFFICIENT_BALANCE": "Insufficient balance",
-    "YOUR_ADDRESS": "Your address",
+    "YOUR_ADDRESS": "My address",
     "FROM": "From",
     "INPUT": "Inputs",
     "INPUT_AND_OUTPUT": "Inputs & Outputs",
@@ -439,7 +439,7 @@
       "ORDINAL": "Ordinal",
       "RECIPIENT": "Recipient",
       "TO": "To",
-      "YOUR_ADDRESS": "Your address"
+      "YOUR_ADDRESS": "My address"
     },
     "YOUR_ORDINAL_ADDRESS": "Your ordinals address",
     "YOUR_PAYMENT_ADDRESS": "Your payment address",
@@ -680,7 +680,7 @@
     "ACTIVATE_ORDINALS_INFO": "You have Bitcoin Ordinals in your wallet. Would you like to display them? This is an experimental feature. You can change this setting at anytime.",
     "ACTIVATE": "Activate",
     "DENY": "No",
-    "COPIED": "Copied!",
+    "COPIED": "Copied",
     "MINT": "Mint",
     "TRANSFER": "Transfer",
     "DEPLOY": "Deploy",
@@ -1095,7 +1095,7 @@
       "ORDINAL": "Ordinal",
       "RECIPIENT": "Recipient",
       "TO": "To",
-      "YOUR_ADDRESS": "Your address"
+      "YOUR_ADDRESS": "My address"
     },
     "PREVIEW": {
       "SATS": {
@@ -1311,13 +1311,13 @@
     "LESS_THAN_OR_EQUAL_TO": "Less than or equal to",
     "FROM": "From",
     "TO": "To",
-    "YOUR_ADDRESS": "Your address",
+    "YOUR_ADDRESS": "My address",
     "CANCEL": "Cancel",
     "CONFIRM": "Confirm",
     "FEES": "Fees",
     "ROUTE": "Route",
     "COPIED": "Copied",
-    "COPY_YOUR_ADDRESS": "copy your address",
+    "COPY_YOUR_ADDRESS": "Copy my address",
     "ADVANCED_SETTING": "Advanced settings",
     "THIS_IS_A_SPONSORED_TRANSACTION": "This is a sponsored transaction, no transaction fees will be deducted from your account.",
     "SWAP_TRANSACTION_CANNOT_BE_SPONSORED": "Swap transaction cannot be sponsored while you have a pending transaction.",
