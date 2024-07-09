@@ -3,18 +3,26 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import { btcTransaction, RuneSummary } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { getTruncatedAddress } from '@utils/helper';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import Amount from './itemRow/amount';
 import AmountWithInscriptionSatribute from './itemRow/amountWithInscriptionSatribute';
 import InscriptionSatributeRow from './itemRow/inscriptionSatributeRow';
 import { getInputsWitAssetsFromUserAddress, getOutputsWithAssetsFromUserAddress } from './utils';
 
+const Title = styled.p`
+  ${(props) => props.theme.typography.body_medium_m};
+  color: ${(props) => props.theme.colors.white_200};
+  margin-top: ${(props) => props.theme.space.s};
+  margin-bottom: ${(props) => props.theme.space.xs};
+`;
+
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   background: props.theme.colors.elevation1,
-  borderRadius: 12,
-  padding: `${props.theme.space.m} 0`,
+  borderRadius: props.theme.radius(2),
+  padding: `${props.theme.space.m} 0 20px`,
   justifyContent: 'center',
   marginBottom: props.theme.space.s,
 }));
@@ -55,6 +63,7 @@ function TransferSection({
   netAmount,
   onShowInscription,
 }: Props) {
+  const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { btcAddress, ordinalsAddress } = useSelectedAccount();
 
   const { inputFromPayment, inputFromOrdinal } = getInputsWitAssetsFromUserAddress({
@@ -86,70 +95,69 @@ function TransferSection({
   if (!hasData) return null;
 
   return (
-    <Container>
-      <Header spaceBetween>
-        <StyledP typography="body_medium_m" color="white_400">
-          {/* TODO: This component is also used in SignBatchPsbtRequest, make the needed changes */}
-          {/* {t('YOU_WILL_TRANSFER')} */}
-          To
-        </StyledP>
-        {recipientAddress && (
-          <StyledP typography="body_medium_m" color="white_0">
-            {/* TODO: This component is also used in SignBatchPsbtRequest, make the needed changes */}
-            {/* {t('YOU_WILL_TRANSFER')} */}
-            {getTruncatedAddress(recipientAddress, 6)}
+    <>
+      <Title>{t('YOU_WILL_SEND')}</Title>
+      <Container>
+        <Header spaceBetween>
+          <StyledP typography="body_medium_m" color="white_400">
+            {t('TO')}
           </StyledP>
+          {recipientAddress && (
+            <StyledP typography="body_medium_m" color="white_0">
+              {getTruncatedAddress(recipientAddress, 6)}
+            </StyledP>
+          )}
+        </Header>
+        {
+          // if transaction is not final, then runes will be delegated and will show up in the delegation section
+          transactionIsFinal &&
+            runeTransfers?.map((transfer) => (
+              <RowContainer key={transfer.runeName}>
+                <RuneAmount rune={transfer} hasSufficientBalance={transfer.hasSufficientBalance} />
+              </RowContainer>
+            ))
+        }
+        {showAmount && (
+          <RowContainer>
+            <Amount amount={netAmount} />
+            <AmountWithInscriptionSatribute
+              inscriptions={inscriptionsFromPayment}
+              satributes={satributesFromPayment}
+              onShowInscription={onShowInscription}
+            />
+          </RowContainer>
         )}
-      </Header>
-      {
-        // if transaction is not final, then runes will be delegated and will show up in the delegation section
-        transactionIsFinal &&
-          runeTransfers?.map((transfer) => (
-            <RowContainer key={transfer.runeName}>
-              <RuneAmount rune={transfer} hasSufficientBalance={transfer.hasSufficientBalance} />
-            </RowContainer>
-          ))
-      }
-      {showAmount && (
-        <RowContainer>
-          <Amount amount={netAmount} />
-          <AmountWithInscriptionSatribute
-            inscriptions={inscriptionsFromPayment}
-            satributes={satributesFromPayment}
-            onShowInscription={onShowInscription}
-          />
-        </RowContainer>
-      )}
-      {hasInscriptionsRareSatsInOrdinal && (
-        <RowContainer noPadding noMargin={hasRuneTransfers || showAmount}>
-          {!transactionIsFinal
-            ? inputFromOrdinal.map((input, index) => (
-                <InscriptionSatributeRow
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={index}
-                  inscriptions={input.inscriptions}
-                  satributes={input.satributes}
-                  amount={input.extendedUtxo.utxo.value}
-                  onShowInscription={onShowInscription}
-                  showTopDivider={(hasRuneTransfers || showAmount) && index === 0}
-                  showBottomDivider={inputFromOrdinal.length > index + 1}
-                />
-              ))
-            : outputsFromOrdinal.map((output, index) => (
-                <InscriptionSatributeRow
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={index}
-                  inscriptions={output.inscriptions}
-                  satributes={output.satributes}
-                  amount={output.amount}
-                  onShowInscription={onShowInscription}
-                  showTopDivider={(hasRuneTransfers || showAmount) && index === 0}
-                  showBottomDivider={outputsFromOrdinal.length > index + 1}
-                />
-              ))}
-        </RowContainer>
-      )}
-    </Container>
+        {hasInscriptionsRareSatsInOrdinal && (
+          <RowContainer noPadding noMargin={hasRuneTransfers || showAmount}>
+            {!transactionIsFinal
+              ? inputFromOrdinal.map((input, index) => (
+                  <InscriptionSatributeRow
+                    // eslint-disable-next-line react/no-array-index-key
+                    key={index}
+                    inscriptions={input.inscriptions}
+                    satributes={input.satributes}
+                    amount={input.extendedUtxo.utxo.value}
+                    onShowInscription={onShowInscription}
+                    showTopDivider={(hasRuneTransfers || showAmount) && index === 0}
+                    showBottomDivider={inputFromOrdinal.length > index + 1}
+                  />
+                ))
+              : outputsFromOrdinal.map((output, index) => (
+                  <InscriptionSatributeRow
+                    // eslint-disable-next-line react/no-array-index-key
+                    key={index}
+                    inscriptions={output.inscriptions}
+                    satributes={output.satributes}
+                    amount={output.amount}
+                    onShowInscription={onShowInscription}
+                    showTopDivider={(hasRuneTransfers || showAmount) && index === 0}
+                    showBottomDivider={outputsFromOrdinal.length > index + 1}
+                  />
+                ))}
+          </RowContainer>
+        )}
+      </Container>
+    </>
   );
 }
 

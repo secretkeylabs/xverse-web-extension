@@ -222,7 +222,7 @@ function RecipientComponent({
             <MultipleAddressContainer>
               <TransferDetailView icon={WalletIcon} title={t('FROM')} address={ordinalsAddress} />
               <DownArrowIcon src={ArrowIcon} />
-              <TransferDetailView icon={WalletIcon} title={t('To')} address={address} />
+              <TransferDetailView icon={WalletIcon} title={t('TO')} address={address} />
             </MultipleAddressContainer>
           ) : (
             <TransferDetailView icon={OutputIcon} title={t('RECIPIENT')} address={address} />

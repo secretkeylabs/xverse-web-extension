@@ -14,7 +14,7 @@ const Container = styled.div((props) => ({
   flexDirection: 'column',
   borderRadius: props.theme.space.s,
   background: props.theme.colors.elevation1,
-  padding: `${props.theme.space.s} ${props.theme.space.m}`,
+  padding: props.theme.space.m,
   marginBottom: props.theme.space.s,
 }));
 

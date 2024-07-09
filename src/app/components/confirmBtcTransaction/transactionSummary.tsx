@@ -30,9 +30,10 @@ import { getNetAmount, isScriptOutput } from './utils';
 
 const Container = styled.div((props) => ({
   background: props.theme.colors.elevation1,
-  borderRadius: 12,
-  padding: '12px 16px',
-  marginBottom: 12,
+  borderRadius: props.theme.radius(2),
+  padding: props.theme.space.m,
+  paddingBottom: 20,
+  marginBottom: props.theme.space.s,
 }));
 
 const WarningCallout = styled(Callout)`
@@ -133,9 +134,6 @@ function TransactionSummary({
         <WarningCallout bodyText={t('RUNE_IS_CLOSED')} variant="danger" />
       )}
       {hasRuneDelegation && <DelegateSection delegations={runeSummary?.transfers} />}
-
-      {/* TODO: Change the text to match the action */}
-      <Subtitle>{t('YOU_WILL_SEND')}</Subtitle>
 
       <TransferSection
         outputs={outputs}

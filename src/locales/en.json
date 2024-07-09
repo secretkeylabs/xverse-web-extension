@@ -378,7 +378,7 @@
     "PSBT_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction is invalid and cannot be processed. Please contact the developer of the requesting app for support.",
     "PSBT_INDEX_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction at {{index}} index is invalid and cannot be processed. Please contact the developer of the requesting app for support.",
     "PSBT_CANT_SIGN_ERROR_TITLE": "Failed to sign transaction",
-    "To": "To",
+    "TO": "To",
     "YOU_WILL_TRANSFER": "You will transfer",
     "YOU_WILL_RECEIVE": "You will receive",
     "YOU_WILL_BURN": "You will burn",
