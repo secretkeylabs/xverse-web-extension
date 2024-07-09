@@ -3,6 +3,7 @@ import {
   RpcErrorCode,
   RpcRequestMessage,
   getBalanceMethodName,
+  getInfoMethodName,
   renouncePermissionsMethodName,
   requestPermissionsMethodName,
 } from '@sats-connect/core';
@@ -48,8 +49,8 @@ async function handleRPCRequest(message: RpcRequestMessage, port: chrome.runtime
         break;
       }
 
-      case 'getInfo': {
-        handleGetInfo(message.id as string, getTabIdFromPort(port));
+      case getInfoMethodName: {
+        handleGetInfo(message, port);
         break;
       }
       case 'getAddresses': {

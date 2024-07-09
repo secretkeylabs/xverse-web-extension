@@ -1,16 +1,34 @@
-import { Requests, Return, RpcId } from '@sats-connect/core';
+import {
+  Requests,
+  Return,
+  RpcRequestMessage,
+  getInfoRequestMessageSchema,
+} from '@sats-connect/core';
 import { keys } from 'ts-transformer-keys';
+import * as v from 'valibot';
+import { getTabIdFromPort } from '..';
+import { handleInvalidMessage } from './handle-invalid-message';
 import { makeRpcSuccessResponse, sendRpcResponse } from './helpers';
 
 declare const VERSION: string;
 
-const handleGetInfo = (requestId: RpcId, tabId: number) => {
+const handleGetInfo = (message: RpcRequestMessage, port: chrome.runtime.Port) => {
+  const parseResult = v.safeParse(getInfoRequestMessageSchema, message);
+
+  if (!parseResult.success) {
+    handleInvalidMessage(message, getTabIdFromPort(port), parseResult.issues);
+    return;
+  }
+
   const response: Return<'getInfo'> = {
     version: VERSION,
+
+    // TODO: migrate when all methods have been migrated. See
+    // https://linear.app/xverseapp/issue/ENG-4623
     methods: keys<Requests>(),
     supports: [],
   };
-  sendRpcResponse(tabId, makeRpcSuccessResponse(requestId, response));
+  sendRpcResponse(getTabIdFromPort(port), makeRpcSuccessResponse(parseResult.output.id, response));
 };
 
 export default handleGetInfo;
