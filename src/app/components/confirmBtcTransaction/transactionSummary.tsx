@@ -161,6 +161,9 @@ function TransactionSummary({
       <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
       <TxInOutput inputs={inputs} outputs={outputs} />
       {hasOutputScript && !runeSummary && <WarningCallout bodyText={t('SCRIPT_OUTPUT_TX')} />}
+
+      {feeOutput && <Subtitle>{t('FEES')}</Subtitle>}
+
       {feeOutput && !showFeeSelector && (
         <TransferFeeView
           fee={new BigNumber(feeOutput.amount)}
@@ -170,8 +173,6 @@ function TransactionSummary({
           onShowInscription={setInscriptionToShow}
         />
       )}
-
-      {feeOutput && showFeeSelector && <Subtitle>{t('FEES')}</Subtitle>}
 
       {feeOutput && showFeeSelector && (
         <Container>

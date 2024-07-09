@@ -90,17 +90,17 @@ function TransferFeeView({
     <Container>
       <Row>
         <FeeTitleContainer>
-          <StyledP typography="body_medium_m" color="white_200">
-            {title ?? t('FEES')}
+          <StyledP typography="body_medium_m" color="white_0">
+            {title ?? t('NETWORK_FEE')}
           </StyledP>
           {customFeeClick && (
             <CustomRow>
               <StyledP typography="body_medium_m" color="white_400">
-                Custom
+                {t('CUSTOM')}
               </StyledP>
               <EditButton onClick={() => {}}>
                 <StyledP typography="body_medium_m" color="tangerine">
-                  Edit
+                  {t('EDIT')}
                 </StyledP>
                 <PencilSimple size="16" color={Theme.colors.tangerine} weight="fill" />
               </EditButton>

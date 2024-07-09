@@ -315,6 +315,9 @@
   },
   "CONFIRM_TRANSACTION": {
     "SEND": "Confirm Transaction",
+    "CUSTOM": "Custom",
+    "EDIT": "Edit",
+    "NETWORK_FEE": "Network Fee",
     "INDICATION": "You will send",
     "RECIPIENT_ADDRESS": "recipient address",
     "MEMO": "Attached memo",

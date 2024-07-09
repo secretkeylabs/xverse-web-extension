@@ -1,4 +1,4 @@
-import BottomModal from '@components/bottomModal';
+import Sheet from '@ui-library/sheet';
 import styled from 'styled-components';
 
 export const OuterContainer = styled.div`
@@ -16,8 +16,8 @@ export const Container = styled.div((props) => ({
   flexDirection: 'column',
   flex: 1,
   marginTop: props.theme.spacing(11),
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
+  marginLeft: props.theme.space.m,
+  marginRight: props.theme.space.m,
 }));
 
 export const LoaderContainer = styled.div((props) => ({
@@ -25,26 +25,26 @@ export const LoaderContainer = styled.div((props) => ({
   flex: 1,
   justifyContent: 'center',
   alignItems: 'center',
-  marginTop: props.theme.spacing(12),
+  marginTop: props.theme.space.l,
 }));
 
 export const ButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
-  padding: props.theme.spacing(8),
-  paddingTop: props.theme.spacing(12),
-  paddingBottom: props.theme.spacing(20),
+  padding: props.theme.space.m,
+  paddingTop: props.theme.space.l,
+  paddingBottom: props.theme.space.xxl,
 }));
 
 export const TransparentButtonContainer = styled.div((props) => ({
-  marginRight: props.theme.spacing(6),
+  marginRight: props.theme.space.s,
   width: '100%',
 }));
 
 export const ReviewTransactionText = styled.h1((props) => ({
   ...props.theme.headline_s,
   color: props.theme.colors.white_0,
-  marginBottom: props.theme.spacing(12),
+  marginBottom: props.theme.space.l,
   textAlign: 'left',
 }));
 
@@ -54,7 +54,7 @@ export const BundleLinkContainer = styled.button((props) => ({
   backgroundColor: 'transparent',
   color: props.theme.colors.tangerine,
   transition: 'color 0.2s ease',
-  marginBottom: props.theme.spacing(6),
+  marginBottom: props.theme.space.s,
   ':hover': {
     color: props.theme.colors.tangerine_light,
   },
@@ -62,10 +62,10 @@ export const BundleLinkContainer = styled.button((props) => ({
 
 export const BundleLinkText = styled.div((props) => ({
   ...props.theme.typography.body_medium_m,
-  marginRight: props.theme.spacing(2),
+  marginRight: props.theme.space.xxs,
 }));
 
-export const CustomizedModal = styled(BottomModal)`
+export const StyledSheet = styled(Sheet)`
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -73,14 +73,13 @@ export const CustomizedModal = styled(BottomModal)`
   background-color: #181818 !important;
 `;
 
-export const CustomizedModalContainer = styled(Container)`
-  margin-top: 0;
+export const SheetContainer = styled.div`
+  margin-top: -40px;
 `;
 
 export const TxReviewModalControls = styled.div((props) => ({
   display: 'flex',
-  columnGap: props.theme.spacing(6),
-  padding: props.theme.spacing(8),
-  paddingTop: props.theme.spacing(12),
-  paddingBottom: props.theme.spacing(20),
+  columnGap: props.theme.space.s,
+  paddingTop: props.theme.space.l,
+  paddingBottom: props.theme.space.xxl,
 }));

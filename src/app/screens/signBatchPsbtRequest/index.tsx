@@ -2,7 +2,6 @@ import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types'
 import { delay } from '@common/utils/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
 import AssetModal from '@components/assetModal';
-import ActionButton from '@components/button';
 import BurnSection from '@components/confirmBtcTransaction/burnSection';
 import DelegateSection from '@components/confirmBtcTransaction/delegateSection';
 import MintSection from '@components/confirmBtcTransaction/mintSection';
@@ -29,6 +28,7 @@ import {
   btcTransaction,
   parseSummaryForRunes,
 } from '@secretkeylabs/xverse-core';
+import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
 import Spinner from '@ui-library/spinner';
 import { isLedgerAccount } from '@utils/helper';
@@ -42,11 +42,11 @@ import {
   BundleLinkText,
   ButtonContainer,
   Container,
-  CustomizedModal,
-  CustomizedModalContainer,
   LoaderContainer,
   OuterContainer,
   ReviewTransactionText,
+  SheetContainer,
+  StyledSheet,
   TransparentButtonContainer,
   TxReviewModalControls,
 } from './index.styled';
@@ -348,60 +348,56 @@ function SignBatchPsbtRequest() {
           </OuterContainer>
           <ButtonContainer>
             <TransparentButtonContainer>
-              <ActionButton text={t('CANCEL')} transparent onPress={onCancelClick} />
+              <Button title={t('CANCEL')} variant="secondary" onClick={onCancelClick} />
             </TransparentButtonContainer>
-            <ActionButton
-              text={t('CONFIRM_ALL')}
-              onPress={onSignPsbtConfirmed}
-              processing={isSigning}
+            <Button
+              title={t('CONFIRM_ALL')}
+              onClick={onSignPsbtConfirmed}
+              loading={isSigning}
               disabled={isLedgerAccount(selectedAccount)}
             />
           </ButtonContainer>
         </>
       )}
-      <CustomizedModal
-        header=""
+      <StyledSheet
+        title=""
         visible={reviewTransaction}
         onClose={() => {
           setReviewTransaction(false);
           setCurrentPsbtIndex(0);
         }}
       >
-        <OuterContainer>
-          <CustomizedModalContainer>
-            <ReviewTransactionText>
-              {t('TRANSACTION')} {currentPsbtIndex + 1}/{parsedPsbts.length}
-            </ReviewTransactionText>
-            {!!parsedPsbts[currentPsbtIndex] && (
-              <TransactionSummary
-                inputs={parsedPsbts[currentPsbtIndex].summary.inputs}
-                outputs={parsedPsbts[currentPsbtIndex].summary.outputs}
-                feeOutput={parsedPsbts[currentPsbtIndex].summary.feeOutput}
-                runeSummary={parsedPsbts[currentPsbtIndex].runeSummary}
-                transactionIsFinal={parsedPsbts[currentPsbtIndex].summary.isFinal}
-                showCenotaphCallout={
-                  !!parsedPsbts[currentPsbtIndex].summary.runeOp?.Cenotaph?.flaws
-                }
-              />
-            )}
-          </CustomizedModalContainer>
-        </OuterContainer>
+        <SheetContainer>
+          <ReviewTransactionText>
+            {t('TRANSACTION')} {currentPsbtIndex + 1}/{parsedPsbts.length}
+          </ReviewTransactionText>
+          {!!parsedPsbts[currentPsbtIndex] && (
+            <TransactionSummary
+              inputs={parsedPsbts[currentPsbtIndex].summary.inputs}
+              outputs={parsedPsbts[currentPsbtIndex].summary.outputs}
+              feeOutput={parsedPsbts[currentPsbtIndex].summary.feeOutput}
+              runeSummary={parsedPsbts[currentPsbtIndex].runeSummary}
+              transactionIsFinal={parsedPsbts[currentPsbtIndex].summary.isFinal}
+              showCenotaphCallout={!!parsedPsbts[currentPsbtIndex].summary.runeOp?.Cenotaph?.flaws}
+            />
+          )}
+        </SheetContainer>
         <TxReviewModalControls>
           {currentPsbtIndex > 0 && (
-            <ActionButton
-              text={t('PREVIOUS')}
-              transparent
-              onPress={() => {
+            <Button
+              title={t('PREVIOUS')}
+              variant="secondary"
+              onClick={() => {
                 setCurrentPsbtIndex((prevIndex) => prevIndex - 1);
               }}
               icon={<ArrowLeft color="white" size={16} weight="bold" />}
             />
           )}
           {currentPsbtIndex < parsedPsbts.length - 1 && (
-            <ActionButton
-              text={t('NEXT')}
-              transparent
-              onPress={() => {
+            <Button
+              title={t('NEXT')}
+              variant="secondary"
+              onClick={() => {
                 setCurrentPsbtIndex((prevIndex) => prevIndex + 1);
               }}
               icon={<ArrowRight color="white" size={16} weight="bold" />}
@@ -409,16 +405,16 @@ function SignBatchPsbtRequest() {
             />
           )}
           {currentPsbtIndex === parsedPsbts.length - 1 && (
-            <ActionButton
-              text={t('DONE')}
-              onPress={() => {
+            <Button
+              title={t('DONE')}
+              onClick={() => {
                 setReviewTransaction(false);
                 setCurrentPsbtIndex(0);
               }}
             />
           )}
         </TxReviewModalControls>
-      </CustomizedModal>
+      </StyledSheet>
     </>
   );
 }
