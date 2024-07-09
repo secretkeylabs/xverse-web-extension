@@ -70,7 +70,16 @@ export function ListRunesReducer(state: ListRunesState, action: Action): ListRun
     case 'SET_SELECT_ALL_TOGGLE':
       return { ...state, selectAllToggle: action.payload };
     case 'SET_RUNE_PRICE_OPTION':
-      return { ...state, runePriceOption: action.payload };
+      return {
+        ...state,
+        runePriceOption: action.payload,
+        listItemsMap: Object.fromEntries(
+          Object.entries(state.listItemsMap).map(([fullTxId, listItem]) => [
+            fullTxId,
+            { ...listItem, useIndividualCustomPrice: false },
+          ]),
+        ),
+      };
     case 'SET_CUSTOM_RUNE_PRICE':
       return { ...state, customRunePrice: action.payload };
     case 'SET_INDIVIDUAL_CUSTOM_ITEM':
