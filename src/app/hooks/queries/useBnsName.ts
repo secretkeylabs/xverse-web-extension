@@ -9,8 +9,12 @@ export const useBnsName = (walletAddress: string) => {
 
   useEffect(() => {
     (async () => {
-      const name = await getBnsName(walletAddress, network);
-      setBnsName(name ?? '');
+      if (walletAddress) {
+        const name = await getBnsName(walletAddress, network);
+        setBnsName(name ?? '');
+      } else {
+        setBnsName('');
+      }
     })();
   }, [walletAddress, network]);
 

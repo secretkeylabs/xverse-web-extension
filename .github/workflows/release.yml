@@ -60,7 +60,7 @@ jobs:
           PR_ID: ${{ github.event.pull_request.number }}
         run: |
           # update PR description
-          cat release.json | jq -r .body > body.md
+          cat scripts/release.json | jq -r .body > body.md
           echo -e "\n\nPublished latest release: $(cat release.json | jq -r .html_url)" >> body.md
           gh api \
             --method PATCH \
@@ -71,7 +71,7 @@ jobs:
       - id: download-latest-asset
         name: Download latest asset from rc
         run: |
-          ASSET_ID=$(cat releases.json | jq -r ".[] | select(.tag_name==\"$TAG_RC\") | .assets[0].id")
+          ASSET_ID=$(cat scripts/releases.json | jq -r ".[] | select(.tag_name==\"$TAG_RC\") | .assets[0].id")
           gh api \
             -H "Accept: application/octet-stream" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
@@ -96,6 +96,7 @@ jobs:
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
           # run shell script
+          cd scripts
           ./merge-to-remote.sh
       - id: copy-release-to-public
         name: Copy release to public remote
@@ -103,7 +104,7 @@ jobs:
           REMOTE_REPO: xverse-web-extension
         run: |
           # publish the latest release on remote
-          cat release.json | jq -r .body > public-body.md
+          cat scripts/release.json | jq -r .body > public-body.md
           gh api \
             --method POST \
             -H "Accept: application/vnd.github+json" \

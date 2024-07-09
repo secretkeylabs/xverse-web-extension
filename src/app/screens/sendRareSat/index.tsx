@@ -1,9 +1,10 @@
 import ActionButton from '@components/button';
+import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useNftDataSelector from '@hooks/stores/useNftDataSelector';
-import useBtcClient from '@hooks/useBtcClient';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSeedVault from '@hooks/useSeedVault';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   ErrorCodes,
@@ -96,7 +97,8 @@ function SendOrdinal() {
   const { selectedSatBundle } = useNftDataSelector();
   const btcClient = useBtcClient();
   const location = useLocation();
-  const { network, ordinalsAddress, btcAddress, selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { network } = useWalletSelector();
   const { btcFiatRate } = useCoinRates();
 
   const { getSeed } = useSeedVault();
@@ -112,7 +114,7 @@ function SendOrdinal() {
     mutate,
   } = useMutation<SignedBtcTx | undefined, ResponseError, string>({
     mutationFn: async (recipient) => {
-      const addressUtxos = await btcClient.getUnspentUtxos(ordinalsAddress);
+      const addressUtxos = await btcClient.getUnspentUtxos(selectedAccount.ordinalsAddress);
       const ordUtxo = addressUtxos.find(
         (utxo) =>
           `${utxo.txid}:${utxo.vout}` === `${selectedSatBundle?.txid}:${selectedSatBundle?.vout}`,
@@ -123,8 +125,8 @@ function SendOrdinal() {
         const signedTx = await signOrdinalSendTransaction(
           recipient,
           ordUtxo,
-          btcAddress,
-          Number(selectedAccount?.id),
+          selectedAccount.btcAddress,
+          Number(selectedAccount.id),
           seedPhrase,
           btcClient,
           network.type,
@@ -184,7 +186,7 @@ function SendOrdinal() {
       setRecipientError({ variant: 'danger', message: t('ERRORS.ADDRESS_INVALID') });
       return false;
     }
-    if (address === ordinalsAddress || address === btcAddress) {
+    if (address === selectedAccount.ordinalsAddress || address === selectedAccount.btcAddress) {
       setRecipientError({ variant: 'info', message: t('YOU_ARE_TRANSFERRING_TO_YOURSELF') });
       return true;
     }

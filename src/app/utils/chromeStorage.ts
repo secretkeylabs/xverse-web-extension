@@ -1,29 +1,23 @@
-const driverMap = new WeakMap();
-const runtimeMap = new WeakMap();
-
+/* eslint-disable class-methods-use-this */
 class ChromeStorage {
-  constructor(driver: any, runtime: any) {
-    driverMap.set(this, driver);
-    runtimeMap.set(this, runtime);
+  private driver!: chrome.storage.LocalStorageArea;
+
+  constructor(driver: chrome.storage.LocalStorageArea) {
+    this.driver = driver;
   }
 
-  getDriver(): chrome.storage.StorageArea {
-    return driverMap.get(this);
-  }
+  getError(): Error | undefined {
+    if (!chrome.runtime.lastError) return undefined;
 
-  hasError() {
-    return !!this.getError();
-  }
-
-  getError(): string | undefined {
-    return runtimeMap.get(this).lastError;
+    return new Error(chrome.runtime.lastError.message);
   }
 
   setItem(key: string, item: any): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.getDriver().set({ [key]: item }, () => {
-        if (this.hasError()) {
-          return reject(this.getError());
+      this.driver.set({ [key]: item }, () => {
+        const error = this.getError();
+        if (error) {
+          return reject(error);
         }
         return resolve();
       });
@@ -32,9 +26,10 @@ class ChromeStorage {
 
   getItem<T = any, D = undefined>(key: string, defaultValue?: D): Promise<T | D> {
     return new Promise((resolve, reject) => {
-      this.getDriver().get(key, (response: any) => {
-        if (this.hasError()) {
-          return reject(this.getError());
+      this.driver.get(key, (response: any) => {
+        const error = this.getError();
+        if (error) {
+          return reject(error);
         }
         return resolve(response[key] ?? defaultValue);
       });
@@ -43,15 +38,30 @@ class ChromeStorage {
 
   removeItem(key: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.getDriver().remove(key, () => {
-        if (this.hasError()) {
-          return reject(this.getError());
+      this.driver.remove(key, () => {
+        const error = this.getError();
+        if (error) {
+          return reject(error);
         }
         return resolve();
       });
     });
   }
 }
-export default ChromeStorage;
-export const chromeSessionStorage = new ChromeStorage(chrome.storage.session, chrome.runtime);
-export const chromeLocalStorage = new ChromeStorage(chrome.storage.local, chrome.runtime);
+
+const storageInstances: { session?: ChromeStorage; local?: ChromeStorage } = {};
+
+export default {
+  get session() {
+    if (!storageInstances.session) {
+      storageInstances.session = new ChromeStorage(chrome.storage.session);
+    }
+    return storageInstances.session;
+  },
+  get local() {
+    if (!storageInstances.local) {
+      storageInstances.local = new ChromeStorage(chrome.storage.local);
+    }
+    return storageInstances.local;
+  },
+};

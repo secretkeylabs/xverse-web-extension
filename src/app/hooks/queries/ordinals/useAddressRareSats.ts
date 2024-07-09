@@ -1,3 +1,4 @@
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   getAddressUtxoOrdinalBundles,
@@ -5,12 +6,13 @@ import {
   mapRareSatsAPIResponseToBundle,
 } from '@secretkeylabs/xverse-core';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
-import { handleRetries, InvalidParamsError } from '@utils/query';
+import { InvalidParamsError, handleRetries } from '@utils/query';
 
 const PAGE_SIZE = 30;
 
 export const useAddressRareSats = () => {
-  const { ordinalsAddress, network } = useWalletSelector();
+  const { ordinalsAddress } = useSelectedAccount();
+  const { network } = useWalletSelector();
 
   const getRareSatsByAddress = async ({ pageParam = 0 }) => {
     if (!ordinalsAddress) {
@@ -24,7 +26,7 @@ export const useAddressRareSats = () => {
       PAGE_SIZE,
       {
         hideUnconfirmed: true,
-        hideInscriptionOnly: true,
+        hideSpecialWithoutSatributes: true,
       },
     );
     return bundleResponse;

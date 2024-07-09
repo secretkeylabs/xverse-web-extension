@@ -32,6 +32,7 @@ jobs:
       - id: run-create-release-pr-sh
         env:
           BUMP: ${{ inputs.bump }}
+          SOURCE_BRANCH: ${{ github.ref_name }}
           GH_TOKEN: ${{ github.token }}
         run: |
           # git config

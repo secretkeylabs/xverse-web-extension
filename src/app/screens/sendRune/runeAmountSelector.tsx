@@ -70,13 +70,14 @@ function RuneAmountSelector({
       complications={
         <>
           <VertRule />
-          <MaxButton $sendMax={sendMax} onClick={handleMaxClick}>
+          <MaxButton disabled={sendMax} onClick={handleMaxClick}>
             MAX
           </MaxButton>
         </>
       }
       feedback={amountError !== '' ? [{ message: amountError, variant: 'danger' }] : []}
       hideClear
+      autoFocus
     />
   );
 }

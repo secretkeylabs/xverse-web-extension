@@ -6,9 +6,10 @@ import { SwapInfoBlock } from '@screens/swap/swapInfoBlock';
 import SwapTokenBlock from '@screens/swap/swapTokenBlock';
 import { useSwap } from '@screens/swap/useSwap';
 import Button from '@ui-library/button';
-import { useCallback, useState } from 'react';
+import { isFungibleToken } from '@utils/helper';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 const ScrollContainer = styled.div`
@@ -55,9 +56,27 @@ function SwapScreen() {
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
   const swap = useSwap();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const defaultFrom = params.get('from');
 
   const [selecting, setSelecting] = useState<'from' | 'to'>();
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (
+      !swap.selectedFromToken &&
+      !swap.selectedToToken &&
+      defaultFrom &&
+      (defaultFrom === 'STX' || isFungibleToken(defaultFrom))
+    ) {
+      swap.onSelectToken(defaultFrom, 'from');
+    }
+  }, [defaultFrom, swap]);
+
+  const handleGoBack = () => {
+    navigate(-1);
+  };
 
   const handleClickContinue = useCallback(async () => {
     if (swap.submitError || !swap.onSwap) {
@@ -73,7 +92,7 @@ function SwapScreen() {
 
   return (
     <>
-      <TopRow title={t('SWAP')} onClick={() => navigate('/')} />
+      <TopRow title={t('SWAP')} onClick={handleGoBack} />
       <ScrollContainer>
         <Container>
           <SwapTokenBlock

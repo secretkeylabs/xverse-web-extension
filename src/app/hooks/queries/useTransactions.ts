@@ -1,5 +1,5 @@
-import useBtcClient from '@hooks/useBtcClient';
-import useRunesApi from '@hooks/useRunesApi';
+import useBtcClient from '@hooks/apiClients/useBtcClient';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   APIGetRunesActivityForAddressResponse,
@@ -24,8 +24,8 @@ export default function useTransactions(
   brc20Token: string | null,
   runeToken: string | null,
 ) {
-  const { network, stxAddress, btcAddress, ordinalsAddress, hasActivatedOrdinalsKey } =
-    useWalletSelector();
+  const { stxAddress, btcAddress, ordinalsAddress } = useSelectedAccount();
+  const { network, hasActivatedOrdinalsKey } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
   const btcClient = useBtcClient();
   const fetchTransactions = async (): Promise<

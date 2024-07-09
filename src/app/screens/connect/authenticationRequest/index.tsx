@@ -8,7 +8,7 @@ import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import useSeedVault from '@hooks/useSeedVault';
-import useWalletSelector from '@hooks/useWalletSelector';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { animated, useSpring } from '@react-spring/web';
 import { AddressPurpose } from '@sats-connect/core';
@@ -109,7 +109,8 @@ function AuthenticationRequest() {
   const params = new URLSearchParams(search);
   const authRequestToken = params.get('authRequest') ?? '';
   const authRequest = decodeToken(authRequestToken) as unknown as AuthRequest;
-  const { selectedAccount, btcAddress, stxAddress } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { btcAddress, stxAddress } = selectedAccount;
   const { getSeed } = useSeedVault();
   const isDisabled = !selectedAccount?.stxAddress;
 

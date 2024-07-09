@@ -10,7 +10,7 @@ on:
       - develop
 jobs:
   build:
-    if: ${{ !startsWith(github.head_ref, 'release/') && !startsWith(github.head_ref, 'e2etest/')}}
+    if: ${{ !startsWith(github.head_ref, 'release/') && !startsWith(github.head_ref, 'e2etest/') && !github.event.pull_request.draft == true }}
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
@@ -44,7 +44,7 @@ jobs:
         env:
           SEED_WORDS1: ${{ secrets.SEED_WORDS1 }}
           SEED_WORDS2: ${{ secrets.SEED_WORDS2 }}
-        run: xvfb-run --auto-servernum --server-args="-screen 0 360x360x24" npx playwright test --grep "#smoketest" --reporter=html
+        run: xvfb-run --auto-servernum --server-args="-screen 0 360x360x24" npm run e2etest:smoketest --reporter=html
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v3

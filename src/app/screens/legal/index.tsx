@@ -1,15 +1,13 @@
 import LinkIcon from '@assets/img/linkIcon.svg';
 import Separator from '@components/separator';
-import useWalletSelector from '@hooks/useWalletSelector';
+import useWalletReducer from '@hooks/useWalletReducer';
 import { CustomSwitch } from '@screens/ledger/importLedgerAccount/steps/index.styled';
-import { changeShowDataCollectionAlertAction } from '@stores/wallet/actions/actionCreators';
 import Button from '@ui-library/button';
 import { PRIVACY_POLICY_LINK, TERMS_LINK } from '@utils/constants';
 import { saveIsTermsAccepted } from '@utils/localStorage';
 import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 
@@ -75,8 +73,7 @@ const DataCollectionDescription = styled.p((props) => ({
 function Legal() {
   const { t } = useTranslation('translation', { keyPrefix: 'LEGAL_SCREEN' });
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { selectedAccount } = useWalletSelector();
+  const { changeShowDataCollectionAlert } = useWalletReducer();
   const [searchParams] = useSearchParams();
   const theme = useTheme();
   const [isToggleEnabled, setIsToggleEnabled] = useState(true);
@@ -85,11 +82,12 @@ function Legal() {
 
   const handleLegalAccept = async () => {
     if (isToggleEnabled) {
-      optInMixPanel(selectedAccount?.masterPubKey);
+      optInMixPanel();
     } else {
       optOutMixPanel();
     }
-    dispatch(changeShowDataCollectionAlertAction(false));
+
+    changeShowDataCollectionAlert();
     saveIsTermsAccepted(true);
     const isRestore = !!searchParams.get('restore');
     if (isRestore) {

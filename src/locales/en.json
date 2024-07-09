@@ -4,6 +4,7 @@
     "SEND": "Send",
     "COMBO": "Combo",
     "SATS": "Sats",
+    "BTC": "BTC",
     "SATRIBUTES": "Satributes",
     "INPUT": "Input",
     "SIZE": "Size",
@@ -23,18 +24,18 @@
     "SCREEN_TITLE": "The Bitcoin wallet for everyone",
     "CREATE_WALLET_BUTTON": "Create a new wallet",
     "RESTORE_WALLET_BUTTON": "Restore an existing wallet",
-    "ONBOARDING_1_TITlE": "Store BTC, Runes, Ordinals, BRC-20, Rare Sats, STX and more!",
-    "ONBOARDING_2_TITlE": "Connect to your favorite Bitcoin apps"
+    "ONBOARDING_1_TITLE": "Store BTC, Runes, Ordinals, BRC20, Rare Sats, STX and more!",
+    "ONBOARDING_2_TITLE": "Connect to your favorite Bitcoin apps"
   },
   "LEDGER_IMPORT_SCREEN": {
     "LEDGER_IMPORT_1_TITLE": "Secure Your Assets with Ledger",
-    "LEDGER_IMPORT_1_SUBTITLE": "Connecting a Ledger hardware wallet to Xverse is the most secure way to store your Bitcoin, Ordinals, Stacks, BRC-20 and SIP-10 tokens, and more.",
+    "LEDGER_IMPORT_1_SUBTITLE": "Connecting a Ledger hardware wallet to Xverse is the most secure way to store your Bitcoin, Runes, Ordinals, Stacks, BRC-20 and SIP-10 tokens, and more.",
     "LEDGER_IMPORT_1_BUTTON": "Get started",
     "LEDGER_IMPORT_2_TITLE": "Select assets",
     "LEDGER_IMPORT_2_SUBTITLE": "Choose the assets you want to manage with this wallet.",
     "LEDGER_IMPORT_2_FOOTNOTE": "If you don’t want to set a Stacks address now, you have the possibility to set it up later.",
     "LEDGER_IMPORT_2_SELECT": {
-      "BTC_TITLE": "Bitcoin & Ordinals (default)",
+      "BTC_TITLE": "Bitcoin, Runes & Ordinals (default)",
       "BTC_SUBTITLE": "Native SegWit and Taproot addresses",
       "STACKS_TITLE": "Stacks (optional)",
       "STACKS_SUBTITLE": "SIP-10 address"
@@ -66,11 +67,11 @@
       "SUBTITLE_CANCELLED": "The account import process was cancelled on the device."
     },
     "LEDGER_ADDRESS_ADDED": {
-      "TITLE_BTC_ORDINALS": "Bitcoin & Ordinals wallets added",
+      "TITLE_BTC_ORDINALS": "Bitcoin, Runes & Ordinals wallets added",
       "TITLE_BTC": "Bitcoin wallet added",
       "TITLE_ORDINALS": "Ordinals wallet added",
       "TITLE_STX": "Stacks wallet added",
-      "SUBTITLE": "You can now receive & send Bitcoin, Ordinals and BRC-20 tokens using Xverse and Ledger.",
+      "SUBTITLE": "You can now receive & send Bitcoin, Runes, Ordinals and BRC-20 tokens using Xverse and Ledger.",
       "SUBTITLE_STX": "You can now receive & send STX, Stacks NFTs and SIP-10 tokens using Xverse and Ledger."
     },
     "LEDGER_ADD_ACCOUNT_NAME": {
@@ -258,6 +259,9 @@
       "NO_FUNDS": "You don't have any funds to send. You can purchase crypto quickly and deposit directly into your Xverse wallet.",
       "BUY_BTC": "Buy Bitcoin"
     },
+    "STX": {
+      "BUY_STX": "Buy Stacks"
+    },
     "SEND_TO": "Send to",
     "SEND": "Send",
     "AMOUNT": "Amount",
@@ -265,10 +269,11 @@
     "RECIPIENT": "Recipient",
     "RECIPIENT_PLACEHOLDER": "STX Address or .btc domain",
     "ORDINAL_RECIPIENT_PLACEHOLDER": "Enter address",
-    "MEMO": "Add a memo (optional)",
+    "MEMO": "Memo (optional)",
     "MEMO_PLACEHOLDER": "Memo",
     "ASSOCIATED_ADDRESS": "Associated Address",
-    "MEMO_INFO": "Adding a memo can have an impact on the transaction fee",
+    "ASSOCIATED_DOMAIN": "Associated Domain",
+    "MEMO_INFO": "Adding a memo can have an impact on the transaction fee.",
     "NEXT": "Next",
     "NO_FUNDS": "You don't have any funds to send.",
     "BUY_CRYPTO": "Buy crypto",
@@ -295,7 +300,7 @@
     "ASSOCIATED_BNS_DOMAIN": "Associated BNS Name",
     "SWITCH_TO": "Switch to",
     "SEND_ORDINAL_TITLE": "Send Ordinal",
-    "MAKE_SURE_THE_RECIPIENT": "Make sure the recipient address support Ordinals. Items sent to the wrong address cannot be recovered.",
+    "MAKE_SURE_THE_RECIPIENT": "Make sure the recipient address supports Ordinals. Items sent to the wrong address cannot be recovered.",
     "SEND_BRC20_ORDINAL_WALLET_WARNING": "Transferring this Ordinal inscription will initiate the transfer of your BRC-20 tokens.",
     "SEND_ORDINAL_TO_SELF_WARNING": "You are about to transfer an Ordinal to yourself",
     "SEND_BRC20_ORDINAL_TO_SELF_WARNING": "You are about to transfer BRC-20 tokens to yourself",
@@ -305,7 +310,8 @@
     "INSUFFICIENT_FUNDS": "Insufficient funds",
     "RATE_TOO_LOW": "Set fee is below minimum of {{minFee}} Sats/vByte",
     "RATE_TOO_HIGH": "Set fee is above maximum of {{maxFee}} Sats/vByte",
-    "SPEND_DELEGATED_STX": "You are transferring some STX that is registered for the next stacking cycle. The amount transferred will be subtracted from your current stacking pool delegation, and will not be locked to generate rewards in the next cycle."
+    "SPEND_DELEGATED_STX": "You are transferring some STX that is registered for the next stacking cycle. The amount transferred will be subtracted from your current stacking pool delegation, and will not be locked to generate rewards in the next cycle.",
+    "INVALID_FEE_RATE": "Invalid fee rate"
   },
   "CONFIRM_TRANSACTION": {
     "SEND": "Confirm Transaction",
@@ -313,7 +319,7 @@
     "RECIPIENT_ADDRESS": "recipient address",
     "MEMO": "Attached memo",
     "NETWORK": "Network",
-    "FEES": "Fees",
+    "FEES": "Network fee",
     "TRANSACTION": "Transaction",
     "PREVIOUS": "Previous",
     "NEXT": "Next",
@@ -345,7 +351,16 @@
     "ASSET": "Asset",
     "CLOSE": "Close",
     "NAME": "Name",
+    "RUNE_SIZE": "Size",
     "SYMBOL": "Symbol",
+    "DIVISIBILITY": "Divisibility",
+    "MINTING_LIMIT": "Minting limit",
+    "MINT_AMOUNT": "Mint amount",
+    "MINTABLE": "Mintable",
+    "RUNE_BLOCK_HEIGHT_TERM": "Start height & end Height",
+    "RUNE_BLOCK_OFFSET_TERM": "Start offset & end offset",
+    "YES": "Yes",
+    "NO": "No",
     "SIGNING_TRANSACTIONS": "Signing transactions",
     "BROADCASTING_TRANSACTIONS": "Broadcasting transactions",
     "THIS_MAY_TAKE_A_FEW_MINUTES": "This may take a few minutes, please keep this window open.",
@@ -368,11 +383,15 @@
     "YOU_WILL_RECEIVE": "You will receive",
     "YOU_WILL_BURN": "You will burn",
     "YOU_WILL_MINT": "You will mint",
+    "YOU_WILL_ISSUE": "You will issue",
     "YOU_WILL_TRANSFER_IN_TOTAL": "You will transfer in total",
     "YOU_WILL_RECEIVE_IN_TOTAL": "You will receive in total",
     "REVIEW_ALL": "Review all",
     "SCRIPT_OUTPUT": "Script output",
     "SCRIPT_OUTPUT_TX": "This transaction contains a script output. Be sure you trust the source of this transaction before confirming it.",
+    "PUBLIC_KEY": "Public key",
+    "MULTISIG": "Multi-signature",
+    "YOUR_PUBLIC_KEY": "with your public key",
     "ORDINAL": "Ordinal",
     "ORDINAL_DETECTED_WARNING": "Ordinal inscription detected in transaction. Continuing will cause your ordinal to be transferred away.",
     "ORDINAL_DETECTED_ACTION": "Move to my ordinals address",
@@ -412,6 +431,13 @@
       "CANCEL_BUTTON": "Cancel",
       "SEE_TRANSACTION_BUTTON": "See transaction",
       "RETRY_BUTTON": "Try again"
+    },
+    "INSCRIBE": {
+      "TITLE": "You will inscribe",
+      "ORDINAL": "Ordinal",
+      "RECIPIENT": "Recipient",
+      "TO": "To",
+      "YOUR_ADDRESS": "Your address"
     },
     "YOUR_ORDINAL_ADDRESS": "Your ordinals address",
     "YOUR_PAYMENT_ADDRESS": "Your payment address",
@@ -466,6 +492,7 @@
     "BROADCASTED": "Transaction Broadcasted",
     "SUCCESS_MSG": "Your transaction has been successfully submitted.",
     "SEE_ON": "See on",
+    "SEE_ON_MAGICEDEN": "See {{runeSymbol}} on Magic Eden",
     "STACKS_EXPLORER": "Stacks Explorer",
     "BITCOIN_EXPLORER": "Explorer",
     "TRANSACTION_ID": "Transaction ID",
@@ -809,6 +836,7 @@
     "BACK": "Back",
     "INCORRECT_PASSWORD_ERROR": "Incorrect password",
     "TESTNET": "Testnet",
+    "SIGNET": "Signet",
     "ORDINALS": "Ordinals",
     "ACTIVATE_ORDINAL_NFTS": "Display ordinals",
     "RECOVER_ASSETS": "Recover assets",
@@ -854,15 +882,44 @@
   "BUY_SCREEN": {
     "BUY": "Buy",
     "PURCHASE_CRYPTO": "Purchase crypto quickly and deposit directly into your Xverse wallet.",
-    "MOONPAY": "Buy on Moonpay",
-    "TRANSAK": "Buy on Transak",
+    "MOONPAY": "Moonpay",
+    "TRANSAK": "Transak",
+    "PAYPAL": "Paypal",
+    "US_UK_EU_ONLY": "US, UK or EU Citizens only",
     "DISCLAIMER": "Disclaimer",
     "THIRD_PARTY_WARNING": "You will be redirected to a third-party service provider to complete the purchase. If you encounter any issues during the process please contact the provider."
+  },
+  "LIST_RUNE_SCREEN": {
+    "LIST_RUNES": "List Runes",
+    "SELECT_RUNES_SECTION": "Select Runes bundles to list on Magic Eden’s runes marketplace.",
+    "SET_PRICES_SECTION": "Set the listing price for your Runes bundles.",
+    "CONTINUE": "Continue",
+    "LISTED": "LISTED",
+    "NOT_LISTED": "NOT LISTED",
+    "SELECT_ALL": "Select all",
+    "DESELECT_ALL": "Deselect all",
+    "SET_PRICES": "Set price",
+    "MAGIC_EDEN_FLOOR_PRICE": "The Magic Eden floor price is currently {{sats}} Sats/{{symbol}}",
+    "TOTAL_LISTED": "Total listed",
+    "TOTAL_RECEIVED_IF_SOLD": "Total received if sold",
+    "LISTING_PRICE": "Listing price",
+    "APPLY": "Apply",
+    "AT_FLOOR_PRICE_LABEL": "This listing is at floor price",
+    "BELOW_FLOOR_PRICE_LABEL": "This listing is {{percentage}}% below floor price",
+    "ABOVE_FLOOR_PRICE_LABEL": "This listing is {{percentage}}% above floor price",
+    "LISTING_PRICE_TOO_LOW": "Your listing price is too low",
+    "LISTING_PRICE_TOO_HIGH": "Your bundle price price must be < 10 BTC",
+    "EDIT": "Edit",
+    "MIN_PRICE_LABEL": "The listing price per {{symbol}} must be at least {{price}} Sats",
+    "NO_LISTED_ITEMS": "There're no listed items for this rune.",
+    "NO_UNLISTED_ITEMS": "There're no unlisted items for this rune."
   },
   "COIN_DASHBOARD_SCREEN": {
     "SEND": "Send",
     "RECEIVE": "Receive",
+    "SWAP": "Swap",
     "BUY": "Buy",
+    "LIST": "List",
     "TRANSACTION_HISTORY_TITLE": "Transaction history",
     "TRANSACTIONS_LIST_EMPTY": "No transactions found.",
     "TRANSACTIONS_LIST_ERROR": "Error fetching transaction history for this token",
@@ -994,7 +1051,8 @@
         "TITLE": "Connect Your Ledger",
         "SUBTITLE": "To continue, connect your Ledger device, make sure it's unlocked, and open the {{name}} app.",
         "ERROR_TITLE": "Connection error",
-        "ERROR_SUBTITLE": "We haven’t been able to connect to your device."
+        "ERROR_SUBTITLE": "We weren't able to connect to your device.",
+        "ERROR_SUBTITLE_DEVICE_LOCKED": "Your Ledger device is locked. Please unlock it to continue."
       },
       "CONFIRM": {
         "TITLE": "Confirm the signature",
@@ -1019,7 +1077,9 @@
       "CLOSE_BUTTON": "Close",
       "CANCEL_BUTTON": "Cancel",
       "RETRY_BUTTON": "Try again"
-    }
+    },
+    "UNLISTED_SUCCESS": "Rune unlisted successfully",
+    "UNLISTED_ERROR": "Rune unlisting failed"
   },
   "INSCRIPTION_REQUEST": {
     "TITLE": "Review Transaction",
@@ -1061,6 +1121,11 @@
       "DEVELOPER": "Developer fee",
       "TRANSACTION": "Network fee",
       "TOTAL": "Total fees"
+    },
+    "LEDGER": {
+      "CONNECT_BUTTON": "Connect",
+      "RETRY_BUTTON": "Retry",
+      "CANCEL_BUTTON": "Cancel"
     },
     "COMPLETE": {
       "INSCRIBED": "Ordinal inscribed",
@@ -1182,15 +1247,29 @@
     "YOUR_TRANSACTION_HAS_BEEN": "Your transaction has been successfully submitted.",
     "XVERSE_WALLET_ROUTER": "Xverse Wallet Router: ",
     "SEE_YOUR_TRANSACTION": "See transaction",
-    "CLOSE": "Close"
+    "CLOSE": "Close",
+    "LEDGER": {
+      "CONNECT_BUTTON": "Connect",
+      "RETRY_BUTTON": "Retry",
+      "CANCEL_BUTTON": "Cancel",
+      "INSCRIPTION": {
+        "TITLE": "Confirm the signature (1 of 2)",
+        "SUBTITLE": "Sign the inscription of your BRC-20 token transfer on your Ledger device to continue."
+      },
+      "TRANSFER": {
+        "TITLE": "Confirm the signature (2 of 2)",
+        "SUBTITLE": "Sign the transfer of your BRC-20 token on your Ledger device to continue."
+      }
+    }
   },
   "CACHE_MIGRATION_SCREEN": {
-    "TITLE": "Your wallet data store needs to be updated in order to remain secure.",
-    "WARNING": "Please make sure you have your seed phrase backed up securely and restore your wallet after resetting it from settings",
+    "TITLE": "A data upgrade is required. This should only take a few seconds.",
+    "WARNING1": "You should make sure you have your seed phrase securely backed up before continuing.",
+    "WARNING2": " Do not close the wallet while the update is in progress.",
     "SUCCESS_TITLE": "Update Complete",
     "SKIP_BUTTON": "Do it later",
-    "CONFIRM_BUTTON": "Confirm",
-    "CLOSE_TAB": "I understand"
+    "CONFIRM_BUTTON": "Update",
+    "CLOSE_TAB": "Close"
   },
   "SWAP_SCREEN": {
     "SWAP": "Swap",

@@ -6,8 +6,9 @@ import {
   UTXO,
 } from '@secretkeylabs/xverse-core';
 import { useEffect, useMemo, useState } from 'react';
-import useBtcClient from './useBtcClient';
+import useBtcClient from './apiClients/useBtcClient';
 import useOrdinalsByAddress from './useOrdinalsByAddress';
+import useSelectedAccount from './useSelectedAccount';
 import useWalletSelector from './useWalletSelector';
 
 interface Params {
@@ -40,7 +41,8 @@ const useBtcFees = ({
   });
   const [highFeeError, setHighFeeError] = useState<string>('');
   const [standardFeeError, setStandardFeeError] = useState<string>('');
-  const { network, btcAddress, ordinalsAddress } = useWalletSelector();
+  const { btcAddress, ordinalsAddress } = useSelectedAccount();
+  const { network } = useWalletSelector();
   const btcClient = useBtcClient();
   const { ordinals } = useOrdinalsByAddress(btcAddress);
   const ordinalsUtxos = useMemo(() => ordinals?.map((ord) => ord.utxo), [ordinals]);

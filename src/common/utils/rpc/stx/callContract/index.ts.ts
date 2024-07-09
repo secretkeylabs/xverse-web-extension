@@ -8,7 +8,10 @@ import {
 import RequestsRoutes from '@common/utils/route-urls';
 import { RpcErrorCode } from '@sats-connect/core';
 import { makeRPCError } from '../../helpers';
-import { sendInvalidParametersMessage, sendMissingParametersMessage } from '../rpcResponseMessages';
+import {
+  sendInvalidParametersResponseMessage,
+  sendMissingParametersMessage,
+} from '../../responseMessages/errors';
 import { callContractParamsSchema } from './paramsSchema';
 
 async function callContract(message: WebBtcMessage<'stx_callContract'>, port: chrome.runtime.Port) {
@@ -19,7 +22,7 @@ async function callContract(message: WebBtcMessage<'stx_callContract'>, port: ch
 
   const paramsParseResult = callContractParamsSchema.safeParse(message.params);
   if (!paramsParseResult.success) {
-    sendInvalidParametersMessage({
+    sendInvalidParametersResponseMessage({
       tabId: getTabIdFromPort(port),
       messageId: message.id,
       error: paramsParseResult.error,
@@ -43,7 +46,7 @@ async function callContract(message: WebBtcMessage<'stx_callContract'>, port: ch
 
     // Metadata
     rpcMethod: 'stx_callContract',
-    messageId: message.id,
+    messageId: String(message.id),
   };
 
   const { urlParams, tabId } = makeSearchParamsWithDefaults(port, popupParams);

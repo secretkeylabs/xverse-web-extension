@@ -7,18 +7,21 @@ import TopRow from '@components/topRow';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   AnalyticsEvents,
   StacksTransaction,
   broadcastSignedTransaction,
+  microstacksToStx,
+  stxToMicrostacks,
 } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 
@@ -32,11 +35,13 @@ function ConfirmFtTransaction() {
     amount,
     fungibleToken,
     memo,
-    recepientAddress,
+    recipientAddress,
   } = location.state;
+  const [fee, setFee] = useState<BigNumber>();
   const unsignedTx = useMemo(() => deserializeTransaction(unsignedTxHex), [unsignedTxHex]);
   const { refetch } = useStxWalletData();
-  const { network, selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { network } = useWalletSelector();
 
   const {
     isLoading,
@@ -80,7 +85,7 @@ function ConfirmFtTransaction() {
       const state: ConfirmStxTransactionState = {
         unsignedTx: Buffer.from(unsignedTx.serialize()),
         type,
-        recipients: [{ address: recepientAddress, amountMicrostacks: new BigNumber(amount) }],
+        recipients: [{ address: recipientAddress, amountMicrostacks: new BigNumber(amount) }],
         fee: new BigNumber(unsignedTx.auth.spendingCondition.fee.toString()),
       };
 
@@ -100,7 +105,7 @@ function ConfirmFtTransaction() {
   const handleBackButtonClick = () => {
     navigate('/send-sip10', {
       state: {
-        recipientAddress: recepientAddress,
+        recipientAddress,
         amountToSend: amount.toString(),
         stxMemo: memo,
         fungibleToken,
@@ -117,9 +122,13 @@ function ConfirmFtTransaction() {
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={handleBackButtonClick}
         skipModal={isLedgerAccount(selectedAccount)}
+        fee={fee ? microstacksToStx(fee).toString() : undefined}
+        setFeeRate={(feeRate: string) => {
+          setFee(stxToMicrostacks(new BigNumber(feeRate)));
+        }}
       >
         <RecipientComponent
-          address={recepientAddress}
+          address={recipientAddress}
           value={`${amount}`}
           fungibleToken={fungibleToken}
           title={t('AMOUNT')}

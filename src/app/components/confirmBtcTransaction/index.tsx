@@ -1,12 +1,17 @@
 import { delay } from '@common/utils/ledger';
-import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import { Tab } from '@components/tabBar';
-import useWalletSelector from '@hooks/useWalletSelector';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import TransportFactory from '@ledgerhq/hw-transport-webusb';
-import { RuneSummary, Transport, btcTransaction } from '@secretkeylabs/xverse-core';
+import {
+  RuneSummary,
+  RuneSummaryActions,
+  Transport,
+  btcTransaction,
+} from '@secretkeylabs/xverse-core';
 import Callout from '@ui-library/callout';
 import { StickyHorizontalSplitButtonContainer, StyledP } from '@ui-library/common.styled';
+import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
 import { isLedgerAccount } from '@utils/helper';
 import { useState } from 'react';
@@ -47,7 +52,7 @@ type Props = {
   inputs: btcTransaction.EnhancedInput[];
   outputs: btcTransaction.EnhancedOutput[];
   feeOutput?: btcTransaction.TransactionFeeOutput;
-  runeSummary?: RuneSummary;
+  runeSummary?: RuneSummaryActions | RuneSummary;
   showCenotaphCallout: boolean;
   isLoading: boolean;
   isSubmitting: boolean;
@@ -113,7 +118,7 @@ function ConfirmBtcTransaction({
   const { t: signatureRequestTranslate } = useTranslation('translation', {
     keyPrefix: 'SIGNATURE_REQUEST',
   });
-  const { selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
 
   const hideBackButton = !onBackClick;
   const hasInsufficientRunes =
@@ -228,7 +233,7 @@ function ConfirmBtcTransaction({
           </StickyHorizontalSplitButtonContainer>
         )}
       </SendLayout>
-      <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
+      <Sheet title="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
         <LedgerStepView
           currentStep={currentStep}
           isConnectSuccess={isConnectSuccess}
@@ -258,7 +263,7 @@ function ConfirmBtcTransaction({
             </>
           )}
         </SuccessActionsContainer>
-      </BottomModal>
+      </Sheet>
     </>
   );
 }

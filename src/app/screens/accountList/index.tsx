@@ -6,6 +6,7 @@ import Separator from '@components/separator';
 import TopRow from '@components/topRow';
 import useAccountBalance from '@hooks/queries/useAccountBalance';
 import { broadcastResetUserFlow } from '@hooks/useResetUserFlow';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Plus } from '@phosphor-icons/react';
@@ -15,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-export const Container = styled.div({
+const Container = styled.div({
   height: '100%',
   display: 'flex',
   flexDirection: 'column',
@@ -59,7 +60,8 @@ function AccountList(): JSX.Element {
   const navigate = useNavigate();
   const { search } = useLocation();
   const params = new URLSearchParams(search);
-  const { network, accountsList, selectedAccount, ledgerAccountsList } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { network, accountsList, ledgerAccountsList } = useWalletSelector();
   const { createAccount, switchAccount } = useWalletReducer();
   const { enqueueFetchBalances } = useAccountBalance();
 

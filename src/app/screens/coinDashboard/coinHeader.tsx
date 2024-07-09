@@ -1,6 +1,8 @@
 import ArrowDown from '@assets/img/dashboard/arrow_down.svg';
 import ArrowUp from '@assets/img/dashboard/arrow_up.svg';
 import Buy from '@assets/img/dashboard/black_plus.svg';
+import List from '@assets/img/dashboard/list.svg';
+import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import Lock from '@assets/img/transactions/Lock.svg';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
@@ -9,163 +11,51 @@ import TokenImage from '@components/tokenImage';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useHasFeature from '@hooks/useHasFeature';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  currencySymbolMap,
+  FeatureId,
   FungibleToken,
+  currencySymbolMap,
+  getFiatEquivalent,
   microstacksToStx,
-  satsToBtc,
 } from '@secretkeylabs/xverse-core';
 import { CurrencyTypes } from '@utils/constants';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
-import { getFtBalance, getFtTicker } from '@utils/tokens';
+import { getBalanceAmount, getFtTicker } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import {
+  AvailableStxContainer,
+  BalanceInfoContainer,
+  BalanceTitleText,
+  BalanceValuesContainer,
+  CoinBalanceText,
+  Container,
+  FiatAmountText,
+  HeaderSeparator,
+  LockedStxContainer,
+  ProtocolText,
+  RowButtonContainer,
+  RowContainer,
+  StacksLockedInfoText,
+  StxLockedText,
+  VerifyButtonContainer,
+  VerifyOrViewContainer,
+} from './coinHeader.styled';
 
-interface CoinBalanceProps {
-  coin: CurrencyTypes;
+type Props = {
+  currency: CurrencyTypes;
   fungibleToken?: FungibleToken;
-}
+};
 
-const Container = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-}));
-
-const RowContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-});
-
-const ProtocolText = styled.p((props) => ({
-  ...props.theme.headline_category_s,
-  fontWeight: 700,
-  height: 15,
-  marginTop: props.theme.spacing(3),
-  textTransform: 'uppercase',
-  marginLeft: props.theme.spacing(2),
-  backgroundColor: props.theme.colors.white_400,
-  padding: '1px 6px 1px',
-  color: props.theme.colors.elevation0,
-  borderRadius: props.theme.radius(2),
-}));
-
-const BalanceInfoContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-});
-
-const BalanceValuesContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-});
-
-const CoinBalanceText = styled.p((props) => ({
-  ...props.theme.headline_l,
-  fontSize: '1.5rem',
-  color: props.theme.colors.white_0,
-  textAlign: 'center',
-  wordBreak: 'break-all',
-}));
-
-const FiatAmountText = styled.p((props) => ({
-  ...props.theme.headline_category_s,
-  color: props.theme.colors.white_200,
-  fontSize: '0.875rem',
-  marginTop: props.theme.spacing(2),
-  textAlign: 'center',
-}));
-
-const BalanceTitleText = styled.p((props) => ({
-  ...props.theme.body_medium_m,
-  color: props.theme.colors.white_400,
-  textAlign: 'center',
-  marginTop: props.theme.spacing(4),
-}));
-
-const RowButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  marginTop: props.theme.spacing(11),
-}));
-
-const ButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  position: 'relative',
-  marginRight: props.theme.spacing(12),
-}));
-
-const RecieveButtonContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-});
-
-const HeaderSeparator = styled.div((props) => ({
-  border: `0.5px solid ${props.theme.colors.white_400}`,
-  width: '50%',
-  alignSelf: 'center',
-  marginTop: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(8),
-}));
-
-const StxLockedText = styled.p((props) => ({
-  ...props.theme.body_medium_m,
-}));
-
-const LockedStxContainer = styled.div((props) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  span: {
-    color: props.theme.colors.white_400,
-    marginRight: props.theme.spacing(3),
-  },
-  img: {
-    marginRight: props.theme.spacing(3),
-  },
-}));
-
-const AvailableStxContainer = styled.div((props) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  marginTop: props.theme.spacing(4),
-  span: {
-    color: props.theme.colors.white_400,
-    marginRight: props.theme.spacing(3),
-  },
-}));
-
-const VerifyOrViewContainer = styled.div((props) => ({
-  margin: props.theme.spacing(8),
-  marginTop: props.theme.spacing(16),
-  marginBottom: props.theme.spacing(20),
-}));
-
-const VerifyButtonContainer = styled.div((props) => ({
-  marginBottom: props.theme.spacing(6),
-}));
-
-const StacksLockedInfoText = styled.span((props) => ({
-  ...props.theme.body_medium_m,
-  color: props.theme.colors.white_400,
-  textAlign: 'left',
-}));
-
-export default function CoinHeader(props: CoinBalanceProps) {
-  const { coin, fungibleToken } = props;
-  const { fiatCurrency, selectedAccount } = useWalletSelector();
+export default function CoinHeader({ currency, fungibleToken }: Props) {
+  const selectedAccount = useSelectedAccount();
+  const { fiatCurrency, network } = useWalletSelector();
   const { data: btcBalance } = useBtcWalletData();
   const { data: stxData } = useStxWalletData();
   const { btcFiatRate, stxBtcRate } = useCoinRates();
@@ -173,6 +63,15 @@ export default function CoinHeader(props: CoinBalanceProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const isReceivingAddressesVisible = !isLedgerAccount(selectedAccount);
+  const showSwaps =
+    useHasFeature(FeatureId.SWAPS) &&
+    currency === 'STX' &&
+    !isLedgerAccount(selectedAccount) &&
+    network.type !== 'Testnet';
+
+  const showRunesListing =
+    (useHasFeature(FeatureId.RUNES_LISTING) || process.env.NODE_ENV === 'development') &&
+    network.type === 'Mainnet';
 
   const handleReceiveModalOpen = () => {
     setOpenReceiveModal(true);
@@ -182,58 +81,18 @@ export default function CoinHeader(props: CoinBalanceProps) {
     setOpenReceiveModal(false);
   };
 
-  function getBalanceAmount() {
-    switch (coin) {
-      case 'STX':
-        return microstacksToStx(new BigNumber(stxData?.balance ?? 0)).toString();
-      case 'BTC':
-        return satsToBtc(new BigNumber(btcBalance ?? 0)).toString();
-      default:
-        return fungibleToken ? getFtBalance(fungibleToken) : '';
-    }
-  }
-
-  function getFtFiatEquivalent() {
-    if (fungibleToken?.tokenFiatRate) {
-      const balance = new BigNumber(getFtBalance(fungibleToken));
-      const rate = new BigNumber(fungibleToken.tokenFiatRate);
-      return balance.multipliedBy(rate).toFixed(2).toString();
-    }
-    return '';
-  }
-
   const getTokenTicker = () => {
-    if (coin === 'STX' || coin === 'BTC') {
-      return coin;
+    if (currency === 'STX' || currency === 'BTC') {
+      return currency;
     }
-    if (coin === 'FT' && fungibleToken) {
+    if (currency === 'FT' && fungibleToken) {
       return getFtTicker(fungibleToken);
     }
     return '';
   };
 
-  function getFiatEquivalent() {
-    switch (coin) {
-      case 'STX':
-        return microstacksToStx(new BigNumber(stxData?.balance ?? '0'))
-          .multipliedBy(new BigNumber(stxBtcRate))
-          .multipliedBy(new BigNumber(btcFiatRate))
-          .toFixed(2)
-          .toString();
-      case 'BTC':
-        return satsToBtc(new BigNumber(btcBalance ?? 0))
-          .multipliedBy(new BigNumber(btcFiatRate))
-          .toFixed(2)
-          .toString();
-      case 'FT':
-        return getFtFiatEquivalent();
-      default:
-        return '';
-    }
-  }
-
   const renderStackingBalances = () => {
-    if (!new BigNumber(stxData?.locked ?? 0).eq(0) && coin === 'STX') {
+    if (!new BigNumber(stxData?.locked ?? 0).eq(0) && currency === 'STX') {
       return (
         <>
           <HeaderSeparator />
@@ -264,78 +123,31 @@ export default function CoinHeader(props: CoinBalanceProps) {
   };
 
   const goToSendScreen = async () => {
-    if (isLedgerAccount(selectedAccount) && !isInOptions()) {
-      switch (coin) {
-        case 'BTC':
-          await chrome.tabs.create({
-            url: chrome.runtime.getURL('options.html#/send-btc'),
-          });
-          return;
-        case 'STX':
-          await chrome.tabs.create({
-            url: chrome.runtime.getURL('options.html#/send-stx'),
-          });
-          return;
-        default:
-          break;
-      }
+    let route = '';
+    if (currency === 'BTC' || currency === 'STX') {
+      route = `/send-${currency}`;
+    } else {
       switch (fungibleToken?.protocol) {
         case 'stacks':
-          await chrome.tabs.create({
-            url: chrome.runtime.getURL(
-              `options.html#/send-sip10?coinTicker=${fungibleToken?.ticker}`,
-            ),
-          });
-          return;
+          route = `/send-sip10?principal=${fungibleToken?.principal}`;
+          break;
         case 'brc-20':
-          // TODO replace with send-brc20-one-step route, when ledger support is ready
-          await chrome.tabs.create({
-            url: chrome.runtime.getURL(
-              `options.html#/send-brc20?coinTicker=${fungibleToken?.ticker}`,
-            ),
-          });
-          return;
+          route = `/send-brc20-one-step?principal=${fungibleToken?.principal}`;
+          break;
         case 'runes':
-          await chrome.tabs.create({
-            url: chrome.runtime.getURL(`options.html#/send-rune?coinTicker=${fungibleToken?.name}`),
-          });
-          return;
+          route = `/send-rune?principal=${fungibleToken?.principal}`;
+          break;
         default:
           break;
       }
     }
-    switch (coin) {
-      case 'BTC':
-      case 'STX':
-        navigate(`/send-${coin}`);
-        break;
-      default:
-        break;
-    }
-    switch (fungibleToken?.protocol) {
-      case 'stacks':
-        navigate('/send-sip10', {
-          state: {
-            fungibleToken,
-          },
-        });
-        break;
-      case 'brc-20':
-        navigate('/send-brc20-one-step', {
-          state: {
-            fungibleToken,
-          },
-        });
-        break;
-      case 'runes':
-        navigate('/send-rune', {
-          state: {
-            fungibleToken,
-          },
-        });
-        break;
-      default:
-        break;
+
+    if (isLedgerAccount(selectedAccount) && !isInOptions()) {
+      await chrome.tabs.create({
+        url: chrome.runtime.getURL(`options.html#${route}`),
+      });
+    } else {
+      navigate(route);
     }
   };
 
@@ -343,53 +155,25 @@ export default function CoinHeader(props: CoinBalanceProps) {
     if (fungibleToken?.name) {
       return `${fungibleToken.name} ${t('BALANCE')}`;
     }
-    if (coin === 'STX') {
+
+    if (!currency) {
+      return '';
+    }
+
+    if (currency === 'STX') {
       return `Stacks ${t('BALANCE')}`;
     }
-    if (coin === 'BTC') {
+    if (currency === 'BTC') {
       return `Bitcoin ${t('BALANCE')}`;
     }
-    if (coin) {
-      return `${coin} ${t('BALANCE')}`;
-    }
-    return '';
+    return `${currency} ${t('BALANCE')}`;
   };
-
-  const verifyOrViewAddresses = (
-    <VerifyOrViewContainer>
-      <VerifyButtonContainer>
-        <ActionButton
-          text={t('VERIFY_ADDRESS_ON_LEDGER')}
-          onPress={async () => {
-            await chrome.tabs.create({
-              url: chrome.runtime.getURL(
-                `options.html#/verify-ledger?currency=${
-                  !fungibleToken ? coin : fungibleToken?.protocol === 'stacks' ? 'STX' : 'ORD'
-                }`,
-              ),
-            });
-          }}
-        />
-      </VerifyButtonContainer>
-      <ActionButton
-        transparent
-        text={t('VIEW_ADDRESS')}
-        onPress={() => {
-          navigate(
-            `/receive/${
-              !fungibleToken ? coin : fungibleToken?.protocol === 'stacks' ? 'STX' : 'ORD'
-            }`,
-          );
-        }}
-      />
-    </VerifyOrViewContainer>
-  );
 
   return (
     <Container>
       <BalanceInfoContainer>
         <TokenImage
-          currency={coin || undefined}
+          currency={currency || undefined}
           loading={false}
           fungibleToken={fungibleToken || undefined}
         />
@@ -405,7 +189,7 @@ export default function CoinHeader(props: CoinBalanceProps) {
         </RowContainer>
         <BalanceValuesContainer>
           <NumericFormat
-            value={getBalanceAmount()}
+            value={getBalanceAmount(currency, fungibleToken, stxData, btcBalance)}
             displayType="text"
             thousandSeparator
             renderText={(value: string) => (
@@ -413,10 +197,16 @@ export default function CoinHeader(props: CoinBalanceProps) {
             )}
           />
           <NumericFormat
-            value={getFiatEquivalent()}
+            value={getFiatEquivalent(
+              Number(getBalanceAmount(currency, fungibleToken, stxData, btcBalance)),
+              currency,
+              BigNumber(stxBtcRate),
+              BigNumber(btcFiatRate),
+              fungibleToken,
+            )}
             displayType="text"
             thousandSeparator
-            prefix={`${currencySymbolMap[fiatCurrency]} `}
+            prefix={`${currencySymbolMap[fiatCurrency]}`}
             suffix={` ${fiatCurrency}`}
             renderText={(value) => <FiatAmountText>{value}</FiatAmountText>}
           />
@@ -424,31 +214,9 @@ export default function CoinHeader(props: CoinBalanceProps) {
       </BalanceInfoContainer>
       {renderStackingBalances()}
       <RowButtonContainer>
-        {/* ENG-4020 - Disable BRC20 Sending on Ledger */}
-        {!(fungibleToken?.protocol === 'brc-20' && isLedgerAccount(selectedAccount)) && (
-          <ButtonContainer>
-            <SmallActionButton src={ArrowUp} text={t('SEND')} onPress={() => goToSendScreen()} />
-          </ButtonContainer>
-        )}
-        {!fungibleToken ? (
+        <SmallActionButton src={ArrowUp} text={t('SEND')} onPress={() => goToSendScreen()} />
+        {fungibleToken ? (
           <>
-            <ButtonContainer>
-              <SmallActionButton
-                src={ArrowDown}
-                text={t('RECEIVE')}
-                onPress={() => {
-                  if (isReceivingAddressesVisible) {
-                    navigate(`/receive/${coin}`);
-                  } else {
-                    handleReceiveModalOpen();
-                  }
-                }}
-              />
-            </ButtonContainer>
-            <SmallActionButton src={Buy} text={t('BUY')} onPress={() => navigate(`/buy/${coin}`)} />
-          </>
-        ) : (
-          <RecieveButtonContainer>
             <SmallActionButton
               src={ArrowDown}
               text={t('RECEIVE')}
@@ -457,16 +225,78 @@ export default function CoinHeader(props: CoinBalanceProps) {
                 navigate(`/receive/${fungibleToken?.protocol === 'stacks' ? 'STX' : 'ORD'}`)
               }
             />
-          </RecieveButtonContainer>
+            {showRunesListing && fungibleToken.protocol === 'runes' && (
+              <SmallActionButton
+                src={List}
+                text={t('LIST')}
+                onPress={() => navigate(`/list-rune/${fungibleToken.principal}`)}
+              />
+            )}
+          </>
+        ) : (
+          <>
+            <SmallActionButton
+              src={ArrowDown}
+              text={t('RECEIVE')}
+              onPress={() => {
+                if (isReceivingAddressesVisible) {
+                  navigate(`/receive/${currency}`);
+                } else {
+                  handleReceiveModalOpen();
+                }
+              }}
+            />
+            {showSwaps && (
+              <SmallActionButton
+                src={ArrowSwap}
+                text={t('SWAP')}
+                onPress={() => navigate(`/swap?from=${currency}`)}
+              />
+            )}
+            <SmallActionButton
+              src={Buy}
+              text={t('BUY')}
+              onPress={() => navigate(`/buy/${currency}`)}
+            />
+          </>
         )}
       </RowButtonContainer>
-
       <BottomModal
         visible={openReceiveModal}
         header={t('RECEIVE')}
         onClose={handleReceiveModalClose}
       >
-        {verifyOrViewAddresses}
+        <VerifyOrViewContainer>
+          <VerifyButtonContainer>
+            <ActionButton
+              text={t('VERIFY_ADDRESS_ON_LEDGER')}
+              onPress={async () => {
+                await chrome.tabs.create({
+                  url: chrome.runtime.getURL(
+                    `options.html#/verify-ledger?currency=${
+                      !fungibleToken
+                        ? currency
+                        : fungibleToken?.protocol === 'stacks'
+                        ? 'STX'
+                        : 'ORD'
+                    }`,
+                  ),
+                });
+              }}
+            />
+          </VerifyButtonContainer>
+          <ActionButton
+            transparent
+            text={t('VIEW_ADDRESS')}
+            onPress={() => {
+              navigate(
+                `/receive/${
+                  !fungibleToken ? currency : fungibleToken?.protocol === 'stacks' ? 'STX' : 'ORD'
+                }`,
+              );
+            }}
+          />
+        </VerifyOrViewContainer>
       </BottomModal>
     </Container>
   );

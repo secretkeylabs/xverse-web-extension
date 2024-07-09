@@ -1,7 +1,7 @@
 import useNftDetail from '@hooks/queries/useNftDetail';
 import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
 import useResetUserFlow from '@hooks/useResetUserFlow';
-import useWalletSelector from '@hooks/useWalletSelector';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import { GAMMA_URL } from '@utils/constants';
 import { getExplorerUrl, isInOptions, isLedgerAccount } from '@utils/helper';
 import { useMemo } from 'react';
@@ -9,7 +9,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 export default function useNftDetailScreen() {
   const navigate = useNavigate();
-  const { stxAddress, selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
   const { id } = useParams();
 
   const nftDetailQuery = useNftDetail(id!);
@@ -64,7 +64,7 @@ export default function useNftDetailScreen() {
     nft: nftDetailQuery.data,
     nftData: nftDetailQuery.data?.data,
     collection,
-    stxAddress,
+    stxAddress: selectedAccount.stxAddress,
     isLoading: nftDetailQuery.isLoading,
     isGalleryOpen,
     onSharePress,

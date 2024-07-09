@@ -1,5 +1,5 @@
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
-import useWalletSelector from '@hooks/useWalletSelector';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import { SwapConfirmationInput } from '@screens/swap/swapConfirmation/useConfirmSwap';
 import {
   buf2hex,
@@ -21,10 +21,10 @@ import { useStxCurrencyConversion } from './useStxCurrencyConversion';
 
 const isNotNull = <T extends any>(t: T | null | undefined): t is T => t != null;
 
-function updateOppositeCurrencyIfSameAsSelected(
+const updateOppositeCurrencyIfSameAsSelected = (
   state: SelectedCurrencyState,
-  { newCurrency, side },
-) {
+  { newCurrency, side }: { newCurrency: Currency; side: Side },
+) => {
   switch (side) {
     case 'from':
       if (state.to !== newCurrency) {
@@ -45,7 +45,7 @@ function updateOppositeCurrencyIfSameAsSelected(
     default:
       return state.to;
   }
-}
+};
 
 export const selectedTokenReducer: (
   state: SelectedCurrencyState,
@@ -75,7 +75,7 @@ export function useSwap(): UseSwap {
   const navigate = useNavigate();
   const alexSDK = useState(() => new AlexSDK())[0];
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
-  const { stxAddress, stxPublicKey } = useWalletSelector();
+  const { stxAddress, stxPublicKey } = useSelectedAccount();
   const { acceptableCoinList, currencyToToken } = useStxCurrencyConversion();
   const [userOverrideSponsorValue, setUserOverrideSponsorValue] = useState(true);
   const { data: stxPendingTxData } = useStxPendingTxData();

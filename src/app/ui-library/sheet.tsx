@@ -3,7 +3,22 @@ import { isInOptions } from '@utils/helper';
 import Modal from 'react-modal';
 import styled, { useTheme } from 'styled-components';
 
-const BottomModalTitleText = styled.h1((props) => ({
+export const CrossButton = styled.button`
+  background-color: transparent;
+  cursor: pointer;
+  display: flex;
+  transition: opacity 0.1s ease;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &:active {
+    opacity: 0.6;
+  }
+`;
+
+const Title = styled.h1((props) => ({
   ...props.theme.typography.body_bold_l,
   flex: 1,
 }));
@@ -16,13 +31,12 @@ const RowContainer = styled.div((props) => ({
   margin: props.theme.space.m,
 }));
 
-const ButtonImage = styled.button({
-  backgroundColor: 'transparent',
-});
-
 const CustomisedModal = styled(Modal)`
   overflow-y: auto;
   position: absolute;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 `;
 
 const BodyContainer = styled.div`
@@ -33,7 +47,7 @@ type Props = {
   title: string;
   visible: boolean;
   children: React.ReactNode;
-  onClose: () => void;
+  onClose?: () => void;
   overlayStylesOverriding?: {};
   contentStylesOverriding?: {};
   className?: string;
@@ -55,14 +69,14 @@ function Sheet({
     overlay: {
       backgroundColor: theme.colors.background.modalBackdrop,
       zIndex: 15000,
+      display: 'flex',
+      alignItems: isGalleryOpen ? 'center' : 'flex-end',
+      justifyContent: 'center',
       ...overlayStylesOverriding,
     },
     content: {
-      bottom: isGalleryOpen ? '50%' : '0',
-      left: isGalleryOpen ? '50%' : undefined,
-      transform: isGalleryOpen ? 'translateX(-50%) translateY(50%)' : undefined,
       width: '100vw',
-      maxWidth: isGalleryOpen ? 330 : 360,
+      maxWidth: 360,
       maxHeight: '90vh',
       border: 'transparent',
       background: theme.colors.elevation6_600,
@@ -87,10 +101,12 @@ function Sheet({
       className={className}
     >
       <RowContainer>
-        <BottomModalTitleText>{title}</BottomModalTitleText>
-        <ButtonImage onClick={onClose}>
-          <XCircle color={theme.colors.white_200} weight="fill" size="28" />
-        </ButtonImage>
+        <Title>{title}</Title>
+        {onClose && (
+          <CrossButton onClick={onClose}>
+            <XCircle color={theme.colors.white_200} weight="fill" size="28" />
+          </CrossButton>
+        )}
       </RowContainer>
       <BodyContainer>{children}</BodyContainer>
     </CustomisedModal>

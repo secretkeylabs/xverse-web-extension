@@ -4,11 +4,11 @@ import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/u
 import AlertMessage from '@components/alertMessage';
 import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionComponent';
 import InfoContainer from '@components/infoContainer';
+import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useBtcClient from '@hooks/useBtcClient';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
-import useWalletSelector from '@hooks/useWalletSelector';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import { Return, RpcErrorCode } from '@sats-connect/core';
 import {
   AnalyticsEvents,
@@ -28,7 +28,8 @@ import SendLayout from '../../layouts/sendLayout';
 function ConfirmBtcTransaction() {
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const { ordinalsAddress, btcAddress, selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { ordinalsAddress, btcAddress } = selectedAccount;
   const btcClient = useBtcClient();
   const [signedTx, setSignedTx] = useState<string>('');
   const [showOrdinalsDetectedAlert, setShowOrdinalsDetectedAlert] = useState(false);

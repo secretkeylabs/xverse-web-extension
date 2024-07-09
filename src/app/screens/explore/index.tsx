@@ -2,11 +2,13 @@ import FeaturedCardCarousel from '@components/explore/FeaturedCarousel';
 import RecommendedApps from '@components/explore/RecommendedApps';
 import SwiperNavigation from '@components/explore/SwiperNavigation';
 import BottomBar from '@components/tabBar';
+import Tabs from '@components/tabs';
 import useFeaturedDapps from '@hooks/useFeaturedDapps';
 import { ArrowsOut } from '@phosphor-icons/react';
 import { StyledHeading } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
 import { XVERSE_EXPLORE_URL } from '@utils/constants';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -64,6 +66,15 @@ function ExploreScreen() {
   const { data, isLoading } = useFeaturedDapps();
   const { featured, recommended } = data || {};
 
+  const categories = new Set(recommended?.map((r) => r.category!) || []);
+  const tabs = Array.from(categories).map((c: string) => ({
+    label: c,
+    value: c,
+  }));
+
+  const [activeTab, setActiveTab] = useState<string>(tabs[0]?.value || '');
+  const category = activeTab ? recommended?.filter((r) => r.category === activeTab) : recommended;
+
   return isLoading ? (
     <LoaderContainer>
       <Spinner color="white" size={30} />
@@ -81,8 +92,12 @@ function ExploreScreen() {
           <SwiperNavigation />
         </Subheader>
         {!!featured?.length && <FeaturedCardCarousel items={featured} />}
-        <Subheader>{t('RECOMMENDED')}</Subheader>
-        {!!recommended?.length && <RecommendedApps items={recommended} />}
+        {activeTab ? (
+          <Tabs tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />
+        ) : (
+          <Subheader>{t('RECOMMENDED')}</Subheader>
+        )}
+        {!!category?.length && <RecommendedApps items={category} />}
       </Container>
       <BottomBar tab="explore" />
     </>

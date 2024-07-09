@@ -1,11 +1,11 @@
 import useNetworkSelector from '@hooks/useNetwork';
-import useWalletSelector from '@hooks/useWalletSelector';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import { getNftCollections, StacksCollectionList } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import { handleRetries } from '@utils/query';
 
 const useStacksCollectibles = () => {
-  const { stxAddress } = useWalletSelector();
+  const { stxAddress } = useSelectedAccount();
   const selectedNetwork = useNetworkSelector();
 
   const fetchNftCollections = (): Promise<StacksCollectionList> =>

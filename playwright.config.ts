@@ -18,8 +18,11 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 1 : 0,
-  /* Opt out of 2 tests parallel on CI. */
-  workers: process.env.CI ? 2 : 1,
+  /* Opt to only 2 tests parallel on CI.
+   Note that you may want to change the non-ci amount to a lower number depending on
+   the specs of your computer or if the number of tests increases over time.
+  */
+  workers: process.env.CI ? 2 : 5,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: process.env.CI ? 'blob' : 'html',
   snapshotDir: './playwright-snapshots',

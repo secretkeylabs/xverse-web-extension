@@ -1,10 +1,10 @@
-import useBtcClient from '@hooks/useBtcClient';
+import useBtcClient from '@hooks/apiClients/useBtcClient';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import type { BtcAddressData } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
-import useWalletSelector from '../useWalletSelector';
 
-export const useBtcWalletData = () => {
-  const { btcAddress } = useWalletSelector();
+const useBtcWalletData = () => {
+  const { btcAddress } = useSelectedAccount();
   const btcClient = useBtcClient();
 
   const fetchBtcWalletData = async () => {

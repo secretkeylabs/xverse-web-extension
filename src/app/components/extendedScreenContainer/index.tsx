@@ -40,6 +40,11 @@ function ExtendedScreenContainer(): JSX.Element {
           <TestnetText>{t('SETTING_SCREEN.TESTNET')}</TestnetText>
         </TestnetContainer>
       )}
+      {network.type === 'Signet' && (
+        <TestnetContainer>
+          <TestnetText>{t('SETTING_SCREEN.SIGNET')}</TestnetText>
+        </TestnetContainer>
+      )}
       <Outlet />
     </ExtendedScreenRouteContainer>
   );

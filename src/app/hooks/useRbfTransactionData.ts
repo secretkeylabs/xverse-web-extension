@@ -17,8 +17,9 @@ import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import useBtcClient from './useBtcClient';
+import useBtcClient from './apiClients/useBtcClient';
 import useNetworkSelector from './useNetwork';
+import useSelectedAccount from './useSelectedAccount';
 import useWalletSelector from './useWalletSelector';
 
 // TODO: move the types and helper functions below to xverse-core
@@ -115,7 +116,8 @@ const sortFees = (fees: RbfRecommendedFees) =>
 const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransactionData): RbfData => {
   const [isLoading, setIsLoading] = useState(true);
   const [rbfData, setRbfData] = useState<RbfData>({});
-  const { accountType, network, selectedAccount, feeMultipliers } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { selectedAccountType, network, feeMultipliers } = useWalletSelector();
   const { data: stxData } = useStxWalletData();
   const btcClient = useBtcClient();
   const selectedNetwork = useNetworkSelector();
@@ -219,7 +221,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
 
       const rbfTx = new rbf.RbfTransaction(transaction, {
         ...selectedAccount,
-        accountType: accountType || 'software',
+        accountType: selectedAccountType || 'software',
         accountId:
           isLedgerAccount(selectedAccount) && selectedAccount.deviceAccountIndex
             ? selectedAccount.deviceAccountIndex
@@ -249,7 +251,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
   }, [
     selectedAccount,
     transaction,
-    accountType,
+    selectedAccountType,
     network.type,
     btcClient,
     fetchStxData,

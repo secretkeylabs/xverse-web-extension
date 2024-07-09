@@ -1,6 +1,7 @@
 import checkmarkBold from '@assets/img/checkmark-bold.svg';
 import React from 'react';
 import styled from 'styled-components';
+import Theme from 'theme';
 
 const Container = styled.div((props) => ({
   ...props.theme.typography.body_medium_m,
@@ -17,9 +18,9 @@ const Container = styled.div((props) => ({
   },
 }));
 
-const CheckboxInput = styled.input.attrs({ type: 'checkbox' })`
+const CheckboxInput = styled.input.attrs({ type: 'checkbox' })<{ $color: string }>`
   appearance: none;
-  border: 1.5px solid ${(props) => props.theme.colors.white_0};
+  border: 1.5px solid ${(props) => props.theme.colors[props.$color]};
   border-radius: 2px;
   width: 16px;
   height: 16px;
@@ -37,14 +38,21 @@ const CheckboxInput = styled.input.attrs({ type: 'checkbox' })`
 type Props = {
   checkboxId: string;
   text?: string;
-  defaultChecked?: boolean;
+  checked?: boolean;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  color?: keyof typeof Theme.colors;
 };
 
-export default function Checkbox({ checkboxId, text, defaultChecked = false, onChange }: Props) {
+export default function Checkbox({
+  checkboxId,
+  text,
+  checked = false,
+  onChange,
+  color = 'white_0',
+}: Props) {
   return (
     <Container>
-      <CheckboxInput id={checkboxId} defaultChecked={defaultChecked} onChange={onChange} />
+      <CheckboxInput id={checkboxId} checked={checked} onChange={onChange} $color={color} />
       {text && <label htmlFor={checkboxId}>{text}</label>}
     </Container>
   );

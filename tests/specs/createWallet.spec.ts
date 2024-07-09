@@ -3,21 +3,6 @@ import Landing from '../pages/landing';
 import Onboarding from '../pages/onboarding';
 import Wallet from '../pages/wallet';
 
-test.beforeEach(async ({ page, extensionId, context }) => {
-  await page.goto(`chrome-extension://${extensionId}/options.html#/landing`);
-  // TODO: this fixes a temporary issue with two tabs at the start see technical debt https://linear.app/xverseapp/issue/ENG-3992/two-tabs-open-instead-of-one-since-version-0323-for-start-extension
-  const pages = await context.pages();
-  if (pages.length === 2) {
-    await pages[1].close(); // pages[1] is the second (newest) page
-  }
-});
-test.afterEach(async ({ context }) => {
-  if (context.pages().length > 0) {
-    // Close the context only if there are open pages
-    await context.close();
-  }
-});
-
 const strongPW = Onboarding.generateSecurePasswordCrypto();
 const fs = require('fs');
 const path = require('path');
@@ -63,7 +48,7 @@ test.describe('Create and Restore Wallet Flow', () => {
 
       const filteredValues = buttonValues.filter((value) => value !== seedword);
       const randomValue = filteredValues[Math.floor(Math.random() * filteredValues.length)];
-      await page.locator(`button[value="${randomValue}"]`).click();
+      await page.locator(`button[value="${randomValue}"]`).first().click();
 
       // Check if error message is displayed when clicking the wrong seedword
       await expect(page.locator('p:has-text("This word is not")')).toBeVisible();
@@ -88,8 +73,7 @@ test.describe('Create and Restore Wallet Flow', () => {
       const newWallet = new Wallet(page);
       await newWallet.checkVisualsStartpage();
 
-      const balanceText = await newWallet.balance.innerText();
-      await expect(balanceText).toBe('$0.00');
+      await expect(newWallet.balance).toHaveText('$0.00');
 
       // TODO: find better selector for the receive button
       await newWallet.allupperButtons.nth(1).click();
@@ -97,15 +81,12 @@ test.describe('Create and Restore Wallet Flow', () => {
       // Get the addresses and save it in variables
       const addressBitcoin = await newWallet.getAddress(newWallet.buttonCopyBitcoinAddress);
       const addressOrdinals = await newWallet.getAddress(newWallet.buttonCopyOrdinalsAddress);
-      // Stack Address doesn't have the confirm message
-      await expect(newWallet.buttonCopyStacksAddress).toBeVisible();
-      await newWallet.buttonCopyStacksAddress.click();
-      const addressStack = await page.evaluate('navigator.clipboard.readText()');
+      const addressStack = await newWallet.getAddress(newWallet.buttonCopyStacksAddress, false);
 
       // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
       await page.reload();
       // click close for the modal window
-      // TODO find better locator for close button --> issue https://linear.app/xverseapp/issue/ENG-4039/adjust-id-or-add-titles-for-copy-address-button-for-receive-menu
+      // TODO: find better locator for close button --> issue https://linear.app/xverseapp/issue/ENG-4039/adjust-id-or-add-titles-for-copy-address-button-for-receive-menu
       // await expect(page.locator('button.sc-hceviv > svg')).toBeVisible();
       // await page.locator('button.sc-hceviv > svg').click();
 
@@ -134,12 +115,12 @@ test.describe('Create and Restore Wallet Flow', () => {
       await expect(landingpage.buttonRestoreWallet).toBeVisible();
       await landingpage.buttonRestoreWallet.click();
 
+      await context.waitForEvent('page');
+
       // Clicking on restore opens in this setup a new page for legal
       const newPage = await context.pages()[context.pages().length - 1];
       await expect(newPage.url()).toContain('legal');
-      // old page needs to be closed as the test is continuing in the new tab
-      const pages = await context.pages();
-      await pages[0].close(); // pages[0] is the first (oldest) page
+
       const onboardingpage2 = new Onboarding(newPage);
 
       await onboardingpage2.buttonAccept.click();
@@ -165,18 +146,18 @@ test.describe('Create and Restore Wallet Flow', () => {
       const newWallet = new Wallet(newPage);
       await newWallet.checkVisualsStartpage();
 
-      const balanceText = await newWallet.balance.innerText();
-      await expect(balanceText).toBe('$0.00');
+      const balanceText = newWallet.balance;
+      await await expect(balanceText).toHaveText('$0.00');
 
       await newWallet.allupperButtons.nth(1).click();
 
       // Get the Addresses
       const addressBitcoinCheck = await newWallet.getAddress(newWallet.buttonCopyBitcoinAddress);
       const addressOrdinalsCheck = await newWallet.getAddress(newWallet.buttonCopyOrdinalsAddress);
-      // Stack Address doesn't have the confirm message
-      await expect(newWallet.buttonCopyStacksAddress).toBeVisible();
-      await newWallet.buttonCopyStacksAddress.click();
-      const addressStackCheck = await newPage.evaluate('navigator.clipboard.readText()');
+      const addressStackCheck = await newWallet.getAddress(
+        newWallet.buttonCopyStacksAddress,
+        false,
+      );
 
       // Read and parse the file
       const rawData = fs.readFileSync(filePathAddresses, 'utf8');

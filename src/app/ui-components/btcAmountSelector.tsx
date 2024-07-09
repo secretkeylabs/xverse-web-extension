@@ -195,13 +195,14 @@ function AmountSelector({
             <ArrowsDownUp size={16} weight="fill" />
           </ConvertComplication>
           <VertRule />
-          <MaxButton $sendMax={sendMax} disabled={disabled} onClick={handleMaxClick}>
+          <MaxButton disabled={sendMax || disabled} onClick={handleMaxClick}>
             MAX
           </MaxButton>
         </>
       }
       disabled={disabled}
       hideClear
+      autoFocus
     />
   );
 }

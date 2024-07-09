@@ -1,7 +1,7 @@
 {
   "name": "xverse-web-extension",
   "description": "A Bitcoin wallet for Web3",
-  "version": "0.36.1",
+  "version": "0.38.1",
   "private": true,
   "engines": {
     "node": "^18.18.2"
@@ -14,11 +14,14 @@
     "test": "vitest ./src",
     "style": "prettier --write \"src/**/*.{ts,tsx}\"",
     "prepare": "husky install",
-    "e2etest": "npx playwright test",
+    "e2etest": "npx playwright test -g \"\" --grep-invert \"#localexecution\"",
     "e2etest:ui": "npx playwright test --ui",
-    "smoketest": "npx playwright test --grep \"#smoketest\"",
+    "e2etest:smoketest": "npx playwright test --grep \"#smoketest\"",
+    "e2etest:skipped": "npx playwright test --grep \"#localexecution\"",
     "e2etest:report": "playwright show-report",
-    "find-deadcode": "ts-prune"
+    "find-deadcode": "ts-prune -p tsconfig.tsPrune.json",
+    "ts-check": "tsc --noEmit",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx --quiet"
   },
   "overrides": {
     "buffer": "6.0.3"
@@ -35,13 +38,14 @@
     ]
   },
   "dependencies": {
+    "@aryzing/superqs": "0.0.6",
     "@ledgerhq/hw-transport-webusb": "^6.27.13",
     "@phosphor-icons/react": "^2.0.10",
     "@playwright/test": "^1.43.1",
     "@react-spring/web": "^9.6.1",
-    "@sats-connect/core": "0.0.9",
+    "@sats-connect/core": "0.0.14",
     "@scure/btc-signer": "1.2.1",
-    "@secretkeylabs/xverse-core": "13.7.1",
+    "@secretkeylabs/xverse-core": "17.1.1",
     "@stacks/connect": "7.4.1",
     "@stacks/stacks-blockchain-api-types": "6.1.1",
     "@stacks/transactions": "6.13.1",
@@ -54,6 +58,7 @@
     "@testing-library/user-event": "^13.5.0",
     "alex-sdk": "0.1.26",
     "argon2-browser": "^1.18.0",
+    "async-mutex": "^0.5.0",
     "axios": "1.7.0",
     "bignumber.js": "^9.1.0",
     "bip39": "^3.0.3",
@@ -101,6 +106,7 @@
     "superjson": "2.2.1",
     "swiper": "11.0.6",
     "ts-transformer-keys": "0.4.4",
+    "valibot": "0.33.2",
     "valid-url": "^1.0.9",
     "webextension-polyfill": "^0.10.0",
     "zod": "3.22.4",
@@ -135,7 +141,7 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-jsx-a11y": "^6.6.1",
     "eslint-plugin-no-inline-styles": "^1.0.5",
-    "eslint-plugin-playwright": "^1.5.4",
+    "eslint-plugin-playwright": "^1.6.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-react": "^7.31.8",
     "eslint-plugin-react-hooks": "^4.6.0",
@@ -161,6 +167,7 @@
     "type-fest": "^2.19.0",
     "typescript": "^5.0.0",
     "typescript-plugin-styled-components": "^3.0.0",
+    "vite-tsconfig-paths": "4.3.2",
     "vitest": "^0.34.6",
     "webpack": "^5.89.0",
     "webpack-cli": "^4.0.0",

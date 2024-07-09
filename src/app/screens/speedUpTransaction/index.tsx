@@ -8,9 +8,9 @@ import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import SpeedUpBtcTransaction from '@components/speedUpTransaction/btc';
 import SpeedUpStxTransaction from '@components/speedUpTransaction/stx';
 import TopRow from '@components/topRow';
+import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useTransaction from '@hooks/queries/useTransaction';
-import useBtcClient from '@hooks/useBtcClient';
 import useNetworkSelector from '@hooks/useNetwork';
 import useRbfTransactionData, {
   getLatestNonce,
@@ -18,6 +18,7 @@ import useRbfTransactionData, {
   isBtcTransaction,
 } from '@hooks/useRbfTransactionData';
 import useSeedVault from '@hooks/useSeedVault';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { CarProfile, Lightning, RocketLaunch, ShootingStar } from '@phosphor-icons/react';
@@ -48,7 +49,8 @@ function SpeedUpTransactionScreen() {
   const navigate = useNavigate();
 
   const [showCustomFee, setShowCustomFee] = useState(false);
-  const { selectedAccount, stxAddress, network } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { network } = useWalletSelector();
   const { data: stxData } = useStxWalletData();
   const { id } = useParams();
   const location = useLocation();
@@ -143,7 +145,7 @@ function SpeedUpTransactionScreen() {
   };
 
   const signAndBroadcastStxTx = async (transport?: TransportType) => {
-    if (!feeRateInput || !selectedAccount) {
+    if (!feeRateInput) {
       return;
     }
 
@@ -154,7 +156,7 @@ function SpeedUpTransactionScreen() {
       const unsignedTx: StacksTransaction = deserializeTransaction(txRaw);
 
       // check if the transaction exists in microblock
-      const latestNonceData = await getLatestNonce(stxAddress, network);
+      const latestNonceData = await getLatestNonce(selectedAccount.stxAddress, network);
       if (stxTransaction.nonce > latestNonceData.last_executed_tx_nonce) {
         unsignedTx.setFee(BigInt(fee));
         unsignedTx.setNonce(BigInt(stxTransaction.nonce));
@@ -237,7 +239,7 @@ function SpeedUpTransactionScreen() {
   };
 
   const handleClickSubmit = async () => {
-    if (!selectedAccount || (!btcTransaction && !stxTransaction)) {
+    if (!btcTransaction && !stxTransaction) {
       return;
     }
 
@@ -250,11 +252,6 @@ function SpeedUpTransactionScreen() {
   };
 
   const handleConnectAndConfirm = async () => {
-    if (!selectedAccount) {
-      console.error('No account selected');
-      return;
-    }
-
     setIsLedgerConnectButtonDisabled(true);
     const transport = await Transport.create();
     if (!transport) {

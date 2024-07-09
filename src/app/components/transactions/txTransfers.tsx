@@ -1,7 +1,7 @@
 import ReceiveIcon from '@assets/img/transactions/received.svg';
 import SendIcon from '@assets/img/transactions/sent.svg';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
-import useWalletSelector from '@hooks/useWalletSelector';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import { microstacksToStx } from '@secretkeylabs/xverse-core';
 import { AddressTransactionWithTransfers } from '@stacks/stacks-blockchain-api-types';
 import { CurrencyTypes } from '@utils/constants';
@@ -59,7 +59,7 @@ interface TxTransfersProps {
 
 export default function TxTransfers(props: TxTransfersProps) {
   const { transaction, coin, txFilter } = props;
-  const { selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
   const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
 

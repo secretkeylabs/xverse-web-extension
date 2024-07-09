@@ -1,5 +1,5 @@
-import ActionButton from '@components/button';
 import { animated, easings, useSpring } from '@react-spring/web';
+import Button from '@ui-library/button';
 import { StyledHeading, StyledP, VerticalStackButtonContainer } from '@ui-library/common.styled';
 import className from 'classnames';
 import { useState } from 'react';
@@ -23,6 +23,7 @@ const Container = styled.div`
   padding-top: ${(props) => props.theme.spacing(68)}px;
   position: relative;
   height: 100%;
+  min-height: 600px;
 `;
 
 const CenterAlignContainer = styled.div`
@@ -169,12 +170,12 @@ export function LoadingTransactionStatus({
       </CenterAlignContainer>
       <BottomFixedContainer className={visibleClass}>
         <VerticalStackButtonContainer>
-          <ActionButton text={primaryAction.text} onPress={primaryAction.onPress} />
+          <Button title={primaryAction.text} onClick={primaryAction.onPress} />
           {secondaryAction && status === 'SUCCESS' && (
-            <ActionButton
-              text={secondaryAction.text}
-              onPress={secondaryAction.onPress}
-              transparent
+            <Button
+              title={secondaryAction.text}
+              onClick={secondaryAction.onPress}
+              variant="tertiary"
             />
           )}
         </VerticalStackButtonContainer>

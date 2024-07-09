@@ -9,10 +9,10 @@ import RequestsRoutes from '@common/utils/route-urls';
 import { RpcErrorCode } from '@sats-connect/core';
 import { makeRPCError } from '../../helpers';
 import {
-  sendInvalidParametersMessage,
+  sendInvalidParametersResponseMessage,
   sendInvalidStacksTransactionMessage,
   sendMissingParametersMessage,
-} from '../rpcResponseMessages';
+} from '../../responseMessages/errors';
 import paramsSchema from './paramsSchema';
 import { isValidStacksTransaction } from './utils';
 
@@ -27,7 +27,7 @@ async function signTransaction(
 
   const paramsParseResult = paramsSchema.safeParse(message.params);
   if (!paramsParseResult.success) {
-    sendInvalidParametersMessage({
+    sendInvalidParametersResponseMessage({
       tabId: getTabIdFromPort(port),
       messageId: message.id,
       error: paramsParseResult.error,

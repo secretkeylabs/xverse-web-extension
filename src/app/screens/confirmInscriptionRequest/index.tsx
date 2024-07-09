@@ -9,12 +9,13 @@ import TopRow from '@components/topRow';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import TransactionSettingAlert from '@components/transactionSetting';
 import TransferFeeView from '@components/transferFeeView';
+import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useCoinRates from '@hooks/queries/useCoinRates';
-import useBtcClient from '@hooks/useBtcClient';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSeedVault from '@hooks/useSeedVault';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Brc20Tile from '@screens/ordinals/brc20Tile';
 import CollapsableContainer from '@screens/signatureRequest/collapsableContainer';
@@ -157,7 +158,8 @@ function ConfirmInscriptionRequest() {
     brcContent,
     feePerVByte,
   } = location.state;
-  const { btcAddress, network, selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { network } = useWalletSelector();
   const { btcFiatRate } = useCoinRates();
   const { getSeed } = useSeedVault();
   const btcClient = useBtcClient();
@@ -169,7 +171,7 @@ function ConfirmInscriptionRequest() {
   const [currentFeeRate, setCurrentFeeRate] = useState(feePerVByte);
   const [showFeeSettings, setShowFeeSettings] = useState(false);
   const { refetch } = useBtcWalletData();
-  const { ordinals: ordinalsInBtc } = useOrdinalsByAddress(btcAddress);
+  const { ordinals: ordinalsInBtc } = useOrdinalsByAddress(selectedAccount.btcAddress);
 
   const content = useMemo(() => textContent && JSON.parse(textContent), [textContent]);
 
@@ -214,7 +216,7 @@ function ConfirmInscriptionRequest() {
     mutationFn: async ({ recipients, txFee, seedPhrase }) =>
       signBtcTransaction(
         recipients,
-        btcAddress,
+        selectedAccount.btcAddress,
         selectedAccount?.id ?? 0,
         seedPhrase,
         btcClient,

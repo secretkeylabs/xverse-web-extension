@@ -48,15 +48,16 @@ const GridItemContainer = styled.button`
   width: 100%;
 `;
 
-interface Props {
+type Props = {
   item?: Inscription | NonFungibleToken;
   itemId?: string;
   itemSubText?: string;
   itemSubTextColor?: Color;
   children: ReactNode;
   onClick?: (item: Inscription | NonFungibleToken) => void;
-}
-export function CollectibleCollectionGridItem({
+};
+
+function CollectibleCollectionGridItem({
   item,
   itemId,
   itemSubText,
@@ -72,7 +73,7 @@ export function CollectibleCollectionGridItem({
       : undefined;
 
   return (
-    <GridItemContainer onClick={handleOnClick}>
+    <GridItemContainer data-testid="collection-item" onClick={handleOnClick}>
       <ImageContainer>{children}</ImageContainer>
       <InfoContainer>
         <StyledItemId typography="body_bold_m" color="white_0">

@@ -7,21 +7,6 @@ import Wallet from '../pages/wallet';
 const strongPW = Onboarding.generateSecurePasswordCrypto();
 
 test.describe('onboarding flow', () => {
-  test.beforeEach(async ({ page, extensionId, context }) => {
-    await page.goto(`chrome-extension://${extensionId}/options.html#/landing`);
-    // TODO: this fixes a temporary issue with two tabs at the start see technical debt https://linear.app/xverseapp/issue/ENG-3992/two-tabs-open-instead-of-one-since-version-0323-for-start-extension
-    const pages = await context.pages();
-    if (pages.length === 2) {
-      await pages[1].close(); // pages[1] is the second (newest) page
-    }
-  });
-  test.afterEach(async ({ context }) => {
-    if (context.pages().length > 0) {
-      // Close the context only if there are open pages
-      await context.close();
-    }
-  });
-
   test('visual check legal page', async ({ page, context, extensionId }) => {
     const onboardingpage = new Onboarding(page);
     // Skip Landing and go directly to legal via URL
@@ -186,6 +171,7 @@ test.describe('onboarding flow', () => {
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.checkVisualsStartpage();
     await expect(wallet.buttonMenu).toBeVisible();
     await wallet.buttonMenu.click();
     await expect(wallet.buttonLock).toBeVisible();

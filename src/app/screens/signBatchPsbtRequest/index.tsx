@@ -16,6 +16,7 @@ import LoadingTransactionStatus from '@components/loadingTransactionStatus';
 import { ConfirmationStatus } from '@components/loadingTransactionStatus/circularSvgAnimation';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useHasFeature from '@hooks/useHasFeature';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useSignBatchPsbtTx from '@hooks/useSignBatchPsbtTx';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useTransactionContext from '@hooks/useTransactionContext';
@@ -24,6 +25,7 @@ import { ArrowLeft, ArrowRight } from '@phosphor-icons/react';
 import { SignMultiplePsbtPayload } from '@sats-connect/core';
 import {
   AnalyticsEvents,
+  FeatureId,
   RuneSummary,
   btcTransaction,
   parseSummaryForRunes,
@@ -135,7 +137,8 @@ interface TxResponse {
 type PsbtSummary = Awaited<ReturnType<btcTransaction.EnhancedPsbt['getSummary']>>;
 
 function SignBatchPsbtRequest() {
-  const { btcAddress, ordinalsAddress, selectedAccount, network } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { network } = useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { payload, confirmSignPsbt, cancelSignPsbt, requestToken } = useSignBatchPsbtTx();
@@ -152,7 +155,7 @@ function SignBatchPsbtRequest() {
   const [inscriptionToShow, setInscriptionToShow] = useState<
     btcTransaction.IOInscription | undefined
   >(undefined);
-  const hasRunesSupport = useHasFeature('RUNES_SUPPORT');
+  const hasRunesSupport = useHasFeature(FeatureId.RUNES_SUPPORT);
   useTrackMixPanelPageViewed();
 
   const [parsedPsbts, setParsedPsbts] = useState<
@@ -198,7 +201,10 @@ function SignBatchPsbtRequest() {
   }, [payload.psbts.length, handlePsbtParsing]);
 
   const checkAddressMismatch = (input) => {
-    if (input.address !== btcAddress && input.address !== ordinalsAddress) {
+    if (
+      input.address !== selectedAccount.btcAddress &&
+      input.address !== selectedAccount.ordinalsAddress
+    ) {
       navigate('/tx-status', {
         state: {
           txid: '',
@@ -258,7 +264,7 @@ function SignBatchPsbtRequest() {
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
         protocol: 'bitcoin',
         action: 'sign-psbt',
-        wallet_type: selectedAccount?.accountType || 'software',
+        wallet_type: selectedAccount.accountType || 'software',
         batch: payload.psbts.length,
       });
 
@@ -310,8 +316,8 @@ function SignBatchPsbtRequest() {
               getNetAmount({
                 inputs: psbt.summary.inputs,
                 outputs: psbt.summary.outputs,
-                btcAddress,
-                ordinalsAddress,
+                btcAddress: selectedAccount.btcAddress,
+                ordinalsAddress: selectedAccount.ordinalsAddress,
               }),
             ),
           )

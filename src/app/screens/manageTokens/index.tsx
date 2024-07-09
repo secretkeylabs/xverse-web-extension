@@ -4,14 +4,15 @@ import OptionsDialog from '@components/optionsDialog/optionsDialog';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import { useGetBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
-import { useGetRuneFungibleTokens } from '@hooks/queries/runes/useGetRuneFungibleTokens';
+import { useRuneFungibleTokensQuery } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
 import { useGetSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useHasFeature from '@hooks/useHasFeature';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Eye, EyeSlash } from '@phosphor-icons/react';
 import CoinItem from '@screens/manageTokens/coinItem';
-import { FungibleToken, FungibleTokenProtocol } from '@secretkeylabs/xverse-core';
+import { FeatureId, FungibleToken, FungibleTokenProtocol } from '@secretkeylabs/xverse-core';
 import {
   setBrc20ManageTokensAction,
   setRunesManageTokensAction,
@@ -155,21 +156,17 @@ function Stacks() {
 function ManageTokens() {
   const { t } = useTranslation('translation', { keyPrefix: 'TOKEN_SCREEN' });
 
-  const {
-    sip10ManageTokens,
-    brc20ManageTokens,
-    runesManageTokens,
-    selectedAccount,
-    showSpamTokens,
-  } = useWalletSelector();
-  const { data: runesList, isError: runeError } = useGetRuneFungibleTokens();
+  const selectedAccount = useSelectedAccount();
+  const { sip10ManageTokens, brc20ManageTokens, runesManageTokens, showSpamTokens } =
+    useWalletSelector();
+  const { data: runesList, isError: runeError } = useRuneFungibleTokensQuery();
   const { data: sip10List, isError: sip10Error } = useGetSip10FungibleTokens();
   const { data: brc20List, isError: brc20Error } = useGetBrc20FungibleTokens();
 
   const [selectedProtocol, setSelectedProtocol] = useState<FungibleTokenProtocol>(
     selectedAccount?.stxAddress ? 'stacks' : 'brc-20',
   );
-  const showRunes = useHasFeature('RUNES_SUPPORT');
+  const showRunes = useHasFeature(FeatureId.RUNES_SUPPORT);
   const [showOptionsDialog, setShowOptionsDialog] = useState(false);
 
   const [optionsDialogIndents, setOptionsDialogIndents] = useState<

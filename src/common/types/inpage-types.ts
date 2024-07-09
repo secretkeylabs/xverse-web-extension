@@ -1,5 +1,3 @@
-import { RpcBase } from '@sats-connect/core';
-
 /**
  * Inpage Script (Stacks Provider / BitcoinProvider) <-> Content Script
  */
@@ -77,8 +75,3 @@ export interface CreateRepeatInscriptionsEventDetails {
 }
 
 export type CreateRepeatInscriptionsEvent = CustomEvent<CreateRepeatInscriptionsEventDetails>;
-
-export interface RpcRequest<T extends string, U> extends RpcBase {
-  method: T;
-  params: U;
-}

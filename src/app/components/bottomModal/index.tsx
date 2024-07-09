@@ -28,7 +28,7 @@ const CustomisedModal = styled(Modal)`
   position: absolute;
 `;
 
-interface Props {
+type Props = {
   header: string;
   visible: boolean;
   children: React.ReactNode;
@@ -36,7 +36,7 @@ interface Props {
   overlayStylesOverriding?: {};
   contentStylesOverriding?: {};
   className?: string;
-}
+};
 
 function BottomModal({
   header,

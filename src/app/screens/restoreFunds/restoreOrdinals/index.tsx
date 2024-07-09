@@ -1,10 +1,11 @@
 import ActionButton from '@components/button';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useCoinRates from '@hooks/queries/useCoinRates';
-import useBtcClient from '@hooks/useBtcClient';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import useSeedVault from '@hooks/useSeedVault';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   BtcOrdinal,
@@ -65,7 +66,9 @@ const ButtonContainer = styled.div({
 
 function RestoreOrdinals() {
   const { t } = useTranslation('translation');
-  const { network, ordinalsAddress, btcAddress, selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { ordinalsAddress, btcAddress } = selectedAccount;
+  const { network } = useWalletSelector();
   const { btcFiatRate } = useCoinRates();
   const { getSeed } = useSeedVault();
   const navigate = useNavigate();

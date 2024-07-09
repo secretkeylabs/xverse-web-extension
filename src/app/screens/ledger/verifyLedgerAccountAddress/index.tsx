@@ -27,6 +27,7 @@ import useResetUserFlow from '@hooks/useResetUserFlow';
 import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
 import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
 
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import {
   ActionButtonContainer,
   ActionButtonsContainer,
@@ -58,7 +59,7 @@ function VerifyLedger(): JSX.Element {
   const [isConnectFailed, setIsConnectFailed] = useState(false);
   const [isBtcAddressRejected, setIsBtcAddressRejected] = useState(false);
   const [isOrdinalsAddressRejected, setIsOrdinalsAddressRejected] = useState(false);
-  const { selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
   const [isWrongDevice, setIsWrongDevice] = useState(false);
   const { search } = useLocation();
   const params = new URLSearchParams(search);

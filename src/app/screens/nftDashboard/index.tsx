@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import CollectiblesTabs from './collectiblesTabs';
 import ReceiveNftModal from './receiveNft';
-import { useNftDashboard } from './useNftDashboard';
+import useNftDashboard from './useNftDashboard';
 
 const Container = styled.div`
   display: flex;
@@ -122,7 +122,7 @@ function NftDashboard() {
             </StyledHeading>
             {!isGalleryOpen && <StyledWebGalleryButton onClick={openInGalleryView} />}
           </CollectibleContainer>
-          <ButtonContainer>
+          <ButtonContainer data-testid="receive-button">
             <ReceiveButtonContainer>
               <ActionButton
                 icon={<ArrowDown weight="bold" size={16} />}

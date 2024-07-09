@@ -44,11 +44,7 @@ const StyledItemSub = styled(StyledP)`
   width: 100%;
 `;
 
-export function InscriptionsTabGridItem({
-  item: collection,
-}: {
-  item: InscriptionCollectionsData;
-}) {
+function InscriptionsTabGridItem({ item: collection }: { item: InscriptionCollectionsData }) {
   const navigate = useNavigate();
 
   const handleClickCollectionId = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -65,8 +61,9 @@ export function InscriptionsTabGridItem({
   const itemSubText = getInscriptionsTabGridItemSubText(collection);
 
   return (
-    <CollectionContainer>
+    <CollectionContainer data-testid="collection-container">
       <ThumbnailContainer
+        data-testid="inscription-container"
         type="button"
         value={getCollectionKey(collection)}
         onClick={isCollection(collection) ? handleClickCollectionId : handleClickInscriptionId}
@@ -82,14 +79,19 @@ export function InscriptionsTabGridItem({
         )}
       </ThumbnailContainer>
       <InfoContainer>
-        <StyledItemId typography="body_bold_m" color="white_0">
+        <StyledItemId data-testid="inscription-name" typography="body_bold_m" color="white_0">
           {itemId}
         </StyledItemId>
-        <StyledItemSub typography="body_medium_m" color="white_400">
+        <StyledItemSub
+          data-testid="inscription-amount"
+          typography="body_medium_m"
+          color="white_400"
+        >
           {itemSubText}
         </StyledItemSub>
       </InfoContainer>
     </CollectionContainer>
   );
 }
+
 export default InscriptionsTabGridItem;

@@ -10,19 +10,22 @@ import useNftDetail from '@hooks/queries/useNftDetail';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import NftImage from '@screens/nftDashboard/nftImage';
 import {
   AnalyticsEvents,
   StacksTransaction,
   broadcastSignedTransaction,
+  microstacksToStx,
+  stxToMicrostacks,
 } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
@@ -70,7 +73,8 @@ const ReviewTransactionText = styled.h1((props) => ({
 function ConfirmNftTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
-  const { selectedAccount } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const [fee, setFee] = useState<BigNumber>();
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
@@ -177,6 +181,10 @@ function ConfirmNftTransaction() {
           onCancelClick={handleOnCancelClick}
           isAsset
           skipModal={isLedgerAccount(selectedAccount)}
+          fee={fee ? microstacksToStx(fee).toString() : undefined}
+          setFeeRate={(feeRate: string) => {
+            setFee(stxToMicrostacks(new BigNumber(feeRate)));
+          }}
         >
           <Container>
             <NftContainer>

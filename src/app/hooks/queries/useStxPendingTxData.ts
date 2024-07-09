@@ -1,11 +1,10 @@
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import { fetchStxPendingTxData, StxPendingTxData } from '@secretkeylabs/xverse-core';
-import { StoreState } from '@stores/index';
 import { useQuery } from '@tanstack/react-query';
-import { useSelector } from 'react-redux';
 import useNetworkSelector from '../useNetwork';
 
 const useStxPendingTxData = () => {
-  const { stxAddress } = useSelector((state: StoreState) => state.walletState);
+  const { stxAddress } = useSelectedAccount();
   const selectedNetwork = useNetworkSelector();
   const result = useQuery({
     queryKey: ['stx-pending-transaction', { stxAddress, selectedNetwork }],

@@ -4,36 +4,20 @@ import Wallet from '../pages/wallet';
 
 const BTCMain = '3HEcJNAry4C8raqvM4cCPKbZpivTon7hMY';
 const BTCTest = '2MySeYxLrpGg47oqZGJUGBu53cVSy7WKGWf';
-const selfBTCTest = '2NBNBKm81AkZzufdBAmSPGECqjM5hR9AAH3';
 
-// TODO add API_TIMEOUT_MILLI for timeout --> needs invetigation as playwright itself didn't accept the import of the module
+// TODO: add API_TIMEOUT_MILLI for timeout --> needs invetigation as playwright itself didn't accept the import of the module
 
 const strongPW = Onboarding.generateSecurePasswordCrypto();
 const amountBTCSend = 0.000001;
 
 test.describe('Transaction BTC', () => {
-  test.beforeEach(async ({ page, extensionId, context }) => {
-    await page.goto(`chrome-extension://${extensionId}/options.html#/landing`);
-    // TODO: this fixes a temporary issue with two tabs at the start see technical debt https://linear.app/xverseapp/issue/ENG-3992/two-tabs-open-instead-of-one-since-version-0323-for-start-extension
-    const pages = await context.pages();
-    if (pages.length === 2) {
-      await pages[1].close(); // pages[1] is the second (newest) page
-    }
-  });
-  test.afterEach(async ({ context }) => {
-    if (context.pages().length > 0) {
-      // Close the context only if there are open pages
-      await context.close();
-    }
-  });
-
   test('Send BTC Page Visual Check without funds Mainnet', async ({ page, extensionId }) => {
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
 
-    await onboardingpage.restoreWallet(strongPW, 'SEED_WORDS1');
+    await onboardingpage.restoreWallet(strongPW, 'SEED_WORDS2');
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
-    await expect(wallet.allupperButtons).toHaveCount(4);
+    await wallet.checkVisualsStartpage();
 
     // Save initial Balance for later Balance checks
     const initalBTCBalance = await wallet.getTokenBalance('Bitcoin');
@@ -43,7 +27,7 @@ test.describe('Transaction BTC', () => {
 
     await expect(await wallet.divTokenRow.count()).toBeGreaterThanOrEqual(2);
     // Send BTC
-    await wallet.divTokenRow.nth(2).click();
+    await wallet.clickOnSpecificToken('Bitcoin');
     await expect(page.url()).toContain('send-btc');
     await expect(wallet.buttonNext).toBeVisible();
     await expect(wallet.buttonNext).toBeDisabled();
@@ -80,6 +64,13 @@ test.describe('Transaction BTC', () => {
     await wallet.switchtoTestnetNetwork();
     await wallet.navigationDashboard.click();
 
+    // get own BTC Address
+    await wallet.allupperButtons.nth(1).click();
+    const selfBTCTest = await wallet.getAddress(wallet.buttonCopyBitcoinAddress);
+
+    // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
+    await page.reload();
+
     // Save initial Balance for later Balance checks
     const initalBTCBalance = await wallet.getTokenBalance('Bitcoin');
 
@@ -87,7 +78,7 @@ test.describe('Transaction BTC', () => {
     await wallet.allupperButtons.nth(0).click();
 
     await expect(await wallet.divTokenRow.count()).toBeGreaterThanOrEqual(2);
-    await wallet.divTokenRow.nth(2).click();
+    await wallet.clickOnSpecificToken('Bitcoin');
     await expect(page.url()).toContain('send-btc');
     await expect(wallet.buttonNext).toBeVisible();
     await expect(wallet.buttonNext).toBeDisabled();
@@ -113,7 +104,7 @@ test.describe('Transaction BTC', () => {
     // Show input and output and check visuals
     await wallet.buttonExpand.click();
     await expect(wallet.sendAddress).toBeVisible();
-    await expect(wallet.receiveAddress).toBeVisible();
+    await expect(wallet.receiveAddress.first()).toBeVisible();
     await expect(wallet.confirmAmount.first()).toBeVisible();
     await expect(wallet.confirmTotalAmount.first()).toBeVisible();
     await expect(wallet.confirmBalance.first()).toBeVisible();
@@ -133,7 +124,7 @@ test.describe('Transaction BTC', () => {
     await expect(initalBTCBalance).toEqual(balanceAfterCancel);
   });
 
-  test.skip('Send BTC - confirm transaction testnet', async ({ page, extensionId }) => {
+  test('Send BTC - confirm transaction testnet #localexecution', async ({ page, extensionId }) => {
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
 
@@ -144,6 +135,13 @@ test.describe('Transaction BTC', () => {
     await wallet.switchtoTestnetNetwork();
     await wallet.navigationDashboard.click();
 
+    // get own BTC Address
+    await wallet.allupperButtons.nth(1).click();
+    const selfBTCTest = await wallet.getAddress(wallet.buttonCopyBitcoinAddress);
+
+    // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
+    await page.reload();
+
     // Save initial Balance for later Balance checks
     const initalBTCBalance = await wallet.getTokenBalance('Bitcoin');
 
@@ -151,7 +149,7 @@ test.describe('Transaction BTC', () => {
     await wallet.allupperButtons.nth(0).click();
 
     await expect(await wallet.divTokenRow.count()).toBeGreaterThanOrEqual(2);
-    await wallet.divTokenRow.nth(2).click();
+    await wallet.clickOnSpecificToken('Bitcoin');
     await expect(page.url()).toContain('send-btc');
     await expect(wallet.buttonNext).toBeVisible();
     await expect(wallet.buttonNext).toBeDisabled();
@@ -173,7 +171,7 @@ test.describe('Transaction BTC', () => {
     // Show input and output and check visuals
     await wallet.buttonExpand.click();
     await expect(wallet.sendAddress).toBeVisible();
-    await expect(wallet.receiveAddress).toBeVisible();
+    await expect(wallet.receiveAddress.first()).toBeVisible();
     await expect(wallet.confirmAmount.first()).toBeVisible();
     await expect(wallet.confirmTotalAmount.first()).toBeVisible();
     await expect(wallet.confirmBalance.first()).toBeVisible();
@@ -181,7 +179,8 @@ test.describe('Transaction BTC', () => {
     // Check correct amounts
     await wallet.checkAmountsSendingBTC(selfBTCTest, BTCTest, amountBTCSend);
 
-    await wallet.confirmSendTransaction('testnet');
+    await wallet.confirmSendTransaction();
+    await wallet.checkVisualsStartpage('testnet');
 
     // Check BTC Balance after the transaction
     const balanceAfterCancel = await wallet.getTokenBalance('Bitcoin');
@@ -190,21 +189,13 @@ test.describe('Transaction BTC', () => {
 
   // TODO: add test where we change the fees for a BTC transaction
 
-  test('Visual Check BTC Transaction history testnet #transaction', async ({
-    page,
-    extensionId,
-  }) => {
+  test('Visual Check BTC Transaction history #transaction', async ({ page, extensionId }) => {
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
 
     await onboardingpage.restoreWallet(strongPW, 'SEED_WORDS1');
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
     await wallet.checkVisualsStartpage();
-    await wallet.navigationSettings.click();
-    await wallet.switchtoTestnetNetwork();
-    await wallet.navigationDashboard.click();
-    // Check if switch to testnet was successfull and all visuals are correct
-    await wallet.checkVisualsStartpage('testnet');
     await wallet.divTokenRow.first().click();
     await expect(page.url()).toContain('BTC');
     // Check token detail page for token image and coin title

@@ -1,6 +1,6 @@
 import { defaultMainnet, initialNetworksList } from '@secretkeylabs/xverse-core';
+import { REHYDRATE } from 'redux-persist';
 import {
-  AddAccountKey,
   ChangeFiatCurrencyKey,
   ChangeHasActivatedOrdinalsKey,
   ChangeHasActivatedRBFKey,
@@ -9,10 +9,7 @@ import {
   ChangeShowBtcReceiveAlertKey,
   ChangeShowDataCollectionAlertKey,
   ChangeShowOrdinalReceiveAlertKey,
-  FetchAccountKey,
-  GetActiveAccountsKey,
   RareSatsNoticeDismissedKey,
-  RenameAccountKey,
   ResetWalletKey,
   SelectAccountKey,
   SetAccountBalanceKey,
@@ -25,11 +22,12 @@ import {
   SetSpamTokenKey,
   SetSpamTokensKey,
   SetWalletHideStxKey,
-  SetWalletKey,
   SetWalletLockPeriodKey,
   SetWalletUnlockedKey,
   StoreEncryptedSeedKey,
   UpdateLedgerAccountsKey,
+  UpdateSavedNamesKey,
+  UpdateSoftwareAccountsKey,
   WalletActions,
   WalletSessionPeriods,
   WalletState,
@@ -49,7 +47,6 @@ import {
  *  - accountType: 'software',
  *  - accountName: undefined,
  *  - walletLockPeriod: WalletSessionPeriods.STANDARD,
- *  - isUnlocked: false,
  *  - fiatCurrency: 'USD',
  *
  * because we get many bugs around caching the wrong values when switching accounts,
@@ -60,18 +57,12 @@ import {
  * TODO refactor most of these values out of the store and use query cache instead
  */
 export const initialWalletState: WalletState = {
-  stxAddress: '',
-  btcAddress: '',
-  ordinalsAddress: '',
-  masterPubKey: '',
-  stxPublicKey: '',
-  btcPublicKey: '',
-  ordinalsPublicKey: '',
   network: { ...defaultMainnet },
   savedNetworks: initialNetworksList,
   accountsList: [],
   ledgerAccountsList: [],
-  selectedAccount: null,
+  selectedAccountIndex: 0,
+  selectedAccountType: 'software',
   encryptedSeed: '',
   fiatCurrency: 'USD',
   sip10ManageTokens: {},
@@ -86,8 +77,6 @@ export const initialWalletState: WalletState = {
   showBtcReceiveAlert: true,
   showOrdinalReceiveAlert: true,
   showDataCollectionAlert: true,
-  accountType: 'software',
-  accountName: undefined,
   walletLockPeriod: WalletSessionPeriods.STANDARD,
   isUnlocked: false,
   hideStx: false,
@@ -95,37 +84,39 @@ export const initialWalletState: WalletState = {
   spamToken: null,
   spamTokens: [],
   showSpamTokens: false,
+  savedNames: {},
+};
+
+/**
+ * This is a ref to store the error that occurred during rehydration
+ * It's a hack to prevent data corruption when rehydration fails but still
+ * show the error to the user
+ */
+export const rehydrateError: { current?: string } = {
+  current: undefined,
 };
 
 const walletReducer = (
   // eslint-disable-next-line @typescript-eslint/default-param-last
   state: WalletState = initialWalletState,
-  action: WalletActions,
+  action: WalletActions | { type: typeof REHYDRATE; err?: unknown },
 ): WalletState => {
   switch (action.type) {
-    case SetWalletKey:
-      return {
-        ...state,
-        stxAddress: action.wallet.stxAddress,
-        btcAddress: action.wallet.btcAddress,
-        ordinalsAddress: action.wallet.ordinalsAddress,
-        masterPubKey: action.wallet.masterPubKey,
-        stxPublicKey: action.wallet.stxPublicKey,
-        btcPublicKey: action.wallet.btcPublicKey,
-        ordinalsPublicKey: action.wallet.ordinalsPublicKey,
-        accountType: action.wallet.accountType,
-      };
+    case REHYDRATE:
+      if (action.err) {
+        // We can't update the state since we're throwing an error, so we store the error in a ref
+        rehydrateError.current = `${action.err}`;
+        // There was an error loading state from chrome storage so we bail to prevent data corruption
+        // If not done, redux-persist will hydrate the state with the initial state and then store that
+        // in storage resulting in data loss
+        throw new Error('Failed to load state from storage.');
+      }
+      return state;
     case ResetWalletKey:
       return {
         ...initialWalletState,
       };
-    case FetchAccountKey:
-      return {
-        ...state,
-        selectedAccount: action.selectedAccount,
-        accountsList: action.accountsList,
-      };
-    case AddAccountKey:
+    case UpdateSoftwareAccountsKey:
       return {
         ...state,
         accountsList: action.accountsList,
@@ -138,17 +129,8 @@ const walletReducer = (
     case SelectAccountKey:
       return {
         ...state,
-        selectedAccount: action.selectedAccount,
-        stxAddress: action.stxAddress,
-        ordinalsAddress: action.ordinalsAddress,
-        btcAddress: action.btcAddress,
-        masterPubKey: action.masterPubKey,
-        stxPublicKey: action.stxPublicKey,
-        btcPublicKey: action.btcPublicKey,
-        ordinalsPublicKey: action.ordinalsPublicKey,
-        network: action.network,
-        accountType: action.accountType,
-        accountName: action.accountName,
+        selectedAccountIndex: action.selectedAccountIndex,
+        selectedAccountType: action.selectedAccountType,
       };
     case StoreEncryptedSeedKey:
       return {
@@ -164,6 +146,7 @@ const walletReducer = (
       return {
         ...state,
         fiatCurrency: action.fiatCurrency,
+        accountBalances: {},
       };
     case ChangeNetworkKey:
       return {
@@ -173,11 +156,8 @@ const walletReducer = (
           ...state.savedNetworks.filter((n) => n.type !== action.network.type),
           action.network,
         ],
-      };
-    case GetActiveAccountsKey:
-      return {
-        ...state,
-        accountsList: action.accountsList,
+        accountsList: [],
+        accountBalances: {},
       };
     case ChangeHasActivatedOrdinalsKey:
       return {
@@ -256,12 +236,6 @@ const walletReducer = (
         ...state,
         isUnlocked: action.isUnlocked,
       };
-    case RenameAccountKey:
-      return {
-        ...state,
-        accountsList: action.accountsList,
-        selectedAccount: action.selectedAccount,
-      };
     case SetAccountBalanceKey:
       return {
         ...state,
@@ -289,6 +263,14 @@ const walletReducer = (
       return {
         ...state,
         showSpamTokens: action.showSpamTokens,
+      };
+    case UpdateSavedNamesKey:
+      return {
+        ...state,
+        savedNames: {
+          ...state.savedNames,
+          [action.networkType]: action.names,
+        },
       };
     default:
       return state;

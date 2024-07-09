@@ -47,9 +47,9 @@ function CreatePassword(): JSX.Element {
   const [isCreatingWallet, setIsCreatingWallet] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CREATE_PASSWORD_SCREEN' });
-  const { createWallet } = useWalletReducer();
   const { disableWalletExistsGuard } = useWalletExistsContext();
-  const { changePassword } = useSeedVault();
+  const { getSeed } = useSeedVault();
+  const { createWallet } = useWalletReducer();
 
   const handleContinuePasswordCreation = () => {
     setCurrentStepIndex(1);
@@ -60,8 +60,10 @@ function CreatePassword(): JSX.Element {
       try {
         setIsCreatingWallet(true);
         disableWalletExistsGuard?.();
-        await createWallet(); // TODO move this somwhere else
-        await changePassword('', password);
+        const seed = await getSeed();
+
+        await createWallet(seed, password);
+
         navigate('/wallet-success/create', { replace: true });
       } catch (err) {
         setIsCreatingWallet(false);

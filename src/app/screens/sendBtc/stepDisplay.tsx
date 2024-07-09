@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import SendLayout from '../../layouts/sendLayout';
 import AmountSelector from './amountSelector';
+import BtcRecipientSelector from './btcRecipientSelector';
 import { TransactionSummary } from './helpers';
-import RecipientSelector from './recipientSelector';
 import { Step, getNextStep } from './steps';
 
 const TitleContainer = styled.div`
@@ -27,7 +27,7 @@ const Container = styled.div`
   min-height: 370px;
 `;
 
-type StepDisplayProps = {
+type Props = {
   summary: TransactionSummary | undefined;
   currentStep: Step;
   setCurrentStep: (step: Step) => void;
@@ -69,7 +69,7 @@ function StepDisplay({
   onCancel,
   isLoading,
   isSubmitting,
-}: StepDisplayProps) {
+}: Props) {
   const { t } = useTranslation('translation');
   const header = (
     <TitleContainer>
@@ -83,7 +83,7 @@ function StepDisplay({
       return (
         <SendLayout selectedBottomTab="dashboard" onClickBack={onBack}>
           <Container>
-            <RecipientSelector
+            <BtcRecipientSelector
               header={header}
               recipientAddress={recipientAddress}
               setRecipientAddress={setRecipientAddress}

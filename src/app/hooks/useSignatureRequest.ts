@@ -13,9 +13,10 @@ import { useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import useNetworkSelector from './useNetwork';
 import useSeedVault from './useSeedVault';
+import useSelectedAccount from './useSelectedAccount';
 import useWalletSelector from './useWalletSelector';
 
-export type SignatureMessageType = 'utf8' | 'structured';
+type SignatureMessageType = 'utf8' | 'structured';
 
 export function isStructuredMessage(
   messageType: SignatureMessageType,
@@ -31,7 +32,7 @@ function useSignatureRequest() {
   const params = useMemo(() => new URLSearchParams(search), [search]);
   const tabId = params.get('tabId') ?? '0';
   const requestId = params.get('messageId') ?? '';
-  const { stxPublicKey, stxAddress } = useWalletSelector();
+  const { stxPublicKey, stxAddress } = useSelectedAccount();
   const selectedNetwork = useNetworkSelector();
 
   const { payload, domain, messageType, requestToken } = useMemo(() => {
@@ -79,7 +80,8 @@ function useSignatureRequest() {
 }
 
 export function useSignMessage(messageType: SignatureMessageType) {
-  const { selectedAccount, network } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { network } = useWalletSelector();
   const { getSeed } = useSeedVault();
   return useCallback(
     async ({ message, domain }: { message: string; domain?: TupleCV }) => {

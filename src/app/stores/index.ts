@@ -1,22 +1,22 @@
-import { Coin, FungibleToken } from '@secretkeylabs/xverse-core';
-import { chromeLocalStorage } from '@utils/chromeStorage';
+import { Account, AccountType, Coin, FungibleToken } from '@secretkeylabs/xverse-core';
+import chromeStorage from '@utils/chromeStorage';
 import { applyMiddleware, combineReducers, createStore } from 'redux';
 import { PersistConfig, createMigrate, persistReducer, persistStore } from 'redux-persist';
 import { createStateSyncMiddleware, initMessageListener } from 'redux-state-sync';
 import NftDataStateReducer from './nftData/reducer';
 import { WalletState } from './wallet/actions/types';
-import walletReducer, { initialWalletState } from './wallet/reducer';
+import walletReducer, { initialWalletState, rehydrateError } from './wallet/reducer';
 
 const rootPersistConfig = {
   version: 1,
   key: 'root',
-  storage: chromeLocalStorage,
+  storage: chromeStorage.local,
   blacklist: ['walletState'],
 };
 
 const migrations = {
   2: (state: WalletState) => {
-    if (state.network.type === 'Testnet') {
+    if (state.network.type !== 'Mainnet') {
       return state;
     }
     return {
@@ -53,13 +53,35 @@ const migrations = {
     coinsList: undefined,
     brcCoinsList: undefined,
   }),
+  4: (
+    state: WalletState & {
+      stxAddress: string;
+      btcAddress: string;
+      ordinalsAddress: string;
+      masterPubKey: string;
+      stxPublicKey: string;
+      btcPublicKey: string;
+      ordinalsPublicKey: string;
+      selectedAccount: Account | null;
+      accountType: AccountType | undefined;
+      accountName: string | undefined;
+    },
+  ) => ({
+    ...state,
+    selectedAccountIndex:
+      state.selectedAccount?.deviceAccountIndex ?? state.selectedAccount?.id ?? 0,
+    selectedAccountType: state.selectedAccount?.accountType ?? 'software',
+  }),
 };
 
-export const WalletPersistConfig: PersistConfig<WalletState> = {
-  version: 3,
+const WalletPersistConfig: PersistConfig<WalletState> = {
+  version: 4,
   key: 'walletState',
-  storage: chromeLocalStorage,
+  storage: chromeStorage.local,
   migrate: createMigrate(migrations as any, { debug: false }),
+  // A timeout of 0 means timeout is disabled
+  // If the timeout is enabled, the rehydration will fail on slower machines and the store will be reset
+  timeout: 0,
 };
 
 const appReducer = combineReducers({
@@ -80,9 +102,10 @@ const storeMiddleware = [
   }),
 ];
 const store = createStore(persistedReducer, applyMiddleware(...storeMiddleware));
-const persistedStore = persistStore(store);
+const persistor = persistStore(store);
+
 initMessageListener(store);
 
-const rootStore = { store, persistedStore };
+const rootStore = { store, persistor, rehydrateError };
 
 export default rootStore;

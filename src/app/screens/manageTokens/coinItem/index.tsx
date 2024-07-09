@@ -76,7 +76,14 @@ function CoinItem({
       <CoinContainer>
         <TokenImage
           fungibleToken={
-            { name, ticker, image, runeInscriptionId, runeSymbol, protocol } as FungibleToken
+            {
+              name,
+              ticker,
+              image,
+              runeInscriptionId,
+              runeSymbol,
+              protocol,
+            } as FungibleToken
           }
           size={32}
         />

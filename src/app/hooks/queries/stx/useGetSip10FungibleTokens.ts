@@ -1,4 +1,5 @@
 import useNetworkSelector from '@hooks/useNetwork';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   FungibleToken,
@@ -56,7 +57,8 @@ export const fetchSip10FungibleTokens =
   };
 
 export const useGetSip10FungibleTokens = () => {
-  const { stxAddress, fiatCurrency, network, spamTokens, showSpamTokens } = useWalletSelector();
+  const { stxAddress } = useSelectedAccount();
+  const { fiatCurrency, network, spamTokens, showSpamTokens } = useWalletSelector();
   const currentNetworkInstance = useNetworkSelector();
 
   const queryFn = fetchSip10FungibleTokens(
