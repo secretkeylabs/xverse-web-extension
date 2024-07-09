@@ -33,7 +33,7 @@ const Row = styled.div`
 `;
 
 const OutputTitleText = styled(StyledP)((props) => ({
-  marginBottom: props.theme.space.s,
+  marginBottom: props.theme.space.m,
 }));
 
 const ExpandedContainer = styled(animated.div)((props) => ({

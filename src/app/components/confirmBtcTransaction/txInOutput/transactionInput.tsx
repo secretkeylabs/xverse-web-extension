@@ -1,4 +1,4 @@
-import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
+import InputIcon from '@assets/img/transactions/arrowUpRed.svg';
 import TransferDetailView from '@components/transferDetailView';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import { btcTransaction, satsToBtc } from '@secretkeylabs/xverse-core';
@@ -62,7 +62,7 @@ function TransactionInput({ input }: Props) {
   return (
     <TransferDetailContainer>
       <TransferDetailView
-        icon={IconBitcoin}
+        icon={InputIcon}
         hideAddress
         dataTestID="confirm-balance"
         hideCopyButton={isPaymentsAddress || isOrdinalsAddress}
