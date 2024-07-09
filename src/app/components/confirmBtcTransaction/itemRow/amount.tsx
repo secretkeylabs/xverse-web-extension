@@ -16,7 +16,7 @@ const RowCenter = styled.div<{ spaceBetween?: boolean }>((props) => ({
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: props.spaceBetween ? 'space-between' : 'initial',
-  columnGap: props.theme.space.m,
+  columnGap: props.theme.space.xs,
 }));
 
 const NumberTypeContainer = styled.div`
@@ -48,6 +48,9 @@ export default function Amount({ amount }: Props) {
         <div>
           <StyledP typography="body_medium_m" color="white_0">
             {t('CONFIRM_TRANSACTION.AMOUNT')}
+          </StyledP>
+          <StyledP typography="body_medium_s" color="white_400">
+            Bitcoin
           </StyledP>
         </div>
         <NumberTypeContainer>

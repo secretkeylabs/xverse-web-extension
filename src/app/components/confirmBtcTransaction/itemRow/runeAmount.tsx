@@ -3,7 +3,7 @@ import TokenImage from '@components/tokenImage';
 import { RuneBase } from '@secretkeylabs/xverse-core';
 import Avatar from '@ui-library/avatar';
 import { StyledP } from '@ui-library/common.styled';
-import { ftDecimals, getTicker } from '@utils/helper';
+import { ftDecimals } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
@@ -66,7 +66,7 @@ export default function RuneAmount({ rune, hasSufficientBalance = true }: Props)
       </AvatarContainer>
       <Column>
         <Row>
-          <StyledP typography="body_medium_m" color="white_200">
+          <StyledP typography="body_medium_m" color="white_0">
             {t('AMOUNT')}
           </StyledP>
           <NumericFormat
@@ -77,7 +77,7 @@ export default function RuneAmount({ rune, hasSufficientBalance = true }: Props)
             renderText={(value: string) => (
               <StyledPRight
                 typography="body_medium_m"
-                color={hasSufficientBalance ? 'white_200' : 'danger_light'}
+                color={hasSufficientBalance ? 'white_0' : 'danger_light'}
               >
                 {value}
               </StyledPRight>

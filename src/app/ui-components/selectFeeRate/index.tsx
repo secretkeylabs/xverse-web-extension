@@ -176,6 +176,9 @@ function SelectFeeRate({
             />
           </Label>
         )}
+      </RowContainer>
+      <RowContainer>
+        <div />
         {fee && (
           <StyledFiatAmountText
             fiatAmount={BigNumber(baseToFiat(fee))}

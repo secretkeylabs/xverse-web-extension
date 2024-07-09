@@ -319,7 +319,7 @@
     "RECIPIENT_ADDRESS": "recipient address",
     "MEMO": "Attached memo",
     "NETWORK": "Network",
-    "FEES": "Network fee",
+    "FEES": "Fees",
     "TRANSACTION": "Transaction",
     "PREVIOUS": "Previous",
     "NEXT": "Next",
