@@ -124,6 +124,7 @@ function StepDisplay({
           inputs={summary.inputs}
           outputs={summary.outputs}
           feeOutput={summary.feeOutput}
+          recipientAddress={recipientAddress}
           showCenotaphCallout={!!summary?.runeOp?.Cenotaph?.flaws}
           isLoading={false}
           confirmText={t('COMMON.CONFIRM')}
