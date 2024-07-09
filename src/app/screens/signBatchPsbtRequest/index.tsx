@@ -2,7 +2,6 @@ import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types'
 import { delay } from '@common/utils/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
 import AssetModal from '@components/assetModal';
-import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import BurnSection from '@components/confirmBtcTransaction/burnSection';
 import DelegateSection from '@components/confirmBtcTransaction/delegateSection';
@@ -38,95 +37,19 @@ import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
-
-const OuterContainer = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  overflow-y: auto;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`;
-
-const Container = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-  marginTop: props.theme.spacing(11),
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-}));
-
-const LoaderContainer = styled.div((props) => ({
-  display: 'flex',
-  flex: 1,
-  justifyContent: 'center',
-  alignItems: 'center',
-  marginTop: props.theme.spacing(12),
-}));
-
-const ButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  padding: props.theme.spacing(8),
-  paddingTop: props.theme.spacing(12),
-  paddingBottom: props.theme.spacing(20),
-}));
-
-const TransparentButtonContainer = styled.div((props) => ({
-  marginRight: props.theme.spacing(6),
-  width: '100%',
-}));
-
-const WarningCallout = styled(Callout)`
-  margin-bottom: ${(props) => props.theme.space.m};
-`;
-
-const ReviewTransactionText = styled.h1((props) => ({
-  ...props.theme.headline_s,
-  color: props.theme.colors.white_0,
-  marginBottom: props.theme.spacing(12),
-  textAlign: 'left',
-}));
-
-const BundleLinkContainer = styled.button((props) => ({
-  display: 'flex',
-  alignItems: 'center',
-  backgroundColor: 'transparent',
-  color: props.theme.colors.tangerine,
-  transition: 'color 0.2s ease',
-  marginBottom: props.theme.spacing(6),
-  ':hover': {
-    color: props.theme.colors.tangerine_light,
-  },
-}));
-
-const BundleLinkText = styled.div((props) => ({
-  ...props.theme.body_medium_m,
-  marginRight: props.theme.spacing(2),
-}));
-
-const CustomizedModal = styled(BottomModal)`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  max-height: 100% !important;
-  background-color: #181818 !important;
-`;
-
-const CustomizedModalContainer = styled(Container)`
-  margin-top: 0;
-`;
-
-const TxReviewModalControls = styled.div((props) => ({
-  display: 'flex',
-  columnGap: props.theme.spacing(6),
-  padding: props.theme.spacing(8),
-  paddingTop: props.theme.spacing(12),
-  paddingBottom: props.theme.spacing(20),
-}));
+import {
+  BundleLinkContainer,
+  BundleLinkText,
+  ButtonContainer,
+  Container,
+  CustomizedModal,
+  CustomizedModalContainer,
+  LoaderContainer,
+  OuterContainer,
+  ReviewTransactionText,
+  TransparentButtonContainer,
+  TxReviewModalControls,
+} from './index.styled';
 
 interface TxResponse {
   txId: string;
