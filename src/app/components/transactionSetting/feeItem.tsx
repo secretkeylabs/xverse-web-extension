@@ -147,7 +147,7 @@ function FeeItem({
           <StyledSubText
             typography="body_medium_s"
             color="white_200"
-          >{`${feeRate} Sats/ vByte`}</StyledSubText>
+          >{`${feeRate} sats/vB`}</StyledSubText>
         </ColumnsTexts>
 
         <EndColumnTexts>

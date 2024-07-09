@@ -48,7 +48,7 @@ const Label = styled.span<{
   display: inline-flex;
   flex-direction: row;
   align-items: center;
-  gap: ${(props) => props.theme.space.xxxs};
+  gap: ${(props) => props.theme.space.xxs};
 `;
 
 const EditRow = styled.span`

@@ -30,6 +30,10 @@ const StyledFiatAmountText = styled(FiatAmountText)`
   margin-top: ${(props) => props.theme.space.xxxs};
 `;
 
+const StyledBtcTitle = styled(StyledP)`
+  margin-top: ${(props) => props.theme.space.xxxs};
+`;
+
 type Props = {
   amount: number;
 };
@@ -49,9 +53,9 @@ export default function Amount({ amount }: Props) {
           <StyledP typography="body_medium_m" color="white_0">
             {t('CONFIRM_TRANSACTION.AMOUNT')}
           </StyledP>
-          <StyledP typography="body_medium_s" color="white_400">
+          <StyledBtcTitle typography="body_medium_s" color="white_400">
             Bitcoin
-          </StyledP>
+          </StyledBtcTitle>
         </div>
         <NumberTypeContainer>
           <NumericFormat
