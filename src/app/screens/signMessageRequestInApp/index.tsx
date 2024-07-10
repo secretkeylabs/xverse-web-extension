@@ -12,7 +12,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import CollapsableContainer from '@screens/signatureRequest/collapsableContainer';
 import SignatureRequestMessage from '@screens/signatureRequest/signatureRequestMessage';
-import { bip0322Hash, signBip322Message } from '@secretkeylabs/xverse-core';
+import { bip0322Hash, MessageSigningProtocols, signMessage } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import Sheet from '@ui-library/sheet';
 import { getTruncatedAddress, isHardwareAccount } from '@utils/helper';
@@ -171,12 +171,13 @@ function SignMessageRequestInApp() {
 
   const confirmSignMessage = async () => {
     const seedPhrase = await getSeed();
-    return signBip322Message({
+    return signMessage({
       accounts: accountsList,
       message: payload.message,
-      signatureAddress: payload.address,
+      address: payload.address,
       seedPhrase,
       network: network.type,
+      protocol: MessageSigningProtocols.BIP322,
     });
   };
 

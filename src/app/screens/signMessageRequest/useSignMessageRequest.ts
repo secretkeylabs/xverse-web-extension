@@ -2,20 +2,21 @@ import useSeedVault from '@hooks/useSeedVault';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { BitcoinNetworkType, SignMessageOptions, SignMessagePayload } from '@sats-connect/core';
-import { SettingsNetwork, signBip322Message } from '@secretkeylabs/xverse-core';
+import { Params, SignMessageOptions, SignMessagePayload } from '@sats-connect/core';
+import { MessageSigningProtocols, signMessage } from '@secretkeylabs/xverse-core';
 import { isHardwareAccount } from '@utils/helper';
 import { decodeToken } from 'jsontokens';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
+import SuperJSON from 'superjson';
 
-const useSignMessageRequestParams = (network: SettingsNetwork) => {
+const useSignMessageRequestParams = () => {
   const { search } = useLocation();
-  const params = new URLSearchParams(search);
+  const params = useMemo(() => new URLSearchParams(search), [search]);
   const tabId = params.get('tabId') ?? '0';
-  const origin = params.get('origin') ?? '';
   const requestId = params.get('requestId') ?? '';
+  const payloadToken = params.get('payload') ?? '';
 
   const { payload, requestToken } = useMemo(() => {
     const token = params.get('signMessageRequest') ?? '';
@@ -26,22 +27,15 @@ const useSignMessageRequestParams = (network: SettingsNetwork) => {
         requestToken: token,
       };
     }
-    const address = params.get('address') ?? '';
-    const message = params.get('message') ?? '';
-    const rpcPayload: SignMessagePayload = {
-      message,
-      address,
-      network: {
-        type: BitcoinNetworkType[network.type],
-      },
-    };
+    const rpcPayload = SuperJSON.parse<Params<'signMessage'>>(payloadToken);
+
     return {
       payload: rpcPayload,
       requestToken: null,
     };
-  }, []);
+  }, [params, payloadToken]);
 
-  return { tabId, origin, payload, requestToken, requestId };
+  return { tabId, payload, requestToken, requestId };
 };
 
 type ValidationError = {
@@ -49,7 +43,9 @@ type ValidationError = {
   errorTitle?: string;
 };
 
-export const useSignMessageValidation = (requestPayload: SignMessagePayload | undefined) => {
+export const useSignMessageValidation = (
+  requestPayload: SignMessagePayload | Params<'signMessage'> | undefined,
+) => {
   const [validationError, setValidationError] = useState<ValidationError | null>(null);
   const { t } = useTranslation('translation', { keyPrefix: 'REQUEST_ERRORS' });
   const selectedAccount = useSelectedAccount();
@@ -71,7 +67,7 @@ export const useSignMessageValidation = (requestPayload: SignMessagePayload | un
 
   const validateSignMessage = () => {
     if (!requestPayload) return;
-    if (requestPayload.network.type !== network.type) {
+    if ((requestPayload as any).network && (requestPayload as any).network.type !== network.type) {
       setValidationError({
         error: t('NETWORK_MISMATCH'),
       });
@@ -102,15 +98,16 @@ export const useSignMessageValidation = (requestPayload: SignMessagePayload | un
 export const useSignMessageRequest = () => {
   const { network, accountsList } = useWalletSelector();
   const { getSeed } = useSeedVault();
-  const { payload, requestToken, tabId, origin, requestId } = useSignMessageRequestParams(network);
+  const { payload, requestToken, tabId, requestId } = useSignMessageRequestParams();
 
   const confirmSignMessage = async () => {
     const { address, message } = payload;
     const seedPhrase = await getSeed();
-    return signBip322Message({
+    return signMessage({
       accounts: accountsList,
       message,
-      signatureAddress: address,
+      address,
+      protocol: (payload as any).protocol,
       seedPhrase,
       network: network.type,
     });
@@ -120,7 +117,6 @@ export const useSignMessageRequest = () => {
     payload,
     requestToken,
     tabId,
-    origin,
     requestId,
     confirmSignMessage,
   };

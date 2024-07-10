@@ -12,7 +12,7 @@ import RequestError from '@components/requests/requestError';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
-import { Return, RpcErrorCode } from '@sats-connect/core';
+import { MessageSigningProtocols, Return, RpcErrorCode } from '@sats-connect/core';
 import CollapsableContainer from '@screens/signatureRequest/collapsableContainer';
 import SignatureRequestMessage from '@screens/signatureRequest/signatureRequestMessage';
 import { finalizeMessageSignature } from '@screens/signatureRequest/utils';
@@ -194,6 +194,7 @@ function SignMessageRequest() {
           address: payload.address,
           messageHash: bip0322Hash(payload.message),
           signature: bip322signature ?? '',
+          protocol: (payload as any).protocol,
         };
         const response = makeRpcSuccessResponse(requestId, signMessageResult);
         sendRpcResponse(+tabId, response);
