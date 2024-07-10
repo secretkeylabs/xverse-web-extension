@@ -162,7 +162,7 @@ function FeeItem({
         <EndColumnTexts>
           {totalFee && (
             <StyledHeading typography="body_medium_m" color="white_0">
-              {`${totalFee} Sats`}
+              {`${totalFee} sats`}
             </StyledHeading>
           )}
           <StyledFiatAmountText fiatAmount={fiatAmount} fiatCurrency={fiatCurrency} />

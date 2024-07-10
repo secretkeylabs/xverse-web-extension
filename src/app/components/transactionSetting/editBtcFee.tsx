@@ -313,7 +313,7 @@ function EditBtcFee({
         <FeePrioritiesContainer>
           <FeeItem
             priority="high"
-            time="~10 mins"
+            time={`~10 ${t('SPEED_UP_TRANSACTION.TIME.MINUTES')}`}
             feeRate={feeData?.highFeeRate}
             totalFee={feeData?.highTotalFee}
             fiatAmount={getBtcFiatEquivalent(
@@ -329,7 +329,7 @@ function EditBtcFee({
           />
           <FeeItem
             priority="medium"
-            time="~30 mins"
+            time={`~30 ${t('SPEED_UP_TRANSACTION.TIME.MINUTES')}`}
             feeRate={feeData?.standardFeeRate}
             totalFee={feeData?.standardTotalFee}
             fiatAmount={getBtcFiatEquivalent(
@@ -385,7 +385,7 @@ function EditBtcFee({
                 value={totalFee}
                 displayType="text"
                 thousandSeparator
-                suffix=" Sats"
+                suffix=" sats"
                 renderText={(value: string) => (
                   <StyledP typography="body_medium_m" color="white_0">
                     {value}
