@@ -217,11 +217,7 @@ function RecipientComponent({
           )}
         </div>
       )}
-      {recipientIndex && totalRecipient && totalRecipient !== 1 && (
-        <RecipientTitleText>
-          {`${t('RECIPIENT')} ${recipientIndex}/${totalRecipient}`}
-        </RecipientTitleText>
-      )}
+
       {heading && <RecipientTitleText>{heading}</RecipientTitleText>}
       {value && (
         <RowContainer>

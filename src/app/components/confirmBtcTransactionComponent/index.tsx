@@ -64,7 +64,7 @@ const ReviewTransactionText = styled.span<{
 }>((props) => ({
   ...props.theme.typography.headline_s,
   color: props.theme.colors.white_0,
-  marginBottom: props.theme.spacing(16),
+  marginBottom: props.theme.space.l,
   textAlign: props.centerAligned ? 'center' : 'left',
 }));
 
