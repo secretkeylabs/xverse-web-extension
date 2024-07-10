@@ -9,7 +9,6 @@ import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import Theme from 'theme';
 import EditBtcFee from './editBtcFee';
 import EditNonce from './editNonce';
 import EditStxFee from './editStxFee';
@@ -264,7 +263,11 @@ function TransactionSettingAlert({
       {renderContent()}
       {type === 'STX' && (showFeeSettings || showNonceSettings || nonceSettings) && (
         <ButtonsContainer>
-          <Button title="Back" onClick={onClosePress} variant="secondary" />
+          <Button
+            title={t('TRANSACTION_SETTING.BACK')}
+            onClick={onClosePress}
+            variant="secondary"
+          />
           <Button
             title={t('TRANSACTION_SETTING.APPLY')}
             onClick={showNonceSettings || nonceSettings ? applyClickForNonceStx : applyClickForStx}
@@ -276,7 +279,7 @@ function TransactionSettingAlert({
       {customFeeSelected && (
         <ButtonsContainer>
           <Button
-            title="Back"
+            title={t('TRANSACTION_SETTING.BACK')}
             onClick={() => {
               setCustomFeeSelected(false);
             }}

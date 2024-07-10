@@ -108,6 +108,15 @@ const FeeItemContainer = styled.button<{
   background: ${(props) => (props.isSelected ? props.theme.colors.elevation6_600 : 'transparent')};
   margin-top: ${(props) => props.theme.space.xs};
   flex: 1;
+  transition: background-color 0.1s ease;
+
+  &:hover:enabled {
+    background-color: ${(props) => props.theme.colors.elevation6_400};
+  }
+
+  &:active:enabled {
+    background-color: ${(props) => props.theme.colors.elevation6_600};
+  }
 `;
 
 const TextRow = styled.div`
