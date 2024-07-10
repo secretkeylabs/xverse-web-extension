@@ -1,4 +1,3 @@
-import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import AssetIcon from '@assets/img/transactions/Assets.svg';
 import RecipientComponent from '@components/recipientComponent';
 import TransactionSettingAlert from '@components/transactionSetting';
@@ -10,6 +9,7 @@ import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import useSeedVault from '@hooks/useSeedVault';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { PencilSimple } from '@phosphor-icons/react';
 import {
   Bundle,
   ErrorCodes,
@@ -41,28 +41,12 @@ const OuterContainer = styled.div`
   flex-direction: column;
 `;
 
-const EditFeesButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: 'transparent',
-  width: '100%',
-  marginTop: props.theme.spacing(10),
-  marginBottom: props.theme.space.m,
-}));
-
-const ButtonText = styled.div((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_0,
-  textAlign: 'center',
-}));
-
-const ButtonImage = styled.img((props) => ({
-  marginRight: props.theme.spacing(3),
-  alignSelf: 'center',
-  transform: 'all',
-}));
+const Subtitle = styled.p`
+  ${(props) => props.theme.typography.body_medium_m};
+  color: ${(props) => props.theme.colors.white_200};
+  margin-top: ${(props) => props.theme.space.s};
+  margin-bottom: ${(props) => props.theme.space.xs};
+`;
 
 const ErrorContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(24),
@@ -88,6 +72,29 @@ const CalloutContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(8),
   marginhorizontal: props.theme.spacing(8),
 }));
+
+const FeeContainer = styled.div`
+  position: relative;
+`;
+
+const Label = styled.span`
+  ${(props) => props.theme.typography.body_medium_m};
+  position: absolute;
+  top: 36px;
+  left: ${(props) => props.theme.space.m};
+  color: ${(props) => props.theme.colors.tangerine};
+  transition: color 0.1s ease;
+  cursor: pointer;
+  user-select: none;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: ${(props) => props.theme.space.xxs};
+
+  &:hover {
+    color: ${(props) => props.theme.colors.tangerine_200};
+  }
+`;
 
 type Props = {
   currentFee: BigNumber;
@@ -273,15 +280,15 @@ function ConfirmBtcTransactionComponent({
     setShowFeeWarning(!!isFeeHigh);
   }, [currentFee, feeMultipliers]);
 
-  const onAdvancedSettingClick = () => {
+  const showEditFeesModal = () => {
     setShowFeeSettings(true);
   };
 
-  const closeTransactionSettingAlert = () => {
+  const hideEditFeesModal = () => {
     setShowFeeSettings(false);
   };
 
-  const onApplyClick = async ({
+  const handleApplyClick = async ({
     fee: modifiedFee,
     feeRate,
   }: {
@@ -302,7 +309,7 @@ function ConfirmBtcTransactionComponent({
     setLoading(true);
   };
 
-  const handleOnConfirmClick = () => {
+  const handleConfirmClick = () => {
     onConfirmClick(signedTx);
   };
 
@@ -372,6 +379,9 @@ function ConfirmBtcTransactionComponent({
           </CalloutContainer>
         )}
         {currencyType !== 'BTC' && bundle && <SatsBundle bundle={bundle} />}
+
+        <Subtitle>{t('CONFIRM_TRANSACTION.YOU_WILL_SEND')}</Subtitle>
+
         {ordinalTxUtxo ? (
           <RecipientComponent
             dataTestID="value-text"
@@ -397,24 +407,33 @@ function ConfirmBtcTransactionComponent({
             />
           ))
         )}
+
+        <Subtitle>{t('CONFIRM_TRANSACTION.TRANSACTION_DETAILS')}</Subtitle>
+
         <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
-        <TransferFeeView
-          feePerVByte={currentFeeRate}
-          fee={currentFee}
-          currency={t('CONFIRM_TRANSACTION.SATS')}
-        />
-        {!ordinalTxUtxo && (
+
+        <Subtitle>{t('CONFIRM_TRANSACTION.FEES')}</Subtitle>
+
+        <FeeContainer>
+          <TransferFeeView
+            feePerVByte={currentFeeRate}
+            fee={currentFee}
+            currency={t('CONFIRM_TRANSACTION.SATS')}
+          />
+          <Label onClick={showEditFeesModal}>
+            {t('COMMON.EDIT')} <PencilSimple size={16} weight="fill" />
+          </Label>
+        </FeeContainer>
+
+        {!ordinalTxUtxo && recipients.length > 1 && (
           <TransactionDetailComponent
             title={t('CONFIRM_TRANSACTION.TOTAL')}
             value={getAmountString(satsToBtc(total), t('BTC'))}
             subValue={getBtcFiatEquivalent(total, BigNumber(btcFiatRate))}
             subTitle={t('CONFIRM_TRANSACTION.AMOUNT_PLUS_FEES')}
+            titleColor="white_0"
           />
         )}
-        <EditFeesButton onClick={onAdvancedSettingClick}>
-          <ButtonImage src={SettingIcon} />
-          <ButtonText>{t('CONFIRM_TRANSACTION.EDIT_FEES')}</ButtonText>
-        </EditFeesButton>
         <TransactionSettingAlert
           visible={showFeeSettings}
           fee={new BigNumber(currentFee).toString()}
@@ -422,8 +441,8 @@ function ConfirmBtcTransactionComponent({
           type={ordinalTxUtxo ? 'Ordinals' : 'BTC'}
           btcRecipients={recipients}
           ordinalTxUtxo={ordinalTxUtxo}
-          onApplyClick={onApplyClick}
-          onCrossClick={closeTransactionSettingAlert}
+          onApplyClick={handleApplyClick}
+          onCrossClick={hideEditFeesModal}
           nonOrdinalUtxos={nonOrdinalUtxos}
           loading={loading || ordinalsLoading}
           isRestoreFlow={isRestoreFundFlow}
@@ -465,7 +484,7 @@ function ConfirmBtcTransactionComponent({
             isLoadingNonOrdinalBtcSend ||
             ordinalsLoading
           }
-          onClick={handleOnConfirmClick}
+          onClick={handleConfirmClick}
         />
       </StickyHorizontalSplitButtonContainer>
     </>

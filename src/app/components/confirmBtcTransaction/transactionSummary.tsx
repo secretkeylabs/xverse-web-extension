@@ -135,7 +135,6 @@ function TransactionSummary({
       )}
       {hasRuneDelegation && <DelegateSection delegations={runeSummary?.transfers} />}
 
-      {/* TODO: Add handling for the array in case of sending to multiple recipients */}
       <TransferSection
         outputs={outputs}
         inputs={inputs}

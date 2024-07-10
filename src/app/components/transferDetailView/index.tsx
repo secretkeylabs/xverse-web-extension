@@ -33,9 +33,9 @@ const AddressContainer = styled.div({
   justifyContent: 'flex-end',
 });
 
-const TitleText = styled.p((props) => ({
+const TitleText = styled.p<{ $color?: string }>((props) => ({
   ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_200,
+  color: props.$color ? props.theme.colors[props.$color] : props.theme.colors.white_200,
 }));
 
 const ValueText = styled.p((props) => ({
@@ -106,6 +106,7 @@ type Props = {
   hideCopyButton?: boolean;
   outputScript?: Array<any>;
   outputScriptIndex?: number;
+  titleColor?: string;
 };
 
 function TransferDetailView({
@@ -119,6 +120,7 @@ function TransferDetailView({
   hideCopyButton,
   outputScript,
   outputScriptIndex,
+  titleColor,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [showScriptOutput, setShowScriptOutput] = useState(false);
@@ -162,7 +164,7 @@ function TransferDetailView({
             {children}
           </ColumnContainer>
         ) : (
-          <TitleText>{title}</TitleText>
+          <TitleText $color={titleColor}>{title}</TitleText>
         )}
         <AddressContainer>
           {outputScript && (
@@ -171,7 +173,7 @@ function TransferDetailView({
             </Button>
           )}
           {!hideAddress && (
-            <ValueText data-testid="address-receive">{getTruncatedAddress(address)}</ValueText>
+            <ValueText data-testid="address-receive">{getTruncatedAddress(address, 6)}</ValueText>
           )}
           {!hideCopyButton && <CopyButton text={address} />}
         </AddressContainer>

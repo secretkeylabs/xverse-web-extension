@@ -57,6 +57,10 @@ const EditButton = styled.button`
   margin-left: ${(props) => props.theme.space.xs};
 `;
 
+const FeeRate = styled(StyledP)`
+  margin: ${(props) => props.theme.space.xxxs} 0;
+`;
+
 type Props = {
   feePerVByte?: BigNumber;
   fee: BigNumber;
@@ -107,7 +111,7 @@ function TransferFeeView({
             </CustomRow>
           )}
           {subtitle && (
-            <StyledP typography="body_s" color="white_400">
+            <StyledP typography="body_medium_s" color="white_400">
               {subtitle}
             </StyledP>
           )}
@@ -131,13 +135,13 @@ function TransferFeeView({
               thousandSeparator
               suffix={` ${tUnits('SATS_PER_VB')}`}
               renderText={(value: string) => (
-                <StyledP typography="body_s" color="white_400">
+                <FeeRate typography="body_medium_s" color="white_400">
                   {value}
-                </StyledP>
+                </FeeRate>
               )}
             />
           )}
-          <StyledP typography="body_s" color="white_400">
+          <StyledP typography="body_medium_s" color="white_400">
             <FiatAmountText
               fiatAmount={
                 currency === 'sats'

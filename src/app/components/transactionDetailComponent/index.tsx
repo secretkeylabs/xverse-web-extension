@@ -1,4 +1,4 @@
-import FiatAmountText from '@components/fiatAmountText';
+import { StyledFiatAmountText } from '@components/fiatAmountText';
 import useWalletSelector from '@hooks/useWalletSelector';
 import BigNumber from 'bignumber.js';
 import styled from 'styled-components';
@@ -14,9 +14,9 @@ const Container = styled.div((props) => ({
   marginBottom: props.theme.space.s,
 }));
 
-const TitleText = styled.p((props) => ({
+const TitleText = styled.p<{ $color?: string }>((props) => ({
   ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_400,
+  color: props.$color ? props.theme.colors[props.$color] : props.theme.colors.white_400,
 }));
 
 const ValueText = styled.p((props) => ({
@@ -25,9 +25,10 @@ const ValueText = styled.p((props) => ({
 }));
 
 const SubValueText = styled.p((props) => ({
-  ...props.theme.typography.body_s,
+  ...props.theme.typography.body_medium_s,
   textAlign: 'right',
   color: props.theme.colors.white_400,
+  marginTop: props.theme.space.xxxs,
 }));
 
 const ColumnContainer = styled.div({
@@ -42,27 +43,39 @@ const TitleContainer = styled.div({
   flexDirection: 'column',
 });
 
+const FiatText = styled(StyledFiatAmountText)((props) => ({
+  marginTop: props.theme.space.xxxs,
+}));
+
 type Props = {
   title: string;
   subTitle?: string;
   value?: string | React.ReactNode;
   description?: string;
   subValue?: BigNumber;
+  titleColor?: string;
 };
 
-function TransactionDetailComponent({ title, subTitle, value, subValue, description }: Props) {
+function TransactionDetailComponent({
+  title,
+  subTitle,
+  value,
+  subValue,
+  description,
+  titleColor,
+}: Props) {
   const { fiatCurrency } = useWalletSelector();
 
   return (
     <Container>
       <TitleContainer>
-        <TitleText>{title}</TitleText>
+        <TitleText $color={titleColor}>{title}</TitleText>
         {subTitle && <SubValueText>{subTitle}</SubValueText>}
       </TitleContainer>
       <ColumnContainer>
         {value && <ValueText>{value}</ValueText>}
         {description && <SubValueText>{description}</SubValueText>}
-        {subValue && <FiatAmountText fiatAmount={subValue} fiatCurrency={fiatCurrency} />}
+        {subValue && <FiatText fiatAmount={subValue} fiatCurrency={fiatCurrency} />}
       </ColumnContainer>
     </Container>
   );
