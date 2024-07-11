@@ -92,7 +92,7 @@ export const useSignMessageValidation = (
     };
   }, [requestPayload]);
 
-  return { validationError, validateSignMessage };
+  return { validationError, validateSignMessage, setValidationError };
 };
 
 export const useSignMessageRequest = () => {

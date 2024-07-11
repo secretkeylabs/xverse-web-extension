@@ -16,7 +16,7 @@ import { bip0322Hash, MessageSigningProtocols, signMessage } from '@secretkeylab
 import Button from '@ui-library/button';
 import Sheet from '@ui-library/sheet';
 import { getTruncatedAddress, isHardwareAccount } from '@utils/helper';
-import { handleBip322LedgerMessageSigning } from '@utils/ledger';
+import { handleLedgerMessageSigning } from '@utils/ledger';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -132,12 +132,13 @@ function SignMessageRequestInApp() {
     setCurrentStepIndex(1);
 
     try {
-      const bip322signature = await handleBip322LedgerMessageSigning({
+      const bip322signature = await handleLedgerMessageSigning({
         transport,
         addressIndex: selectedAccount.deviceAccountIndex,
         address: payload.address,
         networkType: network.type,
         message: payload.message,
+        protocol: MessageSigningProtocols.BIP322,
       });
 
       await runesApi.submitCancelRunesSellOrder({
@@ -189,14 +190,14 @@ function SignMessageRequestInApp() {
         setIsModalVisible(true);
         return;
       }
-      const bip322signature = await confirmSignMessage();
+      const signedMessage = await confirmSignMessage();
 
       await runesApi.submitCancelRunesSellOrder({
         orderIds: payload.orderIds,
         makerPublicKey: selectedAccount?.ordinalsPublicKey!,
         makerAddress: selectedAccount?.ordinalsAddress!,
         token: payload.token,
-        signature: bip322signature,
+        signature: signedMessage.signature,
       });
 
       handleGoBack();

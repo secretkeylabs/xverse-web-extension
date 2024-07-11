@@ -16,10 +16,10 @@ import { MessageSigningProtocols, Return, RpcErrorCode } from '@sats-connect/cor
 import CollapsableContainer from '@screens/signatureRequest/collapsableContainer';
 import SignatureRequestMessage from '@screens/signatureRequest/signatureRequestMessage';
 import { finalizeMessageSignature } from '@screens/signatureRequest/utils';
-import { bip0322Hash } from '@secretkeylabs/xverse-core';
+import { bip0322Hash, legacyHash } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import { getTruncatedAddress, isHardwareAccount } from '@utils/helper';
-import { handleBip322LedgerMessageSigning } from '@utils/ledger';
+import { handleLedgerMessageSigning } from '@utils/ledger';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -41,7 +41,7 @@ function SignMessageRequest() {
   const selectedAccount = useSelectedAccount();
   const { accountsList, network } = useWalletSelector();
   const { payload, tabId, requestToken, confirmSignMessage, requestId } = useSignMessageRequest();
-  const { validationError } = useSignMessageValidation(payload);
+  const { validationError, setValidationError } = useSignMessageValidation(payload);
 
   const [addressType, setAddressType] = useState('');
   const [isSigning, setIsSigning] = useState(false);
@@ -119,22 +119,36 @@ function SignMessageRequest() {
     setCurrentStepIndex(1);
 
     try {
-      const signature = await handleBip322LedgerMessageSigning({
+      const signature = await handleLedgerMessageSigning({
         transport,
         addressIndex: selectedAccount.deviceAccountIndex,
         address: payload.address,
         networkType: network.type,
         message: payload.message,
+        protocol: (payload as any).protocol as MessageSigningProtocols,
       });
-      const signingMessage = {
-        source: MESSAGE_SOURCE,
-        method: SatsConnectMethods.signMessageResponse,
-        payload: {
-          signMessageRequest: requestToken,
-          signMessageResponse: signature,
-        },
-      };
-      chrome.tabs.sendMessage(+tabId, signingMessage);
+      if (requestToken) {
+        const signingMessage = {
+          source: MESSAGE_SOURCE,
+          method: SatsConnectMethods.signMessageResponse,
+          payload: {
+            signMessageRequest: requestToken,
+            signMessageResponse: signature,
+          },
+        };
+        chrome.tabs.sendMessage(+tabId, signingMessage);
+        window.close();
+      }
+      const response = makeRpcSuccessResponse(requestId, {
+        address: payload.address,
+        messageHash:
+          (payload as any).protocol === MessageSigningProtocols.BIP322
+            ? bip0322Hash(payload.message)
+            : legacyHash(payload.message).toString('base64'),
+        signature,
+        protocol: (payload as any).protocol,
+      });
+      sendRpcResponse(+tabId, response);
       window.close();
     } catch (e: any) {
       console.error(e);
@@ -178,22 +192,25 @@ function SignMessageRequest() {
         setIsModalVisible(true);
         return;
       }
-      const bip322signature = await confirmSignMessage();
+      const signedMessage = await confirmSignMessage();
       if (requestToken) {
         const signingMessage = {
           source: MESSAGE_SOURCE,
           method: SatsConnectMethods.signMessageResponse,
           payload: {
             signMessageRequest: requestToken,
-            signMessageResponse: bip322signature,
+            signMessageResponse: signedMessage.signature,
           },
         };
         chrome.tabs.sendMessage(+tabId, signingMessage);
       } else {
         const signMessageResult: Return<'signMessage'> = {
           address: payload.address,
-          messageHash: bip0322Hash(payload.message),
-          signature: bip322signature ?? '',
+          messageHash:
+            (payload as any).protocol === MessageSigningProtocols.BIP322
+              ? bip0322Hash(payload.message)
+              : legacyHash(payload.message).toString('base64'),
+          signature: signedMessage.signature,
           protocol: (payload as any).protocol,
         };
         const response = makeRpcSuccessResponse(requestId, signMessageResult);
@@ -201,6 +218,7 @@ function SignMessageRequest() {
       }
       window.close();
     } catch (err) {
+      setValidationError({ error: (err as any).message });
       console.log(err);
     } finally {
       setIsSigning(false);
