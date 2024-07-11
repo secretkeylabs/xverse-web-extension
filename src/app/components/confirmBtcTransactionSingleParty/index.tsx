@@ -52,6 +52,7 @@ type Props = {
   inputs: btcTransaction.EnhancedInput[];
   outputs: btcTransaction.EnhancedOutput[];
   feeOutput?: btcTransaction.TransactionFeeOutput;
+  recipientAddress?: string;
   runeSummary?: RuneSummaryActions | RuneSummary;
   showCenotaphCallout: boolean;
   isLoading: boolean;
@@ -80,10 +81,11 @@ type Props = {
   selectedBottomTab?: Tab;
 };
 
-function ConfirmBtcTransaction({
+function ConfirmBtcTransactionSingleParty({
   inputs,
   outputs,
   feeOutput,
+  recipientAddress,
   runeSummary,
   showCenotaphCallout,
   isLoading,
@@ -213,6 +215,7 @@ function ConfirmBtcTransaction({
           inputs={inputs}
           outputs={outputs}
           feeOutput={feeOutput}
+          recipientAddress={recipientAddress}
           transactionIsFinal={isFinal}
           showCenotaphCallout={showCenotaphCallout}
           getFeeForFeeRate={getFeeForFeeRate}
@@ -268,4 +271,4 @@ function ConfirmBtcTransaction({
   );
 }
 
-export default ConfirmBtcTransaction;
+export default ConfirmBtcTransactionSingleParty;

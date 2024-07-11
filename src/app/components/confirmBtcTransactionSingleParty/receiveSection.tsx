@@ -11,12 +11,19 @@ import Amount from './itemRow/amount';
 import InscriptionSatributeRow from './itemRow/inscriptionSatributeRow';
 import { getOutputsWithAssetsToUserAddress } from './utils';
 
+const Title = styled.p`
+  ${(props) => props.theme.typography.body_medium_m};
+  color: ${(props) => props.theme.colors.white_200};
+  margin-top: ${(props) => props.theme.space.s};
+  margin-bottom: ${(props) => props.theme.space.xs};
+`;
+
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   background: props.theme.colors.elevation1,
-  borderRadius: 12,
-  padding: `${props.theme.space.m} 0`,
+  borderRadius: props.theme.radius(2),
+  padding: `${props.theme.space.m} 0 20px`,
   justifyContent: 'center',
   marginBottom: props.theme.space.s,
 }));
@@ -48,13 +55,14 @@ type Props = {
   onShowInscription: (inscription: btcTransaction.IOInscription) => void;
   runeReceipts?: RuneSummary['receipts'];
 };
+
 function ReceiveSection({
-                          outputs,
-                          netAmount,
-                          onShowInscription,
-                          runeReceipts,
-                          transactionIsFinal,
-                        }: Props) {
+  outputs,
+  netAmount,
+  onShowInscription,
+  runeReceipts,
+  transactionIsFinal,
+}: Props) {
   const { btcAddress, ordinalsAddress } = useSelectedAccount();
   const { hasActivatedRareSatsKey } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
@@ -104,11 +112,12 @@ function ReceiveSection({
 
   return (
     <>
+      {(showOrdinalSection || showPaymentSection) && <Title>{t('YOU_WILL_RECEIVE')}</Title>}
       {showOrdinalSection && (
         <Container>
           <Header spaceBetween>
-            <StyledP typography="body_medium_m" color="white_200">
-              {t('YOU_WILL_RECEIVE')}
+            <StyledP typography="body_medium_m" color="white_400">
+              {t('TO')}
             </StyledP>
             <RowCenter>
               <ArrowRight weight="bold" color={Theme.colors.white_0} size={16} />
@@ -144,8 +153,8 @@ function ReceiveSection({
       {showPaymentSection && (
         <Container>
           <Header spaceBetween>
-            <StyledP typography="body_medium_m" color="white_200">
-              {t('YOU_WILL_RECEIVE')}
+            <StyledP typography="body_medium_m" color="white_400">
+              {t('TO')}
             </StyledP>
             <RowCenter>
               <ArrowRight weight="bold" color={Theme.colors.white_0} size={16} />

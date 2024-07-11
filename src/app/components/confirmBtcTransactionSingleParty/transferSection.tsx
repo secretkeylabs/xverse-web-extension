@@ -46,6 +46,7 @@ const Header = styled(RowCenter)((props) => ({
 type Props = {
   outputs: btcTransaction.EnhancedOutput[];
   inputs: btcTransaction.EnhancedInput[];
+  recipientAddress?: string;
   transactionIsFinal: boolean;
   runeTransfers?: RuneSummary['transfers'];
   netAmount: number;
@@ -56,6 +57,7 @@ type Props = {
 function TransferSection({
   outputs,
   inputs,
+  recipientAddress,
   transactionIsFinal,
   runeTransfers,
   netAmount,
@@ -94,8 +96,18 @@ function TransferSection({
 
   return (
     <>
-      <Title>{t('YOU_WILL_TRANSFER')}</Title>
+      <Title>{t('YOU_WILL_SEND')}</Title>
       <Container>
+        <Header spaceBetween>
+          <StyledP typography="body_medium_m" color="white_400">
+            {t('TO')}
+          </StyledP>
+          {recipientAddress && (
+            <StyledP typography="body_medium_m" color="white_0">
+              {getTruncatedAddress(recipientAddress, 6)}
+            </StyledP>
+          )}
+        </Header>
         {
           // if transaction is not final, then runes will be delegated and will show up in the delegation section
           transactionIsFinal &&

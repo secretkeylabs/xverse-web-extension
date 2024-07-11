@@ -1,4 +1,4 @@
-import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
+import ConfirmBtcTransaction from 'app/components/confirmBtcTransaction';
 import RequestError from '@components/requests/requestError';
 import { Transport } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';

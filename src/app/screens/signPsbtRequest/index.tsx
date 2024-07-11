@@ -1,5 +1,5 @@
 import { makeRPCError, sendRpcResponse } from '@common/utils/rpc/helpers';
-import ConfirmBitcoinTransaction from '@components/confirmBtcTransaction';
+import ConfirmBitcoinTransaction from 'app/components/confirmBtcTransaction';
 import RequestError from '@components/requests/requestError';
 import useSubmitRuneSellPsbt from '@hooks/queries/runes/useSubmitRuneSellPsbt';
 import useHasFeature from '@hooks/useHasFeature';
