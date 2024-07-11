@@ -8,7 +8,10 @@ import styled from 'styled-components';
 import Amount from '../confirmBtcTransaction/itemRow/amount';
 import AmountWithInscriptionSatribute from '../confirmBtcTransaction/itemRow/amountWithInscriptionSatribute';
 import InscriptionSatributeRow from '../confirmBtcTransaction/itemRow/inscriptionSatributeRow';
-import { getInputsWitAssetsFromUserAddress, getOutputsWithAssetsFromUserAddress } from './utils';
+import {
+  getInputsWitAssetsFromUserAddress,
+  getOutputsWithAssetsFromUserAddress,
+} from '../confirmBtcTransaction/utils';
 
 const Title = styled.p`
   ${(props) => props.theme.typography.body_medium_m};

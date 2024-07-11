@@ -18,7 +18,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import SendLayout from '../../layouts/sendLayout';
-import LedgerStepView, { Steps } from './ledgerStepView';
+import LedgerStepView, { Steps } from '../confirmBtcTransaction/ledgerStepView';
 import TransactionSummary from './transactionSummary';
 
 const LoaderContainer = styled.div(() => ({

@@ -20,13 +20,13 @@ import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import DelegateSection from '../confirmBtcTransaction/delegateSection';
+import EtchSection from '../confirmBtcTransaction/etchSection';
 import AmountWithInscriptionSatribute from '../confirmBtcTransaction/itemRow/amountWithInscriptionSatribute';
+import ReceiveSection from '../confirmBtcTransaction/receiveSection';
 import TxInOutput from '../confirmBtcTransaction/txInOutput/txInOutput';
-import DelegateSection from './delegateSection';
-import EtchSection from './etchSection';
-import ReceiveSection from './receiveSection';
+import { getNetAmount, isScriptOutput } from '../confirmBtcTransaction/utils';
 import TransferSection from './transferSection';
-import { getNetAmount, isScriptOutput } from './utils';
 
 const Container = styled.div((props) => ({
   background: props.theme.colors.elevation1,
