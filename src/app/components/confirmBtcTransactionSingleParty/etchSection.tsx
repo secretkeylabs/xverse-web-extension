@@ -8,7 +8,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import Theme from '../../../theme';
-import InscribeSection from './inscribeSection';
+import InscribeSection from '../confirmBtcTransaction/inscribeSection';
 import {
   AddressLabel,
   Container,

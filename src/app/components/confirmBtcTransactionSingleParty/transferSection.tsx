@@ -5,9 +5,9 @@ import { StyledP } from '@ui-library/common.styled';
 import { getTruncatedAddress } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import Amount from './itemRow/amount';
-import AmountWithInscriptionSatribute from './itemRow/amountWithInscriptionSatribute';
-import InscriptionSatributeRow from './itemRow/inscriptionSatributeRow';
+import Amount from '../confirmBtcTransaction/itemRow/amount';
+import AmountWithInscriptionSatribute from '../confirmBtcTransaction/itemRow/amountWithInscriptionSatribute';
+import InscriptionSatributeRow from '../confirmBtcTransaction/itemRow/inscriptionSatributeRow';
 import { getInputsWitAssetsFromUserAddress, getOutputsWithAssetsFromUserAddress } from './utils';
 
 const Title = styled.p`

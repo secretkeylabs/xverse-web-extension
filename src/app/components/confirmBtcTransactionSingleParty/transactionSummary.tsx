@@ -20,12 +20,12 @@ import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import AmountWithInscriptionSatribute from '../confirmBtcTransaction/itemRow/amountWithInscriptionSatribute';
+import TxInOutput from '../confirmBtcTransaction/txInOutput/txInOutput';
 import DelegateSection from './delegateSection';
 import EtchSection from './etchSection';
-import AmountWithInscriptionSatribute from './itemRow/amountWithInscriptionSatribute';
 import ReceiveSection from './receiveSection';
 import TransferSection from './transferSection';
-import TxInOutput from './txInOutput/txInOutput';
 import { getNetAmount, isScriptOutput } from './utils';
 
 const Container = styled.div((props) => ({

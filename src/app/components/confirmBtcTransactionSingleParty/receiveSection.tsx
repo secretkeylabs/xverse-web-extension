@@ -7,8 +7,8 @@ import { StyledP } from '@ui-library/common.styled';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import Theme from 'theme';
-import Amount from './itemRow/amount';
-import InscriptionSatributeRow from './itemRow/inscriptionSatributeRow';
+import Amount from '../confirmBtcTransaction/itemRow/amount';
+import InscriptionSatributeRow from '../confirmBtcTransaction/itemRow/inscriptionSatributeRow';
 import { getOutputsWithAssetsToUserAddress } from './utils';
 
 const Title = styled.p`
