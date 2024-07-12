@@ -132,7 +132,7 @@ function SignMessageRequestInApp() {
     setCurrentStepIndex(1);
 
     try {
-      const bip322signature = await handleLedgerMessageSigning({
+      const signedMessage = await handleLedgerMessageSigning({
         transport,
         addressIndex: selectedAccount.deviceAccountIndex,
         address: payload.address,
@@ -146,7 +146,7 @@ function SignMessageRequestInApp() {
         makerPublicKey: selectedAccount?.ordinalsPublicKey!,
         makerAddress: selectedAccount?.ordinalsAddress!,
         token: payload.token,
-        signature: bip322signature,
+        signature: signedMessage.signature,
       });
 
       handleGoBack();

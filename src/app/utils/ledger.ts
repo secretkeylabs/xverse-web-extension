@@ -33,7 +33,10 @@ export const handleLedgerMessageSigning = async ({
     protocol,
   });
 
-  return signature;
+  return {
+    signature,
+    protocol,
+  };
 };
 
 export const signatureVrsToRsv = (sig: string): string => sig.slice(2) + sig.slice(0, 2);

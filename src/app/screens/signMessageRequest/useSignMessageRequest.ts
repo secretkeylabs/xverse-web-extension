@@ -2,8 +2,13 @@ import useSeedVault from '@hooks/useSeedVault';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { Params, SignMessageOptions, SignMessagePayload } from '@sats-connect/core';
-import { MessageSigningProtocols, signMessage } from '@secretkeylabs/xverse-core';
+import {
+  BitcoinNetworkType,
+  Params,
+  SignMessageOptions,
+  SignMessagePayload,
+} from '@sats-connect/core';
+import { signMessage } from '@secretkeylabs/xverse-core';
 import { isHardwareAccount } from '@utils/helper';
 import { decodeToken } from 'jsontokens';
 import { useEffect, useMemo, useState } from 'react';
@@ -13,6 +18,7 @@ import SuperJSON from 'superjson';
 
 const useSignMessageRequestParams = () => {
   const { search } = useLocation();
+  const { network } = useWalletSelector();
   const params = useMemo(() => new URLSearchParams(search), [search]);
   const tabId = params.get('tabId') ?? '0';
   const requestId = params.get('requestId') ?? '';
@@ -27,13 +33,18 @@ const useSignMessageRequestParams = () => {
         requestToken: token,
       };
     }
-    const rpcPayload = SuperJSON.parse<Params<'signMessage'>>(payloadToken);
+    const rpcPayload: SignMessagePayload = {
+      ...SuperJSON.parse<Params<'signMessage'>>(payloadToken),
+      network: {
+        type: network.type as BitcoinNetworkType,
+      },
+    };
 
     return {
       payload: rpcPayload,
       requestToken: null,
     };
-  }, [params, payloadToken]);
+  }, [params, payloadToken, network.type]);
 
   return { tabId, payload, requestToken, requestId };
 };
@@ -43,9 +54,7 @@ type ValidationError = {
   errorTitle?: string;
 };
 
-export const useSignMessageValidation = (
-  requestPayload: SignMessagePayload | Params<'signMessage'> | undefined,
-) => {
+export const useSignMessageValidation = (requestPayload: SignMessagePayload | undefined) => {
   const [validationError, setValidationError] = useState<ValidationError | null>(null);
   const { t } = useTranslation('translation', { keyPrefix: 'REQUEST_ERRORS' });
   const selectedAccount = useSelectedAccount();
@@ -67,7 +76,7 @@ export const useSignMessageValidation = (
 
   const validateSignMessage = () => {
     if (!requestPayload) return;
-    if ((requestPayload as any).network && (requestPayload as any).network.type !== network.type) {
+    if (requestPayload.network.type !== network.type) {
       setValidationError({
         error: t('NETWORK_MISMATCH'),
       });
@@ -107,7 +116,7 @@ export const useSignMessageRequest = () => {
       accounts: accountsList,
       message,
       address,
-      protocol: (payload as any).protocol,
+      protocol: payload.protocol,
       seedPhrase,
       network: network.type,
     });

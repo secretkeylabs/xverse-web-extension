@@ -24,3 +24,14 @@ export function sendGetAddressesSuccessResponseMessage({
 }: GetAddressesSuccess) {
   sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
 }
+
+type SignMessageSuccess = BaseArgs & {
+  result: Return<'signMessage'>;
+};
+export function sendSignMessageSuccessResponseMessage({
+  tabId,
+  messageId,
+  result,
+}: SignMessageSuccess) {
+  sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
+}
