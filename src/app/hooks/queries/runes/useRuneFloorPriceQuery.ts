@@ -9,10 +9,13 @@ export default function useRuneFloorPriceQuery(runeName: string, backgroundRefet
     throw new Error('Only available on Mainnet');
   }
   const runesApi = useRunesApi();
-  const queryFn = useCallback(async () => {
-    const res = await runesApi.getRuneMarketData(runeName);
-    return Number(res.floorUnitPrice.formatted);
-  }, [runeName, runesApi]);
+  const queryFn = useCallback(
+    async () =>
+      runesApi
+        .getRuneMarketData(runeName)
+        .then((res) => Number(res.floorUnitPrice?.formatted ?? 0)),
+    [runeName, runesApi],
+  );
   return useQuery({
     refetchOnWindowFocus: backgroundRefetch,
     refetchOnReconnect: backgroundRefetch,
