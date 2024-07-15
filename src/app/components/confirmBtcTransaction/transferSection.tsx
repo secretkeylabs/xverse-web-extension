@@ -1,8 +1,11 @@
 import RuneAmount from '@components/confirmBtcTransaction/itemRow/runeAmount';
 import useSelectedAccount from '@hooks/useSelectedAccount';
-import { btcTransaction, RuneSummary } from '@secretkeylabs/xverse-core';
+import { WarningOctagon } from '@phosphor-icons/react';
+import { RuneSummary, btcTransaction } from '@secretkeylabs/xverse-core';
+import { StyledP } from '@ui-library/common.styled';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import Theme from 'theme';
 import Amount from './itemRow/amount';
 import AmountWithInscriptionSatribute from './itemRow/amountWithInscriptionSatribute';
 import InscriptionSatributeRow from './itemRow/inscriptionSatributeRow';
@@ -29,6 +32,18 @@ const RowContainer = styled.div<{ noPadding?: boolean; noMargin?: boolean }>((pr
   padding: props.noPadding ? 0 : `0 ${props.theme.space.m}`,
   marginTop: props.noMargin ? 0 : `${props.theme.space.m}`,
 }));
+
+const WarningContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: props.theme.space.xs,
+  marginTop: props.theme.space.s,
+}));
+
+const WarningText = styled(StyledP)`
+  flex: 1 0 0;
+`;
 
 type Props = {
   outputs: btcTransaction.EnhancedOutput[];
@@ -75,6 +90,11 @@ function TransferSection({
   const hasInscriptionsRareSatsInOrdinal =
     (!transactionIsFinal && inputFromOrdinal.length > 0) || outputsFromOrdinal.length > 0;
 
+  const hasExternalInputs = inputs.some(
+    (input) =>
+      input.extendedUtxo.address !== btcAddress && input.extendedUtxo.address !== ordinalsAddress,
+  );
+
   const hasData = showAmount || hasRuneTransfers || hasInscriptionsRareSatsInOrdinal;
 
   if (!hasData) return null;
@@ -100,6 +120,14 @@ function TransferSection({
               satributes={satributesFromPayment}
               onShowInscription={onShowInscription}
             />
+            {hasExternalInputs && (
+              <WarningContainer>
+                <WarningOctagon weight="fill" color={Theme.colors.caution} size={16} />
+                <WarningText typography="body_medium_s" color="caution">
+                  {t('BTC_TRANSFER_WARNING')}
+                </WarningText>
+              </WarningContainer>
+            )}
           </RowContainer>
         )}
         {hasInscriptionsRareSatsInOrdinal && (
