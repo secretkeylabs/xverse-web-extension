@@ -77,5 +77,6 @@ export const TxReviewModalControls = styled.div((props) => ({
 }));
 
 export const ButtonsContainer = styled(StickyHorizontalSplitButtonContainer)`
-  padding: 0 ${(props) => props.theme.space.m};
+  padding-left: ${(props) => props.theme.space.m};
+  padding-right: ${(props) => props.theme.space.m};
 `;
