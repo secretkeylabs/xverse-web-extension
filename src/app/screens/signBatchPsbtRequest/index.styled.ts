@@ -1,3 +1,4 @@
+import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import styled from 'styled-components';
 
@@ -26,14 +27,6 @@ export const LoaderContainer = styled.div((props) => ({
   justifyContent: 'center',
   alignItems: 'center',
   marginTop: props.theme.space.l,
-}));
-
-export const ButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  padding: props.theme.space.m,
-  paddingTop: props.theme.space.l,
-  paddingBottom: props.theme.space.xxl,
 }));
 
 export const TransparentButtonContainer = styled.div((props) => ({
@@ -73,13 +66,14 @@ export const StyledSheet = styled(Sheet)`
   background-color: #181818 !important;
 `;
 
-export const SheetContainer = styled.div`
-  margin-top: -40px;
-`;
-
 export const TxReviewModalControls = styled.div((props) => ({
   display: 'flex',
   columnGap: props.theme.space.s,
   paddingTop: props.theme.space.l,
-  paddingBottom: props.theme.space.xxl,
+  paddingBottom: props.theme.space.l,
 }));
+
+export const ButtonsContainer = styled(StickyHorizontalSplitButtonContainer)`
+  padding-left: ${(props) => props.theme.space.m};
+  padding-right: ${(props) => props.theme.space.m};
+`;

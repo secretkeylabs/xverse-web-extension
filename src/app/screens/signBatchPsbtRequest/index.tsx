@@ -40,12 +40,11 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import {
   BundleLinkContainer,
   BundleLinkText,
-  ButtonContainer,
+  ButtonsContainer,
   Container,
   LoaderContainer,
   OuterContainer,
   ReviewTransactionText,
-  SheetContainer,
   StyledSheet,
   TransparentButtonContainer,
   TxReviewModalControls,
@@ -346,7 +345,7 @@ function SignBatchPsbtRequest() {
               </Container>
             )}
           </OuterContainer>
-          <ButtonContainer>
+          <ButtonsContainer>
             <TransparentButtonContainer>
               <Button title={t('CANCEL')} variant="secondary" onClick={onCancelClick} />
             </TransparentButtonContainer>
@@ -356,7 +355,7 @@ function SignBatchPsbtRequest() {
               loading={isSigning}
               disabled={isLedgerAccount(selectedAccount)}
             />
-          </ButtonContainer>
+          </ButtonsContainer>
         </>
       )}
       <StyledSheet
@@ -367,21 +366,19 @@ function SignBatchPsbtRequest() {
           setCurrentPsbtIndex(0);
         }}
       >
-        <SheetContainer>
-          <ReviewTransactionText>
-            {t('TRANSACTION')} {currentPsbtIndex + 1}/{parsedPsbts.length}
-          </ReviewTransactionText>
-          {!!parsedPsbts[currentPsbtIndex] && (
-            <TransactionSummary
-              inputs={parsedPsbts[currentPsbtIndex].summary.inputs}
-              outputs={parsedPsbts[currentPsbtIndex].summary.outputs}
-              feeOutput={parsedPsbts[currentPsbtIndex].summary.feeOutput}
-              runeSummary={parsedPsbts[currentPsbtIndex].runeSummary}
-              transactionIsFinal={parsedPsbts[currentPsbtIndex].summary.isFinal}
-              showCenotaphCallout={!!parsedPsbts[currentPsbtIndex].summary.runeOp?.Cenotaph?.flaws}
-            />
-          )}
-        </SheetContainer>
+        <ReviewTransactionText>
+          {t('TRANSACTION')} {currentPsbtIndex + 1}/{parsedPsbts.length}
+        </ReviewTransactionText>
+        {!!parsedPsbts[currentPsbtIndex] && (
+          <TransactionSummary
+            inputs={parsedPsbts[currentPsbtIndex].summary.inputs}
+            outputs={parsedPsbts[currentPsbtIndex].summary.outputs}
+            feeOutput={parsedPsbts[currentPsbtIndex].summary.feeOutput}
+            runeSummary={parsedPsbts[currentPsbtIndex].runeSummary}
+            transactionIsFinal={parsedPsbts[currentPsbtIndex].summary.isFinal}
+            showCenotaphCallout={!!parsedPsbts[currentPsbtIndex].summary.runeOp?.Cenotaph?.flaws}
+          />
+        )}
         <TxReviewModalControls>
           {currentPsbtIndex > 0 && (
             <Button
