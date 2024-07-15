@@ -1,6 +1,6 @@
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import TransactionSettingAlert from '@components/transactionSetting';
-import { SwapConfirmationOutput } from '@screens/swap/swapConfirmation/useConfirmSwap';
+import { SwapConfirmationOutput } from '@screens/swap/swapStacksConfirmation/useConfirmSwap';
 import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import { useCallback, useState } from 'react';
@@ -33,7 +33,7 @@ type Props = {
   swap: SwapConfirmationOutput;
 };
 
-export function AdvanceSettings({ swap }: Props) {
+function AdvanceSettings({ swap }: Props) {
   const [showModal, setShowModal] = useState(false);
   const [showFeeSettings, setShowFeeSettings] = useState(false);
 

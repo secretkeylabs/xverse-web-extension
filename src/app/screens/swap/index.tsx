@@ -1,146 +1,124 @@
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import { ArrowDown } from '@phosphor-icons/react';
-import CoinSelectModal from '@screens/home/coinSelectModal';
-import { SwapInfoBlock } from '@screens/swap/swapInfoBlock';
-import SwapTokenBlock from '@screens/swap/swapTokenBlock';
-import { useSwap } from '@screens/swap/useSwap';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { ArrowRight } from '@phosphor-icons/react';
 import Button from '@ui-library/button';
-import { isFungibleToken } from '@utils/helper';
-import { useCallback, useEffect, useState } from 'react';
+import { StyledP } from '@ui-library/common.styled';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-
-const ScrollContainer = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  row-gap: 16px;
-  overflow-y: auto;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-  margin-left: 5%;
-  margin-right: 5%;
-  padding-bottom: 16px;
-`;
+import Theme from 'theme';
+import AmountInput from './components/amountInput';
+import RouteItem from './components/routeItem';
 
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  rowGap: props.theme.spacing(8),
-  marginTop: props.theme.spacing(16),
+  flex: 1,
+  padding: `0 ${props.theme.space.m} ${props.theme.space.l} ${props.theme.space.m}`,
 }));
 
-const DownArrowButton = styled.button((props) => ({
-  alignSelf: 'center',
-  borderRadius: props.theme.radius(2),
-  width: props.theme.spacing(18),
-  height: props.theme.spacing(18),
-  background: props.theme.colors.elevation3,
-  transition: 'all 0.2s ease',
+const Flex1 = styled.div((props) => ({
+  flex: 1,
+}));
+
+const RouteContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  margin: `${props.theme.space.l} 0`,
+}));
+
+const SwapButtonContainer = styled.button((props) => ({
+  display: 'flex',
+  background: props.theme.colors.white_0,
+  padding: props.theme.space.xs,
+  alignSelf: 'flex-end',
+  borderRadius: props.theme.space.xxl,
+  marginBottom: props.theme.space.xs,
   ':hover': {
     opacity: 0.8,
   },
 }));
 
 const SendButtonContainer = styled.div((props) => ({
-  paddingBottom: props.theme.spacing(12),
-  paddingTop: props.theme.spacing(4),
-  marginLeft: '5%',
-  marginRight: '5%',
+  marginTop: props.theme.space.l,
 }));
 
-function SwapScreen() {
+export default function SwapScreen() {
+  const [amount, setAmount] = useState('');
+
+  const { fiatCurrency } = useWalletSelector();
   const navigate = useNavigate();
-  const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
-  const swap = useSwap();
+  const { t } = useTranslation('translation');
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const defaultFrom = params.get('from');
-
-  const [selecting, setSelecting] = useState<'from' | 'to'>();
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (
-      !swap.selectedFromToken &&
-      !swap.selectedToToken &&
-      defaultFrom &&
-      (defaultFrom === 'STX' || isFungibleToken(defaultFrom))
-    ) {
-      swap.onSelectToken(defaultFrom, 'from');
-    }
-  }, [defaultFrom, swap]);
 
   const handleGoBack = () => {
     navigate(-1);
   };
 
-  const handleClickContinue = useCallback(async () => {
-    if (swap.submitError || !swap.onSwap) {
-      return;
-    }
-    try {
-      setLoading(true);
-      await swap.onSwap();
-    } finally {
-      setLoading(false);
-    }
-  }, [swap, setLoading]);
+  const getQuotes = () => {
+    // TODO: implement getQuotes
+  };
+
+  const onClickFrom = () => {
+    // TODO: implement from bottomsheet
+  };
+
+  const onClickTo = () => {
+    // TODO: implement from bottomsheet
+  };
+
+  const onClickSwapRoute = () => {
+    // TODO: implement swap route
+  };
+
+  const isGetQuotesDisabled = false;
+  const isError = false;
+  const isGetQuotesLoading = false;
 
   return (
     <>
-      <TopRow title={t('SWAP')} onClick={handleGoBack} />
-      <ScrollContainer>
-        <Container>
-          <SwapTokenBlock
-            title={t('CONVERT')}
-            selectedCoin={swap.selectedFromToken}
-            amount={swap.inputAmount}
-            error={swap.inputAmountInvalid}
-            onAmountChange={swap.onInputAmountChanged}
-            onSelectCoin={() => setSelecting('from')}
+      <TopRow onClick={handleGoBack} />
+      <Container>
+        <StyledP typography="headline_s" color="white_0">
+          {t('SWAP_SCREEN.SWAP')}
+        </StyledP>
+        <Flex1>
+          <RouteContainer>
+            <RouteItem label={t('SWAP_SCREEN.FROM')} onClick={onClickFrom} />
+            <SwapButtonContainer onClick={onClickSwapRoute}>
+              <ArrowRight size={16} weight="bold" color={Theme.colors.elevation0} />
+            </SwapButtonContainer>
+            <RouteItem label={t('SWAP_SCREEN.TO')} onClick={onClickTo} />
+          </RouteContainer>
+          <AmountInput
+            label={t('SWAP_CONFIRM_SCREEN.AMOUNT')}
+            input={{
+              value: amount,
+              onChange: (value: string) => setAmount(value),
+              fiatValue: '0',
+              fiatCurrency,
+            }}
+            max={{ isDisabled: false, onClick: () => {} }}
+            balance="0"
           />
-          <DownArrowButton data-testid="down-arrow-button" onClick={swap.handleClickDownArrow}>
-            <ArrowDown size={20} weight="regular" color="white" />
-          </DownArrowButton>
-          <SwapTokenBlock
-            title={t('TO')}
-            selectedCoin={swap.selectedToToken}
-            onSelectCoin={() => setSelecting('to')}
+        </Flex1>
+        <SendButtonContainer>
+          <Button
+            disabled={isGetQuotesDisabled}
+            variant={isError ? 'danger' : 'primary'}
+            title={isError ? 'Error msg' : t('SWAP_SCREEN.GET_QUOTES')}
+            loading={isGetQuotesLoading}
+            onClick={getQuotes}
           />
-        </Container>
-        <SwapInfoBlock swap={swap} />
-      </ScrollContainer>
-      {selecting != null && (
-        <CoinSelectModal
-          onSelectStacks={() => {
-            swap.onSelectToken('STX', selecting);
-          }}
-          onClose={() => setSelecting(undefined)}
-          onSelectCoin={(coin) => {
-            swap.onSelectToken(coin, selecting);
-          }}
-          visible={!!selecting}
-          coins={swap.coinsList}
-          title={selecting === 'from' ? t('ASSET_TO_CONVERT_FROM') : t('ASSET_TO_CONVERT_TO')}
-          loadingWalletData={swap.isLoadingWalletData}
-        />
-      )}
-      <SendButtonContainer>
-        <Button
-          disabled={!!swap.submitError || swap.onSwap == null}
-          variant={swap.submitError ? 'danger' : 'primary'}
-          title={swap.submitError ?? t('CONTINUE')}
-          loading={loading || swap.isLoadingRates}
-          onClick={handleClickContinue}
-        />
-      </SendButtonContainer>
+        </SendButtonContainer>
+      </Container>
       <BottomBar tab="dashboard" />
     </>
   );
 }
-
-export default SwapScreen;

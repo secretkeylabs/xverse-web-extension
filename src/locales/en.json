@@ -1298,7 +1298,8 @@
       "SLIPPAGE_TOLERANCE_CANNOT_EXCEED": "The slippage tolerance cannot exceed 100%"
     },
     "SWAP_TRANSACTION_CANNOT_BE_SPONSORED": "Swap transaction cannot be sponsored while you have a pending transaction.",
-    "LEARN_MORE": "Learn more"
+    "LEARN_MORE": "Learn more",
+    "GET_QUOTES": "Get quotes"
   },
   "SWAP_CONFIRM_SCREEN": {
     "TOKEN_SWAP": "Token swap",

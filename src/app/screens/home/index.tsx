@@ -429,10 +429,8 @@ function Home() {
     dispatch(changeShowDataCollectionAlertAction(false));
   };
 
-  const showSwaps =
-    useHasFeature(FeatureId.SWAPS) &&
-    !isLedgerAccount(selectedAccount) &&
-    network.type === 'Mainnet';
+  // ledger is disabled for now
+  const showSwaps = !isLedgerAccount(selectedAccount) && network.type === 'Mainnet';
 
   return (
     <>

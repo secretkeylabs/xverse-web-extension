@@ -3,7 +3,7 @@ import CopyIcon from '@assets/img/swap/copy.svg';
 import FoldDownIcon from '@assets/img/swap/fold_arrow_down.svg';
 import FoldIconUp from '@assets/img/swap/fold_arrow_up.svg';
 import TokenImage from '@components/tokenImage';
-import { SwapConfirmationOutput } from '@screens/swap/swapConfirmation/useConfirmSwap';
+import { SwapConfirmationOutput } from '@screens/swap/swapStacksConfirmation/useConfirmSwap';
 import { EstimateUSDText } from '@screens/swap/swapTokenBlock';
 import { getTruncatedAddress } from '@utils/helper';
 import { useCallback, useState } from 'react';
@@ -34,7 +34,7 @@ export const TitleText = styled.h3((props) => ({
   fontWeight: 500,
 }));
 
-export const FoldArrow = styled.img(() => ({
+const FoldArrow = styled.img(() => ({
   width: 14,
   height: 14,
   cursor: 'pointer',

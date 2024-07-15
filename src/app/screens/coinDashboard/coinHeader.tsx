@@ -63,11 +63,6 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const isReceivingAddressesVisible = !isLedgerAccount(selectedAccount);
-  const showSwaps =
-    useHasFeature(FeatureId.SWAPS) &&
-    currency === 'STX' &&
-    !isLedgerAccount(selectedAccount) &&
-    network.type !== 'Testnet';
 
   const showRunesListing =
     (useHasFeature(FeatureId.RUNES_LISTING) || process.env.NODE_ENV === 'development') &&
@@ -169,6 +164,39 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
     return `${currency} ${t('BALANCE')}`;
   };
 
+  const showStacksSwaps = useHasFeature(FeatureId.SWAPS) && currency === 'STX';
+  const showRunesSwap =
+    (currency === 'FT' && fungibleToken?.protocol === 'runes') || currency === 'BTC';
+
+  // ledger is disabled for now
+  const showSwaps =
+    (showStacksSwaps || showRunesSwap) &&
+    !isLedgerAccount(selectedAccount) &&
+    network.type === 'Mainnet';
+
+  const navigateToSwaps = () => {
+    if (!showSwaps) {
+      return;
+    }
+    if (showStacksSwaps) {
+      return navigate(`/swap-stacks?from=${currency}`);
+    }
+    navigate(`/swap?from=${currency}`);
+  };
+
+  const navigateToReceive = () => {
+    if (fungibleToken) {
+      // RUNES & BRC20s => ordinal wallet, SIP-10 => STX wallet
+      return navigate(`/receive/${fungibleToken?.protocol === 'stacks' ? 'STX' : 'ORD'}`);
+    }
+
+    if (isReceivingAddressesVisible) {
+      return navigate(`/receive/${currency}`);
+    }
+
+    handleReceiveModalOpen();
+  };
+
   return (
     <Container>
       <BalanceInfoContainer>
@@ -214,51 +242,24 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
       </BalanceInfoContainer>
       {renderStackingBalances()}
       <RowButtonContainer>
-        <SmallActionButton src={ArrowUp} text={t('SEND')} onPress={() => goToSendScreen()} />
-        {fungibleToken ? (
-          <>
-            <SmallActionButton
-              src={ArrowDown}
-              text={t('RECEIVE')}
-              // RUNES & BRC20s => ordinal wallet, SIP-10 => STX wallet
-              onPress={() =>
-                navigate(`/receive/${fungibleToken?.protocol === 'stacks' ? 'STX' : 'ORD'}`)
-              }
-            />
-            {showRunesListing && fungibleToken.protocol === 'runes' && (
-              <SmallActionButton
-                src={List}
-                text={t('LIST')}
-                onPress={() => navigate(`/list-rune/${fungibleToken.principal}`)}
-              />
-            )}
-          </>
-        ) : (
-          <>
-            <SmallActionButton
-              src={ArrowDown}
-              text={t('RECEIVE')}
-              onPress={() => {
-                if (isReceivingAddressesVisible) {
-                  navigate(`/receive/${currency}`);
-                } else {
-                  handleReceiveModalOpen();
-                }
-              }}
-            />
-            {showSwaps && (
-              <SmallActionButton
-                src={ArrowSwap}
-                text={t('SWAP')}
-                onPress={() => navigate(`/swap?from=${currency}`)}
-              />
-            )}
-            <SmallActionButton
-              src={Buy}
-              text={t('BUY')}
-              onPress={() => navigate(`/buy/${currency}`)}
-            />
-          </>
+        <SmallActionButton src={ArrowUp} text={t('SEND')} onPress={goToSendScreen} />
+        <SmallActionButton src={ArrowDown} text={t('RECEIVE')} onPress={navigateToReceive} />
+        {showRunesListing && fungibleToken?.protocol === 'runes' && (
+          <SmallActionButton
+            src={List}
+            text={t('LIST')}
+            onPress={() => navigate(`/list-rune/${fungibleToken.principal}`)}
+          />
+        )}
+        {showSwaps && (
+          <SmallActionButton src={ArrowSwap} text={t('SWAP')} onPress={navigateToSwaps} />
+        )}
+        {!fungibleToken && (
+          <SmallActionButton
+            src={Buy}
+            text={t('BUY')}
+            onPress={() => navigate(`/buy/${currency}`)}
+          />
         )}
       </RowButtonContainer>
       <BottomModal
