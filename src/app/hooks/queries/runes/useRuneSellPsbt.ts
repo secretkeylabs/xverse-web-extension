@@ -58,7 +58,7 @@ const useRuneSellPsbt = (runeName: string, listingUtxos: Record<string, RuneItem
       };
       setSignPsbtPayload(payload);
     } catch (err) {
-      setError('Something went wrong. Please try again with a lower sat price.');
+      setError('Failed to create listing');
     } finally {
       setLoading(false);
     }
