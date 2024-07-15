@@ -1,5 +1,5 @@
+import BottomModal from '@components/bottomModal';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
-import Sheet from '@ui-library/sheet';
 import styled from 'styled-components';
 
 export const OuterContainer = styled.div`
@@ -17,9 +17,13 @@ export const Container = styled.div((props) => ({
   flexDirection: 'column',
   flex: 1,
   marginTop: props.theme.spacing(11),
-  marginLeft: props.theme.space.m,
-  marginRight: props.theme.space.m,
+  paddingLeft: props.theme.space.m,
+  paddingRight: props.theme.space.m,
 }));
+
+export const ModalContainer = styled(Container)({
+  marginTop: 0,
+});
 
 export const LoaderContainer = styled.div((props) => ({
   display: 'flex',
@@ -58,7 +62,7 @@ export const BundleLinkText = styled.div((props) => ({
   marginRight: props.theme.space.xxs,
 }));
 
-export const StyledSheet = styled(Sheet)`
+export const StyledSheet = styled(BottomModal)`
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -69,11 +73,9 @@ export const StyledSheet = styled(Sheet)`
 export const TxReviewModalControls = styled.div((props) => ({
   display: 'flex',
   columnGap: props.theme.space.s,
-  paddingTop: props.theme.space.l,
-  paddingBottom: props.theme.space.l,
+  padding: `${props.theme.space.l} ${props.theme.space.m}`,
 }));
 
 export const ButtonsContainer = styled(StickyHorizontalSplitButtonContainer)`
-  padding-left: ${(props) => props.theme.space.m};
-  padding-right: ${(props) => props.theme.space.m};
+  padding: 0 ${(props) => props.theme.space.m};
 `;

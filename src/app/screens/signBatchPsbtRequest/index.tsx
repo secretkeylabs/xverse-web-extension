@@ -43,6 +43,7 @@ import {
   ButtonsContainer,
   Container,
   LoaderContainer,
+  ModalContainer,
   OuterContainer,
   ReviewTransactionText,
   StyledSheet,
@@ -359,26 +360,32 @@ function SignBatchPsbtRequest() {
         </>
       )}
       <StyledSheet
-        title=""
+        header=""
         visible={reviewTransaction}
         onClose={() => {
           setReviewTransaction(false);
           setCurrentPsbtIndex(0);
         }}
       >
-        <ReviewTransactionText>
-          {t('TRANSACTION')} {currentPsbtIndex + 1}/{parsedPsbts.length}
-        </ReviewTransactionText>
-        {!!parsedPsbts[currentPsbtIndex] && (
-          <TransactionSummary
-            inputs={parsedPsbts[currentPsbtIndex].summary.inputs}
-            outputs={parsedPsbts[currentPsbtIndex].summary.outputs}
-            feeOutput={parsedPsbts[currentPsbtIndex].summary.feeOutput}
-            runeSummary={parsedPsbts[currentPsbtIndex].runeSummary}
-            transactionIsFinal={parsedPsbts[currentPsbtIndex].summary.isFinal}
-            showCenotaphCallout={!!parsedPsbts[currentPsbtIndex].summary.runeOp?.Cenotaph?.flaws}
-          />
-        )}
+        <OuterContainer>
+          <ModalContainer>
+            <ReviewTransactionText>
+              {t('TRANSACTION')} {currentPsbtIndex + 1}/{parsedPsbts.length}
+            </ReviewTransactionText>
+            {!!parsedPsbts[currentPsbtIndex] && (
+              <TransactionSummary
+                inputs={parsedPsbts[currentPsbtIndex].summary.inputs}
+                outputs={parsedPsbts[currentPsbtIndex].summary.outputs}
+                feeOutput={parsedPsbts[currentPsbtIndex].summary.feeOutput}
+                runeSummary={parsedPsbts[currentPsbtIndex].runeSummary}
+                transactionIsFinal={parsedPsbts[currentPsbtIndex].summary.isFinal}
+                showCenotaphCallout={
+                  !!parsedPsbts[currentPsbtIndex].summary.runeOp?.Cenotaph?.flaws
+                }
+              />
+            )}
+          </ModalContainer>
+        </OuterContainer>
         <TxReviewModalControls>
           {currentPsbtIndex > 0 && (
             <Button
