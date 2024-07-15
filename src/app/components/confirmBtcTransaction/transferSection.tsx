@@ -1,8 +1,6 @@
 import RuneAmount from '@components/confirmBtcTransaction/itemRow/runeAmount';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import { btcTransaction, RuneSummary } from '@secretkeylabs/xverse-core';
-import { StyledP } from '@ui-library/common.styled';
-import { getTruncatedAddress } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import Amount from './itemRow/amount';
@@ -30,17 +28,6 @@ const Container = styled.div((props) => ({
 const RowContainer = styled.div<{ noPadding?: boolean; noMargin?: boolean }>((props) => ({
   padding: props.noPadding ? 0 : `0 ${props.theme.space.m}`,
   marginTop: props.noMargin ? 0 : `${props.theme.space.m}`,
-}));
-
-const RowCenter = styled.div<{ spaceBetween?: boolean }>((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: props.spaceBetween ? 'space-between' : 'initial',
-}));
-
-const Header = styled(RowCenter)((props) => ({
-  padding: `0 ${props.theme.space.m}`,
 }));
 
 type Props = {
@@ -106,7 +93,7 @@ function TransferSection({
             ))
         }
         {showAmount && (
-          <RowContainer>
+          <RowContainer noMargin>
             <Amount amount={netAmount} />
             <AmountWithInscriptionSatribute
               inscriptions={inscriptionsFromPayment}
