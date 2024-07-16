@@ -3,7 +3,6 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import { WarningOctagon } from '@phosphor-icons/react';
 import { RuneSummary, btcTransaction } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
-import { getTruncatedAddress } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import Theme from 'theme';
@@ -11,6 +10,7 @@ import Amount from './itemRow/amount';
 import AmountWithInscriptionSatribute from './itemRow/amountWithInscriptionSatribute';
 import InscriptionSatributeRow from './itemRow/inscriptionSatributeRow';
 import { getInputsWitAssetsFromUserAddress, getOutputsWithAssetsFromUserAddress } from './utils';
+import Divider from '@ui-library/divider';
 
 const Title = styled.p`
   ${(props) => props.theme.typography.body_medium_m};
@@ -38,11 +38,11 @@ const RowCenter = styled.div<{ spaceBetween?: boolean }>((props) => ({
 
 const Header = styled(RowCenter)((props) => ({
   padding: `0 ${props.theme.space.m}`,
+  marginBottom: props.theme.space.m
 }));
 
 const RowContainer = styled.div<{ noPadding?: boolean; noMargin?: boolean }>((props) => ({
   padding: props.noPadding ? 0 : `0 ${props.theme.space.m}`,
-  marginTop: props.noMargin ? 0 : `${props.theme.space.m}`,
 }));
 
 const WarningContainer = styled.div((props) => ({
@@ -60,7 +60,6 @@ const WarningText = styled(StyledP)`
 type Props = {
   outputs: btcTransaction.EnhancedOutput[];
   inputs: btcTransaction.EnhancedInput[];
-  recipientAddress?: string;
   hasExternalInputs: boolean;
   transactionIsFinal: boolean;
   runeTransfers?: RuneSummary['transfers'];
@@ -72,7 +71,6 @@ type Props = {
 function TransferSection({
   outputs,
   inputs,
-  recipientAddress,
   hasExternalInputs,
   transactionIsFinal,
   runeTransfers,
@@ -116,23 +114,14 @@ function TransferSection({
       <Container>
         <Header spaceBetween>
           <StyledP typography="body_medium_m" color="white_400">
-            {t('TO')}
+            {t('TO')} TODO - display recipient address if no external inputs
           </StyledP>
-          {recipientAddress && (
-            <StyledP typography="body_medium_m" color="white_0">
-              {getTruncatedAddress(recipientAddress, 6)}
-            </StyledP>
-          )}
+          {/*{recipientAddress && (*/}
+          {/*  <StyledP typography="body_medium_m" color="white_0">*/}
+          {/*    {getTruncatedAddress(recipientAddress, 6)}*/}
+          {/*  </StyledP>*/}
+          {/*)}*/}
         </Header>
-        {
-          // if transaction is not final, then runes will be delegated and will show up in the delegation section
-          transactionIsFinal &&
-            runeTransfers?.map((transfer) => (
-              <RowContainer key={transfer.runeName}>
-                <RuneAmount rune={transfer} hasSufficientBalance={transfer.hasSufficientBalance} />
-              </RowContainer>
-            ))
-        }
         {showAmount && (
           <RowContainer noMargin>
             <Amount amount={netAmount} />
@@ -151,6 +140,23 @@ function TransferSection({
             )}
           </RowContainer>
         )}
+        {
+          // if transaction is not final, then runes will be delegated and will show up in the delegation section
+          transactionIsFinal &&
+            runeTransfers?.map((transfer, index) => (
+              <>
+                {index === 0 && <Divider verticalMargin="s" />}
+                <RowContainer key={transfer.runeName}>
+                  <RuneAmount
+                    rune={transfer}
+                    hasSufficientBalance={transfer.hasSufficientBalance}
+                  />
+                </RowContainer>
+                {runeTransfers.length > index + 1 && <Divider verticalMargin="s" />}
+              </>
+
+            ))
+        }
         {hasInscriptionsRareSatsInOrdinal && (
           <RowContainer noPadding noMargin={hasRuneTransfers || showAmount}>
             {!transactionIsFinal

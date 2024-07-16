@@ -52,7 +52,6 @@ type Props = {
   showCenotaphCallout: boolean;
   inputs: btcTransaction.EnhancedInput[];
   outputs: btcTransaction.EnhancedOutput[];
-  recipientAddress?: string;
   feeOutput?: btcTransaction.TransactionFeeOutput;
   runeSummary?: RuneSummaryActions | RuneSummary;
   getFeeForFeeRate?: (
@@ -69,7 +68,6 @@ function TransactionSummary({
   showCenotaphCallout,
   inputs,
   outputs,
-  recipientAddress,
   feeOutput,
   runeSummary,
   isSubmitting,
@@ -143,7 +141,6 @@ function TransactionSummary({
       <TransferSection
         outputs={outputs}
         inputs={inputs}
-        recipientAddress={recipientAddress}
         hasExternalInputs={hasExternalInputs}
         transactionIsFinal={transactionIsFinal}
         runeTransfers={runeSummary?.transfers}

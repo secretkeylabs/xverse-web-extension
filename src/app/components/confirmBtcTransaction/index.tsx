@@ -52,7 +52,6 @@ type Props = {
   inputs: btcTransaction.EnhancedInput[];
   outputs: btcTransaction.EnhancedOutput[];
   feeOutput?: btcTransaction.TransactionFeeOutput;
-  recipientAddress?: string; // Only for no external input flows
   runeSummary?: RuneSummaryActions | RuneSummary;
   showCenotaphCallout: boolean;
   isLoading: boolean;
@@ -84,7 +83,6 @@ type Props = {
 function ConfirmBtcTransaction({
   inputs,
   outputs,
-  recipientAddress,
   feeOutput,
   runeSummary,
   showCenotaphCallout,
@@ -214,7 +212,6 @@ function ConfirmBtcTransaction({
           runeSummary={runeSummary}
           inputs={inputs}
           outputs={outputs}
-          recipientAddress={recipientAddress}
           feeOutput={feeOutput}
           transactionIsFinal={isFinal}
           showCenotaphCallout={showCenotaphCallout}
