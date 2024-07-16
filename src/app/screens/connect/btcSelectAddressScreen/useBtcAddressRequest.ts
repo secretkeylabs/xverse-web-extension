@@ -1,124 +1,185 @@
 import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types';
+import { Context, getPopupPayload } from '@common/utils/popup';
 import { accountPurposeAddresses } from '@common/utils/rpc/btc/getAddresses/utils';
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
+import { usePermissionsUtils } from '@components/permissionsManager';
+import { makeAccountResource } from '@components/permissionsManager/resources';
+import { Client, Permission } from '@components/permissionsManager/schemas';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   AddressPurpose,
   BitcoinNetworkType,
+  GetAccountsResult,
   GetAddressOptions,
-  GetAddressPayload,
   GetAddressResponse,
-  Return,
   RpcErrorCode,
+  getAccountsRequestMessageSchema,
+  getAddressesRequestMessageSchema,
 } from '@sats-connect/core';
-import { SettingsNetwork } from '@secretkeylabs/xverse-core';
 import { decodeToken } from 'jsontokens';
-import { useMemo } from 'react';
+import { useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
+import * as v from 'valibot';
 
-const useAddressRequestParams = (network: SettingsNetwork) => {
-  const { search } = useLocation();
-  const params = new URLSearchParams(search);
-  const tabId = params.get('tabId') ?? '0';
-  const origin = params.get('origin') ?? '';
-  const requestId = params.get('requestId') ?? '';
-  const rpcMethod = params.get('rpcMethod') ?? '';
+interface UseRequestHelperReturn {
+  legacyRequestNetworkType: BitcoinNetworkType | undefined;
+  message: string | undefined;
+  purposes: AddressPurpose[];
+  origin: string;
+  sendApprovedResponse: () => Promise<void>;
+  sendCancelledResponse: () => void;
+}
 
-  const { payload, requestToken } = useMemo(() => {
-    const token = params.get('addressRequest') ?? '';
-    if (token) {
-      const request = decodeToken(token) as any as GetAddressOptions;
-
-      return {
-        payload: request.payload,
-        requestToken: token,
-      };
-    }
-    const pArray = params.get('purposes');
-    const message = params.get('message') ?? '';
-    const purposes = pArray?.split(',') as AddressPurpose[];
-    if (rpcMethod === 'getAddresses' || rpcMethod === 'getAccounts') {
-      const getAddressRpcPayload: GetAddressPayload = {
-        message,
-        purposes,
-        network: {
-          type: BitcoinNetworkType[network.type],
-        },
-      };
-      return {
-        payload: getAddressRpcPayload,
-        requestToken: null,
-      };
-    }
-    return {
-      payload: {} as GetAddressPayload,
-      requestToken: {},
-    };
-  }, []);
-
-  return { tabId, origin, payload, requestToken, requestId, rpcMethod };
-};
-
-const useBtcAddressRequest = () => {
-  const selectedAccount = useSelectedAccount();
+/**
+ * During the transition to using permissions with `wallet_requestPermissions`,
+ * this function is used to grant the client read permissions to the account,
+ * ensuring that dApps using the `getAccounts` method to establish a
+ * "connection" are able to query methods requiring permissions, allowing the
+ * wallet to remain backwards compatible.
+ */
+function useMakeTransitionalGrantAccountReadPermissions() {
   const { network } = useWalletSelector();
-  const { tabId, origin, payload, requestToken, requestId, rpcMethod } =
-    useAddressRequestParams(network);
+  const account = useSelectedAccount();
+  const { addClient, addResource, setPermission } = usePermissionsUtils();
+  return useCallback(
+    async (context: Context) => {
+      const client: Client = {
+        id: context.origin,
+        name: context.origin,
+      };
 
-  const approveBtcAddressRequest = () => {
-    const addressesResponse = accountPurposeAddresses(selectedAccount, payload.purposes);
-    if (requestToken) {
-      const response: GetAddressResponse = {
-        addresses: addressesResponse,
-      };
-      const addressMessage = {
-        source: MESSAGE_SOURCE,
-        method: SatsConnectMethods.getAddressResponse,
-        payload: { addressRequest: requestToken, addressResponse: response },
-      };
-      chrome.tabs.sendMessage(+tabId, addressMessage);
-    } else {
-      if (rpcMethod === 'getAccounts') {
-        const result: Return<'getAccounts'> = addressesResponse;
-        const response = makeRpcSuccessResponse(requestId, result);
-        sendRpcResponse(+tabId, response);
-      }
-      if (rpcMethod === 'getAddresses') {
-        const result: Return<'getAddresses'> = {
-          addresses: addressesResponse,
-        };
-        const response = makeRpcSuccessResponse(requestId, result);
-        sendRpcResponse(+tabId, response);
-      }
-    }
-  };
-
-  const cancelAddressRequest = () => {
-    if (requestToken) {
-      const addressMessage = {
-        source: MESSAGE_SOURCE,
-        method: SatsConnectMethods.getAddressResponse,
-        payload: { addressRequest: requestToken, addressResponse: 'cancel' },
-      };
-      chrome.tabs.sendMessage(+tabId, addressMessage);
-    } else {
-      const cancelError = makeRPCError(requestId as string, {
-        code: RpcErrorCode.USER_REJECTION,
-        message: `User rejected ${rpcMethod === 'getAddresses' ? 'address' : 'accounts'} request`,
+      const resource = makeAccountResource({
+        accountId: account.id,
+        networkType: network.type,
+        masterPubKey: account.masterPubKey,
       });
-      sendRpcResponse(+tabId, cancelError);
+
+      const permission: Permission = {
+        clientId: client.id,
+        resourceId: resource.id,
+        actions: new Set(['read']),
+      };
+
+      await addClient(client);
+      await addResource(resource);
+      await setPermission(permission);
+    },
+    [account.id, account.masterPubKey, addClient, addResource, network.type, setPermission],
+  );
+}
+
+export default function useRequestHelper(): UseRequestHelperReturn {
+  const account = useSelectedAccount();
+  const transitionalGrantReadPermissions = useMakeTransitionalGrantAccountReadPermissions();
+
+  // Used for handling a legacy request at the end of this function. Although
+  // its use is discouraged (see its docstring), it was part of the initial
+  // implementation for handling a legacy request, and is used to avoid changing
+  // how legacy requests are handled.
+  const { search } = useLocation();
+
+  const [errorGetAddresses, popupPayloadGetAddresses] = getPopupPayload((data) =>
+    v.parse(getAddressesRequestMessageSchema, data),
+  );
+  if (!errorGetAddresses) {
+    const { context, data } = popupPayloadGetAddresses;
+    return {
+      message: data.params.message,
+      origin: context.origin,
+      legacyRequestNetworkType: undefined,
+      purposes: data.params.purposes,
+      async sendApprovedResponse() {
+        const addresses = accountPurposeAddresses(
+          account,
+          popupPayloadGetAddresses.data.params.purposes,
+        );
+
+        sendRpcResponse(context.tabId, makeRpcSuccessResponse(data.id, { addresses }));
+      },
+      sendCancelledResponse() {
+        sendRpcResponse(
+          context.tabId,
+          makeRPCError(data.id, {
+            code: RpcErrorCode.USER_REJECTION,
+            message: `User rejected ${data.method} request.`,
+          }),
+        );
+      },
+    };
+  }
+
+  const [errorGetAccounts, popupPayloadGetAccounts] = getPopupPayload((data) =>
+    v.parse(getAccountsRequestMessageSchema, data),
+  );
+  if (!errorGetAccounts) {
+    const { context, data } = popupPayloadGetAccounts;
+    return {
+      message: data.params.message,
+      origin: context.origin,
+      legacyRequestNetworkType: undefined,
+      purposes: data.params.purposes,
+      async sendApprovedResponse() {
+        await transitionalGrantReadPermissions(context);
+        const addresses: GetAccountsResult = accountPurposeAddresses(
+          account,
+          popupPayloadGetAccounts.data.params.purposes,
+        ).map((address) => ({ ...address, walletType: account.accountType ?? 'software' }));
+        sendRpcResponse(context.tabId, makeRpcSuccessResponse(data.id, addresses));
+      },
+      sendCancelledResponse() {
+        sendRpcResponse(
+          context.tabId,
+          makeRPCError(data.id, {
+            code: RpcErrorCode.USER_REJECTION,
+            message: `User rejected ${data.method} request.`,
+          }),
+        );
+      },
+    };
+  }
+
+  // When none of the above succeed in processing a request, assume it's a legacy request.
+  {
+    const params = new URLSearchParams(search);
+    const token = params.get('addressRequest') ?? '';
+    let legacyRequestNetworkType;
+    let request: GetAddressOptions | undefined;
+    if (token) {
+      request = decodeToken(token) as any as GetAddressOptions;
+      legacyRequestNetworkType = request.payload.network.type;
     }
-  };
-
-  return {
-    payload,
-    tabId,
-    origin,
-    requestToken,
-    approveBtcAddressRequest,
-    cancelAddressRequest,
-  };
-};
-
-export default useBtcAddressRequest;
+    const message = request?.payload.message ?? params.get('message') ?? '';
+    const pArray = params.get('purposes');
+    const purposes = request?.payload.purposes ?? (pArray?.split(',') as AddressPurpose[]);
+    const addresses = accountPurposeAddresses(account, purposes);
+    const tabId = Number(params.get('tabId') ?? '0');
+    const sendApprovedResponse = async () => {
+      const response: GetAddressResponse = {
+        addresses,
+      };
+      const addressMessage = {
+        source: MESSAGE_SOURCE,
+        method: SatsConnectMethods.getAddressResponse,
+        payload: { addressRequest: token, addressResponse: response },
+      };
+      chrome.tabs.sendMessage(tabId, addressMessage);
+    };
+    const sendCancelledResponse = () => {
+      const addressMessage = {
+        source: MESSAGE_SOURCE,
+        method: SatsConnectMethods.getAddressResponse,
+        payload: { addressRequest: token, addressResponse: 'cancel' },
+      };
+      chrome.tabs.sendMessage(tabId, addressMessage);
+    };
+    return {
+      legacyRequestNetworkType,
+      message,
+      origin,
+      purposes,
+      sendApprovedResponse,
+      sendCancelledResponse,
+    };
+  }
+}
