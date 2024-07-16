@@ -23,3 +23,14 @@ export function sendRenouncePermissionsSuccessResponseMessage({
 }: RenouncePermissionsSuccessArgs) {
   sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
 }
+
+type GetWalletTypeSuccessArgs = BaseArgs & {
+  result: Return<'wallet_getWalletType'>;
+};
+export function sendGetWalletTypeSuccessResponseMessage({
+  tabId,
+  messageId,
+  result,
+}: GetWalletTypeSuccessArgs) {
+  sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
+}

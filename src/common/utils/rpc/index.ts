@@ -2,8 +2,11 @@ import { WebBtcMessage } from '@common/types/message-types';
 import {
   RpcErrorCode,
   RpcRequestMessage,
+  getAccountsMethodName,
+  getAddressesMethodName,
   getBalanceMethodName,
   getInfoMethodName,
+  getWalletTypeMethodName,
   renouncePermissionsMethodName,
   requestPermissionsMethodName,
 } from '@sats-connect/core';
@@ -30,6 +33,7 @@ import handleStacksSignMessage from './stx/signMessage';
 import handleStacksSignStructuredMessage from './stx/signStructuredMessage';
 import signTransaction from './stx/signTransaction';
 import transferStx from './stx/transferStx';
+import { handleGetWalletType } from './wallet/getWalletType';
 import { handleRenouncePermissions } from './wallet/renouncePermissions';
 import { handleRequestPermissions } from './wallet/requestPermissions';
 
@@ -44,21 +48,24 @@ async function handleRPCRequest(message: RpcRequestMessage, port: chrome.runtime
         await handleRenouncePermissions(message, port);
         break;
       }
+      case getWalletTypeMethodName: {
+        await handleGetWalletType(message, port);
+        break;
+      }
       case getBalanceMethodName: {
         await handleGetBalance(message, port);
         break;
       }
-
       case getInfoMethodName: {
         handleGetInfo(message, port);
         break;
       }
-      case 'getAddresses': {
-        await handleGetAddresses(message as unknown as WebBtcMessage<'getAddresses'>, port);
+      case getAddressesMethodName: {
+        await handleGetAddresses(message, port);
         break;
       }
-      case 'getAccounts': {
-        await handleGetAccounts(message as unknown as WebBtcMessage<'getAccounts'>, port);
+      case getAccountsMethodName: {
+        await handleGetAccounts(message, port);
         break;
       }
       case 'signMessage': {
