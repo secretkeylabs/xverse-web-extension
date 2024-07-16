@@ -1,3 +1,4 @@
+import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import TokenImage from '@components/tokenImage';
 import { FungibleToken, RuneSummary } from '@secretkeylabs/xverse-core';
 import { useTranslation } from 'react-i18next';
@@ -7,7 +8,6 @@ import AmountSelector from './amountSelector';
 import { TransactionSummary } from './helpers';
 import RecipientSelector from './recipientSelector';
 import { Step, getNextStep } from './steps';
-import ConfirmBtcTransactionSingleParty from '@components/confirmBtcTransactionSingleParty';
 
 const TitleContainer = styled.div`
   display: flex;
@@ -127,7 +127,7 @@ function StepDisplay({
         return null;
       }
       return (
-        <ConfirmBtcTransactionSingleParty
+        <ConfirmBtcTransaction
           inputs={summary.inputs}
           outputs={summary.outputs}
           feeOutput={summary.feeOutput}

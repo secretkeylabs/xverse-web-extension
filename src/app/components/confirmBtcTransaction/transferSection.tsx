@@ -3,6 +3,7 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import { WarningOctagon } from '@phosphor-icons/react';
 import { RuneSummary, btcTransaction } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
+import { getTruncatedAddress } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import Theme from 'theme';
@@ -28,6 +29,17 @@ const Container = styled.div((props) => ({
   marginBottom: props.theme.space.s,
 }));
 
+const RowCenter = styled.div<{ spaceBetween?: boolean }>((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: props.spaceBetween ? 'space-between' : 'initial',
+}));
+
+const Header = styled(RowCenter)((props) => ({
+  padding: `0 ${props.theme.space.m}`,
+}));
+
 const RowContainer = styled.div<{ noPadding?: boolean; noMargin?: boolean }>((props) => ({
   padding: props.noPadding ? 0 : `0 ${props.theme.space.m}`,
   marginTop: props.noMargin ? 0 : `${props.theme.space.m}`,
@@ -48,6 +60,7 @@ const WarningText = styled(StyledP)`
 type Props = {
   outputs: btcTransaction.EnhancedOutput[];
   inputs: btcTransaction.EnhancedInput[];
+  recipientAddress?: string;
   hasExternalInputs: boolean;
   transactionIsFinal: boolean;
   runeTransfers?: RuneSummary['transfers'];
@@ -59,6 +72,7 @@ type Props = {
 function TransferSection({
   outputs,
   inputs,
+  recipientAddress,
   hasExternalInputs,
   transactionIsFinal,
   runeTransfers,
@@ -98,8 +112,18 @@ function TransferSection({
 
   return (
     <>
-      <Title>{t('YOU_WILL_TRANSFER')}</Title>
+      <Title>{hasExternalInputs ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_SEND')}</Title>
       <Container>
+        <Header spaceBetween>
+          <StyledP typography="body_medium_m" color="white_400">
+            {t('TO')}
+          </StyledP>
+          {recipientAddress && (
+            <StyledP typography="body_medium_m" color="white_0">
+              {getTruncatedAddress(recipientAddress, 6)}
+            </StyledP>
+          )}
+        </Header>
         {
           // if transaction is not final, then runes will be delegated and will show up in the delegation section
           transactionIsFinal &&

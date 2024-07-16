@@ -52,6 +52,7 @@ type Props = {
   showCenotaphCallout: boolean;
   inputs: btcTransaction.EnhancedInput[];
   outputs: btcTransaction.EnhancedOutput[];
+  recipientAddress?: string;
   feeOutput?: btcTransaction.TransactionFeeOutput;
   runeSummary?: RuneSummaryActions | RuneSummary;
   getFeeForFeeRate?: (
@@ -68,6 +69,7 @@ function TransactionSummary({
   showCenotaphCallout,
   inputs,
   outputs,
+  recipientAddress,
   feeOutput,
   runeSummary,
   isSubmitting,
@@ -141,6 +143,7 @@ function TransactionSummary({
       <TransferSection
         outputs={outputs}
         inputs={inputs}
+        recipientAddress={recipientAddress}
         hasExternalInputs={hasExternalInputs}
         transactionIsFinal={transactionIsFinal}
         runeTransfers={runeSummary?.transfers}
@@ -163,7 +166,7 @@ function TransactionSummary({
       <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
       <TxInOutput inputs={inputs} outputs={outputs} />
       {hasOutputScript && !runeSummary && <WarningCallout bodyText={t('SCRIPT_OUTPUT_TX')} />}
-      {feeOutput && !showFeeSelector && (
+      {hasExternalInputs && feeOutput && !showFeeSelector && (
         <TransferFeeView
           fee={new BigNumber(feeOutput.amount)}
           currency={t('SATS')}
@@ -172,30 +175,33 @@ function TransactionSummary({
           onShowInscription={setInscriptionToShow}
         />
       )}
-      {feeOutput && showFeeSelector && (
-        <Container>
-          <SelectFeeRate
-            fee={feeOutput.amount.toString()}
-            feeUnits="sats"
-            feeRate={feeRate.toString()}
-            feeRateUnits={tUnits('SATS_PER_VB')}
-            setFeeRate={(newFeeRate) => onFeeRateSet(+newFeeRate)}
-            baseToFiat={satsToFiat}
-            fiatUnit={fiatCurrency}
-            getFeeForFeeRate={getFeeForFeeRate}
-            feeRates={{
-              medium: recommendedFees?.regular,
-              high: recommendedFees?.priority,
-            }}
-            feeRateLimits={recommendedFees?.limits}
-            isLoading={isSubmitting}
-          />
-          <AmountWithInscriptionSatribute
-            inscriptions={feeOutput.inscriptions}
-            satributes={feeOutput.satributes}
-            onShowInscription={setInscriptionToShow}
-          />
-        </Container>
+      {!hasExternalInputs && feeOutput && showFeeSelector && (
+        <>
+          <Subtitle>{t('FEES')}</Subtitle>
+          <Container>
+            <SelectFeeRate
+              fee={feeOutput.amount.toString()}
+              feeUnits="sats"
+              feeRate={feeRate.toString()}
+              feeRateUnits={tUnits('SATS_PER_VB')}
+              setFeeRate={(newFeeRate) => onFeeRateSet(+newFeeRate)}
+              baseToFiat={satsToFiat}
+              fiatUnit={fiatCurrency}
+              getFeeForFeeRate={getFeeForFeeRate}
+              feeRates={{
+                medium: recommendedFees?.regular,
+                high: recommendedFees?.priority,
+              }}
+              feeRateLimits={recommendedFees?.limits}
+              isLoading={isSubmitting}
+            />
+            <AmountWithInscriptionSatribute
+              inscriptions={feeOutput.inscriptions}
+              satributes={feeOutput.satributes}
+              onShowInscription={setInscriptionToShow}
+            />
+          </Container>
+        </>
       )}
     </>
   );
