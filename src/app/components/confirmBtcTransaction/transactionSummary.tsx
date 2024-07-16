@@ -89,6 +89,11 @@ function TransactionSummary({
 
   const hasOutputScript = outputs.some((output) => isScriptOutput(output));
 
+  const hasExternalInputs = inputs.some(
+    (input) =>
+      input.extendedUtxo.address !== btcAddress && input.extendedUtxo.address !== ordinalsAddress,
+  );
+
   const netAmount = getNetAmount({
     inputs,
     outputs,
@@ -136,6 +141,7 @@ function TransactionSummary({
       <TransferSection
         outputs={outputs}
         inputs={inputs}
+        hasExternalInputs={hasExternalInputs}
         transactionIsFinal={transactionIsFinal}
         runeTransfers={runeSummary?.transfers}
         onShowInscription={setInscriptionToShow}
@@ -157,9 +163,6 @@ function TransactionSummary({
       <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
       <TxInOutput inputs={inputs} outputs={outputs} />
       {hasOutputScript && !runeSummary && <WarningCallout bodyText={t('SCRIPT_OUTPUT_TX')} />}
-
-      {feeOutput && <Subtitle>{t('FEES')}</Subtitle>}
-
       {feeOutput && !showFeeSelector && (
         <TransferFeeView
           fee={new BigNumber(feeOutput.amount)}
@@ -169,7 +172,6 @@ function TransactionSummary({
           onShowInscription={setInscriptionToShow}
         />
       )}
-
       {feeOutput && showFeeSelector && (
         <Container>
           <SelectFeeRate

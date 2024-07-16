@@ -323,6 +323,14 @@ function SignBatchPsbtRequest() {
                 <TransferSection
                   inputs={parsedPsbts.map((psbt) => psbt.summary.inputs).flat()}
                   outputs={parsedPsbts.map((psbt) => psbt.summary.outputs).flat()}
+                  hasExternalInputs={parsedPsbts
+                    .map((psbt) => psbt.summary.inputs)
+                    .flat()
+                    .some(
+                      (input) =>
+                        input.extendedUtxo.address !== selectedAccount.btcAddress &&
+                        input.extendedUtxo.address !== selectedAccount.ordinalsAddress,
+                    )}
                   runeTransfers={parsedPsbts
                     .map((psbt) => psbt.runeSummary?.transfers ?? [])
                     .flat()}

@@ -48,6 +48,7 @@ const WarningText = styled(StyledP)`
 type Props = {
   outputs: btcTransaction.EnhancedOutput[];
   inputs: btcTransaction.EnhancedInput[];
+  hasExternalInputs: boolean;
   transactionIsFinal: boolean;
   runeTransfers?: RuneSummary['transfers'];
   netAmount: number;
@@ -58,6 +59,7 @@ type Props = {
 function TransferSection({
   outputs,
   inputs,
+  hasExternalInputs,
   transactionIsFinal,
   runeTransfers,
   netAmount,
@@ -89,11 +91,6 @@ function TransferSection({
   const hasRuneTransfers = transactionIsFinal && (runeTransfers ?? []).length > 0;
   const hasInscriptionsRareSatsInOrdinal =
     (!transactionIsFinal && inputFromOrdinal.length > 0) || outputsFromOrdinal.length > 0;
-
-  const hasExternalInputs = inputs.some(
-    (input) =>
-      input.extendedUtxo.address !== btcAddress && input.extendedUtxo.address !== ordinalsAddress,
-  );
 
   const hasData = showAmount || hasRuneTransfers || hasInscriptionsRareSatsInOrdinal;
 

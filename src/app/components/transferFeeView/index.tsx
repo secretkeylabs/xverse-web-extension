@@ -2,7 +2,6 @@ import AmountWithInscriptionSatribute from '@components/confirmBtcTransaction/it
 import FiatAmountText from '@components/fiatAmountText';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { PencilSimple } from '@phosphor-icons/react';
 import {
   btcTransaction,
   getBtcFiatEquivalent,
@@ -13,7 +12,6 @@ import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
-import Theme from 'theme';
 
 const Container = styled.div((props) => ({
   background: props.theme.colors.elevation1,
@@ -40,23 +38,6 @@ const FeeContainer = styled.div({
   alignItems: 'flex-end',
 });
 
-const CustomRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-`;
-
-const EditButton = styled.button`
-  display: flex;
-  flex-direction: row;
-  background: transparent;
-  align-items: center;
-  gap: ${(props) => props.theme.space.xxs};
-  cursor: ${(props) => (props.onClick ? 'pointer' : 'initial')};
-  width: 100%;
-  margin-left: ${(props) => props.theme.space.xs};
-`;
-
 const FeeRate = styled(StyledP)`
   margin: ${(props) => props.theme.space.xxxs} 0;
 `;
@@ -65,11 +46,8 @@ type Props = {
   feePerVByte?: BigNumber;
   fee: BigNumber;
   currency: string;
-  title?: string;
   inscriptions?: btcTransaction.IOInscription[];
   satributes?: btcTransaction.IOSatribute[];
-  customFeeClick?: () => void;
-  subtitle?: string;
   onShowInscription?: (inscription: btcTransaction.IOInscription) => void;
 };
 
@@ -77,11 +55,8 @@ function TransferFeeView({
   feePerVByte,
   fee,
   currency,
-  title,
   inscriptions = [],
   satributes = [],
-  customFeeClick,
-  subtitle,
   onShowInscription = () => {},
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
@@ -95,26 +70,8 @@ function TransferFeeView({
       <Row>
         <FeeTitleContainer>
           <StyledP typography="body_medium_m" color="white_0">
-            {title ?? t('NETWORK_FEE')}
+            {t('NETWORK_FEE')}
           </StyledP>
-          {customFeeClick && (
-            <CustomRow>
-              <StyledP typography="body_medium_m" color="white_400">
-                {t('CUSTOM')}
-              </StyledP>
-              <EditButton onClick={() => {}}>
-                <StyledP typography="body_medium_m" color="tangerine">
-                  {t('EDIT')}
-                </StyledP>
-                <PencilSimple size="16" color={Theme.colors.tangerine} weight="fill" />
-              </EditButton>
-            </CustomRow>
-          )}
-          {subtitle && (
-            <StyledP typography="body_medium_s" color="white_400">
-              {subtitle}
-            </StyledP>
-          )}
         </FeeTitleContainer>
         <FeeContainer>
           <NumericFormat
