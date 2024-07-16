@@ -1,12 +1,9 @@
 import Link from '@assets/img/rareSats/link.svg';
-import { CubeTransparent } from '@phosphor-icons/react';
 import { btcTransaction } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
-import Theme from 'theme';
-import Avatar from '../../../ui-library/avatar';
 import { SatRangeTx } from '../utils';
 import Inscription from './inscription';
 import RareSats from './rareSats';
@@ -23,17 +20,10 @@ const Header = styled.div((props) => ({
   display: 'flex',
   flex: 1,
   flexDirection: 'row',
-  alignItems: 'center',
+  justifyContent: 'space-between',
   marginBottom: props.theme.space.m,
 }));
 
-const AvatarContainer = styled.div`
-  margin-right: ${(props) => props.theme.space.xs};
-`;
-
-const RowsContainer = styled.div`
-  padding-left: ${(props) => props.theme.space.m};
-`;
 const LinkContainer = styled.div`
   display: flex;
   width: 32px;
@@ -56,13 +46,12 @@ export default function BundleTxView({
   return (
     <>
       <Header>
-        <AvatarContainer>
-          <Avatar icon={<CubeTransparent size={18} color={Theme.colors.elevation0} />} />
-        </AvatarContainer>
         <div>
-          <StyledP typography="body_medium_m" color="white_200">
+          <StyledP typography="body_medium_m" color="white_400">
             {t('COMMON.BUNDLE')}
           </StyledP>
+        </div>
+        <div>
           {bundleSize && (
             <NumericFormat
               value={bundleSize}
@@ -71,7 +60,7 @@ export default function BundleTxView({
               prefix={`${t('COMMON.SIZE')}: `}
               suffix={` ${t('COMMON.SATS')}`}
               renderText={(value: string) => (
-                <StyledP typography="body_medium_s" color="white_400">
+                <StyledP typography="body_medium_m" color="white_400">
                   {value}
                 </StyledP>
               )}
@@ -79,7 +68,7 @@ export default function BundleTxView({
           )}
         </div>
       </Header>
-      <RowsContainer>
+      <div>
         {inscriptions.map((inscription, index) => (
           <div key={inscription.number}>
             <Inscription inscription={inscription} onShowInscription={onShowInscription} />
@@ -91,7 +80,7 @@ export default function BundleTxView({
           </div>
         ))}
         {showRareSats && <RareSats satributesInfo={satributesInfo} />}
-      </RowsContainer>
+      </div>
     </>
   );
 }
