@@ -12,11 +12,11 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import CollapsableContainer from '@screens/signatureRequest/collapsableContainer';
 import SignatureRequestMessage from '@screens/signatureRequest/signatureRequestMessage';
-import { bip0322Hash, signBip322Message } from '@secretkeylabs/xverse-core';
+import { bip0322Hash, MessageSigningProtocols, signMessage } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import Sheet from '@ui-library/sheet';
 import { getTruncatedAddress, isHardwareAccount } from '@utils/helper';
-import { handleBip322LedgerMessageSigning } from '@utils/ledger';
+import { handleLedgerMessageSigning } from '@utils/ledger';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -132,12 +132,13 @@ function SignMessageRequestInApp() {
     setCurrentStepIndex(1);
 
     try {
-      const bip322signature = await handleBip322LedgerMessageSigning({
+      const signedMessage = await handleLedgerMessageSigning({
         transport,
         addressIndex: selectedAccount.deviceAccountIndex,
         address: payload.address,
         networkType: network.type,
         message: payload.message,
+        protocol: MessageSigningProtocols.BIP322,
       });
 
       await runesApi.submitCancelRunesSellOrder({
@@ -145,7 +146,7 @@ function SignMessageRequestInApp() {
         makerPublicKey: selectedAccount?.ordinalsPublicKey!,
         makerAddress: selectedAccount?.ordinalsAddress!,
         token: payload.token,
-        signature: bip322signature,
+        signature: signedMessage.signature,
       });
 
       handleGoBack();
@@ -171,12 +172,13 @@ function SignMessageRequestInApp() {
 
   const confirmSignMessage = async () => {
     const seedPhrase = await getSeed();
-    return signBip322Message({
+    return signMessage({
       accounts: accountsList,
       message: payload.message,
-      signatureAddress: payload.address,
+      address: payload.address,
       seedPhrase,
       network: network.type,
+      protocol: MessageSigningProtocols.BIP322,
     });
   };
 
@@ -188,14 +190,14 @@ function SignMessageRequestInApp() {
         setIsModalVisible(true);
         return;
       }
-      const bip322signature = await confirmSignMessage();
+      const signedMessage = await confirmSignMessage();
 
       await runesApi.submitCancelRunesSellOrder({
         orderIds: payload.orderIds,
         makerPublicKey: selectedAccount?.ordinalsPublicKey!,
         makerAddress: selectedAccount?.ordinalsAddress!,
         token: payload.token,
-        signature: bip322signature,
+        signature: signedMessage.signature,
       });
 
       handleGoBack();
