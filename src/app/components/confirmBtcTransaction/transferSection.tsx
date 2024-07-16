@@ -3,6 +3,7 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import { WarningOctagon } from '@phosphor-icons/react';
 import { RuneSummary, btcTransaction } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
+import Divider from '@ui-library/divider';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import Theme from 'theme';
@@ -10,7 +11,6 @@ import Amount from './itemRow/amount';
 import AmountWithInscriptionSatribute from './itemRow/amountWithInscriptionSatribute';
 import InscriptionSatributeRow from './itemRow/inscriptionSatributeRow';
 import { getInputsWitAssetsFromUserAddress, getOutputsWithAssetsFromUserAddress } from './utils';
-import Divider from '@ui-library/divider';
 
 const Title = styled.p`
   ${(props) => props.theme.typography.body_medium_m};
@@ -38,7 +38,7 @@ const RowCenter = styled.div<{ spaceBetween?: boolean }>((props) => ({
 
 const Header = styled(RowCenter)((props) => ({
   padding: `0 ${props.theme.space.m}`,
-  marginBottom: props.theme.space.m
+  marginBottom: props.theme.space.m,
 }));
 
 const RowContainer = styled.div<{ noPadding?: boolean; noMargin?: boolean }>((props) => ({
@@ -112,16 +112,6 @@ function TransferSection({
     <>
       <Title>{hasExternalInputs ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_SEND')}</Title>
       <Container>
-        <Header spaceBetween>
-          <StyledP typography="body_medium_m" color="white_400">
-            {t('TO')} TODO - display recipient address if no external inputs
-          </StyledP>
-          {/*{recipientAddress && (*/}
-          {/*  <StyledP typography="body_medium_m" color="white_0">*/}
-          {/*    {getTruncatedAddress(recipientAddress, 6)}*/}
-          {/*  </StyledP>*/}
-          {/*)}*/}
-        </Header>
         {showAmount && (
           <RowContainer noMargin>
             <Amount amount={netAmount} />
@@ -154,7 +144,6 @@ function TransferSection({
                 </RowContainer>
                 {runeTransfers.length > index + 1 && <Divider verticalMargin="s" />}
               </>
-
             ))
         }
         {hasInscriptionsRareSatsInOrdinal && (
