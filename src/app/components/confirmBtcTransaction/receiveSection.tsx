@@ -49,12 +49,12 @@ type Props = {
   runeReceipts?: RuneSummary['receipts'];
 };
 function ReceiveSection({
-                          outputs,
-                          netAmount,
-                          onShowInscription,
-                          runeReceipts,
-                          transactionIsFinal,
-                        }: Props) {
+  outputs,
+  netAmount,
+  onShowInscription,
+  runeReceipts,
+  transactionIsFinal,
+}: Props) {
   const { btcAddress, ordinalsAddress } = useSelectedAccount();
   const { hasActivatedRareSatsKey } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
@@ -92,15 +92,12 @@ function ReceiveSection({
 
   // if transaction is not final, then runes will be delegated and will show up in the delegation section
   const showOrdinalRunes = !!(transactionIsFinal && ordinalRuneReceipts.length);
-  const showOrdinalSection = !!(showOrdinalRunes || areInscriptionRareSatsInOrdinal);
+  const showOrdinalSection = showOrdinalRunes || areInscriptionRareSatsInOrdinal;
 
   // if transaction is not final, then runes will be delegated and will show up in the delegation section
   const showPaymentRunes = !!(transactionIsFinal && paymentRuneReceipts.length);
-  const showPaymentSection = !!(
-    amountIsBiggerThanZero ||
-    showPaymentRunes ||
-    areInscriptionsRareSatsInPayment
-  );
+  const showPaymentSection =
+    amountIsBiggerThanZero || showPaymentRunes || areInscriptionsRareSatsInPayment;
 
   return (
     <>

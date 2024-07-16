@@ -29,18 +29,6 @@ const Container = styled.div((props) => ({
   marginBottom: props.theme.space.s,
 }));
 
-const RowCenter = styled.div<{ spaceBetween?: boolean }>((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: props.spaceBetween ? 'space-between' : 'initial',
-}));
-
-const Header = styled(RowCenter)((props) => ({
-  padding: `0 ${props.theme.space.m}`,
-  marginBottom: props.theme.space.m,
-}));
-
 const RowContainer = styled.div<{ noPadding?: boolean; noMargin?: boolean }>((props) => ({
   padding: props.noPadding ? 0 : `0 ${props.theme.space.m}`,
 }));

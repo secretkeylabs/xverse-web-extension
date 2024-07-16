@@ -1,4 +1,4 @@
-import ConfirmBitcoinTransaction from 'app/components/confirmBtcTransaction';
+import ConfirmBitcoinTransaction from '@components/confirmBtcTransaction';
 import RuneAmount from '@components/confirmBtcTransaction/itemRow/runeAmount';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';

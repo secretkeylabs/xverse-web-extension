@@ -89,6 +89,7 @@ function TransactionSummary({
 
   const hasOutputScript = outputs.some((output) => isScriptOutput(output));
 
+  // TODO - move logic into core
   const hasExternalInputs = inputs.some(
     (input) =>
       input.extendedUtxo.address !== btcAddress && input.extendedUtxo.address !== ordinalsAddress,
