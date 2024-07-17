@@ -1,15 +1,15 @@
 import {
   MESSAGE_SOURCE,
   StacksLegacyMethods,
-  TransactionResponseMessage,
-  TxResult,
+  type TransactionResponseMessage,
+  type TxResult,
 } from '@common/types/message-types';
 
 interface FormatTxSignatureResponseArgs {
   payload: string;
   response: TxResult | 'cancel';
 }
-export function formatTxSignatureResponse({
+function formatTxSignatureResponse({
   payload,
   response,
 }: FormatTxSignatureResponseArgs): TransactionResponseMessage {

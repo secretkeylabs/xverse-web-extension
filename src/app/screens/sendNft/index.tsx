@@ -8,18 +8,22 @@ import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  StacksTransaction,
-  UnsignedStacksTransation,
   applyFeeMultiplier,
   buf2hex,
   cvToHex,
   generateUnsignedTransaction,
   uintCV,
   validateStxAddress,
+  type StacksTransaction,
+  type UnsignedStacksTransation,
 } from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
 import { StickyButtonContainer, StyledHeading, StyledP } from '@ui-library/common.styled';
-import { InputFeedback, InputFeedbackProps, isDangerFeedback } from '@ui-library/inputFeedback';
+import {
+  InputFeedback,
+  isDangerFeedback,
+  type InputFeedbackProps,
+} from '@ui-library/inputFeedback';
 import { checkNftExists } from '@utils/helper';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

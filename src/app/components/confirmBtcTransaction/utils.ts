@@ -1,4 +1,4 @@
-import { btcTransaction, BundleSatRange, FungibleToken } from '@secretkeylabs/xverse-core';
+import type { btcTransaction, BundleSatRange, FungibleToken } from '@secretkeylabs/xverse-core';
 
 export type SatRangeTx = {
   totalSats: number;

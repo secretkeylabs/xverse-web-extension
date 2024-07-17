@@ -1,8 +1,8 @@
-import { Inscription, NonFungibleToken } from '@secretkeylabs/xverse-core';
+import type { Inscription, NonFungibleToken } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import styled from 'styled-components';
-import { Color } from 'theme';
+import type { Color } from 'theme';
 
 const InfoContainer = styled.div`
   display: flex;

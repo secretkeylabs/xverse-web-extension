@@ -1,11 +1,11 @@
 import ConfirmBitcoinTransaction from '@components/confirmBtcTransaction';
 import TokenImage from '@components/tokenImage';
-import { FungibleToken, RuneSummary } from '@secretkeylabs/xverse-core';
+import type { FungibleToken, RuneSummary } from '@secretkeylabs/xverse-core';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import SendLayout from '../../layouts/sendLayout';
 import AmountSelector from './amountSelector';
-import { TransactionSummary } from './helpers';
+import type { TransactionSummary } from './helpers';
 import RecipientSelector from './recipientSelector';
 import { Step, getNextStep } from './steps';
 

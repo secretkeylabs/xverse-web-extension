@@ -1,4 +1,4 @@
-import { MESSAGE_SOURCE, WebBtcMessage } from '@common/types/message-types';
+import { MESSAGE_SOURCE, type WebBtcMessage } from '@common/types/message-types';
 import { getTabIdFromPort, isUndefined, stringifyData } from '@common/utils';
 import {
   listenForPopupClose,
@@ -60,5 +60,4 @@ async function deployContract(
     },
   });
 }
-
 export default deployContract;

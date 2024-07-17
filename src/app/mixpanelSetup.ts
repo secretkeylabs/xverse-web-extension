@@ -1,5 +1,5 @@
 import { MIX_PANEL_EXPLORE_APP_TOKEN, MIX_PANEL_TOKEN } from '@utils/constants';
-import mixpanel, { Mixpanel } from 'mixpanel-browser';
+import mixpanel, { type Mixpanel } from 'mixpanel-browser';
 
 export const mixpanelInstances: Record<string, { token?: string }> = {
   'web-extension': {

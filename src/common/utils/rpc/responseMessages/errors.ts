@@ -1,7 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import { RpcErrorCode } from '@sats-connect/core';
 import { makeRPCError, sendRpcResponse } from '../helpers';
-import { BaseArgs } from './types';
+import type { BaseArgs } from './types';
 
 export function sendMissingParametersMessage({ tabId, messageId }: BaseArgs) {
   sendRpcResponse(
@@ -47,16 +47,6 @@ export function sendNetworkMismatchMessage({ tabId, messageId }: BaseArgs) {
     makeRPCError(messageId, {
       code: RpcErrorCode.INVALID_REQUEST,
       message: 'Network mismatch.',
-    }),
-  );
-}
-
-export function sendUnsupportedNetworkResponseMessage({ tabId, messageId }: BaseArgs) {
-  sendRpcResponse(
-    tabId,
-    makeRPCError(messageId, {
-      code: RpcErrorCode.INVALID_REQUEST,
-      message: 'Unsupported network.',
     }),
   );
 }

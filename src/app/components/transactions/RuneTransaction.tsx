@@ -1,5 +1,5 @@
 import useWalletSelector from '@hooks/useWalletSelector';
-import { GetRunesActivityForAddressEvent } from '@secretkeylabs/xverse-core';
+import type { GetRunesActivityForAddressEvent } from '@secretkeylabs/xverse-core';
 import { ftDecimals, getBtcTxStatusUrl } from '@utils/helper';
 import { useCallback } from 'react';
 import styled from 'styled-components';

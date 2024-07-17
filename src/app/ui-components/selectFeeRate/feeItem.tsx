@@ -1,6 +1,6 @@
 import FiatAmountText from '@components/fiatAmountText';
 import { Bicycle, CarProfile, RocketLaunch } from '@phosphor-icons/react';
-import { SupportedCurrency } from '@secretkeylabs/xverse-core';
+import type { SupportedCurrency } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
 import BigNumber from 'bignumber.js';

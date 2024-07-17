@@ -8,11 +8,11 @@ import useSeedVault from '@hooks/useSeedVault';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  BtcOrdinal,
   ErrorCodes,
   getBtcFiatEquivalent,
-  SignedBtcTx,
   signOrdinalSendTransaction,
+  type BtcOrdinal,
+  type SignedBtcTx,
 } from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
 import Spinner from '@ui-library/spinner';

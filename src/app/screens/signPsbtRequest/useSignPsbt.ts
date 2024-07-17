@@ -4,17 +4,17 @@ import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   BitcoinNetworkType,
-  Return,
   RpcErrorCode,
-  SignTransactionOptions,
-  SignTransactionPayload,
+  type Return,
+  type SignTransactionOptions,
+  type SignTransactionPayload,
 } from '@sats-connect/core';
 import {
-  InputToSign,
-  SettingsNetwork,
   btcTransaction,
   psbtBase64ToHex,
   signPsbt,
+  type InputToSign,
+  type SettingsNetwork,
 } from '@secretkeylabs/xverse-core';
 import { decodeToken } from 'jsontokens';
 import { useMemo } from 'react';

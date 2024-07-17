@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import SendLayout from '../../layouts/sendLayout';
 import AmountSelector from './amountSelector';
 import BtcRecipientSelector from './btcRecipientSelector';
-import { TransactionSummary } from './helpers';
+import type { TransactionSummary } from './helpers';
 import { Step, getNextStep } from './steps';
 
 const TitleContainer = styled.div`

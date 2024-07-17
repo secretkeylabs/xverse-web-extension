@@ -1,11 +1,11 @@
 import btcIcon from '@assets/img/ledger/btc_icon.svg';
 import OutputIcon from '@assets/img/transactions/output.svg';
-import { FiatAmountText } from '@components/fiatAmountText';
+import FiatAmountText from '@components/fiatAmountText';
 import TokenImage from '@components/tokenImage';
 import TransferDetailView from '@components/transferDetailView';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { FungibleToken, getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
+import { getBtcFiatEquivalent, type FungibleToken } from '@secretkeylabs/xverse-core';
 import { getFtTicker } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';

@@ -1,5 +1,5 @@
 import { XCircle } from '@phosphor-icons/react';
-import { AnalyticsEvents, NotificationBanner } from '@secretkeylabs/xverse-core';
+import { AnalyticsEvents, type NotificationBanner } from '@secretkeylabs/xverse-core';
 import { setNotificationBannersAction } from '@stores/wallet/actions/actionCreators';
 import { CrossButton } from '@ui-library/sheet';
 import { trackMixPanel } from '@utils/mixpanel';

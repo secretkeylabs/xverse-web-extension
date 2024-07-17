@@ -1,7 +1,7 @@
 import OrdinalIcon from '@assets/img/rareSats/ic_ordinal_small.svg';
 import RareSatIcon from '@components/rareSatIcon/rareSatIcon';
 import { DotsThree, Eye } from '@phosphor-icons/react';
-import { BundleSatRange, SatRangeInscription } from '@secretkeylabs/xverse-core';
+import type { BundleSatRange, SatRangeInscription } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { getSatLabel } from '@utils/rareSats';
 import { NumericFormat } from 'react-number-format';

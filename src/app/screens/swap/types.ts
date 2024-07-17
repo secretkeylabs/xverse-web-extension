@@ -1,5 +1,5 @@
-import { TokenImageProps } from '@components/tokenImage';
-import { FungibleToken } from '@secretkeylabs/xverse-core';
+import { type TokenImageProps } from '@components/tokenImage';
+import { type FungibleToken } from '@secretkeylabs/xverse-core';
 import { Currency } from 'alex-sdk';
 
 export type STXOrFungibleToken = 'STX' | FungibleToken;

@@ -2,13 +2,13 @@ import { MESSAGE_SOURCE } from '@common/types/message-types';
 import { makeAccountResourceId } from '@components/permissionsManager/resources';
 import * as utils from '@components/permissionsManager/utils';
 import {
-  Requests,
-  Return,
-  RpcError,
   RpcErrorCode,
-  RpcErrorResponse,
-  RpcId,
-  RpcSuccessResponse,
+  type Requests,
+  type Return,
+  type RpcError,
+  type RpcErrorResponse,
+  type RpcId,
+  type RpcSuccessResponse,
 } from '@sats-connect/core';
 import rootStore from '@stores/index';
 import getSelectedAccount from '../getSelectedAccount';

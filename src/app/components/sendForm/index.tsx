@@ -5,17 +5,17 @@ import useCoinRates from '@hooks/queries/useCoinRates';
 import useDebounce from '@hooks/useDebounce';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  FungibleToken,
   getBtcEquivalent,
   getFiatEquivalent,
   getStxTokenEquivalent,
+  type FungibleToken,
 } from '@secretkeylabs/xverse-core';
-import InputFeedback from '@ui-library/inputFeedback';
-import { CurrencyTypes } from '@utils/constants';
+import { InputFeedback } from '@ui-library/inputFeedback';
+import type { CurrencyTypes } from '@utils/constants';
 import { getCurrencyFlag } from '@utils/currency';
 import { getTicker } from '@utils/helper';
 import BigNumber from 'bignumber.js';
-import { ReactNode, SetStateAction, useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode, type SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import { useNavigate } from 'react-router-dom';

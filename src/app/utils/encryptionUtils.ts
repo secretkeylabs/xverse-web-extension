@@ -19,7 +19,7 @@ export async function generateKeyArgon2id(password: string, salt: string): Promi
   return result.hashHex;
 }
 
-export async function generateKeyArgon2i(password: string, salt: string): Promise<string> {
+async function generateKeyArgon2i(password: string, salt: string): Promise<string> {
   const result = await argon2.hash({
     pass: password,
     salt,

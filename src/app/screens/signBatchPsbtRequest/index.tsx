@@ -13,7 +13,7 @@ import TransferSection from '@components/confirmBtcTransaction/transferSection';
 import { getNetAmount, isScriptOutput } from '@components/confirmBtcTransaction/utils';
 import InfoContainer from '@components/infoContainer';
 import LoadingTransactionStatus from '@components/loadingTransactionStatus';
-import { ConfirmationStatus } from '@components/loadingTransactionStatus/circularSvgAnimation';
+import type { ConfirmationStatus } from '@components/loadingTransactionStatus/circularSvgAnimation';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useHasFeature from '@hooks/useHasFeature';
 import useSelectedAccount from '@hooks/useSelectedAccount';
@@ -22,13 +22,13 @@ import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowLeft, ArrowRight } from '@phosphor-icons/react';
-import { SignMultiplePsbtPayload } from '@sats-connect/core';
+import type { SignMultiplePsbtPayload } from '@sats-connect/core';
 import {
   AnalyticsEvents,
   FeatureId,
-  RuneSummary,
   btcTransaction,
   parseSummaryForRunes,
+  type RuneSummary,
 } from '@secretkeylabs/xverse-core';
 import Callout from '@ui-library/callout';
 import Spinner from '@ui-library/spinner';

@@ -1,5 +1,6 @@
 /* eslint-disable prefer-destructuring */
-import { Provider } from '@sats-connect/core';
+/* eslint-disable prefer-destructuring */
+import type { Provider } from '@sats-connect/core';
 import type { NetworkType } from '@secretkeylabs/xverse-core';
 
 export const GAMMA_URL = 'https://gamma.io/';

@@ -4,9 +4,9 @@ import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   BitcoinNetworkType,
-  Params,
-  SignMessageOptions,
-  SignMessagePayload,
+  type Params,
+  type SignMessageOptions,
+  type SignMessagePayload,
 } from '@sats-connect/core';
 import { signMessage } from '@secretkeylabs/xverse-core';
 import { isHardwareAccount } from '@utils/helper';

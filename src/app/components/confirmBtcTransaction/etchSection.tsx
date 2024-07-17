@@ -1,7 +1,11 @@
 import useOrdinalsApi from '@hooks/apiClients/useOrdinalsApi';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import { ArrowRight } from '@phosphor-icons/react';
-import { EtchActionDetails, Inscription, RUNE_DISPLAY_DEFAULTS } from '@secretkeylabs/xverse-core';
+import {
+  RUNE_DISPLAY_DEFAULTS,
+  type EtchActionDetails,
+  type Inscription,
+} from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { ftDecimals, getShortTruncatedAddress } from '@utils/helper';
 import { useCallback, useEffect, useState } from 'react';

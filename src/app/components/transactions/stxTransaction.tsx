@@ -1,8 +1,8 @@
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import { parseStxTransactionData } from '@secretkeylabs/xverse-core';
-import { AddressTransactionWithTransfers } from '@stacks/stacks-blockchain-api-types';
-import { CurrencyTypes } from '@utils/constants';
-import { isAddressTransactionWithTransfers, Tx } from '@utils/transactions/transactions';
+import type { AddressTransactionWithTransfers } from '@stacks/stacks-blockchain-api-types';
+import type { CurrencyTypes } from '@utils/constants';
+import { isAddressTransactionWithTransfers, type Tx } from '@utils/transactions/transactions';
 import StxTransferTransaction from './stxTransferTransaction';
 import TxTransfers from './txTransfers';
 

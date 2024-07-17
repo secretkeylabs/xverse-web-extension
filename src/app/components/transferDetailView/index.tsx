@@ -2,7 +2,7 @@ import Eye from '@assets/img/createPassword/Eye.svg';
 import Cross from '@assets/img/dashboard/X.svg';
 import CopyButton from '@components/copyButton';
 import { getTruncatedAddress } from '@utils/helper';
-import { ReactNode, useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 

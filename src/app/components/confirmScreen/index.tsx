@@ -1,5 +1,5 @@
 import ActionButton from '@components/button';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import styled from 'styled-components';
 
 const MainContainer = styled.div`

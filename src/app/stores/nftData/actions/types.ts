@@ -1,4 +1,4 @@
-import { Bundle } from '@secretkeylabs/xverse-core';
+import type { Bundle } from '@secretkeylabs/xverse-core';
 
 export interface NftDataState {
   selectedSatBundle: Bundle | null;

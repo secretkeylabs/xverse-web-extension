@@ -2,7 +2,7 @@ import RuneAmount from '@components/confirmBtcTransaction/itemRow/runeAmount';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowRight } from '@phosphor-icons/react';
-import { btcTransaction, RuneSummary } from '@secretkeylabs/xverse-core';
+import type { btcTransaction, RuneSummary } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';

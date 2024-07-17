@@ -1,12 +1,12 @@
 import { StyledFiatAmountText } from '@components/fiatAmountText';
 import { PencilSimple } from '@phosphor-icons/react';
-import { SupportedCurrency } from '@secretkeylabs/xverse-core';
+import type { SupportedCurrency } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
-import FeeSelectPopup, { FeePriority } from './feeSelectPopup';
+import FeeSelectPopup, { type FeePriority } from './feeSelectPopup';
 
 const RowContainer = styled.div`
   display: flex;

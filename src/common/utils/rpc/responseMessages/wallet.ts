@@ -1,6 +1,6 @@
-import { Return } from '@sats-connect/core';
+import type { Return } from '@sats-connect/core';
 import { makeRpcSuccessResponse, sendRpcResponse } from '../helpers';
-import { BaseArgs } from './types';
+import type { BaseArgs } from './types';
 
 type RequestPermissionsSuccessArgs = BaseArgs & {
   result: Return<'wallet_requestPermissions'>;

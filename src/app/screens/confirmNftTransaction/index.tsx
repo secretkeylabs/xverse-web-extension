@@ -1,5 +1,5 @@
 import AssetIcon from '@assets/img/transactions/Assets.svg';
-import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
+import type { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmStxTransactionComponent from '@components/confirmStxTransactionComponent';
 import RecipientComponent from '@components/recipientComponent';
@@ -15,10 +15,10 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import NftImage from '@screens/nftDashboard/nftImage';
 import {
   AnalyticsEvents,
-  StacksTransaction,
   broadcastSignedTransaction,
   microstacksToStx,
   stxToMicrostacks,
+  type StacksTransaction,
 } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';

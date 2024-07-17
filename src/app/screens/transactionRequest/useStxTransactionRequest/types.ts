@@ -11,19 +11,19 @@ interface Metadata {
   messageId: string;
 }
 
-export interface TReturnSignTransaction extends TLegacyReturn, Metadata {
+interface TReturnSignTransaction extends TLegacyReturn, Metadata {
   rpcMethod: 'stx_signTransaction';
 }
 
-export interface TReturnCallContract extends TLegacyReturn, Metadata {
+interface TReturnCallContract extends TLegacyReturn, Metadata {
   rpcMethod: 'stx_callContract';
 }
 
-export interface TReturnTransferStx extends TLegacyReturn, Metadata {
+interface TReturnTransferStx extends TLegacyReturn, Metadata {
   rpcMethod: 'stx_transferStx';
 }
 
-export interface TReturnDeployContract extends TLegacyReturn, Metadata {
+interface TReturnDeployContract extends TLegacyReturn, Metadata {
   rpcMethod: 'stx_deployContract';
 }
 

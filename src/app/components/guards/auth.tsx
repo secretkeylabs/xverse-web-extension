@@ -2,7 +2,7 @@ import useSeedVault from '@hooks/useSeedVault';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Spinner from '@ui-library/spinner';
-import { PropsWithChildren, useEffect } from 'react';
+import { useEffect, type PropsWithChildren } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 

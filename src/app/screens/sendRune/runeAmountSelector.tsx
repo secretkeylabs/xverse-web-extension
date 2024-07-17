@@ -1,4 +1,4 @@
-import { FungibleToken } from '@secretkeylabs/xverse-core';
+import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import Input, { MaxButton, VertRule } from '@ui-library/input';
 import { getFtBalance } from '@utils/tokens';
 import { useEffect } from 'react';

@@ -1,12 +1,12 @@
 import { getStxAddressKeyChain, signStacksMessage } from '@secretkeylabs/xverse-core';
-import { SignaturePayload, StructuredDataSignatureRequestOptions } from '@stacks/connect';
+import type { SignaturePayload, StructuredDataSignatureRequestOptions } from '@stacks/connect';
 import {
   ChainID,
-  TupleCV,
   createStacksPrivateKey,
   deserializeCV,
   hexToCV,
   signStructuredData,
+  type TupleCV,
 } from '@stacks/transactions';
 import { decodeToken } from 'jsontokens';
 import { useCallback, useMemo } from 'react';

@@ -1,6 +1,6 @@
 import NftUser from '@assets/img/nftDashboard/bns.svg';
 import useNftDetail from '@hooks/queries/useNftDetail';
-import { NonFungibleToken } from '@secretkeylabs/xverse-core';
+import type { NonFungibleToken } from '@secretkeylabs/xverse-core';
 import { isBnsContract } from '@utils/nfts';
 import styled from 'styled-components';
 import NftImage from './nftImage';

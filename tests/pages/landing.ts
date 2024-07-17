@@ -1,4 +1,4 @@
-import { Locator, Page, expect } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 // Pageobject for landing page under options.html#/landing
 export default class Landing {
   readonly buttonCreateWallet: Locator;

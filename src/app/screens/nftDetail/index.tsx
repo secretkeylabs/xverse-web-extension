@@ -7,7 +7,7 @@ import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import { ArrowLeft, ArrowUp, Share } from '@phosphor-icons/react';
 import NftImage from '@screens/nftDashboard/nftImage';
-import { Attribute } from '@secretkeylabs/xverse-core';
+import type { Attribute } from '@secretkeylabs/xverse-core';
 import { EMPTY_LABEL } from '@utils/constants';
 import { useTranslation } from 'react-i18next';
 import {

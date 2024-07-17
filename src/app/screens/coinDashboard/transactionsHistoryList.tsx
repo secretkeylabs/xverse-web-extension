@@ -7,14 +7,17 @@ import useSeedVault from '@hooks/useSeedVault';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { animated, config, useSpring } from '@react-spring/web';
-import { BtcTransactionData, GetRunesActivityForAddressEvent } from '@secretkeylabs/xverse-core';
-import {
+import type {
+  BtcTransactionData,
+  GetRunesActivityForAddressEvent,
+} from '@secretkeylabs/xverse-core';
+import type {
   AddressTransactionWithTransfers,
   MempoolTransaction,
   PostConditionFungible,
 } from '@stacks/stacks-blockchain-api-types';
 import Spinner from '@ui-library/spinner';
-import { CurrencyTypes } from '@utils/constants';
+import type { CurrencyTypes } from '@utils/constants';
 import { formatDate } from '@utils/date';
 import { isLedgerAccount } from '@utils/helper';
 import {
@@ -25,7 +28,7 @@ import {
   isBtcTransactionArr,
   isRuneTransaction,
   isRuneTransactionArr,
-  Tx,
+  type Tx,
 } from '@utils/transactions/transactions';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';

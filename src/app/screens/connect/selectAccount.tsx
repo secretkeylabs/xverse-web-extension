@@ -1,6 +1,6 @@
 import LedgerBadge from '@assets/img/ledger/ledger_badge.svg';
 import { CaretRight } from '@phosphor-icons/react';
-import { Account } from '@secretkeylabs/xverse-core';
+import type { Account } from '@secretkeylabs/xverse-core';
 import { getAccountGradient } from '@utils/gradient';
 import { isHardwareAccount } from '@utils/helper';
 import { useTranslation } from 'react-i18next';

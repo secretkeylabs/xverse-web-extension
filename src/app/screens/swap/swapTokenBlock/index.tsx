@@ -1,7 +1,7 @@
 import ChevronIcon from '@assets/img/swap/chevron.svg';
 import TokenImage from '@components/tokenImage';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { SwapToken } from '@screens/swap/types';
+import { type SwapToken } from '@screens/swap/types';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core';
 import { EMPTY_LABEL } from '@utils/constants';
 import { useTranslation } from 'react-i18next';

@@ -1,10 +1,10 @@
-import { Account, AccountType, Coin, FungibleToken } from '@secretkeylabs/xverse-core';
+import type { Account, AccountType, Coin, FungibleToken } from '@secretkeylabs/xverse-core';
 import chromeStorage from '@utils/chromeStorage';
 import { applyMiddleware, combineReducers, createStore } from 'redux';
-import { PersistConfig, createMigrate, persistReducer, persistStore } from 'redux-persist';
+import { createMigrate, persistReducer, persistStore, type PersistConfig } from 'redux-persist';
 import { createStateSyncMiddleware, initMessageListener } from 'redux-state-sync';
 import NftDataStateReducer from './nftData/reducer';
-import { WalletState } from './wallet/actions/types';
+import type { WalletState } from './wallet/actions/types';
 import walletReducer, { initialWalletState, rehydrateError } from './wallet/reducer';
 
 const rootPersistConfig = {

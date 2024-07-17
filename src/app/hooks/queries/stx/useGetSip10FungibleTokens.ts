@@ -2,12 +2,12 @@ import useNetworkSelector from '@hooks/useNetwork';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  FungibleToken,
-  SettingsNetwork,
   StacksNetwork,
   // getCoinMetaData,
   getCoinsInfo,
   getFtData,
+  type FungibleToken,
+  type SettingsNetwork,
 } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';

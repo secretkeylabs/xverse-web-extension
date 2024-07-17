@@ -2,8 +2,8 @@ import {
   getBtcFees,
   getBtcFeesForNonOrdinalBtcSend,
   getBtcFeesForOrdinalSend,
-  Recipient,
-  UTXO,
+  type Recipient,
+  type UTXO,
 } from '@secretkeylabs/xverse-core';
 import { useEffect, useMemo, useState } from 'react';
 import useBtcClient from './apiClients/useBtcClient';

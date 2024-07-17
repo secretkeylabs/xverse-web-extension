@@ -1,18 +1,18 @@
-import { Result, safePromise } from '@common/utils/safe';
+import { safePromise, type Result } from '@common/utils/safe';
 import storage from '@utils/chromeStorage';
 import { Mutex } from 'async-mutex';
 import { parse, stringify } from 'superjson';
 import * as v from 'valibot';
 import { permissionsPersistantStoreKeyName } from './constants';
 import {
-  Client,
-  ClientsTable,
-  Permission,
-  PermissionsStoreV1,
-  PermissionsTable,
-  Resource,
-  ResourcesTable,
   permissionsStoreV1Schema,
+  type Client,
+  type ClientsTable,
+  type Permission,
+  type PermissionsStoreV1,
+  type PermissionsTable,
+  type Resource,
+  type ResourcesTable,
 } from './schemas';
 
 // Queries

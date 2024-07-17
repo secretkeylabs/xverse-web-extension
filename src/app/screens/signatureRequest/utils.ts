@@ -1,15 +1,16 @@
+/* eslint-disable import/prefer-default-export */
 import {
   MESSAGE_SOURCE,
-  SignatureResponseMessage,
   StacksLegacyMethods,
+  type SignatureResponseMessage,
 } from '@common/types/message-types';
-import { SignatureData } from '@stacks/connect';
+import type { SignatureData } from '@stacks/connect';
 
 interface FormatMessageSigningResponseArgs {
   request: string;
   response: SignatureData | string;
 }
-export function formatMessageSigningResponse({
+function formatMessageSigningResponse({
   request,
   response,
 }: FormatMessageSigningResponseArgs): SignatureResponseMessage {

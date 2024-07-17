@@ -2,8 +2,8 @@ import useRunesApi from '@hooks/apiClients/useRunesApi';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { BitcoinNetworkType } from '@sats-connect/core';
-import { RuneSellRequest } from '@secretkeylabs/xverse-core';
-import { RuneItem } from '@utils/runes';
+import type { RuneSellRequest } from '@secretkeylabs/xverse-core';
+import type { RuneItem } from '@utils/runes';
 import { useCallback, useState } from 'react';
 
 /*
