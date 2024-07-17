@@ -2,20 +2,27 @@ import useSeedVault from '@hooks/useSeedVault';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { BitcoinNetworkType, SignMessageOptions, SignMessagePayload } from '@sats-connect/core';
-import { SettingsNetwork, signBip322Message } from '@secretkeylabs/xverse-core';
+import {
+  BitcoinNetworkType,
+  Params,
+  SignMessageOptions,
+  SignMessagePayload,
+} from '@sats-connect/core';
+import { signMessage } from '@secretkeylabs/xverse-core';
 import { isHardwareAccount } from '@utils/helper';
 import { decodeToken } from 'jsontokens';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
+import SuperJSON from 'superjson';
 
-const useSignMessageRequestParams = (network: SettingsNetwork) => {
+const useSignMessageRequestParams = () => {
   const { search } = useLocation();
-  const params = new URLSearchParams(search);
+  const { network } = useWalletSelector();
+  const params = useMemo(() => new URLSearchParams(search), [search]);
   const tabId = params.get('tabId') ?? '0';
-  const origin = params.get('origin') ?? '';
   const requestId = params.get('requestId') ?? '';
+  const payloadToken = params.get('payload') ?? '';
 
   const { payload, requestToken } = useMemo(() => {
     const token = params.get('signMessageRequest') ?? '';
@@ -26,22 +33,20 @@ const useSignMessageRequestParams = (network: SettingsNetwork) => {
         requestToken: token,
       };
     }
-    const address = params.get('address') ?? '';
-    const message = params.get('message') ?? '';
     const rpcPayload: SignMessagePayload = {
-      message,
-      address,
+      ...SuperJSON.parse<Params<'signMessage'>>(payloadToken),
       network: {
-        type: BitcoinNetworkType[network.type],
+        type: network.type as BitcoinNetworkType,
       },
     };
+
     return {
       payload: rpcPayload,
       requestToken: null,
     };
-  }, []);
+  }, [params, payloadToken, network.type]);
 
-  return { tabId, origin, payload, requestToken, requestId };
+  return { tabId, payload, requestToken, requestId };
 };
 
 type ValidationError = {
@@ -96,21 +101,22 @@ export const useSignMessageValidation = (requestPayload: SignMessagePayload | un
     };
   }, [requestPayload]);
 
-  return { validationError, validateSignMessage };
+  return { validationError, validateSignMessage, setValidationError };
 };
 
 export const useSignMessageRequest = () => {
   const { network, accountsList } = useWalletSelector();
   const { getSeed } = useSeedVault();
-  const { payload, requestToken, tabId, origin, requestId } = useSignMessageRequestParams(network);
+  const { payload, requestToken, tabId, requestId } = useSignMessageRequestParams();
 
   const confirmSignMessage = async () => {
     const { address, message } = payload;
     const seedPhrase = await getSeed();
-    return signBip322Message({
+    return signMessage({
       accounts: accountsList,
       message,
-      signatureAddress: address,
+      address,
+      protocol: payload.protocol,
       seedPhrase,
       network: network.type,
     });
@@ -120,7 +126,6 @@ export const useSignMessageRequest = () => {
     payload,
     requestToken,
     tabId,
-    origin,
     requestId,
     confirmSignMessage,
   };

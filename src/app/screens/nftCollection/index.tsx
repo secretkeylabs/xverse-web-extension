@@ -97,7 +97,7 @@ const BackButton = styled.button((props) => ({
   marginBottom: props.theme.spacing(12),
 }));
 
-const AssetDeatilButtonText = styled.div((props) => ({
+const AssetDetailButtonText = styled.div((props) => ({
   ...props.theme.typography.body_m,
   fontWeight: 400,
   fontSize: 14,
@@ -201,7 +201,9 @@ function NftCollection() {
               <BackButton onClick={handleBackButtonClick}>
                 <>
                   <ArrowLeft weight="regular" size="20" color="white" />
-                  <AssetDeatilButtonText>{t('BACK_TO_GALLERY')}</AssetDeatilButtonText>
+                  <AssetDetailButtonText data-testid="back">
+                    {t('BACK_TO_GALLERY')}
+                  </AssetDetailButtonText>
                 </>
               </BackButton>
             </BackButtonContainer>

@@ -119,6 +119,9 @@ type Props = {
   onCancelClick: () => void;
 };
 
+/**
+ * @deprecated should use ConfirmBtcTransaction master component
+ */
 function ConfirmBtcTransactionComponent({
   currentFee,
   feePerVByte,
@@ -222,7 +225,6 @@ function ConfirmBtcTransactionComponent({
   } = useMutation<SignedBtcTx, ResponseError, { txFee: string; seedPhrase: string }>({
     mutationFn: async ({ txFee, seedPhrase }) => {
       const ordinalsUtxos = ordinals!.map((ord) => ord.utxo);
-
       const newSignedTx = await signOrdinalSendTransaction(
         recipients[0]?.address,
         ordinalTxUtxo!,

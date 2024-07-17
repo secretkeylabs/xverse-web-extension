@@ -278,7 +278,9 @@ export default class Wallet {
 
   readonly buttonSupportRarity: Locator;
 
-  readonly itemCollenction: Locator;
+  readonly itemCollection: Locator;
+
+  readonly backToGallery: Locator;
 
   readonly buttonShare: Locator;
 
@@ -413,7 +415,8 @@ export default class Wallet {
     this.buttonEnable = page.getByRole('button', { name: 'Enable' });
     this.containerInscription = page.getByTestId('inscription-container');
 
-    this.itemCollenction = page.getByTestId('collection-item');
+    this.backToGallery = page.getByTestId('back-to-gallery');
+    this.itemCollection = page.getByTestId('collection-item');
     this.buttonSend = page.getByRole('button', { name: 'Send' });
     this.buttonShare = page.getByRole('button', { name: 'Share' });
     this.buttonOpenOrdinalViewer = page.getByRole('button', { name: 'Open in Ordinal Viewer' });

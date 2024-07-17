@@ -138,7 +138,6 @@ function TransactionSummary({
         <WarningCallout bodyText={t('RUNE_IS_CLOSED')} variant="danger" />
       )}
       {hasRuneDelegation && <DelegateSection delegations={runeSummary?.transfers} />}
-
       <TransferSection
         outputs={outputs}
         inputs={inputs}
@@ -150,6 +149,7 @@ function TransactionSummary({
       />
       <ReceiveSection
         outputs={outputs}
+        hasExternalInputs={hasExternalInputs}
         transactionIsFinal={transactionIsFinal}
         onShowInscription={setInscriptionToShow}
         netAmount={netAmount}

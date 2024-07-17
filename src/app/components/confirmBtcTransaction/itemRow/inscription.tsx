@@ -73,7 +73,7 @@ export default function Inscription({
         <div>
           {!hideTypeSizeInfo && (
             <>
-              <StyledP typography="body_medium_m" color="white_200">
+              <StyledP typography="body_medium_m" color="white_0">
                 {t('COMMON.INSCRIPTION')}
               </StyledP>
               {bundleSize && (
@@ -101,7 +101,7 @@ export default function Inscription({
             }}
           >
             <RowCenter>
-              <InscriptionNumber typography="body_medium_m" color="white_200">
+              <InscriptionNumber typography="body_medium_m" color="white_0">
                 {inscription.number}
               </InscriptionNumber>
               <Eye color={Theme.colors.white_0} size={20} weight="fill" />
