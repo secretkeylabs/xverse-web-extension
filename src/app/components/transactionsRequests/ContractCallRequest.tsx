@@ -90,6 +90,7 @@ type Props = {
   rpcMethod: string | null;
   requestToken: string;
   attachment: Buffer | undefined;
+  broadcastAfterSigning: boolean;
 };
 
 export default function ContractCallRequest({
@@ -102,6 +103,7 @@ export default function ContractCallRequest({
   attachment,
   messageId,
   rpcMethod,
+  broadcastAfterSigning,
 }: Props) {
   const selectedNetwork = useNetworkSelector();
   const [hasTabClosed, setHasTabClosed] = useState(false);
@@ -194,8 +196,11 @@ export default function ContractCallRequest({
     tx: StacksTransaction[],
     txAttachment: Buffer | undefined = undefined,
   ) => {
+    const txId = tx[0].txid();
     try {
-      const txId = await broadcastSignedTransaction(tx[0], selectedNetwork, txAttachment);
+      if (broadcastAfterSigning) {
+        await broadcastSignedTransaction(tx[0], selectedNetwork, txAttachment);
+      }
       if (tabId && messageId && rpcMethod) {
         switch (rpcMethod) {
           case 'stx_signTransaction': {
@@ -221,6 +226,7 @@ export default function ContractCallRequest({
             sendInternalErrorMessage({ tabId, messageId });
           }
         }
+        if (!broadcastAfterSigning) window.close();
       } else {
         finalizeTxSignature({
           requestPayload: requestToken,

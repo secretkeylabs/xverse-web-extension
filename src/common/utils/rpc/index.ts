@@ -8,6 +8,7 @@ import {
   getWalletTypeMethodName,
   renouncePermissionsMethodName,
   requestPermissionsMethodName,
+  stxSignTransactionMethodName,
   type RpcRequestMessage,
 } from '@sats-connect/core';
 import { getTabIdFromPort } from '..';
@@ -99,8 +100,8 @@ async function handleRPCRequest(message: RpcRequestMessage, port: chrome.runtime
         await handleGetStxAddresses(message as unknown as WebBtcMessage<'stx_getAddresses'>, port);
         break;
       }
-      case 'stx_signTransaction': {
-        await signTransaction(message as unknown as WebBtcMessage<'stx_signTransaction'>, port);
+      case stxSignTransactionMethodName: {
+        await signTransaction(message, port);
         break;
       }
       case 'stx_transferStx': {

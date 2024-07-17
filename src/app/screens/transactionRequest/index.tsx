@@ -21,6 +21,7 @@ import type { ContractCallPayload, ContractDeployPayload } from '@stacks/connect
 import { StacksTransaction } from '@stacks/transactions';
 import Spinner from '@ui-library/spinner';
 import { getNetworkType, isHardwareAccount } from '@utils/helper';
+import RoutePaths from 'app/routes/paths';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -83,7 +84,7 @@ function TransactionRequest() {
       transaction?.auth,
     );
     setUnsignedTx(unsignedSendStxTx);
-    navigate('/confirm-stx-tx', {
+    navigate(RoutePaths.ConfirmStacksTransaction, {
       state: {
         unsignedTx: buf2hex(unsignedSendStxTx.serialize()),
         sponsored: tokenTransferPayload.sponsored,
@@ -92,6 +93,7 @@ function TransactionRequest() {
         messageId,
         requestToken,
         rpcMethod,
+        broadcast: txReq.broadcast,
       },
     });
   };
@@ -160,7 +162,7 @@ function TransactionRequest() {
     } else if (payload.txType === 'smart_contract') {
       await handleContractDeployRequest(payload, requestAccount);
     } else {
-      navigate('/confirm-stx-tx', {
+      navigate(RoutePaths.ConfirmStacksTransaction, {
         state: {
           unsignedTx: payload.txHex,
           sponsored: payload.sponsored,
@@ -169,6 +171,7 @@ function TransactionRequest() {
           requestToken,
           rpcMethod,
           messageId,
+          broadcast: txReq.broadcast,
         },
       });
     }
@@ -188,7 +191,8 @@ function TransactionRequest() {
         await handleTxSigningRequest(account);
       }
     } catch (e: unknown) {
-      console.error(e); // eslint-disable-line
+      // eslint-disable-next-line no-console
+      console.error(e);
       toast.error('Unexpected error creating transaction');
       sendInternalErrorMessage({ tabId, messageId });
     }
@@ -250,6 +254,7 @@ function TransactionRequest() {
         <ContractCallRequest
           request={payload}
           unsignedTx={unsignedTx}
+          broadcastAfterSigning={txReq.broadcast}
           funcMetaData={funcMetaData}
           attachment={attachment}
           coinsMetaData={coinsMetaData}
@@ -262,6 +267,7 @@ function TransactionRequest() {
       {payload && payload.txType === 'smart_contract' && unsignedTx ? (
         <ContractDeployRequest
           unsignedTx={unsignedTx}
+          broadcastAfterSigning={txReq.broadcast}
           codeBody={codeBody!}
           contractName={contractName!}
           sponsored={payload?.sponsored}
