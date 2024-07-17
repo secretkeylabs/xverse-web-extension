@@ -1301,7 +1301,14 @@
     },
     "SWAP_TRANSACTION_CANNOT_BE_SPONSORED": "Swap transaction cannot be sponsored while you have a pending transaction.",
     "LEARN_MORE": "Learn more",
-    "GET_QUOTES": "Get quotes"
+    "GET_QUOTES_TITLE": "Rates",
+    "GET_QUOTES": "Get quotes",
+    "QUOTE_TITLE": "We found the following rates for your swap",
+    "EXCHANGE": "EXCHANGE",
+    "MARKETPLACE": "MARKETPLACE",
+    "FLOOR_PRICE": "Floor price",
+    "RECOMMENDED": "• Recommended",
+    "BEST": "• Best"
   },
   "SWAP_CONFIRM_SCREEN": {
     "TOKEN_SWAP": "Token swap",

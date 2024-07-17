@@ -2,10 +2,17 @@ import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
+import useGetQuotes from '@hooks/queries/swaps/useGetQuotes';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { btcToSats, getBtcFiatEquivalent, type FungibleToken } from '@secretkeylabs/xverse-core';
+import {
+  btcToSats,
+  getBtcFiatEquivalent,
+  type FungibleToken,
+  type Quote,
+  type UtxoQuote,
+} from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
 import { satsToBtcString } from '@utils/helper';
@@ -18,6 +25,7 @@ import styled from 'styled-components';
 import AmountInput from './components/amountInput';
 import RouteItem from './components/routeItem';
 import TokenFromBottomSheet from './components/tokenFromBottomSheet';
+import QuotesModal from './quotesModal';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -63,6 +71,7 @@ const Icon = styled.img`
 // TODO: add form validations, empty state and error handling
 export default function SwapScreen() {
   const [amount, setAmount] = useState('');
+  const [getQuotesModalVisible, setGetQuotesModalVisible] = useState(false);
   const [tokenSelectionBottomSheet, setTokenSelectionBottomSheet] = useState<'from' | 'to' | null>(
     null,
   );
@@ -79,6 +88,7 @@ export default function SwapScreen() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const defaultFrom = params.get('from');
+  const { quotes, loading: quotesLoading, error: quotesError, fetchQuotes } = useGetQuotes();
 
   useEffect(() => {
     if (defaultFrom && runesCoinsList.length > 0) {
@@ -94,8 +104,20 @@ export default function SwapScreen() {
     navigate(-1);
   };
 
-  const getQuotes = () => {
-    // TODO: implement getQuotes
+  useEffect(() => {
+    if (!quotesLoading && quotes) {
+      setGetQuotesModalVisible(true);
+    }
+  }, [quotes, quotesLoading, quotesError]);
+
+  const getQuotes = async () => {
+    // fetch quotes here
+    // example
+    fetchQuotes({
+      from: { ticker: 'BTC', protocol: 'btc' },
+      to: { ticker: 'UNCOMMON•GOODS', protocol: 'runes' },
+      amount: '50',
+    });
   };
 
   const onClickFrom = () => setTokenSelectionBottomSheet('from');
@@ -181,10 +203,11 @@ export default function SwapScreen() {
     setAmount(getFtBalance(fromToken));
   };
 
-  const isGetQuotesDisabled = !fromToken || !toToken || Boolean(error);
+  const errorMsg = error || quotesError;
+  const isGetQuotesDisabled =
+    !fromToken || !toToken || Boolean(error) || quotesLoading || Boolean(quotesError);
   const isMaxDisabled =
     !fromToken || fromToken === 'BTC' || BigNumber(amount).eq(getFtBalance(fromToken));
-  const isGetQuotesLoading = false;
 
   return (
     <>
@@ -218,12 +241,28 @@ export default function SwapScreen() {
         <SendButtonContainer>
           <Button
             disabled={isGetQuotesDisabled}
-            variant={error ? 'danger' : 'primary'}
-            title={error || t('SWAP_SCREEN.GET_QUOTES')}
-            loading={isGetQuotesLoading}
+            variant={errorMsg ? 'danger' : 'primary'}
+            title={errorMsg || t('SWAP_SCREEN.GET_QUOTES')}
+            loading={quotesLoading}
             onClick={getQuotes}
           />
         </SendButtonContainer>
+        <QuotesModal
+          visible={getQuotesModalVisible}
+          onClose={() => {
+            setGetQuotesModalVisible(false);
+          }}
+          ammProviders={quotes?.amm || []}
+          utxoProviders={quotes?.utxo || []}
+          ammProviderClicked={(provider: Quote) => {
+            // todo: navigate to quote screen here
+            console.log('amm clicked', provider);
+          }}
+          utxoProviderClicked={(provider: UtxoQuote) => {
+            // todo: navigate to utxo selection screen
+            console.log('utxo clicked', provider);
+          }}
+        />
         <TokenFromBottomSheet
           onClose={() => setTokenSelectionBottomSheet(null)}
           onSelectCoin={onChangeFromToken}
