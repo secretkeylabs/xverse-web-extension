@@ -1,5 +1,5 @@
-import { PostCondition } from '@stacks/transactions';
 import AssetIcon from '@assets/img/transactions/Assets.svg';
+import type { PostCondition } from '@stacks/transactions';
 import PostConditionsView from './postConditionView';
 import { getAmountFromPostCondition } from './postConditionView/helper';
 

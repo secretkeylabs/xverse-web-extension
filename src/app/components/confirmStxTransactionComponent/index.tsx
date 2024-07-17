@@ -30,7 +30,7 @@ import Callout from '@ui-library/callout';
 import { isHardwareAccount } from '@utils/helper';
 import { modifyRecommendedStxFees } from '@utils/transactions/transactions';
 import BigNumber from 'bignumber.js';
-import { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import Theme from 'theme';
 import {

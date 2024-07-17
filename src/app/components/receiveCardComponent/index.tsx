@@ -3,7 +3,7 @@ import QrCode from '@assets/img/nftDashboard/QrCode.svg';
 import Tick from '@assets/img/tick.svg';
 import ActionButton from '@components/button';
 import { getShortTruncatedAddress } from '@utils/helper';
-import { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';

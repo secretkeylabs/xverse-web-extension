@@ -1,4 +1,4 @@
-import { ConfirmBtcTransactionState, LedgerTransactionType } from '@common/types/ledger';
+import type { ConfirmBtcTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types';
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import AlertMessage from '@components/alertMessage';
@@ -9,11 +9,11 @@ import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
-import { Return, RpcErrorCode } from '@sats-connect/core';
+import { RpcErrorCode, type Return } from '@sats-connect/core';
 import {
   AnalyticsEvents,
-  BtcTransactionBroadcastResponse,
-  Recipient,
+  type BtcTransactionBroadcastResponse,
+  type Recipient,
 } from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';

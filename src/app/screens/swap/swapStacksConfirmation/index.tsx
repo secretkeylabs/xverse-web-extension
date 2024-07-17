@@ -3,7 +3,7 @@ import InfoContainer from '@components/infoContainer';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import { Container } from '@screens/home/index.styled';
-import AdvanceSettings from '@screens/swap/swapStacksConfirmation/advanceSettings';
+import { AdvanceSettings } from '@screens/swap/swapStacksConfirmation/advanceSettings';
 import FeesBlock from '@screens/swap/swapStacksConfirmation/feesBlock';
 import FunctionBlock from '@screens/swap/swapStacksConfirmation/functionBlock';
 import RouteBlock from '@screens/swap/swapStacksConfirmation/routeBlock';

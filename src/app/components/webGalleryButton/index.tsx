@@ -23,7 +23,7 @@ const StyledButton = styled.button`
   }
 `;
 
-export function WebGalleryButton({
+function WebGalleryButton({
   className,
   onClick,
 }: {

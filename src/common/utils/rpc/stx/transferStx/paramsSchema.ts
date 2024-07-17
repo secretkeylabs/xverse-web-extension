@@ -6,6 +6,4 @@ const paramsSchema = z.object({
   memo: z.string().optional(),
 });
 
-export type ParamsSchema = z.infer<typeof paramsSchema>;
-
 export default paramsSchema;

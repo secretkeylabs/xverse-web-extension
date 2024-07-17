@@ -1,28 +1,36 @@
-import { NetworkType, signSimpleBip322Message, Transport } from '@secretkeylabs/xverse-core';
+import {
+  MessageSigningProtocols,
+  signMessageLedger,
+  type NetworkType,
+  type Transport,
+} from '@secretkeylabs/xverse-core';
 
-export const handleBip322LedgerMessageSigning = async ({
+export const handleLedgerMessageSigning = async ({
   transport,
   addressIndex,
   address,
   networkType,
   message,
+  protocol,
 }: {
   transport: Transport;
   addressIndex?: number;
   address: string;
   networkType: NetworkType;
   message: string;
+  protocol?: MessageSigningProtocols;
 }) => {
   if (addressIndex === undefined) {
     throw new Error('Account not found');
   }
 
-  const signature = await signSimpleBip322Message({
+  const signature = await signMessageLedger({
     transport,
     networkType,
     addressIndex,
     address,
     message,
+    protocol,
   });
 
   return signature;

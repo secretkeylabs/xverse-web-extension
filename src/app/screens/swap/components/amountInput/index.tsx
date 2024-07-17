@@ -1,8 +1,7 @@
-import useWalletSelector from '@hooks/useWalletSelector';
-import { currencySymbolMap, SupportedCurrency } from '@secretkeylabs/xverse-core';
+import { currencySymbolMap, type SupportedCurrency } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { MaxButton } from '@ui-library/input';
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';

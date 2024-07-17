@@ -40,8 +40,14 @@ function BtcSelectAddressScreen() {
   const [appIcon, setAppIcon] = useState<string>('');
   const [isLoadingIcon, setIsLoadingIcon] = useState(false);
 
-  const { payload, origin, approveBtcAddressRequest, cancelAddressRequest } =
-    useBtcAddressRequest();
+  const {
+    legacyRequestNetworkType,
+    purposes,
+    origin,
+    message,
+    sendApprovedResponse,
+    sendCancelledResponse,
+  } = useBtcAddressRequest();
   const appUrl = useMemo(() => origin.replace(/(^\w+:|^)\/\//, ''), [origin]);
 
   const transition = useTransition(isLoadingIcon, {
@@ -51,11 +57,11 @@ function BtcSelectAddressScreen() {
 
   const confirmCallback = async () => {
     setLoading(true);
-    approveBtcAddressRequest();
+    await sendApprovedResponse();
     trackMixPanel(
       AnalyticsEvents.AppConnected,
       {
-        requestedAddress: payload.purposes,
+        requestedAddress: purposes,
         wallet_type: selectedAccount?.accountType || 'software',
       },
       { send_immediately: true },
@@ -66,13 +72,13 @@ function BtcSelectAddressScreen() {
   };
 
   const cancelCallback = () => {
-    cancelAddressRequest();
+    sendCancelledResponse();
     window.close();
   };
 
   useEffect(() => {
     // Handle address requests to a network that's not currently active
-    if (payload.network.type !== network.type) {
+    if (legacyRequestNetworkType && legacyRequestNetworkType !== network.type) {
       navigate('/tx-status', {
         state: {
           txid: '',
@@ -84,7 +90,7 @@ function BtcSelectAddressScreen() {
       });
     }
     // Handle address requests with an unsupported purpose
-    payload.purposes.forEach((purpose) => {
+    purposes.forEach((purpose) => {
       if (
         purpose !== AddressPurpose.Ordinals &&
         purpose !== AddressPurpose.Payment &&
@@ -101,7 +107,7 @@ function BtcSelectAddressScreen() {
         });
       }
     });
-  }, []);
+  }, [legacyRequestNetworkType, navigate, network.type, purposes, t]);
 
   useEffect(() => {
     if (origin === '') {
@@ -118,42 +124,45 @@ function BtcSelectAddressScreen() {
       });
   }, [origin]);
 
-  const AddressPurposeRow = useCallback((purpose: AddressPurpose) => {
-    if (purpose === AddressPurpose.Payment) {
-      return (
-        <AddressPurposeBox
-          key={purpose}
-          purpose={purpose}
-          icon={BitcoinIcon}
-          title={t('BITCOIN_ADDRESS')}
-          address={btcAddress}
-        />
-      );
-    }
-    if (purpose === AddressPurpose.Ordinals) {
-      return (
-        <AddressPurposeBox
-          key={purpose}
-          purpose={purpose}
-          icon={OrdinalsIcon}
-          title={t('ORDINAL_ADDRESS')}
-          address={ordinalsAddress}
-        />
-      );
-    }
-    if (purpose === AddressPurpose.Stacks) {
-      return (
-        <AddressPurposeBox
-          key={purpose}
-          purpose={purpose}
-          icon={stxIcon}
-          title={t('STX_ADDRESS')}
-          address={stxAddress}
-          bnsName={selectedAccount?.bnsName}
-        />
-      );
-    }
-  }, []);
+  const AddressPurposeRow = useCallback(
+    (purpose: AddressPurpose) => {
+      if (purpose === AddressPurpose.Payment) {
+        return (
+          <AddressPurposeBox
+            key={purpose}
+            purpose={purpose}
+            icon={BitcoinIcon}
+            title={t('BITCOIN_ADDRESS')}
+            address={btcAddress}
+          />
+        );
+      }
+      if (purpose === AddressPurpose.Ordinals) {
+        return (
+          <AddressPurposeBox
+            key={purpose}
+            purpose={purpose}
+            icon={OrdinalsIcon}
+            title={t('ORDINAL_ADDRESS')}
+            address={ordinalsAddress}
+          />
+        );
+      }
+      if (purpose === AddressPurpose.Stacks) {
+        return (
+          <AddressPurposeBox
+            key={purpose}
+            purpose={purpose}
+            icon={stxIcon}
+            title={t('STX_ADDRESS')}
+            address={stxAddress}
+            bnsName={selectedAccount?.bnsName}
+          />
+        );
+      }
+    },
+    [btcAddress, ordinalsAddress, selectedAccount?.bnsName, stxAddress, t],
+  );
 
   const handleSwitchAccount = () => {
     navigate('/account-list?hideListActions=true');
@@ -176,13 +185,13 @@ function BtcSelectAddressScreen() {
             <Title>{t('TITLE')}</Title>
             <DapURL>{appUrl}</DapURL>
           </HeadingContainer>
-          {payload.message ? (
-            <RequestMessage>{payload.message.substring(0, 80)}</RequestMessage>
+          {message ? (
+            <RequestMessage>{message.substring(0, 80)}</RequestMessage>
           ) : (
             <RequestMessagePlaceholder />
           )}
           <SelectAccount account={selectedAccount!} handlePressAccount={handleSwitchAccount} />
-          <AddressBoxContainer>{payload.purposes.map(AddressPurposeRow)}</AddressBoxContainer>
+          <AddressBoxContainer>{purposes.map(AddressPurposeRow)}</AddressBoxContainer>
           <PermissionsContainer>
             <PermissionsList />
           </PermissionsContainer>

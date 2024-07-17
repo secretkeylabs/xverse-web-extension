@@ -1,5 +1,5 @@
-import { BitcoinProvider } from '@sats-connect/core';
-import { StacksProvider } from '@stacks/connect';
+import { type BitcoinProvider } from '@sats-connect/core';
+import { type StacksProvider } from '@stacks/connect';
 
 import { XverseProviderInfo } from '@utils/constants';
 import SatsMethodsProvider from './sats.inpage';

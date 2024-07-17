@@ -2,9 +2,9 @@ import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/u
 import useOrdinalsServiceApi from '@hooks/apiClients/useOrdinalsServiceApi';
 import useRunesApi from '@hooks/apiClients/useRunesApi';
 import useTransactionContext from '@hooks/useTransactionContext';
-import { Params, RpcErrorCode } from '@sats-connect/core';
-import { TransactionBuildPayload, generateTransaction } from '@screens/sendBtc/helpers';
-import { Rune, Transport } from '@secretkeylabs/xverse-core';
+import { RpcErrorCode, type Params } from '@sats-connect/core';
+import { generateTransaction, type TransactionBuildPayload } from '@screens/sendBtc/helpers';
+import { type Rune, type Transport } from '@secretkeylabs/xverse-core';
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import SuperJSON from 'superjson';

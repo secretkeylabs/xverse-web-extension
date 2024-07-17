@@ -2,10 +2,10 @@ import ActionButton from '@components/button';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { FastForward } from '@phosphor-icons/react';
 import {
-  Brc20HistoryTransactionData,
-  BtcTransactionData,
   rbf,
-  RBFProps,
+  type Brc20HistoryTransactionData,
+  type BtcTransactionData,
+  type RBFProps,
 } from '@secretkeylabs/xverse-core';
 import { getBtcTxStatusUrl } from '@utils/helper';
 import { isBtcTransaction } from '@utils/transactions/transactions';

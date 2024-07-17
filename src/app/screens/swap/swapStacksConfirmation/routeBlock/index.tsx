@@ -5,7 +5,7 @@ import {
   TitleContainer,
   TitleText,
 } from '@screens/swap/swapStacksConfirmation/stxInfoBlock';
-import { SwapConfirmationOutput } from '@screens/swap/swapStacksConfirmation/useConfirmSwap';
+import type { SwapConfirmationOutput } from '@screens/swap/swapStacksConfirmation/useConfirmSwap';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';

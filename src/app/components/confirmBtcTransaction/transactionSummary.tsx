@@ -11,8 +11,8 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import {
   btcTransaction,
   getBtcFiatEquivalent,
-  RuneSummary,
-  RuneSummaryActions,
+  type RuneSummary,
+  type RuneSummaryActions,
 } from '@secretkeylabs/xverse-core';
 import SelectFeeRate from '@ui-components/selectFeeRate';
 import Callout from '@ui-library/callout';

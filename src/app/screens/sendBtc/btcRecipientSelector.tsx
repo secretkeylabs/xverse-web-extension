@@ -2,7 +2,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { validateBtcAddress } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import Input from '@ui-library/input';
-import { FeedbackVariant } from '@ui-library/inputFeedback';
+import type { FeedbackVariant } from '@ui-library/inputFeedback';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';

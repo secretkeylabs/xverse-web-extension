@@ -1,10 +1,10 @@
 import {
-  FungibleToken,
   microstacksToStx,
   satsToBtc,
-  StxAddressData,
+  type FungibleToken,
+  type StxAddressData,
 } from '@secretkeylabs/xverse-core';
-import { CurrencyTypes } from '@utils/constants';
+import type { CurrencyTypes } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import { ftDecimals, getTicker } from './helper';
 

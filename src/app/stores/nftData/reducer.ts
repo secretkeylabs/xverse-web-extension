@@ -1,8 +1,8 @@
 import {
-  NftDataAction,
-  NftDataState,
   SetSelectedSatBundleItemIndexKey,
   SetSelectedSatBundleKey,
+  type NftDataAction,
+  type NftDataState,
 } from './actions/types';
 
 const initialNftDataState: NftDataState = {

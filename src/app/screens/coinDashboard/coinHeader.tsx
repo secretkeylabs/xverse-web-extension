@@ -16,12 +16,12 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   FeatureId,
-  FungibleToken,
   currencySymbolMap,
   getFiatEquivalent,
   microstacksToStx,
+  type FungibleToken,
 } from '@secretkeylabs/xverse-core';
-import { CurrencyTypes } from '@utils/constants';
+import type { CurrencyTypes } from '@utils/constants';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { getBalanceAmount, getFtTicker } from '@utils/tokens';
 import BigNumber from 'bignumber.js';

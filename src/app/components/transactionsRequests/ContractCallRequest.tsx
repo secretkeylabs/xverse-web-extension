@@ -16,9 +16,6 @@ import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import {
-  Args,
-  Coin,
-  ContractFunction,
   addressToString,
   broadcastSignedTransaction,
   buf2hex,
@@ -26,16 +23,19 @@ import {
   isMultiSig,
   microstacksToStx,
   stxToMicrostacks,
+  type Args,
+  type Coin,
+  type ContractFunction,
 } from '@secretkeylabs/xverse-core';
-import { ContractCallPayload } from '@stacks/connect';
+import type { ContractCallPayload } from '@stacks/connect';
 import {
   ClarityType,
-  MultiSigSpendingCondition,
   PostConditionType,
-  SomeCV,
   StacksTransaction,
   cvToJSON,
   cvToString,
+  type MultiSigSpendingCondition,
+  type SomeCV,
 } from '@stacks/transactions';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';

@@ -23,7 +23,7 @@ import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.s
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import ordinalsIcon from '@assets/img/ledger/ordinals_icon.svg';
 import LedgerFailView from '@components/ledger/failLedgerView';
-import useResetUserFlow from '@hooks/useResetUserFlow';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
 import LedgerConnectionView from '../../../components/ledger/connectLedgerView';
 

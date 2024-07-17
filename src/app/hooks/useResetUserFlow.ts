@@ -64,8 +64,6 @@ export const useResetUserFlow = (path: UserFlowConfigKey) => {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 };
 
-export default useResetUserFlow;
-
 export const broadcastResetUserFlow = () => {
   const broadcastChannel = new BroadcastChannel(resetUserFlowChannel);
   broadcastChannel.postMessage('reset');

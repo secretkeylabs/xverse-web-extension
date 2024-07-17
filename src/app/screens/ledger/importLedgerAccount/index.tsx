@@ -5,12 +5,12 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { useTransition } from '@react-spring/web';
 import {
-  Account,
   LedgerErrors,
   getMasterFingerPrint,
   importNativeSegwitAccountFromLedger,
   importStacksAccountFromLedger,
   importTaprootAccountFromLedger,
+  type Account,
 } from '@secretkeylabs/xverse-core';
 import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
 import { validateAccountName } from '@utils/helper';

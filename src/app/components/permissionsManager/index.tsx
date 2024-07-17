@@ -2,8 +2,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { parse } from 'superjson';
 import * as v from 'valibot';
 import { permissionsPersistantStoreKeyName } from './constants';
-import { Client, Permission, Resource, permissionsStoreV1Schema } from './schemas';
-import { TPermissionsStoreContext, TPermissionsUtilsContext } from './types';
+import { permissionsStoreV1Schema, type Client, type Permission, type Resource } from './schemas';
+import type { TPermissionsStoreContext, TPermissionsUtilsContext } from './types';
 import * as utils from './utils';
 
 const PermissionsStoreContext = createContext<TPermissionsStoreContext>({

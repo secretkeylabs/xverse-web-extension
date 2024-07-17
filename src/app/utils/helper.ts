@@ -1,19 +1,19 @@
 import {
-  Account,
   BitcoinEsploraApiProvider,
-  FungibleToken,
   getStacksInfo,
   microstacksToStx,
-  NetworkType,
-  NftData,
   satsToBtc,
-  SettingsNetwork,
-  StxMempoolTransactionData,
+  type Account,
+  type FungibleToken,
+  type NetworkType,
+  type NftData,
+  type SettingsNetwork,
+  type StxMempoolTransactionData,
 } from '@secretkeylabs/xverse-core';
 import { ChainID } from '@stacks/transactions';
 import { getFtBalance } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
-import { TFunction } from 'react-i18next';
+import type { TFunction } from 'react-i18next';
 import {
   BTC_TRANSACTION_SIGNET_STATUS_URL,
   BTC_TRANSACTION_STATUS_URL,
@@ -179,8 +179,6 @@ export const isValidBtcApi = async (url: string, network: NetworkType) => {
   } catch (e) {
     return false;
   }
-
-  return false;
 };
 
 export const getNetworkType = (stxNetwork) =>

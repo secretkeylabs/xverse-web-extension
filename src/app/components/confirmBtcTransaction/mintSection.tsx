@@ -1,6 +1,6 @@
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import { ArrowRight } from '@phosphor-icons/react';
-import { MintActionDetails, RuneSummary } from '@secretkeylabs/xverse-core';
+import type { MintActionDetails, RuneSummary } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { ftDecimals, getShortTruncatedAddress } from '@utils/helper';
 import { useTranslation } from 'react-i18next';

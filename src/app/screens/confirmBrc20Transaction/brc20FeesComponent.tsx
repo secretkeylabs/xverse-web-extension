@@ -1,4 +1,4 @@
-import { currencySymbolMap, SupportedCurrency } from '@secretkeylabs/xverse-core';
+import { currencySymbolMap, type SupportedCurrency } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';

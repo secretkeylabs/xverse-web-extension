@@ -1,15 +1,15 @@
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import {
-  Brc20HistoryTransactionData,
-  BtcTransactionData,
-  FungibleToken,
-  FungibleTokenProtocol,
-  GetRunesActivityForAddressEvent,
   microstacksToStx,
   satsToBtc,
-  StxTransactionData,
+  type Brc20HistoryTransactionData,
+  type BtcTransactionData,
+  type FungibleToken,
+  type FungibleTokenProtocol,
+  type GetRunesActivityForAddressEvent,
+  type StxTransactionData,
 } from '@secretkeylabs/xverse-core';
-import { CurrencyTypes } from '@utils/constants';
+import type { CurrencyTypes } from '@utils/constants';
 import { getFtBalance, getFtTicker } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { NumericFormat } from 'react-number-format';

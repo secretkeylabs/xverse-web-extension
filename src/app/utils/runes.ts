@@ -1,4 +1,4 @@
-import { GetRunesUtxoItem } from '@secretkeylabs/xverse-core';
+import type { GetRunesUtxoItem } from '@secretkeylabs/xverse-core';
 
 export const getFullTxId = (item: GetRunesUtxoItem) => `${item.txid}:${item.vout.toString()}`;
 

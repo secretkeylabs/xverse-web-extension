@@ -1,5 +1,5 @@
 import useSelectedAccount from '@hooks/useSelectedAccount';
-import { getStacksInfo, getXverseApiClient, StackingData } from '@secretkeylabs/xverse-core';
+import { getStacksInfo, getXverseApiClient, type StackingData } from '@secretkeylabs/xverse-core';
 import { useQueries } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import useWalletSelector from '../useWalletSelector';

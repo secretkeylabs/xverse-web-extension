@@ -1,5 +1,5 @@
 import { XCircle } from '@phosphor-icons/react';
-import InputFeedback from '@ui-library/inputFeedback';
+import { InputFeedback } from '@ui-library/inputFeedback';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
 

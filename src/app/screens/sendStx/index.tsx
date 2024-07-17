@@ -1,5 +1,5 @@
 import TokenImage from '@components/tokenImage';
-import useResetUserFlow from '@hooks/useResetUserFlow';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core';
 import { isInOptions } from '@utils/helper';
 import SendLayout from 'app/layouts/sendLayout';

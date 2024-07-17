@@ -1,4 +1,4 @@
-import { StoreState } from '@stores/index';
+import type { StoreState } from '@stores/index';
 import { useSelector } from 'react-redux';
 
 const useWalletSelector = () => {

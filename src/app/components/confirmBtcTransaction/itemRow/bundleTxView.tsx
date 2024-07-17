@@ -7,7 +7,7 @@ import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 import Theme from 'theme';
 import Avatar from '../../../ui-library/avatar';
-import { SatRangeTx } from '../utils';
+import type { SatRangeTx } from '../utils';
 import Inscription from './inscription';
 import RareSats from './rareSats';
 

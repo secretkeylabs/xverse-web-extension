@@ -1,6 +1,7 @@
+/* eslint-disable import/prefer-default-export */
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import TransactionSettingAlert from '@components/transactionSetting';
-import { SwapConfirmationOutput } from '@screens/swap/swapStacksConfirmation/useConfirmSwap';
+import { type SwapConfirmationOutput } from '@screens/swap/swapStacksConfirmation/useConfirmSwap';
 import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import { useCallback, useState } from 'react';
@@ -33,7 +34,7 @@ type Props = {
   swap: SwapConfirmationOutput;
 };
 
-function AdvanceSettings({ swap }: Props) {
+export function AdvanceSettings({ swap }: Props) {
   const [showModal, setShowModal] = useState(false);
   const [showFeeSettings, setShowFeeSettings] = useState(false);
 
@@ -74,4 +75,3 @@ function AdvanceSettings({ swap }: Props) {
     </>
   );
 }
-export default AdvanceSettings;
