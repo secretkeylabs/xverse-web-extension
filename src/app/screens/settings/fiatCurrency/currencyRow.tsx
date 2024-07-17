@@ -1,6 +1,6 @@
 import TickIcon from '@assets/img/settings/tick.svg';
 import type { SupportedCurrency } from '@secretkeylabs/xverse-core';
-import { Currency } from '@utils/currency';
+import type { Currency } from '@utils/currency';
 import styled, { useTheme } from 'styled-components';
 
 const Button = styled.button<{

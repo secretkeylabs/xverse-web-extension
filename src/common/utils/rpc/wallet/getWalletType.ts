@@ -4,7 +4,7 @@ import getSelectedAccount from '@common/utils/getSelectedAccount';
 import { makeContext } from '@common/utils/popup';
 import { makeAccountResourceId } from '@components/permissionsManager/resources';
 import * as utils from '@components/permissionsManager/utils';
-import { RpcRequestMessage, getWalletTypeRequestMessageSchema } from '@sats-connect/core';
+import { getWalletTypeRequestMessageSchema, type RpcRequestMessage } from '@sats-connect/core';
 import rootStore from '@stores/index';
 import * as v from 'valibot';
 import { handleInvalidMessage } from '../handle-invalid-message';

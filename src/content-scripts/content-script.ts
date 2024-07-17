@@ -1,24 +1,24 @@
 import {
-  AuthenticationRequestEvent,
-  CreateInscriptionEvent,
-  CreateRepeatInscriptionsEvent,
   DomEventName,
-  GetAddressRequestEvent,
-  SendBtcRequestEvent,
-  SignatureRequestEvent,
-  SignBatchPsbtRequestEvent,
-  SignMessageRequestEvent,
-  SignPsbtRequestEvent,
-  TransactionRequestEvent,
+  type AuthenticationRequestEvent,
+  type CreateInscriptionEvent,
+  type CreateRepeatInscriptionsEvent,
+  type GetAddressRequestEvent,
+  type SendBtcRequestEvent,
+  type SignBatchPsbtRequestEvent,
+  type SignMessageRequestEvent,
+  type SignPsbtRequestEvent,
+  type SignatureRequestEvent,
+  type TransactionRequestEvent,
 } from '@common/types/inpage-types';
 import {
   CONTENT_SCRIPT_PORT,
-  LegacyMessageFromContentScript,
-  LegacyMessageToContentScript,
   MESSAGE_SOURCE,
-  SatsConnectMessageFromContentScript,
   SatsConnectMethods,
   StacksLegacyMethods,
+  type LegacyMessageFromContentScript,
+  type LegacyMessageToContentScript,
+  type SatsConnectMessageFromContentScript,
 } from '@common/types/message-types';
 import getEventSourceWindow from '@common/utils/get-event-source-window';
 import RequestsRoutes from '@common/utils/route-urls';

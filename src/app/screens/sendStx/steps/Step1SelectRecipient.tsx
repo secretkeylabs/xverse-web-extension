@@ -5,7 +5,7 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import { validateStacksAddress } from '@stacks/transactions';
 import Button from '@ui-library/button';
 import Input from '@ui-library/input';
-import { FeedbackVariant } from '@ui-library/inputFeedback';
+import type { FeedbackVariant } from '@ui-library/inputFeedback';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';

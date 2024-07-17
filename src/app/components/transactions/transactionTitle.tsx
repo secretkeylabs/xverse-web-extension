@@ -1,5 +1,5 @@
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
-import {
+import type {
   Brc20HistoryTransactionData,
   BtcTransactionData,
   GetRunesActivityForAddressEvent,

@@ -8,10 +8,10 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import {
   AnalyticsEvents,
   FeatureId,
-  RuneSummary,
-  Transport,
   btcTransaction,
   parseSummaryForRunes,
+  type RuneSummary,
+  type Transport,
 } from '@secretkeylabs/xverse-core';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';

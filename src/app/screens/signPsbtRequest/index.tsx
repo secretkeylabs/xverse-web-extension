@@ -12,10 +12,10 @@ import { SigHash } from '@scure/btc-signer';
 import {
   AnalyticsEvents,
   FeatureId,
-  RuneSummary,
-  Transport,
   btcTransaction,
   parseSummaryForRunes,
+  type RuneSummary,
+  type Transport,
 } from '@secretkeylabs/xverse-core';
 import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';

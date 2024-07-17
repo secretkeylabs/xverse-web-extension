@@ -1,6 +1,6 @@
 import { mapRuneNameToPlaceholder } from '@components/confirmBtcTransaction/utils';
 import TokenImage from '@components/tokenImage';
-import { RuneBase } from '@secretkeylabs/xverse-core';
+import type { RuneBase } from '@secretkeylabs/xverse-core';
 import Avatar from '@ui-library/avatar';
 import { StyledP } from '@ui-library/common.styled';
 import { ftDecimals } from '@utils/helper';

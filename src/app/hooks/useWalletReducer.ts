@@ -1,10 +1,7 @@
 import { getDeviceAccountIndex } from '@common/utils/ledger';
 import useNetworkSelector from '@hooks/useNetwork';
 import {
-  Account,
   AnalyticsEvents,
-  NetworkType,
-  SettingsNetwork,
   StacksMainnet,
   StacksNetwork,
   StacksTestnet,
@@ -13,8 +10,11 @@ import {
   getBnsName,
   restoreWalletWithAccounts,
   walletFromSeedPhrase,
+  type Account,
+  type NetworkType,
+  type SettingsNetwork,
 } from '@secretkeylabs/xverse-core';
-import { StoreState } from '@stores/index';
+import type { StoreState } from '@stores/index';
 import {
   ChangeNetworkAction,
   changeShowDataCollectionAlertAction,

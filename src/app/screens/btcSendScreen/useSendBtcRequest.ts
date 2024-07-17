@@ -1,10 +1,14 @@
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import {
   BitcoinNetworkType,
-  SendBtcTransactionOptions,
-  SendBtcTransactionPayload,
+  type SendBtcTransactionOptions,
+  type SendBtcTransactionPayload,
 } from '@sats-connect/core';
-import { Recipient, SettingsNetwork, signBtcTransaction } from '@secretkeylabs/xverse-core';
+import {
+  signBtcTransaction,
+  type Recipient,
+  type SettingsNetwork,
+} from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
 import { decodeToken } from 'jsontokens';

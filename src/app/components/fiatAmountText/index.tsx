@@ -1,4 +1,4 @@
-import { currencySymbolMap, SupportedCurrency } from '@secretkeylabs/xverse-core';
+import { currencySymbolMap, type SupportedCurrency } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
@@ -10,7 +10,7 @@ type Props = {
   dataTestId?: string;
 };
 
-export function FiatAmountText({ className, fiatAmount, fiatCurrency, dataTestId }: Props) {
+function FiatAmountText({ className, fiatAmount, fiatCurrency, dataTestId }: Props) {
   if (!fiatAmount || !fiatCurrency) {
     return null;
   }

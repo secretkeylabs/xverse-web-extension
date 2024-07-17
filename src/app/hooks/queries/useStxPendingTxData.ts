@@ -1,5 +1,5 @@
 import useSelectedAccount from '@hooks/useSelectedAccount';
-import { fetchStxPendingTxData, StxPendingTxData } from '@secretkeylabs/xverse-core';
+import { fetchStxPendingTxData, type StxPendingTxData } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import useNetworkSelector from '../useNetwork';
 

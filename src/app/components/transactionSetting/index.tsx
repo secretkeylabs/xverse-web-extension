@@ -2,7 +2,12 @@ import ArrowIcon from '@assets/img/settings/arrow.svg';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { isCustomFeesAllowed, Recipient, stxToMicrostacks, UTXO } from '@secretkeylabs/xverse-core';
+import {
+  isCustomFeesAllowed,
+  stxToMicrostacks,
+  type Recipient,
+  type UTXO,
+} from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import Sheet from '@ui-library/sheet';
 import BigNumber from 'bignumber.js';

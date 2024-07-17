@@ -1,5 +1,5 @@
 import { useSingleTabGuard } from '@components/guards/singleTab';
-import { PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 
 /**
  * This guard is used to close any open tabs when the wallet is locked or reset.

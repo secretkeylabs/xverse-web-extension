@@ -1,4 +1,4 @@
-import { WebBtcMessage } from '@common/types/message-types';
+import { type WebBtcMessage } from '@common/types/message-types';
 import getSelectedAccount from '@common/utils/getSelectedAccount';
 import { makeContext } from '@common/utils/popup';
 import { AddressPurpose, AddressType, RpcErrorCode } from '@sats-connect/core';

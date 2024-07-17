@@ -7,12 +7,12 @@ import useNetworkSelector from '@hooks/useNetwork';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  StacksTransaction,
-  UnsignedStacksTransation,
   applyFeeMultiplier,
   buf2hex,
   generateUnsignedTransaction,
   validateStxAddress,
+  type StacksTransaction,
+  type UnsignedStacksTransation,
 } from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
 import { convertAmountToFtDecimalPlaces, ftDecimals, replaceCommaByDot } from '@utils/helper';

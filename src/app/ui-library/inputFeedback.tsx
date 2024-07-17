@@ -1,4 +1,4 @@
-import { CheckCircle, Icon, Info, Warning } from '@phosphor-icons/react';
+import { CheckCircle, Info, Warning, type Icon } from '@phosphor-icons/react';
 import styled from 'styled-components';
 import Theme from 'theme';
 import { StyledP } from './common.styled';
@@ -62,4 +62,3 @@ export function InputFeedback({ className, message, variant = 'info' }: InputFee
     </Feedback>
   );
 }
-export default InputFeedback;

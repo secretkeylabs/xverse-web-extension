@@ -1,7 +1,7 @@
 import Cross from '@assets/img/dashboard/X.svg';
 import { animated, useSpring } from '@react-spring/web';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
-import { CondensedInscription, SatRangeInscription } from '@secretkeylabs/xverse-core';
+import type { CondensedInscription, SatRangeInscription } from '@secretkeylabs/xverse-core';
 import styled from 'styled-components';
 
 const TransparentButton = styled.button({

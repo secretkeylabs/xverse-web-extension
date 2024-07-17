@@ -1,6 +1,6 @@
 import useNftDetail from '@hooks/queries/useNftDetail';
 import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
-import useResetUserFlow from '@hooks/useResetUserFlow';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import { GAMMA_URL } from '@utils/constants';
 import { getExplorerUrl, isInOptions, isLedgerAccount } from '@utils/helper';

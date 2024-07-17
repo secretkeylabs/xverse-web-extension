@@ -1,12 +1,13 @@
-import { WebBtcMessage } from '@common/types/message-types';
+/* eslint-disable import/prefer-default-export */
+import type { WebBtcMessage } from '@common/types/message-types';
 import { RpcErrorCode } from '@sats-connect/core';
 import { z } from 'zod';
 import {
-  ParamsKeyValueArray,
   listenForOriginTabClose,
   listenForPopupClose,
   makeSearchParamsWithDefaults,
   triggerRequestWindowOpen,
+  type ParamsKeyValueArray,
 } from '../../legacy-external-message-handler';
 import RequestsRoutes from '../../route-urls';
 import { makeRPCError } from '../helpers';
@@ -56,5 +57,3 @@ export const handleSignPsbt = async (
 
   listenForOriginTabClose({ tabId });
 };
-
-export default handleSignPsbt;

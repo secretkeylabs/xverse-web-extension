@@ -1,19 +1,19 @@
 import {
-  APIGetRunesActivityForAddressResponse,
   API_TIMEOUT_MILLI,
-  AppInfo,
-  Brc20HistoryTransactionData,
-  BtcTransactionData,
-  GetRunesActivityForAddressEvent,
   StacksNetwork,
-  StxTransactionData,
   getNetworkURL,
+  type APIGetRunesActivityForAddressResponse,
+  type AppInfo,
+  type Brc20HistoryTransactionData,
+  type BtcTransactionData,
+  type GetRunesActivityForAddressEvent,
+  type StxTransactionData,
 } from '@secretkeylabs/xverse-core';
 import {
-  AddressTransactionWithTransfers,
-  MempoolTransaction,
-  MempoolTransactionListResponse,
-  Transaction,
+  type AddressTransactionWithTransfers,
+  type MempoolTransaction,
+  type MempoolTransactionListResponse,
+  type Transaction,
 } from '@stacks/stacks-blockchain-api-types';
 import axios from 'axios';
 

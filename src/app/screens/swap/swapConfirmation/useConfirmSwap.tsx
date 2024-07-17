@@ -1,14 +1,14 @@
-import { TokenImageProps } from '@components/tokenImage';
+import { type TokenImageProps } from '@components/tokenImage';
 import useNetworkSelector from '@hooks/useNetwork';
 import useSeedVault from '@hooks/useSeedVault';
 import useSelectedAccount from '@hooks/useSelectedAccount';
-import { SwapToken } from '@screens/swap/types';
+import { type SwapToken } from '@screens/swap/types';
 import {
   ApiResponseError,
   broadcastSignedTransaction,
   microstacksToStx,
   signTransaction,
-  StacksTransaction,
+  type StacksTransaction,
 } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
 import { Currency, SponsoredTxError, SponsoredTxErrorCode } from 'alex-sdk';

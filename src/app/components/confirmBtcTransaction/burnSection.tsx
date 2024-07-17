@@ -1,6 +1,6 @@
 import RuneAmount from '@components/confirmBtcTransaction/itemRow/runeAmount';
-import { RuneSummary } from '@secretkeylabs/xverse-core';
-import InputFeedback from '@ui-library/inputFeedback';
+import type { RuneSummary } from '@secretkeylabs/xverse-core';
+import { InputFeedback } from '@ui-library/inputFeedback';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 

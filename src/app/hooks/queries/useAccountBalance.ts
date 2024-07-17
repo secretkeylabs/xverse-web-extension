@@ -4,12 +4,12 @@ import useCoinRates from '@hooks/queries/useCoinRates';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  Account,
   API_TIMEOUT_MILLI,
-  BtcAddressData,
-  FungibleToken,
   getNetworkURL,
-  TokensResponse,
+  type Account,
+  type BtcAddressData,
+  type FungibleToken,
+  type TokensResponse,
 } from '@secretkeylabs/xverse-core';
 import { setAccountBalanceAction } from '@stores/wallet/actions/actionCreators';
 import { calculateTotalBalance } from '@utils/helper';

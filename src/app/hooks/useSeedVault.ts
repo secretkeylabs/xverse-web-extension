@@ -1,8 +1,8 @@
 import {
-  CryptoUtilsAdapter,
   SeedVaultInstance as SeedVault,
-  StorageAdapter,
   generateRandomKey,
+  type CryptoUtilsAdapter,
+  type StorageAdapter,
 } from '@secretkeylabs/xverse-core';
 import chromeStorage from '@utils/chromeStorage';
 import {

@@ -3,7 +3,7 @@ import {
   addressToString,
   FungibleConditionCode,
   NonFungibleConditionCode,
-  PostCondition,
+  type PostCondition,
 } from '@stacks/transactions';
 import { useTranslation } from 'react-i18next';
 

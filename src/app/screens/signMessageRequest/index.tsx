@@ -13,7 +13,7 @@ import RequestError from '@components/requests/requestError';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
-import { MessageSigningProtocols, Return, RpcErrorCode } from '@sats-connect/core';
+import { MessageSigningProtocols, type Return } from '@sats-connect/core';
 import CollapsableContainer from '@screens/signatureRequest/collapsableContainer';
 import SignatureRequestMessage from '@screens/signatureRequest/signatureRequestMessage';
 import { finalizeMessageSignature } from '@screens/signatureRequest/utils';

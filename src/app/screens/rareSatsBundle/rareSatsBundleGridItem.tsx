@@ -1,6 +1,7 @@
+/* eslint-disable import/prefer-default-export */
 import ExoticSatsRow from '@components/exoticSatsRow/exoticSatsRow';
 import RareSatIcon from '@components/rareSatIcon/rareSatIcon';
-import { BundleSatRange } from '@secretkeylabs/xverse-core';
+import type { BundleSatRange } from '@secretkeylabs/xverse-core';
 import { getSatLabel } from '@utils/rareSats';
 import styled from 'styled-components';
 
@@ -43,4 +44,3 @@ export function RareSatsBundleGridItem({ item }: { item: BundleSatRange }) {
     </Container>
   );
 }
-export default RareSatsBundleGridItem;

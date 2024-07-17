@@ -1,7 +1,7 @@
 import RuneAmount from '@components/confirmBtcTransaction/itemRow/runeAmount';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import { WarningOctagon } from '@phosphor-icons/react';
-import { RuneSummary, btcTransaction } from '@secretkeylabs/xverse-core';
+import { type RuneSummary, btcTransaction } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import Divider from '@ui-library/divider';
 import { useTranslation } from 'react-i18next';

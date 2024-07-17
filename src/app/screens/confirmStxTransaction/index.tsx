@@ -1,5 +1,5 @@
 import IconStacks from '@assets/img/dashboard/stx_icon.svg';
-import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
+import type { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import {
   sendInternalErrorMessage,
   sendUserRejectionMessage,
@@ -23,19 +23,19 @@ import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { StxRequests } from '@sats-connect/core';
+import type { StxRequests } from '@sats-connect/core';
 import {
   AnalyticsEvents,
-  StacksTransaction,
-  TokenTransferPayload,
   addressToString,
   broadcastSignedTransaction,
   buf2hex,
   isMultiSig,
   microstacksToStx,
   stxToMicrostacks,
+  type StacksTransaction,
+  type TokenTransferPayload,
 } from '@secretkeylabs/xverse-core';
-import { MultiSigSpendingCondition, deserializeTransaction } from '@stacks/transactions';
+import { deserializeTransaction, type MultiSigSpendingCondition } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import Callout from '@ui-library/callout';
 import { XVERSE_POOL_ADDRESS } from '@utils/constants';

@@ -1,7 +1,6 @@
-import { WebBtcMessage } from '@common/types/message-types';
+import { type WebBtcMessage } from '@common/types/message-types';
 import {
   RpcErrorCode,
-  RpcRequestMessage,
   getAccountsMethodName,
   getAddressesMethodName,
   getBalanceMethodName,
@@ -9,6 +8,7 @@ import {
   getWalletTypeMethodName,
   renouncePermissionsMethodName,
   requestPermissionsMethodName,
+  type RpcRequestMessage,
 } from '@sats-connect/core';
 import { getTabIdFromPort } from '..';
 import {
@@ -25,8 +25,8 @@ import handleGetInscriptions from './ordinals/getInscriptions';
 import handleEtchRune from './runes/etch';
 import handleGetRunesBalance from './runes/getBalance';
 import handleMintRune from './runes/mint';
-import callContract from './stx/callContract/index.ts';
-import deployContract from './stx/deployContract/index.ts';
+import callContract from './stx/callContract';
+import deployContract from './stx/deployContract';
 import handleGetStxAccounts from './stx/getAccounts';
 import handleGetStxAddresses from './stx/getAddresses';
 import handleStacksSignMessage from './stx/signMessage';

@@ -1,12 +1,12 @@
 import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RecipientSelector from '@components/recipientSelector';
 import TokenImage from '@components/tokenImage';
-import { FungibleToken, RuneSummary } from '@secretkeylabs/xverse-core';
+import type { FungibleToken, RuneSummary } from '@secretkeylabs/xverse-core';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import SendLayout from '../../layouts/sendLayout';
 import AmountSelector from './amountSelector';
-import { TransactionSummary } from './helpers';
+import type { TransactionSummary } from './helpers';
 import { Step, getNextStep } from './steps';
 
 const TitleContainer = styled.div`

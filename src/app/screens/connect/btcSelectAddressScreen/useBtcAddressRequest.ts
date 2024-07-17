@@ -1,21 +1,21 @@
 import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types';
-import { Context, getPopupPayload } from '@common/utils/popup';
+import { getPopupPayload, type Context } from '@common/utils/popup';
 import { accountPurposeAddresses } from '@common/utils/rpc/btc/getAddresses/utils';
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import { usePermissionsUtils } from '@components/permissionsManager';
 import { makeAccountResource } from '@components/permissionsManager/resources';
-import { Client, Permission } from '@components/permissionsManager/schemas';
+import type { Client, Permission } from '@components/permissionsManager/schemas';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   AddressPurpose,
   BitcoinNetworkType,
-  GetAccountsResult,
-  GetAddressOptions,
-  GetAddressResponse,
   RpcErrorCode,
   getAccountsRequestMessageSchema,
   getAddressesRequestMessageSchema,
+  type GetAccountsResult,
+  type GetAddressOptions,
+  type GetAddressResponse,
 } from '@sats-connect/core';
 import { decodeToken } from 'jsontokens';
 import { useCallback } from 'react';

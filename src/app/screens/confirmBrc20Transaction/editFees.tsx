@@ -6,7 +6,7 @@ import useCoinRates from '@hooks/queries/useCoinRates';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
-import InputFeedback from '@ui-library/inputFeedback';
+import { InputFeedback } from '@ui-library/inputFeedback';
 import { handleKeyDownFeeRateInput } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect, useRef, useState } from 'react';
@@ -287,4 +287,3 @@ export function EditFees({
     </BottomModal>
   );
 }
-export default EditFees;

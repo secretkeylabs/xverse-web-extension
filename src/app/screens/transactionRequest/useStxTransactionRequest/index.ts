@@ -4,11 +4,15 @@ import { deployContractParamsSchema } from '@common/utils/rpc/stx/deployContract
 import useNetworkSelector from '@hooks/useNetwork';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import { txPayloadToRequest } from '@secretkeylabs/xverse-core';
-import { ContractCallPayload, ContractDeployPayload, TransactionTypes } from '@stacks/connect';
+import {
+  TransactionTypes,
+  type ContractCallPayload,
+  type ContractDeployPayload,
+} from '@stacks/connect';
 import { AuthType, PayloadType, deserializeTransaction } from '@stacks/transactions';
 import { createUnsecuredToken, decodeToken } from 'jsontokens';
 import { useLocation } from 'react-router-dom';
-import { Return } from './types';
+import type { Return } from './types';
 import { getPayload, isDeployContractPayload } from './utils';
 
 const useStxTransactionRequest = (): Return => {

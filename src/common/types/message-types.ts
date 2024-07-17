@@ -1,14 +1,14 @@
-import {
+import type {
   CreateInscriptionResponse,
   CreateRepeatInscriptionsResponse,
   GetAddressResponse,
+  Params,
+  Requests,
   RpcId,
   SignMultipleTransactionsResponse,
   SignTransactionResponse,
-  type Params,
-  type Requests,
 } from '@sats-connect/core';
-import { FinishedTxPayload, SignatureData, SponsoredFinishedTxPayload } from '@stacks/connect';
+import type { FinishedTxPayload, SignatureData, SponsoredFinishedTxPayload } from '@stacks/connect';
 
 export const MESSAGE_SOURCE = 'xverse-wallet';
 
@@ -26,7 +26,6 @@ export enum StacksLegacyMethods {
   signatureRequest = 'signatureRequest',
   signatureResponse = 'signatureResponse',
   structuredDataSignatureRequest = 'structuredDataSignatureRequest',
-  structuredDataSignatureResponse = 'structuredDataSignatureResponse',
 }
 
 enum RpcMethods {
@@ -124,7 +123,6 @@ export enum SatsConnectMethods {
   createInscriptionResponse = 'createInscriptionResponse',
   createRepeatInscriptionsRequest = 'createRepeatInscriptionsRequest',
   createRepeatInscriptionsResponse = 'createRepeatInscriptionsResponse',
-  request = 'request',
 }
 
 type GetAddressRequestMessage = Message<SatsConnectMethods.getAddressRequest, string>;

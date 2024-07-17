@@ -1,21 +1,26 @@
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useSelectedAccount from '@hooks/useSelectedAccount';
-import { SwapConfirmationInput } from '@screens/swap/swapConfirmation/useConfirmSwap';
+import { type SwapConfirmationInput } from '@screens/swap/swapConfirmation/useConfirmSwap';
 import {
   buf2hex,
-  FungibleToken,
   getNewNonce,
   getNonce,
   microstacksToStx,
   setNonce,
+  type FungibleToken,
 } from '@secretkeylabs/xverse-core';
-import { AnchorMode, makeUnsignedContractCall, PostConditionMode } from '@stacks/transactions';
+import { AnchorMode, PostConditionMode, makeUnsignedContractCall } from '@stacks/transactions';
 import { AlexSDK, Currency } from 'alex-sdk';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { SelectedCurrencyState, Side, STXOrFungibleToken, UseSwap } from './types';
+import {
+  type STXOrFungibleToken,
+  type SelectedCurrencyState,
+  type Side,
+  type UseSwap,
+} from './types';
 import { useAlexSponsoredTransaction } from './useAlexSponsoredTransaction';
 import { useStxCurrencyConversion } from './useStxCurrencyConversion';
 

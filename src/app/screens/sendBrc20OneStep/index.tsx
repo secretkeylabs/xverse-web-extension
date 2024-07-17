@@ -12,8 +12,8 @@ import {
   CoreError,
   validateBtcAddress,
 } from '@secretkeylabs/xverse-core';
-import { InputFeedbackProps, isDangerFeedback } from '@ui-library/inputFeedback';
-import { Brc20TransferEstimateFeesParams, ConfirmBrc20TransferState } from '@utils/brc20';
+import { isDangerFeedback, type InputFeedbackProps } from '@ui-library/inputFeedback';
+import type { Brc20TransferEstimateFeesParams, ConfirmBrc20TransferState } from '@utils/brc20';
 import { isInOptions, replaceCommaByDot } from '@utils/helper';
 import { getFtTicker } from '@utils/tokens';
 import { useState } from 'react';

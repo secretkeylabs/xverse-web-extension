@@ -22,7 +22,11 @@ import {
   microstacksToStx,
   stxToMicrostacks,
 } from '@secretkeylabs/xverse-core';
-import { MultiSigSpendingCondition, PostCondition, StacksTransaction } from '@stacks/transactions';
+import type {
+  MultiSigSpendingCondition,
+  PostCondition,
+  StacksTransaction,
+} from '@stacks/transactions';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

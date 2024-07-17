@@ -12,7 +12,11 @@ import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Eye, EyeSlash } from '@phosphor-icons/react';
 import CoinItem from '@screens/manageTokens/coinItem';
-import { FeatureId, FungibleToken, FungibleTokenProtocol } from '@secretkeylabs/xverse-core';
+import {
+  FeatureId,
+  type FungibleToken,
+  type FungibleTokenProtocol,
+} from '@secretkeylabs/xverse-core';
 import {
   setBrc20ManageTokensAction,
   setRunesManageTokensAction,

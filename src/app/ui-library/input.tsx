@@ -1,4 +1,4 @@
-import { ChangeEvent, useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useRef, type ChangeEvent } from 'react';
 import styled from 'styled-components';
 import { InputFeedback, type FeedbackVariant } from './inputFeedback';
 

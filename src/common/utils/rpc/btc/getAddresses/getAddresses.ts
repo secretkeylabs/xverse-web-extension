@@ -1,7 +1,8 @@
+/* eslint-disable import/prefer-default-export */
 import { getTabIdFromPort } from '@common/utils';
 import getSelectedAccount from '@common/utils/getSelectedAccount';
 import { makeContext, openPopup } from '@common/utils/popup';
-import { RpcRequestMessage, getAddressesRequestMessageSchema } from '@sats-connect/core';
+import { getAddressesRequestMessageSchema, type RpcRequestMessage } from '@sats-connect/core';
 import rootStore from '@stores/index';
 import * as v from 'valibot';
 import RequestsRoutes from '../../../route-urls';
@@ -57,5 +58,3 @@ export const handleGetAddresses = async (message: RpcRequestMessage, port: chrom
     }),
   });
 };
-
-export default handleGetAddresses;

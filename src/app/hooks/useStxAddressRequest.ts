@@ -1,7 +1,7 @@
 import { MESSAGE_SOURCE } from '@common/types/message-types';
 import { sendGetAddressesSuccessResponseMessage } from '@common/utils/rpc/responseMessages/stacks';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { AddressPurpose, AddressType, GetAddressOptions } from '@sats-connect/core';
+import { AddressPurpose, AddressType, type GetAddressOptions } from '@sats-connect/core';
 import { decodeToken } from 'jsontokens';
 import { useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';

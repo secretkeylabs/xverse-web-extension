@@ -8,17 +8,21 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   ErrorCodes,
-  getBtcFiatEquivalent,
   ResponseError,
-  SignedBtcTx,
+  getBtcFiatEquivalent,
   signOrdinalSendTransaction,
-  UTXO,
   validateBtcAddress,
+  type SignedBtcTx,
+  type UTXO,
 } from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
 import Callout from '@ui-library/callout';
 import { StickyButtonContainer, StyledHeading } from '@ui-library/common.styled';
-import InputFeedback, { InputFeedbackProps, isDangerFeedback } from '@ui-library/inputFeedback';
+import {
+  InputFeedback,
+  isDangerFeedback,
+  type InputFeedbackProps,
+} from '@ui-library/inputFeedback';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

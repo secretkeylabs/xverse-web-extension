@@ -1,8 +1,8 @@
 import {
-  Requests,
-  Return,
-  RpcRequestMessage,
   getInfoRequestMessageSchema,
+  type Requests,
+  type Return,
+  type RpcRequestMessage,
 } from '@sats-connect/core';
 import { keys } from 'ts-transformer-keys';
 import * as v from 'valibot';

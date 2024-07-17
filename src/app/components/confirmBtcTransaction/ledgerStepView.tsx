@@ -10,7 +10,7 @@ import {
   ConnectLedgerTitle,
   InfoImage,
 } from '@screens/ledger/confirmLedgerTransaction/index.styled';
-import { TFunction } from 'react-i18next';
+import type { TFunction } from 'react-i18next';
 
 export enum Steps {
   ConnectLedger = 0,

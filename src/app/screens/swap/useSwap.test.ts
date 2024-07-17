@@ -1,6 +1,6 @@
 import { Currency } from 'alex-sdk';
 import { describe, expect, test } from 'vitest';
-import { Side } from './types';
+import { type Side } from './types';
 import { selectedTokenReducer } from './useSwap';
 
 describe('useSwap', () => {

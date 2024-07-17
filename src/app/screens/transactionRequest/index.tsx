@@ -7,17 +7,17 @@ import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  Account,
   buf2hex,
-  Coin,
-  ContractFunction,
   createDeployContractRequest,
   extractFromPayload,
   fetchStxPendingTxData,
   getContractCallPromises,
   getTokenTransferRequest,
+  type Account,
+  type Coin,
+  type ContractFunction,
 } from '@secretkeylabs/xverse-core';
-import { ContractCallPayload, ContractDeployPayload } from '@stacks/connect';
+import type { ContractCallPayload, ContractDeployPayload } from '@stacks/connect';
 import { StacksTransaction } from '@stacks/transactions';
 import Spinner from '@ui-library/spinner';
 import { getNetworkType, isHardwareAccount } from '@utils/helper';

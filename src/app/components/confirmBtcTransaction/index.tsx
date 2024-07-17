@@ -1,8 +1,8 @@
 import { delay } from '@common/utils/ledger';
-import { Tab } from '@components/tabBar';
+import type { Tab } from '@components/tabBar';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import TransportFactory from '@ledgerhq/hw-transport-webusb';
-import {
+import type {
   RuneSummary,
   RuneSummaryActions,
   Transport,

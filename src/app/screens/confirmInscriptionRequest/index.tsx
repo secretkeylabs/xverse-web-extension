@@ -1,6 +1,6 @@
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
-import { ConfirmBrc20TransactionState, LedgerTransactionType } from '@common/types/ledger';
+import type { ConfirmBrc20TransactionState, LedgerTransactionType } from '@common/types/ledger';
 import AlertMessage from '@components/alertMessage';
 import ActionButton from '@components/button';
 import InfoContainer from '@components/infoContainer';
@@ -21,14 +21,14 @@ import Brc20Tile from '@screens/ordinals/brc20Tile';
 import CollapsableContainer from '@screens/signatureRequest/collapsableContainer';
 import {
   AnalyticsEvents,
-  BtcTransactionBroadcastResponse,
-  Recipient,
   ResponseError,
-  SignedBtcTx,
   getBtcFiatEquivalent,
   parseOrdinalTextContentData,
   satsToBtc,
   signBtcTransaction,
+  type BtcTransactionBroadcastResponse,
+  type Recipient,
+  type SignedBtcTx,
 } from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';

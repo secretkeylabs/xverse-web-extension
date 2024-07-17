@@ -1,6 +1,6 @@
 import { BetterBarLoader } from '@components/barLoader';
 import { SquareLogo } from '@phosphor-icons/react';
-import { TokenMetaData } from '@secretkeylabs/xverse-core';
+import type { TokenMetaData } from '@secretkeylabs/xverse-core';
 import { getFetchableUrl } from '@utils/helper';
 import Image from 'rc-image';
 import { Suspense, useState } from 'react';

@@ -13,8 +13,8 @@ import {
   getBtcFeesForNonOrdinalBtcSend,
   getBtcFeesForOrdinalSend,
   getBtcFiatEquivalent,
-  Recipient,
-  UTXO,
+  type Recipient,
+  type UTXO,
 } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import BigNumber from 'bignumber.js';

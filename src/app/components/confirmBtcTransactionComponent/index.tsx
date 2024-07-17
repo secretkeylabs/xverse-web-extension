@@ -11,25 +11,25 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { PencilSimple } from '@phosphor-icons/react';
 import {
-  Bundle,
   ErrorCodes,
-  getBtcFiatEquivalent,
-  Recipient,
   ResponseError,
+  getBtcFiatEquivalent,
   satsToBtc,
   signBtcTransaction,
-  SignedBtcTx,
   signNonOrdinalBtcSendTransaction,
   signOrdinalSendTransaction,
-  UTXO,
+  type Bundle,
+  type Recipient,
+  type SignedBtcTx,
+  type UTXO,
 } from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
 import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
-import { CurrencyTypes } from '@utils/constants';
+import type { CurrencyTypes } from '@utils/constants';
 import BigNumber from 'bignumber.js';
-import { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';

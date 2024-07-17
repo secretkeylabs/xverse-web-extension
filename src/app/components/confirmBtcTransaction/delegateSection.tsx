@@ -2,7 +2,7 @@ import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
 import RuneAmount from '@components/confirmBtcTransaction/itemRow/runeAmount';
 import { WarningOctagon } from '@phosphor-icons/react';
 import { animated, config, useSpring } from '@react-spring/web';
-import { RuneSummary } from '@secretkeylabs/xverse-core';
+import type { RuneSummary } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

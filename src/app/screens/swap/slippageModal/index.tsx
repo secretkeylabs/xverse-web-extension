@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 import ActionButton from '@components/button';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -108,4 +109,3 @@ export function SlippageModalContent({
     </Container>
   );
 }
-export default SlippageModalContent;

@@ -5,6 +5,4 @@ const paramsSchema = z.object({
   pubkey: z.string().optional(),
 });
 
-export type ParamsSchema = z.infer<typeof paramsSchema>;
-
 export default paramsSchema;

@@ -6,7 +6,7 @@ import useRuneSellPsbt from '@hooks/queries/runes/useRuneSellPsbt';
 import useRuneUtxosQuery from '@hooks/queries/runes/useRuneUtxosQuery';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useHasFeature from '@hooks/useHasFeature';
-import useResetUserFlow from '@hooks/useResetUserFlow';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowClockwise } from '@phosphor-icons/react';

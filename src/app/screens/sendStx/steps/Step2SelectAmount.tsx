@@ -5,15 +5,15 @@ import useNetworkSelector from '@hooks/useNetwork';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  StacksTransaction,
   buf2hex,
   generateUnsignedStxTokenTransferTransaction,
   getStxFiatEquivalent,
   microstacksToStx,
   stxToMicrostacks,
+  type StacksTransaction,
 } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction, estimateTransaction } from '@stacks/transactions';
-import SelectFeeRate, { FeeRates } from '@ui-components/selectFeeRate';
+import SelectFeeRate, { type FeeRates } from '@ui-components/selectFeeRate';
 import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
 import { modifyRecommendedStxFees } from '@utils/transactions/transactions';
