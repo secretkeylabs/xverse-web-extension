@@ -1,4 +1,4 @@
-import { getStxAddressKeyChain, signMessage } from '@secretkeylabs/xverse-core';
+import { getStxAddressKeyChain, signStacksMessage } from '@secretkeylabs/xverse-core';
 import { SignaturePayload, StructuredDataSignatureRequestOptions } from '@stacks/connect';
 import {
   ChainID,
@@ -93,7 +93,7 @@ export function useSignMessage(messageType: SignatureMessageType) {
         selectedAccount.id,
       );
       if (messageType === 'utf8') {
-        return signMessage(message, privateKey);
+        return signStacksMessage(message, privateKey);
       }
       if (!domain) throw new Error('Domain is required for structured messages');
       const sk = createStacksPrivateKey(privateKey);
