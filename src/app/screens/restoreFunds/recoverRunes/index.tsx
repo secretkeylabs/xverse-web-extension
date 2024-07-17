@@ -1,4 +1,4 @@
-import ConfirmBitcoinTransaction from '@components/confirmBtcTransaction';
+import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RuneAmount from '@components/confirmBtcTransaction/itemRow/runeAmount';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
@@ -166,7 +166,7 @@ function RecoverRunes() {
         <BottomTabBar tab="settings" />
       </>
     ) : (
-      <ConfirmBitcoinTransaction
+      <ConfirmBtcTransaction
         title={t('TITLE')}
         inputs={summary?.inputs ?? []}
         outputs={summary?.outputs ?? []}
