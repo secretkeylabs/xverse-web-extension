@@ -5,6 +5,7 @@ import { RuneSummary, btcTransaction } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import Divider from '@ui-library/divider';
 import { useTranslation } from 'react-i18next';
+import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 import Theme from 'theme';
 import Amount from './itemRow/amount';
@@ -45,6 +46,14 @@ const WarningText = styled(StyledP)`
   flex: 1 0 0;
 `;
 
+const BundleHeader = styled.div((props) => ({
+  display: 'flex',
+  flex: 1,
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  marginBottom: props.theme.space.m,
+}));
+
 type Props = {
   outputs: btcTransaction.EnhancedOutput[];
   inputs: btcTransaction.EnhancedInput[];
@@ -65,7 +74,7 @@ function TransferSection({
   netAmount,
   onShowInscription,
 }: Props) {
-  const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
+  const { t } = useTranslation('translation');
   const { btcAddress, ordinalsAddress } = useSelectedAccount();
 
   const { inputFromPayment, inputFromOrdinal } = getInputsWitAssetsFromUserAddress({
@@ -98,7 +107,11 @@ function TransferSection({
 
   return (
     <>
-      <Title>{hasExternalInputs ? t('YOU_WILL_TRANSFER') : t('YOU_WILL_SEND')}</Title>
+      <Title>
+        {hasExternalInputs
+          ? t('CONFIRM_TRANSACTION.YOU_WILL_TRANSFER')
+          : t('CONFIRM_TRANSACTION.YOU_WILL_SEND')}
+      </Title>
       <Container>
         {showAmount && (
           <RowContainer noMargin>
@@ -112,7 +125,7 @@ function TransferSection({
               <WarningContainer>
                 <WarningOctagon weight="fill" color={Theme.colors.caution} size={16} />
                 <WarningText typography="body_medium_s" color="caution">
-                  {t('BTC_TRANSFER_WARNING')}
+                  {t('CONFIRM_TRANSACTION.BTC_TRANSFER_WARNING')}
                 </WarningText>
               </WarningContainer>
             )}
@@ -125,6 +138,29 @@ function TransferSection({
               <>
                 {index === 0 && <Divider verticalMargin="s" />}
                 <RowContainer key={transfer.runeName}>
+                  {!hasExternalInputs && (
+                    <BundleHeader>
+                      <div>
+                        <StyledP typography="body_medium_m" color="white_400">
+                          {t('COMMON.BUNDLE')}
+                        </StyledP>
+                      </div>
+                      <div>
+                        <NumericFormat
+                          value={546}
+                          displayType="text"
+                          thousandSeparator
+                          prefix={`${t('COMMON.SIZE')}: `}
+                          suffix={` ${t('COMMON.SATS')}`}
+                          renderText={(value: string) => (
+                            <StyledP typography="body_medium_m" color="white_400">
+                              {value}
+                            </StyledP>
+                          )}
+                        />
+                      </div>
+                    </BundleHeader>
+                  )}
                   <RuneAmount
                     rune={transfer}
                     hasSufficientBalance={transfer.hasSufficientBalance}
@@ -141,6 +177,7 @@ function TransferSection({
                   <InscriptionSatributeRow
                     // eslint-disable-next-line react/no-array-index-key
                     key={index}
+                    hasExternalInputs={hasExternalInputs}
                     inscriptions={input.inscriptions}
                     satributes={input.satributes}
                     amount={input.extendedUtxo.utxo.value}
@@ -153,6 +190,7 @@ function TransferSection({
                   <InscriptionSatributeRow
                     // eslint-disable-next-line react/no-array-index-key
                     key={index}
+                    hasExternalInputs={hasExternalInputs}
                     inscriptions={output.inscriptions}
                     satributes={output.satributes}
                     amount={output.amount}

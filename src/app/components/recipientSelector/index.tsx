@@ -1,4 +1,5 @@
 import useWalletSelector from '@hooks/useWalletSelector';
+import { StyledCallout } from '@screens/createInscription/index.styled';
 import { validateBtcAddress } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import Input from '@ui-library/input';
@@ -24,15 +25,16 @@ type Props = {
   onNext: () => void;
   isLoading: boolean;
   header?: React.ReactNode;
+  calloutText?: string;
 };
 
-// TODO: this could be extracted into a component for reuse
 function RecipientSelector({
   recipientAddress,
   setRecipientAddress,
   onNext,
   isLoading,
   header,
+  calloutText,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { network } = useWalletSelector();
@@ -68,6 +70,7 @@ function RecipientSelector({
       <div>
         {header}
         <Input
+          dataTestID="address-receive"
           title={t('RECIPIENT')}
           placeholder={t('BTC.RECIPIENT_PLACEHOLDER')}
           value={recipientAddress}
@@ -77,6 +80,7 @@ function RecipientSelector({
           autoFocus
         />
       </div>
+      {calloutText && <StyledCallout bodyText={calloutText} />}
       <Buttons>
         <Button
           title={t('NEXT')}
