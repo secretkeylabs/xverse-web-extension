@@ -1,5 +1,5 @@
 import TokenTile from '@components/tokenTile';
-import type { FungibleToken } from '@secretkeylabs/xverse-core';
+import type { FungibleToken, TokenBasic } from '@secretkeylabs/xverse-core';
 import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
 import styled from 'styled-components';
@@ -27,12 +27,13 @@ const StyledTokenTile = styled(TokenTile)`
 interface Props {
   visible: boolean;
   title: string;
+  to?: TokenBasic;
   onSelectCoin: (token: FungibleToken | 'BTC') => void;
   onClose: () => void;
 }
 
-export default function TokenFromBottomSheet({ visible, title, onSelectCoin, onClose }: Props) {
-  const { data, isLoading } = useFromTokens();
+export default function TokenFromBottomSheet({ visible, title, to, onSelectCoin, onClose }: Props) {
+  const { data, isLoading } = useFromTokens(to);
 
   return (
     <Sheet visible={visible} title={title} onClose={onClose}>

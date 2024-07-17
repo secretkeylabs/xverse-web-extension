@@ -1,6 +1,7 @@
 import TokenImage from '@components/tokenImage';
 import { CaretDown } from '@phosphor-icons/react';
-import type { FungibleToken } from '@secretkeylabs/xverse-core';
+import { mapSwapTokenToFungibleToken } from '@screens/swap/utils';
+import type { FungibleToken, Token } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -36,12 +37,14 @@ const TokenName = styled(StyledP)`
 
 type RouteItemProps = {
   label: string;
-  token?: FungibleToken | 'BTC';
+  token?: FungibleToken | Token | 'BTC';
   onClick: () => void;
 };
 
 export default function RouteItem({ label, token, onClick }: RouteItemProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
+
+  const isBtcToken = token === 'BTC' || token?.protocol === 'btc';
 
   return (
     <div>
@@ -51,14 +54,20 @@ export default function RouteItem({ label, token, onClick }: RouteItemProps) {
       <RouteItemButtonContainer onClick={onClick}>
         {token && (
           <TokenImage
-            currency={token === 'BTC' ? 'BTC' : 'FT'}
-            fungibleToken={token === 'BTC' ? undefined : token}
+            currency={isBtcToken ? 'BTC' : 'FT'}
+            fungibleToken={
+              isBtcToken
+                ? undefined
+                : 'principal' in token
+                ? token
+                : mapSwapTokenToFungibleToken(token)
+            }
             showProtocolIcon={false}
             size={20}
           />
         )}
         <TokenName typography="body_medium_m" color="white_0">
-          {token === 'BTC' ? token : token?.name ?? t('SELECT_COIN')}
+          {isBtcToken ? 'BTC' : token?.name ?? t('SELECT_COIN')}
         </TokenName>
         <CaretDown size={12} weight="bold" color={Theme.colors.white_0} />
       </RouteItemButtonContainer>

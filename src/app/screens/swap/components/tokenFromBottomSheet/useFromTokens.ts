@@ -1,25 +1,15 @@
 import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useWalletSelector from '@hooks/useWalletSelector';
-import type {
-  FungibleToken,
-  FungibleTokenProtocol,
-  // getXverseApiClient
-  Protocol,
-  TokenBasic,
+import { mapFTProtocolToSwapProtocol } from '@screens/swap/utils';
+import {
+  getXverseApiClient,
+  type FungibleToken,
+  type TokenBasic,
 } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import { handleRetries } from '@utils/query';
 import BigNumber from 'bignumber.js';
-
-const mapFTProtocolToSwapProtocol = (protocol: FungibleTokenProtocol): Protocol => {
-  const protocolMap: Record<FungibleTokenProtocol, Protocol> = {
-    stacks: 'sip10',
-    runes: 'runes',
-    'brc-20': 'brc20',
-  };
-  return protocolMap[protocol];
-};
 
 const useFromTokens = (to?: TokenBasic) => {
   const { network } = useWalletSelector();
@@ -40,15 +30,14 @@ const useFromTokens = (to?: TokenBasic) => {
     })) ?? [];
 
   const hasBtcBalance = new BigNumber(btcBalanceSats ?? 0).gt(0);
-  const userTokens = [...(hasBtcBalance ? [{ protocol: 'btc', ticker: 'BTC' }] : [])].concat(
-    runesBasicTokens,
-  );
+  const btcBasicToken: TokenBasic = { protocol: 'btc', ticker: 'BTC' };
+  const userTokens = [...(hasBtcBalance ? [btcBasicToken] : [])].concat(runesBasicTokens);
 
   const queryFn = async () => {
-    await new Promise((resolve) => setTimeout(resolve, 10000));
-    const response = userTokens;
-    // TODO: enable this when API is ready
-    // const response = await getXverseApiClient(network.type).swaps.getSourceTokens({ to, userTokens })
+    const response = await getXverseApiClient(network.type).swaps.getSourceTokens({
+      to,
+      userTokens,
+    });
 
     return response
       .filter((token) => token.protocol === 'btc' || !!filteredRunesTokensObject[token.ticker])

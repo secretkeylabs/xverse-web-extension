@@ -11,6 +11,7 @@ import {
   getBtcFiatEquivalent,
   type FungibleToken,
   type Quote,
+  type Token,
   type UtxoQuote,
 } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
@@ -25,6 +26,7 @@ import styled from 'styled-components';
 import AmountInput from './components/amountInput';
 import RouteItem from './components/routeItem';
 import TokenFromBottomSheet from './components/tokenFromBottomSheet';
+import TokenToBottomSheet from './components/tokenToBottomSheet';
 import QuotesModal from './quotesModal';
 
 const Container = styled.div((props) => ({
@@ -76,7 +78,7 @@ export default function SwapScreen() {
     null,
   );
   const [fromToken, setFromToken] = useState<FungibleToken | 'BTC' | undefined>();
-  const [toToken] = useState<FungibleToken | undefined>();
+  const [toToken, setToToken] = useState<Token | undefined>();
   const [error, setError] = useState('');
 
   const { fiatCurrency } = useWalletSelector();
@@ -121,19 +123,23 @@ export default function SwapScreen() {
   };
 
   const onClickFrom = () => setTokenSelectionBottomSheet('from');
-
-  const onClickTo = () => {
-    // TODO: implement from bottomsheet
-  };
+  const onClickTo = () => setTokenSelectionBottomSheet('to');
 
   const onClickSwapRoute = () => {
     // TODO: implement swap route
+  };
+
+  const onChangeToToken = (token: Token) => {
+    setToToken(token);
   };
 
   const onChangeFromToken = (token: FungibleToken | 'BTC') => {
     setError('');
     setAmount('');
     setFromToken(token);
+    if (fromToken) {
+      setToToken(undefined);
+    }
   };
 
   const onChangeAmount = (value: string) => {
@@ -268,6 +274,14 @@ export default function SwapScreen() {
           onSelectCoin={onChangeFromToken}
           visible={tokenSelectionBottomSheet === 'from'}
           title={t('SWAP_SCREEN.ASSET_TO_CONVERT_FROM')}
+          to={toToken}
+        />
+        <TokenToBottomSheet
+          onClose={() => setTokenSelectionBottomSheet(null)}
+          onSelectCoin={onChangeToToken}
+          visible={tokenSelectionBottomSheet === 'to'}
+          title={t('SWAP_SCREEN.ASSET_TO_CONVERT_FROM')}
+          from={fromToken}
         />
       </Container>
       <BottomBar tab="dashboard" />
