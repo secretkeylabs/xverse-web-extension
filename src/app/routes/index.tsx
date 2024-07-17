@@ -166,7 +166,7 @@ const router = createHashRouter([
         element: <SwapStacksConfirmation />,
       },
       {
-        path: 'confirm-stx-tx',
+        path: RoutePaths.ConfirmStacksTransaction,
         element: <ConfirmStxTransaction />,
       },
       {
@@ -218,7 +218,7 @@ const router = createHashRouter([
         element: <WalletExists />,
       },
       {
-        path: 'transaction-request',
+        path: RequestsRoutes.TransactionRequest,
         element: (
           <AuthGuard>
             <TransactionRequest />

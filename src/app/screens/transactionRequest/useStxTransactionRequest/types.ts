@@ -1,6 +1,10 @@
 import { StacksTransaction } from '@stacks/transactions';
 
-interface TLegacyReturn {
+interface Broadcast {
+  broadcast: boolean;
+}
+
+interface TLegacyReturn extends Broadcast {
   payload: any;
   transaction?: StacksTransaction;
   tabId: number;
@@ -11,19 +15,19 @@ interface Metadata {
   messageId: string;
 }
 
-interface TReturnSignTransaction extends TLegacyReturn, Metadata {
+interface TReturnSignTransaction extends TLegacyReturn, Metadata, Broadcast {
   rpcMethod: 'stx_signTransaction';
 }
 
-interface TReturnCallContract extends TLegacyReturn, Metadata {
+interface TReturnCallContract extends TLegacyReturn, Metadata, Broadcast {
   rpcMethod: 'stx_callContract';
 }
 
-interface TReturnTransferStx extends TLegacyReturn, Metadata {
+interface TReturnTransferStx extends TLegacyReturn, Metadata, Broadcast {
   rpcMethod: 'stx_transferStx';
 }
 
-interface TReturnDeployContract extends TLegacyReturn, Metadata {
+interface TReturnDeployContract extends TLegacyReturn, Metadata, Broadcast {
   rpcMethod: 'stx_deployContract';
 }
 

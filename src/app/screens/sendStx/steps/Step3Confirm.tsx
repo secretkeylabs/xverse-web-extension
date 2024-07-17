@@ -1,4 +1,5 @@
 import { stxToMicrostacks } from '@secretkeylabs/xverse-core';
+import RoutePaths from 'app/routes/paths';
 import BigNumber from 'bignumber.js';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +13,7 @@ function Step3Confirm({ unsignedSendStxTx, fee }: Props) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    navigate('/confirm-stx-tx', {
+    navigate(RoutePaths.ConfirmStacksTransaction, {
       state: {
         unsignedTx: unsignedSendStxTx,
         fee: stxToMicrostacks(new BigNumber(fee)).toString(),

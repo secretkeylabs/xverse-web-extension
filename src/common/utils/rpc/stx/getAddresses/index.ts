@@ -45,7 +45,7 @@ const handleGetStxAddresses = async (
           addresses: [
             {
               address: account.stxAddress,
-              publicKey: account.btcPublicKey,
+              publicKey: account.stxPublicKey,
               addressType: AddressType.stacks,
               purpose: AddressPurpose.Stacks,
             },
