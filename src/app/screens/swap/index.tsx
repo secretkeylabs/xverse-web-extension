@@ -1,16 +1,23 @@
+import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
+import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useCoinRates from '@hooks/queries/useCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { ArrowRight } from '@phosphor-icons/react';
+import { btcToSats, getBtcFiatEquivalent, type FungibleToken } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
-import { useState } from 'react';
+import { satsToBtcString } from '@utils/helper';
+import { getFtBalance } from '@utils/tokens';
+import BigNumber from 'bignumber.js';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import Theme from 'theme';
 import AmountInput from './components/amountInput';
 import RouteItem from './components/routeItem';
+import TokenFromBottomSheet from './components/tokenFromBottomSheet';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -19,9 +26,9 @@ const Container = styled.div((props) => ({
   padding: `0 ${props.theme.space.m} ${props.theme.space.l} ${props.theme.space.m}`,
 }));
 
-const Flex1 = styled.div((props) => ({
-  flex: 1,
-}));
+const Flex1 = styled.div`
+  flex: 1;
+`;
 
 const RouteContainer = styled.div((props) => ({
   display: 'flex',
@@ -47,15 +54,41 @@ const SendButtonContainer = styled.div((props) => ({
   marginTop: props.theme.space.l,
 }));
 
+const Icon = styled.img`
+  width: 16px;
+  height: 16px;
+  rotate: 90deg;
+`;
+
+// TODO: add form validations, empty state and error handling
 export default function SwapScreen() {
   const [amount, setAmount] = useState('');
+  const [tokenSelectionBottomSheet, setTokenSelectionBottomSheet] = useState<'from' | 'to' | null>(
+    null,
+  );
+  const [fromToken, setFromToken] = useState<FungibleToken | 'BTC' | undefined>();
+  const [toToken] = useState<FungibleToken | undefined>();
+  const [error, setError] = useState('');
 
   const { fiatCurrency } = useWalletSelector();
+  const { visible: runesCoinsList } = useVisibleRuneFungibleTokens();
+  const { data: btcBalance } = useBtcWalletData();
+  const { btcFiatRate } = useCoinRates();
   const navigate = useNavigate();
   const { t } = useTranslation('translation');
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const defaultFrom = params.get('from');
+
+  useEffect(() => {
+    if (defaultFrom && runesCoinsList.length > 0) {
+      const token =
+        defaultFrom === 'BTC'
+          ? 'BTC'
+          : runesCoinsList.find((coin) => coin.principal === defaultFrom);
+      setFromToken(token);
+    }
+  }, [defaultFrom, runesCoinsList.length]);
 
   const handleGoBack = () => {
     navigate(-1);
@@ -65,9 +98,7 @@ export default function SwapScreen() {
     // TODO: implement getQuotes
   };
 
-  const onClickFrom = () => {
-    // TODO: implement from bottomsheet
-  };
+  const onClickFrom = () => setTokenSelectionBottomSheet('from');
 
   const onClickTo = () => {
     // TODO: implement from bottomsheet
@@ -77,8 +108,82 @@ export default function SwapScreen() {
     // TODO: implement swap route
   };
 
-  const isGetQuotesDisabled = false;
-  const isError = false;
+  const onChangeFromToken = (token: FungibleToken | 'BTC') => {
+    setError('');
+    setAmount('');
+    setFromToken(token);
+  };
+
+  const onChangeAmount = (value: string) => {
+    if (!fromToken) {
+      return;
+    }
+
+    if (fromToken === 'BTC') {
+      const amountInSats = btcToSats(new BigNumber(value));
+      setError(
+        BigNumber(amountInSats).gt(BigNumber(btcBalance ?? 0))
+          ? t('SEND.ERRORS.INSUFFICIENT_BALANCE')
+          : '',
+      );
+      return setAmount(value);
+    }
+
+    setError(
+      BigNumber(value).gt(getFtBalance(fromToken)) ? t('SEND.ERRORS.INSUFFICIENT_BALANCE') : '',
+    );
+    setAmount(value);
+  };
+
+  // extends this for other protocols and stx when needed
+  const getFromBalance = () => {
+    if (!fromToken) {
+      return undefined;
+    }
+
+    if (fromToken === 'BTC') {
+      return satsToBtcString(BigNumber(btcBalance ?? 0));
+    }
+
+    if (fromToken.protocol === 'runes') {
+      return getFtBalance(fromToken);
+    }
+  };
+
+  // extends this for other protocols and stx when needed
+  const getFromAmountFiatValue = () => {
+    const balance = new BigNumber(amount || '0');
+
+    if (fromToken === 'BTC') {
+      const amountInSats = btcToSats(new BigNumber(balance));
+      return getBtcFiatEquivalent(amountInSats, new BigNumber(btcFiatRate)).toFixed(2);
+    }
+
+    if (fromToken?.protocol !== 'runes' || !fromToken?.tokenFiatRate || !fromToken.decimals) {
+      return '0.00';
+    }
+
+    const rate = new BigNumber(fromToken.tokenFiatRate);
+    return balance.multipliedBy(rate).toFixed(2);
+  };
+
+  const onClickMax = () => {
+    if (!fromToken) {
+      return;
+    }
+
+    // we can't use max for btc
+    if (fromToken === 'BTC') {
+      return;
+    }
+
+    setError('');
+    setAmount(getFtBalance(fromToken));
+  };
+
+  const isGetQuotesDisabled = !fromToken || !toToken || Boolean(error);
+  const isMaxDisabled =
+    !fromToken || fromToken === 'BTC' || BigNumber(amount).eq(getFtBalance(fromToken));
   const isGetQuotesLoading = false;
 
   return (
@@ -90,33 +195,41 @@ export default function SwapScreen() {
         </StyledP>
         <Flex1>
           <RouteContainer>
-            <RouteItem label={t('SWAP_SCREEN.FROM')} onClick={onClickFrom} />
+            <RouteItem token={fromToken} label={t('SWAP_SCREEN.FROM')} onClick={onClickFrom} />
             <SwapButtonContainer onClick={onClickSwapRoute}>
-              <ArrowRight size={16} weight="bold" color={Theme.colors.elevation0} />
+              <Icon src={ArrowSwap} />
             </SwapButtonContainer>
-            <RouteItem label={t('SWAP_SCREEN.TO')} onClick={onClickTo} />
+            <RouteItem token={toToken} label={t('SWAP_SCREEN.TO')} onClick={onClickTo} />
           </RouteContainer>
           <AmountInput
             label={t('SWAP_CONFIRM_SCREEN.AMOUNT')}
             input={{
               value: amount,
-              onChange: (value: string) => setAmount(value),
-              fiatValue: '0',
+              onChange: onChangeAmount,
+              fiatValue: getFromAmountFiatValue(),
               fiatCurrency,
             }}
-            max={{ isDisabled: false, onClick: () => {} }}
-            balance="0"
+            max={
+              fromToken === 'BTC' ? undefined : { isDisabled: isMaxDisabled, onClick: onClickMax }
+            }
+            balance={getFromBalance()}
           />
         </Flex1>
         <SendButtonContainer>
           <Button
             disabled={isGetQuotesDisabled}
-            variant={isError ? 'danger' : 'primary'}
-            title={isError ? 'Error msg' : t('SWAP_SCREEN.GET_QUOTES')}
+            variant={error ? 'danger' : 'primary'}
+            title={error || t('SWAP_SCREEN.GET_QUOTES')}
             loading={isGetQuotesLoading}
             onClick={getQuotes}
           />
         </SendButtonContainer>
+        <TokenFromBottomSheet
+          onClose={() => setTokenSelectionBottomSheet(null)}
+          onSelectCoin={onChangeFromToken}
+          visible={tokenSelectionBottomSheet === 'from'}
+          title={t('SWAP_SCREEN.ASSET_TO_CONVERT_FROM')}
+        />
       </Container>
       <BottomBar tab="dashboard" />
     </>

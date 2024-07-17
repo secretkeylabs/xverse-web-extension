@@ -102,7 +102,7 @@ function TokenLoader() {
 
 interface Props {
   title: string;
-  loading: boolean;
+  loading?: boolean;
   currency: CurrencyTypes;
   onPress: (coin: CurrencyTypes, fungibleToken: FungibleToken | undefined) => void;
   fungibleToken?: FungibleToken;
@@ -113,7 +113,7 @@ interface Props {
 
 function TokenTile({
   title,
-  loading,
+  loading = false,
   currency,
   onPress,
   fungibleToken,

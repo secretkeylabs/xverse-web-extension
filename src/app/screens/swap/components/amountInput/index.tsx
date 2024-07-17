@@ -60,7 +60,7 @@ type Props = {
     fiatValue: string;
     fiatCurrency: SupportedCurrency;
   };
-  balance: string;
+  balance?: string;
   max?: {
     isDisabled: boolean;
     onClick: () => void;
@@ -110,14 +110,16 @@ export default function AmountInput({ label, max, input, balance }: Props) {
             thousandSeparator
             renderText={(value: string) => (
               <BalanceP typography="body_medium_m" color="white_0">
-                {value ?? '--'}
+                {value || '--'}
               </BalanceP>
             )}
           />
         </RowCenter>
-        <MaxButton disabled={max?.isDisabled} onClick={max?.onClick}>
-          MAX
-        </MaxButton>
+        {max && (
+          <MaxButton disabled={max.isDisabled} onClick={max.onClick}>
+            MAX
+          </MaxButton>
+        )}
       </RowCenter>
     </div>
   );

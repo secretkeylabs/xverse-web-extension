@@ -164,24 +164,19 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
     return `${currency} ${t('BALANCE')}`;
   };
 
-  const showStacksSwaps = useHasFeature(FeatureId.SWAPS) && currency === 'STX';
   const showRunesSwap =
     (currency === 'FT' && fungibleToken?.protocol === 'runes') || currency === 'BTC';
 
   // ledger is disabled for now
   const showSwaps =
-    (showStacksSwaps || showRunesSwap) &&
-    !isLedgerAccount(selectedAccount) &&
-    network.type === 'Mainnet';
+    showRunesSwap && !isLedgerAccount(selectedAccount) && network.type === 'Mainnet';
 
   const navigateToSwaps = () => {
     if (!showSwaps) {
       return;
     }
-    if (showStacksSwaps) {
-      return navigate(`/swap-stacks?from=${currency}`);
-    }
-    navigate(`/swap?from=${currency}`);
+
+    navigate(`/swap?from=${fungibleToken ? fungibleToken.principal : currency}`);
   };
 
   const navigateToReceive = () => {

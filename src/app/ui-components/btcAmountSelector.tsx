@@ -7,9 +7,9 @@ import {
   currencySymbolMap,
   getBtcFiatEquivalent,
   getFiatBtcEquivalent,
-  satsToBtc,
 } from '@secretkeylabs/xverse-core';
 import Input, { ConvertComplication, MaxButton, VertRule } from '@ui-library/input';
+import { satsToBtcString } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -31,11 +31,6 @@ const btcInputExtractor = /[0-9]+[.]?[0-9]{0,8}/;
 const btcInputValidator = /^[0-9]+[.]?[0-9]{0,8}$/;
 const fiatInputExtractor = /[0-9]+[.]?[0-9]{0,2}/;
 const fiatInputValidator = /^[0-9]+[.]?[0-9]{0,2}$/;
-
-const satsToBtcString = (num: BigNumber) =>
-  satsToBtc(num)
-    .toFixed(8)
-    .replace(/\.?0+$/, '');
 
 type Props = {
   amountSats: string;
