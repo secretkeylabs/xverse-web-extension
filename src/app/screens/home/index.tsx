@@ -19,13 +19,14 @@ import useCoinRates from '@hooks/queries/useCoinRates';
 import useFeeMultipliers from '@hooks/queries/useFeeMultipliers';
 import useSpamTokens from '@hooks/queries/useSpamTokens';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useHasFeature from '@hooks/useHasFeature';
 import useNotificationBanners from '@hooks/useNotificationBanners';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowUp, Plus } from '@phosphor-icons/react';
 import CoinSelectModal from '@screens/home/coinSelectModal';
-import { getFiatEquivalent, type FungibleToken } from '@secretkeylabs/xverse-core';
+import { FeatureId, getFiatEquivalent, type FungibleToken } from '@secretkeylabs/xverse-core';
 import {
   changeShowDataCollectionAlertAction,
   setBrc20ManageTokensAction,
@@ -428,8 +429,9 @@ function Home() {
     dispatch(changeShowDataCollectionAlertAction(false));
   };
 
+  const isCrossChainSwapsEnabled = useHasFeature(FeatureId.CROSS_CHAIN_SWAPS);
   // ledger is disabled for now
-  const showSwaps = !isLedgerAccount(selectedAccount) && network.type === 'Mainnet';
+  const showSwaps = isCrossChainSwapsEnabled && !isLedgerAccount(selectedAccount);
 
   return (
     <>
