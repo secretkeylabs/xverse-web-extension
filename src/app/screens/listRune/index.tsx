@@ -64,6 +64,8 @@ export default function ListRuneScreen() {
   const { fiatCurrency } = useWalletSelector();
   const { btcFiatRate } = useCoinRates();
   const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const locationFrom = params.get('from');
   const showRunesListing =
     useHasFeature(FeatureId.RUNES_LISTING) || process.env.NODE_ENV === 'development';
 
@@ -148,6 +150,11 @@ export default function ListRuneScreen() {
   const individualCustomPriceUsed = selectedListItems.some((item) => item.useIndividualCustomPrice);
 
   const handleGoBack = () => {
+    if (locationFrom === 'swap') {
+      // TODO: when navigating back from swap, there is flash of token dashboard screen
+      navigate(-1);
+    }
+
     if (section === 'SELECT_RUNES') {
       navigate(`/coinDashboard/FT?ftKey=${selectedRune?.principal}&protocol=runes`);
     } else {

@@ -14,7 +14,8 @@
     "NEXT": "Next",
     "CANCEL": "Cancel",
     "CONFIRM": "Confirm",
-    "APPLY": "Apply"
+    "APPLY": "Apply",
+    "IN": "In"
   },
   "UNITS": {
     "SATS_PER_VB": "sats/vByte"
@@ -1299,7 +1300,9 @@
     "ERRORS": {
       "INVALID_AMOUNT": "Invalid amount",
       "INSUFFICIENT_BALANCE_FEES": "Insufficient balance",
-      "SLIPPAGE_TOLERANCE_CANNOT_EXCEED": "The slippage tolerance cannot exceed 100%"
+      "SLIPPAGE_TOLERANCE_CANNOT_EXCEED": "The slippage tolerance cannot exceed 100%",
+      "NO_PAIR_LIQUIDITY": "We couldn't find any quote for this pair.",
+      "TRY_ANOTHER_PAIR": "You can try another pair, or try again later."
     },
     "SWAP_TRANSACTION_CANNOT_BE_SPONSORED": "Swap transaction cannot be sponsored while you have a pending transaction.",
     "LEARN_MORE": "Learn more",
@@ -1311,7 +1314,10 @@
     "MARKETPLACE": "MARKETPLACE",
     "FLOOR_PRICE": "Floor price",
     "RECOMMENDED": "• Recommended",
-    "BEST": "• Best"
+    "BEST": "• Best",
+    "SWAP_FROM": "Swap from",
+    "SWAP_TO": "Swap to",
+    "LIST_YOUR_RUNES": "List your Runes on Magic Eden"
   },
   "SWAP_CONFIRM_SCREEN": {
     "TOKEN_SWAP": "Token swap",

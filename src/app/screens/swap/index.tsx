@@ -1,7 +1,7 @@
 import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
+import { useRuneFungibleTokensQuery } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
 import useGetQuotes from '@hooks/queries/swaps/useGetQuotes';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useCoinRates from '@hooks/queries/useCoinRates';
@@ -14,7 +14,7 @@ import {
   type Token,
   type UtxoQuote,
 } from '@secretkeylabs/xverse-core';
-import Button from '@ui-library/button';
+import Button, { LinkButton } from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
 import { satsToBtcString } from '@utils/helper';
 import { getFtBalance } from '@utils/tokens';
@@ -29,6 +29,11 @@ import TokenFromBottomSheet from './components/tokenFromBottomSheet';
 import TokenToBottomSheet from './components/tokenToBottomSheet';
 import QuoteSummary from './quoteSummary';
 import QuotesModal from './quotesModal';
+import {
+  mapFTProtocolToSwapProtocol,
+  mapSwapProtocolToFTProtocol,
+  mapSwapTokenToFT,
+} from './utils';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -37,8 +42,12 @@ const Container = styled.div((props) => ({
   padding: `0 ${props.theme.space.m} ${props.theme.space.l} ${props.theme.space.m}`,
 }));
 
-const Flex1 = styled.div`
+const Flex1 = styled.div<{ center?: boolean }>`
+  display: flex;
+  flex-direction: column;
   flex: 1;
+  justify-content: ${(props) => (props.center ? 'center' : 'flex-start')};
+  align-items: ${(props) => (props.center ? 'center' : 'normal')};
 `;
 
 const RouteContainer = styled.div((props) => ({
@@ -49,15 +58,17 @@ const RouteContainer = styled.div((props) => ({
   margin: `${props.theme.space.l} 0`,
 }));
 
-const SwapButtonContainer = styled.button((props) => ({
+const SwapButtonContainer = styled.button<{ disabled: boolean }>((props) => ({
   display: 'flex',
   background: props.theme.colors.white_0,
   padding: props.theme.space.xs,
   alignSelf: 'flex-end',
   borderRadius: props.theme.space.xxl,
   marginBottom: props.theme.space.xs,
+  opacity: props.disabled ? 0.5 : 1,
+  cursor: props.disabled ? 'not-allowed' : 'pointer',
   ':hover': {
-    opacity: 0.8,
+    opacity: props.disabled ? 0.5 : 0.8,
   },
 }));
 
@@ -71,7 +82,15 @@ const Icon = styled.img`
   rotate: 90deg;
 `;
 
-// TODO: add form validations, empty state and error handling
+const mapFtToSwapToken = (ft: FungibleToken | 'BTC'): Token => ({
+  ticker: ft === 'BTC' ? 'BTC' : ft.principal ?? '',
+  name: ft === 'BTC' ? 'Bitcoin' : ft.name ?? ft.assetName ?? '',
+  protocol: ft === 'BTC' ? 'btc' : mapFTProtocolToSwapProtocol(ft.protocol ?? 'runes'),
+  divisibility: ft === 'BTC' ? 8 : ft?.decimals ?? 0,
+  logo: ft === 'BTC' ? undefined : ft.image ?? ft.runeInscriptionId ?? '',
+  symbol: ft === 'BTC' ? undefined : ft.runeSymbol ?? '',
+});
+
 export default function SwapScreen() {
   const [amount, setAmount] = useState('');
   const [quote, setQuote] = useState<Quote>();
@@ -82,10 +101,11 @@ export default function SwapScreen() {
   );
   const [fromToken, setFromToken] = useState<FungibleToken | 'BTC' | undefined>();
   const [toToken, setToToken] = useState<Token | undefined>();
-  const [error, setError] = useState('');
+  const [inputError, setInputError] = useState('');
+  const [hasQuoteError, setHasQuoteError] = useState(false);
 
   const { fiatCurrency } = useWalletSelector();
-  const { visible: runesCoinsList } = useVisibleRuneFungibleTokens();
+  const { unfilteredData } = useRuneFungibleTokensQuery();
   const { data: btcBalance } = useBtcWalletData();
   const { btcFiatRate } = useCoinRates();
   const navigate = useNavigate();
@@ -95,8 +115,10 @@ export default function SwapScreen() {
   const defaultFrom = params.get('from');
   const { quotes, loading: quotesLoading, error: quotesError, fetchQuotes } = useGetQuotes();
 
+  const runesCoinsList = unfilteredData ?? [];
+
   useEffect(() => {
-    if (defaultFrom && runesCoinsList.length > 0) {
+    if (defaultFrom) {
       const token =
         defaultFrom === 'BTC'
           ? 'BTC'
@@ -110,13 +132,15 @@ export default function SwapScreen() {
   };
 
   useEffect(() => {
-    if (!quotesLoading && quotes) {
-      if (quotes.amm.length === 0 && quotes.utxo.length === 0) {
-        // show error message here
-      } else {
-        setGetQuotesModalVisible(true);
-      }
+    if (quotesLoading || !quotes) {
+      return;
     }
+
+    if ((quotes.amm.length === 0 && quotes.utxo.length === 0) || quotesError) {
+      return setHasQuoteError(true);
+    }
+
+    setGetQuotesModalVisible(true);
   }, [quotes, quotesLoading, quotesError]);
 
   const getQuotes = async () => {
@@ -138,17 +162,49 @@ export default function SwapScreen() {
   const onClickFrom = () => setTokenSelectionBottomSheet('from');
   const onClickTo = () => setTokenSelectionBottomSheet('to');
 
+  const getUserFTFromTokenTicker = (
+    protocol: Token['protocol'],
+    ticker: Token['ticker'],
+  ): FungibleToken | undefined => {
+    const ftProtocol = mapSwapProtocolToFTProtocol(protocol);
+
+    // add more protocols here when needed
+    switch (ftProtocol) {
+      case 'runes':
+        return runesCoinsList.find((coin) => coin.principal === ticker);
+      default:
+        return undefined;
+    }
+  };
+
+  const isSwapRouteDisabled = !fromToken || !toToken;
+
   const onClickSwapRoute = () => {
-    // TODO: implement swap route
+    if (isSwapRouteDisabled) {
+      return;
+    }
+
+    setInputError('');
+    setAmount('');
+    setHasQuoteError(false);
+    const newFrom =
+      toToken.protocol === 'btc'
+        ? 'BTC'
+        : getUserFTFromTokenTicker(toToken.protocol, toToken.ticker) ?? mapSwapTokenToFT(toToken);
+    const newTo = mapFtToSwapToken(fromToken);
+    setFromToken(newFrom);
+    setToToken(newTo);
   };
 
   const onChangeToToken = (token: Token) => {
+    setHasQuoteError(false);
     setToToken(token);
   };
 
   const onChangeFromToken = (token: FungibleToken | 'BTC') => {
-    setError('');
+    setInputError('');
     setAmount('');
+    setHasQuoteError(false);
     setFromToken(token);
     if (fromToken) {
       setToToken(undefined);
@@ -162,7 +218,7 @@ export default function SwapScreen() {
 
     if (fromToken === 'BTC') {
       const amountInSats = btcToSats(new BigNumber(value));
-      setError(
+      setInputError(
         BigNumber(amountInSats).gt(BigNumber(btcBalance ?? 0))
           ? t('SEND.ERRORS.INSUFFICIENT_BALANCE')
           : '',
@@ -170,7 +226,7 @@ export default function SwapScreen() {
       return setAmount(value);
     }
 
-    setError(
+    setInputError(
       BigNumber(value).gt(getFtBalance(fromToken)) ? t('SEND.ERRORS.INSUFFICIENT_BALANCE') : '',
     );
     setAmount(value);
@@ -218,15 +274,22 @@ export default function SwapScreen() {
       return;
     }
 
-    setError('');
+    setInputError('');
     setAmount(getFtBalance(fromToken));
   };
 
-  const errorMsg = error || quotesError;
-  const isGetQuotesDisabled =
-    !fromToken || !toToken || Boolean(error) || quotesLoading || Boolean(quotesError);
+  const emptyBalanceError =
+    Number(getFromBalance()) === 0 ? t('SEND.ERRORS.INSUFFICIENT_BALANCE') : '';
+  const errorMsg = inputError || emptyBalanceError;
+
+  const isAmountInValid = BigNumber(amount).isNaN() || BigNumber(amount).lte(0);
+  const ifFormInValid = !fromToken || !toToken || isAmountInValid || Boolean(errorMsg);
+  const isGetQuotesDisabled = ifFormInValid || quotesLoading || Boolean(quotesError);
+
   const isMaxDisabled =
     !fromToken || fromToken === 'BTC' || BigNumber(amount).eq(getFtBalance(fromToken));
+  const isRunesToBtcRoute =
+    fromToken !== 'BTC' && fromToken?.protocol === 'runes' && toToken?.protocol === 'btc';
 
   if (quote) {
     return (
@@ -254,34 +317,61 @@ export default function SwapScreen() {
         <Flex1>
           <RouteContainer>
             <RouteItem token={fromToken} label={t('SWAP_SCREEN.FROM')} onClick={onClickFrom} />
-            <SwapButtonContainer onClick={onClickSwapRoute}>
+            <SwapButtonContainer onClick={onClickSwapRoute} disabled={isSwapRouteDisabled}>
               <Icon src={ArrowSwap} />
             </SwapButtonContainer>
             <RouteItem token={toToken} label={t('SWAP_SCREEN.TO')} onClick={onClickTo} />
           </RouteContainer>
           <AmountInput
-            label={t('SWAP_CONFIRM_SCREEN.AMOUNT')}
             input={{
               value: amount,
               onChange: onChangeAmount,
               fiatValue: getFromAmountFiatValue(),
               fiatCurrency,
+              protocol:
+                fromToken === 'BTC'
+                  ? 'btc'
+                  : fromToken?.protocol
+                  ? mapFTProtocolToSwapProtocol(fromToken.protocol)
+                  : undefined,
+              decimals: fromToken === 'BTC' ? 8 : fromToken?.decimals,
+              unit: fromToken === 'BTC' ? 'BTC' : fromToken?.runeSymbol ?? '',
             }}
             max={
               fromToken === 'BTC' ? undefined : { isDisabled: isMaxDisabled, onClick: onClickMax }
             }
             balance={getFromBalance()}
           />
+          {hasQuoteError && (
+            <Flex1 center>
+              <StyledP typography="body_m" color="white_200">
+                {t('SWAP_SCREEN.ERRORS.NO_PAIR_LIQUIDITY')}
+              </StyledP>
+              {isRunesToBtcRoute ? (
+                <LinkButton
+                  title={t('SWAP_SCREEN.LIST_YOUR_RUNES')}
+                  variant="tertiary"
+                  onClick={() => navigate(`/list-rune/${fromToken?.principal}?from=swap`)}
+                />
+              ) : (
+                <StyledP typography="body_m" color="white_200">
+                  {t('SWAP_SCREEN.ERRORS.TRY_ANOTHER_PAIR')}
+                </StyledP>
+              )}
+            </Flex1>
+          )}
         </Flex1>
-        <SendButtonContainer>
-          <Button
-            disabled={isGetQuotesDisabled}
-            variant={errorMsg ? 'danger' : 'primary'}
-            title={errorMsg || t('SWAP_SCREEN.GET_QUOTES')}
-            loading={quotesLoading}
-            onClick={getQuotes}
-          />
-        </SendButtonContainer>
+        {!hasQuoteError && (
+          <SendButtonContainer>
+            <Button
+              disabled={isGetQuotesDisabled}
+              variant={errorMsg ? 'danger' : 'primary'}
+              title={errorMsg || t('SWAP_SCREEN.GET_QUOTES')}
+              loading={quotesLoading}
+              onClick={getQuotes}
+            />
+          </SendButtonContainer>
+        )}
         <QuotesModal
           visible={getQuotesModalVisible}
           onClose={() => {
@@ -303,14 +393,15 @@ export default function SwapScreen() {
           onClose={() => setTokenSelectionBottomSheet(null)}
           onSelectCoin={onChangeFromToken}
           visible={tokenSelectionBottomSheet === 'from'}
-          title={t('SWAP_SCREEN.ASSET_TO_CONVERT_FROM')}
-          to={toToken}
+          title={t('SWAP_SCREEN.SWAP_FROM')}
+          to={toToken && fromToken ? undefined : toToken}
         />
         <TokenToBottomSheet
           onClose={() => setTokenSelectionBottomSheet(null)}
           onSelectCoin={onChangeToToken}
+          resetFrom={() => setFromToken(undefined)}
           visible={tokenSelectionBottomSheet === 'to'}
-          title={t('SWAP_SCREEN.ASSET_TO_CONVERT_FROM')}
+          title={t('SWAP_SCREEN.SWAP_TO')}
           from={fromToken}
         />
       </Container>
