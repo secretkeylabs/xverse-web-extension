@@ -19,7 +19,7 @@ import {
   getBtcFiatEquivalent,
   satsToBtc,
 } from '@secretkeylabs/xverse-core';
-import Button from '@ui-library/button';
+import Button, { LinkButton } from '@ui-library/button';
 import { StickyButtonContainer, StyledP } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
 import { formatToXDecimalPlaces, ftDecimals } from '@utils/helper';
@@ -48,7 +48,6 @@ import {
   SetRunePricesContainer,
   SetRunePricesListContainer,
   StyledButton,
-  StyledSelectAllButton,
   TabButton,
   TabButtonsContainer,
   TabContainer,
@@ -317,7 +316,7 @@ export default function ListRuneScreen() {
                   </TabContainer>
                   <MockContainer>
                     <div />
-                    <StyledSelectAllButton
+                    <LinkButton
                       title={
                         selectAllToggle || Object.values(listItemsMap).some((item) => item.selected)
                           ? t('DESELECT_ALL')
