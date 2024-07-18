@@ -26,6 +26,7 @@ type Props = {
   isLoading: boolean;
   header?: React.ReactNode;
   calloutText?: string;
+  insufficientFunds?: boolean;
 };
 
 function RecipientSelector({
@@ -35,12 +36,18 @@ function RecipientSelector({
   isLoading,
   header,
   calloutText,
+  insufficientFunds,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { network } = useWalletSelector();
   const [addressIsValid, setAddressIsValid] = useState(true);
+  const [displayInsufficientFunds, setDisplayInsufficientFunds] = useState(false);
 
   const handleNext = () => {
+    if (insufficientFunds) {
+      setDisplayInsufficientFunds(true);
+      return;
+    }
     if (validateBtcAddress({ btcAddress: recipientAddress, network: network.type })) {
       onNext();
     } else {
@@ -51,19 +58,27 @@ function RecipientSelector({
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRecipientAddress(e.target.value);
     setAddressIsValid(true);
+    setDisplayInsufficientFunds(false);
   };
 
   const inputFeedback = useMemo(() => {
-    if (addressIsValid) {
-      return [];
+    if (!addressIsValid) {
+      return [
+        {
+          variant: 'danger' as const,
+          message: t('ERRORS.ADDRESS_INVALID'),
+        },
+      ];
     }
-    return [
-      {
-        variant: 'danger' as const,
-        message: t('ERRORS.ADDRESS_INVALID'),
-      },
-    ];
-  }, [addressIsValid]);
+    if (displayInsufficientFunds) {
+      return [
+        {
+          variant: 'danger' as const,
+          message: t('ERRORS.INSUFFICIENT_BALANCE_FEES'),
+        },
+      ];
+    }
+  }, [addressIsValid, displayInsufficientFunds]);
 
   return (
     <Container>
@@ -85,7 +100,7 @@ function RecipientSelector({
         <Button
           title={t('NEXT')}
           onClick={handleNext}
-          disabled={!recipientAddress || !addressIsValid}
+          disabled={displayInsufficientFunds || !recipientAddress || !addressIsValid}
           loading={isLoading}
         />
       </Buttons>

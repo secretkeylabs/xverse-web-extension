@@ -44,6 +44,7 @@ type Props = {
   onCancel: () => void;
   isLoading: boolean;
   isSubmitting: boolean;
+  insufficientFunds: boolean;
 };
 
 function StepDisplay({
@@ -61,6 +62,7 @@ function StepDisplay({
   onCancel,
   isLoading,
   isSubmitting,
+  insufficientFunds,
 }: Props) {
   const { t } = useTranslation('translation');
   const header = (
@@ -81,6 +83,7 @@ function StepDisplay({
               onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient))}
               isLoading={isLoading}
               calloutText={t('SEND.MAKE_SURE_THE_RECIPIENT')}
+              insufficientFunds={insufficientFunds}
             />
           </Container>
         </SendLayout>

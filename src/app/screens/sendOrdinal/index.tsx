@@ -4,7 +4,7 @@ import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import type { TransactionSummary } from '@screens/sendBtc/helpers';
-import { AnalyticsEvents, type Transport, btcTransaction } from '@secretkeylabs/xverse-core';
+import { AnalyticsEvents, btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
@@ -31,6 +31,7 @@ function SendRuneScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [transaction, setTransaction] = useState<btcTransaction.EnhancedTransaction | undefined>();
   const [summary, setSummary] = useState<TransactionSummary | undefined>();
+  const [insufficientFundsError, setInsufficientFundsError] = useState(false);
 
   useResetUserFlow('/send-ordinal');
 
@@ -47,11 +48,13 @@ function SendRuneScreen() {
     if (!recipientAddress || !feeRate) {
       setTransaction(undefined);
       setSummary(undefined);
+      setInsufficientFundsError(false);
       return;
     }
     let isActiveEffect = true;
     const generateTxnAndSummary = async () => {
       setIsLoading(true);
+      setInsufficientFundsError(false);
       try {
         const transactionDetails = await btcTransaction.sendOrdinalsWithSplit(
           context,
@@ -63,9 +66,13 @@ function SendRuneScreen() {
         setTransaction(transactionDetails);
         setSummary(await transactionDetails.getSummary());
       } catch (e) {
-        if (!(e instanceof Error) || !e.message.includes('Insufficient funds')) {
+        if (e instanceof Error) {
           // don't log the error if it's just an insufficient funds error
-          console.error(e);
+          if (e.message.includes('Insufficient funds')) {
+            setInsufficientFundsError(true);
+          } else {
+            console.error(e);
+          }
         }
         setTransaction(undefined);
         setSummary(undefined);
@@ -158,6 +165,7 @@ function SendRuneScreen() {
       setCurrentStep={setCurrentStep}
       recipientAddress={recipientAddress}
       setRecipientAddress={setRecipientAddress}
+      insufficientFunds={insufficientFundsError}
       feeRate={feeRate}
       setFeeRate={handleFeeRateChange}
       getFeeForFeeRate={calculateFeeForFeeRate}
