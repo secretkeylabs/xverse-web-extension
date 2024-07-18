@@ -1,5 +1,11 @@
 import useCoinRates from '@hooks/queries/useCoinRates';
-import { getBtcFiatEquivalent, type Quote, type UtxoQuote } from '@secretkeylabs/xverse-core';
+import {
+  getBtcFiatEquivalent,
+  type FungibleToken,
+  type Quote,
+  type Token,
+  type UtxoQuote,
+} from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import BigNumber from 'bignumber.js';
@@ -12,6 +18,7 @@ interface Props {
   onClose: () => void;
   ammProviders: Quote[];
   utxoProviders: UtxoQuote[];
+  toToken?: Token;
   ammProviderClicked?: (amm: Quote) => void;
   utxoProviderClicked?: (utxoProvider: UtxoQuote) => void;
 }
@@ -46,6 +53,7 @@ function QuotesModal({
   onClose,
   ammProviders,
   utxoProviders,
+  toToken,
   ammProviderClicked,
   utxoProviderClicked,
 }: Props) {
@@ -89,10 +97,11 @@ function QuotesModal({
             key={amm.provider.name}
             provider={amm.provider.name}
             price={amm.receiveAmount}
-            image={amm.provider.logo}
+            image={{ ft: { image: amm.provider.logo } as FungibleToken }}
             onClick={() => ammProviderClicked && ammProviderClicked(amm)}
             subtitle={t('RECOMMENDED')}
-            unit={amm.to.protocol === 'btc' ? 'sats' : amm.to.protocol}
+            subtitleColor="success_light"
+            unit={amm.to.protocol === 'btc' ? 'sats' : toToken?.symbol || ''}
             fiatValue={
               amm.to.protocol === 'btc'
                 ? getBtcFiatEquivalent(
@@ -113,11 +122,12 @@ function QuotesModal({
             key={utxoProvider.provider.name}
             provider={utxoProvider.provider.name}
             price={utxoProvider.floorRate}
-            image={utxoProvider.provider.logo}
+            image={{ ft: { image: utxoProvider.provider.logo } as FungibleToken }}
             floorText={t('FLOOR_PRICE')}
             onClick={() => utxoProviderClicked && utxoProviderClicked(utxoProvider)}
             subtitle={getSubtitle(utxoProvider, highestFloorRate)}
-            unit="Sats/rune"
+            subtitleColor="success_light"
+            unit={toToken?.symbol ? `Sats/${toToken.symbol}` : ''}
           />
         ))}
       </Container>

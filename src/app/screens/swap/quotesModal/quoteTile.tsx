@@ -1,11 +1,15 @@
+import TokenImage from '@components/tokenImage';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CaretRight } from '@phosphor-icons/react';
+import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
-import BigNumber from 'bignumber.js';
+import type { CurrencyTypes } from '@utils/constants';
+import { formatNumber } from '@utils/helper';
 import { NumericFormat } from 'react-number-format';
 import styled, { useTheme } from 'styled-components';
+import type { Color } from 'theme';
 
-const Container = styled.button`
+const Container = styled.button<{ clickable: boolean }>`
   display: flex;
   flex-direction: row;
   border: 1px solid ${({ theme }) => theme.colors.elevation6};
@@ -14,6 +18,8 @@ const Container = styled.button`
   justify-content: space-between;
   margin-top: ${({ theme }) => theme.space.xs};
   background: transparent;
+  width: 100%;
+  cursor: ${({ clickable }) => (clickable ? 'pointer' : 'default')};
 `;
 
 const SmallContainer = styled.div`
@@ -36,20 +42,18 @@ const RightColumn = styled.div`
   align-items: flex-end;
 `;
 
-const Image = styled.img`
-  align-self: center;
-  width: 32px;
-  height: 32px;
-`;
-
 interface Props {
   provider: string;
   price: string;
-  image: string;
+  image: {
+    currency?: CurrencyTypes;
+    ft?: FungibleToken;
+  };
   subtitle?: string;
+  subtitleColor?: Color;
   fiatValue?: string;
   floorText?: string;
-  onClick: () => void;
+  onClick?: () => void;
   unit?: string;
 }
 
@@ -58,6 +62,7 @@ function QuoteTile({
   price,
   image,
   subtitle,
+  subtitleColor,
   fiatValue,
   floorText,
   onClick,
@@ -67,15 +72,20 @@ function QuoteTile({
   const { fiatCurrency } = useWalletSelector();
 
   return (
-    <Container onClick={onClick}>
+    <Container onClick={onClick} clickable={Boolean(onClick)}>
       <SmallContainer>
-        <Image src={image} alt={`${provider} logo`} />
+        <TokenImage
+          currency={image.currency}
+          fungibleToken={image.ft}
+          size={32}
+          showProtocolIcon={false}
+        />
         <LeftColumn>
           <StyledP typography="body_m" color="white_0">
             {provider}
           </StyledP>
-          {subtitle && (
-            <StyledP typography="body_medium_s" color="success_light">
+          {subtitle && subtitleColor && (
+            <StyledP typography="body_medium_s" color={subtitleColor}>
               {subtitle}
             </StyledP>
           )}
@@ -89,7 +99,7 @@ function QuoteTile({
             thousandSeparator
             renderText={() => (
               <StyledP typography="body_m" color="white_0">
-                {new BigNumber(price).toFixed(2)} {unit}
+                {formatNumber(price)} {unit}
               </StyledP>
             )}
           />
@@ -112,7 +122,7 @@ function QuoteTile({
             </StyledP>
           )}
         </RightColumn>
-        <CaretRight size={theme.space.m} color={theme.colors.white_0} />
+        {onClick && <CaretRight size={theme.space.m} color={theme.colors.white_0} />}
       </SmallContainer>
     </Container>
   );

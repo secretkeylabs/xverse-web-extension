@@ -1274,7 +1274,9 @@
     "CLOSE_TAB": "Close"
   },
   "SWAP_SCREEN": {
+    "QUOTE": "Quote",
     "SWAP": "Swap",
+    "RATE": "Rate",
     "CONVERT": "Convert",
     "BALANCE": "Balance",
     "FROM": "From",
@@ -1291,7 +1293,7 @@
     "SPONSOR_TRANSACTION": "Sponsor transaction (no fees)",
     "POWERED_BY_ALEX": "Powered by ALEX",
     "CONTINUE": "Continue",
-    "SLIPPAGE_DESC": "Your transaction will reverse if the price changes unfavorably by more of this percentage.",
+    "SLIPPAGE_DESC": "You can adjust the slippage tolerance to account for price fluctuations and ensure your transaction goes through.",
     "APPLY": "Apply",
     "RESET_TO_DEFAULT": "Reset to default",
     "ERRORS": {

@@ -27,6 +27,7 @@ import AmountInput from './components/amountInput';
 import RouteItem from './components/routeItem';
 import TokenFromBottomSheet from './components/tokenFromBottomSheet';
 import TokenToBottomSheet from './components/tokenToBottomSheet';
+import QuoteSummary from './quoteSummary';
 import QuotesModal from './quotesModal';
 
 const Container = styled.div((props) => ({
@@ -73,6 +74,8 @@ const Icon = styled.img`
 // TODO: add form validations, empty state and error handling
 export default function SwapScreen() {
   const [amount, setAmount] = useState('');
+  const [quote, setQuote] = useState<Quote>();
+
   const [getQuotesModalVisible, setGetQuotesModalVisible] = useState(false);
   const [tokenSelectionBottomSheet, setTokenSelectionBottomSheet] = useState<'from' | 'to' | null>(
     null,
@@ -108,7 +111,11 @@ export default function SwapScreen() {
 
   useEffect(() => {
     if (!quotesLoading && quotes) {
-      setGetQuotesModalVisible(true);
+      if (quotes.amm.length === 0 && quotes.utxo.length === 0) {
+        // show error message here
+      } else {
+        setGetQuotesModalVisible(true);
+      }
     }
   }, [quotes, quotesLoading, quotesError]);
 
@@ -116,9 +123,15 @@ export default function SwapScreen() {
     // fetch quotes here
     // example
     fetchQuotes({
-      from: { ticker: 'BTC', protocol: 'btc' },
-      to: { ticker: 'UNCOMMON•GOODS', protocol: 'runes' },
-      amount: '50',
+      from: {
+        ticker: fromToken === 'BTC' ? 'BTC' : fromToken?.principal ?? '',
+        protocol: fromToken === 'BTC' ? 'btc' : 'runes',
+      },
+      to: {
+        ticker: toToken?.protocol === 'btc' ? 'BTC' : toToken?.ticker ?? '',
+        protocol: toToken?.protocol ?? 'btc',
+      },
+      amount: fromToken === 'BTC' ? btcToSats(new BigNumber(amount)).toString() : amount,
     });
   };
 
@@ -215,6 +228,22 @@ export default function SwapScreen() {
   const isMaxDisabled =
     !fromToken || fromToken === 'BTC' || BigNumber(amount).eq(getFtBalance(fromToken));
 
+  if (quote) {
+    return (
+      <QuoteSummary
+        amount={amount}
+        quote={quote}
+        fromToken={fromToken}
+        toToken={toToken}
+        onClose={() => setQuote(undefined)}
+        onChangeProvider={() => {
+          setQuote(undefined);
+          setGetQuotesModalVisible(true);
+        }}
+      />
+    );
+  }
+
   return (
     <>
       <TopRow onClick={handleGoBack} />
@@ -260,9 +289,10 @@ export default function SwapScreen() {
           }}
           ammProviders={quotes?.amm || []}
           utxoProviders={quotes?.utxo || []}
+          toToken={toToken}
           ammProviderClicked={(provider: Quote) => {
-            // todo: navigate to quote screen here
-            console.log('amm clicked', provider);
+            setQuote(provider);
+            setGetQuotesModalVisible(false);
           }}
           utxoProviderClicked={(provider: UtxoQuote) => {
             // todo: navigate to utxo selection screen
