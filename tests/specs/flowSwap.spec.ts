@@ -5,7 +5,7 @@ import Wallet from '../pages/wallet';
 const strongPW = Onboarding.generateSecurePasswordCrypto();
 
 // TODO: adjust the test suite to relay on featureEnabled flag to be executed as only than the swap button is visible
-test.describe.skip('Swapping Coins', () => {
+test.describe('Swapping Coins', () => {
   test('Visual check swap page', async ({ page, extensionId }) => {
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
@@ -13,8 +13,8 @@ test.describe.skip('Swapping Coins', () => {
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
     await wallet.allupperButtons.nth(2).click();
     await expect(page.url()).toContain('swap');
-    await expect(wallet.buttonDownArrow).toBeVisible();
-    await expect(await wallet.inputCoinAmount).toHaveCount(2);
+    await expect(wallet.buttonDownArrow.first()).toBeVisible();
+    await expect(await wallet.inputSwapAmount).toHaveCount(2);
     await expect(await wallet.buttonSelectCoin).toHaveCount(2);
     await expect(wallet.buttonDetails).toBeVisible();
     await expect(wallet.buttonContinue).toBeVisible();
@@ -50,10 +50,10 @@ test.describe.skip('Swapping Coins', () => {
     await expect(wallet.coinText.last()).not.toContainText('Select asset');
     await expect(await wallet.imageToken).toHaveCount(2);
     await expect(wallet.buttonContinue).toBeDisabled();
-    await wallet.inputCoinAmount.first().fill(Math.floor(100 + Math.random() * 900).toString());
+    await wallet.inputSwapAmount.first().fill(Math.floor(100 + Math.random() * 900).toString());
     await expect(wallet.buttonInsufficientBalance).toBeVisible();
     await expect(wallet.buttonInsufficientBalance).toBeDisabled();
-    const coinAmount = await wallet.inputCoinAmount.nth(1).inputValue();
+    const coinAmount = await wallet.inputSwapAmount.nth(1).inputValue();
     const numericValue = parseFloat(coinAmount);
     await expect(numericValue).toBeGreaterThan(0);
     await expect(wallet.swapTokenBalance.first()).toContainText('0');
@@ -64,7 +64,7 @@ test.describe.skip('Swapping Coins', () => {
     const usdValue = parseFloat(usdText.replace(/[^\d.-]/g, ''));
     await expect(usdValue).toBeGreaterThan(0);
 
-    await wallet.inputCoinAmount.first().clear();
+    await wallet.inputSwapAmount.first().clear();
     await expect(wallet.buttonInsufficientBalance).toBeHidden();
     await expect(wallet.buttonContinue).toBeVisible();
     await expect(wallet.buttonContinue).toBeDisabled();
@@ -88,7 +88,7 @@ test.describe.skip('Swapping Coins', () => {
     await expect(await wallet.divTokenRow.count()).toBeGreaterThan(1);
     await wallet.divTokenRow.nth(4).click();
     await expect(wallet.buttonDetails).toBeVisible();
-    await wallet.inputCoinAmount.first().fill(Math.floor(100 + Math.random() * 900).toString());
+    await wallet.inputSwapAmount.first().fill(Math.floor(100 + Math.random() * 900).toString());
 
     const tokenName1 = await wallet.coinText.first().innerText();
     const tokenName2 = await wallet.coinText.last().innerText();
@@ -97,7 +97,7 @@ test.describe.skip('Swapping Coins', () => {
     await expect(wallet.coinText.first()).toContainText(tokenName2);
     await expect(wallet.coinText.last()).toContainText(tokenName1);
     await expect(wallet.buttonInsufficientBalance).toBeVisible();
-    const coinAmount1 = await wallet.inputCoinAmount.nth(0).inputValue();
+    const coinAmount1 = await wallet.inputSwapAmount.nth(0).inputValue();
     const numericValue1 = parseFloat(coinAmount1);
     await expect(numericValue1).toBeGreaterThan(0);
   });

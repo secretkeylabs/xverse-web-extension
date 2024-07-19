@@ -82,6 +82,7 @@ export default function AmountInput({ label, max, input, balance }: Props) {
       </StyledP>
       <Container onClick={handleClick}>
         <InputField
+          data-testid="swap-amount"
           ref={inputRef}
           value={input.value}
           onChange={(e) => input.onChange(e.target.value)}
@@ -109,7 +110,7 @@ export default function AmountInput({ label, max, input, balance }: Props) {
             displayType="text"
             thousandSeparator
             renderText={(value: string) => (
-              <BalanceP typography="body_medium_m" color="white_0">
+              <BalanceP data-testid="swap-token-balance" typography="body_medium_m" color="white_0">
                 {value || '--'}
               </BalanceP>
             )}

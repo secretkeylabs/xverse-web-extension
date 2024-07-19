@@ -106,7 +106,7 @@ export default class Wallet {
 
   readonly buttonDownArrow: Locator;
 
-  readonly inputCoinAmount: Locator;
+  readonly inputSwapAmount: Locator;
 
   readonly buttonSelectCoin: Locator;
 
@@ -442,7 +442,7 @@ export default class Wallet {
 
     // Swap
     this.buttonSelectCoin = page.getByTestId('select-coin-button');
-    this.inputCoinAmount = page.getByTestId('coin-input');
+    this.inputSwapAmount = page.getByTestId('swap-amount');
     this.coinText = page.getByTestId('coin-text');
     this.buttonDownArrow = page.getByTestId('down-arrow-button');
     this.buttonContinue = page.getByRole('button', { name: 'Continue' });
