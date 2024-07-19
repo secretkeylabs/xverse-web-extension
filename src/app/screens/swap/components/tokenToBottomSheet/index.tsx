@@ -148,7 +148,7 @@ export default function TokenToBottomSheet({
               return (
                 <StyledTokenTile
                   key={token.name}
-                  title={token.ticker}
+                  title={token.name ?? token.ticker}
                   currency="BTC"
                   onPress={() => {
                     onSelectCoin(token);

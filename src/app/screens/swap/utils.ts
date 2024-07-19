@@ -3,6 +3,7 @@ import type {
   FungibleTokenProtocol,
   Protocol,
   Token,
+  TokenBasic,
 } from '@secretkeylabs/xverse-core';
 
 export const mapFTProtocolToSwapProtocol = (protocol: FungibleTokenProtocol): Protocol => {
@@ -37,3 +38,20 @@ export const mapSwapTokenToFT = (token: Token): FungibleToken => ({
   runeSymbol: token.symbol,
   runeInscriptionId: token.logo,
 });
+
+export const mapFTNativeSwapTokenToTokenBasic = (
+  token: FungibleToken | 'BTC' | Token,
+): TokenBasic => {
+  if (token === 'BTC') {
+    return { ticker: 'BTC', protocol: 'btc' };
+  }
+
+  // if token is FungibleToken
+  if ('principal' in token && token.protocol) {
+    return { ticker: token.principal, protocol: mapFTProtocolToSwapProtocol(token.protocol) };
+  }
+
+  // token will never have a principal prop so we can safely cast it as Token
+  const safeTypeToken = token as Token;
+  return { ticker: safeTypeToken.ticker, protocol: safeTypeToken.protocol };
+};

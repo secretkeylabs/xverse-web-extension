@@ -1,11 +1,15 @@
 import SlippageEditIcon from '@assets/img/swap/slippageEdit.svg';
 import TopRow from '@components/topRow';
 import useCoinRates from '@hooks/queries/useCoinRates';
+import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import useSelectedAccount from '@hooks/useSelectedAccount';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowRight } from '@phosphor-icons/react';
 import {
-  btcToSats,
   getBtcFiatEquivalent,
+  type ExecuteOrderRequest,
   type FungibleToken,
+  type PlaceOrderResponse,
   type Quote,
   type Token,
 } from '@secretkeylabs/xverse-core';
@@ -14,12 +18,15 @@ import { StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import { formatNumber } from '@utils/helper';
 import BigNumber from 'bignumber.js';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
 import QuoteTile from '../quotesModal/quoteTile';
 import { SlippageModalContent } from '../slippageModal';
+import { mapFTNativeSwapTokenToTokenBasic } from '../utils';
+import EditFee from './EditFee';
 import QuoteSummaryTile from './quoteSummaryTile';
+import usePlaceOrder from './usePlaceOrder';
 
 const SlippageButton = styled.button`
   display: flex;
@@ -38,6 +45,8 @@ const Container = styled.div((props) => ({
   flexDirection: 'column',
   flex: 1,
   padding: `0 ${props.theme.space.m} ${props.theme.space.l} ${props.theme.space.m}`,
+  zIndex: 1,
+  backgroundColor: props.theme.colors.elevation0,
 }));
 
 const Flex1 = styled.div`
@@ -76,13 +85,21 @@ const RouteContainer = styled.div`
 
 const QuoteToBaseContainer = styled.div`
   margin-top: 4px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
-const ArrowContainer = styled.div`
+const ArrowOuterContainer = styled.div`
   position: absolute;
+  top: 50%;
   left: 50%;
-  top: 40.5%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
+`;
+
+const ArrowInnerContainer = styled.div`
+  position: relative;
   z-index: 1;
   display: flex;
   justify-content: center;
@@ -93,6 +110,18 @@ const ArrowContainer = styled.div`
   padding: 8px;
 `;
 
+const EditFeeRateContainer = styled.div`
+  margin-top: ${(props) => props.theme.space.xxs};
+`;
+
+const FeeRate = styled.div`
+  ${(props) => props.theme.typography.body_medium_m};
+  color: ${(props) => props.theme.colors.white_0};
+  display: flex;
+  flex-direction: row;
+  align-self: flex-start;
+`;
+
 type QuoteSummaryProps = {
   amount: string;
   fromToken?: FungibleToken | 'BTC';
@@ -100,6 +129,14 @@ type QuoteSummaryProps = {
   quote: Quote;
   onClose: () => void;
   onChangeProvider: () => void;
+  onError: (errorMessage: string) => void;
+  onOrderPlaced: ({
+    order,
+    providerCode,
+  }: {
+    order: PlaceOrderResponse;
+    providerCode: ExecuteOrderRequest['providerCode'];
+  }) => void;
 };
 
 export default function QuoteSummary({
@@ -109,10 +146,34 @@ export default function QuoteSummary({
   quote,
   onClose,
   onChangeProvider,
+  onOrderPlaced,
+  onError,
 }: QuoteSummaryProps) {
   const { t } = useTranslation('translation');
   const theme = useTheme();
   const { btcFiatRate } = useCoinRates();
+  const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey } = useSelectedAccount();
+  const { loading: isPlaceOrderLoading, error: placeOrderError, placeOrder } = usePlaceOrder();
+
+  useEffect(() => {
+    if (placeOrderError) {
+      onError(placeOrderError);
+    }
+  }, [placeOrderError]);
+
+  const { data: recommendedFees } = useBtcFeeRate();
+  const [feeRate, setFeeRate] = useState('0');
+
+  useEffect(() => {
+    if (recommendedFees && feeRate === '0') {
+      setFeeRate(recommendedFees.regular.toString());
+    }
+  }, [recommendedFees, feeRate]);
+
+  const { fiatCurrency } = useWalletSelector();
+
+  const satsToFiat = (sats: string) =>
+    getBtcFiatEquivalent(new BigNumber(sats), BigNumber(btcFiatRate)).toString();
 
   const fromUnit =
     fromToken === 'BTC'
@@ -124,9 +185,29 @@ export default function QuoteSummary({
   const [showSlippageModal, setShowSlippageModal] = useState(false);
   const [slippage, setSlippage] = useState(0.05);
 
-  const handleSwap = () => {
-    // Handle quote confirmation
-    onClose();
+  const handleSwap = async () => {
+    if (!fromToken || !toToken) {
+      return;
+    }
+
+    const placeOrderRequest = {
+      providerCode: quote.provider.code,
+      from: mapFTNativeSwapTokenToTokenBasic(fromToken),
+      to: mapFTNativeSwapTokenToTokenBasic(toToken),
+      sendAmount: amount,
+      receiveAmount: quote.receiveAmount,
+      slippage,
+      feeRate: Number(feeRate),
+      btcAddress,
+      btcPubKey: btcPublicKey,
+      ordAddress: ordinalsAddress,
+      ordPubKey: ordinalsPublicKey,
+    };
+    const placeOrderResponse = await placeOrder(placeOrderRequest);
+
+    if (placeOrderResponse?.psbt) {
+      onOrderPlaced({ order: placeOrderResponse, providerCode: quote.provider.code });
+    }
   };
 
   return (
@@ -148,7 +229,7 @@ export default function QuoteSummary({
           <QuoteToBaseContainer>
             <QuoteTile
               provider="Amount"
-              price={fromToken === 'BTC' ? btcToSats(new BigNumber(amount)).toString() : amount}
+              price={amount}
               // TODO JORDAN: ADD RUNE SYMBOL OVERLAY
               image={{
                 currency: fromToken === 'BTC' ? 'BTC' : 'FT',
@@ -159,17 +240,18 @@ export default function QuoteSummary({
               unit={fromToken === 'BTC' ? 'Sats' : fromToken?.runeSymbol ?? ''}
               fiatValue={
                 fromToken === 'BTC'
-                  ? getBtcFiatEquivalent(
-                      btcToSats(new BigNumber(amount)),
-                      new BigNumber(btcFiatRate),
-                    ).toFixed(2)
+                  ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcFiatRate)).toFixed(
+                      2,
+                    )
                   : // TODO JORDAN: ADD RUNE FIAT EQUIVALENT
                     ''
               }
             />
-            <ArrowContainer>
-              <ArrowDown size={16} />
-            </ArrowContainer>
+            <ArrowOuterContainer>
+              <ArrowInnerContainer>
+                <ArrowDown size={16} />
+              </ArrowInnerContainer>
+            </ArrowOuterContainer>
             <QuoteTile
               provider="Amount"
               price={quote.receiveAmount}
@@ -219,7 +301,7 @@ export default function QuoteSummary({
               </StyledP>
             </ListingDescriptionRow>
             <ListingDescriptionRow>
-              <StyledP typography="body_medium_m" color="white">
+              <StyledP typography="body_medium_m" color="white_200">
                 {t('SWAP_SCREEN.LP_FEE')}
               </StyledP>
               <StyledP typography="body_medium_m" color="white_0">
@@ -235,13 +317,43 @@ export default function QuoteSummary({
                   {fromUnit}
                   <ArrowRight weight="bold" color={theme.colors.white_400} size={16} />
                   {toUnit}
-                </RouteContainer>{' '}
+                </RouteContainer>
               </StyledP>
+            </ListingDescriptionRow>
+            <ListingDescriptionRow>
+              <StyledP typography="body_medium_m" color="white_200">
+                {t('TRANSACTION_SETTING.FEE_RATE')}
+                <EditFeeRateContainer>
+                  <EditFee
+                    feeUnits="Sats"
+                    feeRate={feeRate}
+                    feeRateUnits={t('UNITS.SATS_PER_VB')}
+                    setFeeRate={setFeeRate}
+                    baseToFiat={satsToFiat}
+                    fiatUnit={fiatCurrency}
+                    getFeeForFeeRate={(fee) => Promise.resolve(fee)}
+                    feeRates={{
+                      medium: recommendedFees?.regular,
+                      high: recommendedFees?.priority,
+                    }}
+                    feeRateLimits={recommendedFees?.limits}
+                    onFeeChange={setFeeRate}
+                  />
+                </EditFeeRateContainer>
+              </StyledP>
+              <FeeRate>
+                {feeRate} {t('UNITS.SATS_PER_VB')}
+              </FeeRate>
             </ListingDescriptionRow>
           </ListingDescContainer>
         </Flex1>
         <SendButtonContainer>
-          <Button variant="primary" title={t('SWAP_SCREEN.SWAP')} onClick={handleSwap} />
+          <Button
+            variant="primary"
+            title={t('SWAP_SCREEN.SWAP')}
+            onClick={handleSwap}
+            loading={isPlaceOrderLoading}
+          />
         </SendButtonContainer>
         <Sheet
           title={t('SWAP_SCREEN.SLIPPAGE_TITLE')}
