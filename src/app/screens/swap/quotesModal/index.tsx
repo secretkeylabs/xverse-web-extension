@@ -11,6 +11,7 @@ import Sheet from '@ui-library/sheet';
 import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import type { Color } from 'theme';
 import QuoteTile from './quoteTile';
 
 interface Props {
@@ -62,22 +63,38 @@ function QuotesModal({
   const { btcFiatRate } = useCoinRates();
 
   const numberOfUtxoProviders = utxoProviders.length;
-  const highestFloorRate = Math.max(...utxoProviders.map((provider) => Number(provider.floorRate)));
+  const lowestUtxoQuoteFloorRate = Math.min(
+    ...utxoProviders.map((provider) => Number(provider.floorRate)),
+  );
 
-  const getSubtitle = (provider: UtxoQuote, highestRate: number): string => {
+  const getSubtitle = (provider: UtxoQuote): string => {
     if (numberOfUtxoProviders === 1) {
       return '';
     }
-    if (Number(provider.floorRate) === highestRate) {
+    if (Number(provider.floorRate) === lowestUtxoQuoteFloorRate) {
       return t('BEST');
     }
-    const difference = highestRate ? Number(provider.floorRate) - highestRate : 0;
-    const percentageDifference = (difference / highestRate) * 100;
+    const difference = lowestUtxoQuoteFloorRate
+      ? Number(provider.floorRate) - lowestUtxoQuoteFloorRate
+      : 0;
+    const percentageDifference = (difference / lowestUtxoQuoteFloorRate) * 100;
     if (percentageDifference > 0) {
       return `+${percentageDifference.toFixed(2)}%`;
     }
     return `-${Math.abs(percentageDifference).toFixed(2)}%`;
   };
+
+  const ammQuotes = [...ammProviders].sort((a, b) =>
+    BigNumber(b.receiveAmount).gte(a.receiveAmount)
+      ? 1
+      : BigNumber(a.receiveAmount).gte(b.receiveAmount)
+      ? -1
+      : 0,
+  );
+
+  const utxoQuotes = [...utxoProviders].sort((a, b) =>
+    BigNumber(b.floorRate).gte(a.floorRate) ? -1 : BigNumber(a.floorRate).gte(b.floorRate) ? 1 : 0,
+  );
 
   return (
     <Sheet visible={visible} title={t('GET_QUOTES_TITLE')} onClose={onClose}>
@@ -92,7 +109,7 @@ function QuotesModal({
         )}
         {/* todo: pass rune symbol as unit , it should be passed from swaps screen */}
         {/* get fiat rates of rune after API returns runeID */}
-        {ammProviders.map((amm) => (
+        {ammQuotes.map((amm) => (
           <QuoteTile
             key={amm.provider.name}
             provider={amm.provider.name}
@@ -117,19 +134,27 @@ function QuotesModal({
             {t('MARKETPLACE')}
           </SecondHeading>
         )}
-        {utxoProviders.map((utxoProvider) => (
-          <QuoteTile
-            key={utxoProvider.provider.name}
-            provider={utxoProvider.provider.name}
-            price={utxoProvider.floorRate}
-            image={{ ft: { image: utxoProvider.provider.logo } as FungibleToken }}
-            floorText={t('FLOOR_PRICE')}
-            onClick={() => utxoProviderClicked && utxoProviderClicked(utxoProvider)}
-            subtitle={getSubtitle(utxoProvider, highestFloorRate)}
-            subtitleColor="success_light"
-            unit={toToken?.symbol ? `Sats/${toToken.symbol}` : ''}
-          />
-        ))}
+        {utxoQuotes.map((utxoProvider) => {
+          const subTitle = getSubtitle(utxoProvider);
+          let subTitleColour: Color = 'success_light';
+
+          if (subTitle.startsWith('+')) {
+            subTitleColour = 'danger_light';
+          }
+          return (
+            <QuoteTile
+              key={utxoProvider.provider.name}
+              provider={utxoProvider.provider.name}
+              price={utxoProvider.floorRate}
+              image={{ ft: { image: utxoProvider.provider.logo } as FungibleToken }}
+              floorText={t('FLOOR_PRICE')}
+              onClick={() => utxoProviderClicked && utxoProviderClicked(utxoProvider)}
+              subtitle={subTitle}
+              subtitleColor={subTitleColour}
+              unit={toToken?.symbol ? `Sats/${toToken.symbol}` : ''}
+            />
+          );
+        })}
       </Container>
     </Sheet>
   );
