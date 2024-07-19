@@ -291,19 +291,41 @@ export default function SwapScreen() {
   const isRunesToBtcRoute =
     fromToken !== 'BTC' && fromToken?.protocol === 'runes' && toToken?.protocol === 'btc';
 
+  const QuoteModal = (
+    <QuotesModal
+      visible={getQuotesModalVisible}
+      onClose={() => {
+        setGetQuotesModalVisible(false);
+      }}
+      ammProviders={quotes?.amm || []}
+      utxoProviders={quotes?.utxo || []}
+      toToken={toToken}
+      ammProviderClicked={(provider: Quote) => {
+        setQuote(provider);
+        setGetQuotesModalVisible(false);
+      }}
+      utxoProviderClicked={(provider: UtxoQuote) => {
+        // todo: navigate to utxo selection screen
+        setQuote(undefined);
+        setGetQuotesModalVisible(false);
+        console.log('utxo clicked', provider);
+      }}
+    />
+  );
+
   if (quote) {
     return (
-      <QuoteSummary
-        amount={amount}
-        quote={quote}
-        fromToken={fromToken}
-        toToken={toToken}
-        onClose={() => setQuote(undefined)}
-        onChangeProvider={() => {
-          setQuote(undefined);
-          setGetQuotesModalVisible(true);
-        }}
-      />
+      <>
+        <QuoteSummary
+          amount={amount}
+          quote={quote}
+          fromToken={fromToken}
+          toToken={toToken}
+          onClose={() => setQuote(undefined)}
+          onChangeProvider={() => setGetQuotesModalVisible(true)}
+        />
+        {QuoteModal}
+      </>
     );
   }
 
@@ -372,23 +394,7 @@ export default function SwapScreen() {
             />
           </SendButtonContainer>
         )}
-        <QuotesModal
-          visible={getQuotesModalVisible}
-          onClose={() => {
-            setGetQuotesModalVisible(false);
-          }}
-          ammProviders={quotes?.amm || []}
-          utxoProviders={quotes?.utxo || []}
-          toToken={toToken}
-          ammProviderClicked={(provider: Quote) => {
-            setQuote(provider);
-            setGetQuotesModalVisible(false);
-          }}
-          utxoProviderClicked={(provider: UtxoQuote) => {
-            // todo: navigate to utxo selection screen
-            console.log('utxo clicked', provider);
-          }}
-        />
+        {QuoteModal}
         <TokenFromBottomSheet
           onClose={() => setTokenSelectionBottomSheet(null)}
           onSelectCoin={onChangeFromToken}

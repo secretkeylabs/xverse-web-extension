@@ -177,7 +177,7 @@ export default function TokenToBottomSheet({
           })}
         {!!(data?.length === 0 || error) && !isLoading && (
           <StyledP typography="body_m" color="white_200">
-            No tokens available
+            {t('ERRORS.NO_TOKENS_FOUND')}
           </StyledP>
         )}
       </Container>
