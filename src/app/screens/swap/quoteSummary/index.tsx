@@ -24,7 +24,7 @@ import QuoteSummaryTile from './quoteSummaryTile';
 const SlippageButton = styled.button`
   display: flex;
   flex-direction: row;
-  column-gap: ${(props) => props.theme.spacing(2)};
+  column-gap: ${(props) => props.theme.space.xxs};
   background: transparent;
   align-items: center;
   ${(props) => props.theme.typography.body_medium_m};
