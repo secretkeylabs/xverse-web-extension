@@ -9,7 +9,6 @@ import {
 import { StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import BigNumber from 'bignumber.js';
-import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import type { Color } from 'theme';
@@ -85,28 +84,16 @@ function QuotesModal({
     return `-${Math.abs(percentageDifference).toFixed(2)}%`;
   };
 
-  const ammQuotes = useMemo(
-    () =>
-      [...ammProviders].sort((a, b) =>
-        BigNumber(b.receiveAmount).gte(a.receiveAmount)
-          ? 1
-          : BigNumber(a.receiveAmount).gte(b.receiveAmount)
-          ? -1
-          : 0,
-      ),
-    [ammProviders],
+  const ammQuotes = [...ammProviders].sort((a, b) =>
+    BigNumber(b.receiveAmount).gte(a.receiveAmount)
+      ? 1
+      : BigNumber(a.receiveAmount).gte(b.receiveAmount)
+      ? -1
+      : 0,
   );
 
-  const utxoQuotes = useMemo(
-    () =>
-      [...utxoProviders].sort((a, b) =>
-        BigNumber(b.floorRate).gte(a.floorRate)
-          ? -1
-          : BigNumber(a.floorRate).gte(b.floorRate)
-          ? 1
-          : 0,
-      ),
-    [utxoProviders],
+  const utxoQuotes = [...utxoProviders].sort((a, b) =>
+    BigNumber(b.floorRate).gte(a.floorRate) ? -1 : BigNumber(a.floorRate).gte(b.floorRate) ? 1 : 0,
   );
 
   return (
