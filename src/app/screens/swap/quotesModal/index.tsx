@@ -118,7 +118,7 @@ function QuotesModal({
             onClick={() => ammProviderClicked && ammProviderClicked(amm)}
             subtitle={t('RECOMMENDED')}
             subtitleColor="success_light"
-            unit={amm.to.protocol === 'btc' ? 'sats' : toToken?.symbol || ''}
+            unit={amm.to.protocol === 'btc' ? 'Sats' : toToken?.symbol || ''}
             fiatValue={
               amm.to.protocol === 'btc'
                 ? getBtcFiatEquivalent(
@@ -151,7 +151,7 @@ function QuotesModal({
               onClick={() => utxoProviderClicked && utxoProviderClicked(utxoProvider)}
               subtitle={subTitle}
               subtitleColor={subTitleColour}
-              unit={toToken?.symbol ? `Sats/${toToken.symbol}` : ''}
+              unit={toToken?.symbol ? `Sats / ${toToken.symbol}` : ''}
             />
           );
         })}
