@@ -1,8 +1,9 @@
 import TokenTile from '@components/tokenTile';
 import useDebounce from '@hooks/useDebounce';
 import { MagnifyingGlass } from '@phosphor-icons/react';
-import { mapFTProtocolToSwapProtocol, mapSwapTokenToFungibleToken } from '@screens/swap/utils';
+import { mapFTProtocolToSwapProtocol, mapSwapTokenToFT } from '@screens/swap/utils';
 import type { FungibleToken, Protocol, Token, TokenBasic } from '@secretkeylabs/xverse-core';
+import { StyledP } from '@ui-library/common.styled';
 import Input from '@ui-library/input';
 import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
@@ -52,7 +53,7 @@ const ProtocolItem = styled.button<{ selected: boolean }>`
   color: ${(props) => props.theme.colors.white_0};
   border: none;
   border-radius: ${(props) => props.theme.space.s};
-  cursor: pointer;
+  cursor: ${({ selected }) => (selected ? 'default' : 'pointer')};
   white-space: nowrap;
   flex: 0 0 auto;
   text-transform: uppercase;
@@ -68,11 +69,19 @@ interface Props {
   from?: FungibleToken | 'BTC';
   onSelectCoin: (token: Token) => void;
   onClose: () => void;
+  resetFrom: () => void;
 }
 
 const supportedProtocols: Protocol[] = ['runes']; // add more protocols here
 
-export default function TokenToBottomSheet({ visible, title, from, onSelectCoin, onClose }: Props) {
+export default function TokenToBottomSheet({
+  visible,
+  title,
+  from,
+  onSelectCoin,
+  onClose,
+  resetFrom,
+}: Props) {
   const [query, setQuery] = useState('');
   const [selectedProtocol, setSelectedProtocol] = useState<Protocol>(supportedProtocols[0]);
 
@@ -84,10 +93,25 @@ export default function TokenToBottomSheet({ visible, title, from, onSelectCoin,
         ticker: from === 'BTC' ? 'BTC' : from.principal,
       }
     : undefined;
-  const { data, isLoading } = useToTokens(selectedProtocol, fromTokenBasic, search);
+  const { data, error, isLoading } = useToTokens(selectedProtocol, fromTokenBasic, search);
+
+  const onChangeProtocol = (protocol: Protocol) => () => {
+    if (selectedProtocol === protocol) {
+      return;
+    }
+    resetFrom();
+    setQuery('');
+    setSelectedProtocol(protocol);
+  };
+
+  const handleClose = () => {
+    setQuery('');
+    setSelectedProtocol(supportedProtocols[0]);
+    onClose();
+  };
 
   return (
-    <Sheet visible={visible} title={title} onClose={onClose}>
+    <Sheet visible={visible} title={title} onClose={handleClose}>
       <Container>
         <div>
           <Input
@@ -105,7 +129,7 @@ export default function TokenToBottomSheet({ visible, title, from, onSelectCoin,
                 <ProtocolItem
                   key={key}
                   selected={key === selectedProtocol}
-                  onClick={() => setSelectedProtocol(key)}
+                  onClick={onChangeProtocol(key)}
                 >
                   {key.toUpperCase()}
                 </ProtocolItem>
@@ -128,7 +152,7 @@ export default function TokenToBottomSheet({ visible, title, from, onSelectCoin,
                   currency="BTC"
                   onPress={() => {
                     onSelectCoin(token);
-                    onClose();
+                    handleClose();
                   }}
                   hideBalance
                 />
@@ -142,15 +166,20 @@ export default function TokenToBottomSheet({ visible, title, from, onSelectCoin,
                   currency="FT"
                   onPress={() => {
                     onSelectCoin(token);
-                    onClose();
+                    handleClose();
                   }}
-                  fungibleToken={mapSwapTokenToFungibleToken(token)}
+                  fungibleToken={mapSwapTokenToFT(token)}
                   hideBalance
                 />
               );
             }
             return null;
           })}
+        {!!(data?.length === 0 || error) && !isLoading && (
+          <StyledP typography="body_m" color="white_200">
+            {t('ERRORS.NO_TOKENS_FOUND')}
+          </StyledP>
+        )}
       </Container>
     </Sheet>
   );

@@ -1,7 +1,9 @@
 import TokenTile from '@components/tokenTile';
 import type { FungibleToken, TokenBasic } from '@secretkeylabs/xverse-core';
+import { StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import useFromTokens from './useFromTokens';
 
@@ -33,7 +35,8 @@ interface Props {
 }
 
 export default function TokenFromBottomSheet({ visible, title, to, onSelectCoin, onClose }: Props) {
-  const { data, isLoading } = useFromTokens(to);
+  const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
+  const { data, error, isLoading } = useFromTokens(to);
 
   return (
     <Sheet visible={visible} title={title} onClose={onClose}>
@@ -75,6 +78,11 @@ export default function TokenFromBottomSheet({ visible, title, to, onSelectCoin,
             }
             return null;
           })}
+        {!!(data?.length === 0 || error) && !isLoading && (
+          <StyledP typography="body_m" color="white_200">
+            {t('ERRORS.NO_TOKENS_FOUND')}
+          </StyledP>
+        )}
       </Container>
     </Sheet>
   );

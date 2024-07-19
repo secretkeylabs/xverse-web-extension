@@ -1,32 +1,41 @@
-import { currencySymbolMap, type SupportedCurrency } from '@secretkeylabs/xverse-core';
+import {
+  currencySymbolMap,
+  type Protocol,
+  type SupportedCurrency,
+} from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { MaxButton } from '@ui-library/input';
-import { useRef } from 'react';
+import BigNumber from 'bignumber.js';
+import { useRef, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 
-const Container = styled.div`
+const Container = styled.div<{ hasError: boolean }>`
   display: flex;
   flex-direction: column;
   background-color: ${(props) => props.theme.colors.elevation_n1};
   cursor: pointer;
   margin: ${(props) => props.theme.space.xs} 0;
   padding: ${(props) => props.theme.space.m};
-  border: 1px solid ${(props) => props.theme.colors.white_800};
+  border: 1px solid
+    ${(props) =>
+      props.hasError ? props.theme.colors.danger_dark_200 : props.theme.colors.white_800};
   border-radius: ${(props) => props.theme.space.s};
   &:focus-within {
-    border-color: ${(props) => props.theme.colors.white_600};
+    border-color: ${(props) =>
+      props.hasError ? props.theme.colors.danger_dark_200 : props.theme.colors.white_600};
   }
 `;
 
-const InputField = styled.input<{ $bgColor?: string }>`
+const InputField = styled.input<{ $bgColor?: string; hasError: boolean }>`
   ${(props) => props.theme.typography.body_medium_l}
   background-color: transparent;
   border: none;
   width: 100%;
   margin-bottom: ${(props) => props.theme.space.xxs};
-  color: ${(props) => props.theme.colors.white_0};
+  color: ${(props) =>
+    props.hasError ? props.theme.colors.danger_light : props.theme.colors.white_0};
   caret-color: ${(props) => props.theme.colors.tangerine};
   ::selection {
     background-color: ${(props) => props.theme.colors.tangerine};
@@ -52,13 +61,15 @@ const BalanceP = styled(StyledP)`
 `;
 
 type Props = {
-  label: string;
   input: {
     placeholder?: string;
     value: string;
     onChange: (value: string) => void;
     fiatValue: string;
     fiatCurrency: SupportedCurrency;
+    protocol?: Protocol;
+    decimals?: number;
+    unit?: string;
   };
   balance?: string;
   max?: {
@@ -67,26 +78,51 @@ type Props = {
   };
 };
 
-export default function AmountInput({ label, max, input, balance }: Props) {
-  const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
+const getValidatorByProtocol = (protocol?: Protocol, ftDecimals?: number) => {
+  const validatorByProtocol: Record<Protocol, RegExp> = {
+    btc: /^(?:[0-9]+(?:\.[0-9]{0,8})?)?$/,
+    stx: /^(?:[0-9]+(?:\.[0-9]{0,6})?)?$/,
+    sip10: new RegExp(`^(?:[0-9]+(?:\\${ftDecimals === 0 ? '' : '.'}[0-9]{0,${ftDecimals}})?)?$`),
+    brc20: new RegExp(`^(?:[0-9]+(?:\\${ftDecimals === 0 ? '' : '.'}[0-9]{0,${ftDecimals}})?)?$`),
+    runes: new RegExp(`^(?:[0-9]+(?:\\${ftDecimals === 0 ? '' : '.'}[0-9]{0,${ftDecimals}})?)?$`),
+  };
+
+  return protocol ? validatorByProtocol[protocol] : /^[0-9.]*$/;
+};
+
+export default function AmountInput({ max, input, balance }: Props) {
+  const { t } = useTranslation('translation');
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const tokenInputValidator = getValidatorByProtocol(input.protocol, Number(input.decimals));
 
   const handleClick = () => {
     inputRef.current?.focus();
   };
 
+  const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    if (tokenInputValidator.test(value)) {
+      input.onChange(value);
+    }
+  };
+
+  const error = Boolean(balance && new BigNumber(input.value).isGreaterThan(balance));
+
   return (
     <div>
       <StyledP typography="body_medium_m" color="white_400">
-        {label}
+        {t('SWAP_CONFIRM_SCREEN.AMOUNT')}{' '}
+        {`${input.unit ? `${t('COMMON.IN').toLowerCase()} ${input.unit}` : ''}`}
       </StyledP>
-      <Container onClick={handleClick}>
+      <Container onClick={handleClick} hasError={error}>
         <InputField
           data-testid="swap-amount"
           ref={inputRef}
           value={input.value}
-          onChange={(e) => input.onChange(e.target.value)}
+          onChange={handleOnChange}
           placeholder={input.placeholder ?? '0'}
+          hasError={error}
         />
         <NumericFormat
           value={input.fiatValue}
@@ -103,7 +139,7 @@ export default function AmountInput({ label, max, input, balance }: Props) {
       <RowCenter justifyContent="space-between">
         <RowCenter justifyContent="flex-start">
           <StyledP typography="body_medium_m" color="white_400">
-            {t('BALANCE')}:&nbsp;
+            {t('SWAP_SCREEN.BALANCE')}:&nbsp;
           </StyledP>
           <NumericFormat
             value={balance}
@@ -117,7 +153,10 @@ export default function AmountInput({ label, max, input, balance }: Props) {
           />
         </RowCenter>
         {max && (
-          <MaxButton disabled={max.isDisabled} onClick={max.onClick}>
+          <MaxButton
+            disabled={max.isDisabled || new BigNumber(balance ?? 0).eq(0)}
+            onClick={max.onClick}
+          >
             MAX
           </MaxButton>
         )}

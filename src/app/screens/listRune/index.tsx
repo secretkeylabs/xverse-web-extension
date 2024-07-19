@@ -19,7 +19,7 @@ import {
   getBtcFiatEquivalent,
   satsToBtc,
 } from '@secretkeylabs/xverse-core';
-import Button from '@ui-library/button';
+import Button, { LinkButton } from '@ui-library/button';
 import { StickyButtonContainer, StyledP } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
 import { formatToXDecimalPlaces, ftDecimals } from '@utils/helper';
@@ -48,7 +48,6 @@ import {
   SetRunePricesContainer,
   SetRunePricesListContainer,
   StyledButton,
-  StyledSelectAllButton,
   TabButton,
   TabButtonsContainer,
   TabContainer,
@@ -65,6 +64,8 @@ export default function ListRuneScreen() {
   const { fiatCurrency } = useWalletSelector();
   const { btcFiatRate } = useCoinRates();
   const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const locationFrom = params.get('from');
   const showRunesListing =
     useHasFeature(FeatureId.RUNES_LISTING) || process.env.NODE_ENV === 'development';
 
@@ -149,6 +150,11 @@ export default function ListRuneScreen() {
   const individualCustomPriceUsed = selectedListItems.some((item) => item.useIndividualCustomPrice);
 
   const handleGoBack = () => {
+    if (locationFrom === 'swap') {
+      // TODO: when navigating back from swap, there is flash of token dashboard screen
+      navigate(-1);
+    }
+
     if (section === 'SELECT_RUNES') {
       navigate(`/coinDashboard/FT?ftKey=${selectedRune?.principal}&protocol=runes`);
     } else {
@@ -317,7 +323,7 @@ export default function ListRuneScreen() {
                   </TabContainer>
                   <MockContainer>
                     <div />
-                    <StyledSelectAllButton
+                    <LinkButton
                       title={
                         selectAllToggle || Object.values(listItemsMap).some((item) => item.selected)
                           ? t('DESELECT_ALL')

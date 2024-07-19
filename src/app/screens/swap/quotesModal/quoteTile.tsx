@@ -15,31 +15,26 @@ const Container = styled.button<{ clickable: boolean }>`
   border: 1px solid ${({ theme }) => theme.colors.elevation6};
   border-radius: ${({ theme }) => theme.space.s};
   padding: ${({ theme }) => `${theme.space.m} ${theme.space.s}`};
-  justify-content: space-between;
   margin-top: ${({ theme }) => theme.space.xs};
   background: transparent;
   width: 100%;
   cursor: ${({ clickable }) => (clickable ? 'pointer' : 'default')};
 `;
 
-const SmallContainer = styled.div`
+const RowCenter = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
+  flex: 1;
 `;
 
-const LeftColumn = styled.div`
+const InfoContainer = styled.div`
   display: flex;
   flex-direction: column;
-  margin: 0 ${({ theme }) => theme.space.xs};
-  align-items: flex-start;
-`;
-
-const RightColumn = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin: 0 ${({ theme }) => theme.space.xs};
-  align-items: flex-end;
+  flex: 1;
+  margin-left: ${({ theme }) => theme.space.xs};
+  margin-right: ${({ theme }) => theme.space.s};
 `;
 
 interface Props {
@@ -73,36 +68,34 @@ function QuoteTile({
 
   return (
     <Container onClick={onClick} clickable={Boolean(onClick)}>
-      <SmallContainer>
-        <TokenImage
-          currency={image.currency}
-          fungibleToken={image.ft}
-          size={32}
-          showProtocolIcon={false}
-        />
-        <LeftColumn>
-          <StyledP typography="body_m" color="white_0">
+      <TokenImage
+        currency={image.currency}
+        fungibleToken={image.ft}
+        size={32}
+        showProtocolIcon={false}
+      />
+      <InfoContainer>
+        <RowCenter>
+          <StyledP typography="body_bold_m" color="white_0">
             {provider}
           </StyledP>
-          {subtitle && subtitleColor && (
-            <StyledP typography="body_medium_s" color={subtitleColor}>
-              {subtitle}
-            </StyledP>
-          )}
-        </LeftColumn>
-      </SmallContainer>
-      <SmallContainer>
-        <RightColumn>
           <NumericFormat
             value={price}
             displayType="text"
             thousandSeparator
             renderText={() => (
-              <StyledP typography="body_m" color="white_0">
+              <StyledP typography="body_bold_m" color="white_0">
                 {formatNumber(price)} {unit}
               </StyledP>
             )}
           />
+        </RowCenter>
+        <RowCenter>
+          {subtitle && subtitleColor && (
+            <StyledP typography="body_medium_s" color={subtitleColor}>
+              {subtitle}
+            </StyledP>
+          )}
           {fiatValue && (
             <NumericFormat
               value={fiatValue}
@@ -121,9 +114,9 @@ function QuoteTile({
               {floorText}
             </StyledP>
           )}
-        </RightColumn>
-        {onClick && <CaretRight size={theme.space.m} color={theme.colors.white_0} />}
-      </SmallContainer>
+        </RowCenter>
+      </InfoContainer>
+      {onClick && <CaretRight size={theme.space.m} color={theme.colors.white_0} />}
     </Container>
   );
 }

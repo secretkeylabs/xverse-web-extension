@@ -164,12 +164,11 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
     return `${currency} ${t('BALANCE')}`;
   };
 
+  const isCrossChainSwapsEnabled = useHasFeature(FeatureId.CROSS_CHAIN_SWAPS);
   const showRunesSwap =
     (currency === 'FT' && fungibleToken?.protocol === 'runes') || currency === 'BTC';
-
   // ledger is disabled for now
-  const showSwaps =
-    showRunesSwap && !isLedgerAccount(selectedAccount) && network.type === 'Mainnet';
+  const showSwaps = isCrossChainSwapsEnabled && showRunesSwap && !isLedgerAccount(selectedAccount);
 
   const navigateToSwaps = () => {
     if (!showSwaps) {
