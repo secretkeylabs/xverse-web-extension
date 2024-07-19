@@ -49,7 +49,7 @@ const SendButtonContainer = styled.div((props) => ({
   marginBottom: props.theme.space.s,
 }));
 
-export const ListingDescContainer = styled.div((props) => ({
+const ListingDescContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   gap: props.theme.space.s,
@@ -57,7 +57,7 @@ export const ListingDescContainer = styled.div((props) => ({
   marginBottom: props.theme.space.m,
 }));
 
-export const ListingDescriptionRow = styled.div`
+const ListingDescriptionRow = styled.div`
   display: flex;
   align-items: center;
   flex-direction: row;
@@ -66,7 +66,7 @@ export const ListingDescriptionRow = styled.div`
   min-height: 24px;
 `;
 
-export const RouteContainer = styled.div`
+const RouteContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: right;
