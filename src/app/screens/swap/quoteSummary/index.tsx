@@ -1,8 +1,6 @@
-import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import SlippageEditIcon from '@assets/img/swap/slippageEdit.svg';
 import TopRow from '@components/topRow';
 import useCoinRates from '@hooks/queries/useCoinRates';
-import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowRight } from '@phosphor-icons/react';
 import {
   btcToSats,
@@ -14,7 +12,6 @@ import {
 import Button from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
-import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
 import { formatNumber } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
@@ -27,7 +24,7 @@ import QuoteSummaryTile from './quoteSummaryTile';
 const SlippageButton = styled.button`
   display: flex;
   flex-direction: row;
-  column-gap: ${(props) => props.theme.spacing(2)};
+  column-gap: ${(props) => props.theme.space.xxs};
   background: transparent;
   align-items: center;
   ${(props) => props.theme.typography.body_medium_m};
@@ -115,7 +112,6 @@ export default function QuoteSummary({
 }: QuoteSummaryProps) {
   const { t } = useTranslation('translation');
   const theme = useTheme();
-  const { network } = useWalletSelector();
   const { btcFiatRate } = useCoinRates();
 
   const fromUnit =

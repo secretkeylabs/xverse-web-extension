@@ -1,6 +1,6 @@
 import TokenImage from '@components/tokenImage';
 import { CaretDown } from '@phosphor-icons/react';
-import { mapSwapTokenToFungibleToken } from '@screens/swap/utils';
+import { mapSwapTokenToFT } from '@screens/swap/utils';
 import type { FungibleToken, Token } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { useTranslation } from 'react-i18next';
@@ -56,11 +56,7 @@ export default function RouteItem({ label, token, onClick }: RouteItemProps) {
           <TokenImage
             currency={isBtcToken ? 'BTC' : 'FT'}
             fungibleToken={
-              isBtcToken
-                ? undefined
-                : 'principal' in token
-                ? token
-                : mapSwapTokenToFungibleToken(token)
+              isBtcToken ? undefined : 'principal' in token ? token : mapSwapTokenToFT(token)
             }
             showProtocolIcon={false}
             size={20}

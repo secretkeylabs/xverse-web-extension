@@ -14,7 +14,7 @@ export const mapFTProtocolToSwapProtocol = (protocol: FungibleTokenProtocol): Pr
   return protocolMap[protocol];
 };
 
-const mapSwapProtocolToFTProtocol = (protocol: Protocol): FungibleTokenProtocol => {
+export const mapSwapProtocolToFTProtocol = (protocol: Protocol): FungibleTokenProtocol => {
   const protocolMap: Partial<Record<Protocol, FungibleTokenProtocol>> = {
     sip10: 'stacks',
     runes: 'runes',
@@ -23,7 +23,7 @@ const mapSwapProtocolToFTProtocol = (protocol: Protocol): FungibleTokenProtocol 
   return protocolMap[protocol] ?? 'runes';
 };
 
-export const mapSwapTokenToFungibleToken = (token: Token): FungibleToken => ({
+export const mapSwapTokenToFT = (token: Token): FungibleToken => ({
   protocol: mapSwapProtocolToFTProtocol(token.protocol),
   ticker: token.symbol,
   name: token.name ?? token.ticker,

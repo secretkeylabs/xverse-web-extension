@@ -19,13 +19,14 @@ import useCoinRates from '@hooks/queries/useCoinRates';
 import useFeeMultipliers from '@hooks/queries/useFeeMultipliers';
 import useSpamTokens from '@hooks/queries/useSpamTokens';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useHasFeature from '@hooks/useHasFeature';
 import useNotificationBanners from '@hooks/useNotificationBanners';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowUp, Plus } from '@phosphor-icons/react';
 import CoinSelectModal from '@screens/home/coinSelectModal';
-import { getFiatEquivalent, type FungibleToken } from '@secretkeylabs/xverse-core';
+import { FeatureId, type FungibleToken } from '@secretkeylabs/xverse-core';
 import {
   changeShowDataCollectionAlertAction,
   setBrc20ManageTokensAction,
@@ -39,7 +40,7 @@ import SnackBar from '@ui-library/snackBar';
 import type { CurrencyTypes } from '@utils/constants';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
-import { getBalanceAmount } from '@utils/tokens';
+import { sortFtByFiatBalance } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -176,30 +177,7 @@ function Home() {
   const combinedFtList = sip10CoinsList
     .concat(brc20CoinsList)
     .concat(runesCoinsList)
-    .sort((a, b) => {
-      const aFiatAmount = getFiatEquivalent(
-        Number(getBalanceAmount('FT', a)),
-        'FT',
-        BigNumber(stxBtcRate),
-        BigNumber(btcFiatRate),
-        a,
-      );
-      const bFiatAmount = getFiatEquivalent(
-        Number(getBalanceAmount('FT', b)),
-        'FT',
-        BigNumber(stxBtcRate),
-        BigNumber(btcFiatRate),
-        b,
-      );
-      // Handle empty values explicitly
-      if (aFiatAmount === '' && bFiatAmount === '') return 0;
-      if (aFiatAmount === '') return 1;
-      if (bFiatAmount === '') return -1;
-
-      const aAmount = BigNumber(aFiatAmount || 0);
-      const bAmount = BigNumber(bFiatAmount || 0);
-      return aAmount.isLessThan(bAmount) ? 1 : aAmount.isGreaterThan(bAmount) ? -1 : 0;
-    });
+    .sort((a, b) => sortFtByFiatBalance(a, b, stxBtcRate, btcFiatRate));
 
   const showNotificationBanner =
     notificationBannersArr?.length &&
@@ -428,8 +406,9 @@ function Home() {
     dispatch(changeShowDataCollectionAlertAction(false));
   };
 
+  const isCrossChainSwapsEnabled = useHasFeature(FeatureId.CROSS_CHAIN_SWAPS);
   // ledger is disabled for now
-  const showSwaps = !isLedgerAccount(selectedAccount) && network.type === 'Mainnet';
+  const showSwaps = isCrossChainSwapsEnabled && !isLedgerAccount(selectedAccount);
 
   return (
     <>
