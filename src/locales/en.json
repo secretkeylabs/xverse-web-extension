@@ -17,7 +17,7 @@
     "APPLY": "Apply"
   },
   "UNITS": {
-    "SATS_PER_VB": "sats/vByte"
+    "SATS_PER_VB": "sats/vB"
   },
   "LANDING_SCREEN": {
     "BETA": "Beta",
@@ -308,18 +308,21 @@
     "YOU_ARE_TRANSFERRING_TO_YOURSELF": "You are transferring to yourself",
     "COPYRIGHT": "© {{year}} Secret Key Labs Limited",
     "INSUFFICIENT_FUNDS": "Insufficient funds",
-    "RATE_TOO_LOW": "Set fee is below minimum of {{minFee}} Sats/vByte",
-    "RATE_TOO_HIGH": "Set fee is above maximum of {{maxFee}} Sats/vByte",
+    "RATE_TOO_LOW": "Set fee is below minimum of {{minFee}} sats/vB",
+    "RATE_TOO_HIGH": "Set fee is above maximum of {{maxFee}} sats/vB",
     "SPEND_DELEGATED_STX": "You are transferring some STX that is registered for the next stacking cycle. The amount transferred will be subtracted from your current stacking pool delegation, and will not be locked to generate rewards in the next cycle.",
     "INVALID_FEE_RATE": "Invalid fee rate"
   },
   "CONFIRM_TRANSACTION": {
     "SEND": "Confirm Transaction",
+    "CUSTOM": "Custom",
+    "EDIT": "Edit",
+    "NETWORK_FEE": "Network Fee",
     "INDICATION": "You will send",
     "RECIPIENT_ADDRESS": "recipient address",
     "MEMO": "Attached memo",
     "NETWORK": "Network",
-    "FEES": "Network fee",
+    "FEES": "Fees",
     "TRANSACTION": "Transaction",
     "PREVIOUS": "Previous",
     "NEXT": "Next",
@@ -342,7 +345,7 @@
     "SIGN_TRANSACTIONS": "Sign {{count}} transactions",
     "AMOUNT": "Amount",
     "INSUFFICIENT_BALANCE": "Insufficient balance",
-    "YOUR_ADDRESS": "Your address",
+    "YOUR_ADDRESS": "My address",
     "FROM": "From",
     "INPUT": "Inputs",
     "INPUT_AND_OUTPUT": "Inputs & Outputs",
@@ -378,7 +381,7 @@
     "PSBT_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction is invalid and cannot be processed. Please contact the developer of the requesting app for support.",
     "PSBT_INDEX_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction at {{index}} index is invalid and cannot be processed. Please contact the developer of the requesting app for support.",
     "PSBT_CANT_SIGN_ERROR_TITLE": "Failed to sign transaction",
-    "To": "To",
+    "TO": "To",
     "YOU_WILL_TRANSFER": "You will transfer",
     "YOU_WILL_RECEIVE": "You will receive",
     "YOU_WILL_BURN": "You will burn",
@@ -402,6 +405,9 @@
     "HIGH_FEE_WARNING_TEXT": "The estimated transaction fee for this transaction is very high.",
     "UNCONFIRMED_BALANCE_WARNING": "You are spending unconfirmed outputs in this transaction. This may lower the effective fee rate causing delays in transaction confirmation",
     "RUNES_CENOTAPH_WARNING": "This transaction will burn all input Runes. Make sure you trust the requesting app.",
+    "YOU_WILL_SEND": "You will send",
+    "TRANSACTION_DETAILS": "Transaction details",
+    "BTC_TRANSFER_WARNING": "This amount may include the transaction fees & bundle size of the transferred assets.",
     "LEDGER": {
       "CONNECT": {
         "TITLE": "Connect your hardware wallet",
@@ -437,7 +443,7 @@
       "ORDINAL": "Ordinal",
       "RECIPIENT": "Recipient",
       "TO": "To",
-      "YOUR_ADDRESS": "Your address"
+      "YOUR_ADDRESS": "My address"
     },
     "YOUR_ORDINAL_ADDRESS": "Your ordinals address",
     "YOUR_PAYMENT_ADDRESS": "Your payment address",
@@ -462,7 +468,7 @@
     "ADVANCED_SETTING_NONCE_OPTION": "Edit nonce",
     "EDIT_FEE": "Edit Fees",
     "FEE": "Fee",
-    "NETWORK_FEE": "Network fee",
+    "NETWORK_FEE": "Network Fee",
     "FEE_RATE": "Fee Rate",
     "STANDARD": "Regular",
     "HIGH": "Fast",
@@ -678,7 +684,7 @@
     "ACTIVATE_ORDINALS_INFO": "You have Bitcoin Ordinals in your wallet. Would you like to display them? This is an experimental feature. You can change this setting at anytime.",
     "ACTIVATE": "Activate",
     "DENY": "No",
-    "COPIED": "Copied!",
+    "COPIED": "Copied",
     "MINT": "Mint",
     "TRANSFER": "Transfer",
     "DEPLOY": "Deploy",
@@ -1094,7 +1100,7 @@
       "ORDINAL": "Ordinal",
       "RECIPIENT": "Recipient",
       "TO": "To",
-      "YOUR_ADDRESS": "Your address"
+      "YOUR_ADDRESS": "My address"
     },
     "PREVIEW": {
       "SATS": {
@@ -1311,13 +1317,13 @@
     "LESS_THAN_OR_EQUAL_TO": "Less than or equal to",
     "FROM": "From",
     "TO": "To",
-    "YOUR_ADDRESS": "Your address",
+    "YOUR_ADDRESS": "My address",
     "CANCEL": "Cancel",
     "CONFIRM": "Confirm",
     "FEES": "Fees",
     "ROUTE": "Route",
     "COPIED": "Copied",
-    "COPY_YOUR_ADDRESS": "copy your address",
+    "COPY_YOUR_ADDRESS": "Copy my address",
     "ADVANCED_SETTING": "Advanced settings",
     "THIS_IS_A_SPONSORED_TRANSACTION": "This is a sponsored transaction, no transaction fees will be deducted from your account.",
     "SWAP_TRANSACTION_CANNOT_BE_SPONSORED": "Swap transaction cannot be sponsored while you have a pending transaction.",

@@ -1,268 +1,181 @@
-import ActionButton from '@components/button';
-import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useAddressInscription from '@hooks/queries/ordinals/useAddressInscription';
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
-import useSeedVault from '@hooks/useSeedVault';
 import useSelectedAccount from '@hooks/useSelectedAccount';
-import useWalletSelector from '@hooks/useWalletSelector';
-import {
-  ErrorCodes,
-  ResponseError,
-  getBtcFiatEquivalent,
-  isOrdinalOwnedByAccount,
-  signOrdinalSendTransaction,
-  validateBtcAddress,
-  type SignedBtcTx,
-  type UTXO,
-} from '@secretkeylabs/xverse-core';
-import { useMutation } from '@tanstack/react-query';
-import Callout from '@ui-library/callout';
-import { StickyButtonContainer, StyledHeading } from '@ui-library/common.styled';
-import {
-  InputFeedback,
-  isDangerFeedback,
-  type InputFeedbackProps,
-} from '@ui-library/inputFeedback';
-import BigNumber from 'bignumber.js';
+import useTransactionContext from '@hooks/useTransactionContext';
+import type { TransactionSummary } from '@screens/sendBtc/helpers';
+import { AnalyticsEvents, btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
+import { isInOptions, isLedgerAccount } from '@utils/helper';
+import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import styled from 'styled-components';
-import SendLayout from '../../layouts/sendLayout';
+import StepDisplay from './stepDisplay';
+import { Step, getPreviousStep } from './steps';
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  flex-grow: 1;
-`;
-
-const StyledSendTo = styled(StyledHeading)`
-  margin-bottom: ${(props) => props.theme.space.l};
-`;
-
-const InputGroup = styled.div`
-  margin-top: ${(props) => props.theme.spacing(8)}px;
-`;
-
-const Label = styled.label((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_200,
-  display: 'flex',
-  flex: 1,
-}));
-
-const AmountInputContainer = styled.div<{ error: boolean }>((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginTop: props.theme.spacing(4),
-  marginBottom: props.theme.spacing(4),
-  border: props.error
-    ? `1px solid ${props.theme.colors.danger_dark_200}`
-    : `1px solid ${props.theme.colors.white_800}`,
-  backgroundColor: props.theme.colors.elevation_n1,
-  borderRadius: props.theme.radius(1),
-  paddingLeft: props.theme.spacing(5),
-  paddingRight: props.theme.spacing(5),
-  height: 44,
-}));
-
-const InputFieldContainer = styled.div(() => ({
-  flex: 1,
-}));
-
-const InputField = styled.input((props) => ({
-  ...props.theme.typography.body_m,
-  backgroundColor: 'transparent',
-  color: props.theme.colors.white_0,
-  width: '100%',
-  border: 'transparent',
-}));
-
-const ErrorContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(3),
-  marginBottom: props.theme.spacing(12),
-}));
-
-const RowContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-});
-
-const StyledCallout = styled(Callout)`
-  margin-bottom: ${(props) => props.theme.spacing(14)}px;
-`;
-
-function SendOrdinal() {
-  const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
+function SendRuneScreen() {
   const navigate = useNavigate();
-  const btcClient = useBtcClient();
+  const isInOption = isInOptions();
+
+  const context = useTransactionContext();
   const location = useLocation();
   const { id } = useParams();
   const { data: selectedOrdinal } = useAddressInscription(id!);
   const selectedAccount = useSelectedAccount();
-  const { network } = useWalletSelector();
-  const { btcFiatRate } = useCoinRates();
+  const { data: btcFeeRate, isLoading: feeRatesLoading } = useBtcFeeRate();
+  const [currentStep, setCurrentStep] = useState<Step>(Step.SelectRecipient);
+  const [feeRate, setFeeRate] = useState('');
 
-  const { getSeed } = useSeedVault();
-  const [ordinalUtxo, setOrdinalUtxo] = useState<UTXO | undefined>(undefined);
   const [recipientAddress, setRecipientAddress] = useState(location.state?.recipientAddress ?? '');
-  const [recipientError, setRecipientError] = useState<InputFeedbackProps | null>(null);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [transaction, setTransaction] = useState<btcTransaction.EnhancedTransaction | undefined>();
+  const [summary, setSummary] = useState<TransactionSummary | undefined>();
+  const [insufficientFundsError, setInsufficientFundsError] = useState(false);
 
   useResetUserFlow('/send-ordinal');
 
-  const {
-    isLoading,
-    data,
-    error: txError,
-    mutate,
-  } = useMutation<SignedBtcTx | undefined, ResponseError, string>({
-    mutationFn: async (recipient) => {
-      const seedPhrase = await getSeed();
-      const addressUtxos = await btcClient.getUnspentUtxos(selectedAccount.ordinalsAddress);
-      const ordUtxo = addressUtxos.find(
-        (utxo) => `${utxo.txid}:${utxo.vout}` === selectedOrdinal?.output,
-      );
-      setOrdinalUtxo(ordUtxo);
-      if (ordUtxo) {
-        const signedTx = await signOrdinalSendTransaction(
-          recipient,
-          ordUtxo,
-          selectedAccount.btcAddress,
-          Number(selectedAccount.id),
-          seedPhrase,
-          btcClient,
-          network.type,
-          [ordUtxo],
+  useEffect(() => {
+    if (!selectedOrdinal) {
+      return;
+    }
+    if (!feeRate && btcFeeRate && !feeRatesLoading) {
+      setFeeRate(btcFeeRate.regular.toString());
+    }
+  }, [btcFeeRate, feeRatesLoading]);
+
+  useEffect(() => {
+    if (!recipientAddress || !feeRate) {
+      setTransaction(undefined);
+      setSummary(undefined);
+      setInsufficientFundsError(false);
+      return;
+    }
+    let isActiveEffect = true;
+    const generateTxnAndSummary = async () => {
+      setIsLoading(true);
+      setInsufficientFundsError(false);
+      try {
+        const transactionDetails = await btcTransaction.sendOrdinalsWithSplit(
+          context,
+          [{ toAddress: recipientAddress, inscriptionId: id! }],
+          Number(feeRate),
         );
-        return signedTx;
+        if (!isActiveEffect) return;
+        if (!transactionDetails) return;
+        setTransaction(transactionDetails);
+        setSummary(await transactionDetails.getSummary());
+      } catch (e) {
+        if (e instanceof Error) {
+          // don't log the error if it's just an insufficient funds error
+          if (e.message.includes('Insufficient funds')) {
+            setInsufficientFundsError(true);
+          } else {
+            console.error(e);
+          }
+        }
+        setTransaction(undefined);
+        setSummary(undefined);
+      } finally {
+        if (isActiveEffect) {
+          setIsLoading(false);
+        }
       }
-    },
-  });
+    };
+    generateTxnAndSummary();
+    return () => {
+      isActiveEffect = false;
+    };
+  }, [context, recipientAddress, feeRate, id]);
 
-  useEffect(() => {
-    if (txError) {
-      if (Number(txError) === ErrorCodes.InSufficientBalance) {
-        setRecipientError({ variant: 'danger', message: t('ERRORS.INSUFFICIENT_BALANCE') });
-      } else if (Number(txError) === ErrorCodes.InSufficientBalanceWithTxFee) {
-        setRecipientError({ variant: 'danger', message: t('ERRORS.INSUFFICIENT_BALANCE_FEES') });
-      } else {
-        setRecipientError({ variant: 'danger', message: txError.toString() });
-      }
-    }
-  }, [txError, t]);
+  if (!selectedOrdinal) {
+    navigate('/');
+    return null;
+  }
 
-  useEffect(() => {
-    if (data) {
-      navigate(`/nft-dashboard/confirm-ordinal-tx/${selectedOrdinal?.id}`, {
-        state: {
-          signedTxHex: data.signedTx,
-          recipientAddress,
-          fee: data.fee,
-          feePerVByte: data.feePerVByte,
-          fiatFee: getBtcFiatEquivalent(data.fee, BigNumber(btcFiatRate)),
-          total: data.total,
-          fiatTotal: getBtcFiatEquivalent(data.total, BigNumber(btcFiatRate)),
-          ordinalUtxo,
-        },
-      });
+  const handleCancel = () => {
+    if (isLedgerAccount(selectedAccount) && isInOption) {
+      window.close();
+      return;
     }
-  }, [data]);
+    navigate(`/nft-dashboard/ordinal-detail/${selectedOrdinal?.id}`);
+  };
 
   const handleBackButtonClick = () => {
-    navigate(-1);
-  };
-
-  const activeAccountOwnsOrdinal =
-    selectedOrdinal && isOrdinalOwnedByAccount(selectedOrdinal, selectedAccount);
-
-  const validateRecipientAddress = (address: string): boolean => {
-    if (!activeAccountOwnsOrdinal) {
-      setRecipientError({ variant: 'danger', message: t('ERRORS.ORDINAL_NOT_OWNED') });
-      return false;
-    }
-    if (!address) {
-      setRecipientError({ variant: 'danger', message: t('ERRORS.ADDRESS_REQUIRED') });
-      return false;
-    }
-    if (
-      !validateBtcAddress({
-        btcAddress: address,
-        network: network.type,
-      })
-    ) {
-      setRecipientError({ variant: 'danger', message: t('ERRORS.ADDRESS_INVALID') });
-      return false;
-    }
-    if (address === selectedAccount.ordinalsAddress || address === selectedAccount.btcAddress) {
-      setRecipientError({ variant: 'info', message: t('YOU_ARE_TRANSFERRING_TO_YOURSELF') });
-      return true;
-    }
-    setRecipientError(null);
-    return true;
-  };
-
-  const onPressNext = async () => {
-    if (validateRecipientAddress(recipientAddress)) {
-      mutate(recipientAddress);
+    if (currentStep > 0) {
+      setCurrentStep(getPreviousStep(currentStep));
+    } else {
+      handleCancel();
     }
   };
 
-  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    validateRecipientAddress(e.target.value);
-    setRecipientAddress(e.target.value);
+  const calculateFeeForFeeRate = async (desiredFeeRate: number): Promise<number | undefined> => {
+    const transactionDetails = await btcTransaction.sendOrdinalsWithSplit(
+      context,
+      [{ toAddress: recipientAddress, inscriptionId: id! }],
+      desiredFeeRate,
+    );
+    if (!transactionDetails) return;
+    const txSummary = await transactionDetails.getSummary();
+    if (txSummary) return Number(txSummary.fee);
+    return undefined;
   };
 
-  const isNextEnabled = !isDangerFeedback(recipientError) && !!recipientAddress;
+  const handleSubmit = async (ledgerTransport?: Transport) => {
+    try {
+      setIsSubmitting(true);
+      const txnId = await transaction?.broadcast({ ledgerTransport, rbfEnabled: true });
 
-  // hide back button if there is no history
-  const hideBackButton = location.key === 'default';
+      trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
+        protocol: 'runes',
+        action: 'transfer',
+        wallet_type: selectedAccount?.accountType || 'software',
+      });
+
+      navigate('/tx-status', {
+        state: {
+          txid: txnId,
+          currency: 'BTC',
+          error: '',
+          browserTx: isInOption,
+        },
+      });
+    } catch (e) {
+      console.error(e);
+      navigate('/tx-status', {
+        state: {
+          txid: '',
+          currency: 'BTC',
+          error: `${e}`,
+          browserTx: isInOption,
+        },
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleFeeRateChange = (newFeeRate: string) => setFeeRate(newFeeRate);
 
   return (
-    <SendLayout
-      selectedBottomTab="nft"
-      onClickBack={handleBackButtonClick}
-      hideBackButton={hideBackButton}
-    >
-      <Container>
-        <div>
-          <StyledSendTo typography="headline_xs" color="white_0">
-            {t('SEND_TO')}
-          </StyledSendTo>
-          <InputGroup>
-            <RowContainer>
-              <Label>{t('RECIPIENT')}</Label>
-            </RowContainer>
-            <AmountInputContainer error={isDangerFeedback(recipientError)}>
-              <InputFieldContainer>
-                <InputField
-                  value={recipientAddress}
-                  placeholder={t('ORDINAL_RECIPIENT_PLACEHOLDER')}
-                  onChange={handleAddressChange}
-                  autoFocus
-                />
-              </InputFieldContainer>
-            </AmountInputContainer>
-            <ErrorContainer>
-              {recipientError && <InputFeedback {...recipientError} />}
-            </ErrorContainer>
-          </InputGroup>
-          <StyledCallout bodyText={t('MAKE_SURE_THE_RECIPIENT')} />
-        </div>
-        <StickyButtonContainer>
-          <ActionButton
-            text={t('NEXT')}
-            disabled={!isNextEnabled}
-            processing={isLoading}
-            onPress={onPressNext}
-          />
-        </StickyButtonContainer>
-      </Container>
-    </SendLayout>
+    <StepDisplay
+      ordinal={selectedOrdinal}
+      summary={summary}
+      currentStep={currentStep}
+      setCurrentStep={setCurrentStep}
+      recipientAddress={recipientAddress}
+      setRecipientAddress={setRecipientAddress}
+      insufficientFunds={insufficientFundsError}
+      feeRate={feeRate}
+      setFeeRate={handleFeeRateChange}
+      getFeeForFeeRate={calculateFeeForFeeRate}
+      onBack={handleBackButtonClick}
+      onCancel={handleCancel}
+      onConfirm={handleSubmit}
+      isLoading={isLoading}
+      isSubmitting={isSubmitting}
+    />
   );
 }
 
-export default SendOrdinal;
+export default SendRuneScreen;

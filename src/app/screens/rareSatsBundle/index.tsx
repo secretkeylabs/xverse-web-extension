@@ -239,7 +239,7 @@ function RareSatsBundle() {
         <PageHeader isGalleryOpen={isGalleryOpen}>
           {isGalleryOpen && (
             <BackButtonContainer>
-              <Button onClick={handleBackButtonClick}>
+              <Button data-testid="back-button" onClick={handleBackButtonClick}>
                 <>
                   <ButtonImage src={ArrowLeft} />
                   <AssetDetailButtonText>{goBackText}</AssetDetailButtonText>

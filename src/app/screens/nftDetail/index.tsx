@@ -198,7 +198,7 @@ function NftDetailScreen() {
     <GalleryScrollContainer>
       <GalleryContainer>
         <BackButtonContainer>
-          <BackButton onClick={handleBackButtonClick}>
+          <BackButton data-testid="back-button" onClick={handleBackButtonClick}>
             <>
               <ArrowLeft weight="regular" size="20" color="white" />
               <AssetDeatilButtonText>{t('MOVE_TO_ASSET_DETAIL')}</AssetDeatilButtonText>
@@ -232,7 +232,7 @@ function NftDetailScreen() {
     <GalleryScrollContainer>
       <GalleryContainer>
         <BackButtonContainer>
-          <BackButton onClick={handleBackButtonClick}>
+          <BackButton data-testid="back-button" onClick={handleBackButtonClick}>
             <ArrowLeft weight="regular" size="20" color="white" />
             <AssetDeatilButtonText>{t('MOVE_TO_ASSET_DETAIL')}</AssetDeatilButtonText>
           </BackButton>

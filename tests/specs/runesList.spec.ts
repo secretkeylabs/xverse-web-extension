@@ -1,8 +1,6 @@
 import { expect, test } from '../fixtures/base';
-import Onboarding from '../pages/onboarding';
 import Wallet from '../pages/wallet';
 
-const strongPW = Onboarding.generateSecurePasswordCrypto();
 const price1 = (Math.random() + 1).toFixed(4);
 const runeName = 'SKIBIDI•OHIO•RIZZ';
 
@@ -11,11 +9,8 @@ test.describe('List runes', () => {
     page,
     extensionId,
   }) => {
-    const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
-    await onboardingpage.restoreWallet(strongPW, 'SEED_WORDS1');
-    await page.goto(`chrome-extension://${extensionId}/popup.html`);
-    await wallet.checkVisualsStartpage();
+    await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
     // get own BTC  & Ordinals Address for address check on review page
     await wallet.allupperButtons.nth(1).click();
@@ -151,11 +146,8 @@ test.describe('List runes', () => {
   });
 
   test('List one rune custom price mainnet #localexecution', async ({ page, extensionId }) => {
-    const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
-    await onboardingpage.restoreWallet(strongPW, 'SEED_WORDS1');
-    await page.goto(`chrome-extension://${extensionId}/popup.html`);
-    await wallet.checkVisualsStartpage();
+    await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
     // get own BTC  & Ordinals Address for address check on review page
     await wallet.allupperButtons.nth(1).click();

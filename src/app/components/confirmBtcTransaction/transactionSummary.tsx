@@ -30,13 +30,21 @@ import { getNetAmount, isScriptOutput } from './utils';
 
 const Container = styled.div((props) => ({
   background: props.theme.colors.elevation1,
-  borderRadius: 12,
-  padding: '12px 16px',
-  marginBottom: 12,
+  borderRadius: props.theme.radius(2),
+  padding: props.theme.space.m,
+  paddingBottom: 20,
+  marginBottom: props.theme.space.s,
 }));
 
 const WarningCallout = styled(Callout)`
   margin-bottom: ${(props) => props.theme.space.m};
+`;
+
+const Subtitle = styled.p`
+  ${(props) => props.theme.typography.body_medium_m};
+  color: ${(props) => props.theme.colors.white_200};
+  margin-top: ${(props) => props.theme.space.s};
+  margin-bottom: ${(props) => props.theme.space.xs};
 `;
 
 type Props = {
@@ -80,6 +88,12 @@ function TransactionSummary({
   const { data: recommendedFees } = useBtcFeeRate();
 
   const hasOutputScript = outputs.some((output) => isScriptOutput(output));
+
+  // TODO - move logic into core
+  const hasExternalInputs = inputs.some(
+    (input) =>
+      input.extendedUtxo.address !== btcAddress && input.extendedUtxo.address !== ordinalsAddress,
+  );
 
   const netAmount = getNetAmount({
     inputs,
@@ -127,6 +141,7 @@ function TransactionSummary({
       <TransferSection
         outputs={outputs}
         inputs={inputs}
+        hasExternalInputs={hasExternalInputs}
         transactionIsFinal={transactionIsFinal}
         runeTransfers={runeSummary?.transfers}
         onShowInscription={setInscriptionToShow}
@@ -134,6 +149,7 @@ function TransactionSummary({
       />
       <ReceiveSection
         outputs={outputs}
+        hasExternalInputs={hasExternalInputs}
         transactionIsFinal={transactionIsFinal}
         onShowInscription={setInscriptionToShow}
         netAmount={netAmount}
@@ -142,9 +158,12 @@ function TransactionSummary({
       {!hasRuneDelegation && <BurnSection burns={runeSummary?.burns} />}
       <MintSection mints={[runeSummary?.mint]} />
       <EtchSection etch={(runeSummary as RuneSummaryActions)?.etch} />
+
+      <Subtitle>{t('TRANSACTION_DETAILS')}</Subtitle>
+
+      <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
       <TxInOutput inputs={inputs} outputs={outputs} />
       {hasOutputScript && !runeSummary && <WarningCallout bodyText={t('SCRIPT_OUTPUT_TX')} />}
-      <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
       {feeOutput && !showFeeSelector && (
         <TransferFeeView
           fee={new BigNumber(feeOutput.amount)}
@@ -155,29 +174,32 @@ function TransactionSummary({
         />
       )}
       {feeOutput && showFeeSelector && (
-        <Container>
-          <SelectFeeRate
-            fee={feeOutput.amount.toString()}
-            feeUnits="Sats"
-            feeRate={feeRate.toString()}
-            feeRateUnits={tUnits('SATS_PER_VB')}
-            setFeeRate={(newFeeRate) => onFeeRateSet(+newFeeRate)}
-            baseToFiat={satsToFiat}
-            fiatUnit={fiatCurrency}
-            getFeeForFeeRate={getFeeForFeeRate}
-            feeRates={{
-              medium: recommendedFees?.regular,
-              high: recommendedFees?.priority,
-            }}
-            feeRateLimits={recommendedFees?.limits}
-            isLoading={isSubmitting}
-          />
-          <AmountWithInscriptionSatribute
-            inscriptions={feeOutput.inscriptions}
-            satributes={feeOutput.satributes}
-            onShowInscription={setInscriptionToShow}
-          />
-        </Container>
+        <>
+          <Subtitle>{t('FEES')}</Subtitle>
+          <Container>
+            <SelectFeeRate
+              fee={feeOutput.amount.toString()}
+              feeUnits="sats"
+              feeRate={feeRate.toString()}
+              feeRateUnits={tUnits('SATS_PER_VB')}
+              setFeeRate={(newFeeRate) => onFeeRateSet(+newFeeRate)}
+              baseToFiat={satsToFiat}
+              fiatUnit={fiatCurrency}
+              getFeeForFeeRate={getFeeForFeeRate}
+              feeRates={{
+                medium: recommendedFees?.regular,
+                high: recommendedFees?.priority,
+              }}
+              feeRateLimits={recommendedFees?.limits}
+              isLoading={isSubmitting}
+            />
+            <AmountWithInscriptionSatribute
+              inscriptions={feeOutput.inscriptions}
+              satributes={feeOutput.satributes}
+              onShowInscription={setInscriptionToShow}
+            />
+          </Container>
+        </>
       )}
     </>
   );

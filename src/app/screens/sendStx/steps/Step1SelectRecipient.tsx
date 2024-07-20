@@ -27,6 +27,7 @@ type InputFeedback = {
 };
 
 type Props = {
+  dataTestID?: string;
   recipientAddress: string;
   setRecipientAddress: (address: string) => void;
   setRecipientDomain: (address: string) => void;
@@ -38,6 +39,7 @@ type Props = {
 };
 
 function Step1SelectRecipient({
+  dataTestID,
   recipientAddress,
   setRecipientAddress,
   setRecipientDomain,
@@ -129,6 +131,7 @@ function Step1SelectRecipient({
   const inputElement = (
     <>
       <RecipientInput
+        data-testid={dataTestID}
         title={t('RECIPIENT')}
         placeholder={t('RECIPIENT_PLACEHOLDER')}
         value={recipient}

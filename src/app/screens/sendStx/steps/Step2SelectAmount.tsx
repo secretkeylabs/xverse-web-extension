@@ -235,6 +235,7 @@ function Step2SelectAmount({
         )}
         {!hasStx && (
           <Callout
+            dataTestID="no-funds-message"
             titleText={t('BTC.NO_FUNDS_TITLE')}
             bodyText={t('BTC.NO_FUNDS')}
             redirectText={t('STX.BUY_STX')}

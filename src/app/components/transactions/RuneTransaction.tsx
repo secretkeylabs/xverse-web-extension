@@ -65,7 +65,7 @@ export default function RuneTransactionHistoryItem({
   }, []);
 
   return (
-    <TransactionContainer onClick={openBtcTxStatusLink}>
+    <TransactionContainer data-testid="transaction-container" onClick={openBtcTxStatusLink}>
       <TransactionStatusIcon transaction={transaction} currency={currency} protocol={protocol} />
       <TransactionInfoContainer>
         <TransactionRow>
@@ -73,7 +73,7 @@ export default function RuneTransactionHistoryItem({
             <TransactionTitle transaction={transaction} />
             <TransactionRecipient transaction={transaction} />
           </div>
-          <TransactionAmountContainer>
+          <TransactionAmountContainer data-testid="transaction-amount">
             <TransactionAmount
               transaction={{ ...transaction, amount: ftDecimals(transaction.amount, runeDecimals) }}
               currency={currency}

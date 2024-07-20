@@ -6,7 +6,7 @@ const TEST_ORDINALS_ADDRESS = 'tb1pprpcu07x8fd02keqx9wtfncz99fhg6hepvpw34w9l2lna
 test.describe('Collectibles Tab - Rare sats', () => {
   test('Check rare sats testnet', async ({ page, extensionId }) => {
     const wallet = new Wallet(page);
-    await wallet.setupTestnetTest(extensionId, 'SEED_WORDS1');
+    await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
     // Navigate to Collectibles tab
     await wallet.navigateToCollectibles();
@@ -28,7 +28,7 @@ test.describe('Collectibles Tab - Rare sats', () => {
 
   test('Cancel send rare sats testnet', async ({ page, extensionId }) => {
     const wallet = new Wallet(page);
-    await wallet.setupTestnetTest(extensionId, 'SEED_WORDS1');
+    await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
     // Navigate to Collectibles tab
     await wallet.navigateToCollectibles();
@@ -83,7 +83,7 @@ test.describe('Collectibles Tab - Rare sats', () => {
 
   test('Send rare stats testnet #localexecution', async ({ page, extensionId }) => {
     const wallet = new Wallet(page);
-    await wallet.setupTestnetTest(extensionId, 'SEED_WORDS1');
+    await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
     // Navigate to Collectibles tab
     await wallet.navigateToCollectibles();

@@ -119,7 +119,7 @@ function ConfirmOrdinalTransaction() {
 
   const holdsRareSats = ordinalSatributes?.length > 0;
 
-  const handleOnConfirmClick = (txHex: string) => {
+  const handleConfirmClick = (txHex: string) => {
     if (isLedgerAccount(selectedAccount)) {
       const txType: LedgerTransactionType = 'ORDINALS';
       const state: ConfirmOrdinalsTransactionState = {
@@ -160,7 +160,7 @@ function ConfirmOrdinalTransaction() {
         recipients={[{ address: recipientAddress, amountSats: new BigNumber(0) }]}
         loadingBroadcastedTx={isLoading}
         signedTxHex={signedTxHex}
-        onConfirmClick={handleOnConfirmClick}
+        onConfirmClick={handleConfirmClick}
         onCancelClick={handleBackButtonClick}
         ordinalTxUtxo={ordinalUtxo}
         assetDetail={selectedOrdinal ? selectedOrdinal.number.toString() : ''}
