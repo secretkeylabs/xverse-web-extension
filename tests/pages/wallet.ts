@@ -190,6 +190,8 @@ export default class Wallet {
 
   readonly errorMessageSendSelf: Locator;
 
+  readonly infoMessageSendSelf: Locator;
+
   readonly inputBTCAmount: Locator;
 
   readonly buttonExpand: Locator;
@@ -286,7 +288,7 @@ export default class Wallet {
 
   readonly buttonOpenOrdinalViewer: Locator;
 
-  readonly textValueReviewPage: Locator;
+  readonly numberInscription: Locator;
 
   readonly numberOrdinal: Locator;
 
@@ -312,6 +314,20 @@ export default class Wallet {
 
   readonly listedRunePrice: Locator;
 
+  readonly inputField: Locator;
+
+  readonly buttonEditFee: Locator;
+
+  readonly feeAmount: Locator;
+
+  readonly transactionHistoryInfo: Locator;
+
+  readonly buttonReceive: Locator;
+
+  readonly sendRuneAmount: Locator;
+
+  readonly buttonInsufficientFunds: Locator;
+
   constructor(readonly page: Page) {
     this.page = page;
     this.navigationDashboard = page.getByTestId('nav-dashboard');
@@ -330,6 +346,8 @@ export default class Wallet {
     this.buttonDenyDataCollection = page.getByRole('button', { name: 'Deny' });
     this.labelBalanceAmountSelector = page.getByTestId('balance-label');
     this.buttonClose = page.getByRole('button', { name: 'Close' });
+    this.buttonEditFee = page.getByTestId('fee-button');
+    this.feeAmount = page.getByTestId('fee-amount');
 
     // Account
     this.labelAccountName = page.getByLabel('Account Name');
@@ -386,6 +404,7 @@ export default class Wallet {
     this.coinBalance = page.getByTestId('coin-balance');
     this.containerTransactionHistory = page.getByTestId('transaction-container');
     this.transactionHistoryAmount = page.getByTestId('transaction-amount');
+    this.transactionHistoryInfo = page.getByTestId('transaction-info');
     this.buttonCoinContract = page.getByTestId('coin-contract-button');
     this.coinContractContainer = page.getByTestId('coin-contract-container');
     this.coinContractAddress = page.getByTestId('coin-contract-address');
@@ -419,12 +438,13 @@ export default class Wallet {
     this.itemCollection = page.getByTestId('collection-item');
     this.buttonSend = page.getByRole('button', { name: 'Send' });
     this.buttonShare = page.getByRole('button', { name: 'Share' });
+    this.buttonReceive = page.getByRole('button', { name: 'Receive', exact: true });
     this.buttonOpenOrdinalViewer = page.getByRole('button', { name: 'Open in Ordinal Viewer' });
     this.labelSatsValue = page.locator('h1').filter({ hasText: 'Sats value' });
     this.labelOwnedBy = page.locator('h1').filter({ hasText: 'Owned by' });
     this.labelRareSats = page.locator('p').filter({ hasText: 'Rare Sats' });
     this.buttonSupportRarity = page.getByRole('button', { name: 'See supported rarity scale' });
-    this.textValueReviewPage = page.getByTestId('value-text');
+    this.numberInscription = page.getByTestId('inscription-number');
     this.numberOrdinal = page.getByTestId('ordinal-number');
 
     // Explore
@@ -451,6 +471,7 @@ export default class Wallet {
     this.buttonContinue = page.getByRole('button', { name: 'Continue' });
     this.buttonDetails = page.getByRole('button', { name: 'Details' });
     this.buttonInsufficientBalance = page.getByRole('button', { name: 'Insufficient balance' });
+    this.buttonInsufficientFunds = page.getByRole('button', { name: 'Insufficient funds' });
     this.imageToken = page.getByTestId('token-image');
     this.swapTokenBalance = page.getByTestId('swap-token-balance');
     this.textUSD = page.getByTestId('usd-text');
@@ -466,6 +487,9 @@ export default class Wallet {
     this.errorMessageAddressRequired = page
       .locator('p')
       .filter({ hasText: 'Recipient address is required' });
+    this.infoMessageSendSelf = page
+      .locator('p')
+      .filter({ hasText: 'You are transferring to yourself' });
     this.errorMessageSendSelf = page.locator('p').filter({ hasText: 'Cannot send to self' });
     this.errorInsufficientBalance = page.locator('p').filter({ hasText: 'Insufficient balance' });
     this.errorInsufficientFunds = page.locator('p').filter({ hasText: 'Insufficient funds' });
@@ -483,6 +507,9 @@ export default class Wallet {
     this.buttonSign = page.getByRole('button', { name: 'Sign' });
     this.sendTransactionID = page.getByTestId('transaction-id');
     this.sendSTXValue = page.getByTestId('send-value');
+    this.inputField = page.locator('input[type="text"]');
+    this.sendRuneAmount = page.getByTestId('send-rune-amount');
+    //
 
     // List
     this.buttonList = page.getByTestId('action-button').filter({ hasText: 'List' });
@@ -519,14 +546,18 @@ export default class Wallet {
     this.infoTextStacking = page.locator('h1').filter({ hasText: 'STX with other stackers' });
   }
 
-  // Helper function to restore the wallet and switch it to testnet
-  async setupTestnetTest(extensionId, wallet) {
+  // Helper function to restore the wallet, switch to testnet if parameter is true and navigate to dashboard
+  async setupTest(extensionId, wallet, testnet) {
     const onboardingpage = new Onboarding(this.page);
     await onboardingpage.restoreWallet(strongPW, wallet);
     await this.page.goto(`chrome-extension://${extensionId}/popup.html`);
     await this.checkVisualsStartpage();
-    await this.navigationSettings.click();
-    await this.switchtoTestnetNetwork();
+    if (testnet) {
+      await this.navigationSettings.click();
+      await this.switchtoTestnetNetwork();
+      await this.navigationDashboard.click();
+      await this.checkVisualsStartpage('testnet');
+    }
   }
 
   async checkVisualsStartpage(network?: string) {
@@ -567,15 +598,122 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(await this.divTokenRow.count()).toBeGreaterThan(1);
   }
 
-  async checkVisualsSendSTXPage() {
+  async checkVisualsSendSTXPage1() {
     await expect(this.page.url()).toContain('send-stx');
     await expect(this.buttonNext).toBeVisible();
     await expect(this.buttonNext).toBeDisabled();
-    // await expect(this.inputSendAmount).toBeVisible();
-    await expect(this.inputRecipientAdress).toBeVisible();
-    await expect(this.inputMemo).toBeVisible();
+    // Receiver Address
+    await expect(this.inputField.first()).toBeVisible();
+    // Memo
+    await expect(this.inputField.last()).toBeVisible();
     await expect(this.imageToken).toBeVisible();
+    // await expect(this.buttonBack).toBeVisible();
+  }
+
+  async checkVisualsSendSTXPage2() {
+    await expect(this.page.url()).toContain('send-stx');
+    await expect(this.buttonNext).toBeVisible();
+    await expect(this.buttonNext).toBeDisabled();
+    // STX amount
+    await expect(this.inputField.first()).toBeVisible();
+    await expect(this.labelBalanceAmountSelector).toBeVisible();
+    // Edit Fee
+    await expect(this.buttonEditFee).toBeVisible();
+    await expect(this.feeAmount).toBeVisible();
+    await expect(this.imageToken).toBeVisible();
+    // await expect(this.buttonBack).toBeVisible();
+  }
+
+  async checkVisualsSendSTXPage3() {
+    await expect(this.page.url()).toContain('confirm-stx-tx');
+    await expect(this.buttonConfirm).toBeVisible();
+    await expect(this.buttonCancel).toBeVisible();
+    await expect(this.receiveAddress).toBeVisible();
+    await expect(this.confirmAmount).toBeVisible();
+    await expect(this.buttonEditFee).toBeVisible();
+    await expect(this.feeAmount).toBeVisible();
     await expect(this.buttonBack).toBeVisible();
+  }
+
+  async checkVisualsSendInscriptionsPage2(ordinalAddress, ordinalNumber) {
+    await expect(this.confirmTotalAmount).toBeVisible();
+    await expect(this.confirmCurrencyAmount).toBeVisible();
+    await expect(this.buttonExpand).toBeVisible();
+    await expect(this.buttonCancel).toBeEnabled();
+    await expect(this.buttonConfirm).toBeEnabled();
+    await expect(this.buttonEditFee).toBeVisible();
+    await expect(this.feeAmount).toBeVisible();
+    await expect(this.imageToken).toBeVisible();
+
+    await this.buttonExpand.click();
+    await expect(this.sendAddress.first()).toBeVisible();
+    await expect(this.receiveAddress.first()).toBeVisible();
+    await expect(this.confirmAmount.first()).toBeVisible();
+    await expect(this.confirmBalance.first()).toBeVisible();
+    await expect(await this.receiveAddress.first().innerText()).toContain(ordinalAddress.slice(-4));
+
+    // Check if the right ordinal number is shown
+    const reviewNumberOrdinal = await this.numberInscription.first().innerText();
+    await expect(ordinalNumber).toMatch(reviewNumberOrdinal);
+  }
+
+  async checkVisualsSendPage1(url) {
+    await expect(this.page.url()).toContain(url);
+    await expect(this.buttonNext).toBeVisible();
+    await expect(this.buttonNext).toBeDisabled();
+    // Receiver Address
+    await expect(this.receiveAddress).toBeVisible();
+    await expect(this.imageToken).toBeVisible();
+    // await expect(this.buttonBack).toBeVisible();
+  }
+
+  async checkVisualsSendPage2(url) {
+    await expect(this.page.url()).toContain(url);
+    await expect(this.buttonNext).toBeVisible();
+    await expect(this.buttonNext).toBeDisabled();
+    // Send amount field
+    await expect(this.inputSendAmount).toBeVisible();
+    await expect(this.labelBalanceAmountSelector).toBeVisible();
+    // Edit Fee
+    await expect(this.buttonEditFee).toBeVisible();
+    await expect(this.feeAmount).toBeVisible();
+    await expect(this.imageToken).toBeVisible();
+    // await expect(this.buttonBack).toBeVisible();
+  }
+
+  async checkVisualsSendTransactionReview(url, sendAddress, receiverAddress) {
+    await expect(this.page.url()).toContain(url);
+    await expect(this.confirmTotalAmount).toBeVisible();
+    await expect(this.confirmCurrencyAmount).toBeVisible();
+    await expect(this.buttonExpand).toBeVisible();
+    await expect(this.buttonCancel).toBeEnabled();
+    await expect(this.buttonConfirm).toBeEnabled();
+    await expect(this.buttonEditFee).toBeVisible();
+    await expect(this.feeAmount).toBeVisible();
+    await expect(this.imageToken.first()).toBeVisible();
+
+    await this.buttonExpand.click();
+    await expect(this.sendAddress.first()).toBeVisible();
+    await expect(this.receiveAddress.first()).toBeVisible();
+    await expect(this.confirmAmount.first()).toBeVisible();
+    await expect(this.confirmBalance.first()).toBeVisible();
+    await expect(await this.sendAddress.first().innerText()).toContain(sendAddress.slice(-4));
+    await expect(await this.receiveAddress.first().innerText()).toContain(
+      receiverAddress.slice(-4),
+    );
+  }
+
+  // Check Visuals of Rune Dashboard (without List button), return balance amount
+  async checkVisualsRunesDashboard(runeName) {
+    await expect(this.imageToken.first()).toBeVisible();
+    await expect(this.textCoinTitle).toBeVisible();
+    await expect(await this.textCoinTitle).toContainText(runeName);
+    await expect(this.coinBalance).toBeVisible();
+    await expect(this.buttonReceive).toBeVisible();
+    await expect(this.buttonSend).toBeVisible();
+    const originalBalanceText = await this.coinBalance.innerText();
+    const numericOriginalValue = parseFloat(originalBalanceText.replace(/[^\d.-]/g, ''));
+    return numericOriginalValue;
   }
 
   async checkVisualsListRunesPage() {
@@ -598,6 +736,13 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(this.runeContainer.first()).toBeVisible();
   }
 
+  async invalidAdressCheck(adressfield) {
+    await adressfield.fill(`Test Address 123`);
+    await this.buttonNext.click();
+    await expect(this.errorMessageAddressInvalid).toBeVisible();
+    await expect(this.buttonNext).toBeDisabled();
+  }
+
   async navigateToCollectibles() {
     await this.navigationNFT.click();
     await expect(this.page.url()).toContain('nft-dashboard');
@@ -612,25 +757,19 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
 
   // had to disable this rule as my first assertion was always changed to a wrong assertion
   /* eslint-disable playwright/prefer-web-first-assertions */
-  async checkAmountsSendingSTX(amountSTXSend, STXTest) {
+  async checkAmountsSendingSTX(amountSTXSend, STXTest, sendFee) {
     await expect(await this.receiveAddress.first().innerText()).toContain(STXTest.slice(-4));
 
     // Sending amount without Fee
     const sendAmount = await this.confirmAmount.first().innerText();
     const numericValueSendAmount = parseFloat(sendAmount.replace(/[^0-9.]/g, ''));
 
-    await await expect(numericValueSendAmount).toEqual(amountSTXSend);
+    await expect(numericValueSendAmount).toEqual(amountSTXSend);
 
     // Fees
-    const fee = await this.sendSTXValue.first().innerText();
+    const fee = await this.feeAmount.innerText();
     const numericValueFee = parseFloat(fee.replace(/[^0-9.]/g, ''));
-
-    // total amount (amount + fees)
-    const totalAmount = await this.sendSTXValue.last().innerText();
-    const numericValuetotalAmount = parseFloat(totalAmount.replace(/[^0-9.]/g, ''));
-
-    const roundedResult = Number((numericValueSendAmount + numericValueFee).toFixed(9));
-    await expect(numericValuetotalAmount).toEqual(roundedResult);
+    await expect(numericValueFee).toEqual(sendFee);
   }
 
   /* eslint-disable playwright/prefer-web-first-assertions */

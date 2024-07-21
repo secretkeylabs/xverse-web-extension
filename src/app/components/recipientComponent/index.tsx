@@ -226,6 +226,7 @@ function RecipientComponent({
             <div>
               <TitleText>{title}</TitleText>
               {currencyType === 'BTC' && <Subtitle typography="body_medium_s">Bitcoin</Subtitle>}
+              {currencyType === 'STX' && <Subtitle typography="body_medium_s">Stacks</Subtitle>}
             </div>
           </TitleContainer>
           {currencyType === 'NFT' || currencyType === 'Ordinal' || currencyType === 'RareSat' ? (

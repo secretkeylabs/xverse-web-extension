@@ -198,7 +198,7 @@ function NftCollection() {
         <PageHeader isGalleryOpen={isGalleryOpen}>
           {isGalleryOpen && (
             <BackButtonContainer>
-              <BackButton onClick={handleBackButtonClick}>
+              <BackButton data-testid="back-button" onClick={handleBackButtonClick}>
                 <>
                   <ArrowLeft weight="regular" size="20" color="white" />
                   <AssetDetailButtonText data-testid="back">

@@ -688,7 +688,7 @@ function OrdinalDetailScreen() {
     <GalleryScrollContainer>
       <GalleryContainer>
         <BackButtonContainer>
-          <Button onClick={handleBackButtonClick}>
+          <Button data-testid="back-to-gallery" onClick={handleBackButtonClick}>
             <>
               <ButtonImage src={ArrowLeft} />
               <AssetDeatilButtonText>{backButtonText}</AssetDeatilButtonText>
@@ -722,7 +722,7 @@ function OrdinalDetailScreen() {
     <GalleryScrollContainer>
       <GalleryContainer>
         <BackButtonContainer>
-          <Button onClick={handleBackButtonClick}>
+          <Button data-testid="back-button" onClick={handleBackButtonClick}>
             <>
               <ButtonImage src={ArrowLeft} />
               <AssetDeatilButtonText>{backButtonText}</AssetDeatilButtonText>

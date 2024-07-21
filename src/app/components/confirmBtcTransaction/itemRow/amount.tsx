@@ -3,7 +3,6 @@ import TokenImage from '@components/tokenImage';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core';
-import Avatar from '@ui-library/avatar';
 import { StyledP } from '@ui-library/common.styled';
 import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +15,7 @@ const RowCenter = styled.div<{ spaceBetween?: boolean }>((props) => ({
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: props.spaceBetween ? 'space-between' : 'initial',
-  columnGap: props.theme.space.xs,
+  columnGap: props.theme.space.m,
 }));
 
 const NumberTypeContainer = styled.div`
@@ -45,9 +44,7 @@ export default function Amount({ amount }: Props) {
 
   return (
     <RowCenter>
-      <div>
-        <Avatar src={<TokenImage currency="BTC" loading={false} size={32} />} />
-      </div>
+      <TokenImage currency="BTC" loading={false} size={32} />
       <RowCenter spaceBetween>
         <div>
           <StyledP typography="body_medium_m" color="white_0">

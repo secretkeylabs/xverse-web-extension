@@ -138,7 +138,7 @@ function SelectFeeRate({
           displayType="text"
           thousandSeparator
           renderText={(value: string) => (
-            <Label $size="m" $variant="light">
+            <Label data-testid="fee-amount" $size="m" $variant="light">
               {value} {feeUnits}
             </Label>
           )}
@@ -152,6 +152,7 @@ function SelectFeeRate({
             </Label>
           )}
           <Label
+            data-testid="fee-button"
             $size="m"
             $variant="action"
             $clickable={!isLoading}
@@ -162,7 +163,7 @@ function SelectFeeRate({
         </EditRow>
         {/* Fee can either be an absolute amount or a rate */}
         {/* If feeRateUnits is not defined, therefore an absolute fee is used */}
-        {feeRateUnits && (
+        {feeRateUnits ? (
           <Label $size="s" $variant="dark">
             <NumericFormat
               value={feeRate}
@@ -175,17 +176,27 @@ function SelectFeeRate({
               )}
             />
           </Label>
+        ) : (
+          fee && (
+            <StyledFiatAmountText
+              fiatAmount={BigNumber(baseToFiat(fee))}
+              fiatCurrency={fiatUnit as SupportedCurrency}
+            />
+          )
         )}
       </RowContainer>
-      <RowContainer>
-        <div />
-        {fee && (
-          <StyledFiatAmountText
-            fiatAmount={BigNumber(baseToFiat(fee))}
-            fiatCurrency={fiatUnit as SupportedCurrency}
-          />
-        )}
-      </RowContainer>
+      {/* add extra row if contain both feeRateUnits & fees */}
+      {feeRateUnits && fee && (
+        <RowContainer>
+          <div />
+          {fee && (
+            <StyledFiatAmountText
+              fiatAmount={BigNumber(baseToFiat(fee))}
+              fiatCurrency={fiatUnit as SupportedCurrency}
+            />
+          )}
+        </RowContainer>
+      )}
       {editing && (
         <FeeSelectPopup
           currentFeeRate={feeRate}

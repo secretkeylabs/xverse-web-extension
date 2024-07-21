@@ -1,3 +1,4 @@
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { StyledCallout } from '@screens/createInscription/index.styled';
 import { validateBtcAddress } from '@secretkeylabs/xverse-core';
@@ -41,27 +42,40 @@ function RecipientSelector({
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { network } = useWalletSelector();
   const [addressIsValid, setAddressIsValid] = useState(true);
+  const [toOwnAddress, setToOwnAddress] = useState(false);
   const [displayInsufficientFunds, setDisplayInsufficientFunds] = useState(false);
+  const selectedAccount = useSelectedAccount();
 
   const handleNext = () => {
     if (insufficientFunds) {
       setDisplayInsufficientFunds(true);
       return;
     }
-    if (validateBtcAddress({ btcAddress: recipientAddress, network: network.type })) {
-      onNext();
-    } else {
+    if (!validateBtcAddress({ btcAddress: recipientAddress, network: network.type })) {
       setAddressIsValid(false);
+      return;
     }
+    onNext();
   };
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRecipientAddress(e.target.value);
+    setToOwnAddress(
+      [selectedAccount.btcAddress, selectedAccount.ordinalsAddress].includes(e.target.value),
+    );
     setAddressIsValid(true);
     setDisplayInsufficientFunds(false);
   };
 
   const inputFeedback = useMemo(() => {
+    if (toOwnAddress) {
+      return [
+        {
+          variant: 'info' as const,
+          message: t('YOU_ARE_TRANSFERRING_TO_YOURSELF'),
+        },
+      ];
+    }
     if (!addressIsValid) {
       return [
         {
@@ -78,7 +92,7 @@ function RecipientSelector({
         },
       ];
     }
-  }, [addressIsValid, displayInsufficientFunds]);
+  }, [addressIsValid, displayInsufficientFunds, toOwnAddress]);
 
   return (
     <Container>

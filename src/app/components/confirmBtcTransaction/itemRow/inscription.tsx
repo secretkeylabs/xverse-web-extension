@@ -34,7 +34,7 @@ const NumberTypeContainer = styled.div`
 `;
 
 const AvatarContainer = styled.div`
-  margin-right: ${(props) => props.theme.space.xs};
+  margin-right: ${(props) => props.theme.space.m};
 `;
 
 const InscriptionNumber = styled(StyledP)`
@@ -101,7 +101,11 @@ export default function Inscription({
             }}
           >
             <RowCenter>
-              <InscriptionNumber typography="body_medium_m" color="white_0">
+              <InscriptionNumber
+                data-testid="inscription-number"
+                typography="body_medium_m"
+                color="white_0"
+              >
                 {inscription.number}
               </InscriptionNumber>
               <Eye color={Theme.colors.white_0} size={20} weight="fill" />

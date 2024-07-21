@@ -93,7 +93,7 @@ export default function StxTransferTransaction({
       <TransactionStatusIcon transaction={transaction} currency="STX" />
       <TransactionInfoContainer>
         <TransactionRow>
-          <div>
+          <div data-testid="transaction-info">
             <TransactionTitle transaction={transaction} />
             <TransactionRecipient transaction={transaction} />
           </div>
