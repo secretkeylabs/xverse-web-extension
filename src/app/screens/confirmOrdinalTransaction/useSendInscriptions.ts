@@ -6,7 +6,7 @@ import useTransactionContext from '@hooks/useTransactionContext';
 import { RpcErrorCode, sendInscriptionsSchema } from '@sats-connect/core';
 import { type TransactionSummary } from '@screens/sendBtc/helpers';
 import { btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as v from 'valibot';
 
 const useSendInscriptionsRequest = () => {
@@ -42,29 +42,25 @@ const useSendInscriptions = () => {
   const { data: btcFeeRates } = useBtcFeeRate();
   const txContext = useTransactionContext();
 
-  const generateTransferTxAndSummary = useCallback(
-    async (desiredFeeRate: number) => {
-      const tx = await btcTransaction.sendOrdinalsWithSplit(
-        txContext,
-        transfers.map((transfer) => ({
-          toAddress: transfer.address,
-          inscriptionId: transfer.inscriptionId,
-        })),
-        Number(desiredFeeRate),
-      );
-      const txSummary = await tx.getSummary();
-      return { tx, txSummary };
-    },
-    [transfers, txContext],
-  );
+  const generateTransferTxAndSummary = async (desiredFeeRate: number) => {
+    const tx = await btcTransaction.sendOrdinalsWithSplit(
+      txContext,
+      transfers.map((transfer) => ({
+        toAddress: transfer.address,
+        inscriptionId: transfer.inscriptionId,
+      })),
+      Number(desiredFeeRate),
+    );
+    const txSummary = await tx.getSummary();
+    return { tx, txSummary };
+  };
 
-  const buildTx = useCallback(async () => {
+  const buildTx = async (desiredFeeRate: number | undefined) => {
     try {
+      if (!desiredFeeRate) return;
       setIsLoading(true);
-      const initialFeeRate = +feeRate || btcFeeRates?.priority;
-      if (!initialFeeRate) return;
-      const { tx, txSummary } = await generateTransferTxAndSummary(initialFeeRate);
-      setFeeRate(initialFeeRate.toString());
+      const { tx, txSummary } = await generateTransferTxAndSummary(desiredFeeRate);
+      setFeeRate(desiredFeeRate.toString());
       setTransaction(tx);
       setSummary(txSummary);
     } catch (e) {
@@ -77,8 +73,7 @@ const useSendInscriptions = () => {
     } finally {
       setIsLoading(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [feeRate]);
+  };
 
   const getFeeForFeeRate = async (desiredFeeRate: number): Promise<number | undefined> => {
     const { txSummary } = await generateTransferTxAndSummary(desiredFeeRate);
@@ -88,8 +83,14 @@ const useSendInscriptions = () => {
   };
 
   useEffect(() => {
-    buildTx();
-  }, [buildTx]);
+    let initialFeeRate: number | undefined = Number.parseInt(feeRate, 10);
+    if (Number.isNaN(initialFeeRate)) {
+      initialFeeRate = btcFeeRates?.priority;
+    }
+
+    buildTx(initialFeeRate);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [feeRate, btcFeeRates?.priority]);
 
   const confirmOrdinalsTransferRequest = async (ledgerTransport?: Transport) => {
     try {
