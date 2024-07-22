@@ -6,6 +6,7 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowRight } from '@phosphor-icons/react';
 import {
+  RUNE_DISPLAY_DEFAULTS,
   getBtcFiatEquivalent,
   type ExecuteOrderRequest,
   type FungibleToken,
@@ -175,9 +176,14 @@ export default function QuoteSummary({
   const fromUnit =
     fromToken === 'BTC'
       ? 'Sats'
-      : (fromToken as FungibleToken)?.runeSymbol ?? (fromToken as FungibleToken)?.ticker ?? '⧉';
+      : (fromToken as FungibleToken)?.runeSymbol ??
+        (fromToken as FungibleToken)?.ticker ??
+        RUNE_DISPLAY_DEFAULTS.symbol;
 
-  const toUnit = toToken?.protocol === 'btc' ? 'SATS' : toToken?.symbol ?? toToken?.ticker ?? '⧉';
+  const toUnit =
+    toToken?.protocol === 'btc'
+      ? 'SATS'
+      : toToken?.symbol ?? toToken?.ticker ?? RUNE_DISPLAY_DEFAULTS.symbol;
 
   const [showSlippageModal, setShowSlippageModal] = useState(false);
   const [slippage, setSlippage] = useState(0.05);
