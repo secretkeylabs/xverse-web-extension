@@ -175,9 +175,9 @@ export default function QuoteSummary({
   const fromUnit =
     fromToken === 'BTC'
       ? 'BTC'
-      : (fromToken as FungibleToken)?.runeSymbol || (fromToken as FungibleToken)?.ticker;
+      : (fromToken as FungibleToken)?.runeSymbol ?? (fromToken as FungibleToken)?.ticker ?? '⧉';
 
-  const toUnit = toToken?.protocol === 'btc' ? 'SATS' : toToken?.symbol ?? toToken?.ticker;
+  const toUnit = toToken?.protocol === 'btc' ? 'SATS' : toToken?.symbol ?? toToken?.ticker ?? '⧉';
 
   const [showSlippageModal, setShowSlippageModal] = useState(false);
   const [slippage, setSlippage] = useState(0.05);
