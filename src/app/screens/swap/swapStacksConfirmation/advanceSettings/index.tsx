@@ -1,7 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import TransactionSettingAlert from '@components/transactionSetting';
-import { type SwapConfirmationOutput } from '@screens/swap/swapConfirmation/useConfirmSwap';
+import { type SwapConfirmationOutput } from '@screens/swap/swapStacksConfirmation/useConfirmSwap';
 import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 import { useCallback, useState } from 'react';

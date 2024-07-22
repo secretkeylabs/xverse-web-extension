@@ -4,8 +4,8 @@ import {
   FoldButton,
   TitleContainer,
   TitleText,
-} from '@screens/swap/swapConfirmation/stxInfoBlock';
-import { type SwapConfirmationOutput } from '@screens/swap/swapConfirmation/useConfirmSwap';
+} from '@screens/swap/swapStacksConfirmation/stxInfoBlock';
+import type { SwapConfirmationOutput } from '@screens/swap/swapStacksConfirmation/useConfirmSwap';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';

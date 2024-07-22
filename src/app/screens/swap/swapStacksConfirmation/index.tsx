@@ -3,12 +3,12 @@ import InfoContainer from '@components/infoContainer';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import { Container } from '@screens/home/index.styled';
-import { AdvanceSettings } from '@screens/swap/swapConfirmation/advanceSettings';
-import FeesBlock from '@screens/swap/swapConfirmation/feesBlock';
-import FunctionBlock from '@screens/swap/swapConfirmation/functionBlock';
-import RouteBlock from '@screens/swap/swapConfirmation/routeBlock';
-import StxInfoBlock from '@screens/swap/swapConfirmation/stxInfoBlock';
-import { useConfirmSwap } from '@screens/swap/swapConfirmation/useConfirmSwap';
+import { AdvanceSettings } from '@screens/swap/swapStacksConfirmation/advanceSettings';
+import FeesBlock from '@screens/swap/swapStacksConfirmation/feesBlock';
+import FunctionBlock from '@screens/swap/swapStacksConfirmation/functionBlock';
+import RouteBlock from '@screens/swap/swapStacksConfirmation/routeBlock';
+import StxInfoBlock from '@screens/swap/swapStacksConfirmation/stxInfoBlock';
+import { useConfirmSwap } from '@screens/swap/swapStacksConfirmation/useConfirmSwap';
 import Button from '@ui-library/button';
 import { SUPPORT_URL_TAB_TARGET, SWAP_SPONSOR_DISABLED_SUPPORT_URL } from '@utils/constants';
 import { useCallback, useState } from 'react';
@@ -53,7 +53,7 @@ const StyledInfoContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(4),
 }));
 
-export default function SwapConfirmation() {
+export default function SwapStacksConfirmation() {
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_CONFIRM_SCREEN' });
   const location = useLocation();
   const navigate = useNavigate();
