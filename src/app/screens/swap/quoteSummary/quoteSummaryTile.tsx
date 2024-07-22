@@ -24,6 +24,7 @@ const SmallContainer = styled.div`
 const LeftColumn = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
   margin: 0 ${({ theme }) => theme.space.xs};
   align-items: flex-start;
 `;
@@ -33,10 +34,11 @@ const RightColumn = styled.div`
   flex-direction: column;
   margin: 0 ${({ theme }) => theme.space.xs};
   align-items: flex-end;
+  justify-content: flex-end;
 `;
 
 const FullHeightP = styled(StyledP)`
-  margin-top: 16px;
+  margin-top: ${({ theme }) => theme.space.m};
 `;
 
 const Image = styled.img`
@@ -73,7 +75,10 @@ function QuoteSummaryTile({ fromUnit, toUnit, rate, provider, image, onClick }: 
       </SmallContainer>
       <SmallContainer>
         <RightColumn>
-          <FullHeightP typography="body_medium_m" color="white_0">
+          <FullHeightP
+            typography={rate.length > 7 ? 'body_medium_s' : 'body_medium_m'}
+            color="white_0"
+          >
             1 {fromUnit} ≈ {formatNumber(rate)} {toUnit}
           </FullHeightP>
         </RightColumn>
