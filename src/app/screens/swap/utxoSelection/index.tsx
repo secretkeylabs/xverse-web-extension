@@ -1,9 +1,9 @@
 import TopRow from '@components/topRow';
 import { ArrowClockwise, ArrowRight } from '@phosphor-icons/react';
 import {
-  btcToSats,
   currencySymbolMap,
   getBtcFiatEquivalent,
+  satsToBtc,
   type GetUtxosRequest,
   type MarketUtxo,
   type Token,
@@ -190,10 +190,18 @@ export default function UtxoSelection({
     });
   };
 
-  const totalAmount = Array.from(selectedUtxos).reduce((acc, id) => {
+  const totalRuneAmount = Array.from(selectedUtxos).reduce((acc, id) => {
     const utxo = utxos.find((u) => u.identifier === id);
     if (utxo) {
       return acc.plus(utxo.amount);
+    }
+    return acc;
+  }, new BigNumber(0));
+
+  const totalSatsAmount = Array.from(selectedUtxos).reduce((acc, id) => {
+    const utxo = utxos.find((u) => u.identifier === id);
+    if (utxo) {
+      return acc.plus(utxo.price);
     }
     return acc;
   }, new BigNumber(0));
@@ -247,7 +255,7 @@ export default function UtxoSelection({
                   {t('FROM')}
                 </StyledP>
                 <NumericFormat
-                  value={new BigNumber(amount).toString()}
+                  value={satsToBtc(new BigNumber(totalSatsAmount)).toString()}
                   displayType="text"
                   suffix=" BTC"
                   thousandSeparator
@@ -259,7 +267,7 @@ export default function UtxoSelection({
                 />
                 <NumericFormat
                   value={getBtcFiatEquivalent(
-                    new BigNumber(btcToSats(new BigNumber(amount))),
+                    new BigNumber(new BigNumber(totalSatsAmount)),
                     new BigNumber(btcFiatRate),
                   ).toFixed(2)}
                   displayType="text"
@@ -281,7 +289,7 @@ export default function UtxoSelection({
                   {t('TO')}
                 </StyledP>
                 <NumericFormat
-                  value={totalAmount.toString()}
+                  value={totalRuneAmount.toString()}
                   displayType="text"
                   suffix={` ${toToken?.symbol}`}
                   thousandSeparator
@@ -296,7 +304,7 @@ export default function UtxoSelection({
             <BtnView>
               <Button
                 title={commonT('NEXT')}
-                onClick={() => onNext(totalAmount.toString())}
+                onClick={() => onNext(totalRuneAmount.toString())}
                 variant="primary"
               />
             </BtnView>

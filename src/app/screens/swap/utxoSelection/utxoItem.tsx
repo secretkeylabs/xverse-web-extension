@@ -1,7 +1,8 @@
-import type { MarketUtxo, Token } from '@secretkeylabs/xverse-core';
+import { satsToBtc, type MarketUtxo, type Token } from '@secretkeylabs/xverse-core';
 import Checkbox from '@ui-library/checkbox';
 import { StyledP } from '@ui-library/common.styled';
 import { getTruncatedAddress } from '@utils/helper';
+import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
@@ -10,7 +11,6 @@ const Container = styled.div<{ $selected: boolean }>`
   display: flex;
   align-items: center;
   flex-direction: row;
-  justify-content: space-between;
   flex: 1;
   padding: ${(props) => props.theme.space.s};
   padding-right: ${(props) => props.theme.space.m};
@@ -20,20 +20,6 @@ const Container = styled.div<{ $selected: boolean }>`
   background-color: ${(props) =>
     props.$selected ? props.theme.colors.elevation2 : props.theme.colors.elevation1};
   transition: background-color 0.1s ease, border-color 0.1s ease;
-`;
-
-const InfoContainer = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: ${(props) => props.theme.space.xxxs};
-`;
-
-const SubContainer = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: row;
-  justify-content: space-between;
 `;
 
 const RuneTitle = styled(StyledP)`
@@ -52,10 +38,25 @@ const CheckBoxContainer = styled.div((props) => ({
   marginRight: props.theme.space.s,
 }));
 
-const SizeInfoContainer = styled.div`
+const LeftColumn = styled.div`
   display: flex;
-  align-items: center;
-  column-gap: ${(props) => props.theme.space.xxs};
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1;
+`;
+const RightColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-end;
+  flex: 1;
+`;
+
+const Row = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex: 1;
 `;
 
 type Props = {
@@ -68,6 +69,8 @@ type Props = {
 function UtxoItem({ utxo, selected, token, onSelect }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'COMMON' });
 
+  const satsPerRune = new BigNumber(utxo.price).div(utxo.amount);
+
   return (
     <Container data-testid="utxo-item" $selected={selected}>
       <CheckBoxContainer>
@@ -78,38 +81,49 @@ function UtxoItem({ utxo, selected, token, onSelect }: Props) {
           color="white_400"
         />
       </CheckBoxContainer>
-      <InfoContainer>
-        <NumericFormat
-          value={utxo.amount}
-          displayType="text"
-          suffix={` ${token?.symbol}`}
-          thousandSeparator
-          renderText={(value: string) => (
-            <RuneTitle typography="body_medium_m" color="white_0">
-              {value}
-            </RuneTitle>
-          )}
-        />
-        <SubContainer>
+      <Row>
+        <LeftColumn>
+          <NumericFormat
+            value={utxo.amount}
+            displayType="text"
+            suffix={` ${token?.symbol}`}
+            thousandSeparator
+            renderText={(value: string) => (
+              <RuneTitle typography="body_medium_m" color="white_0">
+                {value}
+              </RuneTitle>
+            )}
+          />
+
           <StyledP typography="body_medium_s" color="white_400">
             {`${getTruncatedAddress(utxo.identifier, 6)}`}
           </StyledP>
-          <SizeInfoContainer>
-            <NumericFormat
-              value={utxo.price}
-              displayType="text"
-              prefix="Size: "
-              suffix={` ${t('SATS')}`}
-              thousandSeparator
-              renderText={(value: string) => (
-                <StyledBundleSub typography="body_medium_s" color="white_400">
-                  {value}
-                </StyledBundleSub>
-              )}
-            />
-          </SizeInfoContainer>
-        </SubContainer>
-      </InfoContainer>
+        </LeftColumn>
+        <RightColumn>
+          <NumericFormat
+            value={satsToBtc(new BigNumber(utxo.price)).toString()}
+            displayType="text"
+            suffix=" BTC"
+            thousandSeparator
+            renderText={(value: string) => (
+              <StyledP typography="body_medium_m" color="white_0">
+                {value}
+              </StyledP>
+            )}
+          />
+          <NumericFormat
+            value={satsPerRune.toFixed(2)}
+            displayType="text"
+            suffix={` ${t('SATS')}/${token?.symbol}`}
+            thousandSeparator
+            renderText={(value: string) => (
+              <StyledP typography="body_medium_s" color="white_400">
+                {value}
+              </StyledP>
+            )}
+          />
+        </RightColumn>
+      </Row>
     </Container>
   );
 }
