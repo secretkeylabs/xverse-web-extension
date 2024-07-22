@@ -1,3 +1,4 @@
+import RoutePaths from 'app/routes/paths';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -16,7 +17,7 @@ const userFlowConfig: Record<string, { resetTo: string }> = {
   '/confirm-inscription-request': { resetTo: '/' },
   '/ordinals-collection': { resetTo: '/nft-dashboard?tab=inscriptions' },
   '/ordinal-detail': { resetTo: '/nft-dashboard?tab=inscriptions' },
-  '/send-ordinal': { resetTo: '/nft-dashboard?tab=inscriptions' },
+  [RoutePaths.SendOrdinal]: { resetTo: '/nft-dashboard?tab=inscriptions' },
   '/confirm-ordinal-tx': { resetTo: '/nft-dashboard?tab=inscriptions' },
   '/nft-collection': { resetTo: '/nft-dashboard?tab=nfts' },
   '/nft-detail': { resetTo: '/nft-dashboard?tab=nfts' },

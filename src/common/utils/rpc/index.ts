@@ -1,6 +1,5 @@
 import { type WebBtcMessage } from '@common/types/message-types';
 import {
-  RpcErrorCode,
   getAccountsMethodName,
   getAddressesMethodName,
   getBalanceMethodName,
@@ -8,6 +7,8 @@ import {
   getWalletTypeMethodName,
   renouncePermissionsMethodName,
   requestPermissionsMethodName,
+  RpcErrorCode,
+  sendInscriptionsMethodName,
   stxSignTransactionMethodName,
   type RpcRequestMessage,
 } from '@sats-connect/core';
@@ -23,6 +24,7 @@ import handleGetBalance from './btc/getBalance';
 import handleGetInfo from './getInfo';
 import { makeRPCError, sendRpcResponse } from './helpers';
 import handleGetInscriptions from './ordinals/getInscriptions';
+import handleSendInscriptions from './ordinals/sendInscriptions';
 import handleEtchRune from './runes/etch';
 import handleGetRunesBalance from './runes/getBalance';
 import handleMintRune from './runes/mint';
@@ -125,6 +127,10 @@ async function handleRPCRequest(message: RpcRequestMessage, port: chrome.runtime
       }
       case 'ord_getInscriptions': {
         await handleGetInscriptions(message, port);
+        break;
+      }
+      case sendInscriptionsMethodName: {
+        await handleSendInscriptions(message, port);
         break;
       }
       case 'runes_mint': {
