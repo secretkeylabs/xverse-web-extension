@@ -9,27 +9,33 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import {
   btcToSats,
   getBtcFiatEquivalent,
+  type ExecuteOrderRequest,
   type FungibleToken,
+  type PlaceOrderResponse,
   type Quote,
   type Token,
   type UtxoQuote,
 } from '@secretkeylabs/xverse-core';
 import Button, { LinkButton } from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
+import SnackBar from '@ui-library/snackBar';
 import { satsToBtcString } from '@utils/helper';
 import { getFtBalance } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import AmountInput from './components/amountInput';
+import PsbtConfimation from './components/psbtConfirmation/psbtConfirmation';
 import RouteItem from './components/routeItem';
 import TokenFromBottomSheet from './components/tokenFromBottomSheet';
 import TokenToBottomSheet from './components/tokenToBottomSheet';
 import QuoteSummary from './quoteSummary';
 import QuotesModal from './quotesModal';
 import {
+  mapFTNativeSwapTokenToTokenBasic,
   mapFTProtocolToSwapProtocol,
   mapSwapProtocolToFTProtocol,
   mapSwapTokenToFT,
@@ -94,6 +100,7 @@ const mapFtToSwapToken = (ft: FungibleToken | 'BTC'): Token => ({
 export default function SwapScreen() {
   const [amount, setAmount] = useState('');
   const [quote, setQuote] = useState<Quote>();
+  const [errorMessage, setErrorMessage] = useState('');
 
   const [getQuotesModalVisible, setGetQuotesModalVisible] = useState(false);
   const [tokenSelectionBottomSheet, setTokenSelectionBottomSheet] = useState<'from' | 'to' | null>(
@@ -103,8 +110,12 @@ export default function SwapScreen() {
   const [toToken, setToToken] = useState<Token | undefined>();
   const [inputError, setInputError] = useState('');
   const [hasQuoteError, setHasQuoteError] = useState(false);
+  const [orderInfo, setOrderInfo] = useState<
+    { order: PlaceOrderResponse; providerCode: ExecuteOrderRequest['providerCode'] } | undefined
+  >();
 
   const { fiatCurrency } = useWalletSelector();
+
   const { unfilteredData } = useRuneFungibleTokensQuery();
   const { data: btcBalance } = useBtcWalletData();
   const { btcFiatRate } = useCoinRates();
@@ -143,19 +154,17 @@ export default function SwapScreen() {
     setGetQuotesModalVisible(true);
   }, [quotes, quotesLoading, quotesError]);
 
+  const amountForQuote = fromToken === 'BTC' ? btcToSats(new BigNumber(amount)).toString() : amount;
+
   const getQuotes = async () => {
-    // fetch quotes here
-    // example
+    if (!fromToken || !toToken) {
+      return;
+    }
+
     fetchQuotes({
-      from: {
-        ticker: fromToken === 'BTC' ? 'BTC' : fromToken?.principal ?? '',
-        protocol: fromToken === 'BTC' ? 'btc' : 'runes',
-      },
-      to: {
-        ticker: toToken?.protocol === 'btc' ? 'BTC' : toToken?.ticker ?? '',
-        protocol: toToken?.protocol ?? 'btc',
-      },
-      amount: fromToken === 'BTC' ? btcToSats(new BigNumber(amount)).toString() : amount,
+      from: mapFTNativeSwapTokenToTokenBasic(fromToken),
+      to: mapFTNativeSwapTokenToTokenBasic(toToken),
+      amount: amountForQuote,
     });
   };
 
@@ -291,6 +300,21 @@ export default function SwapScreen() {
   const isRunesToBtcRoute =
     fromToken !== 'BTC' && fromToken?.protocol === 'runes' && toToken?.protocol === 'btc';
 
+  useEffect(() => {
+    if (errorMessage) {
+      const toastId = toast.custom(
+        <SnackBar
+          text={errorMessage}
+          type="error"
+          actionButtonCallback={() => {
+            toast.remove(toastId);
+          }}
+        />,
+        { duration: 3000 },
+      );
+    }
+  }, [errorMessage]);
+
   const QuoteModal = (
     <QuotesModal
       visible={getQuotesModalVisible}
@@ -313,16 +337,24 @@ export default function SwapScreen() {
     />
   );
 
+  if (orderInfo?.order.psbt) {
+    return <PsbtConfimation orderInfo={orderInfo} onClose={() => setOrderInfo(undefined)} />;
+  }
+
   if (quote) {
     return (
       <>
         <QuoteSummary
-          amount={amount}
+          amount={amountForQuote}
           quote={quote}
           fromToken={fromToken}
           toToken={toToken}
           onClose={() => setQuote(undefined)}
-          onChangeProvider={() => setGetQuotesModalVisible(true)}
+          onChangeProvider={() => {
+            setGetQuotesModalVisible(true);
+          }}
+          onOrderPlaced={setOrderInfo}
+          onError={setErrorMessage}
         />
         {QuoteModal}
       </>
