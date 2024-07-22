@@ -1305,7 +1305,8 @@
       "TRY_ANOTHER_PAIR": "You can try another pair, or try again later.",
       "NO_TOKENS_FOUND": "No tokens found",
       "MISSING_UTXOS": "Selected bundles are not available anymore",
-      "SOME_MISSING_UTXOS": "Some selected bundles are not available anymore"
+      "SOME_MISSING_UTXOS": "Some selected bundles are not available anymore",
+      "NO_UTXOS_FOR_PURCHASE": "The selected bundles are no longer available for purchase"
     },
     "SWAP_TRANSACTION_CANNOT_BE_SPONSORED": "Swap transaction cannot be sponsored while you have a pending transaction.",
     "LEARN_MORE": "Learn more",

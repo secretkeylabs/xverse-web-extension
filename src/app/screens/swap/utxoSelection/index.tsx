@@ -12,6 +12,7 @@ import {
 import { StyledP } from '@ui-library/common.styled';
 
 import useGetUtxos from '@hooks/queries/swaps/useGetUtxos';
+import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Button from '@ui-library/button';
@@ -33,12 +34,13 @@ const Heading = styled(StyledP)`
   font-weight: 700;
   line-height: 140%;
 `;
-const StyledContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  marginLeft: props.theme.space.m,
-  marginRight: props.theme.space.m,
-}));
+
+const StyledContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-left: ${(props) => props.theme.space.m};
+  margin-right: ${(props) => props.theme.space.m};
+`;
 
 const RefreshView = styled.div`
   display: flex;
@@ -106,17 +108,15 @@ const LoaderContainer = styled.div`
 
 type Props = {
   utxosRequest: GetUtxosRequest;
-  amount: string;
   selectedUtxoProvider?: UtxoQuote;
   toToken?: Token;
   onClose: () => void;
   onChangeProvider: () => void;
-  onNext: (amount: string) => void;
+  onNext: (amount: string, btcAmount: string, selectedUtxos: Omit<MarketUtxo, 'token'>[]) => void;
 };
 
 export default function UtxoSelection({
   utxosRequest,
-  amount,
   toToken,
   selectedUtxoProvider,
   onClose,
@@ -128,6 +128,7 @@ export default function UtxoSelection({
 
   const { fiatCurrency } = useWalletSelector();
   const { btcFiatRate } = useCoinRates();
+  const { data: btcBalance } = useBtcWalletData();
 
   const totalRunesPerBtc = new BigNumber(100000000).dividedBy(
     new BigNumber(selectedUtxoProvider?.floorRate ?? 1),
@@ -205,6 +206,8 @@ export default function UtxoSelection({
     }
     return acc;
   }, new BigNumber(0));
+
+  const insufficientBalance = btcBalance && totalSatsAmount.gte(new BigNumber(btcBalance));
 
   return (
     <>
@@ -303,9 +306,27 @@ export default function UtxoSelection({
             </Row>
             <BtnView>
               <Button
-                title={commonT('NEXT')}
-                onClick={() => onNext(totalRuneAmount.toString())}
-                variant="primary"
+                title={
+                  insufficientBalance ? t('ERRORS.INSUFFICIENT_BALANCE_FEES') : commonT('NEXT')
+                }
+                onClick={() => {
+                  const selectedBundles: Omit<MarketUtxo, 'token'>[] = Array.from(selectedUtxos)
+                    .map((id) => {
+                      const utxo = utxos.find((u) => u.identifier === id);
+                      if (utxo) {
+                        return {
+                          identifier: utxo.identifier,
+                          amount: utxo.amount,
+                          price: utxo.price,
+                        };
+                      }
+                      return null;
+                    })
+                    .filter((bundle): bundle is Omit<MarketUtxo, 'token'> => bundle !== null);
+                  onNext(totalRuneAmount.toString(), totalSatsAmount.toString(), selectedBundles);
+                }}
+                disabled={Boolean(insufficientBalance)}
+                variant={insufficientBalance ? 'danger' : 'primary'}
               />
             </BtnView>
           </StickyButtonContainer>

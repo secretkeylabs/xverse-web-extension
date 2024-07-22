@@ -12,7 +12,10 @@ import {
   getBtcFiatEquivalent,
   type ExecuteOrderRequest,
   type FungibleToken,
+  type MarketUtxo,
   type PlaceOrderResponse,
+  type PlaceUtxoOrderRequest,
+  type PlaceUtxoOrderResponse,
   type Quote,
   type Token,
 } from '@secretkeylabs/xverse-core';
@@ -31,6 +34,7 @@ import { mapFTNativeSwapTokenToTokenBasic } from '../utils';
 import EditFee from './EditFee';
 import QuoteSummaryTile from './quoteSummaryTile';
 import usePlaceOrder from './usePlaceOrder';
+import usePlaceUtxoOrder from './usePlaceUtxoOrder';
 
 const SlippageButton = styled.button`
   display: flex;
@@ -138,9 +142,10 @@ type QuoteSummaryProps = {
     order,
     providerCode,
   }: {
-    order: PlaceOrderResponse;
+    order: PlaceOrderResponse | PlaceUtxoOrderResponse;
     providerCode: ExecuteOrderRequest['providerCode'];
   }) => void;
+  selectedIdentifiers?: Omit<MarketUtxo, 'token'>[];
 };
 
 export default function QuoteSummary({
@@ -152,18 +157,24 @@ export default function QuoteSummary({
   onChangeProvider,
   onOrderPlaced,
   onError,
+  selectedIdentifiers,
 }: QuoteSummaryProps) {
   const { t } = useTranslation('translation');
   const theme = useTheme();
   const { btcFiatRate } = useCoinRates();
   const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey } = useSelectedAccount();
   const { loading: isPlaceOrderLoading, error: placeOrderError, placeOrder } = usePlaceOrder();
+  const {
+    loading: isPlaceUtxoOrderLoading,
+    error: placeUtxoOrderError,
+    placeUtxoOrder,
+  } = usePlaceUtxoOrder();
 
   useEffect(() => {
-    if (placeOrderError) {
-      onError(placeOrderError);
+    if (placeOrderError || placeUtxoOrderError) {
+      onError(placeOrderError ?? placeUtxoOrderError ?? '');
     }
-  }, [placeOrderError]);
+  }, [placeOrderError, placeUtxoOrderError]);
 
   const { data: recommendedFees } = useBtcFeeRate();
   const [feeRate, setFeeRate] = useState('0');
@@ -186,7 +197,7 @@ export default function QuoteSummary({
 
   const toUnit =
     toToken?.protocol === 'btc'
-      ? 'SATS'
+      ? 'Sats'
       : toToken?.symbol ?? toToken?.ticker ?? RUNE_DISPLAY_DEFAULTS.symbol;
 
   const [showSlippageModal, setShowSlippageModal] = useState(false);
@@ -203,25 +214,50 @@ export default function QuoteSummary({
       to: toToken.protocol === 'btc' ? 'BTC' : toToken.name ?? toToken.ticker,
     });
 
-    const placeOrderRequest = {
-      providerCode: quote.provider.code,
-      from: mapFTNativeSwapTokenToTokenBasic(fromToken),
-      to: mapFTNativeSwapTokenToTokenBasic(toToken),
-      sendAmount: amount,
-      receiveAmount: quote.receiveAmount,
-      slippage,
-      feeRate: Number(feeRate),
-      btcAddress,
-      btcPubKey: btcPublicKey,
-      ordAddress: ordinalsAddress,
-      ordPubKey: ordinalsPublicKey,
-    };
-    const placeOrderResponse = await placeOrder(placeOrderRequest);
+    if (selectedIdentifiers) {
+      const placeUtxoOrderRequest: PlaceUtxoOrderRequest = {
+        providerCode: quote.provider.code,
+        from: mapFTNativeSwapTokenToTokenBasic(fromToken),
+        to: mapFTNativeSwapTokenToTokenBasic(toToken),
+        orders: selectedIdentifiers,
+        feeRate: Number(feeRate),
+        btcAddress,
+        btcPubKey: btcPublicKey,
+        ordAddress: ordinalsAddress,
+        ordPubKey: ordinalsPublicKey,
+      };
+      const placeUtxoOrderResponse = await placeUtxoOrder(placeUtxoOrderRequest);
+      if (placeUtxoOrderResponse?.psbt && placeUtxoOrderResponse.orders.length > 0) {
+        return onOrderPlaced({ order: placeUtxoOrderResponse, providerCode: quote.provider.code });
+      }
 
-    if (placeOrderResponse?.psbt) {
-      onOrderPlaced({ order: placeOrderResponse, providerCode: quote.provider.code });
+      // if no orders are returned it means that all the utxos were swept
+      if (placeUtxoOrderResponse?.orders.length === 0) {
+        onError(t('SWAP_SCREEN.ERRORS.NO_UTXOS_FOR_PURCHASE'));
+      }
+    } else {
+      const placeOrderRequest = {
+        providerCode: quote.provider.code,
+        from: mapFTNativeSwapTokenToTokenBasic(fromToken),
+        to: mapFTNativeSwapTokenToTokenBasic(toToken),
+        sendAmount: amount,
+        receiveAmount: quote.receiveAmount,
+        slippage,
+        feeRate: Number(feeRate),
+        btcAddress,
+        btcPubKey: btcPublicKey,
+        ordAddress: ordinalsAddress,
+        ordPubKey: ordinalsPublicKey,
+      };
+      const placeOrderResponse = await placeOrder(placeOrderRequest);
+
+      if (placeOrderResponse?.psbt) {
+        onOrderPlaced({ order: placeOrderResponse, providerCode: quote.provider.code });
+      }
     }
   };
+
+  const feeUnits = toToken?.protocol === 'sip10' || toToken?.protocol === 'stx' ? 'STX' : 'Sats';
 
   return (
     <>
@@ -320,14 +356,26 @@ export default function QuoteSummary({
                 {formatNumber(quote.receiveAmount)} {toUnit}
               </StyledP>
             </ListingDescriptionRow>
-            <ListingDescriptionRow>
-              <StyledP typography="body_medium_m" color="white_200">
-                {t('SWAP_SCREEN.LP_FEE')}
-              </StyledP>
-              <StyledP typography="body_medium_m" color="white_0">
-                {formatNumber(quote.feePercentage)}%
-              </StyledP>
-            </ListingDescriptionRow>
+            {Boolean(quote.feePercentage) && (
+              <ListingDescriptionRow>
+                <StyledP typography="body_medium_m" color="white_200">
+                  {t('SWAP_SCREEN.LP_FEE')}
+                </StyledP>
+                <StyledP typography="body_medium_m" color="white_0">
+                  {formatNumber(quote.feePercentage)}%
+                </StyledP>
+              </ListingDescriptionRow>
+            )}
+            {Boolean(quote.feeFlat) && (
+              <ListingDescriptionRow>
+                <StyledP typography="body_medium_m" color="white_200">
+                  {t('SWAP_SCREEN.LP_FEE')}
+                </StyledP>
+                <StyledP typography="body_medium_m" color="white_0">
+                  {formatNumber(quote.feeFlat)} {feeUnits}
+                </StyledP>
+              </ListingDescriptionRow>
+            )}
             <ListingDescriptionRow>
               <StyledP typography="body_medium_m" color="white_200">
                 {t('SWAP_SCREEN.ROUTE')}
@@ -345,7 +393,7 @@ export default function QuoteSummary({
                 {t('TRANSACTION_SETTING.FEE_RATE')}
                 <EditFeeRateContainer>
                   <EditFee
-                    feeUnits="Sats"
+                    feeUnits={feeUnits}
                     feeRate={feeRate}
                     feeRateUnits={t('UNITS.SATS_PER_VB')}
                     setFeeRate={setFeeRate}
@@ -374,7 +422,7 @@ export default function QuoteSummary({
             variant="primary"
             title={t('SWAP_SCREEN.SWAP')}
             onClick={handleSwap}
-            loading={isPlaceOrderLoading}
+            loading={isPlaceOrderLoading || isPlaceUtxoOrderLoading}
           />
         </SendButtonContainer>
         <Sheet

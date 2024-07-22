@@ -7,19 +7,25 @@ import {
   btcTransaction,
   parseSummaryForRunes,
   type ExecuteOrderRequest,
+  type ExecuteUtxoOrderRequest,
   type PlaceOrderResponse,
+  type PlaceUtxoOrderResponse,
   type RuneSummary,
 } from '@secretkeylabs/xverse-core';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import useExecuteOrder from './useExecuteOrder';
+import useExecuteUtxoOrder from './useExecuteUtxoOrder';
 
 // TODO: export this from core
 type PSBTSummary = Awaited<ReturnType<btcTransaction.EnhancedPsbt['getSummary']>>;
 
 type Props = {
-  orderInfo: { order: PlaceOrderResponse; providerCode: ExecuteOrderRequest['providerCode'] };
+  orderInfo: {
+    order: PlaceOrderResponse | PlaceUtxoOrderResponse;
+    providerCode: ExecuteOrderRequest['providerCode'];
+  };
   onClose: () => void;
   onConfirm: () => void;
 };
@@ -40,6 +46,7 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
   const txnContext = useTransactionContext();
   const { network } = useWalletSelector();
   const { executeOrder, error: executeOrderError } = useExecuteOrder();
+  const { executeUtxoOrder, error: executeUtxoOrderError } = useExecuteUtxoOrder();
 
   const parsedPsbt = useMemo(() => {
     try {
@@ -50,18 +57,19 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
   }, [orderInfo.order.psbt, txnContext]);
 
   useEffect(() => {
-    if (executeOrderError) {
+    const error = executeOrderError ?? executeUtxoOrderError;
+    if (error) {
       navigate('/tx-status', {
         state: {
           txid: '',
           currency: 'BTC',
           errorTitle: '',
-          error: executeOrderError,
+          error,
           browserTx: true,
         },
       });
     }
-  }, [executeOrderError]);
+  }, [executeOrderError, executeUtxoOrderError]);
 
   useEffect(() => {
     if (!parsedPsbt) return;
@@ -81,6 +89,36 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
       });
   }, [parsedPsbt]);
 
+  const handleExecuteOrder = async (signedPsbt: string) => {
+    if ('orders' in orderInfo.order) {
+      const executeUtxoOrderRequest: ExecuteUtxoOrderRequest = {
+        providerCode: orderInfo.providerCode,
+        orderId: orderInfo.order.orderId,
+        psbt: signedPsbt,
+        btcAddress,
+        btcPubKey: btcPublicKey,
+        ordAddress: ordinalsAddress,
+        ordPubKey: ordinalsPublicKey,
+        orders: orderInfo.order.orders,
+      };
+      const executeUtxoOrderResponse = await executeUtxoOrder(executeUtxoOrderRequest);
+      return executeUtxoOrderResponse;
+    }
+
+    const executeOrderRequest = {
+      providerCode: orderInfo.providerCode,
+      orderId: orderInfo.order.orderId,
+      psbt: signedPsbt,
+      btcAddress,
+      btcPubKey: btcPublicKey,
+      ordAddress: ordinalsAddress,
+      ordPubKey: ordinalsPublicKey,
+    };
+
+    const executeOrderResponse = await executeOrder(executeOrderRequest);
+    return executeOrderResponse;
+  };
+
   const handleConfirm = async () => {
     setIsSigning(true);
     try {
@@ -91,19 +129,9 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
         throw new Error(t('PSBT_CANT_SIGN_ERROR_TITLE'));
       }
 
-      const executeOrderRequest = {
-        providerCode: orderInfo.providerCode,
-        orderId: orderInfo.order.orderId,
-        psbt: signedPsbt,
-        btcAddress,
-        btcPubKey: btcPublicKey,
-        ordAddress: ordinalsAddress,
-        ordPubKey: ordinalsPublicKey,
-      };
+      const orderResponse = await handleExecuteOrder(signedPsbt);
 
-      const executeOrderResponse = await executeOrder(executeOrderRequest);
-
-      if (!executeOrderResponse) {
+      if (!orderResponse) {
         return setIsSigning(false);
       }
 
@@ -112,7 +140,7 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
       setIsSigning(false);
       navigate('/tx-status', {
         state: {
-          txid: executeOrderResponse.txid,
+          txid: orderResponse.txid,
           currency: 'BTC',
           error: '',
           browserTx: true,

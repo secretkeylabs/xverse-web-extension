@@ -13,6 +13,7 @@ import {
   type ExecuteOrderRequest,
   type FungibleToken,
   type GetUtxosRequest,
+  type MarketUtxo,
   type PlaceOrderResponse,
   type Quote,
   type Token,
@@ -119,6 +120,8 @@ export default function SwapScreen() {
   const [orderInfo, setOrderInfo] = useState<
     { order: PlaceOrderResponse; providerCode: ExecuteOrderRequest['providerCode'] } | undefined
   >();
+  const [selectedUtxos, setSelectedUtxos] = useState<Omit<MarketUtxo, 'token'>[]>();
+  const [utxoProviderSendAmount, setUtxoProviderSendAmount] = useState<string | undefined>();
 
   const { fiatCurrency } = useWalletSelector();
 
@@ -341,12 +344,20 @@ export default function SwapScreen() {
     });
 
     if (isAmm) {
+      setUtxosRequest(null);
+      setSelectedUtxos(undefined);
+      setUtxoProviderSendAmount(undefined);
       setQuote(provider as Quote);
     } else {
-      // todo: navigate to utxo selection screen
-      console.log('utxo clicked', provider);
-      setSelectedUtxoProvider(provider as UtxoQuote);
       setQuote(undefined);
+      setSelectedUtxoProvider(provider as UtxoQuote);
+      const request: GetUtxosRequest = {
+        providerCode: provider.provider.code,
+        from: provider.from,
+        to: provider.to,
+        amount: fromToken === 'BTC' ? btcToSats(new BigNumber(amount)).toString() : amount,
+      };
+      setUtxosRequest(request);
     }
     setGetQuotesModalVisible(false);
   };
@@ -373,20 +384,10 @@ export default function SwapScreen() {
       utxoProviders={quotes?.utxo || []}
       toToken={toToken}
       ammProviderClicked={(provider: Quote) => {
-        setUtxosRequest(null);
         setProvider(true, provider);
-        setGetQuotesModalVisible(false);
       }}
       utxoProviderClicked={(provider: UtxoQuote) => {
         setProvider(false, provider);
-        setGetQuotesModalVisible(false);
-        const request: GetUtxosRequest = {
-          providerCode: provider.provider.code,
-          from: provider.from,
-          to: provider.to,
-          amount: fromToken === 'BTC' ? btcToSats(new BigNumber(amount)).toString() : amount,
-        };
-        setUtxosRequest(request);
       }}
     />
   );
@@ -405,7 +406,7 @@ export default function SwapScreen() {
     return (
       <>
         <QuoteSummary
-          amount={amountForQuote}
+          amount={utxoProviderSendAmount ?? amountForQuote}
           quote={quote}
           fromToken={fromToken}
           toToken={toToken}
@@ -415,6 +416,7 @@ export default function SwapScreen() {
           }}
           onOrderPlaced={setOrderInfo}
           onError={setErrorMessage}
+          selectedIdentifiers={selectedUtxos}
         />
         {QuoteModal}
       </>
@@ -426,15 +428,32 @@ export default function SwapScreen() {
       <>
         <UtxoSelection
           utxosRequest={utxosRequest}
-          amount={amount}
           onClose={() => setUtxosRequest(null)}
           toToken={toToken}
           selectedUtxoProvider={selectedUtxoProvider}
           onChangeProvider={() => {
             setGetQuotesModalVisible(true);
           }}
-          onNext={(receiveAmount: string) => {
-            // todo: navigate to quote screen
+          onNext={(
+            receiveAmount: string,
+            sendBtcAmount: string,
+            selectedIdentifiers: Omit<MarketUtxo, 'token'>[],
+          ) => {
+            if (!fromToken || !toToken || !selectedUtxoProvider) {
+              return;
+            }
+            setUtxoProviderSendAmount(sendBtcAmount);
+            setSelectedUtxos(selectedIdentifiers);
+            const q: Quote = {
+              from: mapFTNativeSwapTokenToTokenBasic(fromToken),
+              to: mapFTNativeSwapTokenToTokenBasic(toToken),
+              provider: selectedUtxoProvider.provider,
+              receiveAmount,
+              slippageSupported: false,
+              feePercentage: selectedUtxoProvider.feePercentage,
+              feeFlat: selectedUtxoProvider.feeFlat,
+            };
+            setQuote(q);
           }}
         />
         {QuoteModal}
@@ -496,31 +515,7 @@ export default function SwapScreen() {
             </Flex1>
           )}
         </Flex1>
-
-        <QuotesModal
-          visible={getQuotesModalVisible}
-          onClose={() => {
-            setGetQuotesModalVisible(false);
-          }}
-          ammProviders={quotes?.amm || []}
-          utxoProviders={quotes?.utxo || []}
-          toToken={toToken}
-          ammProviderClicked={(provider: Quote) => {
-            setQuote(provider);
-            setGetQuotesModalVisible(false);
-          }}
-          utxoProviderClicked={(provider: UtxoQuote) => {
-            setSelectedUtxoProvider(provider);
-            setGetQuotesModalVisible(false);
-            const request: GetUtxosRequest = {
-              providerCode: provider.provider.code,
-              from: provider.from,
-              to: provider.to,
-              amount: fromToken === 'BTC' ? btcToSats(new BigNumber(amount)).toString() : amount,
-            };
-            setUtxosRequest(request);
-          }}
-        />
+        {QuoteModal}
         {!hasQuoteError && (
           <GetQuoteButtonContainer>
             <Button
