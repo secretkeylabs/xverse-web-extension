@@ -7,6 +7,7 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowRight } from '@phosphor-icons/react';
 import {
+  AnalyticsEvents,
   RUNE_DISPLAY_DEFAULTS,
   getBtcFiatEquivalent,
   type ExecuteOrderRequest,
@@ -19,6 +20,7 @@ import Button from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import { formatNumber } from '@utils/helper';
+import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -194,6 +196,12 @@ export default function QuoteSummary({
     if (!fromToken || !toToken) {
       return;
     }
+
+    trackMixPanel(AnalyticsEvents.ConfirmSwap, {
+      provider: quote.provider.name,
+      from: fromToken === 'BTC' ? 'BTC' : fromToken.name,
+      to: toToken.protocol === 'btc' ? 'BTC' : toToken.name ?? toToken.ticker,
+    });
 
     const placeOrderRequest = {
       providerCode: quote.provider.code,

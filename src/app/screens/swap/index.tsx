@@ -7,6 +7,7 @@ import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  AnalyticsEvents,
   btcToSats,
   getBtcFiatEquivalent,
   type ExecuteOrderRequest,
@@ -21,6 +22,7 @@ import Button, { LinkButton } from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
 import SnackBar from '@ui-library/snackBar';
 import { satsToBtcString } from '@utils/helper';
+import { trackMixPanel } from '@utils/mixpanel';
 import { getFtBalance } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
@@ -80,7 +82,7 @@ const SwapButtonContainer = styled.button<{ disabled: boolean }>((props) => ({
   },
 }));
 
-const SendButtonContainer = styled.div((props) => ({
+const GetQuoteButtonContainer = styled.div((props) => ({
   marginTop: props.theme.space.l,
 }));
 
@@ -164,6 +166,11 @@ export default function SwapScreen() {
     if (!fromToken || !toToken) {
       return;
     }
+
+    trackMixPanel(AnalyticsEvents.FetchSwapQuote, {
+      from: fromToken === 'BTC' ? 'BTC' : fromToken.name,
+      to: toToken.protocol === 'btc' ? 'BTC' : toToken.name ?? toToken.ticker,
+    });
 
     fetchQuotes({
       from: mapFTNativeSwapTokenToTokenBasic(fromToken),
@@ -319,7 +326,42 @@ export default function SwapScreen() {
       // Reset
       setErrorMessage('');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errorMessage]);
+
+  const setProvider = (isAmm: boolean, provider: Quote | UtxoQuote) => {
+    if (!fromToken || !toToken) {
+      return;
+    }
+
+    trackMixPanel(AnalyticsEvents.SelectSwapQuote, {
+      provider: provider.provider.name,
+      from: fromToken === 'BTC' ? 'BTC' : fromToken.name,
+      to: toToken.protocol === 'btc' ? 'BTC' : toToken.name ?? toToken.ticker,
+    });
+
+    if (isAmm) {
+      setQuote(provider as Quote);
+    } else {
+      // todo: navigate to utxo selection screen
+      console.log('utxo clicked', provider);
+      setSelectedUtxoProvider(provider as UtxoQuote);
+      setQuote(undefined);
+    }
+    setGetQuotesModalVisible(false);
+  };
+
+  const onConfirmExecute = () => {
+    const provider = quote?.provider ?? selectedUtxoProvider?.provider;
+    if (!fromToken || !toToken || !provider) {
+      return;
+    }
+    trackMixPanel(AnalyticsEvents.SignSwap, {
+      provider: provider.name,
+      from: fromToken === 'BTC' ? 'BTC' : fromToken.name,
+      to: toToken.protocol === 'btc' ? 'BTC' : toToken.name ?? toToken.ticker,
+    });
+  };
 
   const QuoteModal = (
     <QuotesModal
@@ -332,12 +374,11 @@ export default function SwapScreen() {
       toToken={toToken}
       ammProviderClicked={(provider: Quote) => {
         setUtxosRequest(null);
-        setQuote(provider);
+        setProvider(true, provider);
         setGetQuotesModalVisible(false);
       }}
       utxoProviderClicked={(provider: UtxoQuote) => {
-        setQuote(undefined);
-        setSelectedUtxoProvider(provider);
+        setProvider(false, provider);
         setGetQuotesModalVisible(false);
         const request: GetUtxosRequest = {
           providerCode: provider.provider.code,
@@ -351,7 +392,13 @@ export default function SwapScreen() {
   );
 
   if (orderInfo?.order.psbt) {
-    return <PsbtConfimation orderInfo={orderInfo} onClose={() => setOrderInfo(undefined)} />;
+    return (
+      <PsbtConfimation
+        orderInfo={orderInfo}
+        onConfirm={onConfirmExecute}
+        onClose={() => setOrderInfo(undefined)}
+      />
+    );
   }
 
   if (quote) {
@@ -475,7 +522,7 @@ export default function SwapScreen() {
           }}
         />
         {!hasQuoteError && (
-          <SendButtonContainer>
+          <GetQuoteButtonContainer>
             <Button
               disabled={isGetQuotesDisabled}
               variant={errorMsg ? 'danger' : 'primary'}
@@ -483,7 +530,7 @@ export default function SwapScreen() {
               loading={quotesLoading}
               onClick={getQuotes}
             />
-          </SendButtonContainer>
+          </GetQuoteButtonContainer>
         )}
         {QuoteModal}
         <TokenFromBottomSheet

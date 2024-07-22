@@ -21,9 +21,10 @@ type PSBTSummary = Awaited<ReturnType<btcTransaction.EnhancedPsbt['getSummary']>
 type Props = {
   orderInfo: { order: PlaceOrderResponse; providerCode: ExecuteOrderRequest['providerCode'] };
   onClose: () => void;
+  onConfirm: () => void;
 };
 
-export default function PsbtConfirmation({ orderInfo, onClose }: Props) {
+export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Props) {
   const [isLoading, setIsLoading] = useState(true);
   const [isSigning, setIsSigning] = useState(false);
   const [summary, setSummary] = useState<PSBTSummary | undefined>();
@@ -80,7 +81,7 @@ export default function PsbtConfirmation({ orderInfo, onClose }: Props) {
       });
   }, [parsedPsbt]);
 
-  const onConfirm = async () => {
+  const handleConfirm = async () => {
     setIsSigning(true);
     try {
       // TODO: add ledger support
@@ -105,6 +106,8 @@ export default function PsbtConfirmation({ orderInfo, onClose }: Props) {
       if (!executeOrderResponse) {
         return setIsSigning(false);
       }
+
+      onConfirm();
 
       setIsSigning(false);
       navigate('/tx-status', {
@@ -161,7 +164,7 @@ export default function PsbtConfirmation({ orderInfo, onClose }: Props) {
       confirmText={t('CONFIRM')}
       cancelText={t('CANCEL')}
       onCancel={onCancel}
-      onConfirm={onConfirm}
+      onConfirm={handleConfirm}
       onBackClick={onClose}
       hideBottomBar
       showAccountHeader={false}

@@ -15,6 +15,7 @@ import useHasFeature from '@hooks/useHasFeature';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  AnalyticsEvents,
   FeatureId,
   currencySymbolMap,
   getFiatEquivalent,
@@ -23,6 +24,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import type { CurrencyTypes } from '@utils/constants';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
+import { trackMixPanel } from '@utils/mixpanel';
 import { getBalanceAmount, getFtTicker } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
@@ -174,7 +176,9 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
     if (!showSwaps) {
       return;
     }
-
+    trackMixPanel(AnalyticsEvents.InitiateSwapFlow, {
+      token: fungibleToken ? fungibleToken.name ?? fungibleToken.principal : currency,
+    });
     navigate(`/swap?from=${fungibleToken ? fungibleToken.principal : currency}`);
   };
 
