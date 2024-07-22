@@ -1,7 +1,5 @@
 import { type WebBtcMessage } from '@common/types/message-types';
 import {
-  RpcErrorCode,
-  SendInscriptionsMethodName,
   getAccountsMethodName,
   getAddressesMethodName,
   getBalanceMethodName,
@@ -9,6 +7,8 @@ import {
   getWalletTypeMethodName,
   renouncePermissionsMethodName,
   requestPermissionsMethodName,
+  RpcErrorCode,
+  sendInscriptionsMethodName,
   stxSignTransactionMethodName,
   type RpcRequestMessage,
 } from '@sats-connect/core';
@@ -129,7 +129,7 @@ async function handleRPCRequest(message: RpcRequestMessage, port: chrome.runtime
         await handleGetInscriptions(message, port);
         break;
       }
-      case SendInscriptionsMethodName: {
+      case sendInscriptionsMethodName: {
         await handleSendInscriptions(message, port);
         break;
       }
