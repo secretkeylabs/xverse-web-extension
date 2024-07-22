@@ -172,9 +172,6 @@ export default function QuoteSummary({
 
   const { fiatCurrency } = useWalletSelector();
 
-  const satsToFiat = (sats: string) =>
-    getBtcFiatEquivalent(new BigNumber(sats), BigNumber(btcFiatRate)).toString();
-
   const fromUnit =
     fromToken === 'BTC'
       ? 'BTC'
@@ -329,7 +326,9 @@ export default function QuoteSummary({
                     feeRate={feeRate}
                     feeRateUnits={t('UNITS.SATS_PER_VB')}
                     setFeeRate={setFeeRate}
-                    baseToFiat={satsToFiat}
+                    // We only know the rate, not the absolute amount
+                    // It is impossible to determine the fiat value
+                    baseToFiat={() => ''}
                     fiatUnit={fiatCurrency}
                     getFeeForFeeRate={(fee) => Promise.resolve(fee)}
                     feeRates={{
