@@ -174,7 +174,7 @@ export default function QuoteSummary({
 
   const fromUnit =
     fromToken === 'BTC'
-      ? 'BTC'
+      ? 'Sats'
       : (fromToken as FungibleToken)?.runeSymbol ?? (fromToken as FungibleToken)?.ticker ?? '⧉';
 
   const toUnit = toToken?.protocol === 'btc' ? 'SATS' : toToken?.symbol ?? toToken?.ticker ?? '⧉';
@@ -218,7 +218,11 @@ export default function QuoteSummary({
           <QuoteSummaryTile
             fromUnit={fromUnit}
             toUnit={toUnit}
-            rate={new BigNumber(quote.receiveAmount).dividedBy(new BigNumber(amount)).toString()}
+            rate={
+              toToken?.protocol === 'btc'
+                ? new BigNumber(quote.receiveAmount).dividedBy(new BigNumber(amount)).toString()
+                : new BigNumber(amount).dividedBy(new BigNumber(quote.receiveAmount)).toString()
+            }
             provider={quote.provider.name}
             image={quote.provider.logo}
             onClick={onChangeProvider}
