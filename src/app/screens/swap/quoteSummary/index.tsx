@@ -1,5 +1,6 @@
 import SlippageEditIcon from '@assets/img/swap/slippageEdit.svg';
 import TopRow from '@components/topRow';
+import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useSelectedAccount from '@hooks/useSelectedAccount';
@@ -164,6 +165,7 @@ export default function QuoteSummary({
 
   const { data: recommendedFees } = useBtcFeeRate();
   const [feeRate, setFeeRate] = useState('0');
+  const { data: runeFloorPrice } = useRuneFloorPriceQuery(toToken?.name ?? '');
 
   useEffect(() => {
     if (recommendedFees && feeRate === '0') {
@@ -250,8 +252,7 @@ export default function QuoteSummary({
                   ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcFiatRate)).toFixed(
                       2,
                     )
-                  : // TODO JORDAN: ADD RUNE FIAT EQUIVALENT
-                    ''
+                  : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2)
               }
             />
             <ArrowOuterContainer>
@@ -271,6 +272,7 @@ export default function QuoteSummary({
                         runeSymbol: toToken?.symbol,
                         runeInscriptionId: toToken?.logo,
                         ticker: toToken?.name,
+                        protocol: 'runes',
                       } as FungibleToken),
               }}
               subtitle={toToken?.protocol === 'btc' ? 'Bitcoin' : toToken?.name}
@@ -282,7 +284,10 @@ export default function QuoteSummary({
                       new BigNumber(quote.receiveAmount),
                       new BigNumber(btcFiatRate),
                     ).toFixed(2)
-                  : ''
+                  : getBtcFiatEquivalent(
+                      new BigNumber(runeFloorPrice ?? 0).multipliedBy(quote.receiveAmount),
+                      new BigNumber(btcFiatRate),
+                    ).toFixed(2)
               }
             />
           </QuoteToBaseContainer>

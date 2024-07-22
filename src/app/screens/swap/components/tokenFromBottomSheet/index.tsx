@@ -72,7 +72,6 @@ export default function TokenFromBottomSheet({ visible, title, to, onSelectCoin,
                     onClose();
                   }}
                   fungibleToken={token}
-                  showProtocolIcon={false}
                 />
               );
             }
