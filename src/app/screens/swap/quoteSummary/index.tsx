@@ -336,7 +336,7 @@ export default function QuoteSummary({
                       medium: recommendedFees?.regular,
                       high: recommendedFees?.priority,
                     }}
-                    feeRateLimits={recommendedFees?.limits}
+                    feeRateLimits={{ ...recommendedFees?.limits, min: recommendedFees?.regular }}
                     onFeeChange={setFeeRate}
                   />
                 </EditFeeRateContainer>
