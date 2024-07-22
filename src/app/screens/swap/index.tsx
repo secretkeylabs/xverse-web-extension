@@ -312,6 +312,8 @@ export default function SwapScreen() {
         />,
         { duration: 3000 },
       );
+      // Reset
+      setErrorMessage('');
     }
   }, [errorMessage]);
 

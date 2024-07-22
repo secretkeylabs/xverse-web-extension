@@ -6,6 +6,7 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowRight } from '@phosphor-icons/react';
 import {
+  RUNE_DISPLAY_DEFAULTS,
   getBtcFiatEquivalent,
   type ExecuteOrderRequest,
   type FungibleToken,
@@ -172,15 +173,17 @@ export default function QuoteSummary({
 
   const { fiatCurrency } = useWalletSelector();
 
-  const satsToFiat = (sats: string) =>
-    getBtcFiatEquivalent(new BigNumber(sats), BigNumber(btcFiatRate)).toString();
-
   const fromUnit =
     fromToken === 'BTC'
-      ? 'BTC'
-      : (fromToken as FungibleToken)?.runeSymbol || (fromToken as FungibleToken)?.ticker;
+      ? 'Sats'
+      : (fromToken as FungibleToken)?.runeSymbol ??
+        (fromToken as FungibleToken)?.ticker ??
+        RUNE_DISPLAY_DEFAULTS.symbol;
 
-  const toUnit = toToken?.protocol === 'btc' ? 'SATS' : toToken?.symbol ?? toToken?.ticker;
+  const toUnit =
+    toToken?.protocol === 'btc'
+      ? 'SATS'
+      : toToken?.symbol ?? toToken?.ticker ?? RUNE_DISPLAY_DEFAULTS.symbol;
 
   const [showSlippageModal, setShowSlippageModal] = useState(false);
   const [slippage, setSlippage] = useState(0.05);
@@ -221,7 +224,11 @@ export default function QuoteSummary({
           <QuoteSummaryTile
             fromUnit={fromUnit}
             toUnit={toUnit}
-            rate={new BigNumber(quote.receiveAmount).dividedBy(new BigNumber(amount)).toString()}
+            rate={
+              toToken?.protocol === 'btc'
+                ? new BigNumber(quote.receiveAmount).dividedBy(new BigNumber(amount)).toString()
+                : new BigNumber(amount).dividedBy(new BigNumber(quote.receiveAmount)).toString()
+            }
             provider={quote.provider.name}
             image={quote.provider.logo}
             onClick={onChangeProvider}
@@ -329,14 +336,16 @@ export default function QuoteSummary({
                     feeRate={feeRate}
                     feeRateUnits={t('UNITS.SATS_PER_VB')}
                     setFeeRate={setFeeRate}
-                    baseToFiat={satsToFiat}
+                    // We only know the rate, not the absolute amount
+                    // It is impossible to determine the fiat value
+                    baseToFiat={() => ''}
                     fiatUnit={fiatCurrency}
                     getFeeForFeeRate={(fee) => Promise.resolve(fee)}
                     feeRates={{
                       medium: recommendedFees?.regular,
                       high: recommendedFees?.priority,
                     }}
-                    feeRateLimits={recommendedFees?.limits}
+                    feeRateLimits={{ ...recommendedFees?.limits, min: recommendedFees?.regular }}
                     onFeeChange={setFeeRate}
                   />
                 </EditFeeRateContainer>
