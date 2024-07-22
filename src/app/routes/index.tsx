@@ -16,7 +16,7 @@ import ConfirmFtTransaction from '@screens/confirmFtTransaction';
 import ConfirmInscriptionRequest from '@screens/confirmInscriptionRequest';
 import ConfirmNftTransaction from '@screens/confirmNftTransaction';
 import ConfirmOrdinalTransaction from '@screens/confirmOrdinalTransaction';
-import ConfirmOrdinalsTransfer from '@screens/confirmOrdinalTransaction/confirmOrdinalsTransfer';
+import SendOrdinalsRequest from '@screens/confirmOrdinalTransaction/confirmOrdinalsTransfer';
 import ConfirmStxTransaction from '@screens/confirmStxTransaction';
 import AuthenticationRequest from '@screens/connect/authenticationRequest';
 import BtcSelectAddressScreen from '@screens/connect/btcSelectAddressScreen';
@@ -418,7 +418,7 @@ const router = createHashRouter([
         ),
       },
       {
-        path: RoutePaths.SendOrdinals,
+        path: RoutePaths.SendOrdinal,
         element: (
           <AuthGuard>
             <SendOrdinal />
@@ -426,10 +426,10 @@ const router = createHashRouter([
         ),
       },
       {
-        path: RoutePaths.SendOrdinalsRequest,
+        path: RoutePaths.SendInscriptionsRequest,
         element: (
           <AuthGuard>
-            <ConfirmOrdinalsTransfer />
+            <SendOrdinalsRequest />
           </AuthGuard>
         ),
       },

@@ -7,6 +7,7 @@ import type { TransactionSummary } from '@screens/sendBtc/helpers';
 import { AnalyticsEvents, btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
+import RoutePaths from 'app/routes/paths';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import StepDisplay from './stepDisplay';
@@ -32,6 +33,8 @@ function SendRuneScreen() {
   const [transaction, setTransaction] = useState<btcTransaction.EnhancedTransaction | undefined>();
   const [summary, setSummary] = useState<TransactionSummary | undefined>();
   const [insufficientFundsError, setInsufficientFundsError] = useState(false);
+
+  useResetUserFlow(RoutePaths.SendOrdinal);
 
   useEffect(() => {
     if (!selectedOrdinal) {

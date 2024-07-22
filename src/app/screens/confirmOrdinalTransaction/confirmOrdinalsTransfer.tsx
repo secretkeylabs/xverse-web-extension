@@ -15,7 +15,7 @@ const LoaderContainer = styled.div(() => ({
   alignItems: 'center',
 }));
 
-function ConfirmOrdinalsTransfer() {
+function SendOrdinalsRequest() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const navigate = useNavigate();
   const {
@@ -92,4 +92,4 @@ function ConfirmOrdinalsTransfer() {
   );
 }
 
-export default ConfirmOrdinalsTransfer;
+export default SendOrdinalsRequest;

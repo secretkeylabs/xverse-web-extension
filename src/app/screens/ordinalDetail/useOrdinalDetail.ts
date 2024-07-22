@@ -85,7 +85,7 @@ export default function useOrdinalDetail() {
       return;
     }
 
-    navigate(RoutePaths.SendOrdinals.slice(1));
+    navigate(RoutePaths.SendOrdinal.slice(1));
   };
 
   const handleRedirectToTx = () => {

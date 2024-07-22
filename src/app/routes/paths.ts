@@ -1,8 +1,8 @@
 enum RoutePaths {
   ConnectedAppsAndPermissions = '/connected-apps-and-permissions',
   ConfirmStacksTransaction = '/confirm-stx-tx',
-  SendOrdinals = '/send-ordinal',
-  SendOrdinalsRequest = '/send-ordinal-request',
+  SendOrdinal = '/send-ordinal',
+  SendInscriptionsRequest = '/send-inscriptions-request',
 }
 
 export default RoutePaths;

@@ -15,7 +15,7 @@ const handleSendInscriptions = async (message: RpcRequestMessage, port: chrome.r
   }
 
   await openPopup({
-    path: RoutePaths.SendOrdinalsRequest,
+    path: RoutePaths.SendInscriptionsRequest,
     data: parseResult.output,
     context: makeContext(port),
     onClose: makeSendPopupClosedUserRejectionMessage({
