@@ -130,7 +130,7 @@ export default function AmountInput({ max, input, balance }: Props) {
           thousandSeparator
           prefix={`~${currencySymbolMap[input.fiatCurrency]}`}
           renderText={(value: string) => (
-            <StyledP typography="body_s" color="white_400">
+            <StyledP data-testid="usd-text" typography="body_s" color="white_400">
               {value} {input.fiatCurrency}
             </StyledP>
           )}

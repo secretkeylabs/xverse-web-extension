@@ -114,7 +114,7 @@ export default class Wallet {
 
   readonly buttonDetails: Locator;
 
-  readonly coinText: Locator;
+  readonly nameToken: Locator;
 
   readonly buttonInsufficientBalance: Locator;
 
@@ -310,6 +310,10 @@ export default class Wallet {
 
   readonly listedRunePrice: Locator;
 
+  readonly buttonGetQuotes: Locator;
+
+  readonly buttonSwap: Locator;
+
   constructor(readonly page: Page) {
     this.page = page;
     this.navigationDashboard = page.getByTestId('nav-dashboard');
@@ -443,9 +447,12 @@ export default class Wallet {
     // Swap
     this.buttonSelectCoin = page.getByTestId('select-coin-button');
     this.inputSwapAmount = page.getByTestId('swap-amount');
-    this.coinText = page.getByTestId('coin-text');
+    this.nameToken = page.getByTestId('token-name');
     this.buttonDownArrow = page.getByTestId('down-arrow-button');
     this.buttonContinue = page.getByRole('button', { name: 'Continue' });
+    this.buttonGetQuotes = page.getByRole('button', { name: 'Get quotes' });
+    this.buttonSwap = page.getByTestId('swap-button');
+
     this.buttonDetails = page.getByRole('button', { name: 'Details' });
     this.buttonInsufficientBalance = page.getByRole('button', { name: 'Insufficient balance' });
     this.imageToken = page.getByTestId('token-image');
@@ -582,6 +589,21 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(this.buttonSetPrice).toBeDisabled();
     await expect(this.runeItem.first()).toBeVisible();
     await expect(await this.runeItem.count()).toBeGreaterThanOrEqual(1);
+  }
+
+  async checkVisualsSSwapPage() {
+    await expect(this.page.url()).toContain('swap');
+    await expect(this.buttonDownArrow.first()).toBeVisible();
+    await expect(this.buttonGetQuotes.first()).toBeVisible();
+    await expect(this.buttonGetQuotes.first()).toBeDisabled();
+    await expect(this.inputSwapAmount.first()).toBeVisible();
+    await expect(this.swapTokenBalance).toContainText('--');
+    await expect(this.buttonBack).toBeVisible();
+    await expect(this.nameToken.first()).toContainText('Select asset');
+    await expect(await this.nameToken).toHaveCount(2);
+    await expect(await this.buttonDownArrow).toHaveCount(2);
+    await expect(this.buttonSwap).toBeVisible();
+    await expect(this.textUSD).toBeVisible();
   }
 
   async checkVisualsListOnMEPage() {
