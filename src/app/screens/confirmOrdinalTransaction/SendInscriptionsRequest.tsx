@@ -6,7 +6,7 @@ import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import useOrdinalsTransfer from './useOrdinalsTransferRequest';
+import useSendInscriptions from './useSendInscriptions';
 
 const LoaderContainer = styled.div(() => ({
   display: 'flex',
@@ -15,7 +15,7 @@ const LoaderContainer = styled.div(() => ({
   alignItems: 'center',
 }));
 
-function SendOrdinalsRequest() {
+function SendInscriptionsRequest() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const navigate = useNavigate();
   const {
@@ -30,7 +30,7 @@ function SendOrdinalsRequest() {
     transaction,
     summary,
     txError,
-  } = useOrdinalsTransfer();
+  } = useSendInscriptions();
 
   const createOrdinalsTransferTx = useCallback(async () => {
     await buildTx();
@@ -92,4 +92,4 @@ function SendOrdinalsRequest() {
   );
 }
 
-export default SendOrdinalsRequest;
+export default SendInscriptionsRequest;

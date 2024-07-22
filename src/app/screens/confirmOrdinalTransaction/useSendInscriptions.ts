@@ -9,7 +9,7 @@ import { btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
 import { useCallback, useState } from 'react';
 import * as v from 'valibot';
 
-const useOrdinalsTransferRequest = () => {
+const useSendInscriptionsRequest = () => {
   const [error, popupPayloadSendInscriptions] = getPopupPayload((data) =>
     v.parse(SendInscriptionsSchema, data),
   );
@@ -20,7 +20,7 @@ const useOrdinalsTransferRequest = () => {
   return { popupPayloadSendInscriptions, error };
 };
 
-const useOrdinalsTransfer = () => {
+const useSendInscriptions = () => {
   const [txError, setTxError] = useState<{
     code: number | undefined;
     message: string;
@@ -38,7 +38,7 @@ const useOrdinalsTransfer = () => {
         id,
       },
     },
-  } = useOrdinalsTransferRequest();
+  } = useSendInscriptionsRequest();
   const { data: btcFeeRates } = useBtcFeeRate();
   const txContext = useTransactionContext();
 
@@ -137,4 +137,4 @@ const useOrdinalsTransfer = () => {
   };
 };
 
-export default useOrdinalsTransfer;
+export default useSendInscriptions;
