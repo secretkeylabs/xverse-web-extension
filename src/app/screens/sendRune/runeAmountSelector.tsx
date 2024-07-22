@@ -58,11 +58,12 @@ function RuneAmountSelector({
   return (
     <Input
       title={t('AMOUNT', { currency: token.ticker })}
+      dataTestID="send-input"
       value={amountToSend}
       onChange={(e) => handleAmountChange(e.target.value)}
       placeholder="0"
       infoPanel={
-        <BalanceDiv>
+        <BalanceDiv data-testid="balance-label">
           <BalanceText>{t('BALANCE')} </BalanceText>
           <NumericFormat value={balance} displayType="text" thousandSeparator />
         </BalanceDiv>

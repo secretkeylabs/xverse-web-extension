@@ -42,11 +42,11 @@ const TickerIconText = styled.h1((props) => ({
   fontSize: 11,
 }));
 
-const TickerProtocolContainer = styled.div({
-  position: 'relative',
-  alignSelf: 'center',
-  display: 'inline-flex',
-});
+const TickerProtocolContainer = styled.div`
+  position: relative;
+  align-self: center;
+  display: inline-flex;
+`;
 
 const ProtocolIcon = styled.div<{ isSquare?: boolean }>((props) => ({
   width: props.isSquare ? 18 : 22,

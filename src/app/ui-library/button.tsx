@@ -113,6 +113,7 @@ type Props = {
   title: string;
   onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
   icon?: React.ReactNode;
+  iconPosition?: 'left' | 'right';
   disabled?: boolean;
   loading?: boolean;
   className?: string;
@@ -124,6 +125,7 @@ function Button({
   title,
   onClick,
   icon,
+  iconPosition = 'left',
   className,
   loading = false,
   disabled = false,
@@ -142,8 +144,9 @@ function Button({
         <Spinner />
       ) : (
         <>
-          {icon && <CenterDiv>{icon}</CenterDiv>}
+          {icon && iconPosition === 'left' && <CenterDiv>{icon}</CenterDiv>}
           <div>{title}</div>
+          {icon && iconPosition === 'right' && <CenterDiv>{icon}</CenterDiv>}
         </>
       )}
     </StyledButton>

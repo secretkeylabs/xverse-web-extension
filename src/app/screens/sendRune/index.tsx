@@ -36,7 +36,6 @@ function SendRuneScreen() {
   const selectedAccount = useSelectedAccount();
   const { network } = useWalletSelector();
   const { data: runesCoinsList } = useRuneFungibleTokensQuery();
-  const context = useTransactionContext();
   const [recipientAddress, setRecipientAddress] = useState(location.state?.recipientAddress || '');
   const [amountError, setAmountError] = useState('');
   const [amountToSend, setAmountToSend] = useState<string>(location.state?.amount || '');
@@ -117,7 +116,11 @@ function SendRuneScreen() {
         if (transactionDetails.summary) {
           setSummary(transactionDetails.summary);
           setRuneSummary(
-            await parseSummaryForRunes(context, transactionDetails.summary, network.type),
+            await parseSummaryForRunes(
+              transactionContext,
+              transactionDetails.summary,
+              network.type,
+            ),
           );
         }
       } catch (e) {

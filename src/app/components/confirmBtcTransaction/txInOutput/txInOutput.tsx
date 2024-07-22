@@ -14,7 +14,7 @@ const Container = styled.div((props) => ({
   flexDirection: 'column',
   borderRadius: props.theme.space.s,
   background: props.theme.colors.elevation1,
-  padding: `${props.theme.space.s} ${props.theme.space.m}`,
+  padding: props.theme.space.m,
   marginBottom: props.theme.space.s,
 }));
 
@@ -33,7 +33,7 @@ const Row = styled.div`
 `;
 
 const OutputTitleText = styled(StyledP)((props) => ({
-  marginBottom: props.theme.space.s,
+  marginBottom: props.theme.space.m,
 }));
 
 const ExpandedContainer = styled(animated.div)((props) => ({
@@ -72,7 +72,7 @@ function TxInOutput({ inputs, outputs }: Props) {
     <Container>
       <Button type="button" onClick={() => setIsExpanded((prevState) => !prevState)}>
         <Row>
-          <StyledP typography="body_medium_m" color="white_200">
+          <StyledP typography="body_medium_m" color="white_400">
             {isExpanded ? t('INPUT') : t('INPUT_AND_OUTPUT')}
           </StyledP>
         </Row>
@@ -83,7 +83,7 @@ function TxInOutput({ inputs, outputs }: Props) {
           {inputs.map((input) => (
             <TransactionInput input={input} key={input.extendedUtxo.outpoint} />
           ))}
-          <OutputTitleText typography="body_medium_m" color="white_200">
+          <OutputTitleText typography="body_medium_m" color="white_400">
             {t('OUTPUT')}
           </OutputTitleText>
           {outputs.map((output, index) => (

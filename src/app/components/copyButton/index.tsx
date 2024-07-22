@@ -12,9 +12,9 @@ const Button = styled.button((props) => ({
   background: 'transparent',
   marginLeft: props.theme.spacing(3),
   padding: 3,
+  borderRadius: props.theme.radius(5),
   ':hover': {
     background: props.theme.colors.white_900,
-    borderRadius: 24,
   },
 }));
 
@@ -23,16 +23,16 @@ const Img = styled.img({
   height: 20,
 });
 
-const StyledToolTip = styled(Tooltip)`
+const StyledTooltip = styled(Tooltip)`
   background-color: ${(props) => props.theme.colors.white_0};
   color: #12151e;
   border-radius: 8px;
   padding: 7px;
 `;
 
-interface Props {
+type Props = {
   text: string;
-}
+};
 
 function CopyButton({ text }: Props) {
   const [isCopied, setIsCopied] = useState(false);
@@ -56,7 +56,7 @@ function CopyButton({ text }: Props) {
       <Button id={`copy-${text}`} onClick={onCopyClick}>
         {isCopied ? <Img src={Tick} /> : <Img src={Copy} />}
       </Button>
-      <StyledToolTip
+      <StyledTooltip
         anchorId={`copy-${text}`}
         variant="light"
         content={t('COPIED')}

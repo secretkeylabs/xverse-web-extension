@@ -342,7 +342,6 @@ function ConfirmStxTransactionComponent({
         )}
 
         {children}
-
         <FeeRateContainer>
           <SelectFeeRate
             fee={fee}

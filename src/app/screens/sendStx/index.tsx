@@ -99,6 +99,7 @@ function SendStxScreen() {
         <SendLayout selectedBottomTab="dashboard" onClickBack={handleBackButtonClick}>
           <Container>
             <Step1SelectRecipientAndMemo
+              dataTestID="address-receive"
               header={header}
               recipientAddress={recipientAddress}
               setRecipientAddress={setRecipientAddress}

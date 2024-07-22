@@ -14,7 +14,7 @@ const RowContainer = styled.div({
 });
 
 const Icon = styled.img((props) => ({
-  marginRight: props.theme.spacing(4),
+  marginRight: props.theme.space.xs,
   width: 32,
   height: 32,
   borderRadius: 30,
@@ -33,18 +33,18 @@ const AddressContainer = styled.div({
   justifyContent: 'flex-end',
 });
 
-const TitleText = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
-  color: props.theme.colors.white_200,
+const TitleText = styled.p<{ $color?: string }>((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.$color ? props.theme.colors[props.$color] : props.theme.colors.white_200,
 }));
 
-const ValueText = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
+const ValueText = styled.p((props) => ({
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_0,
 }));
 
-const AmountText = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
+const AmountText = styled.p((props) => ({
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_0,
 }));
 
@@ -53,15 +53,15 @@ const ColumnContainer = styled.div({
   flexDirection: 'column',
 });
 
-const ScriptOutputHeadingText = styled.h1((props) => ({
+const ScriptOutputHeadingText = styled.p((props) => ({
   ...props.theme.headline_s,
-  color: props.theme.colors.white[0],
-  marginBottom: props.theme.spacing(12),
+  color: props.theme.colors.white_0,
+  marginBottom: props.theme.space.l,
 }));
 
-const ScriptText = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
-  color: props.theme.colors.white[200],
+const ScriptText = styled.p((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_200,
   width: 320,
   wordWrap: 'break-word',
 }));
@@ -90,7 +90,7 @@ const ShowScriptBackgroundContainer = styled.div((props) => ({
   position: 'fixed',
   background: props.theme.colors.background.modalBackdrop2,
   backdropFilter: 'blur(16px)',
-  padding: props.theme.spacing(8),
+  padding: props.theme.space.m,
   display: 'flex',
   flexDirection: 'column',
 }));
@@ -106,6 +106,7 @@ type Props = {
   hideCopyButton?: boolean;
   outputScript?: Array<any>;
   outputScriptIndex?: number;
+  titleColor?: string;
 };
 
 function TransferDetailView({
@@ -119,6 +120,7 @@ function TransferDetailView({
   hideCopyButton,
   outputScript,
   outputScriptIndex,
+  titleColor,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [showScriptOutput, setShowScriptOutput] = useState(false);
@@ -162,7 +164,7 @@ function TransferDetailView({
             {children}
           </ColumnContainer>
         ) : (
-          <TitleText>{title}</TitleText>
+          <TitleText $color={titleColor}>{title}</TitleText>
         )}
         <AddressContainer>
           {outputScript && (
@@ -171,7 +173,7 @@ function TransferDetailView({
             </Button>
           )}
           {!hideAddress && (
-            <ValueText data-testid="address-receive">{getTruncatedAddress(address)}</ValueText>
+            <ValueText data-testid="address-receive">{getTruncatedAddress(address, 6)}</ValueText>
           )}
           {!hideCopyButton && <CopyButton text={address} />}
         </AddressContainer>

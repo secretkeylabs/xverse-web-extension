@@ -93,7 +93,7 @@ function AmountSelector({
         <FeeRateContainer>
           <SelectFeeRate
             fee={fee}
-            feeUnits="Sats"
+            feeUnits="sats"
             feeRate={feeRate}
             feeRateUnits={tUnits('SATS_PER_VB')}
             setFeeRate={setFeeRate}

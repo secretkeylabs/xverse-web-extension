@@ -1,12 +1,13 @@
+import OrdinalIcon from '@assets/img/rareSats/ic_ordinal_small_over_card.svg';
 import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RecipientSelector from '@components/recipientSelector';
-import TokenImage from '@components/tokenImage';
-import type { FungibleToken, RuneSummary } from '@secretkeylabs/xverse-core';
+import OrdinalImage from '@screens/ordinals/ordinalImage';
+import type { TransactionSummary } from '@screens/sendBtc/helpers';
+import type { Inscription } from '@secretkeylabs/xverse-core';
+import Avatar from '@ui-library/avatar';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import SendLayout from '../../layouts/sendLayout';
-import AmountSelector from './amountSelector';
-import type { TransactionSummary } from './helpers';
 import { Step, getNextStep } from './steps';
 
 const TitleContainer = styled.div`
@@ -29,63 +30,51 @@ const Container = styled.div`
 `;
 
 type Props = {
-  token: FungibleToken;
+  ordinal: Inscription;
   summary: TransactionSummary | undefined;
-  runeSummary: RuneSummary | undefined;
-  amountToSend: string;
-  setAmountToSend: (amount: string) => void;
-  amountError: string;
   currentStep: Step;
   setCurrentStep: (step: Step) => void;
   recipientAddress: string;
   setRecipientAddress: (address: string) => void;
   feeRate: string;
   setFeeRate: (feeRate: string) => void;
-  sendMax: boolean;
-  setSendMax: (sendMax: boolean) => void;
   getFeeForFeeRate: (feeRate: number, useEffectiveFeeRate?: boolean) => Promise<number | undefined>;
   onConfirm: () => void;
   onBack: () => void;
   onCancel: () => void;
   isLoading: boolean;
   isSubmitting: boolean;
+  insufficientFunds: boolean;
 };
 
 function StepDisplay({
-  token,
+  ordinal,
   summary,
-  runeSummary,
-  amountToSend,
-  setAmountToSend,
-  amountError,
   currentStep,
   setCurrentStep,
   recipientAddress,
   setRecipientAddress,
   feeRate,
   setFeeRate,
-  sendMax,
-  setSendMax,
   getFeeForFeeRate,
   onConfirm,
   onBack,
   onCancel,
   isLoading,
   isSubmitting,
+  insufficientFunds,
 }: Props) {
   const { t } = useTranslation('translation');
   const header = (
     <TitleContainer>
-      <TokenImage currency="FT" fungibleToken={token} />
-      <Title>
-        {t('SEND.SEND')} {token.name}
-      </Title>
+      <Avatar src={<OrdinalImage ordinal={ordinal} placeholderIcon={OrdinalIcon} />} />
+      <Title>{t('SEND.SEND')} Ordinal</Title>
     </TitleContainer>
   );
   switch (currentStep) {
     case Step.SelectRecipient:
       return (
-        <SendLayout selectedBottomTab="dashboard" onClickBack={onBack}>
+        <SendLayout selectedBottomTab="nft" onClickBack={onBack}>
           <Container>
             <RecipientSelector
               header={header}
@@ -93,30 +82,8 @@ function StepDisplay({
               setRecipientAddress={setRecipientAddress}
               onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient))}
               isLoading={isLoading}
-            />
-          </Container>
-        </SendLayout>
-      );
-    case Step.SelectAmount:
-      return (
-        <SendLayout selectedBottomTab="dashboard" onClickBack={onBack}>
-          <Container>
-            <AmountSelector
-              token={token}
-              header={header}
-              amountToSend={amountToSend}
-              setAmountToSend={setAmountToSend}
-              amountError={amountError}
-              feeRate={feeRate}
-              setFeeRate={setFeeRate}
-              sendMax={sendMax}
-              setSendMax={setSendMax}
-              fee={summary?.fee.toString()}
-              getFeeForFeeRate={getFeeForFeeRate}
-              dustFiltered={summary?.dustFiltered ?? false}
-              onNext={() => setCurrentStep(getNextStep(Step.SelectAmount))}
-              hasSufficientFunds={!!summary || isLoading}
-              isLoading={isLoading}
+              calloutText={t('SEND.MAKE_SURE_THE_RECIPIENT')}
+              insufficientFunds={insufficientFunds}
             />
           </Container>
         </SendLayout>
@@ -132,7 +99,6 @@ function StepDisplay({
           outputs={summary.outputs}
           feeOutput={summary.feeOutput}
           showCenotaphCallout={!!summary?.runeOp?.Cenotaph?.flaws}
-          runeSummary={runeSummary}
           isLoading={false}
           confirmText={t('COMMON.CONFIRM')}
           cancelText={t('COMMON.CANCEL')}
@@ -143,8 +109,8 @@ function StepDisplay({
           onFeeRateSet={(newFeeRate) => setFeeRate(newFeeRate.toString())}
           feeRate={+feeRate}
           isSubmitting={isSubmitting}
-          isBroadcast
           hideBottomBar
+          isBroadcast
         />
       );
     default:
