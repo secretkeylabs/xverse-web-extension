@@ -20,44 +20,106 @@ test.describe('Swapping Coins', () => {
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
+    await wallet.checkVisualsStartpage();
     await wallet.allupperButtons.nth(2).click();
     await wallet.checkVisualsSSwapPage();
+
+    // Select the first Coin
     await wallet.buttonDownArrow.nth(0).click();
 
-    // Had problemns with loading of all tokens so I check that a 'Coin' is loaded (could have also chosen bitcoint or something other than Stacks as that one always appeared)
-    await expect(wallet.labelTokenSubtitle.getByText('BTC').first()).toBeVisible();
+    // Had problemns with loading of all tokens so I check that 'Bitcoin' is loaded
+    await expect(wallet.labelTokenSubtitle.getByText('Bitcoin').first()).toBeVisible();
     await expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
     await wallet.divTokenRow.first().click();
     await expect(wallet.nameToken.first()).not.toContainText('Select asset');
-    await expect(wallet.imageToken).toBeVisible();
-    await expect(wallet.buttonGetQuotes).toBeDisabled();
-    await wallet.buttonSelectCoin.nth(1).click();
-    await expect(wallet.labelTokenSubtitle.getByText('Coin').first()).toBeVisible();
-    await expect(await wallet.divTokenRow.count()).toBeGreaterThan(1);
-    await wallet.divTokenRow.nth(1).click();
-    await expect(wallet.buttonDetails).toBeVisible();
-    await expect(wallet.nameToken.last()).not.toContainText('Select asset');
-    await expect(await wallet.imageToken).toHaveCount(2);
-    await expect(wallet.buttonContinue).toBeDisabled();
-    await wallet.inputSwapAmount.first().fill(Math.floor(100 + Math.random() * 900).toString());
+    await expect(wallet.imageToken.first()).toBeVisible();
     await expect(wallet.buttonInsufficientBalance).toBeVisible();
     await expect(wallet.buttonInsufficientBalance).toBeDisabled();
-    const coinAmount = await wallet.inputSwapAmount.nth(1).inputValue();
+
+    // Select the second Coin
+    await wallet.buttonDownArrow.nth(1).click();
+    // Had problemns with loading of all tokens so I check that a 'DOG' is loaded
+    await expect(wallet.labelTokenSubtitle.getByText('DOG').first()).toBeVisible();
+    await expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
+    await wallet.divTokenRow.first().click();
+    await expect(wallet.nameToken.last()).not.toContainText('Select asset');
+    await expect(wallet.imageToken.last()).toBeVisible();
+    await expect(wallet.buttonInsufficientBalance).toBeVisible();
+    await expect(wallet.buttonInsufficientBalance).toBeDisabled();
+
+    await wallet.inputSwapAmount.first().fill(Math.floor(100 + Math.random() * 900).toString());
+
+    const coinAmount = await wallet.inputSwapAmount.inputValue();
     const numericValue = parseFloat(coinAmount);
     await expect(numericValue).toBeGreaterThan(0);
-    await expect(wallet.swapTokenBalance.first()).toContainText('0');
-    await expect(wallet.swapTokenBalance.last()).toContainText('0');
+    const usdAmount = await wallet.textUSD.innerText();
+    const numericUSDValue = parseFloat(usdAmount.replace(/[^0-9.]/g, ''));
+    await expect(numericUSDValue).toBeGreaterThan(0);
 
-    // Check that the first USD text is greater than 0
-    const usdText = await wallet.textUSD.first().innerText();
-    const usdValue = parseFloat(usdText.replace(/[^\d.-]/g, ''));
-    await expect(usdValue).toBeGreaterThan(0);
+    await expect(wallet.swapTokenBalance).toContainText('0');
 
-    await wallet.inputSwapAmount.first().clear();
-    await expect(wallet.buttonInsufficientBalance).toBeHidden();
-    await expect(wallet.buttonContinue).toBeVisible();
-    await expect(wallet.buttonContinue).toBeDisabled();
+    await expect(wallet.buttonInsufficientBalance).toBeVisible();
+    await expect(wallet.buttonInsufficientBalance).toBeDisabled();
   });
+
+  test('Cancel exchange', async ({ page, extensionId }) => {
+    // Restore wallet and setup Testnet network
+    const wallet = new Wallet(page);
+    await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
+
+    await wallet.allupperButtons.nth(2).click();
+    await wallet.checkVisualsSSwapPage();
+
+    // Select the first Coin
+    await wallet.buttonDownArrow.nth(0).click();
+
+    // Had problemns with loading of all tokens so I check that 'Bitcoin' is loaded
+    await expect(wallet.labelTokenSubtitle.getByText('Bitcoin').first()).toBeVisible();
+    await expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
+    await wallet.divTokenRow.first().click();
+    await expect(wallet.nameToken.first()).not.toContainText('Select asset');
+    await expect(wallet.imageToken.first()).toBeVisible();
+    await expect(wallet.buttonGetQuotes).toBeDisabled();
+
+    // Select the second Coin
+    await wallet.buttonDownArrow.nth(1).click();
+    // Had problemns with loading of all tokens so I check that a 'DOG' is loaded
+    await expect(wallet.labelTokenSubtitle.getByText('DOG').first()).toBeVisible();
+    await expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
+    await wallet.divTokenRow.first().click();
+    await expect(wallet.nameToken.last()).not.toContainText('Select asset');
+    await expect(wallet.imageToken.last()).toBeVisible();
+    await expect(wallet.buttonGetQuotes).toBeDisabled();
+
+    const swapBalance = await wallet.swapTokenBalance.innerText();
+    const numericswapBalance = parseFloat(swapBalance.replace(/[^0-9.]/g, ''));
+    const swapAmount = numericswapBalance * 0.8;
+    // Fill did not work with the field so we need to use this method
+    await wallet.inputSwapAmount.pressSequentially(swapAmount.toString());
+    await expect(wallet.buttonGetQuotes).toBeEnabled();
+
+    const usdAmount = await wallet.textUSD.innerText();
+    const numericUSDValue = parseFloat(usdAmount.replace(/[^0-9.]/g, ''));
+    await expect(numericUSDValue).toBeGreaterThan(0);
+
+    await wallet.buttonGetQuotes.click();
+    await expect(wallet.nameSwapPlace.first()).toBeVisible();
+    await expect(wallet.quoteAmount.first()).toBeVisible();
+    await expect(wallet.infoMessage.first()).toBeVisible();
+    await expect(wallet.buttonSwapPlace.first()).toBeVisible();
+
+    const quoteAmount = await wallet.quoteAmount.first().innerText();
+    const numericQuoteValue = parseFloat(quoteAmount.replace(/[^0-9.]/g, ''));
+    await expect(numericQuoteValue).toBeGreaterThan(0);
+
+    await wallet.buttonSwapPlace.first().click();
+    await expect(wallet.imageToken.first()).toBeVisible();
+    await expect(wallet.buttonSwap).toBeVisible();
+    await expect(wallet.buttonSlippage).toBeVisible();
+    await wallet.buttonSwap.click();
+    // await wallet.checkVisualsSendTransactionReview('swap', addressOrdinals, TEST_ORDINALS_ADDRESS);
+  });
+
   test('Use arrow button to switch token', async ({ page, extensionId }) => {
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);

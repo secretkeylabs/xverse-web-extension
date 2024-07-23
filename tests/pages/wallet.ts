@@ -332,6 +332,16 @@ export default class Wallet {
 
   readonly buttonInsufficientFunds: Locator;
 
+  readonly nameSwapPlace: Locator;
+
+  readonly quoteAmount: Locator;
+
+  readonly infoMessage: Locator;
+
+  readonly buttonSwapPlace: Locator;
+
+  buttonSlippage: Locator;
+
   constructor(readonly page: Page) {
     this.page = page;
     this.navigationDashboard = page.getByTestId('nav-dashboard');
@@ -474,7 +484,12 @@ export default class Wallet {
     this.buttonDownArrow = page.getByTestId('down-arrow-button');
     this.buttonContinue = page.getByRole('button', { name: 'Continue' });
     this.buttonGetQuotes = page.getByRole('button', { name: 'Get quotes' });
-    this.buttonSwap = page.getByTestId('swap-button');
+    this.buttonSwap = page.getByRole('button', { name: 'Swap', exact: true });
+    this.nameSwapPlace = page.getByTestId('place-name');
+    this.quoteAmount = page.getByTestId('quote-label');
+    this.infoMessage = page.getByTestId('info-message');
+    this.buttonSwapPlace = page.getByTestId('swap-place-button');
+    this.buttonSlippage = page.getByTestId('slippage-button');
 
     this.buttonDetails = page.getByRole('button', { name: 'Details' });
     this.buttonInsufficientBalance = page.getByRole('button', { name: 'Insufficient balance' });
@@ -743,7 +758,7 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(this.nameToken.first()).toContainText('Select asset');
     await expect(await this.nameToken).toHaveCount(2);
     await expect(await this.buttonDownArrow).toHaveCount(2);
-    await expect(this.buttonSwap).toBeVisible();
+    await expect(this.buttonGetQuotes).toBeVisible();
     await expect(this.textUSD).toBeVisible();
   }
 
