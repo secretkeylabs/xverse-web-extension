@@ -88,7 +88,7 @@ function TransferSection({
     ordinalsAddress,
   });
 
-  const showBtcAmount = netAmount > 0;
+  const showAmount = netAmount > 0;
 
   const inscriptionsFromPayment: btcTransaction.IOInscription[] = [];
   const satributesFromPayment: btcTransaction.IOSatribute[] = [];
@@ -101,7 +101,7 @@ function TransferSection({
   const hasInscriptionsRareSatsInOrdinal =
     (!transactionIsFinal && inputFromOrdinal.length > 0) || outputsFromOrdinal.length > 0;
 
-  const hasData = showBtcAmount || hasRuneTransfers || hasInscriptionsRareSatsInOrdinal;
+  const hasData = showAmount || hasRuneTransfers || hasInscriptionsRareSatsInOrdinal;
 
   if (!hasData) return null;
 
@@ -113,7 +113,7 @@ function TransferSection({
           : t('CONFIRM_TRANSACTION.YOU_WILL_SEND')}
       </Title>
       <Container>
-        {showBtcAmount && (
+        {showAmount && (
           <RowContainer noMargin>
             <Amount amount={netAmount} />
             <AmountWithInscriptionSatribute
@@ -136,7 +136,7 @@ function TransferSection({
           transactionIsFinal &&
             runeTransfers?.map((transfer, index) => (
               <>
-                {showBtcAmount && index === 0 && <Divider verticalMargin="s" />}
+                {showAmount && index === 0 && <Divider verticalMargin="s" />}
                 <RowContainer key={transfer.runeName}>
                   {!hasExternalInputs && (
                     <BundleHeader>
@@ -171,7 +171,7 @@ function TransferSection({
             ))
         }
         {hasInscriptionsRareSatsInOrdinal && (
-          <RowContainer noPadding noMargin={hasRuneTransfers || showBtcAmount}>
+          <RowContainer noPadding noMargin={hasRuneTransfers || showAmount}>
             {!transactionIsFinal
               ? inputFromOrdinal.map((input, index) => (
                   <InscriptionSatributeRow
@@ -182,7 +182,7 @@ function TransferSection({
                     satributes={input.satributes}
                     amount={input.extendedUtxo.utxo.value}
                     onShowInscription={onShowInscription}
-                    showTopDivider={(hasRuneTransfers || showBtcAmount) && index === 0}
+                    showTopDivider={(hasRuneTransfers || showAmount) && index === 0}
                     showBottomDivider={inputFromOrdinal.length > index + 1}
                   />
                 ))
@@ -195,7 +195,7 @@ function TransferSection({
                     satributes={output.satributes}
                     amount={output.amount}
                     onShowInscription={onShowInscription}
-                    showTopDivider={(hasRuneTransfers || showBtcAmount) && index === 0}
+                    showTopDivider={(hasRuneTransfers || showAmount) && index === 0}
                     showBottomDivider={outputsFromOrdinal.length > index + 1}
                   />
                 ))}
