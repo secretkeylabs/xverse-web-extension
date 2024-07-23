@@ -4,8 +4,20 @@ import Wallet from '../pages/wallet';
 
 const strongPW = Onboarding.generateSecurePasswordCrypto();
 
-// TODO: adjust the test suite to relay on featureEnabled flag to be executed as only than the swap button is visible
 test.describe('Swapping Coins', () => {
+  // Enables the feature flag for Swap
+  test.beforeEach(async ({ page }) => {
+    await page.route('https://api-3.xverse.app/v1/app-features', (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          CROSS_CHAIN_SWAPS: { enabled: true },
+        }),
+      });
+    });
+  });
+
   test('Visual check swap page', async ({ page, extensionId }) => {
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
@@ -112,12 +124,11 @@ test.describe('Swapping Coins', () => {
     const numericQuoteValue = parseFloat(quoteAmount.replace(/[^0-9.]/g, ''));
     await expect(numericQuoteValue).toBeGreaterThan(0);
 
-    await wallet.buttonSwapPlace.first().click();
-    await expect(wallet.imageToken.first()).toBeVisible();
+    await wallet.buttonSwapPlace.last().click();
     await expect(wallet.buttonSwap).toBeVisible();
     await expect(wallet.buttonSlippage).toBeVisible();
     await wallet.buttonSwap.click();
-    // await wallet.checkVisualsSendTransactionReview('swap', addressOrdinals, TEST_ORDINALS_ADDRESS);
+    await wallet.checkVisualsSendTransactionReview('swap');
   });
 
   test('Use arrow button to switch token', async ({ page, extensionId }) => {

@@ -478,6 +478,7 @@ export default class Wallet {
     this.buttonConfirmCopyAddress = page.getByRole('button', { name: 'I understand' });
 
     // Swap
+    this.imageToken = page.getByTestId('token-image');
     this.buttonSelectCoin = page.getByTestId('select-coin-button');
     this.inputSwapAmount = page.getByTestId('swap-amount');
     this.nameToken = page.getByTestId('token-name');
@@ -494,7 +495,7 @@ export default class Wallet {
     this.buttonDetails = page.getByRole('button', { name: 'Details' });
     this.buttonInsufficientBalance = page.getByRole('button', { name: 'Insufficient balance' });
     this.buttonInsufficientFunds = page.getByRole('button', { name: 'Insufficient funds' });
-    this.imageToken = page.getByTestId('token-image');
+
     this.swapTokenBalance = page.getByTestId('swap-token-balance');
     this.textUSD = page.getByTestId('usd-text');
     this.noFundsBTCMessage = page.getByTestId('no-funds-message');
@@ -703,7 +704,12 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     // await expect(this.buttonBack).toBeVisible();
   }
 
-  async checkVisualsSendTransactionReview(url, sendAddress, receiverAddress) {
+  // SendAddress or receiverAdress can be null as not all TR screens have them e.g. swap
+  async checkVisualsSendTransactionReview(
+    url: string,
+    sendAddress?: string,
+    receiverAddress?: string,
+  ) {
     await expect(this.page.url()).toContain(url);
     await expect(this.confirmTotalAmount).toBeVisible();
     await expect(this.confirmCurrencyAmount).toBeVisible();
@@ -719,10 +725,18 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(this.receiveAddress.first()).toBeVisible();
     await expect(this.confirmAmount.first()).toBeVisible();
     await expect(this.confirmBalance.first()).toBeVisible();
-    await expect(await this.sendAddress.first().innerText()).toContain(sendAddress.slice(-4));
-    await expect(await this.receiveAddress.first().innerText()).toContain(
-      receiverAddress.slice(-4),
-    );
+
+    // Execute these checks only if sendAddress is provided
+    if (sendAddress) {
+      await expect(await this.sendAddress.first().innerText()).toContain(sendAddress.slice(-4));
+    }
+
+    // Execute these checks only if receiverAddress is provided
+    if (receiverAddress) {
+      await expect(await this.receiveAddress.first().innerText()).toContain(
+        receiverAddress.slice(-4),
+      );
+    }
   }
 
   // Check Visuals of Rune Dashboard (without List button), return balance amount
