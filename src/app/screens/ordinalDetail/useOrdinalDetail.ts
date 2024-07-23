@@ -13,6 +13,7 @@ import {
   getInscriptionsCollectionGridItemSubText,
   getInscriptionsCollectionGridItemSubTextColor,
 } from '@utils/inscriptions';
+import RoutePaths from 'app/routes/paths';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -84,7 +85,7 @@ export default function useOrdinalDetail() {
       return;
     }
 
-    navigate('send-ordinal');
+    navigate(RoutePaths.SendOrdinal.slice(1));
   };
 
   const handleRedirectToTx = () => {
