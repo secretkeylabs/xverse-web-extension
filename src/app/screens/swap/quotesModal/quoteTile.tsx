@@ -67,11 +67,11 @@ function QuoteTile({
   const { fiatCurrency } = useWalletSelector();
 
   return (
-    <Container onClick={onClick} clickable={Boolean(onClick)}>
+    <Container data-testid="swap-place-button" onClick={onClick} clickable={Boolean(onClick)}>
       <TokenImage currency={image.currency} fungibleToken={image.ft} size={32} />
       <InfoContainer>
         <RowCenter>
-          <StyledP typography="body_bold_m" color="white_0">
+          <StyledP data-testid="place-name" typography="body_bold_m" color="white_0">
             {provider}
           </StyledP>
           <NumericFormat
@@ -79,7 +79,7 @@ function QuoteTile({
             displayType="text"
             thousandSeparator
             renderText={() => (
-              <StyledP typography="body_bold_m" color="white_0">
+              <StyledP data-testid="quote-label" typography="body_bold_m" color="white_0">
                 {formatNumber(price)} {unit}
               </StyledP>
             )}
@@ -87,7 +87,7 @@ function QuoteTile({
         </RowCenter>
         <RowCenter>
           {subtitle && subtitleColor && (
-            <StyledP typography="body_medium_s" color={subtitleColor}>
+            <StyledP data-testid="info-message" typography="body_medium_s" color={subtitleColor}>
               {subtitle}
             </StyledP>
           )}

@@ -342,7 +342,10 @@ export default function QuoteSummary({
                 <StyledP typography="body_medium_m" color="white_200">
                   {t('SWAP_SCREEN.SLIPPAGE')}
                 </StyledP>
-                <SlippageButton onClick={() => setShowSlippageModal(true)}>
+                <SlippageButton
+                  data-testid="slippage-button"
+                  onClick={() => setShowSlippageModal(true)}
+                >
                   {slippage * 100}%
                   <img alt={t('SLIPPAGE')} src={SlippageEditIcon} />
                 </SlippageButton>
