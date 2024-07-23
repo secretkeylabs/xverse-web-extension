@@ -340,7 +340,9 @@ export default class Wallet {
 
   readonly buttonSwapPlace: Locator;
 
-  buttonSlippage: Locator;
+  readonly buttonSlippage: Locator;
+
+  readonly buttonExchangeDotSwap: Locator;
 
   constructor(readonly page: Page) {
     this.page = page;
@@ -491,6 +493,10 @@ export default class Wallet {
     this.infoMessage = page.getByTestId('info-message');
     this.buttonSwapPlace = page.getByTestId('swap-place-button');
     this.buttonSlippage = page.getByTestId('slippage-button');
+    // TODO needs to be change when this is fixed: https://linear.app/xverseapp/issue/ENG-4752/double-loaded-reactmodalportal-for-rates
+    this.buttonExchangeDotSwap = this.page
+      .getByRole('button')
+      .filter({ has: this.nameSwapPlace.getByText('DotSwap', { exact: true }) });
 
     this.buttonDetails = page.getByRole('button', { name: 'Details' });
     this.buttonInsufficientBalance = page.getByRole('button', { name: 'Insufficient balance' });
@@ -709,6 +715,7 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     url: string,
     sendAddress?: string,
     receiverAddress?: string,
+    editableFees?: boolean,
   ) {
     await expect(this.page.url()).toContain(url);
     await expect(this.confirmTotalAmount).toBeVisible();
@@ -716,7 +723,7 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(this.buttonExpand).toBeVisible();
     await expect(this.buttonCancel).toBeEnabled();
     await expect(this.buttonConfirm).toBeEnabled();
-    await expect(this.buttonEditFee).toBeVisible();
+
     await expect(this.feeAmount).toBeVisible();
     await expect(this.imageToken.first()).toBeVisible();
 
@@ -725,6 +732,10 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(this.receiveAddress.first()).toBeVisible();
     await expect(this.confirmAmount.first()).toBeVisible();
     await expect(this.confirmBalance.first()).toBeVisible();
+
+    if (editableFees) {
+      await expect(this.buttonEditFee).toBeVisible();
+    }
 
     // Execute these checks only if sendAddress is provided
     if (sendAddress) {

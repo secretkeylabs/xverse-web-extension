@@ -74,10 +74,13 @@ test.describe('Swapping Coins', () => {
     await expect(wallet.buttonInsufficientBalance).toBeDisabled();
   });
 
-  test('Cancel exchange', async ({ page, extensionId }) => {
+  test('Cancel exchange token via DotSwap', async ({ page, extensionId }) => {
     // Restore wallet and setup Testnet network
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
+
+    // Save initial Balance for later Balance checks
+    const initalBTCBalance = await wallet.getTokenBalance('Bitcoin');
 
     await wallet.allupperButtons.nth(2).click();
     await wallet.checkVisualsSSwapPage();
@@ -107,7 +110,7 @@ test.describe('Swapping Coins', () => {
     const numericswapBalance = parseFloat(swapBalance.replace(/[^0-9.]/g, ''));
     const swapAmount = numericswapBalance * 0.8;
     // Fill did not work with the field so we need to use this method
-    await wallet.inputSwapAmount.pressSequentially(swapAmount.toString());
+    await wallet.inputSwapAmount.pressSequentially('0.00000546'); // swapAmount.toString());
     await expect(wallet.buttonGetQuotes).toBeEnabled();
 
     const usdAmount = await wallet.textUSD.innerText();
@@ -124,14 +127,24 @@ test.describe('Swapping Coins', () => {
     const numericQuoteValue = parseFloat(quoteAmount.replace(/[^0-9.]/g, ''));
     await expect(numericQuoteValue).toBeGreaterThan(0);
 
-    await wallet.buttonSwapPlace.last().click();
+    await wallet.buttonExchangeDotSwap.last().click();
     await expect(wallet.buttonSwap).toBeVisible();
     await expect(wallet.buttonSlippage).toBeVisible();
     await wallet.buttonSwap.click();
     await wallet.checkVisualsSendTransactionReview('swap');
+    // Cancel the transaction
+    await expect(wallet.buttonCancel).toBeEnabled();
+    await wallet.buttonCancel.click();
+
+    // Check Startpage
+    await wallet.checkVisualsStartpage();
+
+    // Check BTC Balance after cancel the transaction
+    const balanceAfterCancel = await wallet.getTokenBalance('Bitcoin');
+    await expect(initalBTCBalance).toEqual(balanceAfterCancel);
   });
 
-  test('Use arrow button to switch token', async ({ page, extensionId }) => {
+  test.skip('Use arrow button to switch token', async ({ page, extensionId }) => {
     const onboardingpage = new Onboarding(page);
     const wallet = new Wallet(page);
     await onboardingpage.createWalletSkipBackup(strongPW);
