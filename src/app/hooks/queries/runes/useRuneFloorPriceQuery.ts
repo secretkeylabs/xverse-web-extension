@@ -5,15 +5,15 @@ import { useCallback } from 'react';
 
 export default function useRuneFloorPriceQuery(runeName: string, backgroundRefetch = true) {
   const { network } = useWalletSelector();
-  if (network.type !== 'Mainnet') {
-    throw new Error('Only available on Mainnet');
-  }
+
   const runesApi = useRunesApi();
   const queryFn = useCallback(
     async () =>
-      runesApi
-        .getRuneMarketData(runeName)
-        .then((res) => Number(res.floorUnitPrice?.formatted ?? 0)),
+      network.type !== 'Mainnet'
+        ? runesApi
+            .getRuneMarketData(runeName)
+            .then((res) => Number(res.floorUnitPrice?.formatted ?? 0))
+        : undefined,
     [runeName, runesApi],
   );
   return useQuery({
