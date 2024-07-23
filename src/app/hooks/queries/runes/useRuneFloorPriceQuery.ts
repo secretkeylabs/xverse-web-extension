@@ -14,7 +14,7 @@ export default function useRuneFloorPriceQuery(runeName: string, backgroundRefet
             .getRuneMarketData(runeName)
             .then((res) => Number(res.floorUnitPrice?.formatted ?? 0))
         : undefined,
-    [runeName, runesApi],
+    [network.type, runeName, runesApi],
   );
   return useQuery({
     refetchOnWindowFocus: backgroundRefetch,
