@@ -107,9 +107,8 @@ function QuotesModal({
             {t('EXCHANGE')}
           </Heading>
         )}
-        {/* todo: pass rune symbol as unit , it should be passed from swaps screen */}
-        {/* get fiat rates of rune after API returns runeID */}
-        {ammQuotes.map((amm) => (
+        {/* todo: get fiat rates of rune from API */}
+        {ammProviders.map((amm) => (
           <QuoteTile
             key={amm.provider.name}
             provider={amm.provider.name}

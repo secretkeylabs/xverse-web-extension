@@ -1,15 +1,21 @@
 import SlippageEditIcon from '@assets/img/swap/slippageEdit.svg';
 import TopRow from '@components/topRow';
+import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowRight } from '@phosphor-icons/react';
 import {
+  AnalyticsEvents,
+  RUNE_DISPLAY_DEFAULTS,
   getBtcFiatEquivalent,
   type ExecuteOrderRequest,
   type FungibleToken,
+  type MarketUtxo,
   type PlaceOrderResponse,
+  type PlaceUtxoOrderRequest,
+  type PlaceUtxoOrderResponse,
   type Quote,
   type Token,
 } from '@secretkeylabs/xverse-core';
@@ -17,6 +23,7 @@ import Button from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import { formatNumber } from '@utils/helper';
+import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,6 +34,7 @@ import { mapFTNativeSwapTokenToTokenBasic } from '../utils';
 import EditFee from './EditFee';
 import QuoteSummaryTile from './quoteSummaryTile';
 import usePlaceOrder from './usePlaceOrder';
+import usePlaceUtxoOrder from './usePlaceUtxoOrder';
 
 const SlippageButton = styled.button`
   display: flex;
@@ -134,9 +142,10 @@ type QuoteSummaryProps = {
     order,
     providerCode,
   }: {
-    order: PlaceOrderResponse;
+    order: PlaceOrderResponse | PlaceUtxoOrderResponse;
     providerCode: ExecuteOrderRequest['providerCode'];
   }) => void;
+  selectedIdentifiers?: Omit<MarketUtxo, 'token'>[];
 };
 
 export default function QuoteSummary({
@@ -148,21 +157,28 @@ export default function QuoteSummary({
   onChangeProvider,
   onOrderPlaced,
   onError,
+  selectedIdentifiers,
 }: QuoteSummaryProps) {
   const { t } = useTranslation('translation');
   const theme = useTheme();
   const { btcFiatRate } = useCoinRates();
   const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey } = useSelectedAccount();
   const { loading: isPlaceOrderLoading, error: placeOrderError, placeOrder } = usePlaceOrder();
+  const {
+    loading: isPlaceUtxoOrderLoading,
+    error: placeUtxoOrderError,
+    placeUtxoOrder,
+  } = usePlaceUtxoOrder();
 
   useEffect(() => {
-    if (placeOrderError) {
-      onError(placeOrderError);
+    if (placeOrderError || placeUtxoOrderError) {
+      onError(placeOrderError ?? placeUtxoOrderError ?? '');
     }
-  }, [placeOrderError]);
+  }, [placeOrderError, placeUtxoOrderError]);
 
   const { data: recommendedFees } = useBtcFeeRate();
   const [feeRate, setFeeRate] = useState('0');
+  const { data: runeFloorPrice } = useRuneFloorPriceQuery(toToken?.name ?? '');
 
   useEffect(() => {
     if (recommendedFees && feeRate === '0') {
@@ -172,15 +188,17 @@ export default function QuoteSummary({
 
   const { fiatCurrency } = useWalletSelector();
 
-  const satsToFiat = (sats: string) =>
-    getBtcFiatEquivalent(new BigNumber(sats), BigNumber(btcFiatRate)).toString();
-
   const fromUnit =
     fromToken === 'BTC'
-      ? 'BTC'
-      : (fromToken as FungibleToken)?.runeSymbol || (fromToken as FungibleToken)?.ticker;
+      ? 'Sats'
+      : (fromToken as FungibleToken)?.runeSymbol ??
+        (fromToken as FungibleToken)?.ticker ??
+        RUNE_DISPLAY_DEFAULTS.symbol;
 
-  const toUnit = toToken?.protocol === 'btc' ? 'SATS' : toToken?.symbol ?? toToken?.ticker;
+  const toUnit =
+    toToken?.protocol === 'btc'
+      ? 'Sats'
+      : toToken?.symbol ?? toToken?.ticker ?? RUNE_DISPLAY_DEFAULTS.symbol;
 
   const [showSlippageModal, setShowSlippageModal] = useState(false);
   const [slippage, setSlippage] = useState(0.05);
@@ -190,25 +208,56 @@ export default function QuoteSummary({
       return;
     }
 
-    const placeOrderRequest = {
-      providerCode: quote.provider.code,
-      from: mapFTNativeSwapTokenToTokenBasic(fromToken),
-      to: mapFTNativeSwapTokenToTokenBasic(toToken),
-      sendAmount: amount,
-      receiveAmount: quote.receiveAmount,
-      slippage,
-      feeRate: Number(feeRate),
-      btcAddress,
-      btcPubKey: btcPublicKey,
-      ordAddress: ordinalsAddress,
-      ordPubKey: ordinalsPublicKey,
-    };
-    const placeOrderResponse = await placeOrder(placeOrderRequest);
+    trackMixPanel(AnalyticsEvents.ConfirmSwap, {
+      provider: quote.provider.name,
+      from: fromToken === 'BTC' ? 'BTC' : fromToken.name,
+      to: toToken.protocol === 'btc' ? 'BTC' : toToken.name ?? toToken.ticker,
+    });
 
-    if (placeOrderResponse?.psbt) {
-      onOrderPlaced({ order: placeOrderResponse, providerCode: quote.provider.code });
+    if (selectedIdentifiers) {
+      const placeUtxoOrderRequest: PlaceUtxoOrderRequest = {
+        providerCode: quote.provider.code,
+        from: mapFTNativeSwapTokenToTokenBasic(fromToken),
+        to: mapFTNativeSwapTokenToTokenBasic(toToken),
+        orders: selectedIdentifiers,
+        feeRate: Number(feeRate),
+        btcAddress,
+        btcPubKey: btcPublicKey,
+        ordAddress: ordinalsAddress,
+        ordPubKey: ordinalsPublicKey,
+      };
+      const placeUtxoOrderResponse = await placeUtxoOrder(placeUtxoOrderRequest);
+      if (placeUtxoOrderResponse?.psbt && placeUtxoOrderResponse.orders.length > 0) {
+        return onOrderPlaced({ order: placeUtxoOrderResponse, providerCode: quote.provider.code });
+      }
+
+      // if no orders are returned it means that all the utxos were swept
+      if (placeUtxoOrderResponse?.orders.length === 0) {
+        onError(t('SWAP_SCREEN.ERRORS.NO_UTXOS_FOR_PURCHASE'));
+      }
+    } else {
+      const placeOrderRequest = {
+        providerCode: quote.provider.code,
+        from: mapFTNativeSwapTokenToTokenBasic(fromToken),
+        to: mapFTNativeSwapTokenToTokenBasic(toToken),
+        sendAmount: amount,
+        receiveAmount: quote.receiveAmount,
+        slippage,
+        feeRate: Number(feeRate),
+        btcAddress,
+        btcPubKey: btcPublicKey,
+        ordAddress: ordinalsAddress,
+        ordPubKey: ordinalsPublicKey,
+      };
+      const placeOrderResponse = await placeOrder(placeOrderRequest);
+
+      if (placeOrderResponse?.psbt) {
+        onOrderPlaced({ order: placeOrderResponse, providerCode: quote.provider.code });
+      }
     }
   };
+
+  const feeUnits = toToken?.protocol === 'sip10' || toToken?.protocol === 'stx' ? 'STX' : 'Sats';
 
   return (
     <>
@@ -221,7 +270,11 @@ export default function QuoteSummary({
           <QuoteSummaryTile
             fromUnit={fromUnit}
             toUnit={toUnit}
-            rate={new BigNumber(quote.receiveAmount).dividedBy(new BigNumber(amount)).toString()}
+            rate={
+              toToken?.protocol === 'btc'
+                ? new BigNumber(quote.receiveAmount).dividedBy(new BigNumber(amount)).toString()
+                : new BigNumber(amount).dividedBy(new BigNumber(quote.receiveAmount)).toString()
+            }
             provider={quote.provider.name}
             image={quote.provider.logo}
             onClick={onChangeProvider}
@@ -243,8 +296,7 @@ export default function QuoteSummary({
                   ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcFiatRate)).toFixed(
                       2,
                     )
-                  : // TODO JORDAN: ADD RUNE FIAT EQUIVALENT
-                    ''
+                  : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2)
               }
             />
             <ArrowOuterContainer>
@@ -264,6 +316,7 @@ export default function QuoteSummary({
                         runeSymbol: toToken?.symbol,
                         runeInscriptionId: toToken?.logo,
                         ticker: toToken?.name,
+                        protocol: 'runes',
                       } as FungibleToken),
               }}
               subtitle={toToken?.protocol === 'btc' ? 'Bitcoin' : toToken?.name}
@@ -275,7 +328,10 @@ export default function QuoteSummary({
                       new BigNumber(quote.receiveAmount),
                       new BigNumber(btcFiatRate),
                     ).toFixed(2)
-                  : ''
+                  : getBtcFiatEquivalent(
+                      new BigNumber(runeFloorPrice ?? 0).multipliedBy(quote.receiveAmount),
+                      new BigNumber(btcFiatRate),
+                    ).toFixed(2)
               }
             />
           </QuoteToBaseContainer>
@@ -300,14 +356,26 @@ export default function QuoteSummary({
                 {formatNumber(quote.receiveAmount)} {toUnit}
               </StyledP>
             </ListingDescriptionRow>
-            <ListingDescriptionRow>
-              <StyledP typography="body_medium_m" color="white_200">
-                {t('SWAP_SCREEN.LP_FEE')}
-              </StyledP>
-              <StyledP typography="body_medium_m" color="white_0">
-                {formatNumber(quote.feePercentage)}%
-              </StyledP>
-            </ListingDescriptionRow>
+            {Boolean(quote.feePercentage) && (
+              <ListingDescriptionRow>
+                <StyledP typography="body_medium_m" color="white_200">
+                  {t('SWAP_SCREEN.LP_FEE')}
+                </StyledP>
+                <StyledP typography="body_medium_m" color="white_0">
+                  {formatNumber(quote.feePercentage)}%
+                </StyledP>
+              </ListingDescriptionRow>
+            )}
+            {Boolean(quote.feeFlat) && (
+              <ListingDescriptionRow>
+                <StyledP typography="body_medium_m" color="white_200">
+                  {t('SWAP_SCREEN.LP_FEE')}
+                </StyledP>
+                <StyledP typography="body_medium_m" color="white_0">
+                  {formatNumber(quote.feeFlat)} {feeUnits}
+                </StyledP>
+              </ListingDescriptionRow>
+            )}
             <ListingDescriptionRow>
               <StyledP typography="body_medium_m" color="white_200">
                 {t('SWAP_SCREEN.ROUTE')}
@@ -325,18 +393,20 @@ export default function QuoteSummary({
                 {t('TRANSACTION_SETTING.FEE_RATE')}
                 <EditFeeRateContainer>
                   <EditFee
-                    feeUnits="Sats"
+                    feeUnits={feeUnits}
                     feeRate={feeRate}
                     feeRateUnits={t('UNITS.SATS_PER_VB')}
                     setFeeRate={setFeeRate}
-                    baseToFiat={satsToFiat}
+                    // We only know the rate, not the absolute amount
+                    // It is impossible to determine the fiat value
+                    baseToFiat={() => ''}
                     fiatUnit={fiatCurrency}
                     getFeeForFeeRate={(fee) => Promise.resolve(fee)}
                     feeRates={{
                       medium: recommendedFees?.regular,
                       high: recommendedFees?.priority,
                     }}
-                    feeRateLimits={recommendedFees?.limits}
+                    feeRateLimits={{ ...recommendedFees?.limits, min: recommendedFees?.regular }}
                     onFeeChange={setFeeRate}
                   />
                 </EditFeeRateContainer>
@@ -352,7 +422,7 @@ export default function QuoteSummary({
             variant="primary"
             title={t('SWAP_SCREEN.SWAP')}
             onClick={handleSwap}
-            loading={isPlaceOrderLoading}
+            loading={isPlaceOrderLoading || isPlaceUtxoOrderLoading}
           />
         </SendButtonContainer>
         <Sheet

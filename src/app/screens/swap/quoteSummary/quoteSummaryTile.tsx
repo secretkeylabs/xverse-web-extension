@@ -15,28 +15,20 @@ const Container = styled.button`
   width: 100%;
 `;
 
-const SmallContainer = styled.div`
+const RowCenter = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
+  flex: 1;
 `;
 
-const LeftColumn = styled.div`
+const InfoContainer = styled.div`
   display: flex;
   flex-direction: column;
-  margin: 0 ${({ theme }) => theme.space.xs};
-  align-items: flex-start;
-`;
-
-const RightColumn = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin: 0 ${({ theme }) => theme.space.xs};
-  align-items: flex-end;
-`;
-
-const FullHeightP = styled(StyledP)`
-  margin-top: 16px;
+  flex: 1;
+  margin-left: ${({ theme }) => theme.space.m};
+  margin-right: ${({ theme }) => theme.space.s};
 `;
 
 const Image = styled.img`
@@ -60,24 +52,22 @@ function QuoteSummaryTile({ fromUnit, toUnit, rate, provider, image, onClick }: 
 
   return (
     <Container onClick={onClick}>
-      <SmallContainer>
-        <Image src={image} alt={`${provider} logo`} />
-        <LeftColumn>
+      <Image src={image} alt={`${provider} logo`} />
+      <InfoContainer>
+        <RowCenter>
           <StyledP typography="body_bold_m" color="white_0">
             {provider}
           </StyledP>
+        </RowCenter>
+        <RowCenter>
           <StyledP typography="body_medium_m" color="white_200">
             {t('SWAP_SCREEN.RATE')}
           </StyledP>
-        </LeftColumn>
-      </SmallContainer>
-      <SmallContainer>
-        <RightColumn>
-          <FullHeightP typography="body_medium_m" color="white_0">
+          <StyledP typography="body_medium_m" color="white_0">
             1 {fromUnit} ≈ {formatNumber(rate)} {toUnit}
-          </FullHeightP>
-        </RightColumn>
-      </SmallContainer>
+          </StyledP>
+        </RowCenter>
+      </InfoContainer>
     </Container>
   );
 }

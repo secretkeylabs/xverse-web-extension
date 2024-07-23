@@ -33,7 +33,7 @@ const InfoContainer = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
-  margin-left: ${({ theme }) => theme.space.xs};
+  margin-left: ${({ theme }) => theme.space.m};
   margin-right: ${({ theme }) => theme.space.s};
 `;
 
@@ -68,12 +68,7 @@ function QuoteTile({
 
   return (
     <Container onClick={onClick} clickable={Boolean(onClick)}>
-      <TokenImage
-        currency={image.currency}
-        fungibleToken={image.ft}
-        size={32}
-        showProtocolIcon={false}
-      />
+      <TokenImage currency={image.currency} fungibleToken={image.ft} size={32} />
       <InfoContainer>
         <RowCenter>
           <StyledP typography="body_bold_m" color="white_0">

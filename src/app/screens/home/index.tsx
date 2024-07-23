@@ -26,7 +26,7 @@ import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowUp, Plus } from '@phosphor-icons/react';
 import CoinSelectModal from '@screens/home/coinSelectModal';
-import { FeatureId, type FungibleToken } from '@secretkeylabs/xverse-core';
+import { AnalyticsEvents, FeatureId, type FungibleToken } from '@secretkeylabs/xverse-core';
 import {
   changeShowDataCollectionAlertAction,
   setBrc20ManageTokensAction,
@@ -39,7 +39,7 @@ import Sheet from '@ui-library/sheet';
 import SnackBar from '@ui-library/snackBar';
 import type { CurrencyTypes } from '@utils/constants';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
-import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
+import { optInMixPanel, optOutMixPanel, trackMixPanel } from '@utils/mixpanel';
 import { sortFtByFiatBalance } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
@@ -309,6 +309,7 @@ function Home() {
   };
 
   const onSwapPressed = () => {
+    trackMixPanel(AnalyticsEvents.InitiateSwapFlow, {});
     navigate('/swap');
   };
 

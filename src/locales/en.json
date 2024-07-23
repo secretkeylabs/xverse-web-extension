@@ -1309,7 +1309,10 @@
       "SLIPPAGE_TOLERANCE_CANNOT_EXCEED": "The slippage tolerance cannot exceed 100%",
       "NO_PAIR_LIQUIDITY": "We couldn't find any quote for this pair.",
       "TRY_ANOTHER_PAIR": "You can try another pair, or try again later.",
-      "NO_TOKENS_FOUND": "No tokens found"
+      "NO_TOKENS_FOUND": "No tokens found",
+      "MISSING_UTXOS": "Selected bundles are not available anymore",
+      "SOME_MISSING_UTXOS": "Some selected bundles are not available anymore",
+      "NO_UTXOS_FOR_PURCHASE": "The selected bundles are no longer available for purchase"
     },
     "SWAP_TRANSACTION_CANNOT_BE_SPONSORED": "Swap transaction cannot be sponsored while you have a pending transaction.",
     "LEARN_MORE": "Learn more",
@@ -1322,6 +1325,8 @@
     "FLOOR_PRICE": "Floor price",
     "RECOMMENDED": "• Recommended",
     "BEST": "• Best",
+    "SWAP_BTC": "Swap Bitcoin for runes",
+    "SELECT_BUNDLES": "Select bundles to proceed with the swap",
     "SWAP_FROM": "Swap from",
     "SWAP_TO": "Swap to",
     "LIST_YOUR_RUNES": "List your Runes on Magic Eden"
