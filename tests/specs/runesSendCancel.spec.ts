@@ -46,9 +46,9 @@ test.describe('Send runes', () => {
 
     await wallet.checkVisualsSendTransactionReview(
       'send-rune',
+      true,
       addressOrdinals,
       TEST_ORDINALS_ADDRESS,
-      true,
     );
 
     await expect(await wallet.sendAddress.last().innerText()).toContain(selfBTC.slice(-4));

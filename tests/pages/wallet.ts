@@ -344,6 +344,8 @@ export default class Wallet {
 
   readonly buttonExchangeDotSwap: Locator;
 
+  buttonSwapToken: Locator;
+
   constructor(readonly page: Page) {
     this.page = page;
     this.navigationDashboard = page.getByTestId('nav-dashboard');
@@ -492,6 +494,7 @@ export default class Wallet {
     this.quoteAmount = page.getByTestId('quote-label');
     this.infoMessage = page.getByTestId('info-message');
     this.buttonSwapPlace = page.getByTestId('swap-place-button');
+    this.buttonSwapToken = page.getByTestId('swap-token-button');
     this.buttonSlippage = page.getByTestId('slippage-button');
     // TODO needs to be change when this is fixed: https://linear.app/xverseapp/issue/ENG-4752/double-loaded-reactmodalportal-for-rates
     this.buttonExchangeDotSwap = this.page
@@ -713,9 +716,9 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
   // SendAddress or receiverAdress can be null as not all TR screens have them e.g. swap
   async checkVisualsSendTransactionReview(
     url: string,
+    editableFees?: boolean,
     sendAddress?: string,
     receiverAddress?: string,
-    editableFees?: boolean,
   ) {
     await expect(this.page.url()).toContain(url);
     await expect(this.confirmTotalAmount).toBeVisible();
@@ -785,6 +788,7 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(await this.buttonDownArrow).toHaveCount(2);
     await expect(this.buttonGetQuotes).toBeVisible();
     await expect(this.textUSD).toBeVisible();
+    await expect(this.buttonSwapToken).toBeVisible();
   }
 
   async checkVisualsListOnMEPage() {
