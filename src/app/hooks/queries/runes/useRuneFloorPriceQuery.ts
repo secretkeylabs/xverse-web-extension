@@ -9,7 +9,7 @@ export default function useRuneFloorPriceQuery(runeName: string, backgroundRefet
   const runesApi = useRunesApi();
   const queryFn = useCallback(
     async () =>
-      network.type !== 'Mainnet'
+      network.type === 'Mainnet'
         ? runesApi
             .getRuneMarketData(runeName)
             .then((res) => Number(res.floorUnitPrice?.formatted ?? 0))
