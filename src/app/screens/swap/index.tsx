@@ -173,6 +173,10 @@ export default function SwapScreen() {
     trackMixPanel(AnalyticsEvents.FetchSwapQuote, {
       from: fromToken === 'BTC' ? 'BTC' : fromToken.name,
       to: toToken.protocol === 'btc' ? 'BTC' : toToken.name ?? toToken.ticker,
+      fromAmount:
+        fromToken === 'BTC'
+          ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcFiatRate)).toFixed(2)
+          : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2),
     });
 
     fetchQuotes({
@@ -533,7 +537,6 @@ export default function SwapScreen() {
           onSelectCoin={onChangeFromToken}
           visible={tokenSelectionBottomSheet === 'from'}
           title={t('SWAP_SCREEN.SWAP_FROM')}
-          to={toToken && fromToken ? undefined : toToken}
         />
         <TokenToBottomSheet
           onClose={() => setTokenSelectionBottomSheet(null)}
