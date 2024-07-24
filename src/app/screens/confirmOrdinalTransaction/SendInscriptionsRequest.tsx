@@ -2,7 +2,6 @@ import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RequestError from '@components/requests/requestError';
 import { type Transport } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
-import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -19,11 +18,10 @@ function SendInscriptionsRequest() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const navigate = useNavigate();
   const {
-    buildTx,
     cancelOrdinalsTransferRequest,
     confirmOrdinalsTransferRequest,
     setFeeRate,
-    changeFeeRate,
+    getFeeForFeeRate,
     feeRate,
     isExecuting,
     isLoading,
@@ -31,15 +29,6 @@ function SendInscriptionsRequest() {
     summary,
     txError,
   } = useSendInscriptions();
-
-  const createOrdinalsTransferTx = useCallback(async () => {
-    await buildTx();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    createOrdinalsTransferTx();
-  }, [createOrdinalsTransferTx]);
 
   const onClickCancel = async () => {
     await cancelOrdinalsTransferRequest();
@@ -80,7 +69,7 @@ function SendInscriptionsRequest() {
           cancelText={t('CANCEL')}
           onCancel={onClickCancel}
           onConfirm={onClickConfirm}
-          getFeeForFeeRate={changeFeeRate}
+          getFeeForFeeRate={getFeeForFeeRate}
           onFeeRateSet={(newFeeRate) => setFeeRate(newFeeRate.toString())}
           feeRate={+feeRate}
           isSubmitting={isExecuting}

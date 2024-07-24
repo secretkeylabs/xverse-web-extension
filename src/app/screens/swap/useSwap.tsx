@@ -1,6 +1,6 @@
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useSelectedAccount from '@hooks/useSelectedAccount';
-import { type SwapConfirmationInput } from '@screens/swap/swapConfirmation/useConfirmSwap';
+import { type SwapConfirmationInput } from '@screens/swap/swapStacksConfirmation/useConfirmSwap';
 import {
   buf2hex,
   getNewNonce,
@@ -294,7 +294,7 @@ export function useSwap(): UseSwap {
               functionName: `${tx.contractName}\n${tx.functionName}`,
               userOverrideSponsorValue,
             };
-            navigate('/swap-confirm', {
+            navigate('/swap-stacks-confirm', {
               state,
             });
           }

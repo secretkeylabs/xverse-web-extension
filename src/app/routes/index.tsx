@@ -78,7 +78,8 @@ import SignatureRequest from '@screens/signatureRequest';
 import SpeedUpTransactionScreen from '@screens/speedUpTransaction';
 import Stacking from '@screens/stacking';
 import SwapScreen from '@screens/swap';
-import SwapConfirmScreen from '@screens/swap/swapConfirmation';
+import SwapStacksScreen from '@screens/swap/swap-stacks';
+import SwapStacksConfirmation from '@screens/swap/swapStacksConfirmation';
 import TransactionRequest from '@screens/transactionRequest';
 import TransactionStatus from '@screens/transactionStatus';
 import UnlistRuneScreen from '@screens/unlistRune';
@@ -158,8 +159,12 @@ const router = createHashRouter([
         element: <SwapScreen />,
       },
       {
-        path: 'swap-confirm',
-        element: <SwapConfirmScreen />,
+        path: 'swap-stacks',
+        element: <SwapStacksScreen />,
+      },
+      {
+        path: 'swap-stacks-confirm',
+        element: <SwapStacksConfirmation />,
       },
       {
         path: RoutePaths.ConfirmStacksTransaction,

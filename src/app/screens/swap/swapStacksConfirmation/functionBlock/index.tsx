@@ -1,4 +1,8 @@
-import { Container, TitleContainer, TitleText } from '@screens/swap/swapConfirmation/stxInfoBlock';
+import {
+  Container,
+  TitleContainer,
+  TitleText,
+} from '@screens/swap/swapStacksConfirmation/stxInfoBlock';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 

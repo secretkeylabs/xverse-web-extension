@@ -58,12 +58,12 @@ const CoinTickerText = styled.p((props) => ({
   color: props.theme.colors.white_0,
 }));
 
-const SubText = styled.p((props) => ({
+const SubText = styled.p<{ fullWidth: boolean }>((props) => ({
   ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_200,
   fontSize: 12,
   textAlign: 'left',
-  maxWidth: 100,
+  maxWidth: props.fullWidth ? undefined : 100,
   overflow: 'hidden',
   textOverflow: 'ellipsis',
 }));
@@ -102,24 +102,26 @@ function TokenLoader() {
 
 interface Props {
   title: string;
-  loading: boolean;
+  loading?: boolean;
   currency: CurrencyTypes;
   onPress: (coin: CurrencyTypes, fungibleToken: FungibleToken | undefined) => void;
   fungibleToken?: FungibleToken;
   enlargeTicker?: boolean;
   className?: string;
   showProtocolIcon?: boolean;
+  hideBalance?: boolean;
 }
 
 function TokenTile({
   title,
-  loading,
+  loading = false,
   currency,
   onPress,
   fungibleToken,
   enlargeTicker = false,
   className,
   showProtocolIcon = true,
+  hideBalance = false,
 }: Props) {
   const { fiatCurrency } = useSelector((state: StoreState) => state.walletState);
   const { btcFiatRate, stxBtcRate } = useCoinRates();
@@ -160,22 +162,26 @@ function TokenTile({
         <TextContainer>
           <CoinTickerText>{getTickerTitle()}</CoinTickerText>
           <TokenTitleContainer>
-            <SubText aria-label="Token SubTitle">{title}</SubText>
+            <SubText aria-label="Token SubTitle" fullWidth={hideBalance}>
+              {title}
+            </SubText>
           </TokenTitleContainer>
         </TextContainer>
       </RowContainer>
       {loading ? (
         <TokenLoader />
       ) : (
-        <AmountContainer aria-label="CoinBalance Container">
-          <NumericFormat
-            value={getBalanceAmount(currency, fungibleToken, stxData, btcBalance)}
-            displayType="text"
-            thousandSeparator
-            renderText={(value: string) => <CoinBalanceText>{value}</CoinBalanceText>}
-          />
-          <StyledFiatAmountText fiatAmount={getFiatAmount()} fiatCurrency={fiatCurrency} />
-        </AmountContainer>
+        !hideBalance && (
+          <AmountContainer aria-label="CoinBalance Container">
+            <NumericFormat
+              value={getBalanceAmount(currency, fungibleToken, stxData, btcBalance)}
+              displayType="text"
+              thousandSeparator
+              renderText={(value: string) => <CoinBalanceText>{value}</CoinBalanceText>}
+            />
+            <StyledFiatAmountText fiatAmount={getFiatAmount()} fiatCurrency={fiatCurrency} />
+          </AmountContainer>
+        )
       )}
     </TileContainer>
   );

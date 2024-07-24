@@ -154,3 +154,18 @@ function Button({
 }
 
 export default Button;
+
+export const LinkButton = styled(Button)((props) => ({
+  ...props.theme.typography.body_medium_m,
+  padding: `0 ${props.theme.space.m}`,
+  transition: 'opacity 0.1s ease',
+  width: 'fit-content',
+  div: {
+    width: 'parent',
+    textAlign: 'right',
+    color: props.theme.colors.tangerine_light,
+  },
+  ':hover:enabled': {
+    opacity: 0.8,
+  },
+}));

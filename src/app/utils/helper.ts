@@ -333,3 +333,8 @@ export const isFungibleToken = (token: any): token is FungibleToken =>
   'total_received' in token &&
   'principal' in token &&
   'assetName' in token;
+
+export const satsToBtcString = (num: BigNumber) =>
+  satsToBtc(num)
+    .toFixed(8)
+    .replace(/\.?0+$/, '');

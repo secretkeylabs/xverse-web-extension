@@ -51,6 +51,7 @@ type Props = {
   overlayStylesOverriding?: {};
   contentStylesOverriding?: {};
   className?: string;
+  shouldCloseOnOverlayClick?: boolean;
 };
 
 function Sheet({
@@ -61,6 +62,7 @@ function Sheet({
   overlayStylesOverriding,
   contentStylesOverriding,
   className,
+  shouldCloseOnOverlayClick = true,
 }: Props) {
   const theme = useTheme();
   const isGalleryOpen = isInOptions();
@@ -99,6 +101,8 @@ function Sheet({
       ariaHideApp={false}
       style={customStyles}
       className={className}
+      shouldCloseOnOverlayClick={shouldCloseOnOverlayClick}
+      onRequestClose={onClose}
     >
       <RowContainer>
         <Title>{title}</Title>

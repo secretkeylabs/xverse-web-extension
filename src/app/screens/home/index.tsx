@@ -26,7 +26,7 @@ import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowUp, Plus } from '@phosphor-icons/react';
 import CoinSelectModal from '@screens/home/coinSelectModal';
-import { FeatureId, getFiatEquivalent, type FungibleToken } from '@secretkeylabs/xverse-core';
+import { AnalyticsEvents, FeatureId, type FungibleToken } from '@secretkeylabs/xverse-core';
 import {
   changeShowDataCollectionAlertAction,
   setBrc20ManageTokensAction,
@@ -39,8 +39,8 @@ import Sheet from '@ui-library/sheet';
 import SnackBar from '@ui-library/snackBar';
 import type { CurrencyTypes } from '@utils/constants';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
-import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
-import { getBalanceAmount } from '@utils/tokens';
+import { optInMixPanel, optOutMixPanel, trackMixPanel } from '@utils/mixpanel';
+import { sortFtByFiatBalance } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -177,30 +177,7 @@ function Home() {
   const combinedFtList = sip10CoinsList
     .concat(brc20CoinsList)
     .concat(runesCoinsList)
-    .sort((a, b) => {
-      const aFiatAmount = getFiatEquivalent(
-        Number(getBalanceAmount('FT', a)),
-        'FT',
-        BigNumber(stxBtcRate),
-        BigNumber(btcFiatRate),
-        a,
-      );
-      const bFiatAmount = getFiatEquivalent(
-        Number(getBalanceAmount('FT', b)),
-        'FT',
-        BigNumber(stxBtcRate),
-        BigNumber(btcFiatRate),
-        b,
-      );
-      // Handle empty values explicitly
-      if (aFiatAmount === '' && bFiatAmount === '') return 0;
-      if (aFiatAmount === '') return 1;
-      if (bFiatAmount === '') return -1;
-
-      const aAmount = BigNumber(aFiatAmount || 0);
-      const bAmount = BigNumber(bFiatAmount || 0);
-      return aAmount.isLessThan(bAmount) ? 1 : aAmount.isGreaterThan(bAmount) ? -1 : 0;
-    });
+    .sort((a, b) => sortFtByFiatBalance(a, b, stxBtcRate, btcFiatRate));
 
   const showNotificationBanner =
     notificationBannersArr?.length &&
@@ -332,6 +309,7 @@ function Home() {
   };
 
   const onSwapPressed = () => {
+    trackMixPanel(AnalyticsEvents.InitiateSwapFlow, {});
     navigate('/swap');
   };
 
@@ -429,10 +407,9 @@ function Home() {
     dispatch(changeShowDataCollectionAlertAction(false));
   };
 
-  const showSwaps =
-    useHasFeature(FeatureId.SWAPS) &&
-    !isLedgerAccount(selectedAccount) &&
-    network.type === 'Mainnet';
+  const isCrossChainSwapsEnabled = useHasFeature(FeatureId.CROSS_CHAIN_SWAPS);
+  // ledger is disabled for now
+  const showSwaps = isCrossChainSwapsEnabled && !isLedgerAccount(selectedAccount);
 
   return (
     <>

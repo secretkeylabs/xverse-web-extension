@@ -35,7 +35,7 @@ const ToastContainer = styled.div<{ type: ToastType }>`
   background: ${(props) => getBackgroundColor(props.type, props.theme)};
   border-radius: 12px;
   box-shadow: 0px 7px 16px -4px rgba(25, 25, 48, 0.25);
-  height: 44px;
+  min-height: 44px;
   padding: 12px 20px;
   width: auto;
   max-width: 306px;
