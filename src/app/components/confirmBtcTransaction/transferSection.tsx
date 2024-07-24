@@ -136,7 +136,7 @@ function TransferSection({
           transactionIsFinal &&
             runeTransfers?.map((transfer, index) => (
               <>
-                {index === 0 && <Divider verticalMargin="s" />}
+                {showAmount && index === 0 && <Divider verticalMargin="s" />}
                 <RowContainer key={transfer.runeName}>
                   {!hasExternalInputs && (
                     <BundleHeader>
