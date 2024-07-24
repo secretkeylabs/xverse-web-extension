@@ -355,7 +355,7 @@ export default function QuoteSummary({
               <StyledP typography="body_medium_m" color="white_200">
                 {t('SWAP_SCREEN.MIN_RECEIVE')}
               </StyledP>
-              <StyledP typography="body_medium_m" color="white_0">
+              <StyledP data-testid="min-received-amount" typography="body_medium_m" color="white_0">
                 {formatNumber(quote.receiveAmount)} {toUnit}
               </StyledP>
             </ListingDescriptionRow>

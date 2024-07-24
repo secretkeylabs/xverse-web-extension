@@ -422,7 +422,7 @@ function ConfirmBtcTransactionComponent({
             fee={currentFee}
             currency={t('CONFIRM_TRANSACTION.SATS')}
           />
-          <Label onClick={showEditFeesModal}>
+          <Label data-testid="fee-button" onClick={showEditFeesModal}>
             {t('COMMON.EDIT')} <PencilSimple size={16} weight="fill" />
           </Label>
         </FeeContainer>

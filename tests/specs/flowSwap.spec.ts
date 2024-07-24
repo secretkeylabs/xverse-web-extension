@@ -109,7 +109,7 @@ test.describe('Swapping Coins', () => {
     const swapBalance = await wallet.swapTokenBalance.innerText();
     const numericswapBalance = parseFloat(swapBalance.replace(/[^0-9.]/g, ''));
     const swapAmount = numericswapBalance * 0.8;
-    // Fill did not work with the field so we need to use this method
+    // .Fill() did not work with the field so we need to use this method
     await wallet.inputSwapAmount.pressSequentially('0.00000546'); // swapAmount.toString());
     await expect(wallet.buttonGetQuotes).toBeEnabled();
 
@@ -130,6 +130,12 @@ test.describe('Swapping Coins', () => {
     await wallet.buttonExchangeDotSwap.last().click();
     await expect(wallet.buttonSwap).toBeVisible();
     await expect(wallet.buttonSlippage).toBeVisible();
+    // Onlyy 2 token should be visible
+    await expect(await wallet.buttonSwapPlace.count()).toBe(2);
+    await expect(await wallet.imageToken.count()).toBe(2);
+
+    await wallet.buttonSwap.click();
+    await wallet.buttonSwap.click();
     await wallet.buttonSwap.click();
     await wallet.checkVisualsSendTransactionReview('swap');
     // Cancel the transaction
