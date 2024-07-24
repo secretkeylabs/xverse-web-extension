@@ -496,7 +496,7 @@
     }
   },
   "TRANSACTION_STATUS": {
-    "BROADCASTED": "Transaction Broadcasted",
+    "BROADCASTED": "Transaction broadcasted",
     "SUCCESS_MSG": "Your transaction has been successfully submitted.",
     "SEE_ON": "See on",
     "SEE_ON_MAGICEDEN": "See {{runeSymbol}} on Magic Eden",
