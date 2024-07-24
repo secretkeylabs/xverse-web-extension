@@ -214,7 +214,7 @@ export default function UtxoSelection({
       <TopRow onClick={onClose} />
       <StyledContainer>
         <Heading typography="headline_s" color="white_0">
-          {t('SWAP_BTC')}
+          {t('SWAP')}
         </Heading>
         <QuoteSummaryTile
           fromUnit="BTC"
