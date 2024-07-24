@@ -33,7 +33,7 @@ test.describe('Swap Flow Exchange', () => {
     const initalBTCBalance = await wallet.getTokenBalance('Bitcoin');
 
     await wallet.allupperButtons.nth(2).click();
-    await wallet.checkVisualsSSwapPage();
+    await wallet.checkVisualsSwapPage();
 
     // Select the first Coin
     await wallet.buttonDownArrow.nth(0).click();
@@ -65,6 +65,9 @@ test.describe('Swap Flow Exchange', () => {
     const numericUSDValue = parseFloat(usdAmount.replace(/[^0-9.]/g, ''));
     await expect(numericUSDValue).toBeGreaterThan(0);
 
+    // Save rune token name
+    const tokenName1 = await wallet.nameToken.last().innerText();
+
     await wallet.buttonGetQuotes.click();
     await expect(wallet.nameSwapPlace.first()).toBeVisible();
     await expect(wallet.quoteAmount.first()).toBeVisible();
@@ -76,17 +79,8 @@ test.describe('Swap Flow Exchange', () => {
     await expect(numericQuoteValue).toBeGreaterThan(0);
 
     await wallet.buttonExchangeDotSwap.last().click();
-    await expect(wallet.buttonSwap).toBeVisible();
-    await expect(wallet.buttonSlippage).toBeVisible();
-    // Onlyy 2 token should be visible
-    await expect(await wallet.buttonSwapPlace.count()).toBe(2);
-    await expect(await wallet.imageToken.count()).toBe(2);
 
-    // Check if USD amount from quote page is the same as from th swap start flow page
-    const usdAmountQuote = await wallet.textUSD.first().innerText();
-    const numericUSDQuote = parseFloat(usdAmountQuote.replace(/[^0-9.]/g, ''));
-    await expect(numericUSDQuote).toBe(numericUSDValue);
-    await expect(wallet.buttonEditFee).toBeVisible();
+    await wallet.checkVisualsQuotePage(tokenName1, true, numericQuoteValue, numericUSDValue);
 
     // TODO: change work around as button should be disabled until the feerate is calculted
     await wallet.buttonSwap.click();
@@ -98,6 +92,9 @@ test.describe('Swap Flow Exchange', () => {
     const swapSendAmount = await wallet.confirmBalance.last().innerText();
     const numericValueSwap = parseFloat(swapSendAmount.replace(/[^0-9.]/g, ''));
     await expect(numericValueSwap).toEqual(swapAmount);
+
+    // Check Rune token name
+    await expect(wallet.nameRune).toContainText(tokenName1);
 
     // Cancel the transaction
     await expect(wallet.buttonCancel).toBeEnabled();

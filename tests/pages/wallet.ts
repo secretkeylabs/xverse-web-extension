@@ -346,6 +346,10 @@ export default class Wallet {
 
   buttonSwapToken: Locator;
 
+  minReceivedAmount: Locator;
+
+  nameRune: Locator;
+
   constructor(readonly page: Page) {
     this.page = page;
     this.navigationDashboard = page.getByTestId('nav-dashboard');
@@ -496,6 +500,9 @@ export default class Wallet {
     this.buttonSwapPlace = page.getByTestId('swap-place-button');
     this.buttonSwapToken = page.getByTestId('swap-token-button');
     this.buttonSlippage = page.getByTestId('slippage-button');
+    this.minReceivedAmount = page.getByTestId('min-received-amount');
+    this.nameRune = page.getByTestId('rune-name');
+
     // TODO needs to be change when this is fixed: https://linear.app/xverseapp/issue/ENG-4752/double-loaded-reactmodalportal-for-rates
     this.buttonExchangeDotSwap = this.page
       .getByRole('button')
@@ -775,7 +782,7 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(await this.runeItem.count()).toBeGreaterThanOrEqual(1);
   }
 
-  async checkVisualsSSwapPage() {
+  async checkVisualsSwapPage() {
     await expect(this.page.url()).toContain('swap');
     await expect(this.buttonDownArrow.first()).toBeVisible();
     await expect(this.buttonGetQuotes.first()).toBeVisible();
@@ -789,6 +796,42 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(this.buttonGetQuotes).toBeVisible();
     await expect(this.textUSD).toBeVisible();
     await expect(this.buttonSwapToken).toBeVisible();
+  }
+
+  // had to disable this rule as my first assertion was always changed to a wrong assertion
+  /* eslint-disable playwright/prefer-web-first-assertions */
+  async checkVisualsQuotePage(
+    tokenName: string,
+    slippage: boolean,
+    numericQuoteValue,
+    numericUSDValue,
+  ) {
+    await expect(this.buttonSwap).toBeVisible();
+    await expect(this.buttonEditFee).toBeVisible();
+    if (slippage) {
+      await expect(this.buttonSlippage).toBeVisible();
+    }
+    // Only 2 token should be visible
+    await expect(await this.buttonSwapPlace.count()).toBe(2);
+    await expect(await this.imageToken.count()).toBe(2);
+
+    // Check Runen token name
+    await expect(this.infoMessage.last()).toContainText(tokenName);
+
+    // Check if USD amount from quote page is the same as from th swap start flow page
+    const usdAmountQuote = await this.textUSD.first().innerText();
+    const numericUSDQuote = parseFloat(usdAmountQuote.replace(/[^0-9.]/g, ''));
+    await expect(numericUSDQuote).toEqual(numericUSDValue);
+
+    // min-received-amount value should be the same as quoteAmount
+    const minReceivedAmount = await this.minReceivedAmount.innerText();
+    const numericMinReceivedAmount = parseFloat(minReceivedAmount.replace(/[^0-9.]/g, ''));
+    await expect(numericMinReceivedAmount).toEqual(numericQuoteValue);
+
+    // check if quoteAmount is the same from the page before
+    const quoteAmount2Page = await this.quoteAmount.last().innerText();
+    const numericQuote2Page = parseFloat(quoteAmount2Page.replace(/[^0-9.]/g, ''));
+    await expect(numericQuote2Page).toEqual(numericQuoteValue);
   }
 
   async checkVisualsListOnMEPage() {
