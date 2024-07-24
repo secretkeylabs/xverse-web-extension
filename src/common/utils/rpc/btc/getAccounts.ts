@@ -1,65 +1,27 @@
-import { WebBtcMessage } from '@common/types/message-types';
+/* eslint-disable import/prefer-default-export */
 import { getTabIdFromPort } from '@common/utils';
-import { AddressPurpose, RpcErrorCode } from '@sats-connect/core';
-import { z } from 'zod';
-import {
-  ParamsKeyValueArray,
-  listenForOriginTabClose,
-  listenForPopupClose,
-  makeSearchParamsWithDefaults,
-  triggerRequestWindowOpen,
-} from '../../legacy-external-message-handler';
+import { makeContext, openPopup } from '@common/utils/popup';
+import { getAccountsRequestMessageSchema, type RpcRequestMessage } from '@sats-connect/core';
+import * as v from 'valibot';
 import RequestsRoutes from '../../route-urls';
-import { makeRPCError, sendRpcResponse } from '../helpers';
+import { handleInvalidMessage } from '../handle-invalid-message';
+import { makeSendPopupClosedUserRejectionMessage } from '../helpers';
 
-const AddressPurposeSchema = z.enum([
-  AddressPurpose.Ordinals,
-  AddressPurpose.Payment,
-  AddressPurpose.Stacks,
-]);
+export const handleGetAccounts = async (message: RpcRequestMessage, port: chrome.runtime.Port) => {
+  const parseResult = v.safeParse(getAccountsRequestMessageSchema, message);
 
-const GetAccountsParamsSchema = z.object({
-  purposes: z.array(AddressPurposeSchema),
-  message: z.string().optional(),
-});
-
-export const handleGetAccounts = async (
-  message: WebBtcMessage<'getAccounts'>,
-  port: chrome.runtime.Port,
-) => {
-  const paramsParseResult = GetAccountsParamsSchema.safeParse(message.params);
-
-  if (!paramsParseResult.success) {
-    const invalidParamsError = makeRPCError(message.id, {
-      code: RpcErrorCode.INVALID_PARAMS,
-      message: 'Invalid params',
-    });
-    sendRpcResponse(getTabIdFromPort(port), invalidParamsError);
+  if (!parseResult.success) {
+    handleInvalidMessage(message, getTabIdFromPort(port), parseResult.issues);
     return;
   }
 
-  const requestParams: ParamsKeyValueArray = [
-    ['purposes', paramsParseResult.data.purposes.toString()],
-    ['requestId', message.id as string],
-    ['rpcMethod', message.method],
-  ];
-
-  if (paramsParseResult.data.message) {
-    requestParams.push(['message', paramsParseResult.data.message]);
-  }
-
-  const { urlParams, tabId } = makeSearchParamsWithDefaults(port, requestParams);
-
-  const { id } = await triggerRequestWindowOpen(RequestsRoutes.AddressRequest, urlParams);
-  listenForPopupClose({
-    tabId,
-    id,
-    response: makeRPCError(message.id, {
-      code: RpcErrorCode.USER_REJECTION,
-      message: 'User rejected request to get accounts',
+  await openPopup({
+    path: RequestsRoutes.AddressRequest,
+    data: parseResult.output,
+    context: makeContext(port),
+    onClose: makeSendPopupClosedUserRejectionMessage({
+      tabId: getTabIdFromPort(port),
+      messageId: parseResult.output.id,
     }),
   });
-  listenForOriginTabClose({ tabId });
 };
-
-export default handleGetAccounts;

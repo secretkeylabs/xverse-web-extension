@@ -2,7 +2,7 @@ import useRunesApi from '@hooks/apiClients/useRunesApi';
 import useHasFeature from '@hooks/useHasFeature';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { FeatureId, FungibleToken } from '@secretkeylabs/xverse-core';
+import { FeatureId, type FungibleToken } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
 

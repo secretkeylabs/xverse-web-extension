@@ -6,7 +6,14 @@ const TEST_ORDINALS_ADDRESS = 'tb1pprpcu07x8fd02keqx9wtfncz99fhg6hepvpw34w9l2lna
 test.describe('Collectibles Tab - Inscriptions', () => {
   test('Cancel send Collection Inscriptions testnet', async ({ page, extensionId }) => {
     const wallet = new Wallet(page);
-    await wallet.setupTestnetTest(extensionId, 'SEED_WORDS1');
+    await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
+
+    // get own Ordinals Address for address check on review page
+    await wallet.allupperButtons.nth(1).click();
+    const addressOrdinals = await wallet.getAddress(wallet.buttonCopyOrdinalsAddress);
+
+    // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
+    await page.reload();
 
     // Navigate to Collectibles tab
     await wallet.navigateToCollectibles();
@@ -17,12 +24,12 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     // Save name of Inscription for later check
     const nameInscriptions = await wallet.nameInscriptionCollection.first().innerText();
 
-    // Click on the firt collection
+    // Click on the first collection
     await wallet.clickOnSpecificInscription(nameInscriptions);
 
-    await expect(wallet.itemCollenction.first()).toBeVisible();
-    await expect(await wallet.itemCollenction.count()).toBeGreaterThanOrEqual(1);
-    await wallet.itemCollenction.first().click();
+    await expect(wallet.itemCollection.first()).toBeVisible();
+    await expect(await wallet.itemCollection.count()).toBeGreaterThanOrEqual(1);
+    await wallet.itemCollection.first().click();
 
     // Check visuals
     await expect(wallet.buttonSend).toBeVisible();
@@ -44,57 +51,45 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     // Click on send button
     await wallet.buttonSend.click();
     await expect(wallet.buttonNext).toBeVisible();
+    await expect(wallet.receiveAddress).toBeVisible();
     await expect(wallet.buttonNext).toBeDisabled();
 
     // Address invalid check
-    const inputAddress = page.locator('input');
-    await inputAddress.fill(`Test Address 123`);
-    await expect(wallet.errorMessageAddressInvalid).toBeVisible();
-    await expect(wallet.buttonNext).toBeDisabled();
-    await inputAddress.fill(TEST_ORDINALS_ADDRESS);
+    await wallet.invalidAdressCheck(wallet.receiveAddress);
+
+    // Check Info message
+    await wallet.receiveAddress.fill(addressOrdinals);
+    await expect(wallet.infoMessageSendSelf).toBeVisible();
+
+    await wallet.receiveAddress.fill(TEST_ORDINALS_ADDRESS);
     await expect(wallet.buttonNext).toBeEnabled();
     await wallet.buttonNext.click();
 
     // Transaction Review Page
-    await expect(wallet.receiveAddress.first()).toBeVisible();
-    await expect(await wallet.receiveAddress.first().innerText()).toContain(
-      TEST_ORDINALS_ADDRESS.slice(-4),
-    );
-    await expect(wallet.buttonCancel).toBeEnabled();
-    await expect(wallet.buttonConfirm).toBeEnabled();
-    await expect(wallet.textValueReviewPage).toBeEnabled();
-
-    // Check if the right ordinal number is shown
-    const reviewNumberOrdinal = await wallet.textValueReviewPage.innerText();
-    await expect(orgNumberOrdinal).toMatch(reviewNumberOrdinal);
+    await wallet.checkVisualsSendInscriptionsPage2(TEST_ORDINALS_ADDRESS, orgNumberOrdinal);
 
     // Cancel the transaction
-    // TODO: Enable the following code when this is fixed: https://linear.app/xverseapp/issue/ENG-4305/cancel-transaction-functionality-is-inconsistent-between-stx-and-btc
-    /*
     await wallet.buttonCancel.click();
 
-    // TODO: Check where the cancel button leads the user
-    // Check Startpage
-    await wallet.checkVisualsStartpage('testnet');
+    // Back to collection overview
+    await wallet.buttonBack.click();
+    // back to gallery
+    await wallet.backToGallery.click();
 
     // Check if Inscription is still there
-    await wallet.navigateToCollectibles();
     await expect(await wallet.containersCollectibleItem.count()).toBeGreaterThanOrEqual(1);
 
     // Click on the same Inscriptions from before
     await wallet.clickOnSpecificInscription(nameInscriptions);
-
-      await expect(wallet.itemCollenction.first()).toBeVisible();
-      await expect(await wallet.itemCollenction.count()).toBeGreaterThanOrEqual(1);
-      await wallet.itemCollenction.first().click();
-
+    await expect(wallet.itemCollection.first()).toBeVisible();
+    await expect(await wallet.itemCollection.count()).toBeGreaterThanOrEqual(1);
+    await wallet.itemCollection.first().click();
 
     // check ordinal number with the ordinal number from before
     await expect(wallet.numberOrdinal).toBeVisible();
     const org2NumberOrdinal = await wallet.numberOrdinal.innerText();
 
     await expect(orgNumberOrdinal).toMatch(org2NumberOrdinal);
-     */
   });
 
   test('Send one Item from Collection Inscriptions testnet #localexecution', async ({
@@ -102,7 +97,7 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     extensionId,
   }) => {
     const wallet = new Wallet(page);
-    await wallet.setupTestnetTest(extensionId, 'SEED_WORDS1');
+    await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
     // Navigate to Collectibles tab
     await wallet.navigateToCollectibles();
@@ -116,9 +111,9 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     // Click on the firt collection
     await wallet.clickOnSpecificInscription(nameInscriptions);
 
-    await expect(wallet.itemCollenction.first()).toBeVisible();
-    await expect(await wallet.itemCollenction.count()).toBeGreaterThanOrEqual(1);
-    await wallet.itemCollenction.first().click();
+    await expect(wallet.itemCollection.first()).toBeVisible();
+    await expect(await wallet.itemCollection.count()).toBeGreaterThanOrEqual(1);
+    await wallet.itemCollection.first().click();
 
     // Check visuals
     await expect(wallet.buttonSend).toBeVisible();
@@ -140,31 +135,23 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     // Click on send button
     await wallet.buttonSend.click();
     await expect(wallet.buttonNext).toBeVisible();
+    await expect(wallet.receiveAddress).toBeVisible();
     await expect(wallet.buttonNext).toBeDisabled();
 
     // Address invalid check
-    const inputAddress = page.locator('input');
-    await inputAddress.fill(`Test Address 123`);
-    await expect(wallet.errorMessageAddressInvalid).toBeVisible();
-    await expect(wallet.buttonNext).toBeDisabled();
-    await inputAddress.fill(TEST_ORDINALS_ADDRESS);
+    await wallet.invalidAdressCheck(wallet.receiveAddress);
+
+    await wallet.receiveAddress.fill(TEST_ORDINALS_ADDRESS);
     await expect(wallet.buttonNext).toBeEnabled();
     await wallet.buttonNext.click();
 
     // Transaction Review Page
-    await expect(wallet.receiveAddress.first()).toBeVisible();
-    await expect(await wallet.receiveAddress.first().innerText()).toContain(
-      TEST_ORDINALS_ADDRESS.slice(-4),
-    );
-    await expect(wallet.buttonCancel).toBeEnabled();
-    await expect(wallet.buttonConfirm).toBeEnabled();
-    await expect(wallet.textValueReviewPage).toBeEnabled();
-
-    // Check if the right ordinal number is shown
-    const reviewNumberOrdinal = await wallet.textValueReviewPage.innerText();
-    await expect(orgNumberOrdinal).toMatch(reviewNumberOrdinal);
+    await wallet.checkVisualsSendInscriptionsPage2(TEST_ORDINALS_ADDRESS, orgNumberOrdinal);
 
     await wallet.confirmSendTransaction();
+
+    // Back on startpage go to Collectibles tab
+    await wallet.navigateToCollectibles();
 
     // Check visuals on opening Collectibles page
     await expect(wallet.tabsCollectiblesItems.first()).toBeVisible();
@@ -176,7 +163,14 @@ test.describe('Collectibles Tab - Inscriptions', () => {
 
   test('Cancel send single Inscriptions testnet', async ({ page, extensionId }) => {
     const wallet = new Wallet(page);
-    await wallet.setupTestnetTest(extensionId, 'SEED_WORDS1');
+    await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
+
+    // get own Ordinals Address for address check on review page
+    await wallet.allupperButtons.nth(1).click();
+    const addressOrdinals = await wallet.getAddress(wallet.buttonCopyOrdinalsAddress);
+
+    // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
+    await page.reload();
 
     // Navigate to Collectibles tab
     await wallet.navigateToCollectibles();
@@ -213,38 +207,25 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     await expect(wallet.buttonNext).toBeDisabled();
 
     // Address invalid check
-    const inputAddress = page.locator('input');
-    await inputAddress.fill(`Test Address 123`);
-    await expect(wallet.errorMessageAddressInvalid).toBeVisible();
-    await expect(wallet.buttonNext).toBeDisabled();
-    await inputAddress.fill(TEST_ORDINALS_ADDRESS);
+    await wallet.invalidAdressCheck(wallet.receiveAddress);
+
+    // Check Info message
+    await wallet.receiveAddress.fill(addressOrdinals);
+    await expect(wallet.infoMessageSendSelf).toBeVisible();
+
+    await wallet.receiveAddress.fill(TEST_ORDINALS_ADDRESS);
     await expect(wallet.buttonNext).toBeEnabled();
     await wallet.buttonNext.click();
 
     // Transaction Review Page
-    await expect(wallet.receiveAddress.first()).toBeVisible();
-    await expect(await wallet.receiveAddress.first().innerText()).toContain(
-      TEST_ORDINALS_ADDRESS.slice(-4),
-    );
-    await expect(wallet.buttonCancel).toBeEnabled();
-    await expect(wallet.buttonConfirm).toBeEnabled();
-    await expect(wallet.textValueReviewPage).toBeEnabled();
-
-    // Check if the right ordinal number is shown
-    const reviewNumberOrdinal = await wallet.textValueReviewPage.innerText();
-    await expect(orgNumberOrdinal).toMatch(reviewNumberOrdinal);
+    await wallet.checkVisualsSendInscriptionsPage2(TEST_ORDINALS_ADDRESS, orgNumberOrdinal);
 
     // Cancel the transaction
-    // TODO: Enable the following code when this is fixed: https://linear.app/xverseapp/issue/ENG-4305/cancel-transaction-functionality-is-inconsistent-between-stx-and-btc
-    /*
     await wallet.buttonCancel.click();
 
-    // TODO: Check where the cancel button leads the user
-    // Check Startpage
-    await wallet.checkVisualsStartpage('testnet');
+    // Back from detail to overview
+    await wallet.buttonBack.click();
 
-    // Check if Inscription is still there
-    await wallet.navigateToCollectibles();
     await expect(await wallet.containersCollectibleItem.count()).toBeGreaterThanOrEqual(1);
 
     // Click on the same Inscriptions from before
@@ -255,12 +236,11 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     const org2NumberOrdinal = await wallet.numberOrdinal.innerText();
 
     await expect(orgNumberOrdinal).toMatch(org2NumberOrdinal);
-     */
   });
 
   test('Send single Inscriptions testnet #localexecution', async ({ page, extensionId }) => {
     const wallet = new Wallet(page);
-    await wallet.setupTestnetTest(extensionId, 'SEED_WORDS1');
+    await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
     // Navigate to Collectibles tab
     await wallet.navigateToCollectibles();
@@ -296,29 +276,18 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     await expect(wallet.buttonNext).toBeVisible();
     await expect(wallet.buttonNext).toBeDisabled();
 
-    // Address invalid check
-    const inputAddress = page.locator('input');
-    await inputAddress.fill(`Test Address 123`);
-    await expect(wallet.errorMessageAddressInvalid).toBeVisible();
-    await expect(wallet.buttonNext).toBeDisabled();
-    await inputAddress.fill(TEST_ORDINALS_ADDRESS);
+    // Input Address
+    await wallet.receiveAddress.fill(TEST_ORDINALS_ADDRESS);
     await expect(wallet.buttonNext).toBeEnabled();
     await wallet.buttonNext.click();
 
     // Transaction Review Page
-    await expect(wallet.receiveAddress.first()).toBeVisible();
-    await expect(await wallet.receiveAddress.first().innerText()).toContain(
-      TEST_ORDINALS_ADDRESS.slice(-4),
-    );
-    await expect(wallet.buttonCancel).toBeEnabled();
-    await expect(wallet.buttonConfirm).toBeEnabled();
-    await expect(wallet.textValueReviewPage).toBeEnabled();
-
-    // Check if the right ordinal number is shown
-    const reviewNumberOrdinal = await wallet.textValueReviewPage.innerText();
-    await expect(orgNumberOrdinal).toMatch(reviewNumberOrdinal);
+    await wallet.checkVisualsSendInscriptionsPage2(TEST_ORDINALS_ADDRESS, orgNumberOrdinal);
 
     await wallet.confirmSendTransaction();
+
+    // Back on startpage go to Collectibles tab
+    await wallet.navigateToCollectibles();
 
     // Check visuals on opening Collectibles page
     await expect(wallet.tabsCollectiblesItems.first()).toBeVisible();

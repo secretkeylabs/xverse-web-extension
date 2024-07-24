@@ -15,6 +15,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": false,
+    "verbatimModuleSyntax": true,
     "jsx": "react-jsx",
     "outDir": "build/js",
     "baseUrl": "./src",

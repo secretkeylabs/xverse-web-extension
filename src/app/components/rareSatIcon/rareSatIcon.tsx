@@ -30,7 +30,7 @@ import SilkRoad from '@assets/img/nftDashboard/rareSats/silkroad.png';
 import Uncommon from '@assets/img/nftDashboard/rareSats/uncommon.png';
 import Unknown from '@assets/img/nftDashboard/rareSats/unknown.png';
 import Vintage from '@assets/img/nftDashboard/rareSats/vintage.png';
-import { RareSatsType } from '@secretkeylabs/xverse-core';
+import type { RareSatsType } from '@secretkeylabs/xverse-core';
 import styled from 'styled-components';
 
 const Image = styled.img<{ size?: number }>`

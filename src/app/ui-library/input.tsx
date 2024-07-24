@@ -1,4 +1,4 @@
-import { ChangeEvent, useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useRef, type ChangeEvent } from 'react';
 import styled from 'styled-components';
 import { InputFeedback, type FeedbackVariant } from './inputFeedback';
 
@@ -33,14 +33,16 @@ const InputContainer = styled.div`
   position: relative;
 `;
 
-const InputField = styled.input<{ $bgColor?: string }>`
+const InputField = styled.input<{ $bgColor?: string; $hasLeftAccessory?: boolean }>`
   ${(props) => props.theme.typography.body_medium_m}
 
   width: 100%;
 
   color: ${(props) => props.theme.colors.white_200};
   background-color: ${(props) => props.$bgColor || props.theme.colors.elevation_n1};
-  padding: ${(props) => props.theme.spacing(5)}px ${(props) => props.theme.space.m};
+  padding: ${(props) => props.theme.spacing(5)}px ${(props) => props.theme.space.m}
+    ${(props) => props.theme.spacing(5)}px
+    ${(props) => props.theme.spacing(props.$hasLeftAccessory ? 18 : 8)}px;
   border-radius: 8px;
 
   caret-color: ${(props) => props.theme.colors.tangerine};
@@ -145,6 +147,22 @@ const ClearButton = styled.div<{ $hasSiblings?: boolean }>`
   }
 `;
 
+const LeftAccessoryContainer = styled.div`
+  position: absolute;
+  left: ${(props) => props.theme.space.xs};
+  top: 0;
+
+  height: 100%;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  > *:first-child {
+    margin-left: ${(props) => props.theme.space.xs};
+  }
+`;
+
 const SubText = styled.div`
   color: ${(props) => props.theme.colors.white_400};
   margin-top: ${(props) => props.theme.spacing(4)}px;
@@ -176,6 +194,9 @@ type Props = {
   }[];
   autoFocus?: boolean;
   bgColor?: string;
+  leftAccessory?: {
+    icon: React.ReactNode;
+  };
 };
 
 function Input({
@@ -196,6 +217,7 @@ function Input({
   disabled = false,
   autoFocus = false,
   bgColor,
+  leftAccessory,
 }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const complicationsRef = useRef<HTMLDivElement>(null);
@@ -242,6 +264,7 @@ function Input({
         </TitleContainer>
       )}
       <InputContainer>
+        {leftAccessory && <LeftAccessoryContainer>{leftAccessory.icon}</LeftAccessoryContainer>}
         <InputField
           className={displayVariant}
           ref={inputRef}
@@ -254,6 +277,7 @@ function Input({
           disabled={disabled}
           autoFocus={autoFocus}
           $bgColor={bgColor}
+          $hasLeftAccessory={!!leftAccessory}
         />
         <ComplicationsContainer ref={complicationsRef}>
           {!hideClear && value && (

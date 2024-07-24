@@ -6,14 +6,14 @@ import PendingIcon from '@assets/img/transactions/pending.svg';
 import ReceiveIcon from '@assets/img/transactions/received.svg';
 import SendIcon from '@assets/img/transactions/sent.svg';
 
-import {
+import type {
   Brc20HistoryTransactionData,
   BtcTransactionData,
   FungibleTokenProtocol,
   GetRunesActivityForAddressEvent,
   StxTransactionData,
 } from '@secretkeylabs/xverse-core';
-import { CurrencyTypes } from '@utils/constants';
+import type { CurrencyTypes } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 
 interface TransactionStatusIconPros {

@@ -1,5 +1,5 @@
 import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
-import useResetUserFlow from '@hooks/useResetUserFlow';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 

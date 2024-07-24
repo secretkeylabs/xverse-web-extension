@@ -4,7 +4,7 @@ import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import ledgerConfirmOrdinalsIcon from '@assets/img/ledger/ordinals_icon_big.svg';
-import { LedgerTransactionType } from '@common/types/ledger';
+import { type LedgerTransactionType } from '@common/types/ledger';
 import { delay } from '@common/utils/ledger';
 import ActionButton from '@components/button';
 import InfoContainer from '@components/infoContainer';
@@ -21,15 +21,15 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { useTransition } from '@react-spring/web';
 import {
-  Recipient,
-  StacksRecipient,
-  UTXO,
   broadcastSignedTransaction,
   microstacksToStx,
   satsToBtc,
   signLedgerMixedBtcTransaction,
   signLedgerNativeSegwitBtcTransaction,
   signLedgerStxTransaction,
+  type Recipient,
+  type StacksRecipient,
+  type UTXO,
 } from '@secretkeylabs/xverse-core';
 import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
 import { getBtcTxStatusUrl, getStxTxStatusUrl, getTruncatedAddress } from '@utils/helper';

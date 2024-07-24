@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 import ActionButton from '@components/button';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -6,7 +7,6 @@ import styled from 'styled-components';
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 16px;
   row-gap: 16px;
 `;
 
@@ -64,7 +64,7 @@ const Description = styled.p((props) => ({
   color: props.theme.colors.white_400,
 }));
 
-const DEFAULT_SLIPPAGE = '4%';
+const DEFAULT_SLIPPAGE = '5%';
 export function SlippageModalContent({
   slippage,
   onChange,
@@ -108,4 +108,3 @@ export function SlippageModalContent({
     </Container>
   );
 }
-export default SlippageModalContent;

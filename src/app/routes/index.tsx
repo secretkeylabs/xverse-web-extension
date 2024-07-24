@@ -16,6 +16,7 @@ import ConfirmFtTransaction from '@screens/confirmFtTransaction';
 import ConfirmInscriptionRequest from '@screens/confirmInscriptionRequest';
 import ConfirmNftTransaction from '@screens/confirmNftTransaction';
 import ConfirmOrdinalTransaction from '@screens/confirmOrdinalTransaction';
+import SendInscriptionsRequest from '@screens/confirmOrdinalTransaction/SendInscriptionsRequest';
 import ConfirmStxTransaction from '@screens/confirmStxTransaction';
 import AuthenticationRequest from '@screens/connect/authenticationRequest';
 import BtcSelectAddressScreen from '@screens/connect/btcSelectAddressScreen';
@@ -77,7 +78,8 @@ import SignatureRequest from '@screens/signatureRequest';
 import SpeedUpTransactionScreen from '@screens/speedUpTransaction';
 import Stacking from '@screens/stacking';
 import SwapScreen from '@screens/swap';
-import SwapConfirmScreen from '@screens/swap/swapConfirmation';
+import SwapStacksScreen from '@screens/swap/swap-stacks';
+import SwapStacksConfirmation from '@screens/swap/swapStacksConfirmation';
 import TransactionRequest from '@screens/transactionRequest';
 import TransactionStatus from '@screens/transactionStatus';
 import UnlistRuneScreen from '@screens/unlistRune';
@@ -157,11 +159,15 @@ const router = createHashRouter([
         element: <SwapScreen />,
       },
       {
-        path: 'swap-confirm',
-        element: <SwapConfirmScreen />,
+        path: 'swap-stacks',
+        element: <SwapStacksScreen />,
       },
       {
-        path: 'confirm-stx-tx',
+        path: 'swap-stacks-confirm',
+        element: <SwapStacksConfirmation />,
+      },
+      {
+        path: RoutePaths.ConfirmStacksTransaction,
         element: <ConfirmStxTransaction />,
       },
       {
@@ -213,7 +219,7 @@ const router = createHashRouter([
         element: <WalletExists />,
       },
       {
-        path: 'transaction-request',
+        path: RequestsRoutes.TransactionRequest,
         element: (
           <AuthGuard>
             <TransactionRequest />
@@ -417,10 +423,18 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'send-ordinal',
+        path: RoutePaths.SendOrdinal,
         element: (
           <AuthGuard>
             <SendOrdinal />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: RoutePaths.SendInscriptionsRequest,
+        element: (
+          <AuthGuard>
+            <SendInscriptionsRequest />
           </AuthGuard>
         ),
       },

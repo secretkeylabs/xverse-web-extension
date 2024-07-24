@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { AddressPurpose, AddressType } from '@sats-connect/core';
-import { Account } from '@secretkeylabs/xverse-core';
+import type { Account } from '@secretkeylabs/xverse-core';
 
 export function accountPurposeAddresses(account: Account, purposes: AddressPurpose[]) {
   return purposes.map((purpose) => {

@@ -1,11 +1,11 @@
 import { getTabIdFromPort } from '@common/utils';
 import getSelectedAccount from '@common/utils/getSelectedAccount';
 import { makeContext } from '@common/utils/popup';
-import { Result, safePromise } from '@common/utils/safe';
+import { safePromise, type Result } from '@common/utils/safe';
 import { makeAccountResourceId } from '@components/permissionsManager/resources';
 import * as utils from '@components/permissionsManager/utils';
-import { RpcRequestMessage, getBalanceRequestMessageSchema } from '@sats-connect/core';
-import { BitcoinEsploraApiProvider, NetworkType } from '@secretkeylabs/xverse-core';
+import { getBalanceRequestMessageSchema, type RpcRequestMessage } from '@sats-connect/core';
+import { BitcoinEsploraApiProvider, type NetworkType } from '@secretkeylabs/xverse-core';
 import rootStore from '@stores/index';
 import * as v from 'valibot';
 import { handleInvalidMessage } from '../handle-invalid-message';

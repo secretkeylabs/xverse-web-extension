@@ -1,4 +1,4 @@
-import { Recipient, StacksRecipient, UTXO } from '@secretkeylabs/xverse-core';
+import type { Recipient, StacksRecipient, UTXO } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 
 export type LedgerTransactionType = 'BTC' | 'STX' | 'ORDINALS' | 'BRC-20';

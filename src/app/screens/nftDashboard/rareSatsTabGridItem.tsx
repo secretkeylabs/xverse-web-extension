@@ -2,7 +2,7 @@ import ExoticSatsRow from '@components/exoticSatsRow/exoticSatsRow';
 import RareSatIcon from '@components/rareSatIcon/rareSatIcon';
 import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
 import { DotsThree } from '@phosphor-icons/react';
-import { Bundle, RareSatsType } from '@secretkeylabs/xverse-core';
+import type { Bundle, RareSatsType } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { getFormattedTxIdVoutFromBundle } from '@utils/rareSats';
 import { useNavigate } from 'react-router-dom';

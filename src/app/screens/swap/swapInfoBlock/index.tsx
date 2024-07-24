@@ -1,8 +1,9 @@
+/* eslint-disable import/prefer-default-export */
 import ChevronIcon from '@assets/img/swap/chevron.svg';
 import SlippageEditIcon from '@assets/img/swap/slippageEdit.svg';
 import BottomModal from '@components/bottomModal';
 import { SlippageModalContent } from '@screens/swap/slippageModal';
-import { UseSwap } from '@screens/swap/types';
+import { type UseSwap } from '@screens/swap/types';
 import {
   EMPTY_LABEL,
   SUPPORT_URL_TAB_TARGET,
@@ -178,4 +179,3 @@ export function SwapInfoBlock({ swap }: { swap: UseSwap }) {
     </>
   );
 }
-export default SwapInfoBlock;

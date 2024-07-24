@@ -11,10 +11,10 @@ import { ArrowLeft } from '@phosphor-icons/react';
 import { GridContainer } from '@screens/nftDashboard/collectiblesTabs';
 import Nft from '@screens/nftDashboard/nft';
 import NftImage from '@screens/nftDashboard/nftImage';
-import { NonFungibleToken, StacksCollectionData } from '@secretkeylabs/xverse-core';
+import type { NonFungibleToken, StacksCollectionData } from '@secretkeylabs/xverse-core';
 import { EMPTY_LABEL } from '@utils/constants';
 import { getFullyQualifiedKey, getNftCollectionsGridItemId, isBnsCollection } from '@utils/nfts';
-import { PropsWithChildren, useRef } from 'react';
+import { useRef, type PropsWithChildren } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useIsVisible } from 'react-is-visible';
@@ -97,7 +97,7 @@ const BackButton = styled.button((props) => ({
   marginBottom: props.theme.spacing(12),
 }));
 
-const AssetDeatilButtonText = styled.div((props) => ({
+const AssetDetailButtonText = styled.div((props) => ({
   ...props.theme.typography.body_m,
   fontWeight: 400,
   fontSize: 14,
@@ -198,10 +198,12 @@ function NftCollection() {
         <PageHeader isGalleryOpen={isGalleryOpen}>
           {isGalleryOpen && (
             <BackButtonContainer>
-              <BackButton onClick={handleBackButtonClick}>
+              <BackButton data-testid="back-button" onClick={handleBackButtonClick}>
                 <>
                   <ArrowLeft weight="regular" size="20" color="white" />
-                  <AssetDeatilButtonText>{t('BACK_TO_GALLERY')}</AssetDeatilButtonText>
+                  <AssetDetailButtonText data-testid="back">
+                    {t('BACK_TO_GALLERY')}
+                  </AssetDetailButtonText>
                 </>
               </BackButton>
             </BackButtonContainer>

@@ -1,12 +1,12 @@
-import { getStxAddressKeyChain, signMessage } from '@secretkeylabs/xverse-core';
-import { SignaturePayload, StructuredDataSignatureRequestOptions } from '@stacks/connect';
+import { getStxAddressKeyChain, signStacksMessage } from '@secretkeylabs/xverse-core';
+import type { SignaturePayload, StructuredDataSignatureRequestOptions } from '@stacks/connect';
 import {
   ChainID,
-  TupleCV,
   createStacksPrivateKey,
   deserializeCV,
   hexToCV,
   signStructuredData,
+  type TupleCV,
 } from '@stacks/transactions';
 import { decodeToken } from 'jsontokens';
 import { useCallback, useMemo } from 'react';
@@ -93,7 +93,7 @@ export function useSignMessage(messageType: SignatureMessageType) {
         selectedAccount.id,
       );
       if (messageType === 'utf8') {
-        return signMessage(message, privateKey);
+        return signStacksMessage(message, privateKey);
       }
       if (!domain) throw new Error('Domain is required for structured messages');
       const sk = createStacksPrivateKey(privateKey);

@@ -1,7 +1,8 @@
-import styled from 'styled-components';
-import { NumericFormat } from 'react-number-format';
-import { useTranslation } from 'react-i18next';
+/* eslint-disable import/prefer-default-export */
 import { ArrowsDownUp } from '@phosphor-icons/react';
+import { useTranslation } from 'react-i18next';
+import { NumericFormat } from 'react-number-format';
+import styled from 'styled-components';
 
 const RowContainer = styled.div({
   display: 'flex',
@@ -73,4 +74,3 @@ export function FiatRow({
     </RowContainer>
   );
 }
-export default FiatRow;

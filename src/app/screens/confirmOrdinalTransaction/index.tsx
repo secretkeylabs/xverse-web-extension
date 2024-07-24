@@ -1,4 +1,4 @@
-import { ConfirmOrdinalsTransactionState, LedgerTransactionType } from '@common/types/ledger';
+import type { ConfirmOrdinalsTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import ConfirmBtcTransactionComponent from '@components/confirmBtcTransactionComponent';
 import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useAddressInscription from '@hooks/queries/ordinals/useAddressInscription';
@@ -9,7 +9,7 @@ import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
-import { AnalyticsEvents, BtcTransactionBroadcastResponse } from '@secretkeylabs/xverse-core';
+import { AnalyticsEvents, type BtcTransactionBroadcastResponse } from '@secretkeylabs/xverse-core';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
@@ -119,7 +119,7 @@ function ConfirmOrdinalTransaction() {
 
   const holdsRareSats = ordinalSatributes?.length > 0;
 
-  const handleOnConfirmClick = (txHex: string) => {
+  const handleConfirmClick = (txHex: string) => {
     if (isLedgerAccount(selectedAccount)) {
       const txType: LedgerTransactionType = 'ORDINALS';
       const state: ConfirmOrdinalsTransactionState = {
@@ -160,7 +160,7 @@ function ConfirmOrdinalTransaction() {
         recipients={[{ address: recipientAddress, amountSats: new BigNumber(0) }]}
         loadingBroadcastedTx={isLoading}
         signedTxHex={signedTxHex}
-        onConfirmClick={handleOnConfirmClick}
+        onConfirmClick={handleConfirmClick}
         onCancelClick={handleBackButtonClick}
         ordinalTxUtxo={ordinalUtxo}
         assetDetail={selectedOrdinal ? selectedOrdinal.number.toString() : ''}

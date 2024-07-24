@@ -16,9 +16,6 @@ import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import {
-  Args,
-  Coin,
-  ContractFunction,
   addressToString,
   broadcastSignedTransaction,
   buf2hex,
@@ -26,16 +23,19 @@ import {
   isMultiSig,
   microstacksToStx,
   stxToMicrostacks,
+  type Args,
+  type Coin,
+  type ContractFunction,
 } from '@secretkeylabs/xverse-core';
-import { ContractCallPayload } from '@stacks/connect';
+import type { ContractCallPayload } from '@stacks/connect';
 import {
   ClarityType,
-  MultiSigSpendingCondition,
   PostConditionType,
-  SomeCV,
   StacksTransaction,
   cvToJSON,
   cvToString,
+  type MultiSigSpendingCondition,
+  type SomeCV,
 } from '@stacks/transactions';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
@@ -90,6 +90,7 @@ type Props = {
   rpcMethod: string | null;
   requestToken: string;
   attachment: Buffer | undefined;
+  broadcastAfterSigning: boolean;
 };
 
 export default function ContractCallRequest({
@@ -102,6 +103,7 @@ export default function ContractCallRequest({
   attachment,
   messageId,
   rpcMethod,
+  broadcastAfterSigning,
 }: Props) {
   const selectedNetwork = useNetworkSelector();
   const [hasTabClosed, setHasTabClosed] = useState(false);
@@ -194,8 +196,11 @@ export default function ContractCallRequest({
     tx: StacksTransaction[],
     txAttachment: Buffer | undefined = undefined,
   ) => {
+    const txId = tx[0].txid();
     try {
-      const txId = await broadcastSignedTransaction(tx[0], selectedNetwork, txAttachment);
+      if (broadcastAfterSigning) {
+        await broadcastSignedTransaction(tx[0], selectedNetwork, txAttachment);
+      }
       if (tabId && messageId && rpcMethod) {
         switch (rpcMethod) {
           case 'stx_signTransaction': {
@@ -221,6 +226,7 @@ export default function ContractCallRequest({
             sendInternalErrorMessage({ tabId, messageId });
           }
         }
+        if (!broadcastAfterSigning) window.close();
       } else {
         finalizeTxSignature({
           requestPayload: requestToken,

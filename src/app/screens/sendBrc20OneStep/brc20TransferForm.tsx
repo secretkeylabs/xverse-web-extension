@@ -1,9 +1,13 @@
 import ActionButton from '@components/button';
 import TokenImage from '@components/tokenImage';
-import { FungibleToken } from '@secretkeylabs/xverse-core';
+import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import Callout from '@ui-library/callout';
 import { StickyButtonContainer } from '@ui-library/common.styled';
-import { InputFeedback, InputFeedbackProps, isDangerFeedback } from '@ui-library/inputFeedback';
+import {
+  InputFeedback,
+  isDangerFeedback,
+  type InputFeedbackProps,
+} from '@ui-library/inputFeedback';
 import { getFtTicker } from '@utils/tokens';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';

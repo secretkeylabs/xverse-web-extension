@@ -13,7 +13,7 @@ import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowRight, ArrowUp } from '@phosphor-icons/react';
-import { BundleSatRange } from '@secretkeylabs/xverse-core';
+import type { BundleSatRange } from '@secretkeylabs/xverse-core';
 import { StyledHeading, StyledP } from '@ui-library/common.styled';
 import {
   getBtcTxStatusUrl,
@@ -239,7 +239,7 @@ function RareSatsBundle() {
         <PageHeader isGalleryOpen={isGalleryOpen}>
           {isGalleryOpen && (
             <BackButtonContainer>
-              <Button onClick={handleBackButtonClick}>
+              <Button data-testid="back-button" onClick={handleBackButtonClick}>
                 <>
                   <ButtonImage src={ArrowLeft} />
                   <AssetDetailButtonText>{goBackText}</AssetDetailButtonText>

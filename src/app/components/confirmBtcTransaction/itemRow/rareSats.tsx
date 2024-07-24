@@ -10,7 +10,7 @@ import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 import Theme from 'theme';
 import Avatar from '../../../ui-library/avatar';
-import { SatRangeTx, mapTxSatributeInfoToBundleInfo } from '../utils';
+import { mapTxSatributeInfoToBundleInfo, type SatRangeTx } from '../utils';
 
 const SatsBundleContainer = styled.div`
   display: flex;

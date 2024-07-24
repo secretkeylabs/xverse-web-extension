@@ -17,12 +17,12 @@ import {
   useBrc20TransferFees,
   validateBtcAddressIsTaproot,
 } from '@secretkeylabs/xverse-core';
-import Callout, { CalloutProps } from '@ui-library/callout';
+import Callout, { type CalloutProps } from '@ui-library/callout';
 import {
-  Brc20TransferEstimateFeesParams,
-  ConfirmBrc20TransferState,
-  ExecuteBrc20TransferState,
   getFeeValuesForBrc20OneStepTransfer,
+  type Brc20TransferEstimateFeesParams,
+  type ConfirmBrc20TransferState,
+  type ExecuteBrc20TransferState,
 } from '@utils/brc20';
 import { isInOptions } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
@@ -32,8 +32,8 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Brc20FeesComponent from './brc20FeesComponent';
-import { EditFees, OnChangeFeeRate } from './editFees';
-import RecipientCard, { RecipientCardProps } from './recipientCard';
+import { EditFees, type OnChangeFeeRate } from './editFees';
+import RecipientCard, { type RecipientCardProps } from './recipientCard';
 
 const ScrollContainer = styled.div`
   display: flex;

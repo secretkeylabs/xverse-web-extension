@@ -1,5 +1,5 @@
 import { makeRPCError, sendRpcResponse } from '@common/utils/rpc/helpers';
-import ConfirmBitcoinTransaction from '@components/confirmBtcTransaction';
+import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RequestError from '@components/requests/requestError';
 import useSubmitRuneSellPsbt from '@hooks/queries/runes/useSubmitRuneSellPsbt';
 import useHasFeature from '@hooks/useHasFeature';
@@ -12,10 +12,10 @@ import { SigHash } from '@scure/btc-signer';
 import {
   AnalyticsEvents,
   FeatureId,
-  RuneSummary,
-  Transport,
   btcTransaction,
   parseSummaryForRunes,
+  type RuneSummary,
+  type Transport,
 } from '@secretkeylabs/xverse-core';
 import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
@@ -177,7 +177,7 @@ function SignPsbtRequest() {
   }
 
   return (
-    <ConfirmBitcoinTransaction
+    <ConfirmBtcTransaction
       inputs={summary?.inputs ?? []}
       outputs={summary?.outputs ?? []}
       feeOutput={summary?.feeOutput}

@@ -1,5 +1,5 @@
 import TokenImage from '@components/tokenImage';
-import useResetUserFlow from '@hooks/useResetUserFlow';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core';
 import { isInOptions } from '@utils/helper';
 import SendLayout from 'app/layouts/sendLayout';
@@ -99,6 +99,7 @@ function SendStxScreen() {
         <SendLayout selectedBottomTab="dashboard" onClickBack={handleBackButtonClick}>
           <Container>
             <Step1SelectRecipientAndMemo
+              dataTestID="address-receive"
               header={header}
               recipientAddress={recipientAddress}
               setRecipientAddress={setRecipientAddress}

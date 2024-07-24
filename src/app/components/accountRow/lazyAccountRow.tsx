@@ -1,6 +1,6 @@
 import useIntersectionObserver from '@hooks/useIntersectionObserver';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { Account } from '@secretkeylabs/xverse-core';
+import type { Account } from '@secretkeylabs/xverse-core';
 import { useEffect, useRef, useState } from 'react';
 import AccountRow from '.';
 

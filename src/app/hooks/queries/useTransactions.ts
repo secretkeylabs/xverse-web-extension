@@ -2,19 +2,19 @@ import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  APIGetRunesActivityForAddressResponse,
-  Brc20HistoryTransactionData,
-  BtcTransactionData,
   fetchBtcTransactionsData,
   getBrc20History,
   getXverseApiClient,
+  type APIGetRunesActivityForAddressResponse,
+  type Brc20HistoryTransactionData,
+  type BtcTransactionData,
 } from '@secretkeylabs/xverse-core';
-import {
+import type {
   AddressTransactionWithTransfers,
   MempoolTransaction,
 } from '@stacks/stacks-blockchain-api-types';
 import { useQuery } from '@tanstack/react-query';
-import { CurrencyTypes, PAGINATION_LIMIT } from '@utils/constants';
+import { PAGINATION_LIMIT, type CurrencyTypes } from '@utils/constants';
 import { handleRetries } from '@utils/query';
 import { getStxAddressTransactions } from '@utils/transactions/transactions';
 import useNetworkSelector from '../useNetwork';

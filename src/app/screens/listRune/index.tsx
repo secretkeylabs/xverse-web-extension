@@ -6,7 +6,7 @@ import useRuneSellPsbt from '@hooks/queries/runes/useRuneSellPsbt';
 import useRuneUtxosQuery from '@hooks/queries/runes/useRuneUtxosQuery';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useHasFeature from '@hooks/useHasFeature';
-import useResetUserFlow from '@hooks/useResetUserFlow';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowClockwise } from '@phosphor-icons/react';
@@ -19,13 +19,14 @@ import {
   getBtcFiatEquivalent,
   satsToBtc,
 } from '@secretkeylabs/xverse-core';
-import Button from '@ui-library/button';
+import Button, { LinkButton } from '@ui-library/button';
 import { StickyButtonContainer, StyledP } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
 import { formatToXDecimalPlaces, ftDecimals } from '@utils/helper';
 import { getFullTxId, getTxIdFromFullTxId, getVoutFromFullTxId } from '@utils/runes';
 import BigNumber from 'bignumber.js';
 import { useEffect, useReducer } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
@@ -47,7 +48,6 @@ import {
   SetRunePricesContainer,
   SetRunePricesListContainer,
   StyledButton,
-  StyledSelectAllButton,
   TabButton,
   TabButtonsContainer,
   TabContainer,
@@ -64,6 +64,8 @@ export default function ListRuneScreen() {
   const { fiatCurrency } = useWalletSelector();
   const { btcFiatRate } = useCoinRates();
   const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const locationFrom = params.get('from');
   const showRunesListing =
     useHasFeature(FeatureId.RUNES_LISTING) || process.env.NODE_ENV === 'development';
 
@@ -86,6 +88,8 @@ export default function ListRuneScreen() {
     isRefetching: floorPriceRefetching,
   } = useRuneFloorPriceQuery(selectedRune?.name ?? '', false);
 
+  const noFloorPrice = runeFloorPrice === 0;
+
   const isLoading =
     listItemsLoading || listItemsRefetching || floorPriceLoading || floorPriceRefetching;
 
@@ -107,6 +111,7 @@ export default function ListRuneScreen() {
     getRuneSellPsbt,
     signPsbtPayload,
     loading: psbtLoading,
+    error: psbtError,
   } = useRuneSellPsbt(selectedRune?.name ?? '', listItemsMap);
 
   const selectedListItems = Object.values(listItemsMap).filter((item) => item.selected);
@@ -145,6 +150,11 @@ export default function ListRuneScreen() {
   const individualCustomPriceUsed = selectedListItems.some((item) => item.useIndividualCustomPrice);
 
   const handleGoBack = () => {
+    if (locationFrom === 'swap') {
+      // TODO: when navigating back from swap, there is flash of token dashboard screen
+      navigate(-1);
+    }
+
     if (section === 'SELECT_RUNES') {
       navigate(`/coinDashboard/FT?ftKey=${selectedRune?.principal}&protocol=runes`);
     } else {
@@ -207,14 +217,14 @@ export default function ListRuneScreen() {
         type: 'RESTORE_STATE_FROM_PSBT',
         payload: location.state,
       });
-    } else if (listItemsResponse && runeFloorPrice) {
+    } else if (listItemsResponse && runeFloorPrice !== undefined && selectedRune) {
       dispatch({
         type: 'INITIATE_LIST_ITEMS',
         payload: listItemsResponse.reduce(
           (map, item) => ({
             ...map,
             [getFullTxId(item)]: {
-              selected: false,
+              selected: listItemsMap[getFullTxId(item)]?.selected ?? false,
               useIndividualCustomPrice: false,
               satAmount: BigNumber(item.value).toNumber(),
               amount: Number(
@@ -240,6 +250,12 @@ export default function ListRuneScreen() {
       });
     }
   }, [listRunesState, signPsbtPayload, navigate, selectedRune, runeId]);
+
+  useEffect(() => {
+    if (!psbtLoading && psbtError) {
+      toast.error(psbtError);
+    }
+  }, [psbtError, psbtLoading]);
 
   if (isLoading) {
     return (
@@ -269,7 +285,7 @@ export default function ListRuneScreen() {
 
   if (
     listItemsResponse &&
-    runeFloorPrice &&
+    runeFloorPrice !== undefined &&
     Object.keys(listItemsMap).length === listItemsResponse.length
   ) {
     return (
@@ -307,7 +323,7 @@ export default function ListRuneScreen() {
                   </TabContainer>
                   <MockContainer>
                     <div />
-                    <StyledSelectAllButton
+                    <LinkButton
                       title={
                         selectAllToggle || Object.values(listItemsMap).some((item) => item.selected)
                           ? t('DESELECT_ALL')
@@ -361,15 +377,17 @@ export default function ListRuneScreen() {
                     <SetRunePricesButtonsContainer>
                       <StyledButton
                         title="Floor"
+                        disabled={noFloorPrice}
                         onClick={() => dispatch({ type: 'SET_RUNE_PRICE_OPTION', payload: 1 })}
                         variant={
-                          runePriceOption === 1 && !individualCustomPriceUsed
+                          runePriceOption === 1 && !noFloorPrice && !individualCustomPriceUsed
                             ? 'primary'
                             : 'secondary'
                         }
                       />
                       <StyledButton
                         title="+5%"
+                        disabled={noFloorPrice}
                         onClick={() => dispatch({ type: 'SET_RUNE_PRICE_OPTION', payload: 1.05 })}
                         variant={
                           runePriceOption === 1.05 && !individualCustomPriceUsed
@@ -379,6 +397,7 @@ export default function ListRuneScreen() {
                       />
                       <StyledButton
                         title="+10%"
+                        disabled={noFloorPrice}
                         onClick={() => dispatch({ type: 'SET_RUNE_PRICE_OPTION', payload: 1.1 })}
                         variant={
                           runePriceOption === 1.1 && !individualCustomPriceUsed
@@ -388,6 +407,7 @@ export default function ListRuneScreen() {
                       />
                       <StyledButton
                         title="+20%"
+                        disabled={noFloorPrice}
                         onClick={() => dispatch({ type: 'SET_RUNE_PRICE_OPTION', payload: 1.2 })}
                         variant={
                           runePriceOption === 1.2 && !individualCustomPriceUsed
@@ -408,10 +428,12 @@ export default function ListRuneScreen() {
                       />
                     </SetRunePricesButtonsContainer>
                     <StyledP typography="body_medium_s" color="white_200">
-                      {`${t('MAGIC_EDEN_FLOOR_PRICE', {
-                        sats: formatToXDecimalPlaces(runeFloorPrice, 5),
-                        symbol: selectedRune?.runeSymbol,
-                      })}`}
+                      {noFloorPrice
+                        ? t('NO_FLOOR_PRICE', { symbol: selectedRune?.runeSymbol })
+                        : t('MAGIC_EDEN_FLOOR_PRICE', {
+                            sats: formatToXDecimalPlaces(runeFloorPrice, 5),
+                            symbol: selectedRune?.runeSymbol,
+                          })}
                     </StyledP>
                   </SetRunePricesContainer>
                 </PaddingContainer>

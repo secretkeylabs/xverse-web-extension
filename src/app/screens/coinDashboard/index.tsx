@@ -8,10 +8,10 @@ import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungib
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useSpamTokens from '@hooks/queries/useSpamTokens';
-import useResetUserFlow, { broadcastResetUserFlow } from '@hooks/useResetUserFlow';
+import { broadcastResetUserFlow, useResetUserFlow } from '@hooks/useResetUserFlow';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import { Flag } from '@phosphor-icons/react';
-import { FungibleToken } from '@secretkeylabs/xverse-core';
+import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import {
   setBrc20ManageTokensAction,
   setRunesManageTokensAction,
@@ -19,7 +19,7 @@ import {
   setSpamTokenAction,
 } from '@stores/wallet/actions/actionCreators';
 import { StyledP } from '@ui-library/common.styled';
-import { CurrencyTypes, SPAM_OPTIONS_WIDTH } from '@utils/constants';
+import { SPAM_OPTIONS_WIDTH, type CurrencyTypes } from '@utils/constants';
 import { getExplorerUrl } from '@utils/helper';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

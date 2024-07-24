@@ -1,5 +1,5 @@
-import { Coin } from '@secretkeylabs/xverse-core';
-import { PostCondition } from '@stacks/transactions';
+import type { Coin } from '@secretkeylabs/xverse-core';
+import type { PostCondition } from '@stacks/transactions';
 import { ftDecimals } from '@utils/helper';
 import PostConditionsView from './postConditionView';
 import { getAmountFromPostCondition } from './postConditionView/helper';

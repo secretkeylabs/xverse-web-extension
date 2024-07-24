@@ -1,6 +1,6 @@
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { SignTransactionPayload } from '@sats-connect/core';
+import type { SignTransactionPayload } from '@sats-connect/core';
 import { btcTransaction } from '@secretkeylabs/xverse-core';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

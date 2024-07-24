@@ -1,6 +1,6 @@
-import { AnalyticsEventProperties, AnalyticsEvents } from '@secretkeylabs/xverse-core';
+import { AnalyticsEvents, type AnalyticsEventProperties } from '@secretkeylabs/xverse-core';
 import { sha256 } from 'js-sha256';
-import { Callback, RequestOptions } from 'mixpanel-browser';
+import type { Callback, RequestOptions } from 'mixpanel-browser';
 import { getMixpanelInstance, mixpanelInstances } from '../mixpanelSetup';
 
 // Overload definitions

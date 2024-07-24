@@ -4,7 +4,7 @@ import { StyledHeading, StyledP, VerticalStackButtonContainer } from '@ui-librar
 import className from 'classnames';
 import { useState } from 'react';
 import styled from 'styled-components';
-import { CircularSvgAnimation, ConfirmationStatus } from './circularSvgAnimation';
+import { CircularSvgAnimation, type ConfirmationStatus } from './circularSvgAnimation';
 
 type Texts = {
   title: string;
@@ -97,7 +97,7 @@ const Heading = styled(StyledHeading)`
  * @param secondaryAction - The second action to display (text and onPress)
  * @param loadingPercentage - The progress of the loading animation (0-1)
  */
-export function LoadingTransactionStatus({
+function LoadingTransactionStatus({
   status,
   resultTexts,
   loadingTexts,

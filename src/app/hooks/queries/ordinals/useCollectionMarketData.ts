@@ -1,5 +1,8 @@
 import useWalletSelector from '@hooks/useWalletSelector';
-import { CollectionMarketDataResponse, getCollectionMarketData } from '@secretkeylabs/xverse-core';
+import {
+  getCollectionMarketData,
+  type CollectionMarketDataResponse,
+} from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import { InvalidParamsError, handleRetries } from '@utils/query';
 

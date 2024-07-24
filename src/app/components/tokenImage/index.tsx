@@ -4,8 +4,8 @@ import OrdinalIcon from '@assets/img/transactions/ordinal.svg';
 import RunesIcon from '@assets/img/transactions/runes.svg';
 import { StyledBarLoader } from '@components/tilesSkeletonLoader';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { FungibleToken } from '@secretkeylabs/xverse-core';
-import { CurrencyTypes, XVERSE_ORDIVIEW_URL } from '@utils/constants';
+import type { FungibleToken } from '@secretkeylabs/xverse-core';
+import { XVERSE_ORDIVIEW_URL, type CurrencyTypes } from '@utils/constants';
 import { getTicker } from '@utils/helper';
 import { useCallback, useState } from 'react';
 import styled from 'styled-components';
@@ -42,11 +42,11 @@ const TickerIconText = styled.h1((props) => ({
   fontSize: 11,
 }));
 
-const TickerProtocolContainer = styled.div({
-  position: 'relative',
-  alignSelf: 'center',
-  display: 'inline-flex',
-});
+const TickerProtocolContainer = styled.div`
+  position: relative;
+  align-self: center;
+  display: inline-flex;
+`;
 
 const ProtocolIcon = styled.div<{ isSquare?: boolean }>((props) => ({
   width: props.isSquare ? 18 : 22,

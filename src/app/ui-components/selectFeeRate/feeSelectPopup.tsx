@@ -1,14 +1,14 @@
 import FiatAmountText from '@components/fiatAmountText';
 import { Faders } from '@phosphor-icons/react';
-import { SupportedCurrency } from '@secretkeylabs/xverse-core';
+import type { SupportedCurrency } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import { HorizontalSplitButtonContainer, StyledP } from '@ui-library/common.styled';
 import Input from '@ui-library/input';
-import { FeedbackVariant } from '@ui-library/inputFeedback';
+import type { FeedbackVariant } from '@ui-library/inputFeedback';
 import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
 import BigNumber from 'bignumber.js';
-import { ChangeEvent, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
 import FeeItem, { FeeItemContainer } from './feeItem';

@@ -1,6 +1,6 @@
 import CollectibleCollage from '@components/collectibleCollage/collectibleCollage';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
-import { InscriptionCollectionsData } from '@secretkeylabs/xverse-core';
+import type { InscriptionCollectionsData } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import {
   getCollectionKey,

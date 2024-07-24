@@ -2,8 +2,6 @@ import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types'
 import { delay } from '@common/utils/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
 import AssetModal from '@components/assetModal';
-import BottomModal from '@components/bottomModal';
-import ActionButton from '@components/button';
 import BurnSection from '@components/confirmBtcTransaction/burnSection';
 import DelegateSection from '@components/confirmBtcTransaction/delegateSection';
 import MintSection from '@components/confirmBtcTransaction/mintSection';
@@ -13,7 +11,7 @@ import TransferSection from '@components/confirmBtcTransaction/transferSection';
 import { getNetAmount, isScriptOutput } from '@components/confirmBtcTransaction/utils';
 import InfoContainer from '@components/infoContainer';
 import LoadingTransactionStatus from '@components/loadingTransactionStatus';
-import { ConfirmationStatus } from '@components/loadingTransactionStatus/circularSvgAnimation';
+import type { ConfirmationStatus } from '@components/loadingTransactionStatus/circularSvgAnimation';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useHasFeature from '@hooks/useHasFeature';
 import useSelectedAccount from '@hooks/useSelectedAccount';
@@ -22,14 +20,15 @@ import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowLeft, ArrowRight } from '@phosphor-icons/react';
-import { SignMultiplePsbtPayload } from '@sats-connect/core';
+import type { SignMultiplePsbtPayload } from '@sats-connect/core';
 import {
   AnalyticsEvents,
   FeatureId,
-  RuneSummary,
   btcTransaction,
   parseSummaryForRunes,
+  type RuneSummary,
 } from '@secretkeylabs/xverse-core';
+import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
 import Spinner from '@ui-library/spinner';
 import { isLedgerAccount } from '@utils/helper';
@@ -38,95 +37,19 @@ import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
-
-const OuterContainer = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  overflow-y: auto;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`;
-
-const Container = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-  marginTop: props.theme.spacing(11),
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-}));
-
-const LoaderContainer = styled.div((props) => ({
-  display: 'flex',
-  flex: 1,
-  justifyContent: 'center',
-  alignItems: 'center',
-  marginTop: props.theme.spacing(12),
-}));
-
-const ButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  padding: props.theme.spacing(8),
-  paddingTop: props.theme.spacing(12),
-  paddingBottom: props.theme.spacing(20),
-}));
-
-const TransparentButtonContainer = styled.div((props) => ({
-  marginRight: props.theme.spacing(6),
-  width: '100%',
-}));
-
-const WarningCallout = styled(Callout)`
-  margin-bottom: ${(props) => props.theme.space.m};
-`;
-
-const ReviewTransactionText = styled.h1((props) => ({
-  ...props.theme.headline_s,
-  color: props.theme.colors.white_0,
-  marginBottom: props.theme.spacing(12),
-  textAlign: 'left',
-}));
-
-const BundleLinkContainer = styled.button((props) => ({
-  display: 'flex',
-  alignItems: 'center',
-  backgroundColor: 'transparent',
-  color: props.theme.colors.tangerine,
-  transition: 'color 0.2s ease',
-  marginBottom: props.theme.spacing(6),
-  ':hover': {
-    color: props.theme.colors.tangerine_light,
-  },
-}));
-
-const BundleLinkText = styled.div((props) => ({
-  ...props.theme.body_medium_m,
-  marginRight: props.theme.spacing(2),
-}));
-
-const CustomizedModal = styled(BottomModal)`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  max-height: 100% !important;
-  background-color: #181818 !important;
-`;
-
-const CustomizedModalContainer = styled(Container)`
-  margin-top: 0;
-`;
-
-const TxReviewModalControls = styled.div((props) => ({
-  display: 'flex',
-  columnGap: props.theme.spacing(6),
-  padding: props.theme.spacing(8),
-  paddingTop: props.theme.spacing(12),
-  paddingBottom: props.theme.spacing(20),
-}));
+import {
+  BundleLinkContainer,
+  BundleLinkText,
+  ButtonsContainer,
+  Container,
+  LoaderContainer,
+  ModalContainer,
+  OuterContainer,
+  ReviewTransactionText,
+  StyledSheet,
+  TransparentButtonContainer,
+  TxReviewModalControls,
+} from './index.styled';
 
 interface TxResponse {
   txId: string;
@@ -400,6 +323,14 @@ function SignBatchPsbtRequest() {
                 <TransferSection
                   inputs={parsedPsbts.map((psbt) => psbt.summary.inputs).flat()}
                   outputs={parsedPsbts.map((psbt) => psbt.summary.outputs).flat()}
+                  hasExternalInputs={parsedPsbts
+                    .map((psbt) => psbt.summary.inputs)
+                    .flat()
+                    .some(
+                      (input) =>
+                        input.extendedUtxo.address !== selectedAccount.btcAddress &&
+                        input.extendedUtxo.address !== selectedAccount.ordinalsAddress,
+                    )}
                   runeTransfers={parsedPsbts
                     .map((psbt) => psbt.runeSummary?.transfers ?? [])
                     .flat()}
@@ -409,6 +340,14 @@ function SignBatchPsbtRequest() {
                 />
                 <ReceiveSection
                   outputs={parsedPsbts.map((psbt) => psbt.summary.outputs).flat()}
+                  hasExternalInputs={parsedPsbts
+                    .map((psbt) => psbt.summary.inputs)
+                    .flat()
+                    .some(
+                      (input) =>
+                        input.extendedUtxo.address !== selectedAccount.btcAddress &&
+                        input.extendedUtxo.address !== selectedAccount.ordinalsAddress,
+                    )}
                   runeReceipts={parsedPsbts.map((psbt) => psbt.runeSummary?.receipts ?? []).flat()}
                   onShowInscription={setInscriptionToShow}
                   netAmount={totalNetAmount.toNumber()}
@@ -423,20 +362,20 @@ function SignBatchPsbtRequest() {
               </Container>
             )}
           </OuterContainer>
-          <ButtonContainer>
+          <ButtonsContainer>
             <TransparentButtonContainer>
-              <ActionButton text={t('CANCEL')} transparent onPress={onCancelClick} />
+              <Button title={t('CANCEL')} variant="secondary" onClick={onCancelClick} />
             </TransparentButtonContainer>
-            <ActionButton
-              text={t('CONFIRM_ALL')}
-              onPress={onSignPsbtConfirmed}
-              processing={isSigning}
+            <Button
+              title={t('CONFIRM_ALL')}
+              onClick={onSignPsbtConfirmed}
+              loading={isSigning}
               disabled={isLedgerAccount(selectedAccount)}
             />
-          </ButtonContainer>
+          </ButtonsContainer>
         </>
       )}
-      <CustomizedModal
+      <StyledSheet
         header=""
         visible={reviewTransaction}
         onClose={() => {
@@ -445,7 +384,7 @@ function SignBatchPsbtRequest() {
         }}
       >
         <OuterContainer>
-          <CustomizedModalContainer>
+          <ModalContainer>
             <ReviewTransactionText>
               {t('TRANSACTION')} {currentPsbtIndex + 1}/{parsedPsbts.length}
             </ReviewTransactionText>
@@ -461,24 +400,24 @@ function SignBatchPsbtRequest() {
                 }
               />
             )}
-          </CustomizedModalContainer>
+          </ModalContainer>
         </OuterContainer>
         <TxReviewModalControls>
           {currentPsbtIndex > 0 && (
-            <ActionButton
-              text={t('PREVIOUS')}
-              transparent
-              onPress={() => {
+            <Button
+              title={t('PREVIOUS')}
+              variant="secondary"
+              onClick={() => {
                 setCurrentPsbtIndex((prevIndex) => prevIndex - 1);
               }}
               icon={<ArrowLeft color="white" size={16} weight="bold" />}
             />
           )}
           {currentPsbtIndex < parsedPsbts.length - 1 && (
-            <ActionButton
-              text={t('NEXT')}
-              transparent
-              onPress={() => {
+            <Button
+              title={t('NEXT')}
+              variant="secondary"
+              onClick={() => {
                 setCurrentPsbtIndex((prevIndex) => prevIndex + 1);
               }}
               icon={<ArrowRight color="white" size={16} weight="bold" />}
@@ -486,16 +425,16 @@ function SignBatchPsbtRequest() {
             />
           )}
           {currentPsbtIndex === parsedPsbts.length - 1 && (
-            <ActionButton
-              text={t('DONE')}
-              onPress={() => {
+            <Button
+              title={t('DONE')}
+              onClick={() => {
                 setReviewTransaction(false);
                 setCurrentPsbtIndex(0);
               }}
             />
           )}
         </TxReviewModalControls>
-      </CustomizedModal>
+      </StyledSheet>
     </>
   );
 }

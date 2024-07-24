@@ -150,22 +150,6 @@ export const EndScreenTextContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(20),
 }));
 
-export const AssetSelectionButton = styled.button((props) => ({
-  position: 'absolute',
-  left: props.theme.spacing(105),
-  top: props.theme.spacing(60),
-  backgroundColor: 'transparent',
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  gap: props.theme.spacing(3),
-}));
-
-export const AssetSelectionButtonText = styled.p((props) => ({
-  ...props.theme.body_m,
-  color: props.theme.colors.white[0],
-}));
-
 export const ConfirmationText = styled.p((props) => ({
   fontSize: '0.875rem',
   fontWeight: 500,

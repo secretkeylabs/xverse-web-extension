@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 function toHex(str: string) {
   let result = '';
   for (let i = 0; i < str?.length; i += 1) {
@@ -10,7 +11,7 @@ function toHex(str: string) {
  * generateHash
  * @param str - The string to hash
  */
-export function generateHash(str: string): number {
+function generateHash(str: string): number {
   let hash = 0;
 
   /* eslint no-bitwise: ["error", { "allow": ["<<", "&="] }] */
@@ -28,7 +29,7 @@ export function generateHash(str: string): number {
  * @param saturation - saturation of result color (0 - 100)
  * @param lightness - lightness of result color (0 - 100)
  */
-export function stringToHslColor(str: string, saturation: number, lightness: number): string {
+function stringToHslColor(str: string, saturation: number, lightness: number): string {
   const hash = generateHash(str!);
   const hue = hash % 360;
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;

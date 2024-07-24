@@ -1,11 +1,11 @@
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  Brc20Token,
-  FungibleToken,
-  SettingsNetwork,
   getBrc20Tokens,
   getOrdinalsFtBalance,
+  type Brc20Token,
+  type FungibleToken,
+  type SettingsNetwork,
 } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';

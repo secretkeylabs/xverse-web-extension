@@ -1,3 +1,4 @@
+/* eslint-disable import/prefer-default-export */
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import { buf2hex } from '@secretkeylabs/xverse-core';
@@ -48,5 +49,3 @@ export const useAlexSponsoredTransaction = (userOverrideSponsorValue: boolean) =
     isSponsorDisabled: hasPendingTransactions,
   };
 };
-
-export default useAlexSponsoredTransaction;

@@ -1,9 +1,9 @@
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  NetworkType,
-  SupportedCurrency,
   fetchBtcToCurrencyRate,
   fetchStxToBtcRate,
+  type NetworkType,
+  type SupportedCurrency,
 } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 
@@ -27,7 +27,7 @@ const useGetRates = (fiatCurrency: SupportedCurrency, networkType: NetworkType) 
   });
 };
 
-export const useCoinRates = () => {
+const useCoinRates = () => {
   const { fiatCurrency, network } = useWalletSelector();
 
   const { data } = useGetRates(fiatCurrency, network.type);

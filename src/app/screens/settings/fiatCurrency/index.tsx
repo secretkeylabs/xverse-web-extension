@@ -3,7 +3,7 @@ import TopRow from '@components/topRow';
 import { useGetBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
 import { useGetSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { SupportedCurrency } from '@secretkeylabs/xverse-core';
+import type { SupportedCurrency } from '@secretkeylabs/xverse-core';
 import { ChangeFiatCurrencyAction } from '@stores/wallet/actions/actionCreators';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';

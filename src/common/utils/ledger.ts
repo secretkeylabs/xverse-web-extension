@@ -1,4 +1,4 @@
-import { Account, NetworkType } from '@secretkeylabs/xverse-core';
+import type { Account, NetworkType } from '@secretkeylabs/xverse-core';
 
 export const delay = (ms: number) =>
   new Promise((res) => {

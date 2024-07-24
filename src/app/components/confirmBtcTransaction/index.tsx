@@ -1,14 +1,14 @@
 import { delay } from '@common/utils/ledger';
-import ActionButton from '@components/button';
-import { Tab } from '@components/tabBar';
+import type { Tab } from '@components/tabBar';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import TransportFactory from '@ledgerhq/hw-transport-webusb';
-import {
+import type {
   RuneSummary,
   RuneSummaryActions,
   Transport,
   btcTransaction,
 } from '@secretkeylabs/xverse-core';
+import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
 import { StickyHorizontalSplitButtonContainer, StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
@@ -222,13 +222,13 @@ function ConfirmBtcTransaction({
         />
         {!isLoading && (
           <StickyHorizontalSplitButtonContainer>
-            <ActionButton onPress={onCancel} text={cancelText} transparent />
-            <ActionButton
-              onPress={onConfirmPress}
+            <Button onClick={onCancel} title={cancelText} variant="secondary" />
+            <Button
+              onClick={onConfirmPress}
               disabled={confirmDisabled || hasInsufficientRunes || !validMintingRune}
-              processing={isSubmitting}
-              text={hasInsufficientRunes ? t('INSUFFICIENT_BALANCE') : confirmText}
-              warning={isError || hasInsufficientRunes}
+              loading={isSubmitting}
+              title={hasInsufficientRunes ? t('INSUFFICIENT_BALANCE') : confirmText}
+              variant={isError || hasInsufficientRunes ? 'danger' : 'primary'}
             />
           </StickyHorizontalSplitButtonContainer>
         )}
@@ -244,21 +244,21 @@ function ConfirmBtcTransaction({
         />
         <SuccessActionsContainer>
           {currentStep === Steps.ExternalInputs && !isTxRejected && !isConnectFailed ? (
-            <ActionButton onPress={goToConfirmationStep} text={t('LEDGER.CONTINUE_BUTTON')} />
+            <Button onClick={goToConfirmationStep} title={t('LEDGER.CONTINUE_BUTTON')} />
           ) : (
             <>
-              <ActionButton
-                onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}
-                text={signatureRequestTranslate(
+              <Button
+                onClick={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}
+                title={signatureRequestTranslate(
                   isTxRejected || isConnectFailed ? 'LEDGER.RETRY_BUTTON' : 'LEDGER.CONNECT_BUTTON',
                 )}
                 disabled={isButtonDisabled}
-                processing={isButtonDisabled}
+                loading={isButtonDisabled}
               />
-              <ActionButton
-                onPress={onCancel}
-                text={signatureRequestTranslate('LEDGER.CANCEL_BUTTON')}
-                transparent
+              <Button
+                onClick={onCancel}
+                title={signatureRequestTranslate('LEDGER.CANCEL_BUTTON')}
+                variant="secondary"
               />
             </>
           )}

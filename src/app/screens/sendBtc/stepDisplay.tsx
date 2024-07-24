@@ -1,11 +1,11 @@
-import ConfirmBitcoinTransaction from '@components/confirmBtcTransaction';
+import RecipientSelector from '@components/recipientSelector';
 import TokenImage from '@components/tokenImage';
+import ConfirmBtcTransaction from 'app/components/confirmBtcTransaction';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import SendLayout from '../../layouts/sendLayout';
 import AmountSelector from './amountSelector';
-import BtcRecipientSelector from './btcRecipientSelector';
-import { TransactionSummary } from './helpers';
+import type { TransactionSummary } from './helpers';
 import { Step, getNextStep } from './steps';
 
 const TitleContainer = styled.div`
@@ -77,17 +77,17 @@ function StepDisplay({
       <Title>{t('SEND.SEND')}</Title>
     </TitleContainer>
   );
-
   switch (currentStep) {
     case Step.SelectRecipient:
       return (
         <SendLayout selectedBottomTab="dashboard" onClickBack={onBack}>
           <Container>
-            <BtcRecipientSelector
+            <RecipientSelector
               header={header}
               recipientAddress={recipientAddress}
               setRecipientAddress={setRecipientAddress}
               onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient, amountEditable))}
+              isLoading={isLoading}
             />
           </Container>
         </SendLayout>
@@ -120,7 +120,7 @@ function StepDisplay({
         return null;
       }
       return (
-        <ConfirmBitcoinTransaction
+        <ConfirmBtcTransaction
           inputs={summary.inputs}
           outputs={summary.outputs}
           feeOutput={summary.feeOutput}

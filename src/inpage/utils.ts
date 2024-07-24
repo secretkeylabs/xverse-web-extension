@@ -1,8 +1,8 @@
 import {
-  LegacyMessageToContentScript,
   MESSAGE_SOURCE,
-  SatsConnectMessageToContentScript,
   StacksLegacyMethods,
+  type LegacyMessageToContentScript,
+  type SatsConnectMessageToContentScript,
 } from '@common/types/message-types';
 
 type CallableMethods = keyof typeof StacksLegacyMethods;

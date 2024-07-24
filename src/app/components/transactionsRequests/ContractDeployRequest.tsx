@@ -22,7 +22,11 @@ import {
   microstacksToStx,
   stxToMicrostacks,
 } from '@secretkeylabs/xverse-core';
-import { MultiSigSpendingCondition, PostCondition, StacksTransaction } from '@stacks/transactions';
+import type {
+  MultiSigSpendingCondition,
+  PostCondition,
+  StacksTransaction,
+} from '@stacks/transactions';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -119,6 +123,7 @@ type Props = {
   requestToken: string;
   messageId: string | null;
   rpcMethod: string | null;
+  broadcastAfterSigning: boolean;
 };
 
 export default function ContractDeployRequest({
@@ -130,6 +135,7 @@ export default function ContractDeployRequest({
   requestToken,
   messageId,
   rpcMethod,
+  broadcastAfterSigning,
 }: Props) {
   const selectedNetwork = useNetworkSelector();
   const [hasTabClosed, setHasTabClosed] = useState(false);
@@ -150,9 +156,12 @@ export default function ContractDeployRequest({
   });
 
   const broadcastTx = async (tx: StacksTransaction[]) => {
+    const txId = tx[0].txid();
     try {
-      setLoaderForBroadcastingTx(true);
-      const txId = await broadcastSignedTransaction(tx[0], selectedNetwork);
+      if (broadcastAfterSigning) {
+        setLoaderForBroadcastingTx(true);
+        await broadcastSignedTransaction(tx[0], selectedNetwork);
+      }
       if (rpcMethod && messageId && tabId) {
         switch (rpcMethod) {
           case 'stx_signTransaction': {
@@ -175,6 +184,7 @@ export default function ContractDeployRequest({
             sendInternalErrorMessage({ tabId, messageId });
             break;
         }
+        if (!broadcastAfterSigning) window.close();
       } else {
         finalizeTxSignature({
           requestPayload: requestToken,

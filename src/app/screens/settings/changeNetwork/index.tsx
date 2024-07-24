@@ -4,11 +4,11 @@ import TopRow from '@components/topRow';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  SettingsNetwork,
   defaultMainnet,
   defaultSignet,
   defaultTestnet,
   initialNetworksList,
+  type SettingsNetwork,
 } from '@secretkeylabs/xverse-core';
 import { isValidBtcApi, isValidStacksApi } from '@utils/helper';
 import { useState } from 'react';

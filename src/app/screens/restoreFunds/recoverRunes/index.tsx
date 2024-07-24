@@ -1,11 +1,15 @@
-import ConfirmBitcoinTransaction from '@components/confirmBtcTransaction';
+import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RuneAmount from '@components/confirmBtcTransaction/itemRow/runeAmount';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useTransactionContext from '@hooks/useTransactionContext';
-import { TransactionSummary } from '@screens/sendBtc/helpers';
-import { RuneSummary, parseSummaryForRunes, runesTransaction } from '@secretkeylabs/xverse-core';
+import type { TransactionSummary } from '@screens/sendBtc/helpers';
+import {
+  parseSummaryForRunes,
+  runesTransaction,
+  type RuneSummary,
+} from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
@@ -166,7 +170,7 @@ function RecoverRunes() {
         <BottomTabBar tab="settings" />
       </>
     ) : (
-      <ConfirmBitcoinTransaction
+      <ConfirmBtcTransaction
         title={t('TITLE')}
         inputs={summary?.inputs ?? []}
         outputs={summary?.outputs ?? []}

@@ -5,10 +5,10 @@ import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { TextT } from '@phosphor-icons/react';
 import {
-  CondensedInscription,
-  Inscription,
   getBrc20Details,
   getErc721Metadata,
+  type CondensedInscription,
+  type Inscription,
 } from '@secretkeylabs/xverse-core';
 import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
 import { getFetchableUrl } from '@utils/helper';

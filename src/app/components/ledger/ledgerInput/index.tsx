@@ -1,4 +1,4 @@
-import InputFeedback from '@ui-library/inputFeedback';
+import { InputFeedback } from '@ui-library/inputFeedback';
 import styled from 'styled-components';
 
 const Container = styled.div({

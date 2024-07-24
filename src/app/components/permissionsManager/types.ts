@@ -1,4 +1,4 @@
-import { Client, Permission, PermissionsStoreV1, Resource } from './schemas';
+import type { Client, Permission, PermissionsStoreV1, Resource } from './schemas';
 
 export type TPermissionsStoreContext<TError = unknown> =
   | {
