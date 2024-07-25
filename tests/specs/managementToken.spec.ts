@@ -6,9 +6,9 @@ const strongPW = Onboarding.generateSecurePasswordCrypto();
 
 test.describe('Token Management', () => {
   test('Check token page #smoketest', async ({ page, extensionId }) => {
-    const onboardingpage = new Onboarding(page);
+    const onboardingPage = new Onboarding(page);
     const wallet = new Wallet(page);
-    await onboardingpage.createWalletSkipBackup(strongPW);
+    await onboardingPage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
     await wallet.checkVisualsStartpage();
     await expect(wallet.balance).toHaveText('$0.00');
@@ -47,9 +47,9 @@ test.describe('Token Management', () => {
   });
 
   test('Enable and disable some BRC-20 token', async ({ page, extensionId }) => {
-    const onboardingpage = new Onboarding(page);
+    const onboardingPage = new Onboarding(page);
     const wallet = new Wallet(page);
-    await onboardingpage.createWalletSkipBackup(strongPW);
+    await onboardingPage.createWalletSkipBackup(strongPW);
 
     await test.step('Enable a random token', async () => {
       await page.goto(`chrome-extension://${extensionId}/popup.html`);
@@ -70,7 +70,7 @@ test.describe('Token Management', () => {
       await expect(wallet.checkboxTokenActive).toHaveCount(1);
       await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenBRC20 - 1);
       await wallet.buttonBack.click();
-      // new enabled token should be visibal on dashboard
+      // new enabled token should be visible on dashboard
       await expect(wallet.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeVisible();
       // Check balances
       await expect(wallet.balance).toBeVisible();
@@ -90,7 +90,7 @@ test.describe('Token Management', () => {
       await expect(wallet.checkboxTokenActive).toHaveCount(4);
       await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenBRC20 - 4);
       await wallet.buttonBack.click();
-      // new enabled tokens should be visibal on dashboard
+      // new enabled tokens should be visible on dashboard
       await expect(wallet.labelTokenSubtitle.getByText(tokenName1, { exact: true })).toBeVisible();
       await expect(wallet.labelTokenSubtitle.getByText(tokenName2, { exact: true })).toBeVisible();
       await expect(wallet.labelTokenSubtitle.getByText(tokenName3, { exact: true })).toBeVisible();
@@ -108,7 +108,7 @@ test.describe('Token Management', () => {
       await expect(wallet.checkboxTokenActive).toHaveCount(3);
       await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenBRC20 - 3);
       await wallet.buttonBack.click();
-      // new enabled token should be visibal on dashboard
+      // new enabled token should be visible on dashboard
       await expect(wallet.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeHidden();
       // Check balances
       await expect(wallet.balance).toBeVisible();
@@ -119,9 +119,9 @@ test.describe('Token Management', () => {
   });
 
   test('Enable and disable some SIP-10 token', async ({ page, extensionId }) => {
-    const onboardingpage = new Onboarding(page);
+    const onboardingPage = new Onboarding(page);
     const wallet = new Wallet(page);
-    await onboardingpage.createWalletSkipBackup(strongPW);
+    await onboardingPage.createWalletSkipBackup(strongPW);
 
     await test.step('Enable a random token', async () => {
       await page.goto(`chrome-extension://${extensionId}/popup.html`);
@@ -141,7 +141,7 @@ test.describe('Token Management', () => {
       await expect(wallet.checkboxTokenActive).toHaveCount(2);
       await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenSIP - 2);
       await wallet.buttonBack.click();
-      // new enabled token should be visibal on dashboard
+      // new enabled token should be visible on dashboard
       await expect(wallet.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeVisible();
       // Check balances
       await expect(wallet.balance).toBeVisible();
@@ -160,7 +160,7 @@ test.describe('Token Management', () => {
       await expect(wallet.checkboxTokenActive).toHaveCount(5);
       await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenSIP - 5);
       await wallet.buttonBack.click();
-      // new enabled tokens should be visibal on dashboard
+      // new enabled tokens should be visible on dashboard
       await expect(wallet.labelTokenSubtitle.getByText(tokenName1, { exact: true })).toBeVisible();
       await expect(wallet.labelTokenSubtitle.getByText(tokenName2, { exact: true })).toBeVisible();
       await expect(wallet.labelTokenSubtitle.getByText(tokenName3, { exact: true })).toBeVisible();
@@ -177,7 +177,7 @@ test.describe('Token Management', () => {
       await expect(wallet.checkboxTokenActive).toHaveCount(4);
       await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenSIP - 4);
       await wallet.buttonBack.click();
-      // new enabled token should be visibal on dashboard
+      // new enabled token should be visible on dashboard
       await expect(wallet.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeHidden();
       // Check balances
       await expect(wallet.balance).toBeVisible();
@@ -188,9 +188,9 @@ test.describe('Token Management', () => {
   });
 
   test('Enable and disable all SIP-10 token', async ({ page, extensionId }) => {
-    const onboardingpage = new Onboarding(page);
+    const onboardingPage = new Onboarding(page);
     const wallet = new Wallet(page);
-    await onboardingpage.createWalletSkipBackup(strongPW);
+    await onboardingPage.createWalletSkipBackup(strongPW);
 
     await test.step('Enable a all tokens', async () => {
       await page.goto(`chrome-extension://${extensionId}/popup.html`);
@@ -237,9 +237,9 @@ test.describe('Token Management', () => {
     });
   });
   test('Enable and disable all BRC-20 token', async ({ page, extensionId }) => {
-    const onboardingpage = new Onboarding(page);
+    const onboardingPage = new Onboarding(page);
     const wallet = new Wallet(page);
-    await onboardingpage.createWalletSkipBackup(strongPW);
+    await onboardingPage.createWalletSkipBackup(strongPW);
 
     await test.step('Enable a all tokens', async () => {
       await page.goto(`chrome-extension://${extensionId}/popup.html`);

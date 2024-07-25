@@ -148,8 +148,8 @@ export default class Onboarding {
   }
 
   async navigateToBackupPage() {
-    const landingpage = new Landing(this.page);
-    await landingpage.buttonCreateWallet.click();
+    const landingPage = new Landing(this.page);
+    await landingPage.buttonCreateWallet.click();
     await expect(this.page.url()).toContain('legal');
     await this.buttonAccept.click();
     await expect(this.page.url()).toContain('backup');
@@ -164,9 +164,9 @@ export default class Onboarding {
   }
 
   async navigateToRestorePage() {
-    const landingpage = new Landing(this.page);
-    await expect(landingpage.buttonRestoreWallet).toBeVisible();
-    await landingpage.buttonRestoreWallet.click();
+    const landingPage = new Landing(this.page);
+    await expect(landingPage.buttonRestoreWallet).toBeVisible();
+    await landingPage.buttonRestoreWallet.click();
     await expect(this.page.url()).toContain('legal');
     await this.buttonAccept.click();
     await expect(this.page.url()).toContain('restore');
@@ -211,8 +211,8 @@ export default class Onboarding {
   }
 
   async restoreWallet(password, envVarName) {
-    const landingpage = new Landing(this.page);
-    await landingpage.buttonRestoreWallet.click();
+    const landingPage = new Landing(this.page);
+    await landingPage.buttonRestoreWallet.click();
     await expect(this.page.url()).toContain('legal');
     await this.buttonAccept.click();
     await expect(this.page.url()).toContain('restore');

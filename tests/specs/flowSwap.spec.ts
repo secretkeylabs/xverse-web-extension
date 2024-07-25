@@ -19,27 +19,27 @@ test.describe('Swap Flow Visuals', () => {
   });
 
   test('Visual check swap page', async ({ page, extensionId }) => {
-    const onboardingpage = new Onboarding(page);
+    const onboardingPage = new Onboarding(page);
     const wallet = new Wallet(page);
-    await onboardingpage.createWalletSkipBackup(strongPW);
+    await onboardingPage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
     await wallet.checkVisualsStartpage();
-    await wallet.allupperButtons.nth(2).click();
+    await wallet.allUpperButtons.nth(2).click();
     await wallet.checkVisualsSwapPage();
   });
   test('Check error message for insufficient fund', async ({ page, extensionId }) => {
-    const onboardingpage = new Onboarding(page);
+    const onboardingPage = new Onboarding(page);
     const wallet = new Wallet(page);
-    await onboardingpage.createWalletSkipBackup(strongPW);
+    await onboardingPage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
     await wallet.checkVisualsStartpage();
-    await wallet.allupperButtons.nth(2).click();
+    await wallet.allUpperButtons.nth(2).click();
     await wallet.checkVisualsSwapPage();
 
     // Select the first Coin
     await wallet.buttonDownArrow.nth(0).click();
 
-    // Had problemns with loading of all tokens so I check that 'Bitcoin' is loaded
+    // Had problems with loading of all tokens so I check that 'Bitcoin' is loaded
     await expect(wallet.labelTokenSubtitle.getByText('Bitcoin').first()).toBeVisible();
     await expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
     await wallet.divTokenRow.first().click();
@@ -50,7 +50,7 @@ test.describe('Swap Flow Visuals', () => {
 
     // Select the second Coin
     await wallet.buttonDownArrow.nth(1).click();
-    // Had problemns with loading of all tokens so I check that a 'DOG' is loaded
+    // Had problems with loading of all tokens so I check that a 'DOG' is loaded
     await expect(wallet.labelTokenSubtitle.getByText('DOG').first()).toBeVisible();
     await expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
     await wallet.divTokenRow.first().click();
@@ -75,25 +75,25 @@ test.describe('Swap Flow Visuals', () => {
   });
 
   test('Use arrow button to switch token', async ({ page, extensionId }) => {
-    const onboardingpage = new Onboarding(page);
+    const onboardingPage = new Onboarding(page);
     const wallet = new Wallet(page);
-    await onboardingpage.createWalletSkipBackup(strongPW);
+    await onboardingPage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
     await wallet.checkVisualsStartpage();
-    await wallet.allupperButtons.nth(2).click();
+    await wallet.allUpperButtons.nth(2).click();
     await wallet.checkVisualsSwapPage();
 
     // Select the first Coin
     await wallet.buttonDownArrow.nth(0).click();
 
-    // Had problemns with loading of all tokens so I check that 'Bitcoin' is loaded
+    // Had problems with loading of all tokens so I check that 'Bitcoin' is loaded
     await expect(wallet.labelTokenSubtitle.getByText('Bitcoin').first()).toBeVisible();
     await expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
     await wallet.divTokenRow.first().click();
 
     // Select the second Coin
     await wallet.buttonDownArrow.nth(1).click();
-    // Had problemns with loading of all tokens so I check that a 'DOG' is loaded
+    // Had problems with loading of all tokens so I check that a 'DOG' is loaded
     await expect(wallet.labelTokenSubtitle.getByText('DOG').first()).toBeVisible();
     await expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
     await wallet.divTokenRow.first().click();

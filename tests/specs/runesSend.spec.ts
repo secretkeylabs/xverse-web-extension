@@ -12,7 +12,7 @@ test.describe('Send runes', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
     // get own Ordinals Address for address check on review page
-    await wallet.allupperButtons.nth(1).click();
+    await wallet.allUpperButtons.nth(1).click();
     const addressOrdinals = await wallet.getAddress(wallet.buttonCopyOrdinalsAddress);
 
     // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
@@ -50,7 +50,7 @@ test.describe('Send runes', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
     // get own BTC  & Ordinals Address for address check on review page
-    await wallet.allupperButtons.nth(1).click();
+    await wallet.allUpperButtons.nth(1).click();
     const selfBTC = await wallet.getAddress(wallet.buttonCopyBitcoinAddress);
     const addressOrdinals = await wallet.getAddress(wallet.buttonCopyOrdinalsAddress);
 

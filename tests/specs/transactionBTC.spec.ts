@@ -13,17 +13,17 @@ test.describe('Transaction BTC', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS2', false);
 
     // get own BTC  & Ordinals Address for address check on review page
-    await wallet.allupperButtons.nth(1).click();
+    await wallet.allUpperButtons.nth(1).click();
     const selfBTC = await wallet.getAddress(wallet.buttonCopyBitcoinAddress);
 
     // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
     await page.reload();
 
     // Save initial Balance for later Balance checks
-    const initalBTCBalance = await wallet.getTokenBalance('Bitcoin');
+    const initialBTCBalance = await wallet.getTokenBalance('Bitcoin');
 
     // Click on send button
-    await wallet.allupperButtons.nth(0).click();
+    await wallet.allUpperButtons.nth(0).click();
 
     await expect(await wallet.divTokenRow.count()).toBeGreaterThanOrEqual(2);
     // Send BTC
@@ -54,7 +54,7 @@ test.describe('Transaction BTC', () => {
     // Balance check
     const displayBalance = await wallet.labelBalanceAmountSelector.innerText();
     const displayBalanceNumerical = parseFloat(displayBalance.replace(/[^0-9.]/g, ''));
-    await expect(initalBTCBalance).toEqual(displayBalanceNumerical);
+    await expect(initialBTCBalance).toEqual(displayBalanceNumerical);
   });
 
   test('Send BTC - Cancel transaction testnet', async ({ page, extensionId }) => {
@@ -63,17 +63,17 @@ test.describe('Transaction BTC', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
     // get own BTC Address
-    await wallet.allupperButtons.nth(1).click();
+    await wallet.allUpperButtons.nth(1).click();
     const selfBTCTest = await wallet.getAddress(wallet.buttonCopyBitcoinAddress);
 
     // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
     await page.reload();
 
     // Save initial Balance for later Balance checks
-    const initalBTCBalance = await wallet.getTokenBalance('Bitcoin');
+    const initialBTCBalance = await wallet.getTokenBalance('Bitcoin');
 
     // Click on send button
-    await wallet.allupperButtons.nth(0).click();
+    await wallet.allUpperButtons.nth(0).click();
 
     await expect(await wallet.divTokenRow.count()).toBeGreaterThanOrEqual(2);
     await wallet.clickOnSpecificToken('Bitcoin');
@@ -90,7 +90,7 @@ test.describe('Transaction BTC', () => {
     // Balance check
     const displayBalance = await wallet.labelBalanceAmountSelector.innerText();
     const displayBalanceNumerical = parseFloat(displayBalance.replace(/[^0-9.]/g, ''));
-    await expect(initalBTCBalance).toEqual(displayBalanceNumerical);
+    await expect(initialBTCBalance).toEqual(displayBalanceNumerical);
     // Timeout increased as I had connectivity issues
     await expect(wallet.buttonNext).toBeVisible({ timeout: 30000 });
     await expect(wallet.buttonNext).toBeEnabled();
@@ -119,7 +119,7 @@ test.describe('Transaction BTC', () => {
 
     // Check BTC Balance after cancel the transaction
     const balanceAfterCancel = await wallet.getTokenBalance('Bitcoin');
-    await expect(initalBTCBalance).toEqual(balanceAfterCancel);
+    await expect(initialBTCBalance).toEqual(balanceAfterCancel);
   });
 
   test('Send BTC - confirm transaction testnet #localexecution', async ({ page, extensionId }) => {
@@ -128,17 +128,17 @@ test.describe('Transaction BTC', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
     // get own BTC Address
-    await wallet.allupperButtons.nth(1).click();
+    await wallet.allUpperButtons.nth(1).click();
     const selfBTCTest = await wallet.getAddress(wallet.buttonCopyBitcoinAddress);
 
     // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
     await page.reload();
 
     // Save initial Balance for later Balance checks
-    const initalBTCBalance = await wallet.getTokenBalance('Bitcoin');
+    const initialBTCBalance = await wallet.getTokenBalance('Bitcoin');
 
     // Click on send button
-    await wallet.allupperButtons.nth(0).click();
+    await wallet.allUpperButtons.nth(0).click();
 
     await expect(await wallet.divTokenRow.count()).toBeGreaterThanOrEqual(2);
     await wallet.clickOnSpecificToken('Bitcoin');
@@ -176,7 +176,7 @@ test.describe('Transaction BTC', () => {
 
     // Check BTC Balance after the transaction
     const balanceAfterCancel = await wallet.getTokenBalance('Bitcoin');
-    await expect(initalBTCBalance).toEqual(balanceAfterCancel);
+    await expect(initialBTCBalance).toEqual(balanceAfterCancel);
   });
 
   // TODO: add test where we change the fees for a BTC transaction

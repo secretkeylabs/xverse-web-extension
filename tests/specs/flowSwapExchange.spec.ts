@@ -21,7 +21,7 @@ test.describe('Swap Flow Exchange', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
     // get own BTC  & Ordinals Address for address check on review page
-    await wallet.allupperButtons.nth(1).click();
+    await wallet.allUpperButtons.nth(1).click();
     const selfBTC = await wallet.getAddress(wallet.buttonCopyBitcoinAddress);
 
     // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
@@ -30,15 +30,15 @@ test.describe('Swap Flow Exchange', () => {
     await wallet.checkVisualsStartpage();
 
     // Save initial Balance for later Balance checks
-    const initalBTCBalance = await wallet.getTokenBalance('Bitcoin');
+    const initialBTCBalance = await wallet.getTokenBalance('Bitcoin');
 
-    await wallet.allupperButtons.nth(2).click();
+    await wallet.allUpperButtons.nth(2).click();
     await wallet.checkVisualsSwapPage();
 
     // Select the first Coin
     await wallet.buttonDownArrow.nth(0).click();
 
-    // Had problemns with loading of all tokens so I check that 'Bitcoin' is loaded
+    // Had problems with loading of all tokens so I check that 'Bitcoin' is loaded
     await expect(wallet.labelTokenSubtitle.getByText('Bitcoin').first()).toBeVisible();
     await expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
     await wallet.divTokenRow.first().click();
@@ -48,7 +48,7 @@ test.describe('Swap Flow Exchange', () => {
 
     // Select the second Coin
     await wallet.buttonDownArrow.nth(1).click();
-    // Had problemns with loading of all tokens so I check that a 'DOG' is loaded
+    // Had problems with loading of all tokens so I check that a 'DOG' is loaded
     await expect(wallet.labelTokenSubtitle.getByText('DOG').first()).toBeVisible();
     await expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
     await wallet.divTokenRow.first().click();
@@ -82,7 +82,7 @@ test.describe('Swap Flow Exchange', () => {
 
     await wallet.checkVisualsQuotePage(tokenName1, true, numericQuoteValue, numericUSDValue);
 
-    // TODO: change work around as button should be disabled until the feerate is calculted
+    // TODO: change work around as button should be disabled until the Feerate is calculated
     await wallet.buttonSwap.click();
     await wallet.buttonSwap.click();
     await wallet.buttonSwap.click();
@@ -105,6 +105,6 @@ test.describe('Swap Flow Exchange', () => {
 
     // Check BTC Balance after cancel the transaction
     const balanceAfterCancel = await wallet.getTokenBalance('Bitcoin');
-    await expect(initalBTCBalance).toEqual(balanceAfterCancel);
+    await expect(initialBTCBalance).toEqual(balanceAfterCancel);
   });
 });

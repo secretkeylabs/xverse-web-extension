@@ -13,30 +13,30 @@ const filePathAddresses = path.join(__dirname, 'addresses.json');
 
 test.describe('Create and Restore Wallet Flow', () => {
   test('create and restore a wallet via Menu', async ({ page, extensionId, context }) => {
-    const onboardingpage = new Onboarding(page);
+    const onboardingPage = new Onboarding(page);
     const wallet = new Wallet(page);
     await test.step('backup seedphrase and successfully create a wallet', async () => {
-      await onboardingpage.navigateToBackupPage();
-      await onboardingpage.buttonBackupNow.click();
+      await onboardingPage.navigateToBackupPage();
+      await onboardingPage.buttonBackupNow.click();
       await expect(page.url()).toContain('backupWalletSteps');
-      await expect(onboardingpage.buttonContinue).toBeDisabled();
-      await expect(onboardingpage.buttonRevealSeed).toBeVisible();
-      await expect(onboardingpage.firstParagraphBackupStep).toBeVisible();
-      await onboardingpage.buttonRevealSeed.click();
-      await expect(onboardingpage.buttonContinue).toBeEnabled();
-      const seedWords = await onboardingpage.textSeedWords.allTextContents();
-      await onboardingpage.buttonContinue.click();
+      await expect(onboardingPage.buttonContinue).toBeDisabled();
+      await expect(onboardingPage.buttonRevealSeed).toBeVisible();
+      await expect(onboardingPage.firstParagraphBackupStep).toBeVisible();
+      await onboardingPage.buttonRevealSeed.click();
+      await expect(onboardingPage.buttonContinue).toBeEnabled();
+      const seedWords = await onboardingPage.textSeedWords.allTextContents();
+      await onboardingPage.buttonContinue.click();
 
       // check if 12 words are displayed
-      await expect(onboardingpage.buttonSeedWords).toHaveCount(12);
-      await expect(onboardingpage.secondParagraphBackupStep).toBeVisible();
-      let seedword = await onboardingpage.selectSeedWord(seedWords);
+      await expect(onboardingPage.buttonSeedWords).toHaveCount(12);
+      await expect(onboardingPage.secondParagraphBackupStep).toBeVisible();
+      let seedword = await onboardingPage.selectSeedWord(seedWords);
 
       // Save the seedwords into a file to read it out later to restore
       fs.writeFileSync(filePathSeedWords, JSON.stringify(seedWords), 'utf8');
 
       // get all displayed values and filter the value from the actual seedphrase out to do an error message check
-      const buttonValues = await onboardingpage.buttonSeedWords.evaluateAll((buttons) =>
+      const buttonValues = await onboardingPage.buttonSeedWords.evaluateAll((buttons) =>
         buttons.map((button) => {
           // Assert that the button is an HTMLButtonElement to access the `value` property
           if (button instanceof HTMLButtonElement) {
@@ -54,19 +54,19 @@ test.describe('Create and Restore Wallet Flow', () => {
       await expect(page.locator('p:has-text("This word is not")')).toBeVisible();
 
       await page.locator(`button[value="${seedword}"]`).click();
-      seedword = await onboardingpage.selectSeedWord(seedWords);
+      seedword = await onboardingPage.selectSeedWord(seedWords);
       await page.locator(`button[value="${seedword}"]`).click();
-      seedword = await onboardingpage.selectSeedWord(seedWords);
+      seedword = await onboardingPage.selectSeedWord(seedWords);
       await page.locator(`button[value="${seedword}"]`).click();
 
-      await onboardingpage.inputPassword.fill(strongPW);
-      await onboardingpage.buttonContinue.click();
-      await onboardingpage.inputPassword.fill(strongPW);
-      await onboardingpage.buttonContinue.click();
+      await onboardingPage.inputPassword.fill(strongPW);
+      await onboardingPage.buttonContinue.click();
+      await onboardingPage.inputPassword.fill(strongPW);
+      await onboardingPage.buttonContinue.click();
 
-      await expect(onboardingpage.imageSuccess).toBeVisible();
-      await expect(onboardingpage.instruction).toBeVisible();
-      await expect(onboardingpage.buttonCloseTab).toBeVisible();
+      await expect(onboardingPage.imageSuccess).toBeVisible();
+      await expect(onboardingPage.instruction).toBeVisible();
+      await expect(onboardingPage.buttonCloseTab).toBeVisible();
 
       // Open the wallet directly via URL
       await page.goto(`chrome-extension://${extensionId}/popup.html`);
@@ -76,7 +76,7 @@ test.describe('Create and Restore Wallet Flow', () => {
       await expect(newWallet.balance).toHaveText('$0.00');
 
       // TODO: find better selector for the receive button
-      await newWallet.allupperButtons.nth(1).click();
+      await newWallet.allUpperButtons.nth(1).click();
 
       // Get the addresses and save it in variables
       const addressBitcoin = await newWallet.getAddress(newWallet.buttonCopyBitcoinAddress);
@@ -106,14 +106,14 @@ test.describe('Create and Restore Wallet Flow', () => {
       await expect(wallet.buttonResetWallet).toBeVisible();
       await wallet.buttonResetWallet.click();
       await wallet.buttonResetWallet.click();
-      await expect(onboardingpage.inputPassword).toBeVisible();
-      await onboardingpage.inputPassword.fill(strongPW);
-      await onboardingpage.buttonContinue.click();
+      await expect(onboardingPage.inputPassword).toBeVisible();
+      await onboardingPage.inputPassword.fill(strongPW);
+      await onboardingPage.buttonContinue.click();
     });
     await test.step('Restore wallet with 12 word seed phrase', async () => {
-      const landingpage = new Landing(page);
-      await expect(landingpage.buttonRestoreWallet).toBeVisible();
-      await landingpage.buttonRestoreWallet.click();
+      const landingPage = new Landing(page);
+      await expect(landingPage.buttonRestoreWallet).toBeVisible();
+      await landingPage.buttonRestoreWallet.click();
 
       await context.waitForEvent('page');
 
@@ -121,26 +121,26 @@ test.describe('Create and Restore Wallet Flow', () => {
       const newPage = await context.pages()[context.pages().length - 1];
       await expect(newPage.url()).toContain('legal');
 
-      const onboardingpage2 = new Onboarding(newPage);
+      const onboardingPage2 = new Onboarding(newPage);
 
-      await onboardingpage2.buttonAccept.click();
+      await onboardingPage2.buttonAccept.click();
       await expect(newPage.url()).toContain('restore');
-      await onboardingpage2.checkRestoreWalletSeedPhrasePage();
+      await onboardingPage2.checkRestoreWalletSeedPhrasePage();
 
       const seedWords = JSON.parse(fs.readFileSync(filePathSeedWords, 'utf8'));
 
       for (let i = 0; i < seedWords.length; i++) {
-        await onboardingpage2.inputWord(i).fill(seedWords[i]);
+        await onboardingPage2.inputWord(i).fill(seedWords[i]);
       }
-      await expect(onboardingpage2.buttonContinue).toBeEnabled();
-      await onboardingpage2.buttonContinue.click();
-      await onboardingpage2.inputPassword.fill(strongPW);
-      await onboardingpage2.buttonContinue.click();
-      await onboardingpage2.inputPassword.fill(strongPW);
-      await onboardingpage2.buttonContinue.click();
-      await expect(onboardingpage2.imageSuccess).toBeVisible();
-      await expect(onboardingpage2.headingWalletRestored).toBeVisible();
-      await expect(onboardingpage2.buttonCloseTab).toBeVisible();
+      await expect(onboardingPage2.buttonContinue).toBeEnabled();
+      await onboardingPage2.buttonContinue.click();
+      await onboardingPage2.inputPassword.fill(strongPW);
+      await onboardingPage2.buttonContinue.click();
+      await onboardingPage2.inputPassword.fill(strongPW);
+      await onboardingPage2.buttonContinue.click();
+      await expect(onboardingPage2.imageSuccess).toBeVisible();
+      await expect(onboardingPage2.headingWalletRestored).toBeVisible();
+      await expect(onboardingPage2.buttonCloseTab).toBeVisible();
       // Open the wallet directly via URL
       await newPage.goto(`chrome-extension://${extensionId}/popup.html`);
       const newWallet = new Wallet(newPage);
@@ -149,7 +149,7 @@ test.describe('Create and Restore Wallet Flow', () => {
       const balanceText = newWallet.balance;
       await await expect(balanceText).toHaveText('$0.00');
 
-      await newWallet.allupperButtons.nth(1).click();
+      await newWallet.allUpperButtons.nth(1).click();
 
       // Get the Addresses
       const addressBitcoinCheck = await newWallet.getAddress(newWallet.buttonCopyBitcoinAddress);

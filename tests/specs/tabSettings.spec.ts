@@ -6,9 +6,9 @@ const strongPW = Onboarding.generateSecurePasswordCrypto();
 
 test.describe('Settings Tab', () => {
   test('Check settings page', async ({ page, extensionId }) => {
-    const onboardingpage = new Onboarding(page);
+    const onboardingPage = new Onboarding(page);
     const wallet = new Wallet(page);
-    await onboardingpage.createWalletSkipBackup(strongPW);
+    await onboardingPage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
     await wallet.checkVisualsStartpage();
     await wallet.navigationSettings.click();
@@ -25,9 +25,9 @@ test.describe('Settings Tab', () => {
     disableOverridePageRoutes,
   }) => {
     await disableOverridePageRoutes(page);
-    const onboardingpage = new Onboarding(page);
+    const onboardingPage = new Onboarding(page);
     const wallet = new Wallet(page);
-    await onboardingpage.createWalletSkipBackup(strongPW);
+    await onboardingPage.createWalletSkipBackup(strongPW);
 
     // generate extra account
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
@@ -43,7 +43,7 @@ test.describe('Settings Tab', () => {
     await wallet.checkVisualsStartpage();
     await expect(wallet.labelAccountName).toHaveText('Account 2');
     await page.goto(`chrome-extension://${extensionId}/popup.html#/settings`);
-    await wallet.switchtoTestnetNetwork();
+    await wallet.switchToTestnetNetwork();
     await wallet.navigationDashboard.click();
     await expect(wallet.labelAccountName).toHaveText('Account 1');
 
@@ -54,69 +54,69 @@ test.describe('Settings Tab', () => {
     await wallet.checkVisualsStartpage('testnet');
     await expect(wallet.labelAccountName).toHaveText('Account 2');
     await page.goto(`chrome-extension://${extensionId}/popup.html#/settings`);
-    await wallet.switchtoMainnetNetwork();
+    await wallet.switchToMainnetNetwork();
     await wallet.navigationDashboard.click();
     await expect(wallet.labelAccountName).toHaveText('Account 1');
   });
   test('Update password', async ({ page, extensionId }) => {
-    const onboardingpage = new Onboarding(page);
+    const onboardingPage = new Onboarding(page);
     const wallet = new Wallet(page);
-    await onboardingpage.createWalletSkipBackup(strongPW);
+    await onboardingPage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
     await wallet.checkVisualsStartpage();
     await wallet.navigationSettings.click();
     await expect(wallet.buttonUpdatePassword).toBeVisible();
     await wallet.buttonUpdatePassword.click();
     await expect(page.url()).toContain('change-password');
-    await expect(onboardingpage.inputPassword).toBeVisible();
-    await expect(onboardingpage.buttonContinue).toBeDisabled();
-    // errormessage check for wrong password
-    await onboardingpage.inputPassword.fill('ABCwe234');
-    await expect(onboardingpage.buttonContinue).toBeEnabled();
-    await onboardingpage.buttonContinue.click();
+    await expect(onboardingPage.inputPassword).toBeVisible();
+    await expect(onboardingPage.buttonContinue).toBeDisabled();
+    // error message check for wrong password
+    await onboardingPage.inputPassword.fill('ABCwe234');
+    await expect(onboardingPage.buttonContinue).toBeEnabled();
+    await onboardingPage.buttonContinue.click();
     await expect(wallet.errorMessage).toBeVisible();
-    await expect(onboardingpage.buttonContinue).toBeEnabled();
-    await onboardingpage.inputPassword.clear();
+    await expect(onboardingPage.buttonContinue).toBeEnabled();
+    await onboardingPage.inputPassword.clear();
     // Update password
-    await onboardingpage.inputPassword.fill(strongPW);
-    await onboardingpage.buttonContinue.click();
+    await onboardingPage.inputPassword.fill(strongPW);
+    await onboardingPage.buttonContinue.click();
     await expect(wallet.headerNewPassword).toBeVisible();
-    await expect(onboardingpage.inputPassword).toBeVisible();
-    await expect(onboardingpage.buttonContinue).toBeDisabled();
-    await onboardingpage.inputPassword.fill(`${strongPW}ABC`);
-    await expect(onboardingpage.buttonContinue).toBeEnabled();
-    await onboardingpage.buttonContinue.click();
-    await expect(onboardingpage.inputPassword).toBeVisible();
-    await expect(onboardingpage.buttonContinue).toBeDisabled();
-    await onboardingpage.inputPassword.fill(`${strongPW}ABC`);
-    await expect(onboardingpage.buttonContinue).toBeEnabled();
-    await onboardingpage.buttonContinue.click();
+    await expect(onboardingPage.inputPassword).toBeVisible();
+    await expect(onboardingPage.buttonContinue).toBeDisabled();
+    await onboardingPage.inputPassword.fill(`${strongPW}ABC`);
+    await expect(onboardingPage.buttonContinue).toBeEnabled();
+    await onboardingPage.buttonContinue.click();
+    await expect(onboardingPage.inputPassword).toBeVisible();
+    await expect(onboardingPage.buttonContinue).toBeDisabled();
+    await onboardingPage.inputPassword.fill(`${strongPW}ABC`);
+    await expect(onboardingPage.buttonContinue).toBeEnabled();
+    await onboardingPage.buttonContinue.click();
     await expect(wallet.infoUpdatePassword).toBeVisible();
   });
   test('Backup wallet', async ({ page, extensionId }) => {
-    const onboardingpage = new Onboarding(page);
+    const onboardingPage = new Onboarding(page);
     const wallet = new Wallet(page);
-    await onboardingpage.createWalletSkipBackup(strongPW);
+    await onboardingPage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
     await wallet.checkVisualsStartpage();
     await wallet.navigationSettings.click();
     await expect(page.url()).toContain('settings');
     await expect(wallet.buttonBackupWallet).toBeVisible();
     await wallet.buttonBackupWallet.click();
-    await expect(onboardingpage.inputPassword).toBeVisible();
-    await expect(onboardingpage.buttonContinue).toBeDisabled();
-    await onboardingpage.inputPassword.fill(strongPW);
-    await onboardingpage.buttonContinue.click();
-    await expect(onboardingpage.buttonRevealSeed).toBeVisible();
+    await expect(onboardingPage.inputPassword).toBeVisible();
+    await expect(onboardingPage.buttonContinue).toBeDisabled();
+    await onboardingPage.inputPassword.fill(strongPW);
+    await onboardingPage.buttonContinue.click();
+    await expect(onboardingPage.buttonRevealSeed).toBeVisible();
     await expect(wallet.buttonBack).toBeVisible();
-    await onboardingpage.buttonRevealSeed.click();
-    await expect(onboardingpage.textSeedWords).toHaveCount(12);
+    await onboardingPage.buttonRevealSeed.click();
+    await expect(onboardingPage.textSeedWords).toHaveCount(12);
   });
 
   test('Change currency to SGD', async ({ page, extensionId }) => {
-    const onboardingpage = new Onboarding(page);
+    const onboardingPage = new Onboarding(page);
     const wallet = new Wallet(page);
-    await onboardingpage.createWalletSkipBackup(strongPW);
+    await onboardingPage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
     await wallet.checkVisualsStartpage();
     await expect(wallet.textCurrency).toHaveText('USD');

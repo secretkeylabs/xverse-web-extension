@@ -6,7 +6,7 @@ const strongPW = Onboarding.generateSecurePasswordCrypto();
 export default class Wallet {
   readonly balance: Locator;
 
-  readonly allupperButtons: Locator;
+  readonly allUpperButtons: Locator;
 
   readonly labelAccountName: Locator;
 
@@ -359,7 +359,7 @@ export default class Wallet {
     this.navigationSettings = page.getByTestId('nav-settings');
     this.balance = page.getByTestId('total-balance-value');
     this.textCurrency = page.getByTestId('currency-text');
-    this.allupperButtons = page.getByTestId('transaction-buttons-row').getByRole('button');
+    this.allUpperButtons = page.getByTestId('transaction-buttons-row').getByRole('button');
     this.manageTokenButton = page.getByRole('button', { name: 'Manage token list' });
     this.buttonMenu = page.getByRole('button', { name: 'Open Header Options' });
     this.buttonLock = page.getByRole('button', { name: 'Lock' });
@@ -587,13 +587,13 @@ export default class Wallet {
 
   // Helper function to restore the wallet, switch to testnet if parameter is true and navigate to dashboard
   async setupTest(extensionId, wallet, testnet) {
-    const onboardingpage = new Onboarding(this.page);
-    await onboardingpage.restoreWallet(strongPW, wallet);
+    const onboardingPage = new Onboarding(this.page);
+    await onboardingPage.restoreWallet(strongPW, wallet);
     await this.page.goto(`chrome-extension://${extensionId}/popup.html`);
     await this.checkVisualsStartpage();
     if (testnet) {
       await this.navigationSettings.click();
-      await this.switchtoTestnetNetwork();
+      await this.switchToTestnetNetwork();
       await this.navigationDashboard.click();
       await this.checkVisualsStartpage('testnet');
     }
@@ -617,14 +617,14 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     switch (true) {
       case network === 'testnet':
         // Check if all 3 buttons (send, receive, buy) are visible
-        await expect(this.allupperButtons).toHaveCount(3);
+        await expect(this.allUpperButtons).toHaveCount(3);
         break;
       default:
         // Check if all 4 buttons (send, receive, swap, buy) are visible
-        await expect(this.allupperButtons).toHaveCount(4);
+        await expect(this.allUpperButtons).toHaveCount(4);
     }
 */
-    // await expect(this.allupperButtons).toHaveCount(3);
+    // await expect(this.allUpperButtons).toHaveCount(3);
     await expect(this.labelAccountName).toBeVisible();
     await expect(this.buttonMenu).toBeVisible();
     await expect(await this.labelTokenSubtitle.count()).toBeGreaterThanOrEqual(2);
@@ -815,7 +815,7 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(await this.buttonSwapPlace.count()).toBe(2);
     await expect(await this.imageToken.count()).toBe(2);
 
-    // Check Runen token name
+    // Check Rune token name
     await expect(this.infoMessage.last()).toContainText(tokenName);
 
     // Check if USD amount from quote page is the same as from th swap start flow page
@@ -1010,7 +1010,7 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await Promise.all(checks);
   }
 
-  async switchtoTestnetNetwork() {
+  async switchToTestnetNetwork() {
     await expect(this.buttonNetwork).toBeVisible();
     await expect(this.buttonNetwork).toHaveText('NetworkMainnet');
     await this.buttonNetwork.click();
@@ -1033,7 +1033,7 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(this.buttonNetwork).toHaveText('NetworkTestnet');
   }
 
-  async switchtoMainnetNetwork() {
+  async switchToMainnetNetwork() {
     await expect(this.buttonNetwork).toBeVisible();
     await expect(this.buttonNetwork).toHaveText('NetworkTestnet');
     await this.buttonNetwork.click();
