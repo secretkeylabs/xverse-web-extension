@@ -40,6 +40,7 @@ const StyledContainer = styled.div`
   flex-direction: column;
   margin-left: ${(props) => props.theme.space.m};
   margin-right: ${(props) => props.theme.space.m};
+  padding-top: 60px;
 `;
 
 const RefreshView = styled.div`
@@ -96,6 +97,14 @@ const Arrow = styled.div`
 
 const BtnView = styled.div`
   margin-top: ${(props) => props.theme.space.m};
+`;
+
+const TopRowContainer = styled.div`
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1;
+  background-color: ${(props) => props.theme.colors.elevation0};
 `;
 
 const LoaderContainer = styled.div`
@@ -211,10 +220,12 @@ export default function UtxoSelection({
 
   return (
     <>
-      <TopRow onClick={onClose} />
+      <TopRowContainer>
+        <TopRow onClick={onClose} />
+      </TopRowContainer>
       <StyledContainer>
         <Heading typography="headline_s" color="white_0">
-          {t('SWAP_BTC')}
+          {t('SWAP')}
         </Heading>
         <QuoteSummaryTile
           fromUnit="BTC"

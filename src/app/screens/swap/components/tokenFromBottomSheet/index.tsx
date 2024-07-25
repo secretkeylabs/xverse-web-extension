@@ -1,8 +1,7 @@
 import TokenTile from '@components/tokenTile';
-import type { FungibleToken, TokenBasic } from '@secretkeylabs/xverse-core';
+import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
-import Spinner from '@ui-library/spinner';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import useFromTokens from './useFromTokens';
@@ -15,12 +14,6 @@ const Container = styled.div((props) => ({
   gap: props.theme.space.xl,
 }));
 
-const SpinnerContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-
 const StyledTokenTile = styled(TokenTile)`
   padding: 0;
   background-color: transparent;
@@ -29,55 +22,48 @@ const StyledTokenTile = styled(TokenTile)`
 interface Props {
   visible: boolean;
   title: string;
-  to?: TokenBasic;
   onSelectCoin: (token: FungibleToken | 'BTC') => void;
   onClose: () => void;
 }
 
-export default function TokenFromBottomSheet({ visible, title, to, onSelectCoin, onClose }: Props) {
+export default function TokenFromBottomSheet({ visible, title, onSelectCoin, onClose }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
-  const { data, error, isLoading } = useFromTokens(to);
+  const fromTokens = useFromTokens();
 
   return (
     <Sheet visible={visible} title={title} onClose={onClose}>
       <Container>
-        {isLoading && (
-          <SpinnerContainer>
-            <Spinner size={20} />
-          </SpinnerContainer>
-        )}
-        {!!(data && !isLoading) &&
-          data.map((token) => {
-            if (token === 'BTC') {
-              return (
-                <StyledTokenTile
-                  key={token}
-                  title="Bitcoin"
-                  currency="BTC"
-                  onPress={() => {
-                    onSelectCoin(token);
-                    onClose();
-                  }}
-                />
-              );
-            }
-            if (token.protocol === 'runes' && 'principal' in token) {
-              return (
-                <StyledTokenTile
-                  key={token.principal}
-                  title={token.name}
-                  currency="FT"
-                  onPress={() => {
-                    onSelectCoin(token);
-                    onClose();
-                  }}
-                  fungibleToken={token}
-                />
-              );
-            }
-            return null;
-          })}
-        {!!(data?.length === 0 || error) && !isLoading && (
+        {fromTokens.map((token) => {
+          if (token === 'BTC') {
+            return (
+              <StyledTokenTile
+                key={token}
+                title="Bitcoin"
+                currency="BTC"
+                onPress={() => {
+                  onSelectCoin(token);
+                  onClose();
+                }}
+              />
+            );
+          }
+          if (token.protocol === 'runes' && 'principal' in token) {
+            return (
+              <StyledTokenTile
+                key={token.principal}
+                title={token.name}
+                currency="FT"
+                onPress={() => {
+                  onSelectCoin(token);
+                  onClose();
+                }}
+                fungibleToken={token}
+              />
+            );
+          }
+          return null;
+        })}
+        {!!(fromTokens.length === 0) && !fromTokens && (
           <StyledP typography="body_m" color="white_200">
             {t('ERRORS.NO_TOKENS_FOUND')}
           </StyledP>

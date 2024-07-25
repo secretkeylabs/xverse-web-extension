@@ -212,6 +212,17 @@ export default function QuoteSummary({
       provider: quote.provider.name,
       from: fromToken === 'BTC' ? 'BTC' : fromToken.name,
       to: toToken.protocol === 'btc' ? 'BTC' : toToken.name ?? toToken.ticker,
+      fromAmount:
+        fromToken === 'BTC'
+          ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcFiatRate)).toFixed(2)
+          : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2),
+      toAmount:
+        toToken.protocol === 'btc'
+          ? getBtcFiatEquivalent(
+              new BigNumber(quote.receiveAmount),
+              new BigNumber(btcFiatRate),
+            ).toFixed(2)
+          : new BigNumber(quote.receiveAmount).multipliedBy(runeFloorPrice ?? 0).toFixed(2),
     });
 
     if (selectedIdentifiers) {
@@ -426,6 +437,7 @@ export default function QuoteSummary({
             title={t('SWAP_SCREEN.SWAP')}
             onClick={handleSwap}
             loading={isPlaceOrderLoading || isPlaceUtxoOrderLoading}
+            disabled={feeRate === '0'}
           />
         </SendButtonContainer>
         <Sheet
