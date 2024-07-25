@@ -216,7 +216,7 @@ export default function QuoteSummary({
         fromToken === 'BTC'
           ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcFiatRate)).toFixed(2)
           : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2),
-      toAmountMinimum:
+      toAmount:
         toToken.protocol === 'btc'
           ? getBtcFiatEquivalent(
               new BigNumber(quote.receiveAmount),
