@@ -434,6 +434,7 @@ export default function QuoteSummary({
             title={t('SWAP_SCREEN.SWAP')}
             onClick={handleSwap}
             loading={isPlaceOrderLoading || isPlaceUtxoOrderLoading}
+            disabled={feeRate === '0'}
           />
         </SendButtonContainer>
         <Sheet
