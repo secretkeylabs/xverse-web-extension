@@ -100,7 +100,7 @@ test.describe('Swap Flow Visuals', () => {
     await expect(wallet.nameToken.last()).not.toContainText('Select asset');
     await expect(wallet.imageToken.last()).toBeVisible();
 
-    // Save tokennames
+    // Save token names
     const tokenName1 = await wallet.nameToken.first().innerText();
     const tokenName2 = await wallet.nameToken.last().innerText();
 

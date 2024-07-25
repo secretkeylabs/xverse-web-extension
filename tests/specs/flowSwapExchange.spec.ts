@@ -56,14 +56,10 @@ test.describe('Swap Flow Exchange', () => {
     await expect(wallet.imageToken.last()).toBeVisible();
     await expect(wallet.buttonGetQuotes).toBeDisabled();
 
+    // tried a calculated value but had multiple problems with that, for now we stick to a specific value
     const swapAmount = 0.00000546;
-    // .Fill() did not work with the field so we need to use this method
-    await wallet.inputSwapAmount.pressSequentially(swapAmount.toString());
-    await expect(wallet.buttonGetQuotes).toBeEnabled();
 
-    const usdAmount = await wallet.textUSD.innerText();
-    const numericUSDValue = parseFloat(usdAmount.replace(/[^0-9.]/g, ''));
-    await expect(numericUSDValue).toBeGreaterThan(0);
+    const numericUSDValue = await wallet.fillSwapAmount(swapAmount);
 
     // Save rune token name
     const tokenName1 = await wallet.nameToken.last().innerText();
@@ -81,6 +77,35 @@ test.describe('Swap Flow Exchange', () => {
     await wallet.buttonSwapPlace.first().click();
 
     await wallet.checkVisualsQuotePage(tokenName1, true, numericQuoteValue, numericUSDValue);
+
+    // We can only continue if the FeeRate is above 0
+    await wallet.waitForTextAboveZero(wallet.feeAmount, 30000);
+
+    // Save the current fee amount for comparison
+    const originalFee = await wallet.feeAmount.innerText();
+    const numericOriginalFee = parseFloat(originalFee.replace(/[^0-9.]/g, ''));
+    await expect(numericOriginalFee).toBeGreaterThan(0);
+
+    // Click on edit Fee button
+    await wallet.buttonEditFee.click();
+    await expect(wallet.buttonSelectFee.first()).toBeVisible();
+    await expect(wallet.labelTotalFee.first()).toBeVisible();
+
+    // Compare medium fee to previous saved fee
+    const mediumFee = await wallet.labelTotalFee.last().innerText();
+    const numericMediumFee = parseFloat(mediumFee.replace(/[^0-9.]/g, ''));
+    await expect(numericMediumFee).toBe(numericOriginalFee);
+
+    // Save high fee rate for comparison
+    const highFee = await wallet.labelTotalFee.first().innerText();
+    const numericHighFee = parseFloat(highFee.replace(/[^0-9.]/g, ''));
+
+    // Switch to high fee
+    await wallet.buttonSelectFee.first().click();
+
+    const newFee = await wallet.feeAmount.innerText();
+    const numericNewFee = parseFloat(newFee.replace(/[^0-9.]/g, ''));
+    await expect(numericNewFee).toBe(numericHighFee);
 
     await wallet.buttonSwap.click();
     await wallet.checkVisualsSendTransactionReview('swap', false, selfBTC);

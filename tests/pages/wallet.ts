@@ -348,6 +348,10 @@ export default class Wallet {
 
   readonly nameRune: Locator;
 
+  readonly buttonSelectFee: Locator;
+
+  readonly labelTotalFee: Locator;
+
   constructor(readonly page: Page) {
     this.page = page;
     this.navigationDashboard = page.getByTestId('nav-dashboard');
@@ -368,6 +372,8 @@ export default class Wallet {
     this.buttonClose = page.getByRole('button', { name: 'Close' });
     this.buttonEditFee = page.getByTestId('fee-button');
     this.feeAmount = page.getByTestId('fee-amount');
+    this.buttonSelectFee = page.getByTestId('fee-select-button');
+    this.labelTotalFee = page.getByTestId('total-fee');
 
     // Account
     this.labelAccountName = page.getByLabel('Account Name');
@@ -791,6 +797,19 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(this.buttonSwapToken).toBeVisible();
   }
 
+  // Helper function to fill in swap amount and returns usd value as number
+  async fillSwapAmount(amount) {
+    // .Fill() did not work with the field so we need to use this method
+    await this.inputSwapAmount.pressSequentially(amount.toString());
+    await expect(this.buttonGetQuotes).toBeEnabled();
+
+    const usdAmount = await this.textUSD.innerText();
+    const numericUSDValue = parseFloat(usdAmount.replace(/[^0-9.]/g, ''));
+    await expect(numericUSDValue).toBeGreaterThan(0);
+
+    return numericUSDValue;
+  }
+
   // had to disable this rule as my first assertion was always changed to a wrong assertion
   /* eslint-disable playwright/prefer-web-first-assertions */
   async checkVisualsQuotePage(
@@ -1081,75 +1100,75 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     return totalBalance;
   }
 
-  async enableRandomBRC20Token(): Promise<string> {
+  // The enableRandomToken function takes a parameter tokenType which can either be ‘BRC20’ or ‘SIP10’. This parameter determines additional actions specific to BRC20 tokens.
+  async enableRandomToken(tokenType: 'BRC20' | 'SIP10'): Promise<string> {
     await this.manageTokenButton.click();
     await expect(this.page.url()).toContain('manage-tokens');
-    await this.buttonBRC20.click();
-    const tokenName = await this.enableARandomToken();
+
+    // Click on the specific token type button if BRC20 is selected
+    if (tokenType === 'BRC20') {
+      await this.buttonBRC20.click();
+    }
+
+    // Enable a random token
+    const tokenName = await this.toggleRandomToken(true);
+
+    // Navigate back and verify the token is visible
     await this.buttonBack.click();
     await expect(this.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeVisible();
+
     return tokenName;
   }
 
-  async enableRandomSIP10Token(): Promise<string> {
-    await this.manageTokenButton.click();
-    await expect(this.page.url()).toContain('manage-tokens');
-    const tokenName = await this.enableARandomToken();
-    await this.buttonBack.click();
-    await expect(this.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeVisible();
+  // The function toggleRandomToken takes a boolean parameter enable to determine the action:
+  //	true indicates enabling a token (using inactive tokens).
+  //	false indicates disabling a token (using active tokens).
+  async toggleRandomToken(enable: boolean): Promise<string> {
+    const tokenStateLocator = enable ? this.checkboxTokenInactive : this.checkboxTokenActive;
+    await expect(tokenStateLocator.first()).toBeVisible();
+    const numberOfTokens = await tokenStateLocator.count();
+
+    // Generate a random index within the range of available tokens
+    const chosenIndex = Math.floor(Math.random() * numberOfTokens);
+
+    // Access the nth token (adjusting for zero-based indexing)
+    const chosenToken = this.divTokenRow.filter({ has: tokenStateLocator }).nth(chosenIndex);
+    const tokenName = (await chosenToken.getAttribute('data-testid')) || 'default-value';
+
+    // Click the switch handle to toggle the token's state
+    await chosenToken.locator('div.react-switch-handle').click();
+
     return tokenName;
   }
 
-  async enableARandomToken(): Promise<string> {
-    await expect(this.checkboxTokenInactive.first()).toBeVisible();
-    const numberOfUnselectedTokens = await this.checkboxTokenInactive.count();
+  // The function toggleAllTokens takes a boolean parameter enable.
+  //	•	true indicates enabling token (using inactive tokens).
+  //	•	false indicates disabling token (using active tokens).
+  async toggleAllTokens(enable: boolean) {
+    // Determine which tokens to interact with based on the 'enable' parameter
+    const tokenSelector = enable ? this.checkboxTokenInactive : this.checkboxTokenActive;
+    const actionTokens = this.divTokenRow.filter({ has: tokenSelector });
+    const count = await actionTokens.count();
 
-    // Generate a random number within the range of available select elements
-    const chosenNumber = Math.floor(Math.random() * numberOfUnselectedTokens) + 1;
-
-    // Access the nth select element (note the adjustment for zero-based indexing)
-    const adjustChosenNumber = chosenNumber - 1;
-    const chosenUnselectedToken = this.divTokenRow
-      .filter({ has: this.checkboxTokenInactive })
-      .nth(adjustChosenNumber);
-    const enabledTokenName =
-      (await chosenUnselectedToken.getAttribute('data-testid')) || 'default-value';
-    await chosenUnselectedToken.locator('div.react-switch-handle').click();
-    return enabledTokenName;
-  }
-
-  async disableARandomToken(): Promise<string> {
-    await expect(this.checkboxTokenActive.first()).toBeVisible();
-    const numberOfUnselectedTokens = await this.checkboxTokenActive.count();
-
-    // Generate a random number within the range of available select elements
-    const chosenNumber = Math.floor(Math.random() * numberOfUnselectedTokens) + 1;
-
-    // Access the nth select element (note the adjustment for zero-based indexing)
-    const adjustChosenNumber = chosenNumber - 1;
-    const chosenUnselectedToken = this.divTokenRow
-      .filter({ has: this.checkboxTokenActive })
-      .nth(adjustChosenNumber);
-    const disabledTokenName =
-      (await chosenUnselectedToken.getAttribute('data-testid')) || 'default-value';
-    await chosenUnselectedToken.locator('div.react-switch-handle').click();
-    return disabledTokenName;
-  }
-
-  async disableAllTokens() {
-    const allActiveTokens = this.divTokenRow.filter({ has: this.checkboxTokenActive });
-    const count = await allActiveTokens.count();
     for (let i = 0; i < count; i++) {
-      await allActiveTokens.first().locator('div.react-switch-handle').click();
+      // Since clicking the switch will change its state, always interact with the first one
+      await actionTokens.first().locator('div.react-switch-handle').click();
     }
   }
 
-  async enableAllTokens() {
-    const allInactiveTokens = this.divTokenRow.filter({ has: this.checkboxTokenInactive });
-    const count = await allInactiveTokens.count();
-    for (let i = 0; i < count; i++) {
-      // We click the first inactive Token and when this inactive token becomes active we need to click the next one which becomes the first then
-      await allInactiveTokens.first().locator('div.react-switch-handle').click();
+  // Helper function to wait for a field to get greater than 0. Some fields are slowly to load for the E2E so we need to ensure that their is a value loaded before continue
+  async waitForTextAboveZero(selector, timeout = 30000) {
+    const startTime = Date.now();
+    while (true) {
+      if (Date.now() - startTime > timeout) {
+        throw new Error('Timeout waiting for text to be above 0');
+      }
+      const text = await selector.innerText();
+      const numericValue = parseFloat(text.replace(/[^0-9.]/g, ''));
+      if (numericValue > 0) {
+        return; // Exit the function when the condition is met
+      }
+      await this.page.waitForTimeout(1000); // Check every second
     }
   }
 }

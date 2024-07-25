@@ -425,7 +425,7 @@ export default function QuoteSummary({
                   />
                 </EditFeeRateContainer>
               </StyledP>
-              <FeeRate>
+              <FeeRate data-testid="fee-amount">
                 {feeRate} {t('UNITS.SATS_PER_VB')}
               </FeeRate>
             </ListingDescriptionRow>
