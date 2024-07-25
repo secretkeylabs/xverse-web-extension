@@ -539,7 +539,6 @@ export default function SwapScreen() {
             </Flex1>
           )}
         </Flex1>
-        {QuoteModal}
         {!hasQuoteError && (
           <GetQuoteButtonContainer>
             <Button
