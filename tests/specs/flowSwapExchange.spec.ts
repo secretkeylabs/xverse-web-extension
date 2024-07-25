@@ -78,13 +78,10 @@ test.describe('Swap Flow Exchange', () => {
     const numericQuoteValue = parseFloat(quoteAmount.replace(/[^0-9.]/g, ''));
     await expect(numericQuoteValue).toBeGreaterThan(0);
 
-    await wallet.buttonExchangeDotSwap.last().click();
+    await wallet.buttonSwapPlace.first().click();
 
     await wallet.checkVisualsQuotePage(tokenName1, true, numericQuoteValue, numericUSDValue);
 
-    // TODO: change work around as button should be disabled until the Feerate is calculated
-    await wallet.buttonSwap.click();
-    await wallet.buttonSwap.click();
     await wallet.buttonSwap.click();
     await wallet.checkVisualsSendTransactionReview('swap', false, selfBTC);
 

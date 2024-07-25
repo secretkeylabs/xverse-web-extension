@@ -342,13 +342,11 @@ export default class Wallet {
 
   readonly buttonSlippage: Locator;
 
-  readonly buttonExchangeDotSwap: Locator;
+  readonly buttonSwapToken: Locator;
 
-  buttonSwapToken: Locator;
+  readonly minReceivedAmount: Locator;
 
-  minReceivedAmount: Locator;
-
-  nameRune: Locator;
+  readonly nameRune: Locator;
 
   constructor(readonly page: Page) {
     this.page = page;
@@ -502,11 +500,6 @@ export default class Wallet {
     this.buttonSlippage = page.getByTestId('slippage-button');
     this.minReceivedAmount = page.getByTestId('min-received-amount');
     this.nameRune = page.getByTestId('rune-name');
-
-    // TODO needs to be change when this is fixed: https://linear.app/xverseapp/issue/ENG-4752/double-loaded-reactmodalportal-for-rates
-    this.buttonExchangeDotSwap = this.page
-      .getByRole('button')
-      .filter({ has: this.nameSwapPlace.getByText('DotSwap', { exact: true }) });
 
     this.buttonDetails = page.getByRole('button', { name: 'Details' });
     this.buttonInsufficientBalance = page.getByRole('button', { name: 'Insufficient balance' });
