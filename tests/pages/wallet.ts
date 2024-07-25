@@ -636,32 +636,6 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(await this.divTokenRow.count()).toBeGreaterThan(1);
   }
 
-  async checkVisualsSendSTXPage1() {
-    await expect(this.page.url()).toContain('send-stx');
-    await expect(this.buttonNext).toBeVisible();
-    await expect(this.buttonNext).toBeDisabled();
-    // Receiver Address
-    await expect(this.inputField.first()).toBeVisible();
-    // Memo
-    await expect(this.inputField.last()).toBeVisible();
-    await expect(this.imageToken).toBeVisible();
-    // await expect(this.buttonBack).toBeVisible();
-  }
-
-  async checkVisualsSendSTXPage2() {
-    await expect(this.page.url()).toContain('send-stx');
-    await expect(this.buttonNext).toBeVisible();
-    await expect(this.buttonNext).toBeDisabled();
-    // STX amount
-    await expect(this.inputField.first()).toBeVisible();
-    await expect(this.labelBalanceAmountSelector).toBeVisible();
-    // Edit Fee
-    await expect(this.buttonEditFee).toBeVisible();
-    await expect(this.feeAmount).toBeVisible();
-    await expect(this.imageToken).toBeVisible();
-    // await expect(this.buttonBack).toBeVisible();
-  }
-
   async checkVisualsSendSTXPage3() {
     await expect(this.page.url()).toContain('confirm-stx-tx');
     await expect(this.buttonConfirm).toBeVisible();
@@ -695,31 +669,58 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(ordinalNumber).toMatch(reviewNumberOrdinal);
   }
 
-  async checkVisualsSendPage1(url) {
+  /**
+   * Checks the visibility and state of UI elements state on first page in Send Flow
+   *
+   * @param {string} url - The expected URL to validate the correct page navigation.
+   * @param {boolean} isSTX - Optional flag to apply STX-specific element checks (default: false).
+   */
+  async checkVisualsSendPage1(url: string, isSTX: boolean = false) {
     await expect(this.page.url()).toContain(url);
     await expect(this.buttonNext).toBeVisible();
     await expect(this.buttonNext).toBeDisabled();
-    // Receiver Address
-    await expect(this.receiveAddress).toBeVisible();
+
+    if (isSTX) {
+      // Receiver Address
+      await expect(this.inputField.first()).toBeVisible();
+      // Memo
+      await expect(this.inputField.last()).toBeVisible();
+    } else {
+      await expect(this.receiveAddress).toBeVisible();
+    }
+
     await expect(this.imageToken).toBeVisible();
     // await expect(this.buttonBack).toBeVisible();
   }
 
-  async checkVisualsSendPage2(url) {
+  /**
+   * Validates UI element visibility and state on second page in Send Flow
+   *
+   * @param {string} url - URL to verify page navigation; ensures the test is on the correct page.
+   * @param {boolean} isSTX - Indicates if the page is STX-specific; adjusts element checks accordingly (default: false).
+   */
+  async checkVisualsSendPage2(url: string, isSTX: boolean = false) {
     await expect(this.page.url()).toContain(url);
     await expect(this.buttonNext).toBeVisible();
     await expect(this.buttonNext).toBeDisabled();
-    // Send amount field
-    await expect(this.inputSendAmount).toBeVisible();
+
+    // Conditional check based on the type of token
+    if (isSTX) {
+      // STX-specific fields
+      await expect(this.inputField.first()).toBeVisible();
+    } else {
+      // General send amount field
+      await expect(this.inputSendAmount).toBeVisible();
+    }
+
     await expect(this.labelBalanceAmountSelector).toBeVisible();
-    // Edit Fee
     await expect(this.buttonEditFee).toBeVisible();
     await expect(this.feeAmount).toBeVisible();
     await expect(this.imageToken).toBeVisible();
     // await expect(this.buttonBack).toBeVisible();
   }
 
-  // SendAddress or receiverAdress can be null as not all TR screens have them e.g. swap
+  // SendAddress or receiveAddress can be null as not all TR screens have them e.g. swap
   async checkVisualsSendTransactionReview(
     url: string,
     editableFees?: boolean,

@@ -25,7 +25,7 @@ test.describe('Transaction STX', () => {
     await expect(await wallet.divTokenRow.count()).toBeGreaterThanOrEqual(2);
     // Send STX
     await wallet.clickOnSpecificToken('Stacks');
-    await wallet.checkVisualsSendSTXPage1();
+    await wallet.checkVisualsSendPage1('send-stx', true);
 
     // Invalid Address check
     await wallet.inputField.first().fill(`Test Address 123`);
@@ -66,15 +66,15 @@ test.describe('Transaction STX', () => {
 
     await expect(await wallet.divTokenRow.count()).toBeGreaterThanOrEqual(2);
     await wallet.clickOnSpecificToken('Stacks');
-    await wallet.checkVisualsSendSTXPage1();
+    await wallet.checkVisualsSendPage1('send-stx', true);
 
     // Fill in Receiver Address
     await wallet.inputField.first().fill(STXTest);
     await expect(wallet.buttonNext).toBeEnabled();
     await wallet.buttonNext.click();
 
-    // Send Amound
-    await wallet.checkVisualsSendSTXPage2();
+    // Send Amount
+    await wallet.checkVisualsSendPage2('', true);
     await wallet.inputField.first().fill(amountSTXSend.toString());
     await expect(wallet.buttonNext).toBeEnabled();
 
@@ -124,15 +124,15 @@ test.describe('Transaction STX', () => {
     await wallet.clickOnSpecificToken('Stacks');
 
     // Check visuals of sending page
-    await wallet.checkVisualsSendSTXPage1();
+    await wallet.checkVisualsSendPage1('send-stx', true);
 
     // Fill in Receiver Address
     await wallet.inputField.first().fill(STXTest);
     await expect(wallet.buttonNext).toBeEnabled();
     await wallet.buttonNext.click();
 
-    // Send Amound
-    await wallet.checkVisualsSendSTXPage2();
+    // Send Amount
+    await wallet.checkVisualsSendPage2('', true);
     await wallet.inputField.first().fill(amountSTXSend.toString());
     await expect(wallet.buttonNext).toBeEnabled();
 
