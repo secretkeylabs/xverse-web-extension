@@ -543,6 +543,7 @@ export default function SwapScreen() {
           onSelectCoin={onChangeFromToken}
           visible={tokenSelectionBottomSheet === 'from'}
           title={t('SWAP_SCREEN.SWAP_FROM')}
+          to={toToken}
         />
         <TokenToBottomSheet
           onClose={() => setTokenSelectionBottomSheet(null)}
