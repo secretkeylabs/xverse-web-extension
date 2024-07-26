@@ -28,6 +28,7 @@ import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
+import trackSwapMixPanel from '../mixpanel';
 import QuoteTile from '../quotesModal/quoteTile';
 import { SlippageModalContent } from '../slippageModal';
 import { mapFTNativeSwapTokenToTokenBasic } from '../utils';
@@ -86,7 +87,7 @@ const ListingDescriptionRow = styled.div`
 const RouteContainer = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: right;
+  align-items: center;
   flex: 1;
   gap: 4px;
 `;
@@ -208,21 +209,14 @@ export default function QuoteSummary({
       return;
     }
 
-    trackMixPanel(AnalyticsEvents.ConfirmSwap, {
-      provider: quote.provider.name,
-      from: fromToken === 'BTC' ? 'BTC' : fromToken.name,
-      to: toToken.protocol === 'btc' ? 'BTC' : toToken.name ?? toToken.ticker,
-      fromAmount:
-        fromToken === 'BTC'
-          ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcFiatRate)).toFixed(2)
-          : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2),
-      toAmount:
-        toToken.protocol === 'btc'
-          ? getBtcFiatEquivalent(
-              new BigNumber(quote.receiveAmount),
-              new BigNumber(btcFiatRate),
-            ).toFixed(2)
-          : new BigNumber(quote.receiveAmount).multipliedBy(runeFloorPrice ?? 0).toFixed(2),
+    trackSwapMixPanel(AnalyticsEvents.ConfirmSwap, {
+      provider: quote.provider,
+      fromToken,
+      toToken,
+      amount,
+      quote,
+      btcFiatRate,
+      runeFloorPrice,
     });
 
     if (selectedIdentifiers) {
@@ -294,7 +288,6 @@ export default function QuoteSummary({
             <QuoteTile
               provider="Amount"
               price={amount}
-              // TODO JORDAN: ADD RUNE SYMBOL OVERLAY
               image={{
                 currency: fromToken === 'BTC' ? 'BTC' : 'FT',
                 ft: fromToken === 'BTC' ? undefined : fromToken,
