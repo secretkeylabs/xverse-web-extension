@@ -19,6 +19,8 @@ const Container = styled.button<{ clickable: boolean }>`
   background: transparent;
   width: 100%;
   cursor: ${({ clickable }) => (clickable ? 'pointer' : 'default')};
+  align-items: center;
+  justify-content: center;
 `;
 
 const RowCenter = styled.div`
@@ -35,6 +37,19 @@ const InfoContainer = styled.div`
   flex: 1;
   margin-left: ${({ theme }) => theme.space.m};
   margin-right: ${({ theme }) => theme.space.s};
+`;
+
+const GreenEllipse = styled.div`
+  width: 6px;
+  height: 6px;
+  background-color: ${({ theme }) => theme.colors.success_light};
+  border-radius: 50%;
+`;
+
+const SubtitleContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.space.xxs};
 `;
 
 interface Props {
@@ -88,7 +103,10 @@ function QuoteTile({
         <RowCenter>
           {subtitle && subtitleColor && (
             <StyledP typography="body_medium_s" color={subtitleColor}>
-              {subtitle}
+              <SubtitleContainer>
+                {subtitleColor === 'success_light' && <GreenEllipse />}
+                {subtitle}
+              </SubtitleContainer>
             </StyledP>
           )}
           {fiatValue && (
