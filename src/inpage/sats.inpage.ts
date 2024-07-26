@@ -18,20 +18,22 @@ import {
   type SignMessageResponseMessage,
   type SignPsbtResponseMessage,
 } from '@common/types/message-types';
-import type {
-  BitcoinProvider,
-  CreateInscriptionResponse,
-  CreateRepeatInscriptionsResponse,
-  GetAddressResponse,
-  Params,
-  Requests,
-  RpcRequest,
-  RpcResponse,
-  SignMultipleTransactionsResponse,
-  SignTransactionResponse,
+import {
+  rpcResponseMessageSchema,
+  type BitcoinProvider,
+  type CreateInscriptionResponse,
+  type CreateRepeatInscriptionsResponse,
+  type GetAddressResponse,
+  type Params,
+  type Requests,
+  type RpcRequest,
+  type RpcResponse,
+  type SignMultipleTransactionsResponse,
+  type SignTransactionResponse,
 } from '@sats-connect/core';
 import { nanoid } from 'nanoid';
-import { isValidLegacyEvent, isValidRpcEvent } from './utils';
+import * as v from 'valibot';
+import { isValidLegacyEvent } from './utils';
 
 const SatsMethodsProvider: BitcoinProvider = {
   connect: async (btcAddressRequest): Promise<GetAddressResponse> => {
@@ -218,14 +220,28 @@ const SatsMethodsProvider: BitcoinProvider = {
     const rpcRequestEvent = new CustomEvent(DomEventName.rpcRequest, { detail: rpcRequest });
     document.dispatchEvent(rpcRequestEvent);
     return new Promise((resolve) => {
-      function handleRpcResponseEvent(eventMessage: MessageEvent<any>) {
-        if (!isValidRpcEvent(eventMessage)) return;
-        const response = eventMessage.data;
-        if (response.id !== id) {
+      function handleRpcResponseEvent(message: MessageEvent<unknown>) {
+        const parseResult = v.safeParse(rpcResponseMessageSchema, message.data);
+
+        if (!parseResult.success) {
+          // Ignore message if it's not an RPC message.
           return;
         }
+
+        const rpcResponseMessage = parseResult.output;
+
+        if (rpcResponseMessage.id !== id) {
+          // Ignore message if it's not a response to the current request.
+          return;
+        }
+
         window.removeEventListener('message', handleRpcResponseEvent);
-        return resolve(response);
+
+        // NOTE: Ideally the response would be runtime type-checked before the
+        // promise is resolved since the message crosses a type assertion
+        // boundary. For now, since all the responses are typed, it's relatively
+        // safe to assume that the message will conform to the expected type.
+        return resolve(rpcResponseMessage as RpcResponse<Method>);
       }
       window.addEventListener('message', handleRpcResponseEvent);
     });
