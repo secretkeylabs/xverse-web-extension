@@ -9,18 +9,15 @@ const useFromTokens = (toToken?: Token) => {
   const { stxBtcRate, btcFiatRate } = useCoinRates();
   const { btcAddress } = useSelectedAccount();
 
-  const tokens: (FungibleToken | 'BTC')[] = (runesCoinsList ?? []).sort((a, b) =>
+  // Create a copy of the tokens array to avoid global changes
+  const tokens: (FungibleToken | 'BTC')[] = [...(runesCoinsList ?? [])].sort((a, b) =>
     sortFtByFiatBalance(a, b, stxBtcRate, btcFiatRate),
   );
-
-  if (tokens.includes('BTC')) {
-    tokens.splice(tokens.indexOf('BTC'), 1);
-  }
 
   if (btcAddress && toToken?.protocol !== 'btc') tokens.unshift('BTC');
 
   const filteredTokens = toToken
-    ? tokens.filter((token) => token === 'BTC' || token.assetName !== toToken.name)
+    ? tokens.filter((token) => token === 'BTC' || token.principal !== toToken.ticker)
     : tokens;
 
   return filteredTokens;
