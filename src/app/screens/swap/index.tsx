@@ -37,6 +37,7 @@ import PsbtConfimation from './components/psbtConfirmation/psbtConfirmation';
 import RouteItem from './components/routeItem';
 import TokenFromBottomSheet from './components/tokenFromBottomSheet';
 import TokenToBottomSheet from './components/tokenToBottomSheet';
+import trackSwapMixPanel from './mixpanel';
 import QuoteSummary from './quoteSummary';
 import QuotesModal from './quotesModal';
 import {
@@ -172,20 +173,13 @@ export default function SwapScreen() {
       return;
     }
 
-    trackMixPanel(AnalyticsEvents.FetchSwapQuote, {
-      from: fromToken === 'BTC' ? 'BTC' : fromToken.name,
-      to: toToken.protocol === 'btc' ? 'BTC' : toToken.name ?? toToken.ticker,
-      fromAmount:
-        fromToken === 'BTC'
-          ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcFiatRate)).toFixed(2)
-          : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2),
-      toAmount:
-        toToken.protocol === 'btc'
-          ? getBtcFiatEquivalent(
-              new BigNumber(quote?.receiveAmount ?? 0),
-              new BigNumber(btcFiatRate),
-            ).toFixed(2)
-          : new BigNumber(quote?.receiveAmount ?? 0).multipliedBy(runeFloorPrice ?? 0).toFixed(2),
+    trackSwapMixPanel(AnalyticsEvents.FetchSwapQuote, {
+      fromToken,
+      toToken,
+      amount,
+      quote,
+      btcFiatRate,
+      runeFloorPrice,
     });
 
     fetchQuotes({
@@ -380,21 +374,14 @@ export default function SwapScreen() {
     if (!fromToken || !toToken || !provider) {
       return;
     }
-    trackMixPanel(AnalyticsEvents.SignSwap, {
-      provider: provider.name,
-      from: fromToken === 'BTC' ? 'BTC' : fromToken.name,
-      to: toToken.protocol === 'btc' ? 'BTC' : toToken.name ?? toToken.ticker,
-      fromAmount:
-        fromToken === 'BTC'
-          ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcFiatRate)).toFixed(2)
-          : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2),
-      toAmount:
-        toToken.protocol === 'btc'
-          ? getBtcFiatEquivalent(
-              new BigNumber(quote?.receiveAmount ?? 0),
-              new BigNumber(btcFiatRate),
-            ).toFixed(2)
-          : new BigNumber(quote?.receiveAmount ?? 0).multipliedBy(runeFloorPrice ?? 0).toFixed(2),
+    trackSwapMixPanel(AnalyticsEvents.SignSwap, {
+      provider,
+      fromToken,
+      toToken,
+      amount,
+      quote,
+      btcFiatRate,
+      runeFloorPrice,
     });
   };
 
