@@ -1,6 +1,6 @@
 import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
+import { useParsedTxSummaryContext } from '@components/confirmBtcTransaction/hooks/useParsedTxSummaryContext';
 import { animated, config, useSpring } from '@react-spring/web';
-import { btcTransaction } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -42,15 +42,11 @@ const ExpandedContainer = styled(animated.div)((props) => ({
   marginTop: props.theme.space.m,
 }));
 
-type Props = {
-  inputs: btcTransaction.EnhancedInput[];
-  outputs: btcTransaction.EnhancedOutput[];
-};
-
-function TxInOutput({ inputs, outputs }: Props) {
+function TxInOutput() {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
+  const { summary } = useParsedTxSummaryContext();
 
   const slideInStyles = useSpring({
     config: { ...config.gentle, duration: 400 },
@@ -80,13 +76,13 @@ function TxInOutput({ inputs, outputs }: Props) {
       </Button>
       {isExpanded && (
         <ExpandedContainer style={slideInStyles}>
-          {inputs.map((input) => (
+          {summary?.inputs.map((input) => (
             <TransactionInput input={input} key={input.extendedUtxo.outpoint} />
           ))}
           <OutputTitleText typography="body_medium_m" color="white_400">
             {t('OUTPUT')}
           </OutputTitleText>
-          {outputs.map((output, index) => (
+          {summary?.outputs.map((output, index) => (
             <TransactionOutput
               // eslint-disable-next-line react/no-array-index-key
               key={index}

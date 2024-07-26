@@ -27,6 +27,7 @@ function SendInscriptionsRequest() {
     isLoading,
     transaction,
     summary,
+    runeSummary,
     txError,
   } = useSendInscriptions();
 
@@ -59,11 +60,9 @@ function SendInscriptionsRequest() {
       )}
       {transaction && summary && !txError && (
         <ConfirmBtcTransaction
+          summary={summary}
+          runeSummary={runeSummary}
           showAccountHeader
-          inputs={summary.inputs}
-          outputs={summary.outputs}
-          feeOutput={summary.feeOutput}
-          showCenotaphCallout={!!summary?.runeOp?.Cenotaph?.flaws}
           isLoading={isLoading}
           confirmText={t('CONFIRM')}
           cancelText={t('CANCEL')}

@@ -1,5 +1,6 @@
 import RecipientSelector from '@components/recipientSelector';
 import TokenImage from '@components/tokenImage';
+import type { RuneSummary } from '@secretkeylabs/xverse-core';
 import ConfirmBtcTransaction from 'app/components/confirmBtcTransaction';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -29,6 +30,7 @@ const Container = styled.div`
 
 type Props = {
   summary: TransactionSummary | undefined;
+  runeSummary: RuneSummary | undefined;
   currentStep: Step;
   setCurrentStep: (step: Step) => void;
   recipientAddress: string;
@@ -51,6 +53,7 @@ type Props = {
 
 function StepDisplay({
   summary,
+  runeSummary,
   currentStep,
   setCurrentStep,
   recipientAddress,
@@ -104,9 +107,9 @@ function StepDisplay({
               setFeeRate={setFeeRate}
               sendMax={sendMax}
               setSendMax={setSendMax}
-              fee={summary?.fee.toString()}
+              fee={(summary as TransactionSummary)?.fee.toString()}
               getFeeForFeeRate={getFeeForFeeRate}
-              dustFiltered={summary?.dustFiltered ?? false}
+              dustFiltered={(summary as TransactionSummary)?.dustFiltered ?? false}
               onNext={() => setCurrentStep(getNextStep(Step.SelectAmount, amountEditable))}
               hasSufficientFunds={!!summary || isLoading}
               isLoading={isLoading}
@@ -121,10 +124,8 @@ function StepDisplay({
       }
       return (
         <ConfirmBtcTransaction
-          inputs={summary.inputs}
-          outputs={summary.outputs}
-          feeOutput={summary.feeOutput}
-          showCenotaphCallout={!!summary?.runeOp?.Cenotaph?.flaws}
+          summary={summary}
+          runeSummary={runeSummary}
           isLoading={false}
           confirmText={t('COMMON.CONFIRM')}
           cancelText={t('COMMON.CANCEL')}

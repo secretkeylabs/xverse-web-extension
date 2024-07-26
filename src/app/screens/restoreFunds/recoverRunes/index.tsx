@@ -6,6 +6,7 @@ import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useTransactionContext from '@hooks/useTransactionContext';
 import type { TransactionSummary } from '@screens/sendBtc/helpers';
 import {
+  btcTransaction,
   parseSummaryForRunes,
   runesTransaction,
   type RuneSummary,
@@ -60,8 +61,7 @@ const ButtonContainer = styled.div((props) => ({
   padding: `0 ${props.theme.space.m}`,
 }));
 
-// TODO: export this from core
-type EnhancedTransaction = Awaited<ReturnType<typeof runesTransaction.recoverRunes>>;
+type EnhancedTransaction = btcTransaction.EnhancedTransaction;
 
 function RecoverRunes() {
   const { t } = useTranslation('translation', { keyPrefix: 'RECOVER_RUNES_SCREEN' });
@@ -171,12 +171,9 @@ function RecoverRunes() {
       </>
     ) : (
       <ConfirmBtcTransaction
-        title={t('TITLE')}
-        inputs={summary?.inputs ?? []}
-        outputs={summary?.outputs ?? []}
-        feeOutput={summary?.feeOutput}
-        showCenotaphCallout={!!summary?.runeOp?.Cenotaph?.flaws}
+        summary={summary}
         runeSummary={runeSummary}
+        title={t('TITLE')}
         isLoading={isLoading}
         isSubmitting={isBroadcasting}
         confirmText={t('CONFIRM')}

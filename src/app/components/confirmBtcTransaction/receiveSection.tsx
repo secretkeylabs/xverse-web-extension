@@ -1,8 +1,7 @@
+import { useParsedTxSummaryContext } from '@components/confirmBtcTransaction/hooks/useParsedTxSummaryContext';
 import RuneAmount from '@components/confirmBtcTransaction/itemRow/runeAmount';
-import useSelectedAccount from '@hooks/useSelectedAccount';
-import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowRight } from '@phosphor-icons/react';
-import type { btcTransaction, RuneSummary } from '@secretkeylabs/xverse-core';
+import type { btcTransaction } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
@@ -10,7 +9,6 @@ import styled from 'styled-components';
 import Theme from 'theme';
 import Amount from './itemRow/amount';
 import InscriptionSatributeRow from './itemRow/inscriptionSatributeRow';
-import { getOutputsWithAssetsToUserAddress } from './utils';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -51,64 +49,40 @@ const BundleHeader = styled.div((props) => ({
 }));
 
 type Props = {
-  outputs: btcTransaction.EnhancedOutput[];
-  hasExternalInputs: boolean;
-  netAmount: number;
-  transactionIsFinal: boolean;
   onShowInscription: (inscription: btcTransaction.IOInscription) => void;
-  runeReceipts?: RuneSummary['receipts'];
 };
-function ReceiveSection({
-  outputs,
-  hasExternalInputs,
-  netAmount,
-  onShowInscription,
-  runeReceipts,
-  transactionIsFinal,
-}: Props) {
-  const { btcAddress, ordinalsAddress } = useSelectedAccount();
-  const { hasActivatedRareSatsKey } = useWalletSelector();
+function ReceiveSection({ onShowInscription }: Props) {
   const { t } = useTranslation('translation');
+  const {
+    hasExternalInputs,
+    netBtcAmount,
+    receiveSection: {
+      showOrdinalSection,
+      showPaymentSection,
+      showBtcAmount,
+      inscriptionsRareSatsInPayment,
+      ordinalRuneReceipts,
+      outputsToOrdinal,
+      paymentRuneReceipts,
+      showOrdinalRunes,
+      showPaymentRunes,
+    },
+  } = useParsedTxSummaryContext();
 
-  const { outputsToPayment, outputsToOrdinal } = getOutputsWithAssetsToUserAddress({
-    outputs,
-    btcAddress,
-    ordinalsAddress,
-  });
+  /** TODO - start bundling send/receive data by output addresses
+   * switch(output.type) === 'address' -> display `destinationAddress`
+   * script -> OP_RETURN
+   * ms -> nothing
+   * Each address can have 1:N bundles
+   * Challenge right now is how to to group the btc, runes, inscriptions data together by output address
+   */
 
-  // if receiving runes from own addresses, hide it because it is change, unless it swap addresses (recover runes)
-  const filteredRuneReceipts =
-    runeReceipts?.filter(
-      (receipt) =>
-        !receipt.sourceAddresses.some(
-          (address) =>
-            (address === ordinalsAddress && receipt.destinationAddress === ordinalsAddress) ||
-            (address === btcAddress && receipt.destinationAddress === btcAddress),
-        ),
-    ) ?? [];
-  const ordinalRuneReceipts = filteredRuneReceipts.filter(
-    (receipt) => receipt.destinationAddress === ordinalsAddress,
-  );
-  const paymentRuneReceipts = filteredRuneReceipts.filter(
-    (receipt) => receipt.destinationAddress === btcAddress,
-  );
-
-  const inscriptionsRareSatsInPayment = outputsToPayment.filter(
-    (output) =>
-      output.inscriptions.length > 0 || (hasActivatedRareSatsKey && output.satributes.length > 0),
-  );
-  const areInscriptionsRareSatsInPayment = inscriptionsRareSatsInPayment.length > 0;
-  const areInscriptionRareSatsInOrdinal = outputsToOrdinal.length > 0;
-  const amountIsBiggerThanZero = netAmount > 0;
-
-  // if transaction is not final, then runes will be delegated and will show up in the delegation section
-  const showOrdinalRunes = !!(transactionIsFinal && ordinalRuneReceipts.length);
-  const showOrdinalSection = showOrdinalRunes || areInscriptionRareSatsInOrdinal;
-
-  // if transaction is not final, then runes will be delegated and will show up in the delegation section
-  const showPaymentRunes = !!(transactionIsFinal && paymentRuneReceipts.length);
-  const showPaymentSection =
-    amountIsBiggerThanZero || showPaymentRunes || areInscriptionsRareSatsInPayment;
+  /** Receive Data
+   * BTC: netBtcAmount
+   * Runes: paymentRuneReceipts
+   * Ordinals: ordinalRuneReceipts & outputsToOrdinal
+   * Rare Sats: inscriptionsRareSatsInPayment
+   */
 
   return (
     <>
@@ -154,7 +128,7 @@ function ReceiveSection({
                 <RuneAmount rune={receipt} />
               </RowContainer>
             ))}
-          {areInscriptionRareSatsInOrdinal && (
+          {outputsToOrdinal.length > 0 && (
             <RowContainer noPadding noMargin={Boolean(ordinalRuneReceipts.length)}>
               {outputsToOrdinal
                 .sort((a, b) => b.inscriptions.length - a.inscriptions.length)
@@ -194,16 +168,13 @@ function ReceiveSection({
                 <RuneAmount rune={receipt} />
               </RowContainer>
             ))}
-          {amountIsBiggerThanZero && (
+          {showBtcAmount && (
             <RowContainer>
-              <Amount amount={netAmount} />
+              <Amount amount={netBtcAmount} />
             </RowContainer>
           )}
-          {areInscriptionsRareSatsInPayment && (
-            <RowContainer
-              noPadding
-              noMargin={Boolean(paymentRuneReceipts.length) || amountIsBiggerThanZero}
-            >
+          {inscriptionsRareSatsInPayment.length > 0 && (
+            <RowContainer noPadding noMargin={Boolean(paymentRuneReceipts.length) || showBtcAmount}>
               {inscriptionsRareSatsInPayment
                 .sort((a, b) => b.inscriptions.length - a.inscriptions.length)
                 .map((output, index) => (
@@ -216,7 +187,7 @@ function ReceiveSection({
                     amount={output.amount}
                     onShowInscription={onShowInscription}
                     showTopDivider={
-                      (Boolean(paymentRuneReceipts.length) || amountIsBiggerThanZero) && index === 0
+                      (Boolean(paymentRuneReceipts.length) || showBtcAmount) && index === 0
                     }
                     showBottomDivider={inscriptionsRareSatsInPayment.length > index + 1}
                   />

@@ -128,10 +128,7 @@ function StepDisplay({
       }
       return (
         <ConfirmBtcTransaction
-          inputs={summary.inputs}
-          outputs={summary.outputs}
-          feeOutput={summary.feeOutput}
-          showCenotaphCallout={!!summary?.runeOp?.Cenotaph?.flaws}
+          summary={summary}
           runeSummary={runeSummary}
           isLoading={false}
           confirmText={t('COMMON.CONFIRM')}
