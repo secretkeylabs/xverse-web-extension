@@ -3,7 +3,7 @@ import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RecipientSelector from '@components/recipientSelector';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import type { TransactionSummary } from '@screens/sendBtc/helpers';
-import type { Inscription } from '@secretkeylabs/xverse-core';
+import type { Inscription, RuneSummary } from '@secretkeylabs/xverse-core';
 import Avatar from '@ui-library/avatar';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -30,8 +30,9 @@ const Container = styled.div`
 `;
 
 type Props = {
-  ordinal: Inscription;
   summary: TransactionSummary | undefined;
+  runeSummary: RuneSummary | undefined;
+  ordinal: Inscription;
   currentStep: Step;
   setCurrentStep: (step: Step) => void;
   recipientAddress: string;
@@ -48,8 +49,9 @@ type Props = {
 };
 
 function StepDisplay({
-  ordinal,
   summary,
+  runeSummary,
+  ordinal,
   currentStep,
   setCurrentStep,
   recipientAddress,
@@ -65,6 +67,7 @@ function StepDisplay({
   insufficientFunds,
 }: Props) {
   const { t } = useTranslation('translation');
+
   const header = (
     <TitleContainer>
       <Avatar src={<OrdinalImage ordinal={ordinal} placeholderIcon={OrdinalIcon} />} />
@@ -95,10 +98,8 @@ function StepDisplay({
       }
       return (
         <ConfirmBtcTransaction
-          inputs={summary.inputs}
-          outputs={summary.outputs}
-          feeOutput={summary.feeOutput}
-          showCenotaphCallout={!!summary?.runeOp?.Cenotaph?.flaws}
+          summary={summary}
+          runeSummary={runeSummary}
           isLoading={false}
           confirmText={t('COMMON.CONFIRM')}
           cancelText={t('COMMON.CANCEL')}
