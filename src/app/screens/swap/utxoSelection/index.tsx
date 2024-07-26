@@ -274,7 +274,7 @@ export default function UtxoSelection({
                   suffix=" BTC"
                   thousandSeparator
                   renderText={(value: string) => (
-                    <StyledP data-testid="test1" typography="body_medium_m" color="white_0">
+                    <StyledP typography="body_medium_m" color="white_0">
                       {value}
                     </StyledP>
                   )}
@@ -308,7 +308,7 @@ export default function UtxoSelection({
                   suffix={` ${toToken?.symbol}`}
                   thousandSeparator
                   renderText={(value: string) => (
-                    <StyledP data-testid="test3" typography="body_medium_m" color="white_0">
+                    <StyledP data-testid="quote-label" typography="body_medium_m" color="white_0">
                       {value}
                     </StyledP>
                   )}

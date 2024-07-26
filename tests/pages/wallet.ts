@@ -352,6 +352,10 @@ export default class Wallet {
 
   readonly labelTotalFee: Locator;
 
+  readonly itemUTXO: Locator;
+
+  readonly titleUTXO: Locator;
+
   constructor(readonly page: Page) {
     this.page = page;
     this.navigationDashboard = page.getByTestId('nav-dashboard');
@@ -506,6 +510,8 @@ export default class Wallet {
     this.buttonSlippage = page.getByTestId('slippage-button');
     this.minReceivedAmount = page.getByTestId('min-received-amount');
     this.nameRune = page.getByTestId('rune-name');
+    this.itemUTXO = page.getByTestId('utxo-item');
+    this.titleUTXO = page.getByTestId('utxo-title');
 
     this.buttonDetails = page.getByRole('button', { name: 'Details' });
     this.buttonInsufficientBalance = page.getByRole('button', { name: 'Insufficient balance' });
