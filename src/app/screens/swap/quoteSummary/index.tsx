@@ -87,7 +87,7 @@ const ListingDescriptionRow = styled.div`
 const RouteContainer = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: right;
+  align-items: center;
   flex: 1;
   gap: 4px;
 `;
