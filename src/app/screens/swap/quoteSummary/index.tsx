@@ -288,7 +288,6 @@ export default function QuoteSummary({
             <QuoteTile
               provider="Amount"
               price={amount}
-              // TODO JORDAN: ADD RUNE SYMBOL OVERLAY
               image={{
                 currency: fromToken === 'BTC' ? 'BTC' : 'FT',
                 ft: fromToken === 'BTC' ? undefined : fromToken,
