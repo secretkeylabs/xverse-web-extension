@@ -27,6 +27,7 @@ function TransferRunesRequest() {
     isLoading,
     transaction,
     summary,
+    runesSummary,
     txError,
   } = useTransferRunes();
 
@@ -60,6 +61,7 @@ function TransferRunesRequest() {
       {transaction && summary && !txError && (
         <ConfirmBtcTransaction
           showAccountHeader
+          runeSummary={runesSummary}
           inputs={summary.inputs}
           outputs={summary.outputs}
           feeOutput={summary.feeOutput}

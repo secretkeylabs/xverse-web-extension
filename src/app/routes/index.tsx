@@ -82,6 +82,7 @@ import SwapStacksScreen from '@screens/swap/swap-stacks';
 import SwapStacksConfirmation from '@screens/swap/swapStacksConfirmation';
 import TransactionRequest from '@screens/transactionRequest';
 import TransactionStatus from '@screens/transactionStatus';
+import TransferRunesRequest from '@screens/transferRunesRequest';
 import UnlistRuneScreen from '@screens/unlistRune';
 import WalletExists from '@screens/walletExists';
 import ListRuneScreen from 'app/screens/listRune';
@@ -435,6 +436,14 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <SendInscriptionsRequest />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: RoutePaths.TransferRunesRequest,
+        element: (
+          <AuthGuard>
+            <TransferRunesRequest />
           </AuthGuard>
         ),
       },

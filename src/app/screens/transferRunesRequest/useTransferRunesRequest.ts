@@ -3,9 +3,16 @@ import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/u
 import { sendUserRejectionMessage } from '@common/utils/rpc/responseMessages/errors';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useTransactionContext from '@hooks/useTransactionContext';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { RpcErrorCode, transferRunesSchema } from '@sats-connect/core';
 import { type TransactionSummary } from '@screens/sendBtc/helpers';
-import { btcTransaction, runesTransaction, type Transport } from '@secretkeylabs/xverse-core';
+import {
+  btcTransaction,
+  parseSummaryForRunes,
+  runesTransaction,
+  type RuneSummary,
+  type Transport,
+} from '@secretkeylabs/xverse-core';
 import { useEffect, useState } from 'react';
 import * as v from 'valibot';
 
@@ -28,6 +35,7 @@ const useTransferRunes = () => {
   const [feeRate, setFeeRate] = useState<string>('');
   const [transaction, setTransaction] = useState<btcTransaction.EnhancedTransaction | undefined>();
   const [summary, setSummary] = useState<TransactionSummary | undefined>();
+  const [runesSummary, setRunesSummary] = useState<RuneSummary | undefined>();
   const [isExecuting, setIsExecuting] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const {
@@ -40,30 +48,36 @@ const useTransferRunes = () => {
     },
   } = useTransferRunesRequest();
   const { data: btcFeeRates } = useBtcFeeRate();
+  const { network } = useWalletSelector();
   const txContext = useTransactionContext();
 
   const generateTransferTxAndSummary = async (desiredFeeRate: number) => {
-    const tx = await runesTransaction.sendRunes(
+    const requestRecipients = recipients.map((recipient) => ({
+      toAddress: recipient.address,
+      runeName: recipient.runeName,
+      amount: BigInt(recipient.amount),
+    }));
+    const tx = await runesTransaction.sendManyRunes(
       txContext,
-      recipients.map((recipient) => ({
-        address: recipient.address,
-        runName: recipient.runeName,
-        amount: recipient.amount
-      })),
+      requestRecipients,
       Number(desiredFeeRate),
     );
     const txSummary = await tx.getSummary();
-    return { tx, txSummary };
+    const parsedRunesSummary = await parseSummaryForRunes(txContext, txSummary, network.type);
+    return { tx, txSummary, parsedRunesSummary };
   };
 
   const buildTx = async (desiredFeeRate: number | undefined) => {
     try {
       if (!desiredFeeRate) return;
       setIsLoading(true);
-      const { tx, txSummary } = await generateTransferTxAndSummary(desiredFeeRate);
+      const { tx, txSummary, parsedRunesSummary } = await generateTransferTxAndSummary(
+        desiredFeeRate,
+      );
       setFeeRate(desiredFeeRate.toString());
       setTransaction(tx);
       setSummary(txSummary);
+      setRunesSummary(parsedRunesSummary);
     } catch (e) {
       setTransaction(undefined);
       setSummary(undefined);
@@ -132,6 +146,7 @@ const useTransferRunes = () => {
   return {
     transaction,
     summary,
+    runesSummary,
     txError,
     feeRate,
     isLoading,
