@@ -64,17 +64,7 @@ function EtchRune() {
       )}
       {orderTx && orderTx.summary && !etchError && (
         <ConfirmBtcTransaction
-          inputs={orderTx.summary.inputs}
-          outputs={orderTx.summary.outputs}
-          feeOutput={orderTx.summary.feeOutput}
-          feeRate={+feeRate}
-          showCenotaphCallout={false}
-          confirmText={t('CONFIRM')}
-          cancelText={t('CANCEL')}
-          isBroadcast
-          isLoading={false}
-          onCancel={onClickCancel}
-          onConfirm={onClickConfirm}
+          summary={orderTx.summary}
           runeSummary={{
             etch: etchRequest,
             burns: [],
@@ -82,6 +72,13 @@ function EtchRune() {
             transfers: [],
             inputsHadRunes: false,
           }}
+          feeRate={+feeRate}
+          confirmText={t('CONFIRM')}
+          cancelText={t('CANCEL')}
+          isBroadcast
+          isLoading={false}
+          onCancel={onClickCancel}
+          onConfirm={onClickConfirm}
           isSubmitting={isExecuting}
           hideBottomBar
           showAccountHeader

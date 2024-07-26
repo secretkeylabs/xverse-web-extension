@@ -1,9 +1,18 @@
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useDebounce from '@hooks/useDebounce';
+import useHasFeature from '@hooks/useHasFeature';
+import useNetworkSelector from '@hooks/useNetwork';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
-import { AnalyticsEvents, btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
+import {
+  AnalyticsEvents,
+  btcTransaction,
+  FeatureId,
+  parseSummaryForRunes,
+  type RuneSummary,
+  type Transport,
+} from '@secretkeylabs/xverse-core';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
@@ -27,7 +36,10 @@ function SendBtcScreen() {
 
   const { data: btcFeeRate, isLoading: feeRatesLoading } = useBtcFeeRate();
   const selectedAccount = useSelectedAccount();
-  const [recipientAddress, setRecipientAddress] = useState(location.state?.recipientAddress || '');
+  const transactionContext = useTransactionContext();
+  const [recipientAddress, setRecipientAddress] = useState<string>(
+    location.state?.recipientAddress || '',
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [amountSats, setAmountSats] = useState<string>(location.state?.amount || '');
@@ -46,9 +58,10 @@ function SendBtcScreen() {
 
   const [currentStep, setCurrentStep] = useState<Step>(initialStep);
 
-  const transactionContext = useTransactionContext();
   const [transaction, setTransaction] = useState<btcTransaction.EnhancedTransaction | undefined>();
   const [summary, setSummary] = useState<TransactionSummary | undefined>();
+  const [runeSummary, setRuneSummary] = useState<RuneSummary | undefined>();
+  const hasRunesSupport = useHasFeature(FeatureId.RUNES_SUPPORT);
 
   useEffect(() => {
     if (!feeRate && btcFeeRate && !feeRatesLoading) {
@@ -76,6 +89,7 @@ function SendBtcScreen() {
     if (!debouncedRecipient || !feeRate) {
       setTransaction(undefined);
       setSummary(undefined);
+      setRuneSummary(undefined);
       return;
     }
 
@@ -86,13 +100,20 @@ function SendBtcScreen() {
       setIsLoading(true);
       try {
         const transactionDetails = await generateTransactionAndSummary();
-
         if (isCancelled.current) return;
-
         setTransaction(transactionDetails.transaction);
-
-        setSummary(transactionDetails.summary);
-
+        if (transactionDetails.summary) {
+          setSummary(transactionDetails.summary);
+          if (hasRunesSupport) {
+            setRuneSummary(
+              await parseSummaryForRunes(
+                transactionContext,
+                transactionDetails.summary,
+                transactionContext.network,
+              ),
+            );
+          }
+        }
         if (sendMax && transactionDetails.summary) {
           setAmountSats(transactionDetails.summary.outputs[0].amount.toString());
         }
@@ -103,7 +124,6 @@ function SendBtcScreen() {
           // don't log the error if it's just an insufficient funds error
           console.error(e);
         }
-
         setTransaction(undefined);
         setSummary(undefined);
       } finally {
@@ -192,6 +212,8 @@ function SendBtcScreen() {
 
   return (
     <StepDisplay
+      summary={summary}
+      runeSummary={runeSummary}
       currentStep={currentStep}
       setCurrentStep={setCurrentStep}
       recipientAddress={recipientAddress}
@@ -210,7 +232,6 @@ function SendBtcScreen() {
       onConfirm={handleSubmit}
       isLoading={isLoading}
       isSubmitting={isSubmitting}
-      summary={summary}
     />
   );
 }

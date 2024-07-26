@@ -67,35 +67,32 @@ function MintRune() {
       )}
       {orderTx && orderTx.summary && runeInfo && !mintError && (
         <ConfirmBtcTransaction
-          inputs={orderTx.summary.inputs}
-          outputs={orderTx.summary.outputs}
-          feeOutput={orderTx.summary.feeOutput}
-          feeRate={+feeRate}
-          showCenotaphCallout={false}
-          confirmText={t('CONFIRM')}
-          cancelText={t('CANCEL')}
-          isBroadcast
-          isLoading={false}
-          onCancel={onClickCancel}
-          onConfirm={onClickConfirm}
+          summary={orderTx.summary}
           runeSummary={{
             burns: [],
             inputsHadRunes: false,
             receipts: [],
             transfers: [],
             mint: {
-              repeats: mintRequest.repeats,
-              runeSize: RUNE_DISPLAY_DEFAULTS.size,
               runeName: runeInfo.entry.spaced_rune,
               amount: BigInt(runeInfo.entry.terms.amount?.toNumber() ?? 0),
-              inscriptionId: runeInfo.parent ?? '',
-              runeIsMintable: runeInfo.mintable,
-              runeIsOpen: runeInfo.mintable,
-              symbol: runeInfo.entry.symbol,
               divisibility: runeInfo.entry.divisibility.toNumber(),
+              symbol: runeInfo.entry.symbol,
+              inscriptionId: runeInfo.parent ?? '',
+              runeIsOpen: runeInfo.mintable,
+              runeIsMintable: runeInfo.mintable,
               destinationAddress: mintRequest.destinationAddress,
+              repeats: mintRequest.repeats,
+              runeSize: RUNE_DISPLAY_DEFAULTS.size,
             },
           }}
+          feeRate={+feeRate}
+          confirmText={t('CONFIRM')}
+          cancelText={t('CANCEL')}
+          isBroadcast
+          isLoading={false}
+          onCancel={onClickCancel}
+          onConfirm={onClickConfirm}
           isSubmitting={isExecuting}
           hideBottomBar
           showAccountHeader

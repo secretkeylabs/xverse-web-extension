@@ -487,6 +487,7 @@ const router = createHashRouter([
           </AuthGuard>
         ),
       },
+      // TODO can we move this into extended screen container?
       {
         path: RequestsRoutes.MintRune,
         element: (
@@ -495,6 +496,7 @@ const router = createHashRouter([
           </AuthGuard>
         ),
       },
+      // TODO can we move this into extended screen container?
       {
         path: RequestsRoutes.EtchRune,
         element: (
@@ -518,6 +520,7 @@ const router = createHashRouter([
         path: 'send-stx',
         element: <SendStxScreen />,
       },
+      // TODO can we kill this one?
       {
         path: 'confirm-btc-tx',
         element: <ConfirmBtcTransaction />,
