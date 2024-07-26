@@ -1,6 +1,7 @@
 import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery';
 import { useRuneFungibleTokensQuery } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
 import useGetQuotes from '@hooks/queries/swaps/useGetQuotes';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
@@ -134,6 +135,7 @@ export default function SwapScreen() {
   const params = new URLSearchParams(location.search);
   const defaultFrom = params.get('from');
   const { quotes, loading: quotesLoading, error: quotesError, fetchQuotes } = useGetQuotes();
+  const { data: runeFloorPrice } = useRuneFloorPriceQuery(toToken?.name ?? '');
 
   const runesCoinsList = unfilteredData ?? [];
 
@@ -173,6 +175,17 @@ export default function SwapScreen() {
     trackMixPanel(AnalyticsEvents.FetchSwapQuote, {
       from: fromToken === 'BTC' ? 'BTC' : fromToken.name,
       to: toToken.protocol === 'btc' ? 'BTC' : toToken.name ?? toToken.ticker,
+      fromAmount:
+        fromToken === 'BTC'
+          ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcFiatRate)).toFixed(2)
+          : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2),
+      toAmount:
+        toToken.protocol === 'btc'
+          ? getBtcFiatEquivalent(
+              new BigNumber(quote?.receiveAmount ?? 0),
+              new BigNumber(btcFiatRate),
+            ).toFixed(2)
+          : new BigNumber(quote?.receiveAmount ?? 0).multipliedBy(runeFloorPrice ?? 0).toFixed(2),
     });
 
     fetchQuotes({
@@ -371,6 +384,17 @@ export default function SwapScreen() {
       provider: provider.name,
       from: fromToken === 'BTC' ? 'BTC' : fromToken.name,
       to: toToken.protocol === 'btc' ? 'BTC' : toToken.name ?? toToken.ticker,
+      fromAmount:
+        fromToken === 'BTC'
+          ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcFiatRate)).toFixed(2)
+          : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2),
+      toAmount:
+        toToken.protocol === 'btc'
+          ? getBtcFiatEquivalent(
+              new BigNumber(quote?.receiveAmount ?? 0),
+              new BigNumber(btcFiatRate),
+            ).toFixed(2)
+          : new BigNumber(quote?.receiveAmount ?? 0).multipliedBy(runeFloorPrice ?? 0).toFixed(2),
     });
   };
 
@@ -515,7 +539,6 @@ export default function SwapScreen() {
             </Flex1>
           )}
         </Flex1>
-        {QuoteModal}
         {!hasQuoteError && (
           <GetQuoteButtonContainer>
             <Button
@@ -533,7 +556,6 @@ export default function SwapScreen() {
           onSelectCoin={onChangeFromToken}
           visible={tokenSelectionBottomSheet === 'from'}
           title={t('SWAP_SCREEN.SWAP_FROM')}
-          to={toToken && fromToken ? undefined : toToken}
         />
         <TokenToBottomSheet
           onClose={() => setTokenSelectionBottomSheet(null)}
