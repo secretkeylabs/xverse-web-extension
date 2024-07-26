@@ -1,5 +1,5 @@
 import TokenTile from '@components/tokenTile';
-import type { FungibleToken } from '@secretkeylabs/xverse-core';
+import type { FungibleToken, Token } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import { useTranslation } from 'react-i18next';
@@ -24,11 +24,12 @@ interface Props {
   title: string;
   onSelectCoin: (token: FungibleToken | 'BTC') => void;
   onClose: () => void;
+  to?: Token;
 }
 
-export default function TokenFromBottomSheet({ visible, title, onSelectCoin, onClose }: Props) {
+export default function TokenFromBottomSheet({ visible, title, onSelectCoin, onClose, to }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
-  const fromTokens = useFromTokens();
+  const fromTokens = useFromTokens(to);
 
   return (
     <Sheet visible={visible} title={title} onClose={onClose}>
