@@ -61,11 +61,8 @@ function TransferRunesRequest() {
       {transaction && summary && !txError && (
         <ConfirmBtcTransaction
           showAccountHeader
+          summary={summary}
           runeSummary={runesSummary}
-          inputs={summary.inputs}
-          outputs={summary.outputs}
-          feeOutput={summary.feeOutput}
-          showCenotaphCallout={!!summary?.runeOp?.Cenotaph?.flaws}
           isLoading={isLoading}
           confirmText={t('CONFIRM')}
           cancelText={t('CANCEL')}
