@@ -55,7 +55,7 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     await expect(wallet.buttonNext).toBeDisabled();
 
     // Address invalid check
-    await wallet.invalidAdressCheck(wallet.receiveAddress);
+    await wallet.invalidAddressCheck(wallet.receiveAddress);
 
     // Check Info message
     await wallet.receiveAddress.fill(addressOrdinals);
@@ -139,7 +139,7 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     await expect(wallet.buttonNext).toBeDisabled();
 
     // Address invalid check
-    await wallet.invalidAdressCheck(wallet.receiveAddress);
+    await wallet.invalidAddressCheck(wallet.receiveAddress);
 
     await wallet.receiveAddress.fill(TEST_ORDINALS_ADDRESS);
     await expect(wallet.buttonNext).toBeEnabled();
@@ -207,7 +207,7 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     await expect(wallet.buttonNext).toBeDisabled();
 
     // Address invalid check
-    await wallet.invalidAdressCheck(wallet.receiveAddress);
+    await wallet.invalidAddressCheck(wallet.receiveAddress);
 
     // Check Info message
     await wallet.receiveAddress.fill(addressOrdinals);

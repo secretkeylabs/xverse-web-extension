@@ -29,7 +29,7 @@ test.describe('Send runes', () => {
     await wallet.checkVisualsSendPage1('send-rune');
 
     // Address invalid check
-    await wallet.invalidAdressCheck(wallet.receiveAddress);
+    await wallet.invalidAddressCheck(wallet.receiveAddress);
 
     await wallet.receiveAddress.fill(TEST_ORDINALS_ADDRESS);
     await expect(wallet.buttonNext).toBeEnabled();

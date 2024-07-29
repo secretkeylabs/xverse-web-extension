@@ -864,7 +864,7 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(this.runeContainer.first()).toBeVisible();
   }
 
-  async invalidAdressCheck(adressfield) {
+  async invalidAddressCheck(adressfield) {
     await adressfield.fill(`Test Address 123`);
     await this.buttonNext.click();
     await expect(this.errorMessageAddressInvalid).toBeVisible();
