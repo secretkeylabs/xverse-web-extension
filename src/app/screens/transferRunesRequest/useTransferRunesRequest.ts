@@ -12,7 +12,7 @@ import {
   type RuneSummary,
   type Transport,
 } from '@secretkeylabs/xverse-core';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 type Args = {
   tabId: number;
@@ -34,44 +34,50 @@ const useTransferRunes = ({ tabId, messageId, recipients }: Args) => {
   const { network } = useWalletSelector();
   const txContext = useTransactionContext();
 
-  const generateTransferTxAndSummary = async (desiredFeeRate: number) => {
-    const requestRecipients = recipients.map((recipient) => ({
-      toAddress: recipient.address,
-      runeName: recipient.runeName,
-      amount: BigInt(recipient.amount),
-    }));
-    const tx = await runesTransaction.sendManyRunes(
-      txContext,
-      requestRecipients,
-      Number(desiredFeeRate),
-    );
-    const txSummary = await tx.getSummary();
-    const parsedRunesSummary = await parseSummaryForRunes(txContext, txSummary, network.type);
-    return { tx, txSummary, parsedRunesSummary };
-  };
-
-  const buildTx = async (desiredFeeRate: number | undefined) => {
-    try {
-      if (!desiredFeeRate) return;
-      setIsLoading(true);
-      const { tx, txSummary, parsedRunesSummary } = await generateTransferTxAndSummary(
-        desiredFeeRate,
+  const generateTransferTxAndSummary = useCallback(
+    async (desiredFeeRate: number) => {
+      const requestRecipients = recipients.map((recipient) => ({
+        toAddress: recipient.address,
+        runeName: recipient.runeName,
+        amount: BigInt(recipient.amount),
+      }));
+      const tx = await runesTransaction.sendManyRunes(
+        txContext,
+        requestRecipients,
+        Number(desiredFeeRate),
       );
-      setFeeRate(desiredFeeRate.toString());
-      setTransaction(tx);
-      setSummary(txSummary);
-      setRunesSummary(parsedRunesSummary);
-    } catch (e) {
-      setTransaction(undefined);
-      setSummary(undefined);
-      setTxError({
-        code: RpcErrorCode.INTERNAL_ERROR,
-        message: (e as any).message,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      const txSummary = await tx.getSummary();
+      const parsedRunesSummary = await parseSummaryForRunes(txContext, txSummary, network.type);
+      return { tx, txSummary, parsedRunesSummary };
+    },
+    [network.type, recipients, txContext],
+  );
+
+  const buildTx = useCallback(
+    async (desiredFeeRate: number | undefined) => {
+      try {
+        if (!desiredFeeRate) return;
+        setIsLoading(true);
+        const { tx, txSummary, parsedRunesSummary } = await generateTransferTxAndSummary(
+          desiredFeeRate,
+        );
+        setFeeRate(desiredFeeRate.toString());
+        setTransaction(tx);
+        setSummary(txSummary);
+        setRunesSummary(parsedRunesSummary);
+      } catch (e) {
+        setTransaction(undefined);
+        setSummary(undefined);
+        setTxError({
+          code: RpcErrorCode.INTERNAL_ERROR,
+          message: (e as any).message,
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [generateTransferTxAndSummary],
+  );
 
   const getFeeForFeeRate = async (desiredFeeRate: number): Promise<number | undefined> => {
     const { txSummary } = await generateTransferTxAndSummary(desiredFeeRate);
@@ -87,44 +93,46 @@ const useTransferRunes = ({ tabId, messageId, recipients }: Args) => {
     }
 
     buildTx(initialFeeRate);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [feeRate, btcFeeRates?.priority]);
+  }, [feeRate, btcFeeRates?.priority, buildTx]);
 
-  const confirmRunesTransferRequest = async (ledgerTransport?: Transport) => {
-    try {
-      setIsExecuting(true);
-      const txid = await transaction?.broadcast({
-        ledgerTransport,
-        rbfEnabled: false,
-      });
-      if (!txid) {
-        const response = makeRPCError(messageId, {
-          code: RpcErrorCode.INTERNAL_ERROR,
-          message: 'Failed to broadcast transaction',
+  const confirmRunesTransferRequest = useCallback(
+    async (ledgerTransport?: Transport) => {
+      try {
+        setIsExecuting(true);
+        const txid = await transaction?.broadcast({
+          ledgerTransport,
+          rbfEnabled: false,
         });
-        sendRpcResponse(+tabId, response);
-        return;
+        if (!txid) {
+          const response = makeRPCError(messageId, {
+            code: RpcErrorCode.INTERNAL_ERROR,
+            message: 'Failed to broadcast transaction',
+          });
+          sendRpcResponse(tabId, response);
+          return;
+        }
+        const runesTransferResponse = makeRpcSuccessResponse<'runes_transfer'>(messageId, {
+          txid,
+        });
+        sendRpcResponse(tabId, runesTransferResponse);
+        return txid;
+      } catch (err) {
+        const errorResponse = makeRPCError(messageId, {
+          code: RpcErrorCode.INTERNAL_ERROR,
+          message: JSON.stringify((err as any).response.data),
+        });
+        setTxError(errorResponse.error);
+        sendRpcResponse(tabId, errorResponse);
+      } finally {
+        setIsExecuting(false);
       }
-      const runesTransferResponse = makeRpcSuccessResponse<'runes_transfer'>(messageId, {
-        txid,
-      });
-      sendRpcResponse(+tabId, runesTransferResponse);
-      return txid;
-    } catch (err) {
-      const errorResponse = makeRPCError(messageId, {
-        code: RpcErrorCode.INTERNAL_ERROR,
-        message: JSON.stringify((err as any).response.data),
-      });
-      setTxError(errorResponse.error);
-      sendRpcResponse(+tabId, errorResponse);
-    } finally {
-      setIsExecuting(false);
-    }
-  };
+    },
+    [messageId, tabId, transaction],
+  );
 
-  const cancelRunesTransferRequest = async () => {
+  const cancelRunesTransferRequest = useCallback(async () => {
     sendUserRejectionMessage({ tabId, messageId });
-  };
+  }, [messageId, tabId]);
 
   return {
     transaction,
