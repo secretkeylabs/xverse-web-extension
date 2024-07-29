@@ -1,10 +1,9 @@
-import { getPopupPayload } from '@common/utils/popup';
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import { sendUserRejectionMessage } from '@common/utils/rpc/responseMessages/errors';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { RpcErrorCode, transferRunesSchema } from '@sats-connect/core';
+import { RpcErrorCode, type TransferRunesRequest } from '@sats-connect/core';
 import { type TransactionSummary } from '@screens/sendBtc/helpers';
 import {
   btcTransaction,
@@ -14,20 +13,13 @@ import {
   type Transport,
 } from '@secretkeylabs/xverse-core';
 import { useEffect, useState } from 'react';
-import * as v from 'valibot';
 
-const useTransferRunesRequest = () => {
-  const [error, popupPayloadTransferRunes] = getPopupPayload((data) =>
-    v.parse(transferRunesSchema, data),
-  );
-  if (!popupPayloadTransferRunes) {
-    throw new Error('Invalid payload');
-  }
-
-  return { popupPayloadTransferRunes, error };
+type Args = {
+  tabId: number;
+  messageId: string;
+  recipients: TransferRunesRequest['params']['recipients'];
 };
-
-const useTransferRunes = () => {
+const useTransferRunes = ({ tabId, messageId, recipients }: Args) => {
   const [txError, setTxError] = useState<{
     code: number | undefined;
     message: string;
@@ -38,15 +30,6 @@ const useTransferRunes = () => {
   const [runesSummary, setRunesSummary] = useState<RuneSummary | undefined>();
   const [isExecuting, setIsExecuting] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const {
-    popupPayloadTransferRunes: {
-      context: { tabId },
-      data: {
-        params: { recipients },
-        id,
-      },
-    },
-  } = useTransferRunesRequest();
   const { data: btcFeeRates } = useBtcFeeRate();
   const { network } = useWalletSelector();
   const txContext = useTransactionContext();
@@ -115,20 +98,20 @@ const useTransferRunes = () => {
         rbfEnabled: false,
       });
       if (!txid) {
-        const response = makeRPCError(id, {
+        const response = makeRPCError(messageId, {
           code: RpcErrorCode.INTERNAL_ERROR,
           message: 'Failed to broadcast transaction',
         });
         sendRpcResponse(+tabId, response);
         return;
       }
-      const runesTransferResponse = makeRpcSuccessResponse<'runes_transfer'>(id, {
+      const runesTransferResponse = makeRpcSuccessResponse<'runes_transfer'>(messageId, {
         txid,
       });
       sendRpcResponse(+tabId, runesTransferResponse);
       return txid;
     } catch (err) {
-      const errorResponse = makeRPCError(id, {
+      const errorResponse = makeRPCError(messageId, {
         code: RpcErrorCode.INTERNAL_ERROR,
         message: JSON.stringify((err as any).response.data),
       });
@@ -140,7 +123,7 @@ const useTransferRunes = () => {
   };
 
   const cancelRunesTransferRequest = async () => {
-    sendUserRejectionMessage({ tabId: +tabId, messageId: id });
+    sendUserRejectionMessage({ tabId, messageId });
   };
 
   return {

@@ -1,10 +1,16 @@
+import { getPopupPayload, type Context } from '@common/utils/popup';
 import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RequestError from '@components/requests/requestError';
+import {
+  transferRunesRequestSchema,
+  type TransferRunesRequest as TTransferRunesRequest,
+} from '@sats-connect/core';
 import { type Transport } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import * as v from 'valibot';
 import useTransferRunes from './useTransferRunesRequest';
 
 const LoaderContainer = styled.div(() => ({
@@ -14,7 +20,11 @@ const LoaderContainer = styled.div(() => ({
   alignItems: 'center',
 }));
 
-function TransferRunesRequest() {
+type TransferRunesRequestInnerProps = {
+  context: Context;
+  data: TTransferRunesRequest;
+};
+function TransferRunesRequestInner({ data, context }: TransferRunesRequestInnerProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const navigate = useNavigate();
   const {
@@ -29,7 +39,11 @@ function TransferRunesRequest() {
     summary,
     runesSummary,
     txError,
-  } = useTransferRunes();
+  } = useTransferRunes({
+    tabId: context.tabId,
+    messageId: data.id,
+    recipients: data.params.recipients,
+  });
 
   const onClickCancel = async () => {
     await cancelRunesTransferRequest();
@@ -78,6 +92,15 @@ function TransferRunesRequest() {
       )}
     </>
   );
+}
+
+export function TransferRunesRequest() {
+  const [error, data] = getPopupPayload(v.parser(transferRunesRequestSchema));
+  if (error) {
+    throw new Error('Invalid payload');
+  }
+
+  return <TransferRunesRequestInner data={data.data} context={data.context} />;
 }
 
 export default TransferRunesRequest;
