@@ -14,9 +14,15 @@ import { sortFtByFiatBalance } from '@utils/tokens';
 
 const useFromTokens = (to?: TokenBasic) => {
   const { network } = useWalletSelector();
-  const { unfilteredData: runesCoinsList } = useRuneFungibleTokensQuery();
+  const { acceptableCoinList: sip10FtList } = useStxCurrencyConversion();
+  const { unfilteredData: runesFtList } = useRuneFungibleTokensQuery();
   const { stxBtcRate, btcFiatRate } = useCoinRates();
   const { btcAddress } = useSelectedAccount();
+
+  const coinsMasterList = useMemo(
+    () => [...sip10FtList, ...(runesFtList || []), btcFt, stxFt] ?? [],
+    [sip10FtList, runesFtList],
+  );
 
   const filteredRunesTokensObject = (runesCoinsList ?? []).reduce((acc, ft) => {
     acc[ft.principal] = ft;

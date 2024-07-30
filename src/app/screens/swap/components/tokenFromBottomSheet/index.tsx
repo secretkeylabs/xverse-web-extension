@@ -30,7 +30,7 @@ interface Props {
   visible: boolean;
   title: string;
   to?: TokenBasic;
-  onSelectCoin: (token: FungibleToken | 'BTC') => void;
+  onSelectCoin: (token: FungibleToken) => void;
   onClose: () => void;
 }
 

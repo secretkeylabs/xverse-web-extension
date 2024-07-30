@@ -10,6 +10,7 @@ import {
   AnalyticsEvents,
   btcToSats,
   getBtcFiatEquivalent,
+  type BaseToken,
   type ExecuteOrderRequest,
   type FungibleToken,
   type GetUtxosRequest,
@@ -26,7 +27,7 @@ import { satsToBtcString } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { getFtBalance } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -38,6 +39,7 @@ import TokenFromBottomSheet from './components/tokenFromBottomSheet';
 import TokenToBottomSheet from './components/tokenToBottomSheet';
 import QuoteSummary from './quoteSummary';
 import QuotesModal from './quotesModal';
+import { useStxCurrencyConversion } from './useStxCurrencyConversion';
 import {
   mapFTNativeSwapTokenToTokenBasic,
   mapFTProtocolToSwapProtocol,
@@ -93,14 +95,51 @@ const Icon = styled.img`
   rotate: 90deg;
 `;
 
-const mapFtToSwapToken = (ft: FungibleToken | 'BTC'): Token => ({
-  ticker: ft === 'BTC' ? 'BTC' : ft.principal ?? '',
-  name: ft === 'BTC' ? 'Bitcoin' : ft.name ?? ft.assetName ?? '',
-  protocol: ft === 'BTC' ? 'btc' : mapFTProtocolToSwapProtocol(ft.protocol ?? 'runes'),
-  divisibility: ft === 'BTC' ? 8 : ft?.decimals ?? 0,
-  logo: ft === 'BTC' ? undefined : ft.image ?? ft.runeInscriptionId ?? '',
-  symbol: ft === 'BTC' ? undefined : ft.runeSymbol ?? '',
-});
+export const btcFt: FungibleToken = {
+  name: 'Bitcoin',
+  balance: '',
+  total_sent: '',
+  total_received: '',
+  principal: 'BTC',
+  assetName: 'Bitcoin',
+};
+
+export const stxFt: FungibleToken = {
+  name: 'Stacks',
+  balance: '',
+  total_sent: '',
+  total_received: '',
+  principal: 'STX',
+  assetName: 'Stacks',
+};
+
+const mapFtToSwapToken = (st: FungibleToken): Token => {
+  if (st.principal === 'BTC') {
+    return {
+      ticker: 'BTC',
+      name: 'Bitcoin',
+      protocol: 'btc',
+      divisibility: 8,
+    };
+  }
+  if (st.principal === 'STX') {
+    return {
+      ticker: 'STX',
+      name: 'Stacks',
+      protocol: 'stx',
+      divisibility: 6,
+    };
+  }
+
+  return {
+    ticker: st.principal ?? '',
+    name: st.name ?? st.assetName ?? '',
+    protocol: mapFTProtocolToSwapProtocol(st.protocol ?? 'runes'),
+    divisibility: st.decimals ?? 0,
+    logo: st.image ?? st.runeInscriptionId ?? '',
+    symbol: st.runeSymbol ?? '',
+  };
+};
 
 export default function SwapScreen() {
   const [amount, setAmount] = useState('');
@@ -112,7 +151,7 @@ export default function SwapScreen() {
   const [tokenSelectionBottomSheet, setTokenSelectionBottomSheet] = useState<'from' | 'to' | null>(
     null,
   );
-  const [fromToken, setFromToken] = useState<FungibleToken | 'BTC' | undefined>();
+  const [fromToken, setFromToken] = useState<FungibleToken | undefined>();
   const [toToken, setToToken] = useState<Token | undefined>();
   const [utxosRequest, setUtxosRequest] = useState<GetUtxosRequest | null>(null);
   const [inputError, setInputError] = useState('');
@@ -126,7 +165,8 @@ export default function SwapScreen() {
   const { fiatCurrency } = useWalletSelector();
 
   // Hook for SIP-10
-  const { unfilteredData } = useRuneFungibleTokensQuery();
+  const { acceptableCoinList: sip10FtList } = useStxCurrencyConversion();
+  const { unfilteredData: runesFtList } = useRuneFungibleTokensQuery();
   const { data: btcBalance } = useBtcWalletData();
   const { btcFiatRate } = useCoinRates();
   const navigate = useNavigate();
@@ -137,17 +177,17 @@ export default function SwapScreen() {
   const { quotes, loading: quotesLoading, error: quotesError, fetchQuotes } = useGetQuotes();
 
   // Combined list
-  const runesCoinsList = unfilteredData ?? [];
+  const coinsMasterList = useMemo(
+    () => [...sip10FtList, ...(runesFtList || []), btcFt, stxFt] ?? [],
+    [sip10FtList, runesFtList],
+  );
 
   useEffect(() => {
     if (defaultFrom) {
-      const token =
-        defaultFrom === 'BTC'
-          ? 'BTC'
-          : runesCoinsList.find((coin) => coin.principal === defaultFrom);
+      const token = coinsMasterList.find((coin) => coin.principal === defaultFrom);
       setFromToken(token);
     }
-  }, [defaultFrom, runesCoinsList.length]);
+  }, [defaultFrom, coinsMasterList.length]);
 
   const handleGoBack = () => {
     navigate(-1);
@@ -165,7 +205,8 @@ export default function SwapScreen() {
     setGetQuotesModalVisible(true);
   }, [quotes, quotesLoading, quotesError]);
 
-  const amountForQuote = fromToken === 'BTC' ? btcToSats(new BigNumber(amount)).toString() : amount;
+  const amountForQuote =
+    fromToken?.principal === 'BTC' ? btcToSats(new BigNumber(amount)).toString() : amount;
 
   const getQuotes = async () => {
     if (!fromToken || !toToken) {
@@ -173,7 +214,7 @@ export default function SwapScreen() {
     }
 
     trackMixPanel(AnalyticsEvents.FetchSwapQuote, {
-      from: fromToken === 'BTC' ? 'BTC' : fromToken.name,
+      from: fromToken.principal === 'BTC' ? 'BTC' : fromToken.name,
       to: toToken.protocol === 'btc' ? 'BTC' : toToken.name ?? toToken.ticker,
     });
 
@@ -196,7 +237,7 @@ export default function SwapScreen() {
     // add more protocols here when needed
     switch (ftProtocol) {
       case 'runes':
-        return runesCoinsList.find((coin) => coin.principal === ticker);
+        return coinsMasterList.find((coin) => coin.principal === ticker);
       default:
         return undefined;
     }
@@ -213,9 +254,7 @@ export default function SwapScreen() {
     setAmount('');
     setHasQuoteError(false);
     const newFrom =
-      toToken.protocol === 'btc'
-        ? 'BTC'
-        : getUserFTFromTokenTicker(toToken.protocol, toToken.ticker) ?? mapSwapTokenToFT(toToken);
+      getUserFTFromTokenTicker(toToken.protocol, toToken.ticker) ?? mapSwapTokenToFT(toToken);
     const newTo = mapFtToSwapToken(fromToken);
     setFromToken(newFrom);
     setToToken(newTo);
@@ -226,7 +265,7 @@ export default function SwapScreen() {
     setToToken(token);
   };
 
-  const onChangeFromToken = (token: FungibleToken | 'BTC') => {
+  const onChangeFromToken = (token: FungibleToken) => {
     setInputError('');
     setAmount('');
     setHasQuoteError(false);
@@ -241,7 +280,7 @@ export default function SwapScreen() {
       return;
     }
 
-    if (fromToken === 'BTC') {
+    if (fromToken.principal === 'BTC') {
       const amountInSats = btcToSats(new BigNumber(value));
       setInputError(
         BigNumber(amountInSats).gt(BigNumber(btcBalance ?? 0))
@@ -263,7 +302,7 @@ export default function SwapScreen() {
       return undefined;
     }
 
-    if (fromToken === 'BTC') {
+    if (fromToken.principal === 'BTC') {
       return satsToBtcString(BigNumber(btcBalance ?? 0));
     }
 
@@ -276,7 +315,7 @@ export default function SwapScreen() {
   const getFromAmountFiatValue = () => {
     const balance = new BigNumber(amount || '0');
 
-    if (fromToken === 'BTC') {
+    if (fromToken?.principal === 'BTC') {
       const amountInSats = btcToSats(new BigNumber(balance));
       return getBtcFiatEquivalent(amountInSats, new BigNumber(btcFiatRate)).toFixed(2);
     }
@@ -295,7 +334,7 @@ export default function SwapScreen() {
     }
 
     // we can't use max for btc
-    if (fromToken === 'BTC') {
+    if (fromToken.principal === 'BTC' || fromToken.principal === 'STX') {
       return;
     }
 
@@ -312,9 +351,11 @@ export default function SwapScreen() {
   const isGetQuotesDisabled = ifFormInValid || quotesLoading || Boolean(quotesError);
 
   const isMaxDisabled =
-    !fromToken || fromToken === 'BTC' || BigNumber(amount).eq(getFtBalance(fromToken));
+    !fromToken || fromToken.principal === 'BTC' || BigNumber(amount).eq(getFtBalance(fromToken));
   const isRunesToBtcRoute =
-    fromToken !== 'BTC' && fromToken?.protocol === 'runes' && toToken?.protocol === 'btc';
+    fromToken?.principal !== 'BTC' &&
+    fromToken?.protocol === 'runes' &&
+    toToken?.protocol === 'btc';
 
   useEffect(() => {
     if (errorMessage) {
@@ -341,7 +382,7 @@ export default function SwapScreen() {
 
     trackMixPanel(AnalyticsEvents.SelectSwapQuote, {
       provider: provider.provider.name,
-      from: fromToken === 'BTC' ? 'BTC' : fromToken.name,
+      from: fromToken.principal === 'BTC' ? 'BTC' : fromToken.name,
       to: toToken.protocol === 'btc' ? 'BTC' : toToken.name ?? toToken.ticker,
     });
 
@@ -357,7 +398,8 @@ export default function SwapScreen() {
         providerCode: provider.provider.code,
         from: provider.from,
         to: provider.to,
-        amount: fromToken === 'BTC' ? btcToSats(new BigNumber(amount)).toString() : amount,
+        amount:
+          fromToken.principal === 'BTC' ? btcToSats(new BigNumber(amount)).toString() : amount,
       };
       setUtxosRequest(request);
     }
@@ -371,7 +413,7 @@ export default function SwapScreen() {
     }
     trackMixPanel(AnalyticsEvents.SignSwap, {
       provider: provider.name,
-      from: fromToken === 'BTC' ? 'BTC' : fromToken.name,
+      from: fromToken.principal === 'BTC' ? 'BTC' : fromToken.name,
       to: toToken.protocol === 'btc' ? 'BTC' : toToken.name ?? toToken.ticker,
     });
   };
@@ -485,16 +527,18 @@ export default function SwapScreen() {
               fiatValue: getFromAmountFiatValue(),
               fiatCurrency,
               protocol:
-                fromToken === 'BTC'
+                fromToken?.principal === 'BTC'
                   ? 'btc'
                   : fromToken?.protocol
                   ? mapFTProtocolToSwapProtocol(fromToken.protocol)
                   : undefined,
-              decimals: fromToken === 'BTC' ? 8 : fromToken?.decimals,
-              unit: fromToken === 'BTC' ? 'BTC' : fromToken?.runeSymbol ?? '',
+              decimals: fromToken?.principal === 'BTC' ? 8 : fromToken?.decimals,
+              unit: fromToken?.principal === 'BTC' ? 'BTC' : fromToken?.runeSymbol ?? '',
             }}
             max={
-              fromToken === 'BTC' ? undefined : { isDisabled: isMaxDisabled, onClick: onClickMax }
+              fromToken?.principal === 'BTC'
+                ? undefined
+                : { isDisabled: isMaxDisabled, onClick: onClickMax }
             }
             balance={getFromBalance()}
           />
