@@ -125,6 +125,7 @@ export default function SwapScreen() {
 
   const { fiatCurrency } = useWalletSelector();
 
+  // Hook for SIP-10
   const { unfilteredData } = useRuneFungibleTokensQuery();
   const { data: btcBalance } = useBtcWalletData();
   const { btcFiatRate } = useCoinRates();
@@ -135,6 +136,7 @@ export default function SwapScreen() {
   const defaultFrom = params.get('from');
   const { quotes, loading: quotesLoading, error: quotesError, fetchQuotes } = useGetQuotes();
 
+  // Combined list
   const runesCoinsList = unfilteredData ?? [];
 
   useEffect(() => {
