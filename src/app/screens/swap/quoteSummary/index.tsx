@@ -192,14 +192,10 @@ export default function QuoteSummary({
   const fromUnit =
     fromToken === 'BTC'
       ? 'Sats'
-      : (fromToken as FungibleToken)?.runeSymbol ??
-        (fromToken as FungibleToken)?.ticker ??
-        RUNE_DISPLAY_DEFAULTS.symbol;
+      : (fromToken as FungibleToken)?.runeSymbol ?? RUNE_DISPLAY_DEFAULTS.symbol;
 
   const toUnit =
-    toToken?.protocol === 'btc'
-      ? 'Sats'
-      : toToken?.symbol ?? toToken?.ticker ?? RUNE_DISPLAY_DEFAULTS.symbol;
+    toToken?.protocol === 'btc' ? 'Sats' : toToken?.symbol ?? RUNE_DISPLAY_DEFAULTS.symbol;
 
   const [showSlippageModal, setShowSlippageModal] = useState(false);
   const [slippage, setSlippage] = useState(0.05);
