@@ -15,10 +15,10 @@ test.describe('Swap Flow Exchange', () => {
     });
   });
 
-  test('Exchange token via DotSwap testnet', async ({ page, extensionId }) => {
+  test('Cancel exchange token via DotSwap', async ({ page, extensionId }) => {
     // Restore wallet and setup Testnet network
     const wallet = new Wallet(page);
-    await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
+    await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
     // get own BTC  & Ordinals Address for address check on review page
     await wallet.allUpperButtons.nth(1).click();
@@ -51,13 +51,13 @@ test.describe('Swap Flow Exchange', () => {
     // Had problems with loading of all tokens so I check that a 'DOG' is loaded
     await expect(wallet.labelTokenSubtitle.getByText('DOG').first()).toBeVisible();
     await expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
-    await wallet.divTokenRow.filter({ hasText: 'COOK•RUNES•ON•TESTNET' }).click();
+    await wallet.divTokenRow.first().click();
     await expect(wallet.nameToken.last()).not.toContainText('Select asset');
     await expect(wallet.imageToken.last()).toBeVisible();
     await expect(wallet.buttonGetQuotes).toBeDisabled();
 
     // tried a calculated value but had multiple problems with that, for now we stick to a specific value
-    const swapAmount = 0.00002646;
+    const swapAmount = 0.00000546;
 
     const numericUSDValue = await wallet.fillSwapAmount(swapAmount);
 
@@ -118,7 +118,15 @@ test.describe('Swap Flow Exchange', () => {
     // Check Rune token name
     await expect(wallet.nameRune).toContainText(tokenName1);
 
-    await wallet.confirmSendTransaction();
-    await wallet.checkVisualsStartpage('testnet');
+    // Cancel the transaction
+    await expect(wallet.buttonCancel).toBeEnabled();
+    await wallet.buttonCancel.click();
+
+    // Check Startpage
+    await wallet.checkVisualsStartpage();
+
+    // Check BTC Balance after cancel the transaction
+    const balanceAfterCancel = await wallet.getTokenBalance('Bitcoin');
+    await expect(initialBTCBalance).toEqual(balanceAfterCancel);
   });
 });

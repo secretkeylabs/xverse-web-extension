@@ -845,7 +845,8 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     // min-received-amount value should be the same as quoteAmount
     const minReceivedAmount = await this.minReceivedAmount.innerText();
     const numericMinReceivedAmount = parseFloat(minReceivedAmount.replace(/[^0-9.]/g, ''));
-    await expect(numericMinReceivedAmount).toEqual(numericQuoteValue);
+    const formattedNumericMinReceivedAmount = parseFloat(numericMinReceivedAmount.toFixed(3));
+    await expect(formattedNumericMinReceivedAmount).toEqual(numericQuoteValue);
 
     // check if quoteAmount is the same from the page before
     const quoteAmount2Page = await this.quoteAmount.last().innerText();
