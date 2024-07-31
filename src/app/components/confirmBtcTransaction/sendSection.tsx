@@ -119,7 +119,10 @@ function SendSection({
                 </BundleHeader>
                 <RuneAmount rune={transfer} hasSufficientBalance={transfer.hasSufficientBalance} />
               </RowContainer>
-              {runeSummary?.transfers.length > index + 1 && <Divider verticalMargin="s" />}
+              {/* {
+              // unnecessary divider, re-add if needed
+              runeSummary?.transfers.length > index + 1 && <Divider verticalMargin="s" />
+              } */}
             </>
           ))}
         {hasInscriptionsRareSatsInOrdinal && (
