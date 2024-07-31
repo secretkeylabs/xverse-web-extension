@@ -94,7 +94,7 @@ function TransferRunesRequestInner({ data, context }: TransferRunesRequestInnerP
   );
 }
 
-export function TransferRunesRequest() {
+function TransferRunesRequest() {
   const [error, data] = getPopupPayload(v.parser(transferRunesRequestSchema));
   if (error) {
     throw new Error('Invalid payload');
