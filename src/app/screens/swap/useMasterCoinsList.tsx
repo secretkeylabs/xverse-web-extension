@@ -1,7 +1,25 @@
 import { useRuneFungibleTokensQuery } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
+import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import { useMemo } from 'react';
-import { btcFt, stxFt } from './index';
 import { useStxCurrencyConversion } from './useStxCurrencyConversion';
+
+export const btcFt: FungibleToken = {
+  name: 'Bitcoin',
+  balance: '',
+  total_sent: '',
+  total_received: '',
+  principal: 'BTC',
+  assetName: 'Bitcoin',
+};
+
+export const stxFt: FungibleToken = {
+  name: 'Stacks',
+  balance: '',
+  total_sent: '',
+  total_received: '',
+  principal: 'STX',
+  assetName: 'Stacks',
+};
 
 const useMasterCoinsList = () => {
   const { acceptableCoinList: sip10FtList } = useStxCurrencyConversion();

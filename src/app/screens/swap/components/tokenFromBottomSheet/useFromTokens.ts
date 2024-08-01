@@ -2,6 +2,7 @@ import { useRuneFungibleTokensQuery } from '@hooks/queries/runes/useRuneFungible
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
+import useMasterCoinsList from '@screens/swap/useMasterCoinsList';
 import { mapFTProtocolToSwapProtocol } from '@screens/swap/utils';
 import {
   getXverseApiClient,
@@ -19,10 +20,7 @@ const useFromTokens = (to?: TokenBasic) => {
   const { stxBtcRate, btcFiatRate } = useCoinRates();
   const { btcAddress } = useSelectedAccount();
 
-  const coinsMasterList = useMemo(
-    () => [...sip10FtList, ...(runesFtList || []), btcFt, stxFt] ?? [],
-    [sip10FtList, runesFtList],
-  );
+  const coinsMasterList = useMasterCoinsList();
 
   const filteredRunesTokensObject = (runesCoinsList ?? []).reduce((acc, ft) => {
     acc[ft.principal] = ft;

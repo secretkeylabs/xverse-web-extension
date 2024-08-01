@@ -95,24 +95,6 @@ const Icon = styled.img`
   rotate: 90deg;
 `;
 
-export const btcFt: FungibleToken = {
-  name: 'Bitcoin',
-  balance: '',
-  total_sent: '',
-  total_received: '',
-  principal: 'BTC',
-  assetName: 'Bitcoin',
-};
-
-export const stxFt: FungibleToken = {
-  name: 'Stacks',
-  balance: '',
-  total_sent: '',
-  total_received: '',
-  principal: 'STX',
-  assetName: 'Stacks',
-};
-
 const mapFtToSwapToken = (st: FungibleToken): Token => {
   if (st.principal === 'BTC') {
     return {
