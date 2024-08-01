@@ -930,7 +930,7 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await this.allUpperButtons.nth(1).click();
 
     // Need to click on the QR Code button to get the full Address
-
+    // TODO change it to name of the Address instead of index
     await this.buttonQRAddress.nth(whichAddress).click();
     await expect(this.containerQRCode).toBeVisible();
 

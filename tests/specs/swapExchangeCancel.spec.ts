@@ -22,12 +22,8 @@ test.describe('Swap Flow Exchange', () => {
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
-    // get own BTC  & Ordinals Address for address check on review page
-    await wallet.allUpperButtons.nth(1).click();
-    const selfBTC = await wallet.getAddress(wallet.buttonCopyBitcoinAddress);
-
-    // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
-    await page.reload();
+    // get own BTC Address
+    const selfBTC = await wallet.getAddress(0);
 
     await wallet.checkVisualsStartpage();
 
