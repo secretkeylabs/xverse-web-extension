@@ -1,7 +1,7 @@
 import { expect, test } from '../fixtures/base';
 import Wallet from '../pages/wallet';
 
-test.describe('Swap Flow Exchange', () => {
+test.describe('Swap Flow ME', () => {
   // Enables the feature flag for Swap
   test.beforeEach(async ({ page }) => {
     await page.route('https://api-3.xverse.app/v1/app-features', (route) => {
@@ -15,7 +15,9 @@ test.describe('Swap Flow Exchange', () => {
     });
   });
 
-  test('Cancel exchange token via DotSwap', async ({ page, extensionId }) => {
+  const marketplace = 'Magic Eden';
+
+  test('Cancel swap token via ME', async ({ page, extensionId }) => {
     // Restore wallet and setup Testnet network
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
@@ -59,24 +61,37 @@ test.describe('Swap Flow Exchange', () => {
     // tried a calculated value but had multiple problems with that, for now we stick to a specific value
     const swapAmount = 0.00000546;
 
-    const numericUSDValue = await wallet.fillSwapAmount(swapAmount);
+    await wallet.fillSwapAmount(swapAmount);
 
     // Save rune token name
     const tokenName1 = await wallet.nameToken.last().innerText();
 
     await wallet.buttonGetQuotes.click();
-    await expect(wallet.nameSwapPlace.first()).toBeVisible();
-    await expect(wallet.quoteAmount.first()).toBeVisible();
-    await expect(wallet.infoMessage.first()).toBeVisible();
-    await expect(wallet.buttonSwapPlace.first()).toBeVisible();
+    await expect(wallet.nameSwapPlace.last()).toBeVisible();
+    await expect(wallet.quoteAmount.last()).toBeVisible();
+    await expect(wallet.infoMessage.last()).toBeVisible();
+    await expect(wallet.buttonSwapPlace.last()).toBeVisible();
 
-    const quoteAmount = await wallet.quoteAmount.first().innerText();
+    await wallet.buttonSwapPlace.filter({ hasText: marketplace }).click();
+    await expect(wallet.itemUTXO.first()).toBeVisible();
+
+    // click only on a UTXO with value from 1000 e(not enough funds for higher)
+    await wallet.itemUTXO.filter({ hasText: '1,000' }).first().locator('input').click();
+    await expect(wallet.buttonNext).toBeVisible();
+    await expect(wallet.textUSD).toBeVisible();
+    await expect(wallet.quoteAmount).toBeVisible();
+
+    const quoteAmount = await wallet.quoteAmount.innerText();
     const numericQuoteValue = parseFloat(quoteAmount.replace(/[^0-9.]/g, ''));
     await expect(numericQuoteValue).toBeGreaterThan(0);
 
-    await wallet.buttonSwapPlace.first().click();
+    const usdAmount = await wallet.textUSD.innerText();
+    const numericUSDValueSwap = parseFloat(usdAmount.replace(/[^0-9.]/g, ''));
+    await expect(numericUSDValueSwap).toBeGreaterThan(0);
 
-    await wallet.checkVisualsQuotePage(tokenName1, true, numericQuoteValue, numericUSDValue);
+    await wallet.buttonNext.click();
+
+    await wallet.checkVisualsQuotePage(tokenName1, false, numericQuoteValue, numericUSDValueSwap);
 
     // We can only continue if the FeeRate is above 0
     await wallet.waitForTextAboveZero(wallet.feeAmount, 30000);
@@ -110,10 +125,9 @@ test.describe('Swap Flow Exchange', () => {
     await wallet.buttonSwap.click();
     await wallet.checkVisualsSendTransactionReview('swap', false, selfBTC);
 
-    // second confirm-balance is the same as swapAmount
-    const swapSendAmount = await wallet.confirmBalance.last().innerText();
-    const numericValueSwap = parseFloat(swapSendAmount.replace(/[^0-9.]/g, ''));
-    await expect(numericValueSwap).toEqual(swapAmount);
+    const sendRuneAmount = await wallet.sendRuneAmount.innerText();
+    const sendAmountNumerical = parseFloat(sendRuneAmount.replace(/[^0-9.]/g, ''));
+    await expect(numericQuoteValue).toEqual(sendAmountNumerical);
 
     // Check Rune token name
     await expect(wallet.nameRune).toContainText(tokenName1);

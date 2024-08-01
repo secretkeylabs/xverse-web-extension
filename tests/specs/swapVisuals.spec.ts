@@ -18,7 +18,7 @@ test.describe('Swap Flow Visuals', () => {
     });
   });
 
-  test('Visual check swap page', async ({ page, extensionId }) => {
+  test('Check swap page', async ({ page, extensionId }) => {
     const onboardingPage = new Onboarding(page);
     const wallet = new Wallet(page);
     await onboardingPage.createWalletSkipBackup(strongPW);
