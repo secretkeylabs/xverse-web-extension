@@ -1,48 +1,26 @@
 import { useRuneFungibleTokensQuery } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useSelectedAccount from '@hooks/useSelectedAccount';
-import { mapFTProtocolToSwapProtocol } from '@screens/swap/utils';
-import { type FungibleToken, type TokenBasic } from '@secretkeylabs/xverse-core';
+import { type FungibleToken, type Token } from '@secretkeylabs/xverse-core';
 import { sortFtByFiatBalance } from '@utils/tokens';
 
-const useFromTokens = () => {
+const useFromTokens = (toToken?: Token) => {
   const { unfilteredData: runesCoinsList } = useRuneFungibleTokensQuery();
   const { stxBtcRate, btcFiatRate } = useCoinRates();
   const { btcAddress } = useSelectedAccount();
 
-  const filteredRunesTokensObject = (runesCoinsList ?? []).reduce((acc, ft) => {
-    acc[ft.principal] = ft;
-    return acc;
-  }, {} as Record<FungibleToken['principal'], FungibleToken>);
+  // Create a copy of the tokens array to avoid global changes
+  const tokens: (FungibleToken | 'BTC')[] = [...(runesCoinsList ?? [])].sort((a, b) =>
+    sortFtByFiatBalance(a, b, stxBtcRate, btcFiatRate),
+  );
 
-  const runesBasicTokens =
-    Object.values(filteredRunesTokensObject).map((ft) => ({
-      ticker: ft.principal,
-      protocol: mapFTProtocolToSwapProtocol(ft.protocol ?? 'runes'),
-    })) ?? [];
+  if (btcAddress && toToken?.protocol !== 'btc') tokens.unshift('BTC');
 
-  const btcBasicToken: TokenBasic = { protocol: 'btc', ticker: 'BTC' };
-  const userTokens = [...(btcAddress ? [btcBasicToken] : [])].concat(runesBasicTokens);
+  const filteredTokens = toToken
+    ? tokens.filter((token) => token === 'BTC' || token.principal !== toToken.ticker)
+    : tokens;
 
-  const tokens = userTokens
-    .filter((token) => token.protocol === 'btc' || !!filteredRunesTokensObject[token.ticker])
-    .map((token) => {
-      if (token.protocol === 'btc') {
-        return 'BTC';
-      }
-      if (token.protocol === 'runes') {
-        return filteredRunesTokensObject[token.ticker];
-      }
-      return token;
-    })
-    .sort((a, b) => {
-      if (b === 'BTC') return 1;
-      const aFT = a as FungibleToken;
-      const bFT = b as FungibleToken;
-      return sortFtByFiatBalance(aFT, bFT, stxBtcRate, btcFiatRate);
-    });
-
-  return tokens;
+  return filteredTokens;
 };
 
 export default useFromTokens;

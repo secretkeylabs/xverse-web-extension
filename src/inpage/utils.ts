@@ -24,11 +24,6 @@ export const isValidLegacyEvent = (
   return correctSource && correctMethod && !!data.payload;
 };
 
-export const isValidRpcEvent = (event: MessageEvent) => {
-  const { data } = event;
-  return data.source === MESSAGE_SOURCE;
-};
-
 export const callAndReceive = async (
   methodName: CallableMethods | 'getURL',
   opts: any = {},
