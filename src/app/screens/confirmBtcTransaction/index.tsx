@@ -183,11 +183,13 @@ function ConfirmBtcTransaction() {
 
     if (isLedgerAccount(selectedAccount)) {
       const txType: LedgerTransactionType = 'BTC';
-      const state: ConfirmBtcTransactionState = {
+      const state = {
         recipients: recipient,
         type: txType,
         feeRateInput: currentFeeRate,
         fee: currentFee,
+        tabMessageId: requestId,
+        tabId: +tabId,
       };
 
       navigate('/confirm-ledger-tx', { state });
