@@ -58,7 +58,7 @@ test.describe('Send runes', () => {
     await wallet.buttonCancel.click();
 
     // Check Startpage
-    await wallet.checkVisualsStartpage('testnet');
+    await wallet.checkVisualsStartpage();
 
     await wallet.checkAndClickOnSpecificRune(runeName);
     const BalanceAmount = await wallet.checkVisualsRunesDashboard(runeName);

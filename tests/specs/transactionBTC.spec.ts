@@ -28,17 +28,17 @@ test.describe('Transaction BTC', () => {
     await expect(wallet.buttonNext).toBeVisible();
     await expect(wallet.buttonNext).toBeDisabled();
     // Address invalid check
-    await wallet.inputBTCAdress.fill(`Test Address 123`);
+    await wallet.inputBTCAddress.fill(`Test Address 123`);
     await expect(wallet.buttonNext).toBeEnabled();
     await wallet.buttonNext.click();
     await expect(wallet.errorMessageAddressInvalid).toBeVisible();
     await expect(wallet.buttonNext).toBeDisabled();
     // Fill in own Address to check info message
-    await wallet.inputBTCAdress.fill(selfBTC);
+    await wallet.inputBTCAddress.fill(selfBTC);
     await expect(wallet.buttonNext).toBeEnabled();
     await expect(wallet.infoMessageSendSelf).toBeVisible();
     // Fill in correct Receiver Address
-    await wallet.inputBTCAdress.fill(BTCMain);
+    await wallet.inputBTCAddress.fill(BTCMain);
     await expect(wallet.buttonNext).toBeEnabled();
     await wallet.buttonNext.click();
     // Check visuals from 2 page (send BTC)
@@ -73,7 +73,7 @@ test.describe('Transaction BTC', () => {
     await expect(wallet.buttonNext).toBeVisible();
     await expect(wallet.buttonNext).toBeDisabled();
     // Fill in correct Receiver Address
-    await wallet.inputBTCAdress.fill(BTCTest);
+    await wallet.inputBTCAddress.fill(BTCTest);
     await expect(wallet.buttonNext).toBeEnabled();
     await wallet.buttonNext.click();
     await expect(wallet.containerFeeRate).toBeVisible();
@@ -107,7 +107,7 @@ test.describe('Transaction BTC', () => {
     await wallet.buttonCancel.click();
 
     // Check Startpage
-    await wallet.checkVisualsStartpage('testnet');
+    await wallet.checkVisualsStartpage();
 
     // Check BTC Balance after cancel the transaction
     const balanceAfterCancel = await wallet.getTokenBalance('Bitcoin');
@@ -134,7 +134,7 @@ test.describe('Transaction BTC', () => {
     await expect(wallet.buttonNext).toBeVisible();
     await expect(wallet.buttonNext).toBeDisabled();
     // Fill in correct Receiver Address
-    await wallet.inputBTCAdress.fill(BTCTest);
+    await wallet.inputBTCAddress.fill(BTCTest);
     await expect(wallet.buttonNext).toBeEnabled();
     await wallet.buttonNext.click();
     await expect(wallet.containerFeeRate).toBeVisible();
@@ -160,7 +160,7 @@ test.describe('Transaction BTC', () => {
     await wallet.checkAmountsSendingBTC(selfBTCTest, BTCTest, amountBTCSend);
 
     await wallet.confirmSendTransaction();
-    await wallet.checkVisualsStartpage('testnet');
+    await wallet.checkVisualsStartpage();
 
     // Check BTC Balance after the transaction
     const balanceAfterCancel = await wallet.getTokenBalance('Bitcoin');

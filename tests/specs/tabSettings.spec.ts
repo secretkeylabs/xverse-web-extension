@@ -51,7 +51,7 @@ test.describe('Settings Tab', () => {
     await wallet.labelAccountName.click();
     await expect(page.url()).toContain('account-list');
     await wallet.labelAccountName.last().click();
-    await wallet.checkVisualsStartpage('testnet');
+    await wallet.checkVisualsStartpage();
     await expect(wallet.labelAccountName).toHaveText('Account 2');
     await page.goto(`chrome-extension://${extensionId}/popup.html#/settings`);
     await wallet.switchToMainnetNetwork();

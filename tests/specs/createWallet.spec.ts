@@ -7,7 +7,7 @@ const strongPW = Onboarding.generateSecurePasswordCrypto();
 const fs = require('fs');
 const path = require('path');
 
-// Specify the file path for Addresses and Seedphrase
+// Specify the file path for Addresses and seedPhrase
 const filePathSeedWords = path.join(__dirname, 'seedWords.json');
 const filePathAddresses = path.join(__dirname, 'addresses.json');
 
@@ -15,7 +15,7 @@ test.describe('Create and Restore Wallet Flow', () => {
   test('create and restore a wallet via Menu', async ({ page, extensionId, context }) => {
     const onboardingPage = new Onboarding(page);
     const wallet = new Wallet(page);
-    await test.step('backup seedphrase and successfully create a wallet', async () => {
+    await test.step('backup seedPhrase and successfully create a wallet', async () => {
       await onboardingPage.navigateToBackupPage();
       await onboardingPage.buttonBackupNow.click();
       await expect(page.url()).toContain('backupWalletSteps');
@@ -30,34 +30,34 @@ test.describe('Create and Restore Wallet Flow', () => {
       // check if 12 words are displayed
       await expect(onboardingPage.buttonSeedWords).toHaveCount(12);
       await expect(onboardingPage.secondParagraphBackupStep).toBeVisible();
-      let seedword = await onboardingPage.selectSeedWord(seedWords);
+      let seedWord = await onboardingPage.selectSeedWord(seedWords);
 
-      // Save the seedwords into a file to read it out later to restore
+      // Save the seedWords into a file to read it out later to restore
       fs.writeFileSync(filePathSeedWords, JSON.stringify(seedWords), 'utf8');
 
-      // get all displayed values and filter the value from the actual seedphrase out to do an error message check
+      // get all displayed values and filter the value from the actual seedPhrase out to do an error message check
       const buttonValues = await onboardingPage.buttonSeedWords.evaluateAll((buttons) =>
         buttons.map((button) => {
           // Assert that the button is an HTMLButtonElement to access the `value` property
           if (button instanceof HTMLButtonElement) {
             return button.value;
           }
-          return 'testvalue';
+          return 'testValue';
         }),
       );
 
-      const filteredValues = buttonValues.filter((value) => value !== seedword);
+      const filteredValues = buttonValues.filter((value) => value !== seedWord);
       const randomValue = filteredValues[Math.floor(Math.random() * filteredValues.length)];
       await page.locator(`button[value="${randomValue}"]`).first().click();
 
-      // Check if error message is displayed when clicking the wrong seedword
+      // Check if error message is displayed when clicking the wrong seedWord
       await expect(page.locator('p:has-text("This word is not")')).toBeVisible();
 
-      await page.locator(`button[value="${seedword}"]`).click();
-      seedword = await onboardingPage.selectSeedWord(seedWords);
-      await page.locator(`button[value="${seedword}"]`).click();
-      seedword = await onboardingPage.selectSeedWord(seedWords);
-      await page.locator(`button[value="${seedword}"]`).click();
+      await page.locator(`button[value="${seedWord}"]`).click();
+      seedWord = await onboardingPage.selectSeedWord(seedWords);
+      await page.locator(`button[value="${seedWord}"]`).click();
+      seedWord = await onboardingPage.selectSeedWord(seedWords);
+      await page.locator(`button[value="${seedWord}"]`).click();
 
       await onboardingPage.inputPassword.fill(strongPW);
       await onboardingPage.buttonContinue.click();

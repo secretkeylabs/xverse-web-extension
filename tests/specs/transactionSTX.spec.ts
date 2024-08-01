@@ -96,7 +96,7 @@ test.describe('Transaction STX', () => {
     await wallet.buttonCancel.click();
 
     // Check startpage
-    await wallet.checkVisualsStartpage('testnet');
+    await wallet.checkVisualsStartpage();
 
     // Check STX Balance after cancel the transaction
     const balanceAfterCancel = await wallet.getTokenBalance('Stacks');
@@ -152,7 +152,7 @@ test.describe('Transaction STX', () => {
 
     // Confirm the transaction
     await wallet.confirmSendTransaction();
-    await wallet.checkVisualsStartpage('testnet');
+    await wallet.checkVisualsStartpage();
 
     // Can't check amounts or transaction as E2E test is faster than the UI or API to how that transaction --> has to be checked manually
   });

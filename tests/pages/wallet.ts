@@ -160,7 +160,7 @@ export default class Wallet {
 
   readonly inputMemo: Locator;
 
-  readonly inputRecipientAdress: Locator;
+  readonly inputRecipientAddress: Locator;
 
   readonly inputSendAmount: Locator;
 
@@ -172,7 +172,7 @@ export default class Wallet {
 
   readonly containerFeeRate: Locator;
 
-  readonly inputBTCAdress: Locator;
+  readonly inputBTCAddress: Locator;
 
   readonly coinBalance: Locator;
 
@@ -516,7 +516,7 @@ export default class Wallet {
 
     // Send
     this.inputSendAmount = page.getByTestId('send-input');
-    this.inputRecipientAdress = page.getByTestId('recipient-adress');
+    this.inputRecipientAddress = page.getByTestId('recipient-address');
     this.inputMemo = page.getByTestId('memo-input');
     this.errorMessageAddressInvalid = page
       .locator('p')
@@ -531,7 +531,7 @@ export default class Wallet {
     this.errorInsufficientBalance = page.locator('p').filter({ hasText: 'Insufficient balance' });
     this.errorInsufficientFunds = page.locator('p').filter({ hasText: 'Insufficient funds' });
     this.containerFeeRate = page.getByTestId('feerate-container');
-    this.inputBTCAdress = page.locator('input[type="text"]');
+    this.inputBTCAddress = page.locator('input[type="text"]');
     this.inputBTCAmount = page.getByTestId('btc-amount');
     this.buttonExpand = page.getByRole('button', { name: 'Inputs & Outputs Dropdown' });
     this.confirmTotalAmount = page.getByTestId('confirm-total-amount');
@@ -593,11 +593,11 @@ export default class Wallet {
       await this.navigationSettings.click();
       await this.switchToTestnetNetwork();
       await this.navigationDashboard.click();
-      await this.checkVisualsStartpage('testnet');
+      await this.checkVisualsStartpage();
     }
   }
 
-  async checkVisualsStartpage(network?: string) {
+  async checkVisualsStartpage() {
     await expect(this.balance).toBeVisible();
     await expect(this.manageTokenButton).toBeVisible();
 
@@ -606,23 +606,6 @@ export default class Wallet {
       await this.buttonDenyDataCollection.click();
     }
 
-    /*
-TODO: needs to be changed to be debending on network and feature enabled
-const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
-
-    const featureFlags = await getXverseApiClient('Mainnet').getAppFeatures();
-    const featureEnabled = featureFlags?.SWAPS?.enabled;
-    switch (true) {
-      case network === 'testnet':
-        // Check if all 3 buttons (send, receive, buy) are visible
-        await expect(this.allUpperButtons).toHaveCount(3);
-        break;
-      default:
-        // Check if all 4 buttons (send, receive, swap, buy) are visible
-        await expect(this.allUpperButtons).toHaveCount(4);
-    }
-*/
-    // await expect(this.allUpperButtons).toHaveCount(3);
     await expect(this.labelAccountName).toBeVisible();
     await expect(this.buttonMenu).toBeVisible();
     await expect(await this.labelTokenSubtitle.count()).toBeGreaterThanOrEqual(2);
@@ -858,8 +841,8 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(this.runeContainer.first()).toBeVisible();
   }
 
-  async invalidAddressCheck(adressfield) {
-    await adressfield.fill(`Test Address 123`);
+  async invalidAddressCheck(addressField) {
+    await addressField.fill(`Test Address 123`);
     await this.buttonNext.click();
     await expect(this.errorMessageAddressInvalid).toBeVisible();
     await expect(this.buttonNext).toBeDisabled();
@@ -898,8 +881,8 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
   async checkAmountsSendingBTC(selfBTCTest, BTCTest, amountBTCSend) {
     // Sending amount without Fee
     const amountText = await this.confirmAmount.first().innerText();
-    const numericValueamountText = parseFloat(amountText.replace(/[^0-9.]/g, ''));
-    await expect(numericValueamountText).toEqual(amountBTCSend);
+    const numericValueAmountText = parseFloat(amountText.replace(/[^0-9.]/g, ''));
+    await expect(numericValueAmountText).toEqual(amountBTCSend);
 
     // Address check sending and receiving
     await expect(await this.sendAddress.innerText()).toContain(selfBTCTest.slice(-4));
@@ -959,10 +942,10 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await specificToken.last().click();
   }
 
-  async clickOnSpecificInscription(inscriptionname) {
+  async clickOnSpecificInscription(inscriptionName) {
     const specificToken = this.containersCollectibleItem
       .filter({
-        has: this.nameInscription.getByText(inscriptionname, { exact: true }),
+        has: this.nameInscription.getByText(inscriptionName, { exact: true }),
       })
       .getByTestId('inscription-container');
     await specificToken.last().click();
@@ -979,7 +962,7 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
       // Execute alternative commands if an error occurs
       console.log('Test Rune is not active and need to be enabled');
       // Insert your fallback logic here
-      // check if the test rune is enbaled
+      // check if the test rune is enabled
       await this.manageTokenButton.click();
       await this.buttonRunes.click();
       await expect(this.divTokenRow.first()).toBeVisible();

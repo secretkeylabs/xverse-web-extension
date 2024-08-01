@@ -96,6 +96,6 @@ test.describe('Swap Flow Exchange', () => {
     await expect(wallet.nameRune).toContainText(tokenName1);
 
     await wallet.confirmSendTransaction();
-    await wallet.checkVisualsStartpage('testnet');
+    await wallet.checkVisualsStartpage();
   });
 });
