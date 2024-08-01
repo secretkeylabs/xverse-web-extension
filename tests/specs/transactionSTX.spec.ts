@@ -11,11 +11,7 @@ test.describe('Transaction STX', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
     // get own STX Address
-    await wallet.allUpperButtons.nth(1).click();
-    const selfSTXMain = await wallet.getAddress(wallet.buttonCopyStacksAddress, false);
-
-    // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
-    await page.reload();
+    const selfSTXMain = await wallet.getAddress(2);
 
     await wallet.checkVisualsStartpage();
 
