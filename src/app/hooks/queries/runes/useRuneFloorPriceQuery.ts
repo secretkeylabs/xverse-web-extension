@@ -5,9 +5,7 @@ import { useCallback } from 'react';
 
 export default function useRuneFloorPriceQuery(runeName: string, backgroundRefetch = true) {
   const { network } = useWalletSelector();
-  if (network.type !== 'Mainnet') {
-    throw new Error('Only available on Mainnet');
-  }
+
   const runesApi = useRunesApi();
   const queryFn = useCallback(
     async () =>
@@ -20,7 +18,7 @@ export default function useRuneFloorPriceQuery(runeName: string, backgroundRefet
     refetchOnWindowFocus: backgroundRefetch,
     refetchOnReconnect: backgroundRefetch,
     queryKey: ['get-rune-floor-price', runeName],
-    enabled: Boolean(runeName),
+    enabled: Boolean(runeName) && network.type === 'Mainnet',
     queryFn,
   });
 }

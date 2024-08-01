@@ -496,7 +496,7 @@
     }
   },
   "TRANSACTION_STATUS": {
-    "BROADCASTED": "Transaction Broadcasted",
+    "BROADCASTED": "Transaction broadcasted",
     "SUCCESS_MSG": "Your transaction has been successfully submitted.",
     "SEE_ON": "See on",
     "SEE_ON_MAGICEDEN": "See {{runeSymbol}} on Magic Eden",
@@ -1323,9 +1323,8 @@
     "EXCHANGE": "EXCHANGE",
     "MARKETPLACE": "MARKETPLACE",
     "FLOOR_PRICE": "Floor price",
-    "RECOMMENDED": "• Recommended",
-    "BEST": "• Best",
-    "SWAP_BTC": "Swap Bitcoin for runes",
+    "RECOMMENDED": "Recommended",
+    "BEST": "Best",
     "SELECT_BUNDLES": "Select bundles to proceed with the swap",
     "SWAP_FROM": "Swap from",
     "SWAP_TO": "Swap to",

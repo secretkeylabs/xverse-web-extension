@@ -64,10 +64,8 @@ function sendMessageToBackground(
 
 // Receives message from background script to execute in browser
 chrome.runtime.onMessage.addListener((message: LegacyMessageToContentScript) => {
-  if (message.source === MESSAGE_SOURCE) {
-    // Forward to web app (browser)
-    window.postMessage(message, window.location.origin);
-  }
+  // Forward to web app (browser)
+  window.postMessage(message, window.location.origin);
 });
 
 interface ForwardDomEventToBackgroundArgs {
