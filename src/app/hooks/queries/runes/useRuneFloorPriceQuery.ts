@@ -9,18 +9,16 @@ export default function useRuneFloorPriceQuery(runeName: string, backgroundRefet
   const runesApi = useRunesApi();
   const queryFn = useCallback(
     async () =>
-      network.type === 'Mainnet'
-        ? runesApi
-            .getRuneMarketData(runeName)
-            .then((res) => Number(res.floorUnitPrice?.formatted ?? 0))
-        : undefined,
-    [network.type, runeName, runesApi],
+      runesApi
+        .getRuneMarketData(runeName)
+        .then((res) => Number(res.floorUnitPrice?.formatted ?? 0)),
+    [runeName, runesApi],
   );
   return useQuery({
     refetchOnWindowFocus: backgroundRefetch,
     refetchOnReconnect: backgroundRefetch,
     queryKey: ['get-rune-floor-price', runeName],
-    enabled: Boolean(runeName),
+    enabled: Boolean(runeName) && network.type === 'Mainnet',
     queryFn,
   });
 }

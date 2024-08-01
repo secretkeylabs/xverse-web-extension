@@ -1,69 +1,26 @@
 import { useRuneFungibleTokensQuery } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useSelectedAccount from '@hooks/useSelectedAccount';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { mapFTProtocolToSwapProtocol } from '@screens/swap/utils';
-import {
-  getXverseApiClient,
-  type FungibleToken,
-  type TokenBasic,
-} from '@secretkeylabs/xverse-core';
-import { useQuery } from '@tanstack/react-query';
-import { handleRetries } from '@utils/query';
+import { type FungibleToken, type Token } from '@secretkeylabs/xverse-core';
 import { sortFtByFiatBalance } from '@utils/tokens';
 
-const useFromTokens = (to?: TokenBasic) => {
-  const { network } = useWalletSelector();
+const useFromTokens = (toToken?: Token) => {
   const { unfilteredData: runesCoinsList } = useRuneFungibleTokensQuery();
   const { stxBtcRate, btcFiatRate } = useCoinRates();
   const { btcAddress } = useSelectedAccount();
 
-  const filteredRunesTokensObject = (runesCoinsList ?? []).reduce((acc, ft) => {
-    acc[ft.principal] = ft;
-    return acc;
-  }, {} as Record<FungibleToken['principal'], FungibleToken>);
+  // Create a copy of the tokens array to avoid global changes
+  const tokens: (FungibleToken | 'BTC')[] = [...(runesCoinsList ?? [])].sort((a, b) =>
+    sortFtByFiatBalance(a, b, stxBtcRate, btcFiatRate),
+  );
 
-  const runesBasicTokens =
-    Object.values(filteredRunesTokensObject).map((ft) => ({
-      ticker: ft.principal,
-      protocol: mapFTProtocolToSwapProtocol(ft.protocol ?? 'runes'),
-    })) ?? [];
+  if (btcAddress && toToken?.protocol !== 'btc') tokens.unshift('BTC');
 
-  const btcBasicToken: TokenBasic = { protocol: 'btc', ticker: 'BTC' };
-  const userTokens = [...(btcAddress ? [btcBasicToken] : [])].concat(runesBasicTokens);
+  const filteredTokens = toToken
+    ? tokens.filter((token) => token === 'BTC' || token.principal !== toToken.ticker)
+    : tokens;
 
-  const queryFn = async () => {
-    const response = await getXverseApiClient(network.type).swaps.getSourceTokens({
-      to,
-      userTokens,
-    });
-
-    return response
-      .filter((token) => token.protocol === 'btc' || !!filteredRunesTokensObject[token.ticker])
-      .map((token) => {
-        if (token.protocol === 'btc') {
-          return 'BTC';
-        }
-        if (token.protocol === 'runes') {
-          return filteredRunesTokensObject[token.ticker];
-        }
-
-        return token;
-      })
-      .sort((a, b) => {
-        if (b === 'BTC') return 1;
-        const aFT = a as FungibleToken;
-        const bFT = b as FungibleToken;
-        return sortFtByFiatBalance(aFT, bFT, stxBtcRate, btcFiatRate);
-      });
-  };
-
-  return useQuery({
-    enabled: userTokens.length > 0,
-    retry: handleRetries,
-    queryKey: ['swap-from-tokens', network.type, to, userTokens],
-    queryFn,
-  });
+  return filteredTokens;
 };
 
 export default useFromTokens;
