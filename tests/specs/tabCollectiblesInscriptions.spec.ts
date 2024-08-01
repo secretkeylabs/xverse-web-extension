@@ -9,11 +9,7 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
     // get own Ordinals Address for address check on review page
-    await wallet.allupperButtons.nth(1).click();
-    const addressOrdinals = await wallet.getAddress(wallet.buttonCopyOrdinalsAddress);
-
-    // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
-    await page.reload();
+    const addressOrdinals = await wallet.getAddress(1);
 
     // Navigate to Collectibles tab
     await wallet.navigateToCollectibles();
@@ -166,11 +162,7 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
     // get own Ordinals Address for address check on review page
-    await wallet.allupperButtons.nth(1).click();
-    const addressOrdinals = await wallet.getAddress(wallet.buttonCopyOrdinalsAddress);
-
-    // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
-    await page.reload();
+    const addressOrdinals = await wallet.getAddress(1);
 
     // Navigate to Collectibles tab
     await wallet.navigateToCollectibles();

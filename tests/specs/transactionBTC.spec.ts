@@ -13,11 +13,7 @@ test.describe('Transaction BTC', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS2', false);
 
     // get own BTC  & Ordinals Address for address check on review page
-    await wallet.allupperButtons.nth(1).click();
-    const selfBTC = await wallet.getAddress(wallet.buttonCopyBitcoinAddress);
-
-    // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
-    await page.reload();
+    const selfBTC = await wallet.getAddress(0);
 
     // Save initial Balance for later Balance checks
     const initalBTCBalance = await wallet.getTokenBalance('Bitcoin');
@@ -63,11 +59,7 @@ test.describe('Transaction BTC', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
     // get own BTC Address
-    await wallet.allupperButtons.nth(1).click();
-    const selfBTCTest = await wallet.getAddress(wallet.buttonCopyBitcoinAddress);
-
-    // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
-    await page.reload();
+    const selfBTCTest = await wallet.getAddress(0);
 
     // Save initial Balance for later Balance checks
     const initalBTCBalance = await wallet.getTokenBalance('Bitcoin');
@@ -128,11 +120,7 @@ test.describe('Transaction BTC', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
     // get own BTC Address
-    await wallet.allupperButtons.nth(1).click();
-    const selfBTCTest = await wallet.getAddress(wallet.buttonCopyBitcoinAddress);
-
-    // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
-    await page.reload();
+    const selfBTCTest = await wallet.getAddress(0);
 
     // Save initial Balance for later Balance checks
     const initalBTCBalance = await wallet.getTokenBalance('Bitcoin');

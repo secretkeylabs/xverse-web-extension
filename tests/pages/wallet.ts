@@ -40,14 +40,6 @@ export default class Wallet {
 
   readonly buttonDenyDataCollection: Locator;
 
-  readonly buttonCopyBitcoinAddress: Locator;
-
-  readonly buttonCopyOrdinalsAddress: Locator;
-
-  readonly buttonCopyStacksAddress: Locator;
-
-  readonly buttonConfirmCopyAddress: Locator;
-
   readonly buttonNetwork: Locator;
 
   readonly buttonSave: Locator;
@@ -328,6 +320,12 @@ export default class Wallet {
 
   readonly buttonInsufficientFunds: Locator;
 
+  readonly buttonQRAddress: Locator;
+
+  readonly labelAddress: Locator;
+
+  readonly containerQRCode: Locator;
+
   constructor(readonly page: Page) {
     this.page = page;
     this.navigationDashboard = page.getByTestId('nav-dashboard');
@@ -454,14 +452,9 @@ export default class Wallet {
     this.divAppTitle = page.getByTestId('app-title');
 
     // Receive
-    this.buttonCopyBitcoinAddress = page.locator('#copy-address-Bitcoin');
-    this.buttonCopyOrdinalsAddress = page.locator(
-      '#copy-address-Ordinals\\,\\ BRC-20\\ \\&\\ Runes',
-    );
-    this.buttonCopyStacksAddress = page.locator(
-      '#copy-address-Stacks\\ NFTs\\ \\&\\ SIP-10\\ tokens',
-    );
-    this.buttonConfirmCopyAddress = page.getByRole('button', { name: 'I understand' });
+    this.buttonQRAddress = page.getByTestId('qr-button');
+    this.labelAddress = page.getByTestId('address-label');
+    this.containerQRCode = page.getByTestId('qr-container');
 
     // Swap
     this.buttonSelectCoin = page.getByTestId('select-coin-button');
@@ -803,16 +796,19 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await this.buttonClose.click();
   }
 
-  async getAddress(button: Locator, ClickConfirm = true): Promise<string> {
-    await expect(button).toBeVisible();
-    await button.click();
+  async getAddress(whichAddress): Promise<string> {
+    // click on 'Receive' button
+    await this.allupperButtons.nth(1).click();
 
-    if (ClickConfirm) {
-      await expect(this.buttonConfirmCopyAddress).toBeVisible();
-      await this.buttonConfirmCopyAddress.click();
-    }
+    // Need to click on the QR Code button to get the full Address
 
-    const address = await this.page.evaluate<string>('navigator.clipboard.readText()');
+    await this.buttonQRAddress.nth(whichAddress).click();
+    await expect(this.containerQRCode).toBeVisible();
+
+    const address = await this.labelAddress.innerText();
+
+    await this.buttonBack.click();
+
     return address;
   }
 
