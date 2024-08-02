@@ -2,11 +2,18 @@ import TokenTile from '@components/tokenTile';
 import useDebounce from '@hooks/useDebounce';
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import { mapFTProtocolToSwapProtocol, mapSwapTokenToFT } from '@screens/swap/utils';
-import type { FungibleToken, Protocol, Token, TokenBasic } from '@secretkeylabs/xverse-core';
+import {
+  AnalyticsEvents,
+  type FungibleToken,
+  type Protocol,
+  type Token,
+  type TokenBasic,
+} from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import Input from '@ui-library/input';
 import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
+import { trackMixPanel } from '@utils/mixpanel';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -152,6 +159,9 @@ export default function TokenToBottomSheet({
                   currency="BTC"
                   onPress={() => {
                     onSelectCoin(token);
+                    trackMixPanel(AnalyticsEvents.SelectTokenToSwapTo, {
+                      token: 'Bitcoin',
+                    });
                     handleClose();
                   }}
                   hideBalance
@@ -166,6 +176,9 @@ export default function TokenToBottomSheet({
                   currency="FT"
                   onPress={() => {
                     onSelectCoin(token);
+                    trackMixPanel(AnalyticsEvents.SelectTokenToSwapTo, {
+                      token: token.name ?? token.ticker,
+                    });
                     handleClose();
                   }}
                   fungibleToken={mapSwapTokenToFT(token)}
