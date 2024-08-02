@@ -1,7 +1,8 @@
 import TokenTile from '@components/tokenTile';
-import type { FungibleToken, Token } from '@secretkeylabs/xverse-core';
+import { AnalyticsEvents, type FungibleToken, type Token } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
+import { trackMixPanel } from '@utils/mixpanel';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import useFromTokens from './useFromTokens';
@@ -43,6 +44,9 @@ export default function TokenFromBottomSheet({ visible, title, onSelectCoin, onC
                 currency="BTC"
                 onPress={() => {
                   onSelectCoin(token);
+                  trackMixPanel(AnalyticsEvents.SelectTokenToSwapFrom, {
+                    token: 'Bitcoin',
+                  });
                   onClose();
                 }}
               />
@@ -56,6 +60,9 @@ export default function TokenFromBottomSheet({ visible, title, onSelectCoin, onC
                 currency="FT"
                 onPress={() => {
                   onSelectCoin(token);
+                  trackMixPanel(AnalyticsEvents.SelectTokenToSwapFrom, {
+                    token: token.name,
+                  });
                   onClose();
                 }}
                 fungibleToken={token}
