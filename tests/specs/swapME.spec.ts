@@ -17,7 +17,10 @@ test.describe('Swap Flow ME', () => {
 
   const marketplace = 'Magic Eden';
 
-  test('Swap token via ME with standard fee mainnet', async ({ page, extensionId }) => {
+  test('Swap token via ME with standard fee mainnet #localexecution', async ({
+    page,
+    extensionId,
+  }) => {
     // Restore wallet and setup Testnet network
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);

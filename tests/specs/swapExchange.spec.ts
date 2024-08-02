@@ -17,7 +17,10 @@ test.describe('Swap Flow Exchange', () => {
 
   const marketplace = 'DotSwap';
 
-  test('Exchange token via DotSwap with standard fee testnet', async ({ page, extensionId }) => {
+  test('Exchange token via DotSwap with standard fee testnet #localexecution', async ({
+    page,
+    extensionId,
+  }) => {
     // Restore wallet and setup Testnet network
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
