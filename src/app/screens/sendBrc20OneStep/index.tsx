@@ -16,23 +16,24 @@ import { isDangerFeedback, type InputFeedbackProps } from '@ui-library/inputFeed
 import type { Brc20TransferEstimateFeesParams, ConfirmBrc20TransferState } from '@utils/brc20';
 import { isInOptions, replaceCommaByDot } from '@utils/helper';
 import { getFtTicker } from '@utils/tokens';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import Brc20TransferForm from './brc20TransferForm';
 
 function SendBrc20Screen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND_BRC20' });
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const { btcAddress, ordinalsAddress } = useSelectedAccount();
   const { network } = useWalletSelector();
   const { data: brc20CoinsList } = useGetBrc20FungibleTokens();
   const { data: feeRate } = useBtcFeeRate();
+  const [amountToSend, setAmountToSend] = useState(location.state?.amount || '');
   const [amountError, setAmountError] = useState<InputFeedbackProps | null>(null);
-  const [amountToSend, setAmountToSend] = useState('');
+  const [recipientAddress, setRecipientAddress] = useState(location.state?.recipientAddress || '');
   const [recipientError, setRecipientError] = useState<InputFeedbackProps | null>(null);
-  const [recipientAddress, setRecipientAddress] = useState('');
   const [processing, setProcessing] = useState(false);
   const transactionContext = useTransactionContext();
 
@@ -42,10 +43,6 @@ function SendBrc20Screen() {
 
   const principal = searchParams.get('principal');
   const fungibleToken = brc20CoinsList?.find((coin) => coin.principal === principal);
-  if (!fungibleToken) {
-    navigate('/');
-    return null;
-  }
 
   const isNextEnabled =
     !isDangerFeedback(amountError) &&
@@ -54,7 +51,7 @@ function SendBrc20Screen() {
     amountToSend !== '';
 
   const handleBackButtonClick = () => {
-    navigate(-1);
+    navigate(`/coinDashboard/FT?ftKey=${fungibleToken?.principal}&protocol=brc-20`);
   };
 
   const validateAmount = (amountInput: string): boolean => {
@@ -70,15 +67,6 @@ function SendBrc20Screen() {
     }
     setAmountError(null);
     return true;
-  };
-
-  const onInputChange = (e: React.FormEvent<HTMLInputElement>) => {
-    const newValue = e.currentTarget.value;
-    const resultRegex = /^\d*\.?\d*$/;
-    if (resultRegex.test(newValue)) {
-      validateAmount(newValue);
-      setAmountToSend(newValue);
-    }
   };
 
   const validateRecipientAddress = (address: string): boolean => {
@@ -103,6 +91,24 @@ function SendBrc20Screen() {
     return true;
   };
 
+  useEffect(() => {
+    if (location.state?.amount) {
+      validateAmount(location.state.amount);
+    }
+    if (location.state?.recipientAddress) {
+      validateRecipientAddress(location.state.recipientAddress);
+    }
+  }, [location.state]);
+
+  const onInputChange = (e: React.FormEvent<HTMLInputElement>) => {
+    const newValue = e.currentTarget.value;
+    const resultRegex = /^\d*\.?\d*$/;
+    if (resultRegex.test(newValue)) {
+      validateAmount(newValue);
+      setAmountToSend(newValue);
+    }
+  };
+
   const onAddressInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     validateRecipientAddress(e.target.value);
     setRecipientAddress(e.target.value);
@@ -111,6 +117,7 @@ function SendBrc20Screen() {
   const handleOnPressNext = async () => {
     try {
       if (
+        !fungibleToken ||
         !validateAmount(amountToSend) ||
         !validateRecipientAddress(recipientAddress) ||
         !feeRate
@@ -150,6 +157,11 @@ function SendBrc20Screen() {
       setProcessing(false);
     }
   };
+
+  if (!fungibleToken) {
+    navigate('/');
+    return null;
+  }
 
   return (
     <>

@@ -51,6 +51,7 @@ const SuccessActionsContainer = styled.div((props) => ({
 type Props = {
   summary?: ParsedTxSummaryContextProps['summary'];
   runeSummary?: ParsedTxSummaryContextProps['runeSummary'];
+  brc20Summary?: ParsedTxSummaryContextProps['brc20Summary'];
   isLoading: boolean;
   isSubmitting: boolean;
   isBroadcast?: boolean;
@@ -93,10 +94,11 @@ function ConfirmBtcTransaction({
   feeRate,
   title,
   selectedBottomTab,
+  brc20Summary,
 }: Props) {
   const parsedTxSummaryContextValue = useMemo(
-    () => ({ summary, runeSummary }),
-    [summary, runeSummary],
+    () => ({ summary, runeSummary, brc20Summary }),
+    [summary, runeSummary, brc20Summary],
   );
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentStep, setCurrentStep] = useState(Steps.ConnectLedger);

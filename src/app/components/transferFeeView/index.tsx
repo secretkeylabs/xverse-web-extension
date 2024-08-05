@@ -69,7 +69,7 @@ function TransferFeeView({
     <Container>
       <Row>
         <FeeTitleContainer>
-          <StyledP typography="body_medium_m" color="white_400">
+          <StyledP typography="body_medium_m" color="white_0">
             {t('NETWORK_FEE')}
           </StyledP>
         </FeeTitleContainer>

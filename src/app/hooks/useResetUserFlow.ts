@@ -25,7 +25,6 @@ const userFlowConfig: Record<string, { resetTo: string }> = {
   '/confirm-nft-tx': { resetTo: '/nft-dashboard?tab=nfts' },
   '/rare-sats-detail': { resetTo: '/nft-dashboard?tab=rareSats' },
   '/rare-sats-bundle': { resetTo: '/nft-dashboard?tab=rareSats' },
-  '/send-rare-sat': { resetTo: '/nft-dashboard?tab=rareSats' },
   '/verify-ledger': { resetTo: '/verify-ledger?mismatch=true' },
   '/add-stx-address-ledger': { resetTo: '/add-stx-address-ledger?mismatch=true' },
   '/send-rune': { resetTo: '/' },

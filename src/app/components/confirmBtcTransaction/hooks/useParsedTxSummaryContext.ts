@@ -9,20 +9,24 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import type { TransactionSummary } from '@screens/sendBtc/helpers';
 import {
+  type Brc20Definition,
   type btcTransaction,
   type RuneSummary,
   type RuneSummaryActions,
 } from '@secretkeylabs/xverse-core';
 import { createContext, useContext } from 'react';
+import type { Color } from 'theme';
 
 export type ParsedTxSummaryContextProps = {
   summary?: TransactionSummary | btcTransaction.PsbtSummary;
   runeSummary?: RuneSummary | RuneSummaryActions;
+  brc20Summary?: Brc20Definition & { status: string; statusColor: Color };
 };
 
 export const ParsedTxSummaryContext = createContext<ParsedTxSummaryContextProps>({
   summary: undefined,
   runeSummary: undefined,
+  brc20Summary: undefined,
 });
 
 export const useParsedTxSummaryContext = (): {
@@ -31,6 +35,7 @@ export const useParsedTxSummaryContext = (): {
     | btcTransaction.PsbtSummary
     | undefined;
   runeSummary: RuneSummary | RuneSummaryActions | undefined;
+  brc20Summary: (Brc20Definition & { status: string; statusColor: Color }) | undefined;
   hasExternalInputs: boolean;
   isUnconfirmedInput: boolean;
   showCenotaphCallout: boolean;
@@ -67,7 +72,7 @@ export const useParsedTxSummaryContext = (): {
     paymentRuneReceipts: RuneSummary['receipts'];
   };
 } => {
-  const { summary, runeSummary } = useContext(ParsedTxSummaryContext);
+  const { summary, runeSummary, brc20Summary } = useContext(ParsedTxSummaryContext);
   const { btcAddress, ordinalsAddress } = useSelectedAccount();
   const { hasActivatedRareSatsKey } = useWalletSelector();
 
@@ -177,6 +182,7 @@ export const useParsedTxSummaryContext = (): {
   return {
     summary,
     runeSummary,
+    brc20Summary,
     hasExternalInputs,
     hasInsufficientRunes,
     hasOutputScript,

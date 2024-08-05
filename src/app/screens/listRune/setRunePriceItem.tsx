@@ -78,7 +78,7 @@ function SetRunePriceItem({
   floorPriceSats,
   handleShowCustomPriceModal,
 }: Props) {
-  const { t } = useTranslation('translation', { keyPrefix: 'LIST_RUNE_SCREEN' });
+  const { t } = useTranslation('translation');
   const { btcFiatRate } = useCoinRates();
   const { fiatCurrency } = useWalletSelector();
 
@@ -100,8 +100,8 @@ function SetRunePriceItem({
           <NumericFormat
             value={satAmount}
             displayType="text"
-            prefix="Size: "
-            suffix={` sats`}
+            prefix={`${t('COMMON.SIZE')}: `}
+            suffix=" sats"
             thousandSeparator
             renderText={(value: string) => (
               <StyledP typography="body_medium_s" color="white_200">
@@ -145,7 +145,7 @@ function SetRunePriceItem({
               )}
             />
             <Label onClick={handleShowCustomPriceModal}>
-              {t('EDIT')} <PencilSimple size={16} weight="fill" />
+              {t('LIST_RUNE_SCREEN.EDIT')} <PencilSimple size={16} weight="fill" />
             </Label>
           </InfoRowContainer>
         </InfoContainer>

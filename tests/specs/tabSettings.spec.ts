@@ -43,7 +43,7 @@ test.describe('Settings Tab', () => {
     await wallet.checkVisualsStartpage();
     await expect(wallet.labelAccountName).toHaveText('Account 2');
     await page.goto(`chrome-extension://${extensionId}/popup.html#/settings`);
-    await wallet.switchtoTestnetNetwork();
+    await wallet.switchToTestnetNetwork();
     await wallet.navigationDashboard.click();
     await expect(wallet.labelAccountName).toHaveText('Account 1');
 
@@ -51,10 +51,10 @@ test.describe('Settings Tab', () => {
     await wallet.labelAccountName.click();
     await expect(page.url()).toContain('account-list');
     await wallet.labelAccountName.last().click();
-    await wallet.checkVisualsStartpage('testnet');
+    await wallet.checkVisualsStartpage();
     await expect(wallet.labelAccountName).toHaveText('Account 2');
     await page.goto(`chrome-extension://${extensionId}/popup.html#/settings`);
-    await wallet.switchtoMainnetNetwork();
+    await wallet.switchToMainnetNetwork();
     await wallet.navigationDashboard.click();
     await expect(wallet.labelAccountName).toHaveText('Account 1');
   });

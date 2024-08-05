@@ -59,7 +59,7 @@ test.describe('Send runes', () => {
     await wallet.checkVisualsSendPage1('send-rune');
 
     // Address invalid check
-    await wallet.invalidAdressCheck(wallet.receiveAddress);
+    await wallet.invalidAddressCheck(wallet.receiveAddress);
 
     await wallet.receiveAddress.fill(TEST_ORDINALS_ADDRESS);
     await expect(wallet.buttonNext).toBeEnabled();
@@ -90,7 +90,7 @@ test.describe('Send runes', () => {
     await wallet.confirmSendTransaction();
 
     // Check Startpage
-    await wallet.checkVisualsStartpage('testnet');
+    await wallet.checkVisualsStartpage();
 
     await wallet.checkAndClickOnSpecificRune(runeName);
     const BalanceAmount = await wallet.checkVisualsRunesDashboard(runeName);
