@@ -73,7 +73,7 @@ const ProtocolItem = styled.button<{ selected: boolean }>`
 interface Props {
   visible: boolean;
   title: string;
-  from?: FungibleToken | 'BTC';
+  from?: FungibleToken;
   onSelectCoin: (token: Token) => void;
   onClose: () => void;
   resetFrom: () => void;
@@ -96,8 +96,8 @@ export default function TokenToBottomSheet({
   const search = useDebounce(query, 500);
   const fromTokenBasic: TokenBasic | undefined = from
     ? {
-        protocol: from === 'BTC' ? 'btc' : mapFTProtocolToSwapProtocol(from.protocol ?? 'runes'),
-        ticker: from === 'BTC' ? 'BTC' : from.principal,
+        protocol: mapFTProtocolToSwapProtocol(from),
+        ticker: from.principal,
       }
     : undefined;
   const { data, error, isLoading } = useToTokens(selectedProtocol, fromTokenBasic, search);

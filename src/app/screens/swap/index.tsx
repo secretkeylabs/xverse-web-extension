@@ -2,7 +2,6 @@ import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery';
-import { useRuneFungibleTokensQuery } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
 import useGetQuotes from '@hooks/queries/swaps/useGetQuotes';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useCoinRates from '@hooks/queries/useCoinRates';
@@ -11,7 +10,6 @@ import {
   AnalyticsEvents,
   btcToSats,
   getBtcFiatEquivalent,
-  type BaseToken,
   type ExecuteOrderRequest,
   type FungibleToken,
   type GetUtxosRequest,
@@ -28,7 +26,7 @@ import { satsToBtcString } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { getFtBalance } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -41,7 +39,7 @@ import TokenToBottomSheet from './components/tokenToBottomSheet';
 import trackSwapMixPanel from './mixpanel';
 import QuoteSummary from './quoteSummary';
 import QuotesModal from './quotesModal';
-import { useStxCurrencyConversion } from './useStxCurrencyConversion';
+import useMasterCoinsList from './useMasterCoinsList';
 import {
   mapFTNativeSwapTokenToTokenBasic,
   mapFTProtocolToSwapProtocol,
@@ -118,7 +116,7 @@ const mapFtToSwapToken = (st: FungibleToken): Token => {
   return {
     ticker: st.principal ?? '',
     name: st.name ?? st.assetName ?? '',
-    protocol: mapFTProtocolToSwapProtocol(st.protocol ?? 'runes'),
+    protocol: mapFTProtocolToSwapProtocol(st),
     divisibility: st.decimals ?? 0,
     logo: st.image ?? st.runeInscriptionId ?? '',
     symbol: st.runeSymbol ?? '',
@@ -148,9 +146,6 @@ export default function SwapScreen() {
 
   const { fiatCurrency } = useWalletSelector();
 
-  // Hook for SIP-10
-  const { acceptableCoinList: sip10FtList } = useStxCurrencyConversion();
-  const { unfilteredData: runesFtList } = useRuneFungibleTokensQuery();
   const { data: btcBalance } = useBtcWalletData();
   const { btcFiatRate } = useCoinRates();
   const navigate = useNavigate();
@@ -160,12 +155,7 @@ export default function SwapScreen() {
   const defaultFrom = params.get('from');
   const { quotes, loading: quotesLoading, error: quotesError, fetchQuotes } = useGetQuotes();
   const { data: runeFloorPrice } = useRuneFloorPriceQuery(toToken?.name ?? '');
-
-  // Combined list
-  const coinsMasterList = useMemo(
-    () => [...sip10FtList, ...(runesFtList || []), btcFt, stxFt] ?? [],
-    [sip10FtList, runesFtList],
-  );
+  const coinsMasterList = useMasterCoinsList();
 
   useEffect(() => {
     if (defaultFrom) {
@@ -523,7 +513,7 @@ export default function SwapScreen() {
                 fromToken?.principal === 'BTC'
                   ? 'btc'
                   : fromToken?.protocol
-                  ? mapFTProtocolToSwapProtocol(fromToken.protocol)
+                  ? mapFTProtocolToSwapProtocol(fromToken)
                   : undefined,
               decimals: fromToken?.principal === 'BTC' ? 8 : fromToken?.decimals,
               unit: fromToken?.principal === 'BTC' ? 'BTC' : fromToken?.runeSymbol ?? '',
