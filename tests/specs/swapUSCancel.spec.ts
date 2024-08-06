@@ -2,14 +2,14 @@ import { expect, test } from '../fixtures/base';
 import { enableCrossChainSwaps } from '../fixtures/helpers';
 import Wallet from '../pages/wallet';
 
-test.describe('Swap Flow ME', () => {
+test.describe('Swap Flow Unisat', () => {
   // Enables the feature flag for Swap
   test.beforeEach(async ({ page }) => {
     await enableCrossChainSwaps(page);
   });
 
   const marketplace = 'Unisat';
-  const token = 'WONDERLANDWABBIT';
+  const token = 'MAX•DOG•ONCHAIN';
 
   test('Cancel swap token via Unisat', async ({ page, extensionId }) => {
     // Restore wallet
@@ -43,12 +43,9 @@ test.describe('Swap Flow ME', () => {
     // Had problems with loading of all tokens so I check that a 'DOG' is loaded
     await expect(wallet.labelTokenSubtitle.getByText('DOG').first()).toBeVisible();
     await expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
-
-    const searchInput = page.getByRole('textbox', { name: 'Search by token name' });
-    await expect(searchInput).toBeVisible();
-    await searchInput.fill(token);
-    const tokenOption = page.getByRole('paragraph').getByText(token);
-    await tokenOption.first().click();
+    await expect(wallet.inputField).toBeVisible();
+    await wallet.inputField.fill(token);
+    await wallet.divTokenRow.filter({ hasText: token }).first().click();
 
     // await wallet.divTokenRow.filter({ hasText: token }).click();
     await expect(wallet.nameToken.last()).not.toContainText('Select asset');
@@ -73,7 +70,11 @@ test.describe('Swap Flow ME', () => {
     await expect(wallet.itemUTXO.first()).toBeVisible();
 
     // click only on a UTXO with value from 1000 e(not enough funds for higher)
-    await wallet.itemUTXO.nth(1).locator('input').click();
+    await wallet.itemUTXO
+      .filter({ hasText: /\b10,000\b/ })
+      .first()
+      .locator('input')
+      .click();
     await expect(wallet.buttonNext).toBeVisible();
     await expect(wallet.textUSD).toBeVisible();
     await expect(wallet.quoteAmount).toBeVisible();
