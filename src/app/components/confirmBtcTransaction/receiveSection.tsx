@@ -15,7 +15,7 @@ const Container = styled.div((props) => ({
   flexDirection: 'column',
   background: props.theme.colors.elevation1,
   borderRadius: 12,
-  padding: `${props.theme.space.m} 0`,
+  paddingTop: props.theme.space.m,
   justifyContent: 'center',
   marginBottom: props.theme.space.s,
 }));
@@ -54,8 +54,8 @@ type Props = {
 function ReceiveSection({ onShowInscription }: Props) {
   const { t } = useTranslation('translation');
   const {
-    hasExternalInputs,
     netBtcAmount,
+    showReceiveSection,
     receiveSection: {
       showOrdinalSection,
       showPaymentSection,
@@ -69,20 +69,7 @@ function ReceiveSection({ onShowInscription }: Props) {
     },
   } = useParsedTxSummaryContext();
 
-  /** TODO - start bundling send/receive data by output addresses
-   * switch(output.type) === 'address' -> display `destinationAddress`
-   * script -> OP_RETURN
-   * ms -> nothing
-   * Each address can have 1:N bundles
-   * Challenge right now is how to to group the btc, runes, inscriptions data together by output address
-   */
-
-  /** Receive Data
-   * BTC: netBtcAmount
-   * Runes: paymentRuneReceipts
-   * Ordinals: ordinalRuneReceipts & outputsToOrdinal
-   * Rare Sats: inscriptionsRareSatsInPayment
-   */
+  if (!showReceiveSection) return null;
 
   return (
     <>
@@ -102,34 +89,32 @@ function ReceiveSection({ onShowInscription }: Props) {
           {showOrdinalRunes &&
             ordinalRuneReceipts.map((receipt) => (
               <RowContainer key={receipt.runeName}>
-                {hasExternalInputs && (
-                  <BundleHeader>
-                    <div>
-                      <StyledP typography="body_medium_m" color="white_400">
-                        {t('COMMON.BUNDLE')}
-                      </StyledP>
-                    </div>
-                    <div>
-                      <NumericFormat
-                        value={546}
-                        displayType="text"
-                        thousandSeparator
-                        prefix={`${t('COMMON.SIZE')}: `}
-                        suffix={` ${t('COMMON.SATS')}`}
-                        renderText={(value: string) => (
-                          <StyledP typography="body_medium_m" color="white_400">
-                            {value}
-                          </StyledP>
-                        )}
-                      />
-                    </div>
-                  </BundleHeader>
-                )}
+                <BundleHeader>
+                  <div>
+                    <StyledP typography="body_medium_m" color="white_400">
+                      {t('COMMON.BUNDLE')}
+                    </StyledP>
+                  </div>
+                  <div>
+                    <NumericFormat
+                      value={546}
+                      displayType="text"
+                      thousandSeparator
+                      prefix={`${t('COMMON.SIZE')}: `}
+                      suffix={` ${t('COMMON.SATS')}`}
+                      renderText={(value: string) => (
+                        <StyledP typography="body_medium_m" color="white_400">
+                          {value}
+                        </StyledP>
+                      )}
+                    />
+                  </div>
+                </BundleHeader>
                 <RuneAmount rune={receipt} />
               </RowContainer>
             ))}
           {outputsToOrdinal.length > 0 && (
-            <RowContainer noPadding noMargin={Boolean(ordinalRuneReceipts.length)}>
+            <RowContainer>
               {outputsToOrdinal
                 .sort((a, b) => b.inscriptions.length - a.inscriptions.length)
                 .map((output, index) => (
@@ -137,12 +122,10 @@ function ReceiveSection({ onShowInscription }: Props) {
                     // eslint-disable-next-line react/no-array-index-key
                     key={index}
                     inscriptions={output.inscriptions}
-                    hasExternalInputs={hasExternalInputs}
                     satributes={output.satributes}
                     amount={output.amount}
+                    showAmount
                     onShowInscription={onShowInscription}
-                    showTopDivider={Boolean(ordinalRuneReceipts.length) && index === 0}
-                    showBottomDivider={outputsToOrdinal.length > index + 1}
                   />
                 ))}
             </RowContainer>
@@ -162,19 +145,40 @@ function ReceiveSection({ onShowInscription }: Props) {
               </AddressLabel>
             </RowCenter>
           </Header>
-          {showPaymentRunes &&
-            paymentRuneReceipts.map((receipt) => (
-              <RowContainer key={receipt.runeName}>
-                <RuneAmount rune={receipt} />
-              </RowContainer>
-            ))}
           {showBtcAmount && (
             <RowContainer>
               <Amount amount={netBtcAmount} />
             </RowContainer>
           )}
+          {showPaymentRunes &&
+            paymentRuneReceipts.map((receipt) => (
+              <RowContainer key={receipt.runeName}>
+                <BundleHeader>
+                  <div>
+                    <StyledP typography="body_medium_m" color="white_400">
+                      {t('COMMON.BUNDLE')}
+                    </StyledP>
+                  </div>
+                  <div>
+                    <NumericFormat
+                      value={546}
+                      displayType="text"
+                      thousandSeparator
+                      prefix={`${t('COMMON.SIZE')}: `}
+                      suffix={` ${t('COMMON.SATS')}`}
+                      renderText={(value: string) => (
+                        <StyledP typography="body_medium_m" color="white_400">
+                          {value}
+                        </StyledP>
+                      )}
+                    />
+                  </div>
+                </BundleHeader>
+                <RuneAmount rune={receipt} />
+              </RowContainer>
+            ))}
           {inscriptionsRareSatsInPayment.length > 0 && (
-            <RowContainer noPadding noMargin={Boolean(paymentRuneReceipts.length) || showBtcAmount}>
+            <RowContainer>
               {inscriptionsRareSatsInPayment
                 .sort((a, b) => b.inscriptions.length - a.inscriptions.length)
                 .map((output, index) => (
@@ -182,14 +186,10 @@ function ReceiveSection({ onShowInscription }: Props) {
                     // eslint-disable-next-line react/no-array-index-key
                     key={index}
                     inscriptions={output.inscriptions}
-                    hasExternalInputs={hasExternalInputs}
                     satributes={output.satributes}
                     amount={output.amount}
+                    showAmount
                     onShowInscription={onShowInscription}
-                    showTopDivider={
-                      (Boolean(paymentRuneReceipts.length) || showBtcAmount) && index === 0
-                    }
-                    showBottomDivider={inscriptionsRareSatsInPayment.length > index + 1}
                   />
                 ))}
             </RowContainer>

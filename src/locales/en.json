@@ -15,7 +15,8 @@
     "CANCEL": "Cancel",
     "CONFIRM": "Confirm",
     "APPLY": "Apply",
-    "IN": "In"
+    "IN": "In",
+    "TO": "To"
   },
   "UNITS": {
     "SATS_PER_VB": "sats/vB"

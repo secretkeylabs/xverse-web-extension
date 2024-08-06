@@ -16,6 +16,7 @@ const SatsBundleContainer = styled.div`
   display: flex;
   flex-direction: column;
   border-radius: ${(props) => props.theme.space.s};
+  margin-bottom: ${(props) => props.theme.space.s};
 `;
 
 const SatsBundleButton = styled.button`

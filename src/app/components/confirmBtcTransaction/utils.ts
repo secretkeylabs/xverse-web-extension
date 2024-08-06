@@ -118,26 +118,26 @@ export const getInputsWithAssetsFromUserAddress = ({
   ordinalsAddress,
   inputs,
 }: Omit<CommonInputOutputUtilProps, 'outputs'>): {
-  inputFromPayment: btcTransaction.EnhancedInput[];
-  inputFromOrdinal: btcTransaction.EnhancedInput[];
+  inputsFromPayment: btcTransaction.EnhancedInput[];
+  inputsFromOrdinal: btcTransaction.EnhancedInput[];
 } => {
   // we want to discard inputs that are not from user address and do not have inscriptions or satributes
-  const inputFromPayment: btcTransaction.EnhancedInput[] = [];
-  const inputFromOrdinal: btcTransaction.EnhancedInput[] = [];
+  const inputsFromPayment: btcTransaction.EnhancedInput[] = [];
+  const inputsFromOrdinal: btcTransaction.EnhancedInput[] = [];
   inputs?.forEach((input) => {
     if (!input.inscriptions.length && !input.satributes.length) {
       return;
     }
 
     if (input.extendedUtxo.address === btcAddress) {
-      return inputFromPayment.push(input);
+      return inputsFromPayment.push(input);
     }
     if (input.extendedUtxo.address === ordinalsAddress) {
-      inputFromOrdinal.push(input);
+      inputsFromOrdinal.push(input);
     }
   });
 
-  return { inputFromPayment, inputFromOrdinal };
+  return { inputsFromPayment, inputsFromOrdinal };
 };
 
 export const getOutputsWithAssetsToUserAddress = ({
