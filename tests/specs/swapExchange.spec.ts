@@ -1,18 +1,11 @@
 import { expect, test } from '../fixtures/base';
+import { enableCrossChainSwaps } from '../fixtures/helpers';
 import Wallet from '../pages/wallet';
 
 test.describe('Swap Flow Exchange', () => {
   // Enables the feature flag for Swap
   test.beforeEach(async ({ page }) => {
-    await page.route('https://api-3.xverse.app/v1/app-features', (route) => {
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          CROSS_CHAIN_SWAPS: { enabled: true },
-        }),
-      });
-    });
+    await enableCrossChainSwaps(page);
   });
 
   const marketplace = 'DotSwap';
@@ -21,7 +14,7 @@ test.describe('Swap Flow Exchange', () => {
     page,
     extensionId,
   }) => {
-    // Restore wallet and setup Testnet network
+    // Restore wallet
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 

@@ -8,13 +8,10 @@ test.describe('Swap Flow ME', () => {
     await enableCrossChainSwaps(page);
   });
 
-  const marketplace = 'Magic Eden';
-  const token = 'MONEY';
+  const marketplace = 'Unisat';
+  const token = 'WONDERLANDWABBIT';
 
-  test('Swap token via ME with standard fee mainnet #localexecution', async ({
-    page,
-    extensionId,
-  }) => {
+  test('Cancel swap token via Unisat', async ({ page, extensionId }) => {
     // Restore wallet
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
@@ -23,6 +20,9 @@ test.describe('Swap Flow ME', () => {
     const selfBTC = await wallet.getAddress(0);
 
     await wallet.checkVisualsStartpage();
+
+    // Save initial Balance for later Balance checks
+    const initialBTCBalance = await wallet.getTokenBalance('Bitcoin');
 
     await wallet.allUpperButtons.nth(2).click();
     await wallet.checkVisualsSwapPage();
@@ -43,13 +43,20 @@ test.describe('Swap Flow ME', () => {
     // Had problems with loading of all tokens so I check that a 'DOG' is loaded
     await expect(wallet.labelTokenSubtitle.getByText('DOG').first()).toBeVisible();
     await expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
-    await wallet.divTokenRow.filter({ hasText: token }).click();
+
+    const searchInput = page.getByRole('textbox', { name: 'Search by token name' });
+    await expect(searchInput).toBeVisible();
+    await searchInput.fill(token);
+    const tokenOption = page.getByRole('paragraph').getByText(token);
+    await tokenOption.first().click();
+
+    // await wallet.divTokenRow.filter({ hasText: token }).click();
     await expect(wallet.nameToken.last()).not.toContainText('Select asset');
     await expect(wallet.imageToken.last()).toBeVisible();
     await expect(wallet.buttonGetQuotes).toBeDisabled();
 
     // tried a calculated value but had multiple problems with that, for now we stick to a specific value
-    const swapAmount = 0.00000546;
+    const swapAmount = 0.000001;
 
     await wallet.fillSwapAmount(swapAmount);
 
@@ -66,11 +73,7 @@ test.describe('Swap Flow ME', () => {
     await expect(wallet.itemUTXO.first()).toBeVisible();
 
     // click only on a UTXO with value from 1000 e(not enough funds for higher)
-    await wallet.itemUTXO
-      .filter({ hasText: /\b1,000\b/ })
-      .first()
-      .locator('input')
-      .click();
+    await wallet.itemUTXO.nth(1).locator('input').click();
     await expect(wallet.buttonNext).toBeVisible();
     await expect(wallet.textUSD).toBeVisible();
     await expect(wallet.quoteAmount).toBeVisible();
@@ -95,6 +98,27 @@ test.describe('Swap Flow ME', () => {
     const numericOriginalFee = parseFloat(originalFee.replace(/[^0-9.]/g, ''));
     await expect(numericOriginalFee).toBeGreaterThan(0);
 
+    // Click on edit Fee button
+    await wallet.buttonEditFee.click();
+    await expect(wallet.buttonSelectFee.first()).toBeVisible();
+    await expect(wallet.labelTotalFee.first()).toBeVisible();
+
+    // Compare medium fee to previous saved fee
+    const mediumFee = await wallet.labelTotalFee.last().innerText();
+    const numericMediumFee = parseFloat(mediumFee.replace(/[^0-9.]/g, ''));
+    await expect(numericMediumFee).toBe(numericOriginalFee);
+
+    // Save high fee rate for comparison
+    const highFee = await wallet.labelTotalFee.first().innerText();
+    const numericHighFee = parseFloat(highFee.replace(/[^0-9.]/g, ''));
+
+    // Switch to high fee
+    await wallet.buttonSelectFee.first().click();
+
+    const newFee = await wallet.feeAmount.innerText();
+    const numericNewFee = parseFloat(newFee.replace(/[^0-9.]/g, ''));
+    await expect(numericNewFee).toBe(numericHighFee);
+
     await wallet.buttonSwap.click();
     await wallet.checkVisualsSendTransactionReview('swap', false, selfBTC);
 
@@ -105,7 +129,15 @@ test.describe('Swap Flow ME', () => {
     // Check Rune token name
     await expect(wallet.nameRune).toContainText(tokenName1);
 
-    await wallet.confirmSendTransaction();
+    // Cancel the transaction
+    await expect(wallet.buttonCancel).toBeEnabled();
+    await wallet.buttonCancel.click();
+
+    // Check Startpage
     await wallet.checkVisualsStartpage();
+
+    // Check BTC Balance after cancel the transaction
+    const balanceAfterCancel = await wallet.getTokenBalance('Bitcoin');
+    await expect(initialBTCBalance).toEqual(balanceAfterCancel);
   });
 });
