@@ -7,7 +7,7 @@ import { handleRetries, InvalidParamsError } from '@utils/query';
 /**
  * Get inscription details belonging to an address by ordinalId
  */
-const useAddressInscription = (ordinalId: string, ordinal?: Inscription | null) => {
+const useAddressInscription = (ordinalId?: string, ordinal?: Inscription | null) => {
   const { ordinalsAddress } = useSelectedAccount();
   const { network } = useWalletSelector();
   const fetchOrdinals = async (): Promise<Inscription> => {

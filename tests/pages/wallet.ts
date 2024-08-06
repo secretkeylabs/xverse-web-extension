@@ -629,7 +629,7 @@ export default class Wallet {
     await expect(this.buttonBack).toBeVisible();
   }
 
-  async checkVisualsSendInscriptionsPage2(ordinalAddress, ordinalNumber) {
+  async checkVisualsSendInscriptionsPage2(ordinalAddress, ordinalNumber, collection) {
     await expect(this.confirmTotalAmount).toBeVisible();
     await expect(this.confirmCurrencyAmount).toBeVisible();
     await expect(this.buttonExpand).toBeVisible();
@@ -646,9 +646,12 @@ export default class Wallet {
     await expect(this.confirmBalance.first()).toBeVisible();
     await expect(await this.receiveAddress.first().innerText()).toContain(ordinalAddress.slice(-4));
 
+    // Collection Inscriptions don't have the ordinal number displayed in the Review
     // Check if the right ordinal number is shown
-    const reviewNumberOrdinal = await this.numberInscription.first().innerText();
-    await expect(ordinalNumber).toMatch(reviewNumberOrdinal);
+    if (!collection) {
+      const reviewNumberOrdinal = await this.numberInscription.first().innerText();
+      await expect(ordinalNumber).toMatch(reviewNumberOrdinal);
+    }
   }
 
   /**

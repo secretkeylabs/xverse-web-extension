@@ -84,9 +84,13 @@ function RareSats({
         <Row>
           <Avatar icon={<Butterfly size={18} color={Theme.colors.elevation0} />} />
           <BundleInfo>
-            <StyledP typography="body_medium_m" color="white_200">{`${
+            <StyledP typography="body_medium_m" color="white_0">{`${
               satributesInfo.totalExoticSats
-            } ${t('NFT_DASHBOARD_SCREEN.RARE_SATS')}`}</StyledP>
+            } ${t(
+              satributesInfo.totalExoticSats > 1
+                ? 'NFT_DASHBOARD_SCREEN.RARE_SATS'
+                : 'NFT_DASHBOARD_SCREEN.RARE_SAT',
+            )}`}</StyledP>
             {bundleSize && (
               <NumericFormat
                 value={bundleSize}

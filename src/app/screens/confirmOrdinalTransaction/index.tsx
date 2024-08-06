@@ -34,9 +34,9 @@ const NftContainer = styled.div((props) => ({
   aspectRatio: 1,
   justifyContent: 'center',
   alignItems: 'center',
-  borderRadius: 8,
+  borderRadius: props.theme.radius(1),
   padding: props.theme.spacing(5),
-  marginBottom: props.theme.spacing(6),
+  marginBottom: props.theme.space.s,
 }));
 
 function ConfirmOrdinalTransaction() {
@@ -144,9 +144,11 @@ function ConfirmOrdinalTransaction() {
   };
 
   useResetUserFlow('/confirm-ordinal-tx');
+
   const handleBackButtonClick = () => {
-    navigate(-1);
+    navigate(-1); // TODO: change this logic, also create a separate handler for cancel
   };
+
   const hideBackButton = location.key === 'default';
 
   return (

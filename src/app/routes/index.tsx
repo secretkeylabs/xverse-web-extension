@@ -59,7 +59,6 @@ import SendBtcScreen from '@screens/sendBtc';
 import SendSip10Screen from '@screens/sendFt';
 import SendNft from '@screens/sendNft';
 import SendOrdinal from '@screens/sendOrdinal';
-import SendRareSat from '@screens/sendRareSat';
 import SendRuneScreen from '@screens/sendRune';
 import SendStxScreen from '@screens/sendStx';
 import Setting from '@screens/settings';
@@ -573,14 +572,6 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <SendOrdinal />
-          </AuthGuard>
-        ),
-      },
-      {
-        path: 'nft-dashboard/send-rare-sat',
-        element: (
-          <AuthGuard>
-            <SendRareSat />
           </AuthGuard>
         ),
       },

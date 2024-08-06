@@ -62,7 +62,7 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     await wallet.buttonNext.click();
 
     // Transaction Review Page
-    await wallet.checkVisualsSendInscriptionsPage2(TEST_ORDINALS_ADDRESS, orgNumberOrdinal);
+    await wallet.checkVisualsSendInscriptionsPage2(TEST_ORDINALS_ADDRESS, orgNumberOrdinal, true);
 
     // Cancel the transaction
     await wallet.buttonCancel.click();
@@ -142,7 +142,7 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     await wallet.buttonNext.click();
 
     // Transaction Review Page
-    await wallet.checkVisualsSendInscriptionsPage2(TEST_ORDINALS_ADDRESS, orgNumberOrdinal);
+    await wallet.checkVisualsSendInscriptionsPage2(TEST_ORDINALS_ADDRESS, orgNumberOrdinal, true);
 
     await wallet.confirmSendTransaction();
 
@@ -210,7 +210,7 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     await wallet.buttonNext.click();
 
     // Transaction Review Page
-    await wallet.checkVisualsSendInscriptionsPage2(TEST_ORDINALS_ADDRESS, orgNumberOrdinal);
+    await wallet.checkVisualsSendInscriptionsPage2(TEST_ORDINALS_ADDRESS, orgNumberOrdinal, false);
 
     // Cancel the transaction
     await wallet.buttonCancel.click();
@@ -274,7 +274,7 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     await wallet.buttonNext.click();
 
     // Transaction Review Page
-    await wallet.checkVisualsSendInscriptionsPage2(TEST_ORDINALS_ADDRESS, orgNumberOrdinal);
+    await wallet.checkVisualsSendInscriptionsPage2(TEST_ORDINALS_ADDRESS, orgNumberOrdinal, false);
 
     await wallet.confirmSendTransaction();
 
