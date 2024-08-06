@@ -1,392 +1,68 @@
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import AlertMessage from '@components/alertMessage';
-import { BetterBarLoader } from '@components/barLoader';
 import ActionButton from '@components/button';
 import CollectibleDetailTile from '@components/collectibleDetailTile';
 import RareSatIcon from '@components/rareSatIcon/rareSatIcon';
-import Separator from '@components/separator';
 import SquareButton from '@components/squareButton';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import WebGalleryButton from '@components/webGalleryButton';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { ArrowUp, Share } from '@phosphor-icons/react';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
-import Callout from '@ui-library/callout';
 import { StyledP } from '@ui-library/common.styled';
 import { EMPTY_LABEL } from '@utils/constants';
 import { getRareSatsColorsByRareSatsType, getRareSatsLabelByType } from '@utils/rareSats';
 import { useTranslation } from 'react-i18next';
-import { Tooltip } from 'react-tooltip';
-import styled from 'styled-components';
+import {
+  ActionButtonLoader,
+  ActionButtonsLoader,
+  AssetDeatilButtonText,
+  BackButtonContainer,
+  Badge,
+  BottomBarContainer,
+  Button,
+  ButtonContainer,
+  ButtonHiglightedText,
+  ButtonImage,
+  ButtonText,
+  CollectibleText,
+  ColumnContainer,
+  DataItemsContainer,
+  DescriptionContainer,
+  DescriptionText,
+  DetailSection,
+  Divider,
+  ExtensionContainer,
+  ExtensionLoaderContainer,
+  ExtensionOrdinalsContainer,
+  GalleryButtonContainer,
+  GalleryCollectibleText,
+  GalleryContainer,
+  GalleryLoaderContainer,
+  GalleryScrollContainer,
+  InfoContainer,
+  OrdinalDetailsContainer,
+  OrdinalGalleryTitleText,
+  OrdinalsContainer,
+  OrdinalTitleText,
+  RareSatsBundleCallout,
+  Row,
+  RowButtonContainer,
+  RowContainer,
+  SatributeBadgeLabel,
+  SatributesBadgeContainer,
+  SatributesBadges,
+  SatributesIconsContainer,
+  StyledBarLoader,
+  StyledSeparator,
+  StyledTooltip,
+  StyledWebGalleryButton,
+  TitleLoader,
+  ViewInExplorerButton,
+} from './index.styled';
 import OrdinalAttributeComponent from './ordinalAttributeComponent';
 import useOrdinalDetail from './useOrdinalDetail';
-
-interface DetailSectionProps {
-  isGallery: boolean;
-}
-
-const GalleryScrollContainer = styled.div((props) => ({
-  ...props.theme.scrollbar,
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-  alignItems: 'center',
-}));
-
-const GalleryContainer = styled.div({
-  marginLeft: 'auto',
-  marginRight: 'auto',
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  alignItems: 'center',
-  width: '100%',
-  maxWidth: 1224,
-});
-
-const BackButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  width: 820,
-  marginTop: props.theme.spacing(40),
-}));
-
-const ButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  position: 'relative',
-  flexDirection: 'row',
-  maxWidth: 400,
-  columnGap: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(10.5),
-}));
-
-const ExtensionContainer = styled.div((props) => ({
-  ...props.theme.scrollbar,
-  display: 'flex',
-  flexDirection: 'column',
-  marginTop: props.theme.spacing(4),
-  alignItems: 'center',
-  flex: 1,
-  paddingLeft: props.theme.spacing(4),
-  paddingRight: props.theme.spacing(4),
-}));
-
-const OrdinalsContainer = styled.div((props) => ({
-  width: 376.5,
-  height: 376.5,
-  display: 'flex',
-  aspectRatio: '1',
-  flexDirection: 'column',
-  justifyContent: 'flex-start',
-  alignItems: 'flex-start',
-  borderRadius: 8,
-  marginBottom: props.theme.spacing(12),
-}));
-
-const ExtensionOrdinalsContainer = styled.div((props) => ({
-  maxHeight: 136,
-  width: 136,
-  display: 'flex',
-  aspectRatio: '1',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  marginTop: props.theme.spacing(12),
-  marginBottom: props.theme.space.m,
-}));
-
-const OrdinalTitleText = styled.h1((props) => ({
-  ...props.theme.typography.headline_m,
-  color: props.theme.colors.white_0,
-  marginTop: props.theme.spacing(1),
-  textAlign: 'center',
-}));
-
-const OrdinalGalleryTitleText = styled.h1((props) => ({
-  ...props.theme.typography.headline_l,
-  color: props.theme.colors.white_0,
-}));
-
-const DescriptionText = styled.h1((props) => ({
-  ...props.theme.typography.headline_l,
-  color: props.theme.colors.white_0,
-  fontSize: 24,
-}));
-
-const NftOwnedByText = styled.h1((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_400,
-}));
-
-const OwnerAddressText = styled.h1((props) => ({
-  ...props.theme.typography.body_medium_m,
-  marginLeft: props.theme.spacing(3),
-}));
-
-const BottomBarContainer = styled.div({
-  marginTop: 'auto',
-});
-
-const RowContainer = styled.div<{
-  withGap?: boolean;
-}>((props) => ({
-  display: 'flex',
-  alignItems: 'flex-start',
-  marginTop: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(12),
-  flexDirection: 'row',
-  columnGap: props.withGap ? props.theme.spacing(20) : 0,
-}));
-
-const ColumnContainer = styled.div({
-  display: 'flex',
-  alignItems: 'flex-start',
-  flexDirection: 'column',
-  width: '100%',
-});
-
-const OrdinalDetailsContainer = styled.div<DetailSectionProps>((props) => ({
-  display: 'flex',
-  alignItems: 'flex-start',
-  flexDirection: 'column',
-  wordBreak: 'break-all',
-  whiteSpace: 'pre-wrap',
-  width: props.isGallery ? 400 : '100%',
-  marginTop: props.theme.spacing(8),
-}));
-
-const Row = styled.div({
-  display: 'flex',
-  justifyContent: 'space-between',
-  flexDirection: 'row',
-  width: '100%',
-});
-
-const DescriptionContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  marginBottom: props.theme.spacing(30),
-}));
-
-const StyledWebGalleryButton = styled(WebGalleryButton)`
-  margintop: ${(props) => props.theme.space.s};
-`;
-
-const ViewInExplorerButton = styled.button<DetailSectionProps>((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  backgroundColor: 'transparent',
-  width: props.isGallery ? 392 : 328,
-  height: 44,
-  padding: 12,
-  borderRadius: 12,
-  marginTop: props.theme.spacing(16),
-  marginBottom: props.theme.spacing(18),
-  border: `1px solid ${props.theme.colors.white_800}`,
-}));
-
-const ButtonText = styled.h1((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_400,
-}));
-
-const ButtonHiglightedText = styled.h1((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_0,
-  marginLeft: props.theme.spacing(2),
-  marginRight: props.theme.spacing(2),
-}));
-
-const StyledTooltip = styled(Tooltip)`
-  &&& {
-    font-size: 12px;
-    background-color: #ffffff;
-    color: #12151e;
-    border-radius: 8px;
-    padding: 7px;
-  }
-`;
-
-const ButtonImage = styled.img((props) => ({
-  marginRight: props.theme.spacing(3),
-  alignSelf: 'center',
-  transform: 'all',
-}));
-
-const Button = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'flex-start',
-  alignItems: 'center',
-  background: 'transparent',
-  marginBottom: props.theme.spacing(12),
-}));
-
-const AssetDeatilButtonText = styled.div((props) => ({
-  ...props.theme.typography.body_s,
-  fontWeight: 400,
-  fontSize: 14,
-  color: props.theme.colors.white_0,
-  textAlign: 'center',
-}));
-
-const ButtonIcon = styled.img({
-  width: 12,
-  height: 12,
-});
-
-const OrdinalsTag = styled.div({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  marginLeft: 2,
-  background: 'rgba(39, 42, 68, 0.6)',
-  borderRadius: 40,
-  height: 22,
-  padding: '3px 6px',
-});
-
-const CollectibleText = styled.h1((props) => ({
-  ...props.theme.typography.body_bold_m,
-  color: props.theme.colors.white_400,
-  textAlign: 'center',
-}));
-
-const GalleryCollectibleText = styled.h1((props) => ({
-  ...props.theme.typography.body_bold_l,
-  color: props.theme.colors.white_400,
-}));
-
-const Text = styled.h1((props) => ({
-  ...props.theme.typography.body_bold_m,
-  textTransform: 'uppercase',
-  color: props.theme.colors.white_0,
-  fontSize: 10,
-  marginLeft: props.theme.spacing(2),
-}));
-
-const GalleryButtonContainer = styled.div`
-  width: 190px;
-  border-radius: 12px;
-`;
-
-const RowButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  columnGap: props.theme.spacing(11),
-  marginBottom: props.theme.space.l,
-  marginTop: props.theme.space.m,
-  width: '100%',
-}));
-
-const Divider = styled.div((props) => ({
-  width: '100%',
-  borderBottom: `1px solid ${props.theme.colors.elevation3}`,
-}));
-
-const DetailSection = styled.div<DetailSectionProps>((props) => ({
-  display: 'flex',
-  flexDirection: !props.isGallery ? 'row' : 'column',
-  justifyContent: 'space-between',
-  columnGap: props.theme.space.m,
-  width: '100%',
-}));
-
-const ExtensionLoaderContainer = styled.div({
-  height: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'space-around',
-  alignItems: 'center',
-});
-
-const GalleryLoaderContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-});
-
-const StyledBarLoader = styled(BetterBarLoader)<{
-  withMarginBottom?: boolean;
-}>((props) => ({
-  padding: 0,
-  borderRadius: props.theme.radius(1),
-  marginBottom: props.withMarginBottom ? props.theme.spacing(6) : 0,
-}));
-
-const StyledSeparator = styled(Separator)`
-  width: 100%;
-`;
-
-const TitleLoader = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const ActionButtonsLoader = styled.div((props) => ({
-  display: 'flex',
-  justifyContent: 'center',
-  columnGap: props.theme.spacing(11),
-}));
-
-const ActionButtonLoader = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  rowGap: props.theme.spacing(4),
-}));
-
-const InfoContainer = styled.div((props) => ({
-  width: '100%',
-  display: 'flex',
-  justifyContent: 'space-between',
-  padding: `0 ${props.theme.spacing(8)}px`,
-}));
-
-const RareSatsBundleCallout = styled(Callout)<DetailSectionProps>((props) => ({
-  width: props.isGallery ? 400 : '100%',
-  marginBottom: props.isGallery ? 0 : props.theme.space.l,
-  marginTop: props.isGallery ? props.theme.space.xs : 0,
-}));
-
-const SatributesIconsContainer = styled.div<DetailSectionProps>((props) => ({
-  display: 'inline-flex',
-  flexDirection: 'row',
-  marginTop: props.isGallery ? props.theme.space.m : 0,
-}));
-
-const SatributesBadgeContainer = styled.div<DetailSectionProps>((props) => ({
-  marginTop: props.isGallery ? 0 : props.theme.space.m,
-}));
-const SatributesBadges = styled.div<DetailSectionProps>((props) => ({
-  display: 'inline-flex',
-  flexDirection: 'row',
-  flexWrap: 'wrap',
-  maxWidth: props.isGallery ? 400 : '100%',
-  marginTop: props.theme.space.s,
-}));
-const Badge = styled.div<{ backgroundColor?: string; isLastItem: boolean }>((props) => ({
-  display: 'inline-flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  backgroundColor: props.backgroundColor,
-  padding: `${props.theme.space.s} ${props.theme.space.s}`,
-  borderRadius: props.theme.radius(2),
-  border: `1px solid ${props.theme.colors.elevation3}`,
-  marginRight: props.isLastItem ? 0 : props.theme.space.xs,
-  marginBottom: props.theme.space.xs,
-}));
-const SatributeBadgeLabel = styled(StyledP)`
-  margin-left: ${(props) => props.theme.space.xs};
-`;
-const DataItemsContainer = styled.div`
-  margin-top: ${(props) => props.theme.space.l};
-`;
 
 function OrdinalDetailScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
@@ -500,7 +176,15 @@ function OrdinalDetailScreen() {
       case 'mint':
         return (
           <ColumnContainer>
-            <OrdinalAttributeComponent title={t('AMOUNT_TO_MINT')} value={value} />
+            <DetailSection isGallery={isGalleryOpen}>
+              <OrdinalAttributeComponent title={t('AMOUNT_TO_MINT')} value={value} />
+              <OrdinalAttributeComponent
+                title={t('BRC20_TRANSFER_STATUS')}
+                value={brc20InscriptionStatus}
+                valueColor={brc20InscriptionStatusColor}
+                isAddress
+              />
+            </DetailSection>
             {!isGallery && (
               <OrdinalAttributeComponent
                 title={t('OWNED_BY')}

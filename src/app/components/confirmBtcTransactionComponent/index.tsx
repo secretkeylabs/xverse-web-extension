@@ -380,7 +380,6 @@ function ConfirmBtcTransactionComponent({
             <Callout bodyText={t('NFT_DASHBOARD_SCREEN.HOLDS_RARE_SAT')} variant="warning" />
           </CalloutContainer>
         )}
-        {currencyType !== 'BTC' && bundle && <SatsBundle bundle={bundle} />}
 
         <Subtitle>{t('CONFIRM_TRANSACTION.YOU_WILL_SEND')}</Subtitle>
 
@@ -409,6 +408,8 @@ function ConfirmBtcTransactionComponent({
             />
           ))
         )}
+
+        {currencyType !== 'BTC' && bundle && <SatsBundle bundle={bundle} />}
 
         <Subtitle>{t('CONFIRM_TRANSACTION.TRANSACTION_DETAILS')}</Subtitle>
 

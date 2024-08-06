@@ -69,11 +69,12 @@ function TransactionSummary({ isSubmitting, getFeeForFeeRate, onFeeRateSet, feeR
   const {
     summary,
     runeSummary,
-    hasExternalInputs,
     isUnconfirmedInput,
     hasOutputScript,
     showCenotaphCallout,
     transactionIsFinal,
+    showSendSection,
+    showTransferSection,
   } = useParsedTxSummaryContext();
 
   const satsToFiat = (sats: string) =>
@@ -108,11 +109,8 @@ function TransactionSummary({ isSubmitting, getFeeForFeeRate, onFeeRateSet, feeR
         <WarningCallout bodyText={t('RUNE_IS_CLOSED')} variant="danger" />
       )}
       {hasRuneDelegation && <DelegateSection delegations={runeSummary?.transfers} />}
-      {hasExternalInputs ? (
-        <TransferSection onShowInscription={setInscriptionToShow} />
-      ) : (
-        <SendSection onShowInscription={setInscriptionToShow} />
-      )}
+      {showSendSection && <SendSection onShowInscription={setInscriptionToShow} />}
+      {showTransferSection && <TransferSection onShowInscription={setInscriptionToShow} />}
       <ReceiveSection onShowInscription={setInscriptionToShow} />
       {!hasRuneDelegation && <BurnSection burns={runeSummary?.burns} />}
       <MintSection mints={[runeSummary?.mint]} />

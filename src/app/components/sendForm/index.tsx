@@ -277,7 +277,7 @@ function SendForm({
       <AmountInputContainer error={addressError !== ''}>
         <InputFieldContainer>
           <InputField
-            data-testid="recipient-adress"
+            data-testid="recipient-address"
             value={recipientAddress}
             placeholder={getAddressInputPlaceholder()}
             onChange={handleAddressInputChange}

@@ -15,7 +15,8 @@
     "CANCEL": "Cancel",
     "CONFIRM": "Confirm",
     "APPLY": "Apply",
-    "IN": "In"
+    "IN": "In",
+    "TO": "To"
   },
   "UNITS": {
     "SATS_PER_VB": "sats/vB"
@@ -496,7 +497,7 @@
     }
   },
   "TRANSACTION_STATUS": {
-    "BROADCASTED": "Transaction Broadcasted",
+    "BROADCASTED": "Transaction broadcasted",
     "SUCCESS_MSG": "Your transaction has been successfully submitted.",
     "SEE_ON": "See on",
     "SEE_ON_MAGICEDEN": "See {{runeSymbol}} on Magic Eden",
@@ -693,7 +694,8 @@
     "VIEW_ADDRESS": "View address",
     "ADD_STACKS_ADDRESS": "Add a Stacks address",
     "NFTS": "NFTs",
-    "RARE_SATS": "Rare Sats",
+    "RARE_SAT": "Rare sat",
+    "RARE_SATS": "Rare sats",
     "NEW_FEATURE": "New Feature, Rare Sats",
     "NEW_FEAT_RARE_SATS_DESCRIPTION": "Enable rare sats to display rare, interesting and unique sats in your wallet. You can change this setting at any time.",
     "NEW_FEAT_RARE_SATS_ORDINALS_ENABLE": "Enable rare sats to display rare, interesting and unique sats in your wallet. Note than enabling rare sats will also enable Ordinals. You can change this setting at any time.",
@@ -1323,9 +1325,8 @@
     "EXCHANGE": "EXCHANGE",
     "MARKETPLACE": "MARKETPLACE",
     "FLOOR_PRICE": "Floor price",
-    "RECOMMENDED": "• Recommended",
-    "BEST": "• Best",
-    "SWAP_BTC": "Swap Bitcoin for runes",
+    "RECOMMENDED": "Recommended",
+    "BEST": "Best",
     "SELECT_BUNDLES": "Select bundles to proceed with the swap",
     "SWAP_FROM": "Swap from",
     "SWAP_TO": "Swap to",

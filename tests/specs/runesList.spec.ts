@@ -13,12 +13,8 @@ test.describe('List runes', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
     // get own BTC  & Ordinals Address for address check on review page
-    await wallet.allupperButtons.nth(1).click();
-    const selfBTC = await wallet.getAddress(wallet.buttonCopyBitcoinAddress);
-    const selfOrdinals = await wallet.getAddress(wallet.buttonCopyOrdinalsAddress);
-
-    // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
-    await page.reload();
+    const selfBTC = await wallet.getAddress(0);
+    const selfOrdinals = await wallet.getAddress(1);
 
     // Check if Rune is enabled and if not enable the rune and click on it
     await wallet.checkAndClickOnSpecificRune(runeName);
@@ -150,12 +146,8 @@ test.describe('List runes', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
     // get own BTC  & Ordinals Address for address check on review page
-    await wallet.allupperButtons.nth(1).click();
-    const selfBTC = await wallet.getAddress(wallet.buttonCopyBitcoinAddress);
-    const selfOrdinals = await wallet.getAddress(wallet.buttonCopyOrdinalsAddress);
-
-    // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
-    await page.reload();
+    const selfBTC = await wallet.getAddress(0);
+    const selfOrdinals = await wallet.getAddress(1);
 
     // Check if Rune is enabled and if not enable the rune and click on it
     await wallet.checkAndClickOnSpecificRune(runeName);

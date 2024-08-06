@@ -9,21 +9,34 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import type { TransactionSummary } from '@screens/sendBtc/helpers';
 import {
+  type Brc20Definition,
   type btcTransaction,
   type RuneSummary,
   type RuneSummaryActions,
 } from '@secretkeylabs/xverse-core';
 import { createContext, useContext } from 'react';
+import type { Color } from 'theme';
 
 export type ParsedTxSummaryContextProps = {
   summary?: TransactionSummary | btcTransaction.PsbtSummary;
   runeSummary?: RuneSummary | RuneSummaryActions;
+  brc20Summary?: Brc20Definition & { status: string; statusColor: Color };
 };
 
 export const ParsedTxSummaryContext = createContext<ParsedTxSummaryContextProps>({
   summary: undefined,
   runeSummary: undefined,
+  brc20Summary: undefined,
 });
+
+type BundledOutputs = Record<
+  string,
+  {
+    outputs: (btcTransaction.TransactionOutput | btcTransaction.TransactionPubKeyOutput)[];
+    netBtcAmount: number;
+    runeTransfers: RuneSummary['transfers'];
+  }
+>;
 
 export const useParsedTxSummaryContext = (): {
   summary:
@@ -31,6 +44,7 @@ export const useParsedTxSummaryContext = (): {
     | btcTransaction.PsbtSummary
     | undefined;
   runeSummary: RuneSummary | RuneSummaryActions | undefined;
+  brc20Summary: (Brc20Definition & { status: string; statusColor: Color }) | undefined;
   hasExternalInputs: boolean;
   isUnconfirmedInput: boolean;
   showCenotaphCallout: boolean;
@@ -41,16 +55,22 @@ export const useParsedTxSummaryContext = (): {
   hasOutputScript: boolean;
   hasSigHashNone: boolean;
   validMintingRune: undefined | boolean;
+  showSendSection: boolean;
+  showTransferSection: boolean;
+  showReceiveSection: boolean;
   sendSection: {
-    showSendSection: boolean;
+    bundledOutputs: BundledOutputs;
+    inscriptionsFromPayment: btcTransaction.IOInscription[];
+    satributesFromPayment: btcTransaction.IOSatribute[];
+  };
+  transferSection: {
     showBtcAmount: boolean;
     showRuneTransfers: boolean;
-    hasInscriptionsRareSatsInOrdinal: boolean;
     outputsFromOrdinal: (
       | btcTransaction.TransactionOutput
       | btcTransaction.TransactionPubKeyOutput
     )[];
-    inputFromOrdinal: btcTransaction.EnhancedInput[];
+    inputsFromOrdinal: btcTransaction.EnhancedInput[];
     inscriptionsFromPayment: btcTransaction.IOInscription[];
     satributesFromPayment: btcTransaction.IOSatribute[];
   };
@@ -67,10 +87,9 @@ export const useParsedTxSummaryContext = (): {
     paymentRuneReceipts: RuneSummary['receipts'];
   };
 } => {
-  const { summary, runeSummary } = useContext(ParsedTxSummaryContext);
+  const { summary, runeSummary, brc20Summary } = useContext(ParsedTxSummaryContext);
   const { btcAddress, ordinalsAddress } = useSelectedAccount();
   const { hasActivatedRareSatsKey } = useWalletSelector();
-
   const showCenotaphCallout = !!summary?.runeOp?.Cenotaph?.flaws;
   const hasInsufficientRunes =
     runeSummary?.transfers?.some((transfer) => !transfer.hasSufficientBalance) ?? false;
@@ -88,6 +107,11 @@ export const useParsedTxSummaryContext = (): {
       (input) => !input.extendedUtxo.utxo.status.confirmed && input.walletWillSign,
     ) ?? false;
 
+  // defaults for non-psbt transactions
+  const transactionIsFinal = (summary as btcTransaction.PsbtSummary)?.isFinal ?? true;
+  const hasSigHashNone = (summary as btcTransaction.PsbtSummary)?.hasSigHashNone ?? false;
+  const hasSigHashSingle = (summary as btcTransaction.PsbtSummary)?.hasSigHashSingle ?? false;
+
   const netBtcAmount = getNetAmount({
     inputs: summary?.inputs,
     outputs: summary?.outputs,
@@ -95,14 +119,9 @@ export const useParsedTxSummaryContext = (): {
     ordinalsAddress,
   });
 
-  // defaults for non-psbt transactions
-  const transactionIsFinal = (summary as btcTransaction.PsbtSummary)?.isFinal ?? true;
-  const hasSigHashNone = (summary as btcTransaction.PsbtSummary)?.hasSigHashNone ?? false;
-  const hasSigHashSingle = (summary as btcTransaction.PsbtSummary)?.hasSigHashSingle ?? false;
+  /* Send/Transfer Section */
 
-  /* Send/Transfer section */
-
-  const { inputFromPayment, inputFromOrdinal } = getInputsWithAssetsFromUserAddress({
+  const { inputsFromPayment, inputsFromOrdinal } = getInputsWithAssetsFromUserAddress({
     inputs: summary?.inputs,
     btcAddress,
     ordinalsAddress,
@@ -114,10 +133,52 @@ export const useParsedTxSummaryContext = (): {
     ordinalsAddress,
   });
 
+  const showSendBtc = netBtcAmount < 0;
+  // if transaction is not final, then runes will be delegated and will show up in the delegation section
+  const showRuneTransfers = transactionIsFinal && (runeSummary?.transfers ?? []).length > 0;
+  const hasInscriptionsRareSatsInOrdinal =
+    (!transactionIsFinal && inputsFromOrdinal.length > 0) || outputsFromOrdinal.length > 0;
+
+  const showSendOrTransfer = showSendBtc || showRuneTransfers || hasInscriptionsRareSatsInOrdinal;
+  const showSendSection = showSendOrTransfer && transactionIsFinal && !hasExternalInputs;
+  const showTransferSection = showSendOrTransfer && (!transactionIsFinal || hasExternalInputs);
+
+  const bundledOutputs: BundledOutputs = {};
+  if (showSendSection) {
+    summary?.outputs.forEach((output) => {
+      if (output.type === 'script') return;
+      let destinationKey: string;
+      if (output.type === 'address') {
+        if ([ordinalsAddress, btcAddress].includes(output.address)) return; // ignore outputs to own address
+        destinationKey = output.address;
+      } else {
+        // TODO - we can have different destinations of the same type
+        destinationKey = output.type;
+      }
+      bundledOutputs[destinationKey] ||= {
+        outputs: [],
+        netBtcAmount: 0,
+        runeTransfers: [],
+      };
+      if (output.inscriptions.length || (output.satributes.length && hasActivatedRareSatsKey)) {
+        bundledOutputs[destinationKey].outputs =
+          bundledOutputs[destinationKey].outputs.concat(output);
+      } else {
+        bundledOutputs[destinationKey].netBtcAmount += output.amount;
+      }
+    });
+    runeSummary?.transfers.forEach((runeTransfer) => {
+      const outputAddress = runeTransfer.destinationAddresses[0];
+      if (bundledOutputs[outputAddress]) {
+        bundledOutputs[outputAddress].runeTransfers =
+          bundledOutputs[outputAddress].runeTransfers.concat(runeTransfer);
+      }
+    });
+  }
   // TODO move to utils
   const inscriptionsFromPayment: btcTransaction.IOInscription[] = [];
   const satributesFromPayment: btcTransaction.IOSatribute[] = [];
-  (transactionIsFinal ? outputsFromPayment : inputFromPayment).forEach(
+  (transactionIsFinal ? outputsFromPayment : inputsFromPayment).forEach(
     (
       item:
         | btcTransaction.EnhancedInput
@@ -129,17 +190,8 @@ export const useParsedTxSummaryContext = (): {
     },
   );
 
-  const showSendBtcAmount = netBtcAmount < 0;
-
-  // if transaction is not final, then runes will be delegated and will show up in the delegation section
-  const showRuneTransfers = transactionIsFinal && (runeSummary?.transfers ?? []).length > 0;
-
-  const hasInscriptionsRareSatsInOrdinal =
-    (!transactionIsFinal && inputFromOrdinal.length > 0) || outputsFromOrdinal.length > 0;
-
   /* Receive section */
 
-  const showReceiveBtcAmount = netBtcAmount > 0;
   const { outputsToPayment, outputsToOrdinal } = getOutputsWithAssetsToUserAddress({
     outputs: summary?.outputs,
     btcAddress,
@@ -174,9 +226,16 @@ export const useParsedTxSummaryContext = (): {
   // if transaction is not final, then runes will be delegated and will show up in the delegation section
   const showPaymentRunes = !!(transactionIsFinal && paymentRuneReceipts.length);
 
+  const showReceiveBtc = netBtcAmount > 0;
+  const showOrdinalSection = showOrdinalRunes || outputsToOrdinal.length > 0;
+  const showPaymentSection =
+    showReceiveBtc || showPaymentRunes || inscriptionsRareSatsInPayment.length > 0;
+  const showReceiveSection = showOrdinalSection || showPaymentSection;
+
   return {
     summary,
     runeSummary,
+    brc20Summary,
     hasExternalInputs,
     hasInsufficientRunes,
     hasOutputScript,
@@ -187,21 +246,26 @@ export const useParsedTxSummaryContext = (): {
     showCenotaphCallout,
     transactionIsFinal,
     validMintingRune,
+    showSendSection,
+    showTransferSection,
+    showReceiveSection,
     sendSection: {
-      showSendSection: showSendBtcAmount || showRuneTransfers || hasInscriptionsRareSatsInOrdinal,
-      showBtcAmount: showSendBtcAmount,
+      bundledOutputs,
+      inscriptionsFromPayment,
+      satributesFromPayment,
+    },
+    transferSection: {
+      showBtcAmount: showSendBtc,
       showRuneTransfers,
-      hasInscriptionsRareSatsInOrdinal,
+      inputsFromOrdinal,
       outputsFromOrdinal,
-      inputFromOrdinal,
       inscriptionsFromPayment,
       satributesFromPayment,
     },
     receiveSection: {
-      showOrdinalSection: showOrdinalRunes || outputsToOrdinal.length > 0,
-      showPaymentSection:
-        showReceiveBtcAmount || showPaymentRunes || inscriptionsRareSatsInPayment.length > 0,
-      showBtcAmount: showReceiveBtcAmount,
+      showOrdinalSection,
+      showPaymentSection,
+      showBtcAmount: showReceiveBtc,
       inscriptionsRareSatsInPayment,
       ordinalRuneReceipts,
       outputsToOrdinal,

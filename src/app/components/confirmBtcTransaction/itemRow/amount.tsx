@@ -42,6 +42,8 @@ export default function Amount({ amount }: Props) {
   const { btcFiatRate } = useCoinRates();
   const { t } = useTranslation('translation');
 
+  if (!amount) return null;
+
   return (
     <RowCenter>
       <TokenImage currency="BTC" loading={false} size={32} />

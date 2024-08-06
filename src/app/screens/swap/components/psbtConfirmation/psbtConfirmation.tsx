@@ -65,7 +65,7 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
           currency: 'BTC',
           errorTitle: '',
           error,
-          browserTx: true,
+          browserTx: false,
         },
       });
     }
@@ -143,7 +143,7 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
           txid: orderResponse.txid,
           currency: 'BTC',
           error: '',
-          browserTx: true,
+          browserTx: false,
         },
       });
     } catch (err) {
@@ -155,7 +155,7 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
             currency: 'BTC',
             errorTitle: '',
             error: err.message,
-            browserTx: true,
+            browserTx: false,
           },
         });
       }

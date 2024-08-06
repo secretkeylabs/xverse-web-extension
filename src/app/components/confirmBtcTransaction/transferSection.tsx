@@ -23,7 +23,7 @@ const Container = styled.div((props) => ({
   flexDirection: 'column',
   background: props.theme.colors.elevation1,
   borderRadius: props.theme.radius(2),
-  padding: `${props.theme.space.m} 0 20px`,
+  paddingTop: props.theme.space.m,
   justifyContent: 'center',
   marginBottom: props.theme.space.s,
 }));
@@ -51,82 +51,83 @@ function TransferSection({ onShowInscription }: Props) {
   const {
     runeSummary,
     netBtcAmount,
+    showTransferSection,
     transactionIsFinal,
-    sendSection: {
-      showSendSection,
+    transferSection: {
       showBtcAmount,
       showRuneTransfers,
-      hasInscriptionsRareSatsInOrdinal,
       outputsFromOrdinal,
-      inputFromOrdinal,
+      inputsFromOrdinal,
       inscriptionsFromPayment,
       satributesFromPayment,
     },
   } = useParsedTxSummaryContext();
 
-  if (!showSendSection) return null;
+  if (!showTransferSection) return null;
 
   return (
     <>
       <Title>{t('CONFIRM_TRANSACTION.YOU_WILL_TRANSFER')}</Title>
       <Container>
-        {showBtcAmount && (
-          <RowContainer noMargin>
-            <Amount amount={-netBtcAmount} />
-            <AmountWithInscriptionSatribute
-              inscriptions={inscriptionsFromPayment}
-              satributes={satributesFromPayment}
-              onShowInscription={onShowInscription}
-            />
-            <WarningContainer>
-              <WarningOctagon weight="fill" color={Theme.colors.caution} size={16} />
-              <WarningText typography="body_medium_s" color="caution">
-                {t('CONFIRM_TRANSACTION.BTC_TRANSFER_WARNING')}
-              </WarningText>
-            </WarningContainer>
-          </RowContainer>
-        )}
-        {showRuneTransfers &&
-          runeSummary?.transfers?.map((transfer, index) => (
+        <RowContainer noMargin>
+          {showBtcAmount && (
             <>
-              {showBtcAmount && <Divider verticalMargin="s" />}
-              <RowContainer key={transfer.runeName}>
-                <RuneAmount rune={transfer} hasSufficientBalance={transfer.hasSufficientBalance} />
-              </RowContainer>
-              {runeSummary?.transfers.length > index + 1 && <Divider verticalMargin="s" />}
+              <Amount amount={-netBtcAmount} />
+              <AmountWithInscriptionSatribute
+                inscriptions={inscriptionsFromPayment}
+                satributes={satributesFromPayment}
+                onShowInscription={onShowInscription}
+              />
+              <WarningContainer>
+                <WarningOctagon weight="fill" color={Theme.colors.caution} size={16} />
+                <WarningText typography="body_medium_s" color="caution">
+                  {t('CONFIRM_TRANSACTION.BTC_TRANSFER_WARNING')}
+                </WarningText>
+              </WarningContainer>
             </>
-          ))}
-        {hasInscriptionsRareSatsInOrdinal && (
-          <RowContainer noPadding noMargin={showRuneTransfers || showBtcAmount}>
-            {!transactionIsFinal
-              ? inputFromOrdinal.map((input, index) => (
+          )}
+          {showRuneTransfers &&
+            runeSummary?.transfers?.map((transfer, index) => (
+              <>
+                {showBtcAmount && index === 0 && <Divider verticalMargin="s" />}
+                <RuneAmount rune={transfer} hasSufficientBalance={transfer.hasSufficientBalance} />
+                {runeSummary?.transfers.length > index + 1 && <Divider verticalMargin="s" />}
+              </>
+            ))}
+          {transactionIsFinal
+            ? outputsFromOrdinal.map((output, index) => (
+                <>
+                  {(showRuneTransfers || showBtcAmount) && index === 0 && (
+                    <Divider verticalMargin="s" />
+                  )}
                   <InscriptionSatributeRow
                     // eslint-disable-next-line react/no-array-index-key
                     key={index}
-                    hasExternalInputs
-                    inscriptions={input.inscriptions}
-                    satributes={input.satributes}
-                    amount={input.extendedUtxo.utxo.value}
-                    onShowInscription={onShowInscription}
-                    showTopDivider={(showRuneTransfers || showBtcAmount) && index === 0}
-                    showBottomDivider={inputFromOrdinal.length > index + 1}
-                  />
-                ))
-              : outputsFromOrdinal.map((output, index) => (
-                  <InscriptionSatributeRow
-                    // eslint-disable-next-line react/no-array-index-key
-                    key={index}
-                    hasExternalInputs
                     inscriptions={output.inscriptions}
                     satributes={output.satributes}
                     amount={output.amount}
                     onShowInscription={onShowInscription}
-                    showTopDivider={(showRuneTransfers || showBtcAmount) && index === 0}
-                    showBottomDivider={outputsFromOrdinal.length > index + 1}
                   />
-                ))}
-          </RowContainer>
-        )}
+                  {outputsFromOrdinal.length > index + 1 && <Divider verticalMargin="s" />}
+                </>
+              ))
+            : inputsFromOrdinal.map((input, index) => (
+                <>
+                  {(showRuneTransfers || showBtcAmount) && index === 0 && (
+                    <Divider verticalMargin="s" />
+                  )}
+                  <InscriptionSatributeRow
+                    // eslint-disable-next-line react/no-array-index-key
+                    key={index}
+                    inscriptions={input.inscriptions}
+                    satributes={input.satributes}
+                    amount={input.extendedUtxo.utxo.value}
+                    onShowInscription={onShowInscription}
+                  />
+                  {inputsFromOrdinal.length > index + 1 && <Divider verticalMargin="s" />}
+                </>
+              ))}
+        </RowContainer>
       </Container>
     </>
   );
