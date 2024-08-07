@@ -1,4 +1,5 @@
 import { expect, test } from '../fixtures/base';
+import { enableCrossChainSwaps } from '../fixtures/helpers';
 import Onboarding from '../pages/onboarding';
 import Wallet from '../pages/wallet';
 
@@ -7,15 +8,7 @@ const strongPW = Onboarding.generateSecurePasswordCrypto();
 test.describe('Swap Flow Visuals', () => {
   // Enables the feature flag for Swap
   test.beforeEach(async ({ page }) => {
-    await page.route('https://api-3.xverse.app/v1/app-features', (route) => {
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          CROSS_CHAIN_SWAPS: { enabled: true },
-        }),
-      });
-    });
+    await enableCrossChainSwaps(page);
   });
 
   test('Check swap page', async ({ page, extensionId }) => {
