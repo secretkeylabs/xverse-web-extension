@@ -1,5 +1,4 @@
 import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
-import BundleItem from '@components/confirmBtcTransactionComponent/bundleItem';
 import { Butterfly } from '@phosphor-icons/react';
 import { animated, config, useSpring } from '@react-spring/web';
 import { StyledP } from '@ui-library/common.styled';
@@ -11,6 +10,7 @@ import styled from 'styled-components';
 import Theme from 'theme';
 import Avatar from '../../../ui-library/avatar';
 import { mapTxSatributeInfoToBundleInfo, type SatRangeTx } from '../utils';
+import BundleItem from './bundleItem';
 
 const SatsBundleContainer = styled.div`
   display: flex;
