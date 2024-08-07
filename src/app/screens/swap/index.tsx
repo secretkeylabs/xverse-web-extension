@@ -324,13 +324,7 @@ export default function SwapScreen() {
   useEffect(() => {
     if (errorMessage) {
       const toastId = toast.custom(
-        <SnackBar
-          text={errorMessage}
-          type="error"
-          actionButtonCallback={() => {
-            toast.remove(toastId);
-          }}
-        />,
+        <SnackBar text={errorMessage} type="error" dismissToast={() => toast.remove(toastId)} />,
         { duration: 3000 },
       );
       // Reset

@@ -3,6 +3,7 @@ import TopRow from '@components/topRow';
 import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import useSearchParamsState from '@hooks/useSearchParamsState';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowRight } from '@phosphor-icons/react';
@@ -23,7 +24,6 @@ import Button from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import { formatNumber } from '@utils/helper';
-import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -178,7 +178,7 @@ export default function QuoteSummary({
   }, [placeOrderError, placeUtxoOrderError]);
 
   const { data: recommendedFees } = useBtcFeeRate();
-  const [feeRate, setFeeRate] = useState('0');
+  const [feeRate, setFeeRate] = useSearchParamsState('feeRate', '0');
   const { data: runeFloorPrice } = useRuneFloorPriceQuery(toToken?.name ?? '');
 
   useEffect(() => {
@@ -198,7 +198,7 @@ export default function QuoteSummary({
     toToken?.protocol === 'btc' ? 'Sats' : toToken?.symbol ?? RUNE_DISPLAY_DEFAULTS.symbol;
 
   const [showSlippageModal, setShowSlippageModal] = useState(false);
-  const [slippage, setSlippage] = useState(0.05);
+  const [slippage, setSlippage] = useSearchParamsState('slippage', 0.05);
 
   const handleSwap = async () => {
     if (!fromToken || !toToken) {

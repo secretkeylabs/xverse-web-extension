@@ -161,9 +161,7 @@ export default function UtxoSelection({
         <SnackBar
           text={errorMessage ?? utxosError?.message}
           type="error"
-          actionButtonCallback={() => {
-            toast.remove(toastId);
-          }}
+          dismissToast={() => toast.remove(toastId)}
         />,
         { duration: 3000 },
       );

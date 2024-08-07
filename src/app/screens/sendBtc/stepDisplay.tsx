@@ -42,8 +42,6 @@ type Props = {
   sendMax: boolean;
   setSendMax: (sendMax: boolean) => void;
   getFeeForFeeRate: (feeRate: number, useEffectiveFeeRate?: boolean) => Promise<number | undefined>;
-  addressEditable: boolean;
-  amountEditable: boolean;
   onConfirm: () => void;
   onBack: () => void;
   onCancel: () => void;
@@ -65,8 +63,6 @@ function StepDisplay({
   sendMax,
   setSendMax,
   getFeeForFeeRate,
-  addressEditable,
-  amountEditable,
   onConfirm,
   onBack,
   onCancel,
@@ -89,7 +85,7 @@ function StepDisplay({
               header={header}
               recipientAddress={recipientAddress}
               setRecipientAddress={setRecipientAddress}
-              onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient, amountEditable))}
+              onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient))}
               isLoading={isLoading}
             />
           </Container>
@@ -110,7 +106,7 @@ function StepDisplay({
               fee={(summary as TransactionSummary)?.fee.toString()}
               getFeeForFeeRate={getFeeForFeeRate}
               dustFiltered={(summary as TransactionSummary)?.dustFiltered ?? false}
-              onNext={() => setCurrentStep(getNextStep(Step.SelectAmount, amountEditable))}
+              onNext={() => setCurrentStep(getNextStep(Step.SelectAmount))}
               hasSufficientFunds={!!summary || isLoading}
               isLoading={isLoading}
             />
