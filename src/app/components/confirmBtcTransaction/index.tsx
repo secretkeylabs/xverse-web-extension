@@ -10,7 +10,7 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import TransportFactory from '@ledgerhq/hw-transport-webusb';
 import type { Transport } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
-import Callout from '@ui-library/callout';
+import Callout, { type CalloutProps } from '@ui-library/callout';
 import { StickyHorizontalSplitButtonContainer, StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
@@ -72,6 +72,7 @@ type Props = {
   feeRate?: number;
   title?: string;
   selectedBottomTab?: Tab;
+  customCallout?: CalloutProps;
 };
 
 function ConfirmBtcTransaction({
@@ -95,6 +96,7 @@ function ConfirmBtcTransaction({
   title,
   selectedBottomTab,
   brc20Summary,
+  customCallout,
 }: Props) {
   const parsedTxSummaryContextValue = useMemo(
     () => ({ summary, runeSummary, brc20Summary }),
@@ -198,6 +200,7 @@ function ConfirmBtcTransaction({
           />
         )}
         {!isBroadcast && <SpacedCallout bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />}
+        {customCallout && <Callout {...customCallout} />}
         <TransactionSummary
           getFeeForFeeRate={getFeeForFeeRate}
           onFeeRateSet={onFeeRateSet}

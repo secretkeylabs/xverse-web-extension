@@ -183,6 +183,13 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
     );
   }
 
+  const quoteExpiryCallout =
+    orderInfo.providerCode === 'dotswap'
+      ? {
+          bodyText: t('QUOTE_EXPIRES_IN', { seconds: 30 }),
+        }
+      : undefined;
+
   return (
     <ConfirmBtcTransaction
       summary={summary}
@@ -197,6 +204,7 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
       onBackClick={onClose}
       hideBottomBar
       showAccountHeader={false}
+      customCallout={quoteExpiryCallout}
     />
   );
 }
