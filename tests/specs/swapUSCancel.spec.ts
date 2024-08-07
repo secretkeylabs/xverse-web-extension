@@ -17,7 +17,7 @@ test.describe('Swap Flow Unisat', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
     // get own BTC Address
-    const selfBTC = await wallet.getAddress(0);
+    const selfBTC = await wallet.getAddress('Bitcoin');
 
     await wallet.checkVisualsStartpage();
 
@@ -94,31 +94,7 @@ test.describe('Swap Flow Unisat', () => {
     // We can only continue if the FeeRate is above 0
     await wallet.waitForTextAboveZero(wallet.feeAmount, 30000);
 
-    // Save the current fee amount for comparison
-    const originalFee = await wallet.feeAmount.innerText();
-    const numericOriginalFee = parseFloat(originalFee.replace(/[^0-9.]/g, ''));
-    await expect(numericOriginalFee).toBeGreaterThan(0);
-
-    // Click on edit Fee button
-    await wallet.buttonEditFee.click();
-    await expect(wallet.buttonSelectFee.first()).toBeVisible();
-    await expect(wallet.labelTotalFee.first()).toBeVisible();
-
-    // Compare medium fee to previous saved fee
-    const mediumFee = await wallet.labelTotalFee.last().innerText();
-    const numericMediumFee = parseFloat(mediumFee.replace(/[^0-9.]/g, ''));
-    await expect(numericMediumFee).toBe(numericOriginalFee);
-
-    // Save high fee rate for comparison
-    const highFee = await wallet.labelTotalFee.first().innerText();
-    const numericHighFee = parseFloat(highFee.replace(/[^0-9.]/g, ''));
-
-    // Switch to high fee
-    await wallet.buttonSelectFee.first().click();
-
-    const newFee = await wallet.feeAmount.innerText();
-    const numericNewFee = parseFloat(newFee.replace(/[^0-9.]/g, ''));
-    await expect(numericNewFee).toBe(numericHighFee);
+    await wallet.switchToHighFees();
 
     await wallet.buttonSwap.click();
     await wallet.checkVisualsSendTransactionReview('swap', false, selfBTC);

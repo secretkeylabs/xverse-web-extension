@@ -12,8 +12,8 @@ test.describe('Send runes', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
     // get own BTC  & Ordinals Address for address check on review page
-    const selfBTC = await wallet.getAddress(0);
-    const addressOrdinals = await wallet.getAddress(1);
+    const selfBTC = await wallet.getAddress('Bitcoin');
+    const addressOrdinals = await wallet.getAddress('Ordinals');
 
     // Check if Rune is enabled and if not enable the rune and click on it
     await wallet.checkAndClickOnSpecificRune(runeName);
@@ -52,6 +52,9 @@ test.describe('Send runes', () => {
     const sendRuneAmount = await wallet.sendRuneAmount.innerText();
     const sendAmountNumerical = parseFloat(sendRuneAmount.replace(/[^0-9.]/g, ''));
     await expect(price1).toEqual(sendAmountNumerical);
+
+    // TODO: this function doesn't work for the rune fee change on the review transaction page as the changed fee is too slow for the E2E
+    // await wallet.switchToHighFees();
 
     // Cancel the transaction
     await expect(wallet.buttonCancel).toBeEnabled();

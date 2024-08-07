@@ -114,7 +114,7 @@ function ReceiveCardComponent({
   };
 
   return (
-    <ReceiveCard className={className}>
+    <ReceiveCard data-testid="address-div" className={className}>
       <ColumnContainer>
         {children}
         <TitleText>{title}</TitleText>

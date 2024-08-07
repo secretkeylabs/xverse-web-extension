@@ -13,7 +13,7 @@ test.describe('Transaction BTC', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS2', false);
 
     // get own BTC  & Ordinals Address for address check on review page
-    const selfBTC = await wallet.getAddress(0);
+    const selfBTC = await wallet.getAddress('Bitcoin');
 
     // Save initial Balance for later Balance checks
     const initialBTCBalance = await wallet.getTokenBalance('Bitcoin');
@@ -59,7 +59,7 @@ test.describe('Transaction BTC', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
     // get own BTC Address
-    const selfBTCTest = await wallet.getAddress(0);
+    const selfBTCTest = await wallet.getAddress('Bitcoin');
 
     // Save initial Balance for later Balance checks
     const initialBTCBalance = await wallet.getTokenBalance('Bitcoin');
@@ -102,6 +102,8 @@ test.describe('Transaction BTC', () => {
     // Check correct amounts
     await wallet.checkAmountsSendingBTC(selfBTCTest, BTCTest, amountBTCSend);
 
+    await wallet.switchToHighFees();
+
     // Cancel the transaction
     await expect(wallet.buttonCancel).toBeEnabled();
     await wallet.buttonCancel.click();
@@ -120,7 +122,7 @@ test.describe('Transaction BTC', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
     // get own BTC Address
-    const selfBTCTest = await wallet.getAddress(0);
+    const selfBTCTest = await wallet.getAddress('Bitcoin');
 
     // Save initial Balance for later Balance checks
     const initialBTCBalance = await wallet.getTokenBalance('Bitcoin');
@@ -166,6 +168,4 @@ test.describe('Transaction BTC', () => {
     const balanceAfterCancel = await wallet.getTokenBalance('Bitcoin');
     await expect(initialBTCBalance).toEqual(balanceAfterCancel);
   });
-
-  // TODO: add test where we change the fees for a BTC transaction
 });

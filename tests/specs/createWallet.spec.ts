@@ -76,9 +76,9 @@ test.describe('Create and Restore Wallet Flow', () => {
       await expect(newWallet.balance).toHaveText('$0.00');
 
       // Get the addresses and save it in variables
-      const addressBitcoin = await newWallet.getAddress(0);
-      const addressOrdinals = await newWallet.getAddress(1);
-      const addressStack = await newWallet.getAddress(2);
+      const addressBitcoin = await newWallet.getAddress('Bitcoin');
+      const addressOrdinals = await newWallet.getAddress('Ordinals');
+      const addressStack = await newWallet.getAddress('Stacks');
 
       // Save the Address in a file so that other tests can access them
       const dataAddress = JSON.stringify({
@@ -140,9 +140,9 @@ test.describe('Create and Restore Wallet Flow', () => {
       await await expect(balanceText).toHaveText('$0.00');
 
       // Get the Addresses
-      const addressBitcoinCheck = await newWallet.getAddress(0);
-      const addressOrdinalsCheck = await newWallet.getAddress(1);
-      const addressStackCheck = await newWallet.getAddress(2);
+      const addressBitcoinCheck = await newWallet.getAddress('Bitcoin');
+      const addressOrdinalsCheck = await newWallet.getAddress('Ordinals');
+      const addressStackCheck = await newWallet.getAddress('Stacks');
 
       // Read and parse the file
       const rawData = fs.readFileSync(filePathAddresses, 'utf8');

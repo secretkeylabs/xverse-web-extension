@@ -87,7 +87,6 @@ export default class Onboarding {
     this.secondParagraphBackupStep = page.getByRole('heading', { name: 'Confirm you' });
     this.textSeedWords = page.locator('p[translate="no"]');
     this.buttonSeedWords = page.locator('button[value]:not([value=""])');
-    // TODO: find more stable selector
     this.header = page.locator('#app h3');
     this.inputPassword = page.locator('input[type="password"]');
     this.errorMessage = page.getByRole('heading', { name: 'Your password should be at' });

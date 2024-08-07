@@ -20,7 +20,7 @@ test.describe('Swap Flow ME', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
     // get own BTC Address
-    const selfBTC = await wallet.getAddress(0);
+    const selfBTC = await wallet.getAddress('Bitcoin');
 
     await wallet.checkVisualsStartpage();
 

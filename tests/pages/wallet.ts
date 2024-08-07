@@ -354,6 +354,10 @@ export default class Wallet {
 
   readonly containerQRCode: Locator;
 
+  readonly labelFeePriority: Locator;
+
+  readonly divAddress: Locator;
+
   constructor(readonly page: Page) {
     this.page = page;
     this.navigationDashboard = page.getByTestId('nav-dashboard');
@@ -376,6 +380,7 @@ export default class Wallet {
     this.feeAmount = page.getByTestId('fee-amount');
     this.buttonSelectFee = page.getByTestId('fee-select-button');
     this.labelTotalFee = page.getByTestId('total-fee');
+    this.labelFeePriority = page.getByTestId('fee-priority');
 
     // Account
     this.labelAccountName = page.getByLabel('Account Name');
@@ -484,6 +489,7 @@ export default class Wallet {
     // Receive
     this.buttonQRAddress = page.getByTestId('qr-button');
     this.labelAddress = page.getByTestId('address-label');
+    this.divAddress = page.getByTestId('address-div');
     this.containerQRCode = page.getByTestId('qr-container');
 
     // Swap
@@ -546,7 +552,6 @@ export default class Wallet {
     this.sendSTXValue = page.getByTestId('send-value');
     this.inputField = page.locator('input[type="text"]');
     this.sendRuneAmount = page.getByTestId('send-rune-amount');
-    //
 
     // List
     this.buttonList = page.getByTestId('action-button').filter({ hasText: 'List' });
@@ -629,29 +634,6 @@ export default class Wallet {
     await expect(this.buttonBack).toBeVisible();
   }
 
-  async checkVisualsSendInscriptionsPage2(ordinalAddress, ordinalNumber, collection) {
-    await expect(this.buttonExpand).toBeVisible();
-    await expect(this.buttonCancel).toBeEnabled();
-    await expect(this.buttonConfirm).toBeEnabled();
-    await expect(this.buttonEditFee).toBeVisible();
-    await expect(this.feeAmount).toBeVisible();
-    await expect(this.imageToken).toBeVisible();
-
-    await this.buttonExpand.click();
-    await expect(this.sendAddress.first()).toBeVisible();
-    await expect(this.receiveAddress.first()).toBeVisible();
-    await expect(this.confirmAmount.first()).toBeVisible();
-    await expect(this.confirmBalance.first()).toBeVisible();
-    await expect(await this.receiveAddress.first().innerText()).toContain(ordinalAddress.slice(-4));
-
-    // Collection Inscriptions don't have the ordinal number displayed in the Review
-    // Check if the right ordinal number is shown
-    if (!collection) {
-      const reviewNumberOrdinal = await this.numberInscription.first().innerText();
-      await expect(ordinalNumber).toMatch(reviewNumberOrdinal);
-    }
-  }
-
   /**
    * Checks the visibility and state of UI elements state on first page in Send Flow
    *
@@ -703,7 +685,17 @@ export default class Wallet {
     // await expect(this.buttonBack).toBeVisible();
   }
 
-  // SendAddress or receiveAddress can be null as not all TR screens have them e.g. swap
+  /**
+   * Checks the visuals and elements on the send transaction review page.
+   *
+   * @param {string} url - The expected partial URL of the review page.
+   * @param {boolean} editableFees - Optional. Indicates whether the fees can be edited on the Review page
+   * @param {string} sendAddress - Optional. The expected last 4 characters of the sender's address
+   * @param {string} receiverAddress - Optional. The expected last 4 characters of the receiver's address
+   * @param {boolean} totalAmountShown - Optional. Indicates whether the total amount is shown. Default is true.
+   * @param {boolean} tokenImageShown - Optional. Indicates whether the token image is shown. Default is true.
+   * @param {string} ordinalNumber - Optional. The expected ordinal number to be displayed for single Inscriptions
+   */
   async checkVisualsSendTransactionReview(
     url: string,
     editableFees?: boolean,
@@ -711,6 +703,7 @@ export default class Wallet {
     receiverAddress?: string,
     totalAmountShown: boolean = true,
     tokenImageShown: boolean = true,
+    ordinalNumber?: string,
   ) {
     await expect(this.page.url()).toContain(url);
     await expect(this.buttonExpand).toBeVisible();
@@ -748,6 +741,12 @@ export default class Wallet {
       await expect(await this.receiveAddress.first().innerText()).toContain(
         receiverAddress.slice(-4),
       );
+    }
+    // Collection Inscriptions don't have the ordinal number displayed in the Review
+    // Check if the right ordinal number is shown
+    if (ordinalNumber) {
+      const reviewNumberOrdinal = await this.numberInscription.first().innerText();
+      await expect(ordinalNumber).toMatch(reviewNumberOrdinal);
     }
   }
 
@@ -857,6 +856,40 @@ export default class Wallet {
     await expect(this.buttonNext).toBeDisabled();
   }
 
+  // had to disable this rule as my first assertion was always changed to a wrong assertion
+  /* eslint-disable playwright/prefer-web-first-assertions */
+  async switchToHighFees() {
+    // Save the current fee amount for comparison
+    const originalFee = await this.feeAmount.innerText();
+    const numericOriginalFee = parseFloat(originalFee.replace(/[^0-9.]/g, ''));
+    await expect(numericOriginalFee).toBeGreaterThan(0);
+    const feePriority = await this.labelFeePriority.innerText();
+
+    // Click on edit Fee button
+    await this.buttonEditFee.click();
+    await expect(this.buttonSelectFee.first()).toBeVisible();
+    await expect(this.labelTotalFee.first()).toBeVisible();
+
+    // Compare fee to previous saved fee
+    const fee = await this.buttonSelectFee
+      .filter({ hasText: feePriority })
+      .locator(this.labelTotalFee)
+      .innerText();
+    const numericFee = parseFloat(fee.replace(/[^0-9.]/g, ''));
+    await expect(numericFee).toBe(numericOriginalFee);
+
+    // Save high fee rate for comparison
+    const highFee = await this.labelTotalFee.first().innerText();
+    const numericHighFee = parseFloat(highFee.replace(/[^0-9.]/g, ''));
+
+    // Switch to high fee
+    await this.buttonSelectFee.first().click();
+
+    const newFee = await this.feeAmount.innerText();
+    const numericNewFee = parseFloat(newFee.replace(/[^0-9.]/g, ''));
+    await expect(numericNewFee).toBe(numericHighFee);
+  }
+
   async navigateToCollectibles() {
     await this.navigationNFT.click();
     await expect(this.page.url()).toContain('nft-dashboard');
@@ -921,9 +954,11 @@ export default class Wallet {
     // click on 'Receive' button
     await this.allUpperButtons.nth(1).click();
 
+    // Locate the QR button to the address
+    const button = this.divAddress.filter({ hasText: whichAddress }).locator(this.buttonQRAddress);
+
     // Need to click on the QR Code button to get the full Address
-    // TODO change it to name of the Address instead of index
-    await this.buttonQRAddress.nth(whichAddress).click();
+    await button.click();
     await expect(this.containerQRCode).toBeVisible();
 
     const address = await this.labelAddress.innerText();
@@ -1138,8 +1173,8 @@ export default class Wallet {
   }
 
   // The function toggleAllTokens takes a boolean parameter enable.
-  //	•	true indicates enabling token (using inactive tokens).
-  //	•	false indicates disabling token (using active tokens).
+  //	true indicates enabling token (using inactive tokens).
+  //	false indicates disabling token (using active tokens).
   async toggleAllTokens(enable: boolean) {
     // Determine which tokens to interact with based on the 'enable' parameter
     const tokenSelector = enable ? this.checkboxTokenInactive : this.checkboxTokenActive;

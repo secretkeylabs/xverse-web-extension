@@ -11,7 +11,7 @@ test.describe('Transaction STX', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
     // get own STX Address
-    const selfSTXMain = await wallet.getAddress(2);
+    const selfSTXMain = await wallet.getAddress('Stacks');
 
     await wallet.checkVisualsStartpage();
 
@@ -91,6 +91,8 @@ test.describe('Transaction STX', () => {
     // Check correct amounts
     await wallet.checkAmountsSendingSTX(amountSTXSend, STXTest, sendFee);
 
+    await wallet.switchToHighFees();
+
     // Cancel the transaction
     await expect(wallet.buttonCancel).toBeEnabled();
     await wallet.buttonCancel.click();
@@ -103,7 +105,6 @@ test.describe('Transaction STX', () => {
     await expect(initialSTXBalance).toEqual(balanceAfterCancel);
   });
 
-  // TODO: need to add Stack funds to the wallet, testnet is currently not avaiable
   test('Send STX - confirm transaction testnet #localexecution', async ({ page, extensionId }) => {
     // Restore wallet and setup Testnet network
     const wallet = new Wallet(page);
@@ -156,6 +157,4 @@ test.describe('Transaction STX', () => {
 
     // Can't check amounts or transaction as E2E test is faster than the UI or API to how that transaction --> has to be checked manually
   });
-
-  // TODO: add test where we change the fees for a STX transaction
 });
