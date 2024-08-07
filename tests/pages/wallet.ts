@@ -630,8 +630,6 @@ export default class Wallet {
   }
 
   async checkVisualsSendInscriptionsPage2(ordinalAddress, ordinalNumber, collection) {
-    await expect(this.confirmTotalAmount).toBeVisible();
-    await expect(this.confirmCurrencyAmount).toBeVisible();
     await expect(this.buttonExpand).toBeVisible();
     await expect(this.buttonCancel).toBeEnabled();
     await expect(this.buttonConfirm).toBeEnabled();
@@ -711,26 +709,34 @@ export default class Wallet {
     editableFees?: boolean,
     sendAddress?: string,
     receiverAddress?: string,
+    totalAmountShown: boolean = true,
+    tokenImageShown: boolean = true,
   ) {
     await expect(this.page.url()).toContain(url);
-    await expect(this.confirmTotalAmount).toBeVisible();
-    await expect(this.confirmCurrencyAmount).toBeVisible();
     await expect(this.buttonExpand).toBeVisible();
     await expect(this.buttonCancel).toBeEnabled();
     await expect(this.buttonConfirm).toBeEnabled();
-
     await expect(this.feeAmount).toBeVisible();
-    await expect(this.imageToken.first()).toBeVisible();
+
+    // Not all TX Screens show a total amount
+    if (totalAmountShown) {
+      await expect(this.confirmTotalAmount).toBeVisible();
+      await expect(this.confirmCurrencyAmount).toBeVisible();
+    }
+
+    if (tokenImageShown) {
+      await expect(this.imageToken.first()).toBeVisible();
+    }
+
+    if (editableFees) {
+      await expect(this.buttonEditFee).toBeVisible();
+    }
 
     await this.buttonExpand.click();
     await expect(this.sendAddress.first()).toBeVisible();
     await expect(this.receiveAddress.first()).toBeVisible();
     await expect(this.confirmAmount.first()).toBeVisible();
     await expect(this.confirmBalance.first()).toBeVisible();
-
-    if (editableFees) {
-      await expect(this.buttonEditFee).toBeVisible();
-    }
 
     // Execute these checks only if sendAddress is provided
     if (sendAddress) {

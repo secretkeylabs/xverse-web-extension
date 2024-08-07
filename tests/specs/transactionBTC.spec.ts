@@ -53,7 +53,7 @@ test.describe('Transaction BTC', () => {
     await expect(initialBTCBalance).toEqual(displayBalanceNumerical);
   });
 
-  test('Send BTC - Cancel transaction testnet', async ({ page, extensionId }) => {
+  test('Cancel BTC transaction testnet', async ({ page, extensionId }) => {
     // Restore wallet and setup Testnet network
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
@@ -114,7 +114,7 @@ test.describe('Transaction BTC', () => {
     await expect(initialBTCBalance).toEqual(balanceAfterCancel);
   });
 
-  test('Send BTC - confirm transaction testnet #localexecution', async ({ page, extensionId }) => {
+  test('Confirm BTC transaction testnet #localexecution', async ({ page, extensionId }) => {
     // Restore wallet and setup Testnet network
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);

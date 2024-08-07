@@ -63,6 +63,8 @@ test.describe('Collectibles Tab - Rare sats', () => {
       false,
       addressOrdinals,
       addressOrdinals,
+      false,
+      false,
     );
 
     // Cancel the transaction
@@ -112,6 +114,8 @@ test.describe('Collectibles Tab - Rare sats', () => {
       false,
       addressOrdinals,
       addressOrdinals,
+      false,
+      false,
     );
 
     await wallet.confirmSendTransaction();

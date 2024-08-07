@@ -9,7 +9,7 @@ test.describe('Swap Flow ME', () => {
   });
 
   const marketplace = 'Magic Eden';
-  const token = 'MONEY';
+  const token = 'THE•MONEY•BEES';
 
   test('Swap token via ME with standard fee mainnet #localexecution', async ({
     page,
@@ -43,7 +43,8 @@ test.describe('Swap Flow ME', () => {
     // Had problems with loading of all tokens so I check that a 'DOG' is loaded
     await expect(wallet.labelTokenSubtitle.getByText('DOG').first()).toBeVisible();
     await expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
-    await wallet.divTokenRow.filter({ hasText: token }).click();
+    await wallet.inputField.fill(token);
+    await wallet.divTokenRow.filter({ hasText: token }).first().click();
     await expect(wallet.nameToken.last()).not.toContainText('Select asset');
     await expect(wallet.imageToken.last()).toBeVisible();
     await expect(wallet.buttonGetQuotes).toBeDisabled();
