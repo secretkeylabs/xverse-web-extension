@@ -2,10 +2,17 @@ import { getPopupPayload } from '@common/utils/popup';
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import { sendUserRejectionMessage } from '@common/utils/rpc/responseMessages/errors';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import useHasFeature from '@hooks/useHasFeature';
 import useTransactionContext from '@hooks/useTransactionContext';
 import { RpcErrorCode, sendInscriptionsSchema } from '@sats-connect/core';
 import { type TransactionSummary } from '@screens/sendBtc/helpers';
-import { btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
+import {
+  btcTransaction,
+  FeatureId,
+  parseSummaryForRunes,
+  type RuneSummary,
+  type Transport,
+} from '@secretkeylabs/xverse-core';
 import { useEffect, useState } from 'react';
 import * as v from 'valibot';
 
@@ -28,8 +35,11 @@ const useSendInscriptions = () => {
   const [feeRate, setFeeRate] = useState<string>('');
   const [transaction, setTransaction] = useState<btcTransaction.EnhancedTransaction | undefined>();
   const [summary, setSummary] = useState<TransactionSummary | undefined>();
+  const [runeSummary, setRuneSummary] = useState<RuneSummary | undefined>();
+
   const [isExecuting, setIsExecuting] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const hasRunesSupport = useHasFeature(FeatureId.RUNES_SUPPORT);
   const {
     popupPayloadSendInscriptions: {
       context: { tabId },
@@ -63,6 +73,9 @@ const useSendInscriptions = () => {
       setFeeRate(desiredFeeRate.toString());
       setTransaction(tx);
       setSummary(txSummary);
+      if (hasRunesSupport) {
+        setRuneSummary(await parseSummaryForRunes(txContext, txSummary, txContext.network));
+      }
     } catch (e) {
       setTransaction(undefined);
       setSummary(undefined);
@@ -131,6 +144,7 @@ const useSendInscriptions = () => {
   return {
     transaction,
     summary,
+    runeSummary,
     txError,
     feeRate,
     isLoading,

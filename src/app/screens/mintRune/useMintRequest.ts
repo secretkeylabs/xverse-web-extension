@@ -2,7 +2,7 @@ import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/u
 import useOrdinalsServiceApi from '@hooks/apiClients/useOrdinalsServiceApi';
 import useRunesApi from '@hooks/apiClients/useRunesApi';
 import useTransactionContext from '@hooks/useTransactionContext';
-import { RpcErrorCode, type Params } from '@sats-connect/core';
+import { RpcErrorCode, type MintRunesParams, type Params } from '@sats-connect/core';
 import { generateTransaction, type TransactionBuildPayload } from '@screens/sendBtc/helpers';
 import { type Rune, type Transport } from '@secretkeylabs/xverse-core';
 import { useState } from 'react';
@@ -17,12 +17,22 @@ const useRuneMintRequestParams = () => {
   const payloadToken = params.get('payload') ?? '';
 
   const payload = SuperJSON.parse<Params<'runes_mint'>>(payloadToken);
-  const mintRequest = { ...payload, network: undefined };
+  const mintRequest = { ...payload };
 
   return { mintRequest, tabId, requestId, network: payload.network };
 };
 
-const useMintRequest = () => {
+const useMintRequest = (): {
+  runeInfo: Rune | null;
+  mintRequest: MintRunesParams;
+  orderTx: TransactionBuildPayload | null;
+  mintError: { code: number | undefined; message: string } | null;
+  feeRate: string;
+  isExecuting: boolean;
+  handleMint: () => Promise<void>;
+  payAndConfirmMintRequest: (ledgerTransport?: Transport) => Promise<any>;
+  cancelMintRequest: () => Promise<void>;
+} => {
   const { mintRequest, requestId, tabId } = useRuneMintRequestParams();
   const txContext = useTransactionContext();
   const ordinalsServiceApi = useOrdinalsServiceApi();

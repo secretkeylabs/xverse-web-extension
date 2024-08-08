@@ -1,4 +1,4 @@
-import ConfirmBitcoinTransaction from '@components/confirmBtcTransaction';
+import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RequestError from '@components/requests/requestError';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
@@ -65,7 +65,7 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
           currency: 'BTC',
           errorTitle: '',
           error,
-          browserTx: true,
+          browserTx: false,
         },
       });
     }
@@ -143,7 +143,7 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
           txid: orderResponse.txid,
           currency: 'BTC',
           error: '',
-          browserTx: true,
+          browserTx: false,
         },
       });
     } catch (err) {
@@ -155,7 +155,7 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
             currency: 'BTC',
             errorTitle: '',
             error: err.message,
-            browserTx: true,
+            browserTx: false,
           },
         });
       }
@@ -177,18 +177,12 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
   }
 
   return (
-    <ConfirmBitcoinTransaction
-      inputs={summary?.inputs ?? []}
-      outputs={summary?.outputs ?? []}
-      feeOutput={summary?.feeOutput}
-      showCenotaphCallout={!!summary?.runeOp?.Cenotaph?.flaws}
+    <ConfirmBtcTransaction
+      summary={summary}
       runeSummary={runeSummary}
       isLoading={isLoading}
       isSubmitting={isSigning}
       isBroadcast
-      isFinal={summary?.isFinal}
-      hasSigHashSingle={summary?.hasSigHashSingle}
-      hasSigHashNone={summary?.hasSigHashNone}
       confirmText={t('CONFIRM')}
       cancelText={t('CANCEL')}
       onCancel={onCancel}

@@ -1,10 +1,16 @@
 import OrdinalIcon from '@assets/img/rareSats/ic_ordinal_small_over_card.svg';
 import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RecipientSelector from '@components/recipientSelector';
+import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import type { TransactionSummary } from '@screens/sendBtc/helpers';
-import type { Inscription } from '@secretkeylabs/xverse-core';
+import { getBrc20Details, type Inscription, type RuneSummary } from '@secretkeylabs/xverse-core';
 import Avatar from '@ui-library/avatar';
+import {
+  getInscriptionsCollectionGridItemSubText,
+  getInscriptionsCollectionGridItemSubTextColor,
+} from '@utils/inscriptions';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import SendLayout from '../../layouts/sendLayout';
@@ -30,8 +36,9 @@ const Container = styled.div`
 `;
 
 type Props = {
-  ordinal: Inscription;
   summary: TransactionSummary | undefined;
+  runeSummary: RuneSummary | undefined;
+  ordinal?: Inscription;
   currentStep: Step;
   setCurrentStep: (step: Step) => void;
   recipientAddress: string;
@@ -48,8 +55,9 @@ type Props = {
 };
 
 function StepDisplay({
-  ordinal,
   summary,
+  runeSummary,
+  ordinal,
   currentStep,
   setCurrentStep,
   recipientAddress,
@@ -65,12 +73,38 @@ function StepDisplay({
   insufficientFunds,
 }: Props) {
   const { t } = useTranslation('translation');
-  const header = (
+
+  const textContent = useTextOrdinalContent(ordinal);
+  const contentType = ordinal?.content_type ?? '';
+  const brc20Details = useMemo(
+    () => getBrc20Details(textContent!, contentType),
+    [textContent, contentType],
+  );
+  const brc20Status = getInscriptionsCollectionGridItemSubText(ordinal);
+  const brc20StatusColor = getInscriptionsCollectionGridItemSubTextColor(ordinal);
+  const brc20Summary = brc20Details
+    ? {
+        ...brc20Details,
+        status: brc20Status,
+        statusColor: brc20StatusColor,
+      }
+    : undefined;
+
+  let header: React.ReactNode = (
     <TitleContainer>
-      <Avatar src={<OrdinalImage ordinal={ordinal} placeholderIcon={OrdinalIcon} />} />
-      <Title>{t('SEND.SEND')} Ordinal</Title>
+      <Title>{t('SEND.SEND_TO')}</Title>
     </TitleContainer>
   );
+
+  if (ordinal) {
+    header = (
+      <TitleContainer>
+        <Avatar src={<OrdinalImage ordinal={ordinal} placeholderIcon={OrdinalIcon} />} />
+        <Title>{t('SEND.SEND')} Ordinal</Title>
+      </TitleContainer>
+    );
+  }
+
   switch (currentStep) {
     case Step.SelectRecipient:
       return (
@@ -95,10 +129,9 @@ function StepDisplay({
       }
       return (
         <ConfirmBtcTransaction
-          inputs={summary.inputs}
-          outputs={summary.outputs}
-          feeOutput={summary.feeOutput}
-          showCenotaphCallout={!!summary?.runeOp?.Cenotaph?.flaws}
+          summary={summary}
+          runeSummary={runeSummary}
+          brc20Summary={brc20Summary}
           isLoading={false}
           confirmText={t('COMMON.CONFIRM')}
           cancelText={t('COMMON.CANCEL')}

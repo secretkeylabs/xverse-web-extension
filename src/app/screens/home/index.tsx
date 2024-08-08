@@ -147,26 +147,29 @@ function Home() {
         <SnackBar
           text={t('TOKEN_HIDDEN')}
           type="neutral"
-          actionButtonText={t('UNDO')}
-          actionButtonCallback={() => {
-            toast.remove(toastId);
+          dismissToast={() => toast.remove(toastId)}
+          action={{
+            text: t('UNDO'),
+            onClick: () => {
+              toast.remove(toastId);
 
-            // set the visibility back to true
-            const payload = {
-              principal: spamToken.principal,
-              isEnabled: true,
-            };
+              // set the visibility back to true
+              const payload = {
+                principal: spamToken.principal,
+                isEnabled: true,
+              };
 
-            if (fullRunesCoinsList?.find((ft) => ft.principal === spamToken.principal)) {
-              dispatch(setRunesManageTokensAction(payload));
-            } else if (fullSip10CoinsList?.find((ft) => ft.principal === spamToken.principal)) {
-              dispatch(setSip10ManageTokensAction(payload));
-            } else if (fullBrc20CoinsList?.find((ft) => ft.principal === spamToken.principal)) {
-              dispatch(setBrc20ManageTokensAction(payload));
-            }
+              if (fullRunesCoinsList?.find((ft) => ft.principal === spamToken.principal)) {
+                dispatch(setRunesManageTokensAction(payload));
+              } else if (fullSip10CoinsList?.find((ft) => ft.principal === spamToken.principal)) {
+                dispatch(setSip10ManageTokensAction(payload));
+              } else if (fullBrc20CoinsList?.find((ft) => ft.principal === spamToken.principal)) {
+                dispatch(setBrc20ManageTokensAction(payload));
+              }
 
-            removeFromSpamTokens(spamToken.principal);
-            dispatch(setSpamTokenAction(null));
+              removeFromSpamTokens(spamToken.principal);
+              dispatch(setSpamTokenAction(null));
+            },
           }}
         />,
       );

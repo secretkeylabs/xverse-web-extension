@@ -68,11 +68,9 @@ const SeedWordInput = React.forwardRef<HTMLInputElement, SeedWordInputProps>(
     const handlePasteInput = (e: React.ClipboardEvent<HTMLInputElement>) => {
       e.preventDefault();
 
-      if (DEV_MODE || process.env.WALLET_LABEL) {
-        const { clipboardData } = e;
-        const pastedText = clipboardData.getData('text');
-        handlePaste(pastedText);
-      }
+      const { clipboardData } = e;
+      const pastedText = clipboardData.getData('text');
+      handlePaste(pastedText);
     };
 
     return (

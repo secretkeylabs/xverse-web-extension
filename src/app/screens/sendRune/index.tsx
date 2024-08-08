@@ -36,7 +36,10 @@ function SendRuneScreen() {
   const selectedAccount = useSelectedAccount();
   const { network } = useWalletSelector();
   const { data: runesCoinsList } = useRuneFungibleTokensQuery();
-  const [recipientAddress, setRecipientAddress] = useState(location.state?.recipientAddress || '');
+  // TODO: can we remove location.state here?
+  const [recipientAddress, setRecipientAddress] = useState<string>(
+    location.state?.recipientAddress || '',
+  );
   const [amountError, setAmountError] = useState('');
   const [amountToSend, setAmountToSend] = useState<string>(location.state?.amount || '');
   const [feeRate, setFeeRate] = useState('');
@@ -227,9 +230,9 @@ function SendRuneScreen() {
 
   return (
     <StepDisplay
-      token={fungibleToken}
       summary={summary}
       runeSummary={runeSummary}
+      token={fungibleToken}
       amountToSend={amountToSend}
       setAmountToSend={setAmount}
       amountError={amountError}
