@@ -476,7 +476,11 @@ export default function SwapScreen() {
         <Flex1>
           <RouteContainer>
             <RouteItem token={fromToken} label={t('SWAP_SCREEN.FROM')} onClick={onClickFrom} />
-            <SwapButtonContainer onClick={onClickSwapRoute} disabled={isSwapRouteDisabled}>
+            <SwapButtonContainer
+              data-testid="swap-token-button"
+              onClick={onClickSwapRoute}
+              disabled={isSwapRouteDisabled}
+            >
               <Icon src={ArrowSwap} />
             </SwapButtonContainer>
             <RouteItem token={toToken} label={t('SWAP_SCREEN.TO')} onClick={onClickTo} />

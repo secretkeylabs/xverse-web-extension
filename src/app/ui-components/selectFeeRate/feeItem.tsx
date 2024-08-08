@@ -176,6 +176,7 @@ function FeeItem({
 
   return (
     <FeeItemContainer
+      data-testid="fee-select-button"
       onClick={onClick}
       $isSelected={selected}
       disabled={!totalFee || feesExceedBalance}
@@ -199,7 +200,7 @@ function FeeItem({
         </ColumnsTexts>
         {!isLoading ? (
           <EndColumnTexts $insufficientFunds={insufficientFunds}>
-            <StyledHeading typography="body_medium_m" color={mainColor}>
+            <StyledHeading data-testid="total-fee" typography="body_medium_m" color={mainColor}>
               {`${totalFee || '-'} ${feeUnits}`}
             </StyledHeading>
             {totalFee !== undefined && (

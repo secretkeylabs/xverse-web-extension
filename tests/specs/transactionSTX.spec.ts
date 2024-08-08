@@ -11,17 +11,17 @@ test.describe('Transaction STX', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
     // get own STX Address
-    const selfSTXMain = await wallet.getAddress(2);
+    const selfSTXMain = await wallet.getAddress('Stacks');
 
     await wallet.checkVisualsStartpage();
 
     // Click on send button
-    await wallet.allupperButtons.nth(0).click();
+    await wallet.allUpperButtons.nth(0).click();
 
     await expect(await wallet.divTokenRow.count()).toBeGreaterThanOrEqual(2);
     // Send STX
     await wallet.clickOnSpecificToken('Stacks');
-    await wallet.checkVisualsSendSTXPage1();
+    await wallet.checkVisualsSendPage1('send-stx', true);
 
     // Invalid Address check
     await wallet.inputField.first().fill(`Test Address 123`);
@@ -55,29 +55,29 @@ test.describe('Transaction STX', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
     // Save initial Balance for later Balance checks
-    const initalSTXBalance = await wallet.getTokenBalance('Stacks');
+    const initialSTXBalance = await wallet.getTokenBalance('Stacks');
 
     // Click on send button
-    await wallet.allupperButtons.nth(0).click();
+    await wallet.allUpperButtons.nth(0).click();
 
     await expect(await wallet.divTokenRow.count()).toBeGreaterThanOrEqual(2);
     await wallet.clickOnSpecificToken('Stacks');
-    await wallet.checkVisualsSendSTXPage1();
+    await wallet.checkVisualsSendPage1('send-stx', true);
 
     // Fill in Receiver Address
     await wallet.inputField.first().fill(STXTest);
     await expect(wallet.buttonNext).toBeEnabled();
     await wallet.buttonNext.click();
 
-    // Send Amound
-    await wallet.checkVisualsSendSTXPage2();
+    // Send Amount
+    await wallet.checkVisualsSendPage2('', true);
     await wallet.inputField.first().fill(amountSTXSend.toString());
     await expect(wallet.buttonNext).toBeEnabled();
 
     // Balance check
     const displayBalance = await wallet.labelBalanceAmountSelector.innerText();
     const displayBalanceNumerical = parseFloat(displayBalance.replace(/[^0-9.]/g, ''));
-    await expect(initalSTXBalance).toEqual(displayBalanceNumerical);
+    await expect(initialSTXBalance).toEqual(displayBalanceNumerical);
 
     // Save Fees to check on next Page
     const fee = await wallet.feeAmount.innerText();
@@ -91,6 +91,8 @@ test.describe('Transaction STX', () => {
     // Check correct amounts
     await wallet.checkAmountsSendingSTX(amountSTXSend, STXTest, sendFee);
 
+    await wallet.switchToHighFees();
+
     // Cancel the transaction
     await expect(wallet.buttonCancel).toBeEnabled();
     await wallet.buttonCancel.click();
@@ -100,42 +102,41 @@ test.describe('Transaction STX', () => {
 
     // Check STX Balance after cancel the transaction
     const balanceAfterCancel = await wallet.getTokenBalance('Stacks');
-    await expect(initalSTXBalance).toEqual(balanceAfterCancel);
+    await expect(initialSTXBalance).toEqual(balanceAfterCancel);
   });
 
-  // TODO: need to add Stack funds to the wallet, testnet is currently not avaiable
   test('Send STX - confirm transaction testnet #localexecution', async ({ page, extensionId }) => {
     // Restore wallet and setup Testnet network
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
     // Save initial Balance for later Balance checks
-    const initalSTXBalance = await wallet.getTokenBalance('Stacks');
+    const initialSTXBalance = await wallet.getTokenBalance('Stacks');
 
     // Click on send button
-    await wallet.allupperButtons.nth(0).click();
+    await wallet.allUpperButtons.nth(0).click();
 
     // Needed to add this to avoid loading issues with the token list to be displayed
     await expect(await wallet.divTokenRow.count()).toBeGreaterThanOrEqual(2);
     await wallet.clickOnSpecificToken('Stacks');
 
     // Check visuals of sending page
-    await wallet.checkVisualsSendSTXPage1();
+    await wallet.checkVisualsSendPage1('send-stx', true);
 
     // Fill in Receiver Address
     await wallet.inputField.first().fill(STXTest);
     await expect(wallet.buttonNext).toBeEnabled();
     await wallet.buttonNext.click();
 
-    // Send Amound
-    await wallet.checkVisualsSendSTXPage2();
+    // Send Amount
+    await wallet.checkVisualsSendPage2('', true);
     await wallet.inputField.first().fill(amountSTXSend.toString());
     await expect(wallet.buttonNext).toBeEnabled();
 
     // Balance check
     const displayBalance = await wallet.labelBalanceAmountSelector.innerText();
     const displayBalanceNumerical = parseFloat(displayBalance.replace(/[^0-9.]/g, ''));
-    await expect(initalSTXBalance).toEqual(displayBalanceNumerical);
+    await expect(initialSTXBalance).toEqual(displayBalanceNumerical);
 
     // Save Fees to check on next Page
     const fee = await wallet.feeAmount.innerText();
@@ -156,6 +157,4 @@ test.describe('Transaction STX', () => {
 
     // Can't check amounts or transaction as E2E test is faster than the UI or API to how that transaction --> has to be checked manually
   });
-
-  // TODO: add test where we change the fees for a STX transaction
 });

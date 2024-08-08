@@ -342,7 +342,10 @@ export default function QuoteSummary({
                 <StyledP typography="body_medium_m" color="white_200">
                   {t('SWAP_SCREEN.SLIPPAGE')}
                 </StyledP>
-                <SlippageButton onClick={() => setShowSlippageModal(true)}>
+                <SlippageButton
+                  data-testid="slippage-button"
+                  onClick={() => setShowSlippageModal(true)}
+                >
                   {slippage * 100}%
                   <img alt={t('SLIPPAGE')} src={SlippageEditIcon} />
                 </SlippageButton>
@@ -352,7 +355,7 @@ export default function QuoteSummary({
               <StyledP typography="body_medium_m" color="white_200">
                 {t('SWAP_SCREEN.MIN_RECEIVE')}
               </StyledP>
-              <StyledP typography="body_medium_m" color="white_0">
+              <StyledP data-testid="min-received-amount" typography="body_medium_m" color="white_0">
                 {formatNumber(quote.receiveAmount)} {toUnit}
               </StyledP>
             </ListingDescriptionRow>
@@ -411,7 +414,7 @@ export default function QuoteSummary({
                   />
                 </EditFeeRateContainer>
               </StyledP>
-              <FeeRate>
+              <FeeRate data-testid="fee-amount">
                 {feeRate} {t('UNITS.SATS_PER_VB')}
               </FeeRate>
             </ListingDescriptionRow>

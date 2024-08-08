@@ -287,7 +287,7 @@ export default function UtxoSelection({
                   suffix={` ${fiatCurrency}`}
                   thousandSeparator
                   renderText={(value: string) => (
-                    <StyledP typography="body_medium_m" color="white_400">
+                    <StyledP data-testid="usd-text" typography="body_medium_m" color="white_400">
                       {value}
                     </StyledP>
                   )}
@@ -306,7 +306,7 @@ export default function UtxoSelection({
                   suffix={` ${toToken?.symbol}`}
                   thousandSeparator
                   renderText={(value: string) => (
-                    <StyledP typography="body_medium_m" color="white_0">
+                    <StyledP data-testid="quote-label" typography="body_medium_m" color="white_0">
                       {value}
                     </StyledP>
                   )}

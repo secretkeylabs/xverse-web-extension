@@ -117,6 +117,7 @@ export default function AmountInput({ max, input, balance }: Props) {
       </StyledP>
       <Container onClick={handleClick} hasError={error}>
         <InputField
+          data-testid="swap-amount"
           ref={inputRef}
           value={input.value}
           onChange={handleOnChange}
@@ -129,7 +130,7 @@ export default function AmountInput({ max, input, balance }: Props) {
           thousandSeparator
           prefix={`~${currencySymbolMap[input.fiatCurrency]}`}
           renderText={(value: string) => (
-            <StyledP typography="body_s" color="white_400">
+            <StyledP data-testid="usd-text" typography="body_s" color="white_400">
               {value} {input.fiatCurrency}
             </StyledP>
           )}
@@ -145,7 +146,7 @@ export default function AmountInput({ max, input, balance }: Props) {
             displayType="text"
             thousandSeparator
             renderText={(value: string) => (
-              <BalanceP typography="body_medium_m" color="white_0">
+              <BalanceP data-testid="swap-token-balance" typography="body_medium_m" color="white_0">
                 {value || '--'}
               </BalanceP>
             )}
