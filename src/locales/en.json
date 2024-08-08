@@ -592,6 +592,7 @@
     "PERMISSIONS_TITLE": "The app will be able to:",
     "PERMISSION_WALLET_BALANCE": "See your wallet balance and activity",
     "PERMISSION_REQUEST_TX": "Request transaction signing",
+    "PERMISSION_WALLET_TYPE_ACCESS": "See which type of wallet you are using (software or hardware wallet)",
     "NO_STACKS_AUTH_SUPPORT": {
       "TITLE": "This wallet does not have a Stacks address.",
       "LINK": "Create a Stacks address"
