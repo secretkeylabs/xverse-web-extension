@@ -858,12 +858,15 @@ export default class Wallet {
 
   // had to disable this rule as my first assertion was always changed to a wrong assertion
   /* eslint-disable playwright/prefer-web-first-assertions */
-  async switchToHighFees() {
+  async switchToHighFees(feePriorityShown: boolean = true) {
     // Save the current fee amount for comparison
     const originalFee = await this.feeAmount.innerText();
     const numericOriginalFee = parseFloat(originalFee.replace(/[^0-9.]/g, ''));
     await expect(numericOriginalFee).toBeGreaterThan(0);
-    const feePriority = await this.labelFeePriority.innerText();
+    let feePriority = 'Medium';
+    if (feePriorityShown) {
+      feePriority = await this.labelFeePriority.innerText();
+    }
 
     // Click on edit Fee button
     await this.buttonEditFee.click();

@@ -91,7 +91,7 @@ test.describe('Swap Flow ME', () => {
     // We can only continue if the FeeRate is above 0
     await wallet.waitForTextAboveZero(wallet.feeAmount, 30000);
 
-    await wallet.switchToHighFees();
+    await wallet.switchToHighFees(false);
 
     await wallet.buttonSwap.click();
     await wallet.checkVisualsSendTransactionReview('swap', false, selfBTC);
