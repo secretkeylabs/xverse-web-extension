@@ -7,7 +7,8 @@ import * as v from 'valibot';
  */
 export const clientSchema = v.object({
   id: v.string(),
-  name: v.optional(v.string()),
+  name: v.string(),
+  origin: v.string(),
 });
 
 /**

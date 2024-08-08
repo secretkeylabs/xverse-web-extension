@@ -51,6 +51,9 @@ export async function loadPermissionsStore(): Promise<Result<PermissionsStoreV1 
 
   return [null, parseResult.output];
 }
+export async function getClient(permissionStore: PermissionsStoreV1, clientId: Client['id']) {
+  return [...permissionStore.clients].find((c) => c.id === clientId);
+}
 
 // Mutations
 

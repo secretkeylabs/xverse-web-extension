@@ -139,7 +139,7 @@ const router = createHashRouter([
         element: <ManageTokens />,
       },
       {
-        path: 'account-list',
+        path: RoutePaths.AccountList,
         element: <AccountList />,
       },
       {
