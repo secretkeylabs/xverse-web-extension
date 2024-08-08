@@ -4,7 +4,7 @@ import Wallet from '../pages/wallet';
 const BTCMain = '3HEcJNAry4C8raqvM4cCPKbZpivTon7hMY';
 const BTCTest = '2MySeYxLrpGg47oqZGJUGBu53cVSy7WKGWf';
 
-// TODO: add API_TIMEOUT_MILLI for timeout --> needs invetigation as playwright itself didn't accept the import of the module
+// TODO: add API_TIMEOUT_MILLI for timeout --> needs investigation as playwright itself didn't accept the import of the module
 const amountBTCSend = 0.000001;
 
 test.describe('Transaction BTC', () => {
@@ -78,11 +78,21 @@ test.describe('Transaction BTC', () => {
     await wallet.buttonNext.click();
     await expect(wallet.containerFeeRate).toBeVisible();
     await expect(wallet.inputBTCAmount).toBeVisible();
-    await wallet.inputBTCAmount.fill(amountBTCSend.toString());
+
     // Balance check
     const displayBalance = await wallet.labelBalanceAmountSelector.innerText();
     const displayBalanceNumerical = parseFloat(displayBalance.replace(/[^0-9.]/g, ''));
     await expect(initialBTCBalance).toEqual(displayBalanceNumerical);
+
+    // Insufficient fund error message
+    const maxAmount = displayBalanceNumerical + 10;
+    await wallet.inputBTCAmount.fill(maxAmount.toString());
+    await expect(wallet.buttonInsufficientFunds).toBeVisible();
+    await expect(wallet.buttonInsufficientFunds).toBeDisabled();
+
+    // Fill in correct amount
+    await wallet.inputBTCAmount.fill(amountBTCSend.toString());
+
     // Timeout increased as I had connectivity issues
     await expect(wallet.buttonNext).toBeVisible({ timeout: 30000 });
     await expect(wallet.buttonNext).toBeEnabled();

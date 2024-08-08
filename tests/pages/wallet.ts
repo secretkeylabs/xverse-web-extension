@@ -934,17 +934,19 @@ export default class Wallet {
     await expect(await this.receiveAddress.first().innerText()).toContain(BTCTest.slice(-4));
 
     const confirmAmountAfter = await this.confirmAmount.last().innerText();
-    const confirmTotalAmount = await this.confirmTotalAmount.innerText();
+    const originalFee = await this.feeAmount.innerText();
     const confirmBalance = await this.confirmBalance.innerText();
     // Extract amounts for balance, sending amount and amount afterwards
     const num1 = parseFloat(confirmAmountAfter.replace(/[^0-9.]/g, ''));
-    const num2 = parseFloat(confirmTotalAmount.replace(/[^0-9.]/g, ''));
+    // We need to convert the sats value to BTC for this calculation
+    const feeSatsAmount = parseFloat(originalFee.replace(/[^0-9.]/g, ''));
+    const num2 = feeSatsAmount / 100000000;
     const num3 = parseFloat(confirmBalance.replace(/[^0-9.]/g, ''));
 
-    const roundedResult = Number((num3 - num2).toFixed(9));
-    // This sum check is currently not working after the TX Screen updates
-    // TODO needs to be fixed with separate PR after all TX screen PRs are merged
-    // await expect(num1).toEqual(roundedResult);
+    // Balance - fees - sending amount
+    const roundedResult = Number((num3 - num2 - amountBTCSend).toFixed(9));
+    // Check if Balance value after the transaction is the same as the calculated value
+    await expect(num1).toEqual(roundedResult);
   }
 
   async confirmSendTransaction() {
