@@ -5,11 +5,11 @@ import { useGetSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10Fungibl
 import useWalletSelector from '@hooks/useWalletSelector';
 import type { SupportedCurrency } from '@secretkeylabs/xverse-core';
 import { ChangeFiatCurrencyAction } from '@stores/wallet/actions/actionCreators';
+import { currencyList } from '@utils/currency';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { currencyList } from '../../../utils/currency';
 import CurrencyRow from './currencyRow';
 
 const Container = styled.div`

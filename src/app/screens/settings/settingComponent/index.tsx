@@ -1,3 +1,4 @@
+import { ArrowSquareOut, CaretRight } from '@phosphor-icons/react';
 import Switch from 'react-switch';
 import styled, { useTheme } from 'styled-components';
 
@@ -80,8 +81,8 @@ interface SettingComponentProps {
   title?: string;
   text: string;
   textDetail?: string;
+  link?: string;
   onClick?: () => void;
-  icon?: string;
   showDivider?: boolean;
   showWarningTitle?: boolean;
   toggle?: boolean;
@@ -96,7 +97,7 @@ function SettingComponent({
   text,
   textDetail,
   onClick,
-  icon,
+  link,
   showDivider,
   showWarningTitle,
   toggle,
@@ -125,7 +126,7 @@ function SettingComponent({
             {description && <DescriptionText>{description}</DescriptionText>}
           </Column>
           {textDetail && <ComponentDescriptionText>{textDetail}</ComponentDescriptionText>}
-          {icon && <img src={icon} alt="arrow icon" />}
+          {link ? <ArrowSquareOut /> : <CaretRight />}
           {toggle && toggleFunction && (
             <CustomSwitch
               onColor={theme.colors.orange_main}

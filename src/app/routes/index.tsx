@@ -58,13 +58,17 @@ import SendOrdinal from '@screens/sendOrdinal';
 import SendRuneScreen from '@screens/sendRune';
 import SendStxScreen from '@screens/sendStx';
 import Setting from '@screens/settings';
-import BackupWalletScreen from '@screens/settings/backupWallet';
+import About from '@screens/settings/about';
+import AdvancedSettings from '@screens/settings/advanced';
 import ChangeNetworkScreen from '@screens/settings/changeNetwork';
-import ChangePasswordScreen from '@screens/settings/changePassword';
 import ConnectedAppsAndPermissionsScreen from '@screens/settings/connectedAppsAndPermissions';
-import FiatCurrencyScreen from '@screens/settings/fiatCurrency';
-import LockCountdown from '@screens/settings/lockCountdown';
-import PrivacyPreferencesScreen from '@screens/settings/privacyPreferences';
+import Preferences from '@screens/settings/preferences';
+import FiatCurrencyScreen from '@screens/settings/preferences/fiatCurrency';
+import LockCountdown from '@screens/settings/preferences/lockCountdown';
+import PrivacyPreferencesScreen from '@screens/settings/preferences/privacyPreferences';
+import Security from '@screens/settings/security';
+import BackupWalletScreen from '@screens/settings/security/backupWallet';
+import ChangePasswordScreen from '@screens/settings/security/changePassword';
 import SignBatchPsbtRequest from '@screens/signBatchPsbtRequest';
 import SignMessageRequest from '@screens/signMessageRequest';
 import SignMessageRequestInApp from '@screens/signMessageRequestInApp';
@@ -331,10 +335,42 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'settings',
+        path: RoutePaths.Settings,
         element: (
           <AuthGuard>
             <Setting />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: RoutePaths.About,
+        element: (
+          <AuthGuard>
+            <About />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: RoutePaths.Preferences,
+        element: (
+          <AuthGuard>
+            <Preferences />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: RoutePaths.Security,
+        element: (
+          <AuthGuard>
+            <Security />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: RoutePaths.AdvancedSettings,
+        element: (
+          <AuthGuard>
+            <AdvancedSettings />
           </AuthGuard>
         ),
       },

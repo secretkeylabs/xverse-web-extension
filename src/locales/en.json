@@ -809,6 +809,13 @@
     "INCORRECT_PASSWORD_ERROR": "Incorrect password"
   },
   "SETTING_SCREEN": {
+    "TITLE": "Settings",
+    "CATEGORIES": {
+      "ABOUT": "About",
+      "PREFERENCES": "Preferences",
+      "ADVANCED": "Advanced",
+      "SECURITY": "Security"
+    },
     "GENERAL": "General",
     "CURRENCY": "Fiat Currency",
     "PRIVACY_PREFERENCES": {
