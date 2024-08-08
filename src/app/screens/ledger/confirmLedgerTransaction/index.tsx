@@ -38,6 +38,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 
+import { makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import {
   ConfirmTxIconBig,
@@ -93,6 +94,8 @@ function ConfirmLedgerTransaction(): JSX.Element {
     ordinalUtxo,
     feeRateInput,
     fee,
+    tabId,
+    tabMessageId: messageId,
   }: {
     amount: BigNumber;
     recipients: Recipient[] | StacksRecipient[];
@@ -102,6 +105,8 @@ function ConfirmLedgerTransaction(): JSX.Element {
     feeRateInput?: string;
     fee?: BigNumber;
     messageId?: string;
+    tabId?: number;
+    tabMessageId?: string;
   } = location.state;
 
   const transition = useTransition(currentStep, DEFAULT_TRANSITION_OPTIONS);
@@ -129,6 +134,10 @@ function ConfirmLedgerTransaction(): JSX.Element {
       const transactionId = await btcClient.sendRawTransaction(txHex || taprootSignedValue);
       setTxId(transactionId.tx.hash);
       setCurrentStep(Steps.TransactionConfirmed);
+      if (tabId) {
+        const response = makeRpcSuccessResponse(messageId, { txid: transactionId.tx.hash });
+        sendRpcResponse(tabId, response);
+      }
     } catch (err) {
       console.error(err);
       setIsTxRejected(true);
@@ -153,6 +162,10 @@ function ConfirmLedgerTransaction(): JSX.Element {
       const transactionId = await btcClient.sendRawTransaction(result);
       setTxId(transactionId.tx.hash);
       setCurrentStep(Steps.TransactionConfirmed);
+      if (tabId) {
+        const response = makeRpcSuccessResponse(messageId, { txid: transactionId.tx.hash });
+        sendRpcResponse(tabId, response);
+      }
     } catch (err) {
       console.error(err);
       setIsTxRejected(true);
