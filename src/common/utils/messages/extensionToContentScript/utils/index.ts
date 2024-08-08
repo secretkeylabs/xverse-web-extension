@@ -27,7 +27,7 @@ export async function sendMessageContentScriptTabs(
 //
 // - https://developer.chrome.com/docs/extensions/reference/api/tabs#method-query
 // - https://developer.chrome.com/docs/extensions/develop/concepts/match-patterns.
-export function clientOriginToUrlMatchPattern(tabOrigin: string) {
+function clientOriginToUrlMatchPattern(tabOrigin: string) {
   return `${tabOrigin}/*`;
 }
 
