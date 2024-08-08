@@ -457,7 +457,8 @@
     "RUNE_IS_CLOSED": "This rune is closed and cannot be minted.",
     "UNKNOWN_RUNE_RECIPIENTS": "Undetermined Runes recipients ",
     "RUNE_DELEGATION_DESCRIPTION": "This is a partial transaction with undetermined Runes recipients. You are delegating your Runes to the requesting app. The requesting app can burn your runes or transfer them to any recipient",
-    "YOU_WILL_DELEGATE": "You will delegate"
+    "YOU_WILL_DELEGATE": "You will delegate",
+    "QUOTE_EXPIRES_IN": "Note that this swap quote will expire after {{seconds}} seconds"
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "The requested transaction cannot be created due to insufficient balance",

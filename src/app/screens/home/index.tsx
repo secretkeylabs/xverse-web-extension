@@ -411,8 +411,7 @@ function Home() {
   };
 
   const isCrossChainSwapsEnabled = useHasFeature(FeatureId.CROSS_CHAIN_SWAPS);
-  // ledger is disabled for now
-  const showSwaps = isCrossChainSwapsEnabled && !isLedgerAccount(selectedAccount);
+  const showSwaps = isCrossChainSwapsEnabled;
 
   return (
     <>

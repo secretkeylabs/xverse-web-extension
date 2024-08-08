@@ -11,6 +11,7 @@ import {
   type PlaceOrderResponse,
   type PlaceUtxoOrderResponse,
   type RuneSummary,
+  type Transport,
 } from '@secretkeylabs/xverse-core';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -119,11 +120,13 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
     return executeOrderResponse;
   };
 
-  const handleConfirm = async () => {
+  const handleConfirm = async (ledgerTransport?: Transport) => {
     setIsSigning(true);
     try {
-      // TODO: add ledger support
-      const signedPsbt = await parsedPsbt?.getSignedPsbtBase64({ finalize: false });
+      const signedPsbt = await parsedPsbt?.getSignedPsbtBase64({
+        finalize: false,
+        ledgerTransport,
+      });
 
       if (!signedPsbt) {
         throw new Error(t('PSBT_CANT_SIGN_ERROR_TITLE'));
@@ -133,6 +136,10 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
 
       if (!orderResponse) {
         return setIsSigning(false);
+      }
+
+      if (ledgerTransport) {
+        await ledgerTransport.close();
       }
 
       onConfirm();
@@ -176,6 +183,13 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
     );
   }
 
+  const quoteExpiryCallout =
+    orderInfo.providerCode === 'dotswap'
+      ? {
+          bodyText: t('QUOTE_EXPIRES_IN', { seconds: 30 }),
+        }
+      : undefined;
+
   return (
     <ConfirmBtcTransaction
       summary={summary}
@@ -190,6 +204,7 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
       onBackClick={onClose}
       hideBottomBar
       showAccountHeader={false}
+      customCallout={quoteExpiryCallout}
     />
   );
 }
