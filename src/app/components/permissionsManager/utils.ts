@@ -5,11 +5,11 @@ import { parse, stringify } from 'superjson';
 import * as v from 'valibot';
 import { permissionsPersistantStoreKeyName } from './constants';
 import {
-  permissionsStoreV1Schema,
+  permissionsStoreSchema,
   type Client,
   type ClientsTable,
   type Permission,
-  type PermissionsStoreV1,
+  type PermissionsStoreV1 as PermissionsStore,
   type PermissionsTable,
   type Resource,
   type ResourcesTable,
@@ -30,7 +30,7 @@ export function getClientPermission(
 ) {
   return [...permissions].find((p) => p.clientId === clientId && p.resourceId === resourceId);
 }
-export async function loadPermissionsStore(): Promise<Result<PermissionsStoreV1 | null>> {
+export async function loadPermissionsStore(): Promise<Result<PermissionsStore | null>> {
   const [error, persistedData] = await safePromise(
     storage.local.getItem(permissionsPersistantStoreKeyName),
   );
@@ -44,7 +44,7 @@ export async function loadPermissionsStore(): Promise<Result<PermissionsStoreV1 
   }
 
   const hydrated = parse(persistedData);
-  const parseResult = v.safeParse(permissionsStoreV1Schema, hydrated);
+  const parseResult = v.safeParse(permissionsStoreSchema, hydrated);
   if (!parseResult.success) {
     return [new Error('Failed to parse permissions store.', { cause: parseResult.issues }), null];
   }
@@ -56,7 +56,7 @@ export async function loadPermissionsStore(): Promise<Result<PermissionsStoreV1 
  * Get a client by its ID.
  * @public
  */
-export async function getClient(permissionStore: PermissionsStoreV1, clientId: Client['id']) {
+export async function getClient(permissionStore: PermissionsStore, clientId: Client['id']) {
   return [...permissionStore.clients].find((c) => c.id === clientId);
 }
 
@@ -130,7 +130,7 @@ export function removePermission(
     permissions.delete(permission);
   }
 }
-export function savePermissionsStore(permissionsStore: PermissionsStoreV1) {
+export function savePermissionsStore(permissionsStore: PermissionsStore) {
   return chrome.storage.local.set({
     [permissionsPersistantStoreKeyName]: stringify(permissionsStore),
   });
@@ -147,9 +147,9 @@ function makeResourcesTable() {
 function makePermissionsTable() {
   return new Set<Permission>();
 }
-export function makePermissionsStoreV1(): PermissionsStoreV1 {
+export function makePermissionsStore(): PermissionsStore {
   return {
-    version: 1,
+    version: 2,
     clients: makeClientsTable(),
     resources: makeResourcesTable(),
     permissions: makePermissionsTable(),
