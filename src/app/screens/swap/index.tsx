@@ -1,6 +1,7 @@
 import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery';
 import { useRuneFungibleTokensQuery } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
 import useGetQuotes from '@hooks/queries/swaps/useGetQuotes';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
@@ -36,6 +37,7 @@ import PsbtConfimation from './components/psbtConfirmation/psbtConfirmation';
 import RouteItem from './components/routeItem';
 import TokenFromBottomSheet from './components/tokenFromBottomSheet';
 import TokenToBottomSheet from './components/tokenToBottomSheet';
+import trackSwapMixPanel from './mixpanel';
 import QuoteSummary from './quoteSummary';
 import QuotesModal from './quotesModal';
 import {
@@ -134,6 +136,7 @@ export default function SwapScreen() {
   const params = new URLSearchParams(location.search);
   const defaultFrom = params.get('from');
   const { quotes, loading: quotesLoading, error: quotesError, fetchQuotes } = useGetQuotes();
+  const { data: runeFloorPrice } = useRuneFloorPriceQuery(toToken?.name ?? '');
 
   const runesCoinsList = unfilteredData ?? [];
 
@@ -170,9 +173,13 @@ export default function SwapScreen() {
       return;
     }
 
-    trackMixPanel(AnalyticsEvents.FetchSwapQuote, {
-      from: fromToken === 'BTC' ? 'BTC' : fromToken.name,
-      to: toToken.protocol === 'btc' ? 'BTC' : toToken.name ?? toToken.ticker,
+    trackSwapMixPanel(AnalyticsEvents.FetchSwapQuote, {
+      fromToken,
+      toToken,
+      amount,
+      quote,
+      btcFiatRate,
+      runeFloorPrice,
     });
 
     fetchQuotes({
@@ -317,13 +324,7 @@ export default function SwapScreen() {
   useEffect(() => {
     if (errorMessage) {
       const toastId = toast.custom(
-        <SnackBar
-          text={errorMessage}
-          type="error"
-          actionButtonCallback={() => {
-            toast.remove(toastId);
-          }}
-        />,
+        <SnackBar text={errorMessage} type="error" dismissToast={() => toast.remove(toastId)} />,
         { duration: 3000 },
       );
       // Reset
@@ -367,10 +368,14 @@ export default function SwapScreen() {
     if (!fromToken || !toToken || !provider) {
       return;
     }
-    trackMixPanel(AnalyticsEvents.SignSwap, {
-      provider: provider.name,
-      from: fromToken === 'BTC' ? 'BTC' : fromToken.name,
-      to: toToken.protocol === 'btc' ? 'BTC' : toToken.name ?? toToken.ticker,
+    trackSwapMixPanel(AnalyticsEvents.SignSwap, {
+      provider,
+      fromToken,
+      toToken,
+      amount,
+      quote,
+      btcFiatRate,
+      runeFloorPrice,
     });
   };
 
@@ -515,7 +520,6 @@ export default function SwapScreen() {
             </Flex1>
           )}
         </Flex1>
-        {QuoteModal}
         {!hasQuoteError && (
           <GetQuoteButtonContainer>
             <Button
@@ -533,7 +537,7 @@ export default function SwapScreen() {
           onSelectCoin={onChangeFromToken}
           visible={tokenSelectionBottomSheet === 'from'}
           title={t('SWAP_SCREEN.SWAP_FROM')}
-          to={toToken && fromToken ? undefined : toToken}
+          to={toToken}
         />
         <TokenToBottomSheet
           onClose={() => setTokenSelectionBottomSheet(null)}

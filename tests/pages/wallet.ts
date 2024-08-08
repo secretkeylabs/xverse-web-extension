@@ -40,14 +40,6 @@ export default class Wallet {
 
   readonly buttonDenyDataCollection: Locator;
 
-  readonly buttonCopyBitcoinAddress: Locator;
-
-  readonly buttonCopyOrdinalsAddress: Locator;
-
-  readonly buttonCopyStacksAddress: Locator;
-
-  readonly buttonConfirmCopyAddress: Locator;
-
   readonly buttonNetwork: Locator;
 
   readonly buttonSave: Locator;
@@ -168,7 +160,7 @@ export default class Wallet {
 
   readonly inputMemo: Locator;
 
-  readonly inputRecipientAdress: Locator;
+  readonly inputRecipientAddress: Locator;
 
   readonly inputSendAmount: Locator;
 
@@ -180,7 +172,7 @@ export default class Wallet {
 
   readonly containerFeeRate: Locator;
 
-  readonly inputBTCAdress: Locator;
+  readonly inputBTCAddress: Locator;
 
   readonly coinBalance: Locator;
 
@@ -328,6 +320,12 @@ export default class Wallet {
 
   readonly buttonInsufficientFunds: Locator;
 
+  readonly buttonQRAddress: Locator;
+
+  readonly labelAddress: Locator;
+
+  readonly containerQRCode: Locator;
+
   constructor(readonly page: Page) {
     this.page = page;
     this.navigationDashboard = page.getByTestId('nav-dashboard');
@@ -454,14 +452,9 @@ export default class Wallet {
     this.divAppTitle = page.getByTestId('app-title');
 
     // Receive
-    this.buttonCopyBitcoinAddress = page.locator('#copy-address-Bitcoin');
-    this.buttonCopyOrdinalsAddress = page.locator(
-      '#copy-address-Ordinals\\,\\ BRC-20\\ \\&\\ Runes',
-    );
-    this.buttonCopyStacksAddress = page.locator(
-      '#copy-address-Stacks\\ NFTs\\ \\&\\ SIP-10\\ tokens',
-    );
-    this.buttonConfirmCopyAddress = page.getByRole('button', { name: 'I understand' });
+    this.buttonQRAddress = page.getByTestId('qr-button');
+    this.labelAddress = page.getByTestId('address-label');
+    this.containerQRCode = page.getByTestId('qr-container');
 
     // Swap
     this.buttonSelectCoin = page.getByTestId('select-coin-button');
@@ -479,7 +472,7 @@ export default class Wallet {
 
     // Send
     this.inputSendAmount = page.getByTestId('send-input');
-    this.inputRecipientAdress = page.getByTestId('recipient-adress');
+    this.inputRecipientAddress = page.getByTestId('recipient-address');
     this.inputMemo = page.getByTestId('memo-input');
     this.errorMessageAddressInvalid = page
       .locator('p')
@@ -494,7 +487,7 @@ export default class Wallet {
     this.errorInsufficientBalance = page.locator('p').filter({ hasText: 'Insufficient balance' });
     this.errorInsufficientFunds = page.locator('p').filter({ hasText: 'Insufficient funds' });
     this.containerFeeRate = page.getByTestId('feerate-container');
-    this.inputBTCAdress = page.locator('input[type="text"]');
+    this.inputBTCAddress = page.locator('input[type="text"]');
     this.inputBTCAmount = page.getByTestId('btc-amount');
     this.buttonExpand = page.getByRole('button', { name: 'Inputs & Outputs Dropdown' });
     this.confirmTotalAmount = page.getByTestId('confirm-total-amount');
@@ -554,13 +547,13 @@ export default class Wallet {
     await this.checkVisualsStartpage();
     if (testnet) {
       await this.navigationSettings.click();
-      await this.switchtoTestnetNetwork();
+      await this.switchToTestnetNetwork();
       await this.navigationDashboard.click();
-      await this.checkVisualsStartpage('testnet');
+      await this.checkVisualsStartpage();
     }
   }
 
-  async checkVisualsStartpage(network?: string) {
+  async checkVisualsStartpage() {
     await expect(this.balance).toBeVisible();
     await expect(this.manageTokenButton).toBeVisible();
 
@@ -569,23 +562,6 @@ export default class Wallet {
       await this.buttonDenyDataCollection.click();
     }
 
-    /*
-TODO: needs to be changed to be debending on network and feature enabled
-const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
-
-    const featureFlags = await getXverseApiClient('Mainnet').getAppFeatures();
-    const featureEnabled = featureFlags?.SWAPS?.enabled;
-    switch (true) {
-      case network === 'testnet':
-        // Check if all 3 buttons (send, receive, buy) are visible
-        await expect(this.allupperButtons).toHaveCount(3);
-        break;
-      default:
-        // Check if all 4 buttons (send, receive, swap, buy) are visible
-        await expect(this.allupperButtons).toHaveCount(4);
-    }
-*/
-    // await expect(this.allupperButtons).toHaveCount(3);
     await expect(this.labelAccountName).toBeVisible();
     await expect(this.buttonMenu).toBeVisible();
     await expect(await this.labelTokenSubtitle.count()).toBeGreaterThanOrEqual(2);
@@ -635,7 +611,7 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(this.buttonBack).toBeVisible();
   }
 
-  async checkVisualsSendInscriptionsPage2(ordinalAddress, ordinalNumber) {
+  async checkVisualsSendInscriptionsPage2(ordinalAddress, ordinalNumber, collection) {
     await expect(this.confirmTotalAmount).toBeVisible();
     await expect(this.confirmCurrencyAmount).toBeVisible();
     await expect(this.buttonExpand).toBeVisible();
@@ -652,9 +628,12 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(this.confirmBalance.first()).toBeVisible();
     await expect(await this.receiveAddress.first().innerText()).toContain(ordinalAddress.slice(-4));
 
+    // Collection Inscriptions don't have the ordinal number displayed in the Review
     // Check if the right ordinal number is shown
-    const reviewNumberOrdinal = await this.numberInscription.first().innerText();
-    await expect(ordinalNumber).toMatch(reviewNumberOrdinal);
+    if (!collection) {
+      const reviewNumberOrdinal = await this.numberInscription.first().innerText();
+      await expect(ordinalNumber).toMatch(reviewNumberOrdinal);
+    }
   }
 
   async checkVisualsSendPage1(url) {
@@ -736,7 +715,7 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(this.runeContainer.first()).toBeVisible();
   }
 
-  async invalidAdressCheck(adressfield) {
+  async invalidAddressCheck(adressfield) {
     await adressfield.fill(`Test Address 123`);
     await this.buttonNext.click();
     await expect(this.errorMessageAddressInvalid).toBeVisible();
@@ -803,16 +782,19 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await this.buttonClose.click();
   }
 
-  async getAddress(button: Locator, ClickConfirm = true): Promise<string> {
-    await expect(button).toBeVisible();
-    await button.click();
+  async getAddress(whichAddress): Promise<string> {
+    // click on 'Receive' button
+    await this.allupperButtons.nth(1).click();
 
-    if (ClickConfirm) {
-      await expect(this.buttonConfirmCopyAddress).toBeVisible();
-      await this.buttonConfirmCopyAddress.click();
-    }
+    // Need to click on the QR Code button to get the full Address
 
-    const address = await this.page.evaluate<string>('navigator.clipboard.readText()');
+    await this.buttonQRAddress.nth(whichAddress).click();
+    await expect(this.containerQRCode).toBeVisible();
+
+    const address = await this.labelAddress.innerText();
+
+    await this.buttonBack.click();
+
     return address;
   }
 
@@ -901,7 +883,7 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await Promise.all(checks);
   }
 
-  async switchtoTestnetNetwork() {
+  async switchToTestnetNetwork() {
     await expect(this.buttonNetwork).toBeVisible();
     await expect(this.buttonNetwork).toHaveText('NetworkMainnet');
     await this.buttonNetwork.click();
@@ -924,7 +906,7 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
     await expect(this.buttonNetwork).toHaveText('NetworkTestnet');
   }
 
-  async switchtoMainnetNetwork() {
+  async switchToMainnetNetwork() {
     await expect(this.buttonNetwork).toBeVisible();
     await expect(this.buttonNetwork).toHaveText('NetworkTestnet');
     await this.buttonNetwork.click();

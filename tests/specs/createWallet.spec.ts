@@ -75,20 +75,10 @@ test.describe('Create and Restore Wallet Flow', () => {
 
       await expect(newWallet.balance).toHaveText('$0.00');
 
-      // TODO: find better selector for the receive button
-      await newWallet.allupperButtons.nth(1).click();
-
       // Get the addresses and save it in variables
-      const addressBitcoin = await newWallet.getAddress(newWallet.buttonCopyBitcoinAddress);
-      const addressOrdinals = await newWallet.getAddress(newWallet.buttonCopyOrdinalsAddress);
-      const addressStack = await newWallet.getAddress(newWallet.buttonCopyStacksAddress, false);
-
-      // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
-      await page.reload();
-      // click close for the modal window
-      // TODO: find better locator for close button --> issue https://linear.app/xverseapp/issue/ENG-4039/adjust-id-or-add-titles-for-copy-address-button-for-receive-menu
-      // await expect(page.locator('button.sc-hceviv > svg')).toBeVisible();
-      // await page.locator('button.sc-hceviv > svg').click();
+      const addressBitcoin = await newWallet.getAddress(0);
+      const addressOrdinals = await newWallet.getAddress(1);
+      const addressStack = await newWallet.getAddress(2);
 
       // Save the Address in a file so that other tests can access them
       const dataAddress = JSON.stringify({
@@ -149,15 +139,10 @@ test.describe('Create and Restore Wallet Flow', () => {
       const balanceText = newWallet.balance;
       await await expect(balanceText).toHaveText('$0.00');
 
-      await newWallet.allupperButtons.nth(1).click();
-
       // Get the Addresses
-      const addressBitcoinCheck = await newWallet.getAddress(newWallet.buttonCopyBitcoinAddress);
-      const addressOrdinalsCheck = await newWallet.getAddress(newWallet.buttonCopyOrdinalsAddress);
-      const addressStackCheck = await newWallet.getAddress(
-        newWallet.buttonCopyStacksAddress,
-        false,
-      );
+      const addressBitcoinCheck = await newWallet.getAddress(0);
+      const addressOrdinalsCheck = await newWallet.getAddress(1);
+      const addressStackCheck = await newWallet.getAddress(2);
 
       // Read and parse the file
       const rawData = fs.readFileSync(filePathAddresses, 'utf8');

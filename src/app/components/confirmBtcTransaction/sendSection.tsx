@@ -2,9 +2,8 @@ import { useParsedTxSummaryContext } from '@components/confirmBtcTransaction/hoo
 import RuneAmount from '@components/confirmBtcTransaction/itemRow/runeAmount';
 import type { btcTransaction } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
-import Divider from '@ui-library/divider';
+import { getTruncatedAddress } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
-import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 import Amount from './itemRow/amount';
 import AmountWithInscriptionSatribute from './itemRow/amountWithInscriptionSatribute';
@@ -22,7 +21,7 @@ const Container = styled.div((props) => ({
   flexDirection: 'column',
   background: props.theme.colors.elevation1,
   borderRadius: props.theme.radius(2),
-  padding: `${props.theme.space.m} 0 20px`,
+  paddingTop: props.theme.space.m,
   justifyContent: 'center',
   marginBottom: props.theme.space.s,
 }));
@@ -36,7 +35,7 @@ const BundleHeader = styled.div((props) => ({
   flex: 1,
   flexDirection: 'row',
   justifyContent: 'space-between',
-  marginBottom: props.theme.space.m,
+  marginBottom: props.theme.space.s,
 }));
 
 function SendSection({
@@ -46,117 +45,56 @@ function SendSection({
 }) {
   const { t } = useTranslation('translation');
   const {
-    runeSummary,
-    netBtcAmount,
-    transactionIsFinal,
-    sendSection: {
-      showSendSection,
-      showBtcAmount,
-      showRuneTransfers,
-      hasInscriptionsRareSatsInOrdinal,
-      outputsFromOrdinal,
-      inputFromOrdinal,
-      inscriptionsFromPayment,
-      satributesFromPayment,
-    },
+    showSendSection,
+    sendSection: { bundledOutputs, inscriptionsFromPayment, satributesFromPayment },
   } = useParsedTxSummaryContext();
 
-  /** TODO - start bundling send/receive data by output addresses
-   * switch(output.type) === 'address' -> display `destinationAddress`
-   * script -> OP_RETURN
-   * ms -> nothing
-   * Each address can have 1:N bundles
-   * Challenge right now is how to to group the btc, runes, inscriptions data together by output address
-   */
-
-  /** Send Data
-   * BTC: netBtcAmount
-   * Runes: runeSummary.transfers
-   * Ordinals: outputsFromOrdinal OR inputFromOrdinal (depending if tx is final)
-   */
-
-  if (!showSendSection) return null;
+  if (!showSendSection || !Object.entries(bundledOutputs).length) return null;
 
   return (
     <>
       <Title>{t('CONFIRM_TRANSACTION.YOU_WILL_SEND')}</Title>
-      <Container>
-        {showBtcAmount && (
-          <RowContainer noMargin>
-            <Amount amount={-netBtcAmount} />
+      {Object.entries(bundledOutputs).map(([address, bundle], index) => (
+        <Container key={address}>
+          <RowContainer key={address} noMargin>
+            <BundleHeader>
+              <StyledP typography="body_medium_m" color="white_400">
+                {t('COMMON.TO')}
+              </StyledP>
+              <StyledP typography="body_medium_m" color="white_0">
+                {getTruncatedAddress(address, 6)}
+              </StyledP>
+            </BundleHeader>
+            <Amount amount={bundle.netBtcAmount} />
             <AmountWithInscriptionSatribute
               inscriptions={inscriptionsFromPayment}
               satributes={satributesFromPayment}
               onShowInscription={onShowInscription}
             />
+            {bundle.runeTransfers.map((runeTransfer, i) => (
+              <RuneAmount
+                // eslint-disable-next-line react/no-array-index-key
+                key={index}
+                rune={runeTransfer}
+                topMargin={i === 0 && bundle.netBtcAmount > 0}
+                hasSufficientBalance={runeTransfer.hasSufficientBalance}
+              />
+            ))}
+            {bundle.outputs.map((output) => (
+              <InscriptionSatributeRow
+                // eslint-disable-next-line react/no-array-index-key
+                key={index}
+                inscriptions={output.inscriptions}
+                satributes={output.satributes}
+                amount={output.amount}
+                topMargin={bundle.netBtcAmount > 0 || bundle.runeTransfers.length > 0}
+                showAmount
+                onShowInscription={onShowInscription}
+              />
+            ))}
           </RowContainer>
-        )}
-        {showRuneTransfers &&
-          runeSummary?.transfers?.map((transfer, index) => (
-            <>
-              {showBtcAmount && <Divider verticalMargin="s" />}
-              <RowContainer key={transfer.runeName}>
-                <BundleHeader>
-                  <div>
-                    <StyledP typography="body_medium_m" color="white_400">
-                      {t('COMMON.BUNDLE')}
-                    </StyledP>
-                  </div>
-                  <div>
-                    <NumericFormat
-                      value={546}
-                      displayType="text"
-                      thousandSeparator
-                      prefix={`${t('COMMON.SIZE')}: `}
-                      suffix={` ${t('COMMON.SATS')}`}
-                      renderText={(value: string) => (
-                        <StyledP typography="body_medium_m" color="white_400">
-                          {value}
-                        </StyledP>
-                      )}
-                    />
-                  </div>
-                </BundleHeader>
-                <RuneAmount rune={transfer} hasSufficientBalance={transfer.hasSufficientBalance} />
-              </RowContainer>
-              {/* {
-              // unnecessary divider, re-add if needed
-              runeSummary?.transfers.length > index + 1 && <Divider verticalMargin="s" />
-              } */}
-            </>
-          ))}
-        {hasInscriptionsRareSatsInOrdinal && (
-          <RowContainer noPadding noMargin={showRuneTransfers || showBtcAmount}>
-            {transactionIsFinal
-              ? outputsFromOrdinal.map((output, index) => (
-                  <InscriptionSatributeRow
-                    // eslint-disable-next-line react/no-array-index-key
-                    key={index}
-                    hasExternalInputs={false}
-                    inscriptions={output.inscriptions}
-                    satributes={output.satributes}
-                    amount={output.amount}
-                    onShowInscription={onShowInscription}
-                    showTopDivider={(showRuneTransfers || showBtcAmount) && index === 0}
-                    showBottomDivider={outputsFromOrdinal.length > index + 1}
-                  />
-                ))
-              : inputFromOrdinal.map((input, index) => (
-                  <InscriptionSatributeRow
-                    // eslint-disable-next-line react/no-array-index-key
-                    key={index}
-                    hasExternalInputs={false}
-                    inscriptions={input.inscriptions}
-                    satributes={input.satributes}
-                    amount={input.extendedUtxo.utxo.value}
-                    onShowInscription={onShowInscription}
-                    showTopDivider={(showRuneTransfers || showBtcAmount) && index === 0}
-                    showBottomDivider={inputFromOrdinal.length > index + 1}
-                  />
-                ))}
-          </RowContainer>
-        )}
-      </Container>
+        </Container>
+      ))}
     </>
   );
 }

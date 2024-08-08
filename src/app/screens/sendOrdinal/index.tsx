@@ -21,14 +21,19 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import StepDisplay from './stepDisplay';
 import { getPreviousStep, Step } from './steps';
 
-function SendRuneScreen() {
+function SendOrdinalScreen() {
   const navigate = useNavigate();
   const isInOption = isInOptions();
 
-  const context = useTransactionContext();
   const location = useLocation();
   const { id } = useParams();
-  const { data: selectedOrdinal } = useAddressInscription(id!);
+  const params = new URLSearchParams(location.search);
+  const isRareSatParam = params.get('isRareSat');
+  const vout = params.get('vout');
+  const isRareSat = isRareSatParam === 'true';
+
+  const context = useTransactionContext();
+  const { data: selectedOrdinal } = useAddressInscription(isRareSat ? undefined : id);
   const selectedAccount = useSelectedAccount();
   const { data: btcFeeRate, isLoading: feeRatesLoading } = useBtcFeeRate();
   const [currentStep, setCurrentStep] = useState<Step>(Step.SelectRecipient);
@@ -49,7 +54,7 @@ function SendRuneScreen() {
   useResetUserFlow(RoutePaths.SendOrdinal);
 
   useEffect(() => {
-    if (!selectedOrdinal) {
+    if (!selectedOrdinal && !isRareSat) {
       return;
     }
     if (!feeRate && btcFeeRate && !feeRatesLoading) {
@@ -70,11 +75,18 @@ function SendRuneScreen() {
       setIsLoading(true);
       setInsufficientFundsError(false);
       try {
-        const transactionDetails = await btcTransaction.sendOrdinalsWithSplit(
-          context,
-          [{ toAddress: recipientAddress, inscriptionId: id! }],
-          Number(feeRate),
-        );
+        const transactionDetails = isRareSat
+          ? await btcTransaction.sendOrdinals(
+              context,
+              [{ toAddress: recipientAddress, outpoint: `${id}:${vout}` }],
+              Number(feeRate),
+            )
+          : await btcTransaction.sendOrdinalsWithSplit(
+              context,
+              [{ toAddress: recipientAddress, inscriptionId: id! }],
+              Number(feeRate),
+            );
+
         if (!isActiveEffect) return;
         if (!transactionDetails) return;
         setTransaction(transactionDetails);
@@ -111,7 +123,7 @@ function SendRuneScreen() {
     };
   }, [context, recipientAddress, feeRate, id]);
 
-  if (!selectedOrdinal) {
+  if (!selectedOrdinal && !isRareSat) {
     navigate('/');
     return null;
   }
@@ -121,7 +133,11 @@ function SendRuneScreen() {
       window.close();
       return;
     }
-    navigate(`/nft-dashboard/ordinal-detail/${selectedOrdinal?.id}`);
+    navigate(
+      isRareSat
+        ? `/nft-dashboard/rare-sats-bundle`
+        : `/nft-dashboard/ordinal-detail/${selectedOrdinal?.id}`,
+    );
   };
 
   const handleBackButtonClick = () => {
@@ -133,11 +149,18 @@ function SendRuneScreen() {
   };
 
   const calculateFeeForFeeRate = async (desiredFeeRate: number): Promise<number | undefined> => {
-    const transactionDetails = await btcTransaction.sendOrdinalsWithSplit(
-      context,
-      [{ toAddress: recipientAddress, inscriptionId: id! }],
-      desiredFeeRate,
-    );
+    const transactionDetails = isRareSat
+      ? await btcTransaction.sendOrdinals(
+          context,
+          [{ toAddress: recipientAddress, outpoint: `${id}:${vout}` }],
+          desiredFeeRate,
+        )
+      : await btcTransaction.sendOrdinalsWithSplit(
+          context,
+          [{ toAddress: recipientAddress, inscriptionId: id! }],
+          desiredFeeRate,
+        );
+
     if (!transactionDetails) return;
     const txSummary = await transactionDetails.getSummary();
     if (txSummary) return Number(txSummary.fee);
@@ -150,7 +173,7 @@ function SendRuneScreen() {
       const txnId = await transaction?.broadcast({ ledgerTransport, rbfEnabled: true });
 
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
-        protocol: 'runes',
+        protocol: 'ordinals',
         action: 'transfer',
         wallet_type: selectedAccount?.accountType || 'software',
       });
@@ -202,4 +225,4 @@ function SendRuneScreen() {
   );
 }
 
-export default SendRuneScreen;
+export default SendOrdinalScreen;

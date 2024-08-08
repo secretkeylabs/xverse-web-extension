@@ -49,11 +49,11 @@ const TickerProtocolContainer = styled.div`
 `;
 
 const ProtocolIcon = styled.div<{ isSquare?: boolean }>((props) => ({
-  width: props.isSquare ? 18 : 22,
-  height: props.isSquare ? 18 : 22,
-  borderRadius: props.isSquare ? 0 : 22,
+  width: props.isSquare ? 18 : 20,
+  height: props.isSquare ? 18 : 20,
+  borderRadius: props.isSquare ? 0 : 20,
   position: 'absolute',
-  right: props.isSquare ? -9 : -11,
+  right: props.isSquare ? -9 : -10,
   bottom: -2,
   backgroundColor: props.theme.colors.elevation0,
   padding: 2,

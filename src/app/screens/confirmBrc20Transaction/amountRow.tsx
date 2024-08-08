@@ -1,5 +1,5 @@
-import styled from 'styled-components';
 import { StyledP } from '@ui-library/common.styled';
+import styled from 'styled-components';
 
 const RowContainer = styled.div`
   display: flex;
@@ -10,14 +10,15 @@ const RowContainer = styled.div`
 const LabelContainer = styled.div`
   display: flex;
   align-items: center;
-  gap: ${(props) => props.theme.spacing(5)}px;
+  gap: ${(props) => props.theme.space.m};
 `;
 
-const SubTextContainer = styled.div`
-  margin-top: -5px;
-  min-height: 16px;
-  width: 100%;
+const TextContainer = styled.div`
   text-align: end;
+`;
+
+const StyledSubtext = styled(StyledP)`
+  margin-top: ${(props) => props.theme.space.xxxs};
 `;
 
 function AmountRow({
@@ -25,30 +26,37 @@ function AmountRow({
   amountLabel,
   amount,
   amountSubText,
+  ticker,
 }: {
   icon: React.ReactNode;
   amountLabel: string;
   amount: React.ReactNode;
   amountSubText: React.ReactNode;
+  ticker: string;
 }) {
   return (
     <div>
       <RowContainer>
         <LabelContainer>
           {icon}
-          <StyledP typography="body_medium_m" color="white_200">
-            {amountLabel}
-          </StyledP>
+          <div>
+            <StyledP typography="body_medium_m" color="white_0">
+              {amountLabel}
+            </StyledP>
+            <StyledSubtext typography="body_medium_s" color="white_400">
+              {ticker} Token
+            </StyledSubtext>
+          </div>
         </LabelContainer>
-        <StyledP typography="body_medium_m" color="white_0">
-          {amount}
-        </StyledP>
+        <TextContainer>
+          <StyledP typography="body_medium_m" color="white_0">
+            {amount}
+          </StyledP>
+          <StyledSubtext typography="body_medium_s" color="white_400">
+            {amountSubText}
+          </StyledSubtext>
+        </TextContainer>
       </RowContainer>
-      <SubTextContainer>
-        <StyledP typography="body_medium_s" color="white_400">
-          {amountSubText}
-        </StyledP>
-      </SubTextContainer>
     </div>
   );
 }

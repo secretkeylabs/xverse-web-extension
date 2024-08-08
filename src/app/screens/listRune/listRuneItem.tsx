@@ -109,7 +109,7 @@ function ListRuneItem({
             <NumericFormat
               value={satAmount}
               displayType="text"
-              prefix="Size: "
+              prefix={`${t('SIZE')}: `}
               suffix={` ${t('SATS')}`}
               thousandSeparator
               renderText={(value: string) => (

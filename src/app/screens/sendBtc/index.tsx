@@ -1,7 +1,6 @@
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useDebounce from '@hooks/useDebounce';
 import useHasFeature from '@hooks/useHasFeature';
-import useNetworkSelector from '@hooks/useNetwork';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
@@ -16,7 +15,7 @@ import {
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   generateSendMaxTransaction,
   generateTransaction,
@@ -32,31 +31,19 @@ function SendBtcScreen() {
 
   useResetUserFlow('/send-btc');
 
-  const location = useLocation();
-
   const { data: btcFeeRate, isLoading: feeRatesLoading } = useBtcFeeRate();
   const selectedAccount = useSelectedAccount();
   const transactionContext = useTransactionContext();
-  const [recipientAddress, setRecipientAddress] = useState<string>(
-    location.state?.recipientAddress || '',
-  );
+  const [recipientAddress, setRecipientAddress] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [amountSats, setAmountSats] = useState<string>(location.state?.amount || '');
+  const [amountSats, setAmountSats] = useState<string>('');
   const [feeRate, setFeeRate] = useState('');
   const [sendMax, setSendMax] = useState(false);
-  const amountEditable = location.state?.disableAmountEdit ?? true;
-  const addressEditable = location.state?.disableAddressEdit ?? true;
 
   const debouncedRecipient = useDebounce(recipientAddress, 500);
 
-  const initialStep = addressEditable
-    ? Step.SelectRecipient
-    : amountEditable
-    ? Step.SelectRecipient
-    : Step.Confirm;
-
-  const [currentStep, setCurrentStep] = useState<Step>(initialStep);
+  const [currentStep, setCurrentStep] = useState<Step>(Step.SelectRecipient);
 
   const [transaction, setTransaction] = useState<btcTransaction.EnhancedTransaction | undefined>();
   const [summary, setSummary] = useState<TransactionSummary | undefined>();
@@ -150,7 +137,7 @@ function SendBtcScreen() {
 
   const handleBackButtonClick = () => {
     if (currentStep > 0) {
-      setCurrentStep(getPreviousStep(currentStep, addressEditable, amountEditable));
+      setCurrentStep(getPreviousStep(currentStep));
     } else {
       handleCancel();
     }
@@ -159,7 +146,6 @@ function SendBtcScreen() {
   const calculateFeeForFeeRate = async (desiredFeeRate: number): Promise<number | undefined> => {
     const { summary: tempSummary } = await generateTransactionAndSummary(desiredFeeRate);
     if (tempSummary) return Number(tempSummary.fee);
-
     return undefined;
   };
 
@@ -222,11 +208,9 @@ function SendBtcScreen() {
       setAmountSats={setAmountSatsSafe}
       feeRate={feeRate}
       setFeeRate={handleFeeRateChange}
+      getFeeForFeeRate={calculateFeeForFeeRate}
       sendMax={sendMax}
       setSendMax={setSendMax}
-      getFeeForFeeRate={calculateFeeForFeeRate}
-      addressEditable={addressEditable}
-      amountEditable={amountEditable}
       onBack={handleBackButtonClick}
       onCancel={handleCancel}
       onConfirm={handleSubmit}

@@ -143,6 +143,7 @@ export default function useRequestHelper(): UseRequestHelperReturn {
   {
     const params = new URLSearchParams(search);
     const token = params.get('addressRequest') ?? '';
+    const origin = params.get('origin') ?? '';
     let legacyRequestNetworkType;
     let request: GetAddressOptions | undefined;
     if (token) {

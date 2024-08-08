@@ -4,10 +4,10 @@ export enum Step {
   Confirm = 2,
 }
 
-export const getNextStep = (currentStep: Step, amountEditable: boolean) => {
+export const getNextStep = (currentStep: Step) => {
   switch (currentStep) {
     case Step.SelectRecipient:
-      return amountEditable ? Step.SelectAmount : Step.Confirm;
+      return Step.SelectAmount;
     case Step.SelectAmount:
       return Step.Confirm;
     case Step.Confirm:
@@ -17,19 +17,14 @@ export const getNextStep = (currentStep: Step, amountEditable: boolean) => {
   }
 };
 
-export const getPreviousStep = (
-  currentStep: Step,
-  addressEditable: boolean,
-  amountEditable: boolean,
-) => {
+export const getPreviousStep = (currentStep: Step) => {
   switch (currentStep) {
     case Step.SelectRecipient:
       return Step.SelectRecipient;
     case Step.SelectAmount:
-      return addressEditable ? Step.SelectRecipient : Step.SelectAmount;
       return Step.SelectRecipient;
     case Step.Confirm:
-      return amountEditable ? Step.SelectAmount : Step.SelectRecipient;
+      return Step.SelectAmount;
     default:
       throw new Error(`Unknown step: ${currentStep}`);
   }

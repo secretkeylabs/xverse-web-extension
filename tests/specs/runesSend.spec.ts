@@ -12,11 +12,7 @@ test.describe('Send runes', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
     // get own Ordinals Address for address check on review page
-    await wallet.allupperButtons.nth(1).click();
-    const addressOrdinals = await wallet.getAddress(wallet.buttonCopyOrdinalsAddress);
-
-    // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
-    await page.reload();
+    const addressOrdinals = await wallet.getAddress(1);
 
     // Check if Rune is enabled and if not enable the rune and click on it
     await wallet.checkAndClickOnSpecificRune('SKIBIDI•OHIO•RIZZ');
@@ -50,12 +46,8 @@ test.describe('Send runes', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
     // get own BTC  & Ordinals Address for address check on review page
-    await wallet.allupperButtons.nth(1).click();
-    const selfBTC = await wallet.getAddress(wallet.buttonCopyBitcoinAddress);
-    const addressOrdinals = await wallet.getAddress(wallet.buttonCopyOrdinalsAddress);
-
-    // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
-    await page.reload();
+    const selfBTC = await wallet.getAddress(0);
+    const addressOrdinals = await wallet.getAddress(1);
 
     // Check if Rune is enabled and if not enable the rune and click on it
     await wallet.checkAndClickOnSpecificRune(runeName);
@@ -67,7 +59,7 @@ test.describe('Send runes', () => {
     await wallet.checkVisualsSendPage1('send-rune');
 
     // Address invalid check
-    await wallet.invalidAdressCheck(wallet.receiveAddress);
+    await wallet.invalidAddressCheck(wallet.receiveAddress);
 
     await wallet.receiveAddress.fill(TEST_ORDINALS_ADDRESS);
     await expect(wallet.buttonNext).toBeEnabled();
@@ -98,7 +90,7 @@ test.describe('Send runes', () => {
     await wallet.confirmSendTransaction();
 
     // Check Startpage
-    await wallet.checkVisualsStartpage('testnet');
+    await wallet.checkVisualsStartpage();
 
     await wallet.checkAndClickOnSpecificRune(runeName);
     const BalanceAmount = await wallet.checkVisualsRunesDashboard(runeName);

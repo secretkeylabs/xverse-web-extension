@@ -11,11 +11,7 @@ test.describe('Transaction STX', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
     // get own STX Address
-    await wallet.allupperButtons.nth(1).click();
-    const selfSTXMain = await wallet.getAddress(wallet.buttonCopyStacksAddress, false);
-
-    // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
-    await page.reload();
+    const selfSTXMain = await wallet.getAddress(2);
 
     await wallet.checkVisualsStartpage();
 
@@ -100,7 +96,7 @@ test.describe('Transaction STX', () => {
     await wallet.buttonCancel.click();
 
     // Check startpage
-    await wallet.checkVisualsStartpage('testnet');
+    await wallet.checkVisualsStartpage();
 
     // Check STX Balance after cancel the transaction
     const balanceAfterCancel = await wallet.getTokenBalance('Stacks');
@@ -156,7 +152,7 @@ test.describe('Transaction STX', () => {
 
     // Confirm the transaction
     await wallet.confirmSendTransaction();
-    await wallet.checkVisualsStartpage('testnet');
+    await wallet.checkVisualsStartpage();
 
     // Can't check amounts or transaction as E2E test is faster than the UI or API to how that transaction --> has to be checked manually
   });
