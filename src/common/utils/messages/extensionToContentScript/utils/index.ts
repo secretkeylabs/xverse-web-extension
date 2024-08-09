@@ -61,7 +61,7 @@ export async function sendMessageConnectedClient(id: string, message: ContentScr
   const url = clientOriginToUrlMatchPattern(client.origin);
 
   const clientTabs = (await chrome.tabs.query({ url })).filter(
-    (tab): tab is chrome.tabs.Tab & { readonly id: Number } => typeof tab.id === 'number',
+    (tab): tab is chrome.tabs.Tab & { readonly id: number } => typeof tab.id === 'number',
   );
 
   sendMessageContentScriptTabs(
