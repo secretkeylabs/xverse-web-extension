@@ -6,9 +6,9 @@ const strongPW = Onboarding.generateSecurePasswordCrypto();
 
 test.describe('Account Management', () => {
   test('Check account page #smoketest', async ({ page, extensionId }) => {
-    const onboardingpage = new Onboarding(page);
+    const onboardingPage = new Onboarding(page);
     const wallet = new Wallet(page);
-    await onboardingpage.createWalletSkipBackup(strongPW);
+    await onboardingPage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
     await wallet.checkVisualsStartpage();
     await wallet.labelAccountName.click();
@@ -26,9 +26,9 @@ test.describe('Account Management', () => {
   });
 
   test('Rename account', async ({ page, extensionId }) => {
-    const onboardingpage = new Onboarding(page);
+    const onboardingPage = new Onboarding(page);
     const wallet = new Wallet(page);
-    await onboardingpage.createWalletSkipBackup(strongPW);
+    await onboardingPage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
     await wallet.checkVisualsStartpage();
     await wallet.labelAccountName.click();
@@ -43,7 +43,7 @@ test.describe('Account Management', () => {
     await expect(wallet.inputName).toBeVisible();
     await expect(wallet.buttonResetAccountName).toBeVisible();
     await expect(wallet.errorMessageRenameAccount).toBeHidden();
-    // Check Errormessage for non alphabetical and numerical characters
+    // Check Error message for non alphabetical and numerical characters
     await wallet.inputName.fill(`!!!`);
     await expect(wallet.errorMessageRenameAccount).toBeVisible();
     await expect(wallet.buttonConfirm).toBeDisabled();
@@ -59,9 +59,9 @@ test.describe('Account Management', () => {
   });
 
   test('Reset account name', async ({ page, extensionId }) => {
-    const onboardingpage = new Onboarding(page);
+    const onboardingPage = new Onboarding(page);
     const wallet = new Wallet(page);
-    await onboardingpage.createWalletSkipBackup(strongPW);
+    await onboardingPage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
     await wallet.checkVisualsStartpage();
     await wallet.labelAccountName.click();
@@ -87,9 +87,9 @@ test.describe('Account Management', () => {
   });
 
   test('Generate new account', async ({ page, extensionId }) => {
-    const onboardingpage = new Onboarding(page);
+    const onboardingPage = new Onboarding(page);
     const wallet = new Wallet(page);
-    await onboardingpage.createWalletSkipBackup(strongPW);
+    await onboardingPage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
     await wallet.checkVisualsStartpage();
     await wallet.labelAccountName.click();
@@ -104,9 +104,9 @@ test.describe('Account Management', () => {
   });
 
   test('Switch to another account and switch back', async ({ page, extensionId }) => {
-    const onboardingpage = new Onboarding(page);
+    const onboardingPage = new Onboarding(page);
     const wallet = new Wallet(page);
-    await onboardingpage.createWalletSkipBackup(strongPW);
+    await onboardingPage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
     await wallet.checkVisualsStartpage();
     await expect(wallet.labelAccountName).toHaveText('Account 1');

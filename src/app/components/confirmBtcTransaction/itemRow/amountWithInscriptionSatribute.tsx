@@ -25,7 +25,6 @@ const WarningButton = styled.button`
   align-items: center;
   justify-content: space-between;
   background-color: ${(props) => props.theme.colors.elevation1};
-  padding-top: ${(props) => props.theme.space.m};
 `;
 
 const ItemsContainer = styled(animated.div)((props) => ({

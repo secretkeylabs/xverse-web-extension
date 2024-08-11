@@ -169,7 +169,11 @@ export default function Brc20Tile(props: Brc20TileProps) {
         isGalleryOpen={isGalleryOpen}
         isSmallImage={isSmallImage}
       >
-        <TickerIconText enlargeTicker={withoutTitles} isGalleryOpen={isGalleryOpen}>
+        <TickerIconText
+          data-testid="token-image"
+          enlargeTicker={withoutTitles}
+          isGalleryOpen={isGalleryOpen}
+        >
           {ticker}
         </TickerIconText>
       </TickerIconContainer>

@@ -137,7 +137,7 @@ function SwapTokenBlock({
             <CoinButtonArrow src={ChevronIcon} />
           </CoinButtonContainer>
           <AmountInput
-            data-testid="coin-input"
+            data-testid="swap-amount"
             error={error}
             placeholder="0"
             disabled={onAmountChange == null}
