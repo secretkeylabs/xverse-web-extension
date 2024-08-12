@@ -155,7 +155,7 @@ export default function QuoteSummary({
 }: QuoteSummaryProps) {
   const { t } = useTranslation('translation');
   const theme = useTheme();
-  const { btcFiatRate } = useCoinRates();
+  const { btcFiatRate, btcUsdRate } = useCoinRates();
   const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey } = useSelectedAccount();
   const { loading: isPlaceOrderLoading, error: placeOrderError, placeOrder } = usePlaceOrder();
   const {
@@ -204,7 +204,7 @@ export default function QuoteSummary({
       toToken,
       amount,
       quote,
-      btcFiatRate,
+      btcUsdRate,
       runeFloorPrice,
     });
 

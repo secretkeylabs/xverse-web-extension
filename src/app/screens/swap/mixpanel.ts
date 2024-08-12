@@ -16,7 +16,7 @@ function trackSwapMixPanel(
     toToken,
     amount,
     quote,
-    btcFiatRate,
+    btcUsdRate,
     runeFloorPrice,
   }: {
     provider?: Provider;
@@ -24,7 +24,7 @@ function trackSwapMixPanel(
     toToken?: Token;
     amount: string;
     quote?: Quote;
-    btcFiatRate: string;
+    btcUsdRate: string;
     runeFloorPrice?: number;
   },
 ) {
@@ -33,13 +33,13 @@ function trackSwapMixPanel(
 
   const fromAmount =
     fromToken === 'BTC'
-      ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcFiatRate)).toFixed(2)
+      ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcUsdRate)).toFixed(2)
       : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2);
 
   const receiveAmount = new BigNumber(quote?.receiveAmount ?? 0);
   const toAmount = getBtcFiatEquivalent(
     toToken?.protocol === 'btc' ? receiveAmount : receiveAmount.multipliedBy(runeFloorPrice ?? 0),
-    new BigNumber(btcFiatRate),
+    new BigNumber(btcUsdRate),
   ).toFixed(2);
 
   trackMixPanel(eventName, {

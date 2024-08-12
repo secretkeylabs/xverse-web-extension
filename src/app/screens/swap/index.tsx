@@ -126,7 +126,7 @@ export default function SwapScreen() {
 
   const { unfilteredData } = useRuneFungibleTokensQuery();
   const { data: btcBalance } = useBtcWalletData();
-  const { btcFiatRate } = useCoinRates();
+  const { btcFiatRate, btcUsdRate } = useCoinRates();
   const navigate = useNavigate();
   const { t } = useTranslation('translation');
   const location = useLocation();
@@ -175,7 +175,7 @@ export default function SwapScreen() {
       toToken,
       amount,
       quote,
-      btcFiatRate,
+      btcUsdRate,
       runeFloorPrice,
     });
 
@@ -371,7 +371,7 @@ export default function SwapScreen() {
       toToken,
       amount,
       quote,
-      btcFiatRate,
+      btcUsdRate,
       runeFloorPrice,
     });
   };
