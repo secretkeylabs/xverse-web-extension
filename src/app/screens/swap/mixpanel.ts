@@ -1,4 +1,5 @@
 import {
+  btcToSats,
   getBtcFiatEquivalent,
   type FungibleToken,
   type Provider,
@@ -36,18 +37,22 @@ function trackSwapMixPanel(
       ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcUsdRate)).toFixed(2)
       : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2);
 
-  const receiveAmount = new BigNumber(quote?.receiveAmount ?? 0);
-  const toAmount = getBtcFiatEquivalent(
-    toToken?.protocol === 'btc' ? receiveAmount : receiveAmount.multipliedBy(runeFloorPrice ?? 0),
-    new BigNumber(btcUsdRate),
-  ).toFixed(2);
+  const receiveAmount = quote?.receiveAmount ? new BigNumber(quote?.receiveAmount) : undefined;
+  const toAmount = receiveAmount
+    ? getBtcFiatEquivalent(
+        toToken?.protocol === 'btc'
+          ? receiveAmount
+          : receiveAmount.multipliedBy(runeFloorPrice ?? 0),
+        new BigNumber(btcUsdRate),
+      ).toFixed(2)
+    : undefined;
 
   trackMixPanel(eventName, {
     ...(provider ? { provider: provider?.name } : {}),
     ...(from ? { from } : {}),
     ...(to ? { to } : {}),
     fromAmount,
-    toAmount,
+    ...(toAmount ? { toAmount } : {}),
   });
 }
 
