@@ -173,7 +173,7 @@ export default function SwapScreen() {
     trackSwapMixPanel(AnalyticsEvents.FetchSwapQuote, {
       fromToken,
       toToken,
-      amount,
+      amount: fromToken === 'BTC' ? btcToSats(new BigNumber(amount)).toString() : amount,
       quote,
       btcUsdRate,
       runeFloorPrice,
