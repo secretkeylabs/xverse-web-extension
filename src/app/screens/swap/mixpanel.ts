@@ -36,13 +36,11 @@ function trackSwapMixPanel(
       ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcFiatRate)).toFixed(2)
       : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2);
 
-  const toAmount =
-    toToken?.protocol === 'btc'
-      ? getBtcFiatEquivalent(
-          new BigNumber(quote?.receiveAmount ?? 0),
-          new BigNumber(btcFiatRate),
-        ).toFixed(2)
-      : new BigNumber(quote?.receiveAmount ?? 0).multipliedBy(runeFloorPrice ?? 0).toFixed(2);
+  const receiveAmount = new BigNumber(quote?.receiveAmount ?? 0);
+  const toAmount = getBtcFiatEquivalent(
+    toToken?.protocol === 'btc' ? receiveAmount : receiveAmount.multipliedBy(runeFloorPrice ?? 0),
+    new BigNumber(btcFiatRate),
+  ).toFixed(2);
 
   trackMixPanel(eventName, {
     ...(provider ? { provider: provider?.name } : {}),
