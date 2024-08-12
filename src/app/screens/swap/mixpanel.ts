@@ -1,5 +1,4 @@
 import {
-  btcToSats,
   getBtcFiatEquivalent,
   type FungibleToken,
   type Provider,
