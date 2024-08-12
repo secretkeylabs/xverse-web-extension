@@ -1332,7 +1332,8 @@
     "SELECT_BUNDLES": "Select bundles to proceed with the swap",
     "SWAP_FROM": "Swap from",
     "SWAP_TO": "Swap to",
-    "LIST_YOUR_RUNES": "List your Runes on Magic Eden"
+    "LIST_YOUR_RUNES": "List your Runes on Magic Eden",
+    "SLIPPAGE_WARNING": "Your transaction may be frontrun and result in an unfavorable trade"
   },
   "SWAP_CONFIRM_SCREEN": {
     "TOKEN_SWAP": "Token swap",

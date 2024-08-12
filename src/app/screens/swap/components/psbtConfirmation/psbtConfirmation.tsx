@@ -3,13 +3,11 @@ import RequestError from '@components/requests/requestError';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
+import type { OrderInfo } from '@screens/swap/types';
 import {
   btcTransaction,
   parseSummaryForRunes,
-  type ExecuteOrderRequest,
   type ExecuteUtxoOrderRequest,
-  type PlaceOrderResponse,
-  type PlaceUtxoOrderResponse,
   type RuneSummary,
   type Transport,
 } from '@secretkeylabs/xverse-core';
@@ -23,10 +21,7 @@ import useExecuteUtxoOrder from './useExecuteUtxoOrder';
 type PSBTSummary = Awaited<ReturnType<btcTransaction.EnhancedPsbt['getSummary']>>;
 
 type Props = {
-  orderInfo: {
-    order: PlaceOrderResponse | PlaceUtxoOrderResponse;
-    providerCode: ExecuteOrderRequest['providerCode'];
-  };
+  orderInfo: OrderInfo;
   onClose: () => void;
   onConfirm: () => void;
 };
@@ -184,9 +179,11 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
   }
 
   const quoteExpiryCallout =
-    orderInfo.providerCode === 'dotswap'
+    'expiresInMilliseconds' in orderInfo.order && orderInfo.order.expiresInMilliseconds
       ? {
-          bodyText: t('QUOTE_EXPIRES_IN', { seconds: 30 }),
+          bodyText: t('QUOTE_EXPIRES_IN', {
+            seconds: orderInfo.order.expiresInMilliseconds / 1000,
+          }),
         }
       : undefined;
 

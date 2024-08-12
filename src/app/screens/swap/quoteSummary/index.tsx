@@ -6,17 +6,14 @@ import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useSearchParamsState from '@hooks/useSearchParamsState';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { ArrowDown, ArrowRight } from '@phosphor-icons/react';
+import { ArrowDown, ArrowRight, WarningOctagon } from '@phosphor-icons/react';
 import {
   AnalyticsEvents,
   RUNE_DISPLAY_DEFAULTS,
   getBtcFiatEquivalent,
-  type ExecuteOrderRequest,
   type FungibleToken,
   type MarketUtxo,
-  type PlaceOrderResponse,
   type PlaceUtxoOrderRequest,
-  type PlaceUtxoOrderResponse,
   type Quote,
   type Token,
 } from '@secretkeylabs/xverse-core';
@@ -31,23 +28,25 @@ import styled, { useTheme } from 'styled-components';
 import trackSwapMixPanel from '../mixpanel';
 import QuoteTile from '../quotesModal/quoteTile';
 import { SlippageModalContent } from '../slippageModal';
+import type { OrderInfo } from '../types';
 import { mapFTNativeSwapTokenToTokenBasic } from '../utils';
 import EditFee from './EditFee';
 import QuoteSummaryTile from './quoteSummaryTile';
 import usePlaceOrder from './usePlaceOrder';
 import usePlaceUtxoOrder from './usePlaceUtxoOrder';
 
-const SlippageButton = styled.button`
+const SlippageButton = styled.button<{ showWarning: boolean }>`
   display: flex;
   flex-direction: row;
   column-gap: ${(props) => props.theme.space.xxs};
   background: transparent;
   align-items: center;
   ${(props) => props.theme.typography.body_medium_m};
-  color: ${(props) => props.theme.colors.white_0};
   border-radius: 24px;
   border: 1px solid ${(props) => props.theme.colors.white_800};
-  padding: 1.75px 10px;
+  padding: ${(props) => props.theme.space.xxs} ${(props) => props.theme.space.s};
+  color: ${(props) =>
+    props.showWarning ? props.theme.colors.caution : props.theme.colors.white_0};
 `;
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -139,13 +138,7 @@ type QuoteSummaryProps = {
   onClose: () => void;
   onChangeProvider: () => void;
   onError: (errorMessage: string) => void;
-  onOrderPlaced: ({
-    order,
-    providerCode,
-  }: {
-    order: PlaceOrderResponse | PlaceUtxoOrderResponse;
-    providerCode: ExecuteOrderRequest['providerCode'];
-  }) => void;
+  onOrderPlaced: ({ order, providerCode }: OrderInfo) => void;
   selectedIdentifiers?: Omit<MarketUtxo, 'token'>[];
 };
 
@@ -260,6 +253,10 @@ export default function QuoteSummary({
 
   const feeUnits = toToken?.protocol === 'sip10' || toToken?.protocol === 'stx' ? 'STX' : 'Sats';
 
+  const showSlippageWarning = Boolean(
+    quote.slippageSupported && quote.slippageThreshold && slippage > quote.slippageThreshold,
+  );
+
   return (
     <>
       <TopRow onClick={onClose} />
@@ -345,7 +342,11 @@ export default function QuoteSummary({
                 <SlippageButton
                   data-testid="slippage-button"
                   onClick={() => setShowSlippageModal(true)}
+                  showWarning={showSlippageWarning}
                 >
+                  {showSlippageWarning && (
+                    <WarningOctagon weight="fill" color={theme.colors.caution} size={16} />
+                  )}
                   {slippage * 100}%
                   <img alt={t('SLIPPAGE')} src={SlippageEditIcon} />
                 </SlippageButton>
@@ -436,6 +437,8 @@ export default function QuoteSummary({
         >
           <SlippageModalContent
             slippage={slippage}
+            slippageThreshold={quote.slippageThreshold}
+            slippageDecimals={quote.slippageDecimals}
             onChange={(newSlippage) => {
               setSlippage(newSlippage);
               setShowSlippageModal(false);
