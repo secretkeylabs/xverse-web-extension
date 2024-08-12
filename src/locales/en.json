@@ -815,7 +815,8 @@
       "ABOUT": "About",
       "PREFERENCES": "Preferences",
       "ADVANCED": "Advanced",
-      "SECURITY": "Security"
+      "SECURITY": "Security",
+      "CONNECTED_APPS": "Connected Apps"
     },
     "GENERAL": "General",
     "CURRENCY": "Fiat Currency",
@@ -827,12 +828,12 @@
     "BTC_URL": "BTC URL",
     "STACKS_URL": "Stacks URL",
     "FALLBACK_BTC_URL": "Fallback BTC URL",
-    "RESET_TO_DEFAULT": "Reset to default",
+    "RESET_TO_DEFAULT": "Reset URL",
     "REQUIRED": "Required",
     "NETWORK": "Network",
     "SECURITY": "Security",
     "UPDATE_PASSWORD": "Update Password",
-    "BACKUP_WALLET": "Backup Wallet",
+    "BACKUP_WALLET": "Show Seedphrase",
     "AUTO_LOCK": "Auto Lock",
     "RESET_WALLET": "Reset Wallet",
     "ABOUT": "About",
@@ -874,6 +875,11 @@
     "ADVANCED": "Advanced",
     "XVERSE_DEFAULT": "Use Xverse as default wallet",
     "XVERSE_DEFAULT_DESCRIPTION": "Allow apps to prioritize Xverse when looking for a wallet with which to connect."
+  },
+  "CONNECTED_APPS": {
+    "TITLE": "Connected Apps",
+    "SUBTITLE": "You are connected to the following apps.",
+    "EMPTY_MESSAGE": "You’re not currently connected to any app."
   },
   "EXPLORE_SCREEN": {
     "TITLE": "Explore",

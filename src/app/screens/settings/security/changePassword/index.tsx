@@ -53,7 +53,7 @@ function ChangePasswordScreen() {
   const navigate = useNavigate();
 
   const handleBackButtonClick = () => {
-    navigate('/settings');
+    navigate(-1);
   };
 
   const dismissToast = () => {
@@ -103,7 +103,7 @@ function ChangePasswordScreen() {
 
   return (
     <>
-      <TopRow title={t('SETTING_SCREEN.UPDATE_PASSWORD')} onClick={handleBackButtonClick} />
+      <TopRow onClick={handleBackButtonClick} />
       <PasswordContainer>
         {currentStepIndex === 0 && (
           <PasswordInput

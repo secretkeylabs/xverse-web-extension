@@ -1,11 +1,13 @@
 import PasswordInput from '@components/passwordInput';
 import ResetWalletPrompt from '@components/resetWallet';
+import TopRow from '@components/topRow';
 import useSeedVault from '@hooks/useSeedVault';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { Container, Title } from '../index.styles';
 import SettingComponent from '../settingComponent';
 
 const ResetWalletContainer = styled.div((props) => ({
@@ -17,8 +19,7 @@ const ResetWalletContainer = styled.div((props) => ({
   right: 0,
   position: 'fixed',
   zIndex: 10,
-  background: 'rgba(25, 25, 48, 0.5)',
-  backdropFilter: 'blur(10px)',
+  background: props.theme.colors.elevation0,
   paddingLeft: props.theme.space.m,
   paddingRight: props.theme.space.m,
   paddingTop: props.theme.spacing(50),
@@ -74,44 +75,48 @@ function Security() {
     navigate('/backup-wallet');
   };
 
+  const handleBackButtonClick = () => {
+    navigate('/settings');
+  };
+
   return (
-    <div>
-      {showResetWalletDisplay && (
-        <ResetWalletContainer>
-          <PasswordInput
-            title={t('ENTER_PASSWORD')}
-            inputLabel={t('PASSWORD')}
-            enteredPassword={password}
-            setEnteredPassword={setPassword}
-            handleContinue={handlePasswordNextClick}
-            handleBack={goToSettingScreen}
-            passwordError={error}
-            stackButtonAlignment
-            loading={loading}
-          />
-        </ResetWalletContainer>
-      )}
-      <h1>Security</h1>
-      <SettingComponent
-        text={t('BACKUP_WALLET')}
-        onClick={openBackUpWalletScreen}
-        // icon={ArrowIcon}
-        showDivider
-      />
-      <SettingComponent
-        title={t('SECURITY')}
-        text={t('UPDATE_PASSWORD')}
-        onClick={openUpdatePasswordScreen}
-        // icon={ArrowIcon}
-        showDivider
-      />
-      <SettingComponent text={t('RESET_WALLET')} onClick={openResetWalletPrompt} showWarningTitle />
-      <ResetWalletPrompt
-        showResetWalletPrompt={showResetWalletPrompt}
-        onResetWalletPromptClose={onResetWalletPromptClose}
-        openResetWalletScreen={openResetWalletScreen}
-      />
-    </div>
+    <>
+      <TopRow onClick={handleBackButtonClick} />
+      <Container>
+        <Title>Security</Title>
+        {showResetWalletDisplay && (
+          <ResetWalletContainer>
+            <PasswordInput
+              title={t('ENTER_PASSWORD')}
+              inputLabel={t('PASSWORD')}
+              enteredPassword={password}
+              setEnteredPassword={setPassword}
+              handleContinue={handlePasswordNextClick}
+              handleBack={goToSettingScreen}
+              passwordError={error}
+              stackButtonAlignment
+              loading={loading}
+            />
+          </ResetWalletContainer>
+        )}
+        <SettingComponent
+          text={t('UPDATE_PASSWORD')}
+          onClick={openUpdatePasswordScreen}
+          showDivider
+        />
+        <SettingComponent text={t('BACKUP_WALLET')} onClick={openBackUpWalletScreen} showDivider />
+        <SettingComponent
+          text={t('RESET_WALLET')}
+          onClick={openResetWalletPrompt}
+          showWarningTitle
+        />
+        <ResetWalletPrompt
+          showResetWalletPrompt={showResetWalletPrompt}
+          onResetWalletPromptClose={onResetWalletPromptClose}
+          openResetWalletScreen={openResetWalletScreen}
+        />
+      </Container>
+    </>
   );
 }
 

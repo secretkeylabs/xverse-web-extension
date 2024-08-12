@@ -1,4 +1,4 @@
-import { ArrowSquareOut, CaretRight } from '@phosphor-icons/react';
+import { ArrowUpRight, CaretRight } from '@phosphor-icons/react';
 import Switch from 'react-switch';
 import styled, { useTheme } from 'styled-components';
 
@@ -18,7 +18,7 @@ const Button = styled.button<{
   background: 'transparent',
   justifyContent: 'flex-start',
   paddingTop: props.theme.space.m,
-  paddingBottom: props.theme.space.m,
+  paddingBottom: props.theme.space.l,
   borderBottom: props.border,
 }));
 
@@ -37,15 +37,15 @@ const TitleText = styled.h1((props) => ({
 const ComponentText = styled.h1<{
   textColor: string;
 }>((props) => ({
-  ...props.theme.typography.body_m,
+  ...props.theme.typography.body_medium_l,
   color: props.textColor,
   flex: 1,
   textAlign: 'left',
 }));
 
 const ComponentDescriptionText = styled.h1((props) => ({
-  ...props.theme.typography.body_bold_m,
-  color: props.theme.colors.white_0,
+  ...props.theme.typography.body_medium_l,
+  color: props.theme.colors.white_200,
 }));
 
 const DescriptionText = styled.p((props) => ({
@@ -53,7 +53,7 @@ const DescriptionText = styled.p((props) => ({
   marginTop: props.theme.space.xxs,
   color: props.theme.colors.white_400,
   textAlign: 'left',
-  paddingRight: props.theme.space.m,
+  paddingRight: props.theme.space.s,
 }));
 
 const Column = styled.div({
@@ -81,7 +81,7 @@ interface SettingComponentProps {
   title?: string;
   text: string;
   textDetail?: string;
-  link?: string;
+  link?: boolean;
   onClick?: () => void;
   showDivider?: boolean;
   showWarningTitle?: boolean;
@@ -115,7 +115,7 @@ function SettingComponent({
 
         <Button
           onClick={onClick}
-          border={showDivider ? `1px solid ${theme.colors.white_900}` : 'transparent'}
+          border={showDivider ? `1px solid ${theme.colors.elevation2}` : 'transparent'}
         >
           <Column>
             <ComponentText
@@ -126,7 +126,13 @@ function SettingComponent({
             {description && <DescriptionText>{description}</DescriptionText>}
           </Column>
           {textDetail && <ComponentDescriptionText>{textDetail}</ComponentDescriptionText>}
-          {link ? <ArrowSquareOut /> : <CaretRight />}
+          {!toggle ? (
+            link ? (
+              <ArrowUpRight color={theme.colors.white_0} size={16} />
+            ) : (
+              <CaretRight color={theme.colors.white_0} size={16} />
+            )
+          ) : null}
           {toggle && toggleFunction && (
             <CustomSwitch
               onColor={theme.colors.orange_main}

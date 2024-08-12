@@ -1,3 +1,4 @@
+import TopRow from '@components/topRow';
 import useChromeLocalStorage from '@hooks/useChromeLocalStorage';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -11,16 +12,8 @@ import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
+import { Container, Title } from '../index.styles';
 import SettingComponent from '../settingComponent';
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  padding: 0 ${(props) => props.theme.space.xs};
-  ${(props) => props.theme.scrollbar}
-`;
 
 function AdvancedSettings() {
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
@@ -63,47 +56,49 @@ function AdvancedSettings() {
     navigate('/restore-funds');
   };
 
+  const handleBackButtonClick = () => {
+    navigate(-1);
+  };
   return (
-    <Container>
-      <SettingComponent
-        title={t('ADVANCED')}
-        text={t('ACTIVATE_ORDINAL_NFTS')}
-        toggle
-        toggleFunction={switchActivateOrdinalState}
-        toggleValue={hasActivatedOrdinalsKey}
-        showDivider
-      />
-      <SettingComponent
-        text={t('ENABLE_RARE_SATS')}
-        description={t('ENABLE_RARE_SATS_DETAIL')}
-        toggle
-        toggleFunction={switchActivateRareSatsState}
-        toggleValue={hasActivatedRareSatsKey}
-        disabled={!hasActivatedOrdinalsKey}
-        showDivider
-      />
-      <SettingComponent
-        text={t('XVERSE_DEFAULT')}
-        description={t('XVERSE_DEFAULT_DESCRIPTION')}
-        toggle
-        toggleFunction={switchIsPriorityWallet}
-        toggleValue={isPriorityWallet}
-        showDivider
-      />
-      <SettingComponent
-        text={t('ENABLE_SPEED_UP_TRANSACTIONS')}
-        description={t('ENABLE_SPEED_UP_TRANSACTIONS_DETAIL')}
-        toggle
-        toggleFunction={switchActivateRBFState}
-        toggleValue={hasActivatedRBFKey}
-        showDivider
-      />
-      <SettingComponent
-        text={t('RECOVER_ASSETS')}
-        onClick={onRestoreFundClick}
-        // icon={ArrowIcon}
-      />
-    </Container>
+    <>
+      <TopRow onClick={handleBackButtonClick} />
+      <Container>
+        <Title>{t('ADVANCED')}</Title>
+        <SettingComponent
+          text={t('ACTIVATE_ORDINAL_NFTS')}
+          toggle
+          toggleFunction={switchActivateOrdinalState}
+          toggleValue={hasActivatedOrdinalsKey}
+          showDivider
+        />
+        <SettingComponent
+          text={t('ENABLE_RARE_SATS')}
+          description={t('ENABLE_RARE_SATS_DETAIL')}
+          toggle
+          toggleFunction={switchActivateRareSatsState}
+          toggleValue={hasActivatedRareSatsKey}
+          disabled={!hasActivatedOrdinalsKey}
+          showDivider
+        />
+        <SettingComponent
+          text={t('XVERSE_DEFAULT')}
+          description={t('XVERSE_DEFAULT_DESCRIPTION')}
+          toggle
+          toggleFunction={switchIsPriorityWallet}
+          toggleValue={isPriorityWallet}
+          showDivider
+        />
+        <SettingComponent
+          text={t('ENABLE_SPEED_UP_TRANSACTIONS')}
+          description={t('ENABLE_SPEED_UP_TRANSACTIONS_DETAIL')}
+          toggle
+          toggleFunction={switchActivateRBFState}
+          toggleValue={hasActivatedRBFKey}
+          showDivider
+        />
+        <SettingComponent text={t('RECOVER_ASSETS')} onClick={onRestoreFundClick} />
+      </Container>
+    </>
   );
 }
 
