@@ -50,7 +50,7 @@ export const addListener: AddListener = (eventName, cb) => {
 
   addEventCallback(eventName, cb);
 
-  return () => {
+  return function removeEventListener() {
     const listeners = listenersMap.get(eventName);
     if (!listeners) return;
     listeners.delete(cb);
