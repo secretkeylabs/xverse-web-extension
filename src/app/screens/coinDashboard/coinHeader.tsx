@@ -176,7 +176,7 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
       return;
     }
     trackMixPanel(AnalyticsEvents.InitiateSwapFlow, {
-      token: fungibleToken ? fungibleToken.name ?? fungibleToken.principal : currency,
+      selectedToken: fungibleToken ? fungibleToken.name ?? fungibleToken.principal : currency,
     });
     navigate(`/swap?from=${fungibleToken ? fungibleToken.principal : currency}`);
   };

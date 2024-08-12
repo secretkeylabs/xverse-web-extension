@@ -13,8 +13,16 @@ const useGetRates = (fiatCurrency: SupportedCurrency, networkType: NetworkType) 
       const btcFiatRate = await fetchBtcToCurrencyRate(networkType, {
         fiatCurrency,
       });
+
+      const btcUsdRate =
+        fiatCurrency === 'USD'
+          ? btcFiatRate
+          : await fetchBtcToCurrencyRate(networkType, {
+              fiatCurrency: 'USD' as SupportedCurrency,
+            });
+
       const stxBtcRate = await fetchStxToBtcRate(networkType);
-      return { stxBtcRate, btcFiatRate };
+      return { stxBtcRate, btcFiatRate, btcUsdRate };
     } catch (e: any) {
       return Promise.reject(e);
     }
@@ -34,8 +42,9 @@ const useCoinRates = () => {
 
   const stxBtcRate = data?.stxBtcRate.toString() || '0';
   const btcFiatRate = data?.btcFiatRate.toString() || '0';
+  const btcUsdRate = data?.btcUsdRate.toString() || '0';
 
-  return { stxBtcRate, btcFiatRate };
+  return { stxBtcRate, btcFiatRate, btcUsdRate };
 };
 
 export default useCoinRates;

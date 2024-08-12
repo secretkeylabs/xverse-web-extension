@@ -11,11 +11,9 @@ import {
   AnalyticsEvents,
   btcToSats,
   getBtcFiatEquivalent,
-  type ExecuteOrderRequest,
   type FungibleToken,
   type GetUtxosRequest,
   type MarketUtxo,
-  type PlaceOrderResponse,
   type Quote,
   type Token,
   type UtxoQuote,
@@ -40,6 +38,7 @@ import TokenToBottomSheet from './components/tokenToBottomSheet';
 import trackSwapMixPanel from './mixpanel';
 import QuoteSummary from './quoteSummary';
 import QuotesModal from './quotesModal';
+import type { OrderInfo } from './types';
 import {
   mapFTNativeSwapTokenToTokenBasic,
   mapFTProtocolToSwapProtocol,
@@ -119,9 +118,7 @@ export default function SwapScreen() {
   const [utxosRequest, setUtxosRequest] = useState<GetUtxosRequest | null>(null);
   const [inputError, setInputError] = useState('');
   const [hasQuoteError, setHasQuoteError] = useState(false);
-  const [orderInfo, setOrderInfo] = useState<
-    { order: PlaceOrderResponse; providerCode: ExecuteOrderRequest['providerCode'] } | undefined
-  >();
+  const [orderInfo, setOrderInfo] = useState<OrderInfo | undefined>();
   const [selectedUtxos, setSelectedUtxos] = useState<Omit<MarketUtxo, 'token'>[]>();
   const [utxoProviderSendAmount, setUtxoProviderSendAmount] = useState<string | undefined>();
 
@@ -129,7 +126,7 @@ export default function SwapScreen() {
 
   const { unfilteredData } = useRuneFungibleTokensQuery();
   const { data: btcBalance } = useBtcWalletData();
-  const { btcFiatRate } = useCoinRates();
+  const { btcFiatRate, btcUsdRate } = useCoinRates();
   const navigate = useNavigate();
   const { t } = useTranslation('translation');
   const location = useLocation();
@@ -176,9 +173,9 @@ export default function SwapScreen() {
     trackSwapMixPanel(AnalyticsEvents.FetchSwapQuote, {
       fromToken,
       toToken,
-      amount,
+      amount: fromToken === 'BTC' ? btcToSats(new BigNumber(amount)).toString() : amount,
       quote,
-      btcFiatRate,
+      btcUsdRate,
       runeFloorPrice,
     });
 
@@ -374,7 +371,7 @@ export default function SwapScreen() {
       toToken,
       amount,
       quote,
-      btcFiatRate,
+      btcUsdRate,
       runeFloorPrice,
     });
   };
@@ -455,6 +452,8 @@ export default function SwapScreen() {
               provider: selectedUtxoProvider.provider,
               receiveAmount,
               slippageSupported: false,
+              slippageDecimals: 0,
+              slippageThreshold: 0,
               feePercentage: selectedUtxoProvider.feePercentage,
               feeFlat: selectedUtxoProvider.feeFlat,
             };
