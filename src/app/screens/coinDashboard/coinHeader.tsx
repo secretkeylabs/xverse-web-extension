@@ -126,7 +126,7 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
     } else {
       switch (fungibleToken?.protocol) {
         case 'stacks':
-          route = `/send-sip10?principal=${fungibleToken?.principal}`;
+          route = `/send-stx?principal=${fungibleToken?.principal}`;
           break;
         case 'brc-20':
           route = `/send-brc20-one-step?principal=${fungibleToken?.principal}`;
