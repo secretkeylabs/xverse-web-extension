@@ -636,8 +636,6 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
   }
 
   async checkVisualsSendInscriptionsPage2(ordinalAddress, ordinalNumber) {
-    await expect(this.confirmTotalAmount).toBeVisible();
-    await expect(this.confirmCurrencyAmount).toBeVisible();
     await expect(this.buttonExpand).toBeVisible();
     await expect(this.buttonCancel).toBeEnabled();
     await expect(this.buttonConfirm).toBeEnabled();
@@ -776,22 +774,26 @@ const { getXverseApiClient } = require('@secretkeylabs/xverse-core');
   async checkAmountsSendingBTC(selfBTCTest, BTCTest, amountBTCSend) {
     // Sending amount without Fee
     const amountText = await this.confirmAmount.first().innerText();
-    const numericValueamountText = parseFloat(amountText.replace(/[^0-9.]/g, ''));
-    await expect(numericValueamountText).toEqual(amountBTCSend);
+    const numericValueAmountText = parseFloat(amountText.replace(/[^0-9.]/g, ''));
+    await expect(numericValueAmountText).toEqual(amountBTCSend);
 
     // Address check sending and receiving
     await expect(await this.sendAddress.innerText()).toContain(selfBTCTest.slice(-4));
     await expect(await this.receiveAddress.first().innerText()).toContain(BTCTest.slice(-4));
 
     const confirmAmountAfter = await this.confirmAmount.last().innerText();
-    const confirmTotalAmount = await this.confirmTotalAmount.innerText();
+    const originalFee = await this.feeAmount.innerText();
     const confirmBalance = await this.confirmBalance.innerText();
     // Extract amounts for balance, sending amount and amount afterwards
     const num1 = parseFloat(confirmAmountAfter.replace(/[^0-9.]/g, ''));
-    const num2 = parseFloat(confirmTotalAmount.replace(/[^0-9.]/g, ''));
+    // We need to convert the sats value to BTC for this calculation
+    const feeSatsAmount = parseFloat(originalFee.replace(/[^0-9.]/g, ''));
+    const num2 = feeSatsAmount / 100000000;
     const num3 = parseFloat(confirmBalance.replace(/[^0-9.]/g, ''));
 
-    const roundedResult = Number((num3 - num2).toFixed(9));
+    // Balance - fees - sending amount
+    const roundedResult = Number((num3 - num2 - amountBTCSend).toFixed(9));
+    // Check if Balance value after the transaction is the same as the calculated value
     await expect(num1).toEqual(roundedResult);
   }
 
