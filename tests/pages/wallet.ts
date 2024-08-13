@@ -539,7 +539,7 @@ export default class Wallet {
     this.containerFeeRate = page.getByTestId('feerate-container');
     this.inputBTCAddress = page.locator('input[type="text"]');
     this.inputBTCAmount = page.getByTestId('btc-amount');
-    this.buttonExpand = page.getByRole('button', { name: 'Inputs & Outputs Dropdown' });
+    this.buttonExpand = page.getByRole('button', { name: 'Inputs & Outputs' });
     this.confirmTotalAmount = page.getByTestId('confirm-total-amount');
     this.confirmCurrencyAmount = page.getByTestId('confirm-currency-amount');
     this.confirmAmount = page.getByTestId('confirm-amount');
