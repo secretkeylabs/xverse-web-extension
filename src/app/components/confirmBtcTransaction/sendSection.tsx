@@ -28,6 +28,7 @@ const Container = styled.div((props) => ({
 
 const RowContainer = styled.div<{ noPadding?: boolean; noMargin?: boolean }>((props) => ({
   padding: props.noPadding ? 0 : `0 ${props.theme.space.m}`,
+  marginBottom: props.noMargin ? 0 : props.theme.space.m,
 }));
 
 const BundleHeader = styled.div((props) => ({
@@ -65,12 +66,14 @@ function SendSection({
                 {getTruncatedAddress(address, 6)}
               </StyledP>
             </BundleHeader>
-            <Amount amount={bundle.netBtcAmount} />
-            <AmountWithInscriptionSatribute
-              inscriptions={inscriptionsFromPayment}
-              satributes={satributesFromPayment}
-              onShowInscription={onShowInscription}
-            />
+            <RowContainer noPadding>
+              <Amount amount={bundle.netBtcAmount} />
+              <AmountWithInscriptionSatribute
+                inscriptions={inscriptionsFromPayment}
+                satributes={satributesFromPayment}
+                onShowInscription={onShowInscription}
+              />
+            </RowContainer>
             {bundle.runeTransfers.map((runeTransfer, i) => (
               <RuneAmount
                 // eslint-disable-next-line react/no-array-index-key
