@@ -47,6 +47,7 @@ function useMakeTransitionalGrantAccountReadPermissions() {
       const client: Client = {
         id: context.origin,
         name: context.origin,
+        origin: context.origin,
       };
 
       const resource = makeAccountResource({
