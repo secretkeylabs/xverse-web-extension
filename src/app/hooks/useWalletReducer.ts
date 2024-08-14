@@ -1,4 +1,6 @@
 import { getDeviceAccountIndex } from '@common/utils/ledger';
+import { dispatchEventAuthorizedConnectedClients } from '@common/utils/messages/extensionToContentScript/dispatchEvent';
+import { makeAccountResourceId } from '@components/permissionsManager/resources';
 import useNetworkSelector from '@hooks/useNetwork';
 import {
   AnalyticsEvents,
@@ -90,6 +92,7 @@ const useWalletReducer = () => {
   const selectedAccountType = useSelector(
     (state: StoreState) => state.walletState.selectedAccountType,
   );
+  const accounts = useSelector((state: StoreState) => state.walletState.accountsList);
   const savedNames = useSelector((state: StoreState) => state.walletState.savedNames);
 
   const softwareAccountsList = useSelector((state: StoreState) => state.walletState.accountsList);
@@ -348,16 +351,35 @@ const useWalletReducer = () => {
   };
 
   const switchAccount = useCallback(
-    async (account: Account) => {
+    async (nextAccount: Account) => {
       // we clear the query cache to prevent data from the other account potentially being displayed
       await queryClient.cancelQueries();
       queryClient.clear();
 
-      await ensureSelectedAccountValid(account.accountType, account.id);
+      await ensureSelectedAccountValid(nextAccount.accountType, nextAccount.id);
 
-      dispatch(selectAccount(account));
+      dispatch(selectAccount(nextAccount));
+
+      dispatchEventAuthorizedConnectedClients(
+        {
+          resourceId: makeAccountResourceId({
+            accountId: accounts[selectedAccountIndex].id,
+            masterPubKey: accounts[selectedAccountIndex].masterPubKey,
+            networkType: network.type,
+          }),
+          actions: new Set(['read']),
+        },
+        { type: 'accountChange' },
+      );
     },
-    [dispatch, ensureSelectedAccountValid, queryClient],
+    [
+      accounts,
+      dispatch,
+      ensureSelectedAccountValid,
+      network.type,
+      queryClient,
+      selectedAccountIndex,
+    ],
   );
 
   const changeNetwork = async (changedNetwork: SettingsNetwork) => {
@@ -375,13 +397,25 @@ const useWalletReducer = () => {
 
     dispatch(ChangeNetworkAction(changedNetwork));
 
+    dispatchEventAuthorizedConnectedClients(
+      {
+        resourceId: makeAccountResourceId({
+          accountId: accounts[selectedAccountIndex].id,
+          masterPubKey: accounts[selectedAccountIndex].masterPubKey,
+          networkType: network.type,
+        }),
+        actions: new Set(['read']),
+      },
+      { type: 'networkChange' },
+    );
+
     const seedPhrase = await seedVault.getSeed();
     const changedStacksNetwork =
       changedNetwork.type === 'Mainnet'
         ? new StacksMainnet({ url: changedNetwork.address })
         : new StacksTestnet({ url: changedNetwork.address });
 
-    const accounts: Account[] = [];
+    const nextAccounts: Account[] = [];
 
     // we recreate the same number of accounts on the new network
     for (let i = 0; i < softwareAccountsList.length; i++) {
@@ -392,10 +426,10 @@ const useWalletReducer = () => {
         changedStacksNetwork,
         savedNames[changedNetwork.type],
       );
-      accounts.push(account);
+      nextAccounts.push(account);
     }
 
-    await loadActiveAccounts(seedPhrase, changedNetwork, changedStacksNetwork, accounts, true);
+    await loadActiveAccounts(seedPhrase, changedNetwork, changedStacksNetwork, nextAccounts, true);
   };
 
   const addLedgerAccount = async (ledgerAccount: Account) => {

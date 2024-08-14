@@ -7,7 +7,8 @@ import * as v from 'valibot';
  */
 export const clientSchema = v.object({
   id: v.string(),
-  name: v.optional(v.string()),
+  name: v.string(),
+  origin: v.string(),
 });
 
 /**
@@ -94,8 +95,8 @@ export type PermissionsTable = v.InferOutput<typeof permissionsTableSchema>;
 /**
  * @public
  */
-export const permissionsStoreV1Schema = v.object({
-  version: v.literal(1),
+export const permissionsStoreSchema = v.object({
+  version: v.literal(2),
   clients: clientsTableSchema,
   resources: resourcesTableSchema,
   permissions: permissionsTableSchema,
@@ -104,4 +105,4 @@ export const permissionsStoreV1Schema = v.object({
 /**
  * @public
  */
-export type PermissionsStoreV1 = v.InferOutput<typeof permissionsStoreV1Schema>;
+export type PermissionsStoreV1 = v.InferOutput<typeof permissionsStoreSchema>;

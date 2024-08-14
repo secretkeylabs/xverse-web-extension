@@ -21,10 +21,19 @@ function useFeaturedDapps() {
   const fetchFeaturedDapps = async () => {
     const response = await getFeaturedDapps(network.type);
 
-    const featured = response.find((f) => f.section === 'Featured')?.apps;
-    const recommended = response.find((f) => f.section === 'Recommended')?.apps;
+    const featured = response.find((f) => f.section === 'Featured')?.apps ?? [];
+    const recommended = response.find((f) => f.section === 'Recommended')?.apps ?? [];
 
-    return { featured, recommended };
+    const categories = new Set(
+      recommended.map((r) => r.category).filter((c): c is string => c !== undefined),
+    );
+
+    const tabs = Array.from(categories).map((c: string) => ({
+      label: c,
+      value: c,
+    }));
+
+    return { featured, recommended, tabs };
   };
 
   const { data, isLoading, refetch } = useQuery({
@@ -34,7 +43,9 @@ function useFeaturedDapps() {
   });
 
   return {
-    data,
+    featured: data?.featured,
+    recommended: data?.recommended,
+    tabs: data?.tabs,
     isLoading,
     refetch,
   };

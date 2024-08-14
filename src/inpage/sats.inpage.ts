@@ -33,6 +33,7 @@ import {
 } from '@sats-connect/core';
 import { nanoid } from 'nanoid';
 import * as v from 'valibot';
+import { addListener } from './eventHandlers';
 import { isValidLegacyEvent } from './utils';
 
 const SatsMethodsProvider: BitcoinProvider = {
@@ -246,5 +247,6 @@ const SatsMethodsProvider: BitcoinProvider = {
       window.addEventListener('message', handleRpcResponseEvent);
     });
   },
+  addListener,
 };
 export default SatsMethodsProvider;
