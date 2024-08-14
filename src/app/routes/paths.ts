@@ -4,6 +4,7 @@ enum RoutePaths {
   SendOrdinal = '/send-ordinal',
   SendInscriptionsRequest = '/send-inscriptions-request',
   TransferRunesRequest = '/transfer-runes-request',
+  AccountList = '/account-list',
 }
 
 export default RoutePaths;

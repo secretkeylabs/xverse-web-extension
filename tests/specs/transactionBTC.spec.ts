@@ -12,14 +12,14 @@ test.describe('Transaction BTC', () => {
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS2', false);
 
-    // get own BTC  & Ordinals Address for address check on review page
+    // get own BTC  Address for address check on review page
     const selfBTC = await wallet.getAddress('Bitcoin');
 
     // Save initial Balance for later Balance checks
     const initialBTCBalance = await wallet.getTokenBalance('Bitcoin');
 
     // Click on send button
-    await wallet.allUpperButtons.nth(0).click();
+    await wallet.buttonTransactionSend.click();
 
     await expect(await wallet.divTokenRow.count()).toBeGreaterThanOrEqual(2);
     // Send BTC
@@ -65,7 +65,7 @@ test.describe('Transaction BTC', () => {
     const initialBTCBalance = await wallet.getTokenBalance('Bitcoin');
 
     // Click on send button
-    await wallet.allUpperButtons.nth(0).click();
+    await wallet.buttonTransactionSend.click();
 
     await expect(await wallet.divTokenRow.count()).toBeGreaterThanOrEqual(2);
     await wallet.clickOnSpecificToken('Bitcoin');
@@ -138,7 +138,7 @@ test.describe('Transaction BTC', () => {
     const initialBTCBalance = await wallet.getTokenBalance('Bitcoin');
 
     // Click on send button
-    await wallet.allUpperButtons.nth(0).click();
+    await wallet.buttonTransactionSend.click();
 
     await expect(await wallet.divTokenRow.count()).toBeGreaterThanOrEqual(2);
     await wallet.clickOnSpecificToken('Bitcoin');
@@ -152,7 +152,7 @@ test.describe('Transaction BTC', () => {
     await expect(wallet.containerFeeRate).toBeVisible();
     await expect(wallet.inputBTCAmount).toBeVisible();
     await wallet.inputBTCAmount.fill(amountBTCSend.toString());
-    // Timout increased as I had connectivity issues
+    // Timeout increased as I had connectivity issues
     await expect(wallet.buttonNext).toBeVisible({ timeout: 30000 });
     await expect(wallet.buttonNext).toBeEnabled();
     await wallet.buttonNext.click();
