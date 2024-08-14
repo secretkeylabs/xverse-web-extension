@@ -51,7 +51,6 @@ import RestoreOrdinals from '@screens/restoreFunds/restoreOrdinals';
 import RestoreWallet from '@screens/restoreWallet';
 import SendBrc20OneStepScreen from '@screens/sendBrc20OneStep';
 import SendBtcScreen from '@screens/sendBtc';
-import SendSip10Screen from '@screens/sendFt';
 import SendInscriptionsRequest from '@screens/sendInscriptionsRequest';
 import SendNft from '@screens/sendNft';
 import SendOrdinal from '@screens/sendOrdinal';
@@ -142,10 +141,6 @@ const router = createHashRouter([
       {
         path: 'receive/:currency',
         element: <Receive />,
-      },
-      {
-        path: 'send-sip10',
-        element: <SendSip10Screen />,
       },
       {
         path: 'add-stx-address-ledger',

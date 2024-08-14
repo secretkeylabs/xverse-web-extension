@@ -13,8 +13,8 @@ test.describe('List runes', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
     // get own BTC  & Ordinals Address for address check on review page
-    const selfBTC = await wallet.getAddress(0);
-    const selfOrdinals = await wallet.getAddress(1);
+    const selfBTC = await wallet.getAddress('Bitcoin');
+    const selfOrdinals = await wallet.getAddress('Ordinals');
 
     // Check if Rune is enabled and if not enable the rune and click on it
     await wallet.checkAndClickOnSpecificRune(runeName);
@@ -107,8 +107,8 @@ test.describe('List runes', () => {
     // Expected: 0.02323232
     // Received: 0.02323
     const num2 = parseFloat(confirmTotalAmount.replace(/[^0-9.]/g, ''));
-    const truncatenum2 = Number(num2.toFixed(5));
-    await expect(num1).toEqual(truncatenum2);
+    const truncateNum2 = Number(num2.toFixed(5));
+    await expect(num1).toEqual(truncateNum2);
 
     // Cancle the transaction
     await expect(wallet.buttonCancel).toBeEnabled();
@@ -146,8 +146,8 @@ test.describe('List runes', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
     // get own BTC  & Ordinals Address for address check on review page
-    const selfBTC = await wallet.getAddress(0);
-    const selfOrdinals = await wallet.getAddress(1);
+    const selfBTC = await wallet.getAddress('Bitcoin');
+    const selfOrdinals = await wallet.getAddress('Ordinals');
 
     // Check if Rune is enabled and if not enable the rune and click on it
     await wallet.checkAndClickOnSpecificRune(runeName);
@@ -240,8 +240,8 @@ test.describe('List runes', () => {
     // Expected: 0.02323232
     // Received: 0.02323
     const num2 = parseFloat(confirmTotalAmount.replace(/[^0-9.]/g, ''));
-    const truncatenum2 = Number(num2.toFixed(5));
-    await expect(num1).toEqual(truncatenum2);
+    const truncateNum2 = Number(num2.toFixed(5));
+    await expect(num1).toEqual(truncateNum2);
 
     // Confirm the transaction
     await expect(wallet.buttonConfirm).toBeEnabled();

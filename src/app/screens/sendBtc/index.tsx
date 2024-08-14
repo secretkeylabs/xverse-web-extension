@@ -91,6 +91,9 @@ function SendBtcScreen() {
         setTransaction(transactionDetails.transaction);
         if (transactionDetails.summary) {
           setSummary(transactionDetails.summary);
+          if (sendMax) {
+            setAmountSats(transactionDetails.summary.outputs[0].amount.toString());
+          }
           if (hasRunesSupport) {
             setRuneSummary(
               await parseSummaryForRunes(
@@ -100,13 +103,12 @@ function SendBtcScreen() {
               ),
             );
           }
-        }
-        if (sendMax && transactionDetails.summary) {
-          setAmountSats(transactionDetails.summary.outputs[0].amount.toString());
+        } else {
+          setTransaction(undefined);
+          setSummary(undefined);
         }
       } catch (e) {
         if (isCancelled.current) return;
-
         if (!(e instanceof Error) || !e.message.includes('Insufficient funds')) {
           // don't log the error if it's just an insufficient funds error
           console.error(e);

@@ -1,9 +1,15 @@
-import { CheckCircle, Info, Warning, type Icon } from '@phosphor-icons/react';
+import { CheckCircle, Info, Warning, WarningOctagon, type Icon } from '@phosphor-icons/react';
 import styled from 'styled-components';
 import Theme from 'theme';
 import { StyledP } from './common.styled';
 
-export type FeedbackVariant = 'info' | 'danger' | 'explicative' | 'plainIndented' | 'checkmark';
+export type FeedbackVariant =
+  | 'info'
+  | 'danger'
+  | 'explicative'
+  | 'plainIndented'
+  | 'checkmark'
+  | 'warning';
 
 const colors: Record<FeedbackVariant, string> = {
   info: Theme.colors.white_200,
@@ -11,6 +17,7 @@ const colors: Record<FeedbackVariant, string> = {
   explicative: Theme.colors.white_400,
   plainIndented: Theme.colors.white_200,
   checkmark: Theme.colors.success_light,
+  warning: Theme.colors.caution,
 };
 const getColorForVariant = (variant: FeedbackVariant) => colors[variant];
 
@@ -24,6 +31,7 @@ const icons: Record<FeedbackVariant, ReturnType<typeof getStyledIcon> | undefine
   explicative: undefined,
   plainIndented: undefined,
   checkmark: getStyledIcon(CheckCircle),
+  warning: getStyledIcon(WarningOctagon),
 };
 
 const Feedback = styled.div<{ variant: FeedbackVariant }>`

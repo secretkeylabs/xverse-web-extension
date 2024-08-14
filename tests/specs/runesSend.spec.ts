@@ -12,7 +12,7 @@ test.describe('Send runes', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
     // get own Ordinals Address for address check on review page
-    const addressOrdinals = await wallet.getAddress(1);
+    const addressOrdinals = await wallet.getAddress('Ordinals');
 
     // Check if Rune is enabled and if not enable the rune and click on it
     await wallet.checkAndClickOnSpecificRune('SKIBIDI•OHIO•RIZZ');
@@ -46,8 +46,8 @@ test.describe('Send runes', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
     // get own BTC  & Ordinals Address for address check on review page
-    const selfBTC = await wallet.getAddress(0);
-    const addressOrdinals = await wallet.getAddress(1);
+    const selfBTC = await wallet.getAddress('Bitcoin');
+    const addressOrdinals = await wallet.getAddress('Ordinals');
 
     // Check if Rune is enabled and if not enable the rune and click on it
     await wallet.checkAndClickOnSpecificRune(runeName);
@@ -76,6 +76,7 @@ test.describe('Send runes', () => {
 
     await wallet.checkVisualsSendTransactionReview(
       'send-rune',
+      true,
       addressOrdinals,
       TEST_ORDINALS_ADDRESS,
     );

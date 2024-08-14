@@ -33,8 +33,3 @@ export const currencyList: Currency[] = [
   { name: 'RUB', flag: RUB },
   { name: 'AUD', flag: AUD },
 ];
-
-export function getCurrencyFlag(currency: string) {
-  const curr = currencyList.find((value) => value.name === currency);
-  return curr?.flag ?? USD;
-}
