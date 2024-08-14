@@ -1,7 +1,7 @@
 import { expect, test } from '../fixtures/base';
 import Wallet from '../pages/wallet';
 
-const price1 = (Math.random() + 1).toFixed(4);
+const price = (Math.random() + 1).toFixed(4);
 const runeName = 'SKIBIDI•OHIO•RIZZ';
 
 test.describe('List runes', () => {
@@ -64,14 +64,14 @@ test.describe('List runes', () => {
     await expect(wallet.buttonApply).toBeDisabled();
     await expect(wallet.inputListingPrice).toBeVisible();
 
-    await wallet.inputListingPrice.fill(price1);
+    await wallet.inputListingPrice.fill(price);
     await expect(wallet.buttonApply).toBeEnabled();
     await wallet.buttonApply.click();
 
     // Check Price
     const displayPrice = await wallet.runePrice.innerText();
     const displayPriceNumerical = parseFloat(displayPrice.replace(/[^0-9.]/g, ''));
-    await expect(parseFloat(price1)).toEqual(displayPriceNumerical);
+    await expect(parseFloat(price)).toEqual(displayPriceNumerical);
 
     // Save the send amounts
     const sendAmount = await wallet.sendAmount.innerText();
@@ -197,14 +197,14 @@ test.describe('List runes', () => {
     await expect(wallet.buttonApply).toBeDisabled();
     await expect(wallet.inputListingPrice).toBeVisible();
 
-    await wallet.inputListingPrice.fill(price1);
+    await wallet.inputListingPrice.fill(price);
     await expect(wallet.buttonApply).toBeEnabled();
     await wallet.buttonApply.click();
 
     // Check Price
     const displayPrice = await wallet.runePrice.innerText();
     const displayPriceNumerical = parseFloat(displayPrice.replace(/[^0-9.]/g, ''));
-    await expect(parseFloat(price1)).toEqual(displayPriceNumerical);
+    await expect(parseFloat(price)).toEqual(displayPriceNumerical);
 
     // Save the send amounts
     const sendAmount = await wallet.sendAmount.innerText();

@@ -1,7 +1,7 @@
 import { expect, test } from '../fixtures/base';
 import Wallet from '../pages/wallet';
 
-const price1 = Math.floor(Math.random() * (50 - 1 + 1)) + 1;
+const price = Math.floor(Math.random() * (50 - 1 + 1)) + 1;
 const runeName = 'MINT•CAT•FOR•MAINNET•AIRDROP';
 
 const TEST_ORDINALS_ADDRESS = 'tb1p9c9qw2grtpufq6603rua4tejjnynrhpq4fjjl9mxekz77jllqslqee9t9r';
@@ -41,6 +41,68 @@ test.describe('Send runes', () => {
     await expect(wallet.buttonInsufficientFunds).toBeDisabled();
   });
 
+  test('Cancel - send one rune testnet', async ({ page, extensionId }) => {
+    const wallet = new Wallet(page);
+    await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
+
+    // get own BTC  & Ordinals Address for address check on review page
+    const selfBTC = await wallet.getAddress('Bitcoin');
+    const addressOrdinals = await wallet.getAddress('Ordinals');
+
+    // Check if Rune is enabled and if not enable the rune and click on it
+    await wallet.checkAndClickOnSpecificRune(runeName);
+
+    const originalBalanceAmount = await wallet.checkVisualsRunesDashboard(runeName);
+
+    await wallet.buttonSend.click();
+
+    await wallet.checkVisualsSendPage1('send-rune');
+
+    // Address invalid check
+    await wallet.invalidAddressCheck(wallet.receiveAddress);
+
+    await wallet.receiveAddress.fill(TEST_ORDINALS_ADDRESS);
+    await expect(wallet.buttonNext).toBeEnabled();
+    await wallet.buttonNext.click();
+
+    await wallet.checkVisualsSendPage2('send-rune');
+    await wallet.inputSendAmount.fill(price.toString());
+    await expect(wallet.buttonNext).toBeEnabled();
+
+    const displayBalance = await wallet.labelBalanceAmountSelector.innerText();
+    const displayBalanceNumerical = parseFloat(displayBalance.replace(/[^0-9.]/g, ''));
+    await expect(originalBalanceAmount).toEqual(displayBalanceNumerical);
+    await wallet.buttonNext.click();
+
+    await wallet.checkVisualsSendTransactionReview(
+      'send-rune',
+      true,
+      addressOrdinals,
+      TEST_ORDINALS_ADDRESS,
+    );
+
+    await expect(await wallet.sendAddress.last().innerText()).toContain(selfBTC.slice(-4));
+
+    const sendRuneAmount = await wallet.sendRuneAmount.innerText();
+    const sendAmountNumerical = parseFloat(sendRuneAmount.replace(/[^0-9.]/g, ''));
+    await expect(price).toEqual(sendAmountNumerical);
+
+    // TODO: this function doesn't work for the rune fee change on the review transaction page as the changed fee is too slow for the E2E
+    // Can be enabled after this Issue is fixed: https://linear.app/xverseapp/issue/ENG-4898/change-fee-prio-on-transaction-review-ui-is-not-catching-up-for-brc20
+    // await wallet.switchToHighFees();
+
+    // Cancel the transaction
+    await expect(wallet.buttonCancel).toBeEnabled();
+    await wallet.buttonCancel.click();
+
+    // Check Startpage
+    await wallet.checkVisualsStartpage();
+
+    await wallet.checkAndClickOnSpecificRune(runeName);
+    const BalanceAmount = await wallet.checkVisualsRunesDashboard(runeName);
+    await expect(originalBalanceAmount).toEqual(BalanceAmount);
+  });
+
   test('Send one rune testnet #localexecution', async ({ page, extensionId }) => {
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
@@ -66,7 +128,7 @@ test.describe('Send runes', () => {
     await wallet.buttonNext.click();
 
     await wallet.checkVisualsSendPage2('send-rune');
-    await wallet.inputSendAmount.fill(price1.toString());
+    await wallet.inputSendAmount.fill(price.toString());
     await expect(wallet.buttonNext).toBeEnabled();
 
     const displayBalance = await wallet.labelBalanceAmountSelector.innerText();
@@ -85,7 +147,7 @@ test.describe('Send runes', () => {
 
     const sendRuneAmount = await wallet.sendRuneAmount.innerText();
     const sendAmountNumerical = parseFloat(sendRuneAmount.replace(/[^0-9.]/g, ''));
-    await expect(price1).toEqual(sendAmountNumerical);
+    await expect(price).toEqual(sendAmountNumerical);
 
     // Confirm the transaction
     await wallet.confirmSendTransaction();

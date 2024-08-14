@@ -45,7 +45,9 @@ function RecipientCard({ address, amountBrc20, amountSats, fungibleToken }: Reci
     <Container>
       <RowBlock>
         <Title typography="body_medium_m">{t('CONFIRM_TRANSACTION.TO')}</Title>
-        <StyledP typography="body_medium_m">{getTruncatedAddress(address, 6)}</StyledP>
+        <StyledP data-testid="address-receive" typography="body_medium_m">
+          {getTruncatedAddress(address, 6)}
+        </StyledP>
       </RowBlock>
       <RowBlock>
         <Title typography="body_medium_m">{t('COMMON.BUNDLE')}</Title>

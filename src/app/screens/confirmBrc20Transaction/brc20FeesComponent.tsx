@@ -50,6 +50,7 @@ function Brc20FeesComponent({ label, value, suffix, fiatValue, fiatCurrency, fee
           <TextLabel>{label}</TextLabel>
           <TextValue>
             <NumericFormat
+              data-testid="brc20-fee"
               value={value.toString()}
               displayType="text"
               thousandSeparator
