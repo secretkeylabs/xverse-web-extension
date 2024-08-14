@@ -1,5 +1,7 @@
 import TopRow from '@components/topRow';
+import useChromeLocalStorage from '@hooks/useChromeLocalStorage';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { chromeLocalStorageKeys } from '@utils/chromeLocalStorage';
 import { getLockCountdownLabel } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -24,6 +26,15 @@ function Preferences() {
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
   const { fiatCurrency, walletLockPeriod } = useWalletSelector();
   const navigate = useNavigate();
+  const [isPriorityWallet, setIsPriorityWallet] = useChromeLocalStorage<boolean>(
+    chromeLocalStorageKeys.isPriorityWallet,
+    true,
+  );
+
+  const switchIsPriorityWallet = () => {
+    setIsPriorityWallet(!isPriorityWallet);
+  };
+
   const openFiatCurrencyScreen = () => {
     navigate('/fiat-currency');
   };
@@ -60,6 +71,14 @@ function Preferences() {
         <SettingComponent
           text={t('PRIVACY_PREFERENCES.TITLE')}
           onClick={openPrivacyPreferencesScreen}
+        />
+        <SettingComponent
+          text={t('XVERSE_DEFAULT')}
+          description={t('XVERSE_DEFAULT_DESCRIPTION')}
+          toggle
+          toggleFunction={switchIsPriorityWallet}
+          toggleValue={isPriorityWallet}
+          showDivider
         />
       </Container>
     </>

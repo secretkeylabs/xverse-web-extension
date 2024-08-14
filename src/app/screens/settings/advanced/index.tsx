@@ -1,5 +1,4 @@
 import TopRow from '@components/topRow';
-import useChromeLocalStorage from '@hooks/useChromeLocalStorage';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
@@ -7,7 +6,6 @@ import {
   ChangeActivateRareSatsAction,
   ChangeActivateRBFAction,
 } from '@stores/wallet/actions/actionCreators';
-import { chromeLocalStorageKeys } from '@utils/chromeLocalStorage';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -22,14 +20,6 @@ function AdvancedSettings() {
   const { hasActivatedOrdinalsKey, hasActivatedRareSatsKey, hasActivatedRBFKey } =
     useWalletSelector();
   const selectedAccount = useSelectedAccount();
-  const [isPriorityWallet, setIsPriorityWallet] = useChromeLocalStorage<boolean>(
-    chromeLocalStorageKeys.isPriorityWallet,
-    true,
-  );
-
-  const switchIsPriorityWallet = () => {
-    setIsPriorityWallet(!isPriorityWallet);
-  };
 
   const switchActivateOrdinalState = () => {
     dispatch(ChangeActivateOrdinalsAction(!hasActivatedOrdinalsKey));
@@ -65,7 +55,16 @@ function AdvancedSettings() {
       <Container>
         <Title>{t('ADVANCED')}</Title>
         <SettingComponent
+          text={t('ENABLE_SPEED_UP_TRANSACTIONS')}
+          description={t('ENABLE_SPEED_UP_TRANSACTIONS_DETAIL')}
+          toggle
+          toggleFunction={switchActivateRBFState}
+          toggleValue={hasActivatedRBFKey}
+          showDivider
+        />
+        <SettingComponent
           text={t('ACTIVATE_ORDINAL_NFTS')}
+          description={t('ENABLE_ORDINALS_DETAIL')}
           toggle
           toggleFunction={switchActivateOrdinalState}
           toggleValue={hasActivatedOrdinalsKey}
@@ -78,22 +77,6 @@ function AdvancedSettings() {
           toggleFunction={switchActivateRareSatsState}
           toggleValue={hasActivatedRareSatsKey}
           disabled={!hasActivatedOrdinalsKey}
-          showDivider
-        />
-        <SettingComponent
-          text={t('XVERSE_DEFAULT')}
-          description={t('XVERSE_DEFAULT_DESCRIPTION')}
-          toggle
-          toggleFunction={switchIsPriorityWallet}
-          toggleValue={isPriorityWallet}
-          showDivider
-        />
-        <SettingComponent
-          text={t('ENABLE_SPEED_UP_TRANSACTIONS')}
-          description={t('ENABLE_SPEED_UP_TRANSACTIONS_DETAIL')}
-          toggle
-          toggleFunction={switchActivateRBFState}
-          toggleValue={hasActivatedRBFKey}
           showDivider
         />
         <SettingComponent text={t('RECOVER_ASSETS')} onClick={onRestoreFundClick} />
