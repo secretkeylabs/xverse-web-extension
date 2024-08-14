@@ -76,6 +76,7 @@ import SwapStacksScreen from '@screens/swap/swap-stacks';
 import SwapStacksConfirmation from '@screens/swap/swapStacksConfirmation';
 import TransactionRequest from '@screens/transactionRequest';
 import TransactionStatus from '@screens/transactionStatus';
+import TransferRunesRequest from '@screens/transferRunesRequest';
 import UnlistRuneScreen from '@screens/unlistRune';
 import WalletExists from '@screens/walletExists';
 import BtcSendRequest from 'app/screens/btcSendRequest';
@@ -430,10 +431,10 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'send-brc20-one-step',
+        path: RoutePaths.TransferRunesRequest,
         element: (
           <AuthGuard>
-            <SendBrc20OneStepScreen />
+            <TransferRunesRequest />
           </AuthGuard>
         ),
       },
