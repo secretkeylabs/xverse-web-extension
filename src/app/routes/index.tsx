@@ -439,6 +439,14 @@ const router = createHashRouter([
         ),
       },
       {
+        path: 'send-brc20-one-step',
+        element: (
+          <AuthGuard>
+            <SendBrc20OneStepScreen />
+          </AuthGuard>
+        ),
+      },
+      {
         path: 'lockCountdown',
         element: (
           <AuthGuard>
