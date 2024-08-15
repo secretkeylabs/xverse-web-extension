@@ -458,6 +458,7 @@
     "UNKNOWN_RUNE_RECIPIENTS": "Undetermined Runes recipients ",
     "RUNE_DELEGATION_DESCRIPTION": "This is a partial transaction with undetermined Runes recipients. You are delegating your Runes to the requesting app. The requesting app can burn your runes or transfer them to any recipient",
     "YOU_WILL_DELEGATE": "You will delegate",
+    "POST_CONDITION_MODE_WARNING_TEXT": "This transaction might be unsafe. Be sure you trust the source of this transaction before confirming it. (Unsafe post condition mode)",
     "QUOTE_EXPIRES_IN": "Note that this swap quote will expire after {{seconds}} seconds"
   },
   "TX_ERRORS": {

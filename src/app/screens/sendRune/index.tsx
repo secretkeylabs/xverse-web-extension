@@ -123,6 +123,7 @@ function SendRuneScreen() {
               transactionContext,
               transactionDetails.summary,
               network.type,
+              { separateTransfersOnNoExternalInputs: true },
             ),
           );
         }

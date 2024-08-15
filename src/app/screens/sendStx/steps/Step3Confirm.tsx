@@ -7,12 +7,20 @@ import { useNavigate } from 'react-router-dom';
 type Props = {
   unsignedSendStxTx: string;
   fee: string;
+  ftConfirmParams?: any;
 };
 
-function Step3Confirm({ unsignedSendStxTx, fee }: Props) {
+function Step3Confirm({ unsignedSendStxTx, fee, ftConfirmParams }: Props) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (ftConfirmParams) {
+      navigate('/confirm-ft-tx', {
+        state: ftConfirmParams,
+      });
+      return;
+    }
+
     navigate(RoutePaths.ConfirmStacksTransaction, {
       state: {
         unsignedTx: unsignedSendStxTx,

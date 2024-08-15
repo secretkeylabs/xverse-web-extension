@@ -364,6 +364,12 @@ export default class Wallet {
 
   readonly buttonAdvanced: Locator;
 
+  readonly errorInsufficientBRC20Balance: Locator;
+
+  readonly BRC20FeeAmount: Locator;
+
+  readonly buttonTransactionSend: Locator;
+
   constructor(readonly page: Page) {
     this.page = page;
     this.navigationDashboard = page.getByTestId('nav-dashboard');
@@ -374,6 +380,7 @@ export default class Wallet {
     this.balance = page.getByTestId('total-balance-value');
     this.textCurrency = page.getByTestId('currency-text');
     this.allUpperButtons = page.getByTestId('transaction-buttons-row').getByRole('button');
+    this.buttonTransactionSend = this.allUpperButtons.nth(0);
     this.manageTokenButton = page.getByRole('button', { name: 'Manage token list' });
     this.buttonMenu = page.getByRole('button', { name: 'Open Header Options' });
     this.buttonLock = page.getByRole('button', { name: 'Lock' });
@@ -384,6 +391,7 @@ export default class Wallet {
     this.buttonClose = page.getByRole('button', { name: 'Close' });
     this.buttonEditFee = page.getByTestId('fee-button');
     this.feeAmount = page.getByTestId('fee-amount');
+    this.BRC20FeeAmount = page.getByTestId('brc20-fee');
     this.buttonSelectFee = page.getByTestId('fee-select-button');
     this.labelTotalFee = page.getByTestId('total-fee');
     this.labelFeePriority = page.getByTestId('fee-priority');
@@ -544,11 +552,14 @@ export default class Wallet {
       .filter({ hasText: 'You are transferring to yourself' });
     this.errorMessageSendSelf = page.locator('p').filter({ hasText: 'Cannot send to self' });
     this.errorInsufficientBalance = page.locator('p').filter({ hasText: 'Insufficient balance' });
+    this.errorInsufficientBRC20Balance = page
+      .locator('p')
+      .filter({ hasText: 'Insufficient BRC20 balance' });
     this.errorInsufficientFunds = page.locator('p').filter({ hasText: 'Insufficient funds' });
     this.containerFeeRate = page.getByTestId('feerate-container');
     this.inputBTCAddress = page.locator('input[type="text"]');
     this.inputBTCAmount = page.getByTestId('btc-amount');
-    this.buttonExpand = page.getByRole('button', { name: 'Inputs & Outputs Dropdown' });
+    this.buttonExpand = page.getByRole('button', { name: 'Inputs & Outputs' });
     this.confirmTotalAmount = page.getByTestId('confirm-total-amount');
     this.confirmCurrencyAmount = page.getByTestId('confirm-currency-amount');
     this.confirmAmount = page.getByTestId('confirm-amount');
@@ -649,15 +660,15 @@ export default class Wallet {
    * @param {string} url - The expected URL to validate the correct page navigation.
    * @param {boolean} isSTX - Optional flag to apply STX-specific element checks (default: false).
    */
-  async checkVisualsSendPage1(url: string, isSTX: boolean = false) {
+  async checkVisualsSendPage1(url: string, moreInputFields: boolean = false) {
     await expect(this.page.url()).toContain(url);
     await expect(this.buttonNext).toBeVisible();
     await expect(this.buttonNext).toBeDisabled();
 
-    if (isSTX) {
-      // Receiver Address
+    if (moreInputFields) {
+      // Recipient Address for STX or amount for BRC20
       await expect(this.inputField.first()).toBeVisible();
-      // Memo
+      // Memo for STX or recipient for BRC20
       await expect(this.inputField.last()).toBeVisible();
     } else {
       await expect(this.receiveAddress).toBeVisible();
@@ -700,7 +711,7 @@ export default class Wallet {
    * @param {string} url - The expected partial URL of the review page.
    * @param {boolean} editableFees - Optional. Indicates whether the fees can be edited on the Review page
    * @param {string} sendAddress - Optional. The expected last 4 characters of the sender's address
-   * @param {string} receiverAddress - Optional. The expected last 4 characters of the receiver's address
+   * @param {string} recipientAddress - Optional. The expected last 4 characters of the receiver's address
    * @param {boolean} totalAmountShown - Optional. Indicates whether the total amount is shown. Default is true.
    * @param {boolean} tokenImageShown - Optional. Indicates whether the token image is shown. Default is true.
    * @param {string} ordinalNumber - Optional. The expected ordinal number to be displayed for single Inscriptions
@@ -709,7 +720,7 @@ export default class Wallet {
     url: string,
     editableFees?: boolean,
     sendAddress?: string,
-    receiverAddress?: string,
+    recipientAddress?: string,
     totalAmountShown: boolean = true,
     tokenImageShown: boolean = true,
     ordinalNumber?: string,
@@ -735,20 +746,20 @@ export default class Wallet {
     }
 
     await this.buttonExpand.click();
-    await expect(this.sendAddress.first()).toBeVisible();
-    await expect(this.receiveAddress.first()).toBeVisible();
     await expect(this.confirmAmount.first()).toBeVisible();
     await expect(this.confirmBalance.first()).toBeVisible();
 
     // Execute these checks only if sendAddress is provided
     if (sendAddress) {
+      await expect(this.sendAddress.first()).toBeVisible();
       await expect(await this.sendAddress.first().innerText()).toContain(sendAddress.slice(-4));
     }
 
-    // Execute these checks only if receiverAddress is provided
-    if (receiverAddress) {
+    // Execute these checks only if recipientAddress is provided
+    if (recipientAddress) {
+      await expect(this.receiveAddress.first()).toBeVisible();
       await expect(await this.receiveAddress.first().innerText()).toContain(
-        receiverAddress.slice(-4),
+        recipientAddress.slice(-4),
       );
     }
     // Collection Inscriptions don't have the ordinal number displayed in the Review
@@ -958,11 +969,13 @@ export default class Wallet {
     await expect(num1).toEqual(roundedResult);
   }
 
-  async confirmSendTransaction() {
+  async confirmSendTransaction(transactionIDShown: boolean = true) {
     await expect(this.buttonConfirm).toBeEnabled();
     await this.buttonConfirm.click();
-    await expect(this.buttonClose).toBeVisible();
-    await expect(this.sendTransactionID).toBeVisible();
+    await expect(this.buttonClose).toBeVisible({ timeout: 30000 });
+    if (transactionIDShown) {
+      await expect(this.sendTransactionID).toBeVisible();
+    }
     await this.buttonClose.click();
   }
 

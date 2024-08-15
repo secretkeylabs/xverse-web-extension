@@ -74,7 +74,11 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
       .getSummary()
       .then(async (txSummary) => {
         setSummary(txSummary);
-        setRuneSummary(await parseSummaryForRunes(txnContext, txSummary, network.type));
+        setRuneSummary(
+          await parseSummaryForRunes(txnContext, txSummary, network.type, {
+            separateTransfersOnNoExternalInputs: true,
+          }),
+        );
         setIsLoading(false);
       })
       .catch((err) => {

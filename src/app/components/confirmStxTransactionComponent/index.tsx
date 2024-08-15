@@ -23,7 +23,7 @@ import {
   signTransaction,
   stxToMicrostacks,
 } from '@secretkeylabs/xverse-core';
-import { estimateTransaction } from '@stacks/transactions';
+import { estimateTransaction, PostConditionMode } from '@stacks/transactions';
 import SelectFeeRate from '@ui-components/selectFeeRate';
 import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
@@ -325,6 +325,10 @@ function ConfirmStxTransactionComponent({
     return Promise.resolve(totalFee);
   };
 
+  const showPostConditionModeWarning = initialStxTransactions.some(
+    (tx) => tx.postConditionMode === PostConditionMode.Allow,
+  );
+
   return (
     <>
       <Container>
@@ -338,6 +342,12 @@ function ConfirmStxTransactionComponent({
         {showFeeWarning && (
           <WarningWrapper>
             <Callout variant="warning" bodyText={t('HIGH_FEE_WARNING_TEXT')} />
+          </WarningWrapper>
+        )}
+
+        {showPostConditionModeWarning && (
+          <WarningWrapper>
+            <Callout variant="warning" bodyText={t('POST_CONDITION_MODE_WARNING_TEXT')} />
           </WarningWrapper>
         )}
 

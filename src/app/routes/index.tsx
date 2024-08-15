@@ -48,7 +48,6 @@ import Receive from '@screens/receive';
 import RestoreWallet from '@screens/restoreWallet';
 import SendBrc20OneStepScreen from '@screens/sendBrc20OneStep';
 import SendBtcScreen from '@screens/sendBtc';
-import SendSip10Screen from '@screens/sendFt';
 import SendInscriptionsRequest from '@screens/sendInscriptionsRequest';
 import SendNft from '@screens/sendNft';
 import SendOrdinal from '@screens/sendOrdinal';
@@ -81,6 +80,7 @@ import SwapStacksScreen from '@screens/swap/swap-stacks';
 import SwapStacksConfirmation from '@screens/swap/swapStacksConfirmation';
 import TransactionRequest from '@screens/transactionRequest';
 import TransactionStatus from '@screens/transactionStatus';
+import TransferRunesRequest from '@screens/transferRunesRequest';
 import UnlistRuneScreen from '@screens/unlistRune';
 import WalletExists from '@screens/walletExists';
 import BtcSendRequest from 'app/screens/btcSendRequest';
@@ -139,16 +139,12 @@ const router = createHashRouter([
         element: <ManageTokens />,
       },
       {
-        path: 'account-list',
+        path: RoutePaths.AccountList,
         element: <AccountList />,
       },
       {
         path: 'receive/:currency',
         element: <Receive />,
-      },
-      {
-        path: 'send-sip10',
-        element: <SendSip10Screen />,
       },
       {
         path: 'add-stx-address-ledger',
@@ -467,6 +463,14 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <SendInscriptionsRequest />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: RoutePaths.TransferRunesRequest,
+        element: (
+          <AuthGuard>
+            <TransferRunesRequest />
           </AuthGuard>
         ),
       },

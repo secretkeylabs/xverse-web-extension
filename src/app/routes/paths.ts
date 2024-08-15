@@ -8,6 +8,8 @@ enum RoutePaths {
   Preferences = '/preferences',
   Security = '/security',
   AdvancedSettings = '/advanced-settings',
+  TransferRunesRequest = '/transfer-runes-request',
+  AccountList = '/account-list',
 }
 
 export default RoutePaths;

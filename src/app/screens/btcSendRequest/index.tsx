@@ -86,7 +86,9 @@ function BtcSendRequest() {
         setSummary(newSummary);
         if (newSummary && hasRunesSupport) {
           setRuneSummary(
-            await parseSummaryForRunes(transactionContext, newSummary, transactionContext.network),
+            await parseSummaryForRunes(transactionContext, newSummary, transactionContext.network, {
+              separateTransfersOnNoExternalInputs: true,
+            }),
           );
         }
       } catch (e) {

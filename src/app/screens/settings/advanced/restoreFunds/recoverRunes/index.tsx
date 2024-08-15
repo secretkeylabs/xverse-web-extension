@@ -81,7 +81,9 @@ function RecoverRunes() {
   const generateTransactionAndSummary = async (desiredFeeRate: number) => {
     const tx = await runesTransaction.recoverRunes(context, desiredFeeRate);
     const txSummary = await tx.getSummary();
-    const txRuneSummary = await parseSummaryForRunes(context, txSummary, context.network);
+    const txRuneSummary = await parseSummaryForRunes(context, txSummary, context.network, {
+      separateTransfersOnNoExternalInputs: true,
+    });
 
     return { transaction: tx, summary: txSummary, runeSummary: txRuneSummary };
   };

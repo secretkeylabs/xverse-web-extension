@@ -16,7 +16,7 @@ test.describe('Transaction STX', () => {
     await wallet.checkVisualsStartpage();
 
     // Click on send button
-    await wallet.allUpperButtons.nth(0).click();
+    await wallet.buttonTransactionSend.click();
 
     await expect(await wallet.divTokenRow.count()).toBeGreaterThanOrEqual(2);
     // Send STX
@@ -58,7 +58,7 @@ test.describe('Transaction STX', () => {
     const initialSTXBalance = await wallet.getTokenBalance('Stacks');
 
     // Click on send button
-    await wallet.allUpperButtons.nth(0).click();
+    await wallet.buttonTransactionSend.click();
 
     await expect(await wallet.divTokenRow.count()).toBeGreaterThanOrEqual(2);
     await wallet.clickOnSpecificToken('Stacks');
@@ -114,7 +114,7 @@ test.describe('Transaction STX', () => {
     const initialSTXBalance = await wallet.getTokenBalance('Stacks');
 
     // Click on send button
-    await wallet.allUpperButtons.nth(0).click();
+    await wallet.buttonTransactionSend.click();
 
     // Needed to add this to avoid loading issues with the token list to be displayed
     await expect(await wallet.divTokenRow.count()).toBeGreaterThanOrEqual(2);
