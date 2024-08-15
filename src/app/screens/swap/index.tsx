@@ -10,11 +10,9 @@ import {
   AnalyticsEvents,
   btcToSats,
   getBtcFiatEquivalent,
-  type ExecuteOrderRequest,
   type FungibleToken,
   type GetUtxosRequest,
   type MarketUtxo,
-  type PlaceOrderResponse,
   type Quote,
   type Token,
   type UtxoQuote,
@@ -39,6 +37,7 @@ import TokenToBottomSheet from './components/tokenToBottomSheet';
 import trackSwapMixPanel from './mixpanel';
 import QuoteSummary from './quoteSummary';
 import QuotesModal from './quotesModal';
+import type { OrderInfo } from './types';
 import useMasterCoinsList from './useMasterCoinsList';
 import {
   mapFTNativeSwapTokenToTokenBasic,
@@ -138,16 +137,14 @@ export default function SwapScreen() {
   const [utxosRequest, setUtxosRequest] = useState<GetUtxosRequest | null>(null);
   const [inputError, setInputError] = useState('');
   const [hasQuoteError, setHasQuoteError] = useState(false);
-  const [orderInfo, setOrderInfo] = useState<
-    { order: PlaceOrderResponse; providerCode: ExecuteOrderRequest['providerCode'] } | undefined
-  >();
+  const [orderInfo, setOrderInfo] = useState<OrderInfo | undefined>();
   const [selectedUtxos, setSelectedUtxos] = useState<Omit<MarketUtxo, 'token'>[]>();
   const [utxoProviderSendAmount, setUtxoProviderSendAmount] = useState<string | undefined>();
 
   const { fiatCurrency } = useWalletSelector();
 
   const { data: btcBalance } = useBtcWalletData();
-  const { btcFiatRate } = useCoinRates();
+  const { btcFiatRate, btcUsdRate } = useCoinRates();
   const navigate = useNavigate();
   const { t } = useTranslation('translation');
   const location = useLocation();
@@ -191,9 +188,9 @@ export default function SwapScreen() {
     trackSwapMixPanel(AnalyticsEvents.FetchSwapQuote, {
       fromToken,
       toToken,
-      amount,
+      amount: fromToken === 'BTC' ? btcToSats(new BigNumber(amount)).toString() : amount,
       quote,
-      btcFiatRate,
+      btcUsdRate,
       runeFloorPrice,
     });
 
@@ -339,13 +336,7 @@ export default function SwapScreen() {
   useEffect(() => {
     if (errorMessage) {
       const toastId = toast.custom(
-        <SnackBar
-          text={errorMessage}
-          type="error"
-          actionButtonCallback={() => {
-            toast.remove(toastId);
-          }}
-        />,
+        <SnackBar text={errorMessage} type="error" dismissToast={() => toast.remove(toastId)} />,
         { duration: 3000 },
       );
       // Reset
@@ -396,7 +387,7 @@ export default function SwapScreen() {
       toToken,
       amount,
       quote,
-      btcFiatRate,
+      btcUsdRate,
       runeFloorPrice,
     });
   };
@@ -477,6 +468,8 @@ export default function SwapScreen() {
               provider: selectedUtxoProvider.provider,
               receiveAmount,
               slippageSupported: false,
+              slippageDecimals: 0,
+              slippageThreshold: 0,
               feePercentage: selectedUtxoProvider.feePercentage,
               feeFlat: selectedUtxoProvider.feeFlat,
             };
@@ -498,7 +491,11 @@ export default function SwapScreen() {
         <Flex1>
           <RouteContainer>
             <RouteItem token={fromToken} label={t('SWAP_SCREEN.FROM')} onClick={onClickFrom} />
-            <SwapButtonContainer onClick={onClickSwapRoute} disabled={isSwapRouteDisabled}>
+            <SwapButtonContainer
+              data-testid="swap-token-button"
+              onClick={onClickSwapRoute}
+              disabled={isSwapRouteDisabled}
+            >
               <Icon src={ArrowSwap} />
             </SwapButtonContainer>
             <RouteItem token={toToken} label={t('SWAP_SCREEN.TO')} onClick={onClickTo} />

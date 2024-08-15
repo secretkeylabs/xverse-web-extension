@@ -6,8 +6,9 @@ import { useQuery } from '@tanstack/react-query';
 import { handleRetries } from '@utils/query';
 
 const useToTokens = (protocol: Protocol, from?: TokenBasic, query?: string) => {
-  const { network } = useWalletSelector();
   const coinsMasterList = useVisibleMasterCoinsList();
+  const { network, spamTokens } = useWalletSelector();
+  const spamTokenSet = new Set(spamTokens);
 
   const userTokens =
     coinsMasterList.map((ft) => ({
@@ -39,6 +40,7 @@ const useToTokens = (protocol: Protocol, from?: TokenBasic, query?: string) => {
     retry: handleRetries,
     queryKey: ['swap-from-tokens', network.type, userTokens, protocol, from, search],
     queryFn,
+    select: (data) => data.filter((rune) => !spamTokenSet.has(rune.ticker)),
   });
 };
 

@@ -147,26 +147,29 @@ function Home() {
         <SnackBar
           text={t('TOKEN_HIDDEN')}
           type="neutral"
-          actionButtonText={t('UNDO')}
-          actionButtonCallback={() => {
-            toast.remove(toastId);
+          dismissToast={() => toast.remove(toastId)}
+          action={{
+            text: t('UNDO'),
+            onClick: () => {
+              toast.remove(toastId);
 
-            // set the visibility back to true
-            const payload = {
-              principal: spamToken.principal,
-              isEnabled: true,
-            };
+              // set the visibility back to true
+              const payload = {
+                principal: spamToken.principal,
+                isEnabled: true,
+              };
 
-            if (fullRunesCoinsList?.find((ft) => ft.principal === spamToken.principal)) {
-              dispatch(setRunesManageTokensAction(payload));
-            } else if (fullSip10CoinsList?.find((ft) => ft.principal === spamToken.principal)) {
-              dispatch(setSip10ManageTokensAction(payload));
-            } else if (fullBrc20CoinsList?.find((ft) => ft.principal === spamToken.principal)) {
-              dispatch(setBrc20ManageTokensAction(payload));
-            }
+              if (fullRunesCoinsList?.find((ft) => ft.principal === spamToken.principal)) {
+                dispatch(setRunesManageTokensAction(payload));
+              } else if (fullSip10CoinsList?.find((ft) => ft.principal === spamToken.principal)) {
+                dispatch(setSip10ManageTokensAction(payload));
+              } else if (fullBrc20CoinsList?.find((ft) => ft.principal === spamToken.principal)) {
+                dispatch(setBrc20ManageTokensAction(payload));
+              }
 
-            removeFromSpamTokens(spamToken.principal);
-            dispatch(setSpamTokenAction(null));
+              removeFromSpamTokens(spamToken.principal);
+              dispatch(setSpamTokenAction(null));
+            },
           }}
         />,
       );
@@ -249,7 +252,7 @@ function Home() {
     let route = '';
     switch (fungibleToken?.protocol) {
       case 'stacks':
-        route = `/send-sip10?principal=${fungibleToken?.principal}`;
+        route = `/send-stx?principal=${fungibleToken?.principal}`;
         break;
       case 'brc-20':
         route = `/send-brc20-one-step?principal=${fungibleToken?.principal}`;
@@ -408,8 +411,7 @@ function Home() {
   };
 
   const isCrossChainSwapsEnabled = useHasFeature(FeatureId.CROSS_CHAIN_SWAPS);
-  // ledger is disabled for now
-  const showSwaps = isCrossChainSwapsEnabled && !isLedgerAccount(selectedAccount);
+  const showSwaps = isCrossChainSwapsEnabled;
 
   return (
     <>

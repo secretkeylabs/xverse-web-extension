@@ -97,6 +97,7 @@ function SendOrdinalScreen() {
               context,
               await transactionDetails.getSummary(),
               context.network,
+              { separateTransfersOnNoExternalInputs: true },
             ),
           );
         }
@@ -173,7 +174,7 @@ function SendOrdinalScreen() {
       const txnId = await transaction?.broadcast({ ledgerTransport, rbfEnabled: true });
 
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
-        protocol: 'runes',
+        protocol: 'ordinals',
         action: 'transfer',
         wallet_type: selectedAccount?.accountType || 'software',
       });

@@ -16,11 +16,15 @@ export const generateTransaction = async (
   amount: bigint,
   feeRate: number,
 ): Promise<TransactionBuildPayload> => {
-  const transaction = await runesTransaction.sendRunes(
+  const transaction = await runesTransaction.sendManyRunes(
     transactionContext,
-    tokenName,
-    toAddress,
-    amount,
+    [
+      {
+        runeName: tokenName,
+        toAddress,
+        amount,
+      },
+    ],
     feeRate,
   );
   try {

@@ -409,7 +409,7 @@
     "RUNES_CENOTAPH_WARNING": "This transaction will burn all input Runes. Make sure you trust the requesting app.",
     "YOU_WILL_SEND": "You will send",
     "TRANSACTION_DETAILS": "Transaction details",
-    "BTC_TRANSFER_WARNING": "This amount may include the transaction fees & bundle size of the transferred assets.",
+    "BTC_TRANSFER_WARNING": "This amount may include the tx fee & postage associated to transferred ordinals, runes & BRC-20.",
     "LEDGER": {
       "CONNECT": {
         "TITLE": "Connect your hardware wallet",
@@ -457,7 +457,9 @@
     "RUNE_IS_CLOSED": "This rune is closed and cannot be minted.",
     "UNKNOWN_RUNE_RECIPIENTS": "Undetermined Runes recipients ",
     "RUNE_DELEGATION_DESCRIPTION": "This is a partial transaction with undetermined Runes recipients. You are delegating your Runes to the requesting app. The requesting app can burn your runes or transfer them to any recipient",
-    "YOU_WILL_DELEGATE": "You will delegate"
+    "YOU_WILL_DELEGATE": "You will delegate",
+    "POST_CONDITION_MODE_WARNING_TEXT": "This transaction might be unsafe. Be sure you trust the source of this transaction before confirming it. (Unsafe post condition mode)",
+    "QUOTE_EXPIRES_IN": "Note that this swap quote will expire after {{seconds}} seconds"
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "The requested transaction cannot be created due to insufficient balance",
@@ -591,6 +593,7 @@
     "PERMISSIONS_TITLE": "The app will be able to:",
     "PERMISSION_WALLET_BALANCE": "See your wallet balance and activity",
     "PERMISSION_REQUEST_TX": "Request transaction signing",
+    "PERMISSION_WALLET_TYPE_ACCESS": "See which type of wallet you are using (software or hardware wallet)",
     "NO_STACKS_AUTH_SUPPORT": {
       "TITLE": "This wallet does not have a Stacks address.",
       "LINK": "Create a Stacks address"
@@ -1330,7 +1333,8 @@
     "SELECT_BUNDLES": "Select bundles to proceed with the swap",
     "SWAP_FROM": "Swap from",
     "SWAP_TO": "Swap to",
-    "LIST_YOUR_RUNES": "List your Runes on Magic Eden"
+    "LIST_YOUR_RUNES": "List your Runes on Magic Eden",
+    "SLIPPAGE_WARNING": "Your transaction may be frontrun and result in an unfavorable trade"
   },
   "SWAP_CONFIRM_SCREEN": {
     "TOKEN_SWAP": "Token swap",

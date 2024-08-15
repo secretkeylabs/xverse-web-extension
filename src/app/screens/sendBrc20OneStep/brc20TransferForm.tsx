@@ -176,6 +176,7 @@ function Brc20TransferForm(props: Props) {
               <InputField
                 value={amountToSend}
                 placeholder="0"
+                type="text"
                 onChange={onAmountChange}
                 autoFocus
               />
@@ -192,6 +193,7 @@ function Brc20TransferForm(props: Props) {
             <InputFieldContainer>
               <InputField
                 value={recipientAddress}
+                type="text"
                 placeholder="Ordinals address"
                 onChange={onAddressChange}
               />

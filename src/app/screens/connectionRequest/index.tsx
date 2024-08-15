@@ -42,6 +42,7 @@ function ConnectionRequestInner({ data, context }: ConnectionRequestInnerProps) 
     const client: Client = {
       id: context.origin,
       name: context.origin,
+      origin: context.origin,
     };
 
     const resource = makeAccountResource({
@@ -93,6 +94,8 @@ function ConnectionRequestInner({ data, context }: ConnectionRequestInnerProps) 
         <PermissionDescriptionsContainer>
           <Permissions.Title />
           <Permissions.Description description={t('PERMISSION_WALLET_BALANCE')} />
+          <Permissions.Description description={t('PERMISSION_REQUEST_TX')} />
+          <Permissions.Description description={t('PERMISSION_WALLET_TYPE_ACCESS')} />
         </PermissionDescriptionsContainer>
       </ContentContainer>
 

@@ -17,12 +17,15 @@ import {
   SatsConnectMethods,
   StacksLegacyMethods,
   type LegacyMessageFromContentScript,
-  type LegacyMessageToContentScript,
   type SatsConnectMessageFromContentScript,
 } from '@common/types/message-types';
 import getEventSourceWindow from '@common/utils/get-event-source-window';
+import { contentScriptWalletEventMessageSchema } from '@common/utils/messages/extensionToContentScript/schemas';
+
 import RequestsRoutes from '@common/utils/route-urls';
+import { walletEventName } from '@common/walletEvents';
 import { getIsPriorityWallet } from '@utils/chromeLocalStorage';
+import * as v from 'valibot';
 
 // Legacy messaging to work with older versions of Connect
 window.addEventListener('message', (event) => {
@@ -62,9 +65,23 @@ function sendMessageToBackground(
   backgroundPort.postMessage(message);
 }
 
-// Receives message from background script to execute in browser
-chrome.runtime.onMessage.addListener((message: LegacyMessageToContentScript) => {
-  // Forward to web app (browser)
+// Process messages received from the extension.
+chrome.runtime.onMessage.addListener((message: unknown) => {
+  if (v.is(contentScriptWalletEventMessageSchema, message)) {
+    window.dispatchEvent(
+      new CustomEvent(walletEventName, {
+        detail: message.data,
+      }),
+    );
+    return;
+  }
+
+  // Default to posting the message to `window` for unrecognized messages. Some
+  // functionality, such as RPC response messages, rely on the responses being
+  // posted to `window`.
+  //
+  // Ideally, all message types would be handled explicitly and warnings/errors
+  // would be logged when unrecognized messages are received.
   window.postMessage(message, window.location.origin);
 });
 

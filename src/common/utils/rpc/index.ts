@@ -28,6 +28,7 @@ import handleSendInscriptions from './ordinals/sendInscriptions';
 import handleEtchRune from './runes/etch';
 import handleGetRunesBalance from './runes/getBalance';
 import handleMintRune from './runes/mint';
+import handleTransferRunes from './runes/transfer';
 import callContract from './stx/callContract';
 import deployContract from './stx/deployContract';
 import handleGetStxAccounts from './stx/getAccounts';
@@ -139,6 +140,10 @@ async function handleRPCRequest(message: RpcRequestMessage, port: chrome.runtime
       }
       case 'runes_etch': {
         await handleEtchRune(message as unknown as WebBtcMessage<'runes_etch'>, port);
+        break;
+      }
+      case 'runes_transfer': {
+        await handleTransferRunes(message, port);
         break;
       }
       default:

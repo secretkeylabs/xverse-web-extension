@@ -3,14 +3,17 @@ import Wallet from '../pages/wallet';
 
 const runeName = 'SKIBIDI•OHIO•RIZZ';
 
-test.describe('Cancel runes listing', () => {
+test.describe('Unlisting a listed rune', () => {
   // TODO solve the problem of always having 1 rune listed
-  test('Cancel one runes listing mainnet #localexecution', async ({ page, extensionId }) => {
+  test('Cancel an Unlisting of one runes listing mainnet #localexecution', async ({
+    page,
+    extensionId,
+  }) => {
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
     // get own BTC  & Ordinals Address for address check on review page
-    const selfOrdinals = await wallet.getAddress(1);
+    const selfOrdinals = await wallet.getAddress('Ordinals');
 
     // Check if Rune is enabled and if not enable the rune and click on it
     await wallet.checkAndClickOnSpecificRune(runeName);
@@ -64,7 +67,7 @@ test.describe('Cancel runes listing', () => {
     await expect(countNotListedRunes + 1).toBe(countNotListedRunesAfterSign);
   });
 
-  test('Not Sign the Cancel one runes listing mainnet #localexecution', async ({
+  test('Not Sign the Unlisting of one runes listing mainnet #localexecution', async ({
     page,
     extensionId,
   }) => {
@@ -72,7 +75,7 @@ test.describe('Cancel runes listing', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
     // get own BTC  & Ordinals Address for address check on review page
-    const selfOrdinals = await wallet.getAddress(1);
+    const selfOrdinals = await wallet.getAddress('Ordinals');
 
     // Check if Rune is enabled and if not enable the rune and click on it
     await wallet.checkAndClickOnSpecificRune(runeName);

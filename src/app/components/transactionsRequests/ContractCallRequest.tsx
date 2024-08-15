@@ -30,10 +30,11 @@ import {
 import type { ContractCallPayload } from '@stacks/connect';
 import {
   ClarityType,
-  PostConditionType,
-  StacksTransaction,
   cvToJSON,
   cvToString,
+  PostConditionMode,
+  PostConditionType,
+  StacksTransaction,
   type MultiSigSpendingCondition,
   type SomeCV,
 } from '@stacks/transactions';
@@ -183,7 +184,7 @@ export default function ContractCallRequest({
     </SponsoredContainer>
   );
 
-  const postConditionAlert = unsignedTx?.postConditionMode === 2 &&
+  const postConditionAlert = unsignedTx?.postConditionMode === PostConditionMode.Deny &&
     unsignedTx?.postConditions.values.length <= 0 && (
       <PostConditionContainer>
         <PostConditionAlertText>

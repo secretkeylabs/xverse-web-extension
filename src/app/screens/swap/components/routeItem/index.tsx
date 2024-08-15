@@ -62,10 +62,15 @@ export default function RouteItem({ label, token, onClick }: RouteItemProps) {
             size={20}
           />
         )}
-        <TokenName typography="body_medium_m" color="white_0">
+        <TokenName data-testid="token-name" typography="body_medium_m" color="white_0">
           {isBtcToken ? 'BTC' : token?.name ?? t('SELECT_COIN')}
         </TokenName>
-        <CaretDown size={12} weight="bold" color={Theme.colors.white_0} />
+        <CaretDown
+          data-testid="down-arrow-button"
+          size={12}
+          weight="bold"
+          color={Theme.colors.white_0}
+        />
       </RouteItemButtonContainer>
     </div>
   );

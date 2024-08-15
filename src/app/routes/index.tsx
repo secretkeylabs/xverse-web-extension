@@ -7,16 +7,11 @@ import ScreenContainer from '@components/screenContainer';
 import AccountList from '@screens/accountList';
 import BackupWallet from '@screens/backupWallet';
 import BackupWalletSteps from '@screens/backupWalletSteps';
-import BtcSendScreen from '@screens/btcSendScreen';
 import Buy from '@screens/buy';
 import CoinDashboard from '@screens/coinDashboard';
 import ConfirmBrc20Transaction from '@screens/confirmBrc20Transaction';
-import ConfirmBtcTransaction from '@screens/confirmBtcTransaction';
 import ConfirmFtTransaction from '@screens/confirmFtTransaction';
-import ConfirmInscriptionRequest from '@screens/confirmInscriptionRequest';
 import ConfirmNftTransaction from '@screens/confirmNftTransaction';
-import ConfirmOrdinalTransaction from '@screens/confirmOrdinalTransaction';
-import SendInscriptionsRequest from '@screens/confirmOrdinalTransaction/SendInscriptionsRequest';
 import ConfirmStxTransaction from '@screens/confirmStxTransaction';
 import AuthenticationRequest from '@screens/connect/authenticationRequest';
 import BtcSelectAddressScreen from '@screens/connect/btcSelectAddressScreen';
@@ -56,7 +51,7 @@ import RestoreOrdinals from '@screens/restoreFunds/restoreOrdinals';
 import RestoreWallet from '@screens/restoreWallet';
 import SendBrc20OneStepScreen from '@screens/sendBrc20OneStep';
 import SendBtcScreen from '@screens/sendBtc';
-import SendSip10Screen from '@screens/sendFt';
+import SendInscriptionsRequest from '@screens/sendInscriptionsRequest';
 import SendNft from '@screens/sendNft';
 import SendOrdinal from '@screens/sendOrdinal';
 import SendRuneScreen from '@screens/sendRune';
@@ -81,8 +76,10 @@ import SwapStacksScreen from '@screens/swap/swap-stacks';
 import SwapStacksConfirmation from '@screens/swap/swapStacksConfirmation';
 import TransactionRequest from '@screens/transactionRequest';
 import TransactionStatus from '@screens/transactionStatus';
+import TransferRunesRequest from '@screens/transferRunesRequest';
 import UnlistRuneScreen from '@screens/unlistRune';
 import WalletExists from '@screens/walletExists';
+import BtcSendRequest from 'app/screens/btcSendRequest';
 import ListRuneScreen from 'app/screens/listRune';
 import { createHashRouter } from 'react-router-dom';
 import RoutePaths from './paths';
@@ -138,16 +135,12 @@ const router = createHashRouter([
         element: <ManageTokens />,
       },
       {
-        path: 'account-list',
+        path: RoutePaths.AccountList,
         element: <AccountList />,
       },
       {
         path: 'receive/:currency',
         element: <Receive />,
-      },
-      {
-        path: 'send-sip10',
-        element: <SendSip10Screen />,
       },
       {
         path: 'add-stx-address-ledger',
@@ -277,7 +270,7 @@ const router = createHashRouter([
         path: RequestsRoutes.SendBtcTx,
         element: (
           <AuthGuard>
-            <BtcSendScreen />
+            <BtcSendRequest />
           </AuthGuard>
         ),
       },
@@ -438,18 +431,18 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'send-brc20-one-step',
+        path: RoutePaths.TransferRunesRequest,
         element: (
           <AuthGuard>
-            <SendBrc20OneStepScreen />
+            <TransferRunesRequest />
           </AuthGuard>
         ),
       },
       {
-        path: 'confirm-inscription-request',
+        path: 'send-brc20-one-step',
         element: (
           <AuthGuard>
-            <ConfirmInscriptionRequest />
+            <SendBrc20OneStepScreen />
           </AuthGuard>
         ),
       },
@@ -510,11 +503,6 @@ const router = createHashRouter([
         path: 'send-stx',
         element: <SendStxScreen />,
       },
-      // TODO can we kill this one?
-      {
-        path: 'confirm-btc-tx',
-        element: <ConfirmBtcTransaction />,
-      },
       {
         path: 'send-rune',
         element: <SendRuneScreen />,
@@ -572,14 +560,6 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <SendOrdinal />
-          </AuthGuard>
-        ),
-      },
-      {
-        path: 'nft-dashboard/confirm-ordinal-tx/:id',
-        element: (
-          <AuthGuard>
-            <ConfirmOrdinalTransaction />
           </AuthGuard>
         ),
       },

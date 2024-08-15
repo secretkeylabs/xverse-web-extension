@@ -60,12 +60,19 @@ const LoaderContainer = styled.div({
 
 interface Props {
   ordinal: BtcOrdinal;
+  feeRate: string;
   isLoading: boolean;
   disableTransfer: boolean;
-  handleOrdinalTransfer: (ordinal: BtcOrdinal) => Promise<void>;
+  handleOrdinalTransfer: (ordinal: BtcOrdinal, feeRate: string) => Promise<void>;
 }
 
-function OrdinalRow({ ordinal, isLoading, disableTransfer, handleOrdinalTransfer }: Props) {
+function OrdinalRow({
+  ordinal,
+  feeRate,
+  isLoading,
+  disableTransfer,
+  handleOrdinalTransfer,
+}: Props) {
   const { t } = useTranslation('translation');
   const { data: ordinalData, isLoading: isQuerying } = useInscriptionDetails(ordinal.id);
 
@@ -80,7 +87,10 @@ function OrdinalRow({ ordinal, isLoading, disableTransfer, handleOrdinalTransfer
           <ValueText>Ordinal</ValueText>
         </ColumnContainer>
         <ButtonContainer>
-          <TransferButton onClick={() => handleOrdinalTransfer(ordinal)} disabled={disableTransfer}>
+          <TransferButton
+            onClick={() => handleOrdinalTransfer(ordinal, feeRate)}
+            disabled={disableTransfer}
+          >
             {isLoading ? (
               <LoaderContainer>
                 <Spinner color="white" size={15} />

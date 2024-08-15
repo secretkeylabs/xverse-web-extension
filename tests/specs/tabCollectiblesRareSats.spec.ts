@@ -31,7 +31,7 @@ test.describe('Collectibles Tab - Rare sats', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
     // get own Ordinals Address for address check on review page
-    const addressOrdinals = await wallet.getAddress(1);
+    const addressOrdinals = await wallet.getAddress('Ordinals');
 
     // Navigate to Collectibles tab
     await wallet.navigateToCollectibles();
@@ -60,9 +60,14 @@ test.describe('Collectibles Tab - Rare sats', () => {
     // Transaction Review Page
     await wallet.checkVisualsSendTransactionReview(
       'send-ordinal',
+      false,
       addressOrdinals,
       addressOrdinals,
+      false,
+      false,
     );
+
+    await wallet.switchToHighFees();
 
     // Cancel the transaction
     await wallet.buttonCancel.click();
@@ -79,7 +84,7 @@ test.describe('Collectibles Tab - Rare sats', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
     // get own Ordinals Address for address check on review page
-    const addressOrdinals = await wallet.getAddress(1);
+    const addressOrdinals = await wallet.getAddress('Ordinals');
 
     // Navigate to Collectibles tab
     await wallet.navigateToCollectibles();
@@ -108,8 +113,11 @@ test.describe('Collectibles Tab - Rare sats', () => {
     // Transaction Review Page
     await wallet.checkVisualsSendTransactionReview(
       'send-ordinal',
+      false,
       addressOrdinals,
       addressOrdinals,
+      false,
+      false,
     );
 
     await wallet.confirmSendTransaction();

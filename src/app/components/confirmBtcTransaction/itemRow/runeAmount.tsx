@@ -87,7 +87,7 @@ export default function RuneAmount({
             )}
           />
         </Row>
-        <StyledP typography="body_medium_s" color="white_400">
+        <StyledP data-testid="rune-name" typography="body_medium_s" color="white_400">
           {runeName}
         </StyledP>
       </Column>
