@@ -134,7 +134,7 @@ export default class Wallet {
 
   readonly buttonCurrency: Locator;
 
-  readonly buttonBackupWallet: Locator;
+  readonly buttonShowSeedphrase: Locator;
 
   readonly textCurrency: Locator;
 
@@ -358,6 +358,12 @@ export default class Wallet {
 
   readonly divAddress: Locator;
 
+  readonly buttonPreferences: Locator;
+
+  readonly buttonSecurity: Locator;
+
+  readonly buttonAdvanced: Locator;
+
   constructor(readonly page: Page) {
     this.page = page;
     this.navigationDashboard = page.getByTestId('nav-dashboard');
@@ -405,6 +411,9 @@ export default class Wallet {
     this.buttonSave = page.getByRole('button', { name: 'Save' });
     this.buttonMainnet = page.getByRole('button', { name: 'Mainnet' });
     this.buttonTestnet = page.getByRole('button', { name: 'Testnet' });
+    this.buttonPreferences = page.getByRole('button', { name: 'Preferences' });
+    this.buttonSecurity = page.getByRole('button', { name: 'Security' });
+    this.buttonAdvanced = page.getByRole('button', { name: 'Advanced' });
     this.buttonBack = page.getByTestId('back-button');
     this.buttonNext = page.getByRole('button', { name: 'Next' });
     this.inputStacksURL = page.getByTestId('Stacks URL');
@@ -415,7 +424,7 @@ export default class Wallet {
     this.headerNewPassword = page.getByRole('heading', { name: 'Enter your new password' });
     this.infoUpdatePassword = page.getByRole('heading', { name: 'Password successfully updated' });
     this.buttonCurrency = page.getByRole('button', { name: 'Fiat Currency' });
-    this.buttonBackupWallet = page.getByRole('button', { name: 'Backup Wallet' });
+    this.buttonShowSeedphrase = page.getByRole('button', { name: 'Show Seedphrase' });
     this.selectCurrency = page.getByTestId('currency-button');
     this.iconFlag = page.locator('img[alt="flag"]');
 
