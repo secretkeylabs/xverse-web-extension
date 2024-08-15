@@ -126,7 +126,9 @@ function SignBatchPsbtRequest() {
         const parsedPsbt = new btcTransaction.EnhancedPsbt(txnContext, psbt.psbtBase64);
         const summary = await parsedPsbt.getSummary();
         const runeSummary = hasRunesSupport
-          ? await parseSummaryForRunes(txnContext, summary, network.type)
+          ? await parseSummaryForRunes(txnContext, summary, network.type, {
+              separateTransfersOnNoExternalInputs: true,
+            })
           : undefined;
         return { summary, runeSummary };
       } catch (err) {

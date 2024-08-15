@@ -100,6 +100,7 @@ function SendBtcScreen() {
                 transactionContext,
                 transactionDetails.summary,
                 transactionContext.network,
+                { separateTransfersOnNoExternalInputs: true },
               ),
             );
           }

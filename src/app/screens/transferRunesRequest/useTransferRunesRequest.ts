@@ -47,7 +47,9 @@ const useTransferRunes = ({ tabId, messageId, recipients }: Args) => {
         Number(desiredFeeRate),
       );
       const txSummary = await tx.getSummary();
-      const parsedRunesSummary = await parseSummaryForRunes(txContext, txSummary, network.type);
+      const parsedRunesSummary = await parseSummaryForRunes(txContext, txSummary, network.type, {
+        separateTransfersOnNoExternalInputs: true,
+      });
       return { tx, txSummary, parsedRunesSummary };
     },
     [network.type, recipients, txContext],
