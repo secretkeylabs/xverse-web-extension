@@ -32,6 +32,12 @@ const Container = styled.div`
   }
 `;
 
+const Title = styled.h1((props) => ({
+  ...props.theme.typography.headline_xs,
+  paddingTop: props.theme.space.xs,
+  paddingBottom: props.theme.space.s,
+}));
+
 const ButtonContainer = styled.div`
   margin: ${(props) => props.theme.space.m};
 `;
@@ -167,8 +173,9 @@ function ChangeNetworkScreen() {
 
   return (
     <>
-      <TopRow title={t('NETWORK')} onClick={handleBackButtonClick} />
+      <TopRow onClick={handleBackButtonClick} />
       <Container>
+        <Title>{t('NETWORK')}</Title>
         <NetworkRow
           network={savedMainnet || defaultMainnet}
           isSelected={formInputs.type === 'Mainnet'}

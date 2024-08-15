@@ -6,9 +6,8 @@ export const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
-  marginTop: props.theme.spacing(20),
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
+  paddingLeft: props.theme.space.m,
+  paddingRight: props.theme.space.m,
 }));
 
 export const ClientHeader = styled('div')({

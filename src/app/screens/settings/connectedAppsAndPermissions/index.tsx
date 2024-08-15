@@ -3,7 +3,9 @@ import * as utils from '@components/permissionsManager/utils';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { SubTitle, Title } from '../index.styles';
 import {
   Button,
   ClientHeader,
@@ -16,6 +18,7 @@ import {
 } from './index.styles';
 
 function ConnectedAppsAndPermissionsScreen() {
+  const { t } = useTranslation('translation', { keyPrefix: 'CONNECTED_APPS' });
   const navigate = useNavigate();
   const { removeClient } = usePermissionsUtils();
   const { store } = usePermissionsStore();
@@ -30,8 +33,10 @@ function ConnectedAppsAndPermissionsScreen() {
 
   return (
     <>
-      <TopRow title="Connected apps & permissions" onClick={handleBackButtonClick} />
+      <TopRow onClick={handleBackButtonClick} />
       <Container>
+        <Title>{t('TITLE')}</Title>
+        <SubTitle> {store.clients.size === 0 ? t('EMPTY_MESSAGE') : t('SUBTITLE')}</SubTitle>
         {[...store.clients].map((client) => (
           <div key={client.id}>
             <ClientHeader>

@@ -811,6 +811,14 @@
     "INCORRECT_PASSWORD_ERROR": "Incorrect password"
   },
   "SETTING_SCREEN": {
+    "TITLE": "Settings",
+    "CATEGORIES": {
+      "ABOUT": "About",
+      "PREFERENCES": "Preferences",
+      "ADVANCED": "Advanced",
+      "SECURITY": "Security",
+      "CONNECTED_APPS": "Connected Apps"
+    },
     "GENERAL": "General",
     "CURRENCY": "Fiat Currency",
     "PRIVACY_PREFERENCES": {
@@ -821,12 +829,12 @@
     "BTC_URL": "BTC URL",
     "STACKS_URL": "Stacks URL",
     "FALLBACK_BTC_URL": "Fallback BTC URL",
-    "RESET_TO_DEFAULT": "Reset to default",
+    "RESET_TO_DEFAULT": "Reset URL",
     "REQUIRED": "Required",
     "NETWORK": "Network",
     "SECURITY": "Security",
     "UPDATE_PASSWORD": "Update Password",
-    "BACKUP_WALLET": "Backup Wallet",
+    "BACKUP_WALLET": "Show Seedphrase",
     "AUTO_LOCK": "Auto Lock",
     "RESET_WALLET": "Reset Wallet",
     "ABOUT": "About",
@@ -862,12 +870,18 @@
     "CONFIRM_YOUR_NEW_PASSWORD": "Confirm your new password",
     "TEXT_INPUT_NEW_PASSWORD_LABEL": "New Password",
     "ENABLE_RARE_SATS": "Enable Rare Sats (experimental)",
-    "ENABLE_RARE_SATS_DETAIL": "Automatically scan and display rare sats in your Ordinals wallet.",
+    "ENABLE_ORDINALS_DETAIL": "Automatically scan your ordinal address for ordinals and display them in your collectibles and transaction review screens",
+    "ENABLE_RARE_SATS_DETAIL": "Automatically scan your ordinal address for rare sats and display them in your collectibles and transaction review screens",
     "ENABLE_SPEED_UP_TRANSACTIONS": "Enable speed up transactions",
     "ENABLE_SPEED_UP_TRANSACTIONS_DETAIL": "Allows you to speed up unconfirmed transactions by paying a higher fee.",
     "ADVANCED": "Advanced",
     "XVERSE_DEFAULT": "Use Xverse as default wallet",
     "XVERSE_DEFAULT_DESCRIPTION": "Allow apps to prioritize Xverse when looking for a wallet with which to connect."
+  },
+  "CONNECTED_APPS": {
+    "TITLE": "Connected Apps",
+    "SUBTITLE": "You are connected to the following apps.",
+    "EMPTY_MESSAGE": "You're not currently connected to any app."
   },
   "EXPLORE_SCREEN": {
     "TITLE": "Explore",
