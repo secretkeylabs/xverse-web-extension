@@ -22,10 +22,11 @@ import {
   microstacksToStx,
   stxToMicrostacks,
 } from '@secretkeylabs/xverse-core';
-import type {
-  MultiSigSpendingCondition,
-  PostCondition,
-  StacksTransaction,
+import {
+  type MultiSigSpendingCondition,
+  type PostCondition,
+  PostConditionMode,
+  type StacksTransaction,
 } from '@stacks/transactions';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
@@ -298,7 +299,7 @@ export default function ContractDeployRequest({
     </SponsoredContainer>
   );
 
-  const postConditionAlert = unsignedTx?.postConditionMode === 2 &&
+  const postConditionAlert = unsignedTx?.postConditionMode === PostConditionMode.Deny &&
     unsignedTx?.postConditions.values.length <= 0 && (
       <PostConditionContainer>
         <PostConditionAlertText>
