@@ -43,15 +43,9 @@ export const mapSwapTokenToFT = (token: Token): FungibleToken => ({
   runeInscriptionId: token.logo,
 });
 
-export const mapFTNativeSwapTokenToTokenBasic = (
-  token: FungibleToken | 'BTC' | Token,
-): TokenBasic => {
-  if (token === 'BTC') {
-    return { ticker: 'BTC', protocol: 'btc' };
-  }
-
+export const mapFTNativeSwapTokenToTokenBasic = (token: FungibleToken | Token): TokenBasic => {
   // if token is FungibleToken
-  if ('principal' in token && token.protocol) {
+  if ('principal' in token) {
     return { ticker: token.principal, protocol: mapFTProtocolToSwapProtocol(token) };
   }
 

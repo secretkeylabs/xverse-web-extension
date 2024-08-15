@@ -20,7 +20,7 @@ function trackSwapMixPanel(
     runeFloorPrice,
   }: {
     provider?: Provider;
-    fromToken?: FungibleToken | 'BTC';
+    fromToken?: FungibleToken;
     toToken?: Token;
     amount: string;
     quote?: Quote;
@@ -28,11 +28,11 @@ function trackSwapMixPanel(
     runeFloorPrice?: number;
   },
 ) {
-  const from = fromToken === 'BTC' ? 'BTC' : fromToken?.name;
+  const from = fromToken?.name;
   const to = toToken?.protocol === 'btc' ? 'BTC' : toToken?.name ?? toToken?.ticker;
 
   const fromAmount =
-    fromToken === 'BTC'
+    fromToken?.principal === 'BTC'
       ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcUsdRate)).toFixed(2)
       : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2);
 

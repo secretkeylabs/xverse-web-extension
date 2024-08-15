@@ -132,7 +132,7 @@ const FeeRate = styled.div`
 
 type QuoteSummaryProps = {
   amount: string;
-  fromToken?: FungibleToken | 'BTC';
+  fromToken?: FungibleToken;
   toToken?: Token;
   quote: Quote;
   onClose: () => void;
@@ -183,7 +183,7 @@ export default function QuoteSummary({
   const { fiatCurrency } = useWalletSelector();
 
   const fromUnit =
-    fromToken === 'BTC'
+    fromToken?.principal === 'BTC'
       ? 'Sats'
       : (fromToken as FungibleToken)?.runeSymbol ?? RUNE_DISPLAY_DEFAULTS.symbol;
 
@@ -282,14 +282,14 @@ export default function QuoteSummary({
               provider="Amount"
               price={amount}
               image={{
-                currency: fromToken === 'BTC' ? 'BTC' : 'FT',
-                ft: fromToken === 'BTC' ? undefined : fromToken,
+                currency: fromToken?.principal === 'BTC' ? 'BTC' : 'FT',
+                ft: fromToken?.principal === 'BTC' ? undefined : fromToken,
               }}
-              subtitle={fromToken === 'BTC' ? 'Bitcoin' : fromToken?.assetName}
+              subtitle={fromToken?.principal === 'BTC' ? 'Bitcoin' : fromToken?.assetName}
               subtitleColor="white_400"
-              unit={fromToken === 'BTC' ? 'Sats' : fromToken?.runeSymbol ?? ''}
+              unit={fromToken?.principal === 'BTC' ? 'Sats' : fromToken?.runeSymbol ?? ''}
               fiatValue={
-                fromToken === 'BTC'
+                fromToken?.principal === 'BTC'
                   ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcFiatRate)).toFixed(
                       2,
                     )
