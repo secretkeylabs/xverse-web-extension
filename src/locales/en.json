@@ -1348,7 +1348,9 @@
     "SWAP_FROM": "Swap from",
     "SWAP_TO": "Swap to",
     "LIST_YOUR_RUNES": "List your Runes on Magic Eden",
-    "SLIPPAGE_WARNING": "Your transaction may be frontrun and result in an unfavorable trade"
+    "SLIPPAGE_WARNING": "Your transaction may be frontrun and result in an unfavorable trade",
+    "BAD_QUOTE_WARNING_TITLE": "The quote you are receiving may result in significant value loss.",
+    "BAD_QUOTE_WARNING_DESC": "The minimum amount you'll receive is less than {{percentage}}% of the value of the tokens you are swapping. This is due to low liquidity in the pool, which can cause discrepancies in pricing. Please review the details carefully before proceeding with the swap."
   },
   "SWAP_CONFIRM_SCREEN": {
     "TOKEN_SWAP": "Token swap",

@@ -6,6 +6,8 @@ import type {
   TokenBasic,
 } from '@secretkeylabs/xverse-core';
 
+export const BAD_QUOTE_PERCENTAGE = 0.25;
+
 export const mapFTProtocolToSwapProtocol = (protocol: FungibleTokenProtocol): Protocol => {
   const protocolMap: Record<FungibleTokenProtocol, Protocol> = {
     stacks: 'sip10',
