@@ -42,6 +42,7 @@ import type { OrderInfo } from './types';
 import {
   mapFTNativeSwapTokenToTokenBasic,
   mapFTProtocolToSwapProtocol,
+  mapFtToSwapToken,
   mapSwapProtocolToFTProtocol,
   mapSwapTokenToFT,
 } from './utils';
@@ -94,15 +95,6 @@ const Icon = styled.img`
   rotate: 90deg;
 `;
 
-const mapFtToSwapToken = (ft: FungibleToken | 'BTC'): Token => ({
-  ticker: ft === 'BTC' ? 'BTC' : ft.principal ?? '',
-  name: ft === 'BTC' ? 'Bitcoin' : ft.name ?? ft.assetName ?? '',
-  protocol: ft === 'BTC' ? 'btc' : mapFTProtocolToSwapProtocol(ft.protocol ?? 'runes'),
-  divisibility: ft === 'BTC' ? 8 : ft?.decimals ?? 0,
-  logo: ft === 'BTC' ? undefined : ft.image ?? ft.runeInscriptionId ?? '',
-  symbol: ft === 'BTC' ? undefined : ft.runeSymbol ?? '',
-});
-
 export default function SwapScreen() {
   const [amount, setAmount] = useState('');
   const [quote, setQuote] = useState<Quote>();
@@ -148,7 +140,7 @@ export default function SwapScreen() {
   }, [defaultFrom, runesCoinsList.length]);
 
   const handleGoBack = () => {
-    navigate(-1);
+    navigate('/');
   };
 
   useEffect(() => {
