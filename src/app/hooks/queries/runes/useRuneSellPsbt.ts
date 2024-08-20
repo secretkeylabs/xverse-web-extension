@@ -3,6 +3,7 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { BitcoinNetworkType } from '@sats-connect/core';
 import type { RuneSellRequest } from '@secretkeylabs/xverse-core';
+import { sanitizeRuneName } from '@utils/helper';
 import type { RuneItem } from '@utils/runes';
 import { useCallback, useState } from 'react';
 
@@ -20,7 +21,7 @@ const useRuneSellPsbt = (runeName: string, listingUtxos: Record<string, RuneItem
   const runesApi = useRunesApi();
 
   const getRuneSellPsbt = useCallback(async () => {
-    const sanitizedRuneName = runeName.replace(/[^A-Za-z]+/g, '').toUpperCase();
+    const sanitizedRuneName = sanitizeRuneName(runeName);
     const utxosToList = Object.entries(listingUtxos)
       .filter((item) => item[1].selected)
       .map(([key, item]) => ({

@@ -9,12 +9,17 @@ import useSeedVault from './useSeedVault';
 
 const useSignBatchPsbtTx = () => {
   const { accountsList, network } = useWalletSelector();
-  const { search } = useLocation();
+  const location = useLocation();
+  const locationState = useMemo(() => location.state || {}, []);
+  const { search } = location;
   const { getSeed } = useSeedVault();
   const params = new URLSearchParams(search);
+  const inApp = params.get('signBatchPsbtsInApp') ?? false;
   const requestToken = params.get('signBatchPsbtRequest') ?? '';
+
   const request = useMemo(
-    () => decodeToken(requestToken) as any as SignMultipleTransactionOptions,
+    () =>
+      inApp ? locationState : (decodeToken(requestToken) as any as SignMultipleTransactionOptions),
     [requestToken],
   );
   const tabId = params.get('tabId') ?? '0';
@@ -25,7 +30,7 @@ const useSignBatchPsbtTx = () => {
     const signingResponse = await signPsbt(
       seedPhrase,
       accountsList,
-      psbt.inputsToSign,
+      psbt.inputsToSign || [],
       psbt.psbtBase64,
       false,
       network.type,
@@ -63,6 +68,8 @@ const useSignBatchPsbtTx = () => {
     getSigningAddresses,
     confirmSignPsbt,
     cancelSignPsbt,
+    selectedRune: locationState.selectedRune,
+    minPriceSats: locationState.minPriceSats,
   };
 };
 

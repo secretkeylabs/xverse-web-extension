@@ -78,6 +78,7 @@ import Stacking from '@screens/stacking';
 import SwapScreen from '@screens/swap';
 import TransactionRequest from '@screens/transactionRequest';
 import TransactionStatus from '@screens/transactionStatus';
+import MultipleMarketplaceListingResult from '@screens/transactionStatus/multipleMarketplaceListingResult';
 import TransferRunesRequest from '@screens/transferRunesRequest';
 import UnlistRuneScreen from '@screens/unlistRune';
 import WalletExists from '@screens/walletExists';
@@ -399,6 +400,10 @@ const router = createHashRouter([
       {
         path: 'tx-status',
         element: <TransactionStatus />,
+      },
+      {
+        path: 'multiple-marketplace-listing-result',
+        element: <MultipleMarketplaceListingResult />,
       },
       {
         path: 'buy/:currency',

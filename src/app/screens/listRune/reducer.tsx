@@ -1,8 +1,10 @@
 import type { RuneItem } from '@utils/runes';
 
+export type SupportedSections = 'SELECT_RUNES' | 'SELECT_MARKETPLACES' | 'SET_PRICES';
+
 interface ListRunesState {
   listItemsMap: Record<string, RuneItem>;
-  section: 'SELECT_RUNES' | 'SET_PRICES';
+  section: SupportedSections;
   selectAllToggle: boolean;
   runePriceOption: 1 | 1.05 | 1.1 | 1.2 | 'custom';
   customRunePrice: number | null;
@@ -18,7 +20,7 @@ type Action =
   | { type: 'TOGGLE_ALL_LIST_ITEMS'; payload: boolean }
   | { type: 'SET_ALL_LIST_ITEMS_PRICES'; payload: number }
   | { type: 'UPDATE_ONE_LIST_ITEM'; key: string; payload: RuneItem }
-  | { type: 'SET_SECTION'; payload: 'SELECT_RUNES' | 'SET_PRICES' }
+  | { type: 'SET_SECTION'; payload: SupportedSections }
   | { type: 'SET_SELECT_ALL_TOGGLE'; payload: boolean }
   | { type: 'SET_RUNE_PRICE_OPTION'; payload: 1 | 1.05 | 1.1 | 1.2 | 'custom' }
   | { type: 'SET_CUSTOM_RUNE_PRICE'; payload: number | null }
