@@ -36,7 +36,7 @@ export const mapSwapTokenToFT = (token: Token): FungibleToken => ({
   principal: token.ticker,
   balance: '0',
   decimals: token.divisibility,
-  image: undefined,
+  image: token.logo,
   total_received: '0',
   total_sent: '0',
   runeSymbol: token.symbol,

@@ -28,7 +28,7 @@ import styled, { useTheme } from 'styled-components';
 import trackSwapMixPanel from '../mixpanel';
 import QuoteTile from '../quotesModal/quoteTile';
 import { SlippageModalContent } from '../slippageModal';
-import type { OrderInfo } from '../types';
+import type { OrderInfo, StxOrderInfo } from '../types';
 import { mapFTNativeSwapTokenToTokenBasic } from '../utils';
 import EditFee from './EditFee';
 import QuoteSummaryTile from './quoteSummaryTile';
@@ -139,6 +139,7 @@ type QuoteSummaryProps = {
   onChangeProvider: () => void;
   onError: (errorMessage: string) => void;
   onOrderPlaced: ({ order, providerCode }: OrderInfo) => void;
+  onStxOrderPlaced: ({ order, providerCode }: StxOrderInfo) => void;
   selectedIdentifiers?: Omit<MarketUtxo, 'token'>[];
 };
 
@@ -150,14 +151,21 @@ export default function QuoteSummary({
   onClose,
   onChangeProvider,
   onOrderPlaced,
+  onStxOrderPlaced,
   onError,
   selectedIdentifiers,
 }: QuoteSummaryProps) {
   const { t } = useTranslation('translation');
   const theme = useTheme();
   const { btcFiatRate, btcUsdRate } = useCoinRates();
-  const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey } = useSelectedAccount();
-  const { loading: isPlaceOrderLoading, error: placeOrderError, placeOrder } = usePlaceOrder();
+  const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey, stxAddress, stxPublicKey } =
+    useSelectedAccount();
+  const {
+    loading: isPlaceOrderLoading,
+    error: placeOrderError,
+    placeOrder,
+    placeStxOrder,
+  } = usePlaceOrder();
   const {
     loading: isPlaceUtxoOrderLoading,
     error: placeUtxoOrderError,
@@ -185,10 +193,15 @@ export default function QuoteSummary({
   const fromUnit =
     fromToken?.principal === 'BTC'
       ? 'Sats'
-      : (fromToken as FungibleToken)?.runeSymbol ?? RUNE_DISPLAY_DEFAULTS.symbol;
+      : (fromToken as FungibleToken)?.runeSymbol ??
+        (fromToken as FungibleToken).assetName ??
+        RUNE_DISPLAY_DEFAULTS.symbol;
 
   const toUnit =
     toToken?.protocol === 'btc' ? 'Sats' : toToken?.symbol ?? RUNE_DISPLAY_DEFAULTS.symbol;
+
+  const isRunesSwap = fromToken?.protocol === 'runes' || toToken?.protocol === 'runes';
+  const isSip10Swap = fromToken?.protocol === 'stacks' || toToken?.protocol === 'sip10';
 
   const [showSlippageModal, setShowSlippageModal] = useState(false);
   const [slippage, setSlippage] = useSearchParamsState('slippage', 0.05);
@@ -229,7 +242,7 @@ export default function QuoteSummary({
       if (placeUtxoOrderResponse?.orders.length === 0) {
         onError(t('SWAP_SCREEN.ERRORS.NO_UTXOS_FOR_PURCHASE'));
       }
-    } else {
+    } else if (isRunesSwap) {
       const placeOrderRequest = {
         providerCode: quote.provider.code,
         from: mapFTNativeSwapTokenToTokenBasic(fromToken),
@@ -247,6 +260,23 @@ export default function QuoteSummary({
 
       if (placeOrderResponse?.psbt) {
         onOrderPlaced({ order: placeOrderResponse, providerCode: quote.provider.code });
+      }
+    } else if (isSip10Swap) {
+      const placeStxOrderRequest = {
+        providerCode: quote.provider.code,
+        from: mapFTNativeSwapTokenToTokenBasic(fromToken),
+        to: mapFTNativeSwapTokenToTokenBasic(toToken),
+        sendAmount: amount,
+        receiveAmount: quote.receiveAmount,
+        slippage,
+        feeRate: Number(feeRate),
+        stxAddress,
+        stxPublicKey,
+      };
+      const placeOrderResponse = await placeStxOrder(placeStxOrderRequest);
+
+      if (placeOrderResponse?.unsignedTransaction) {
+        onStxOrderPlaced({ order: placeOrderResponse, providerCode: quote.provider.code });
       }
     }
   };

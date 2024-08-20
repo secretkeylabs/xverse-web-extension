@@ -3,6 +3,7 @@ import {
   type ExecuteOrderRequest,
   type FungibleToken,
   type PlaceOrderResponse,
+  type PlaceStxOrderResponse,
   type PlaceUtxoOrderResponse,
 } from '@secretkeylabs/xverse-core';
 import { Currency } from 'alex-sdk';
@@ -52,7 +53,14 @@ export type SelectedCurrencyState = {
   prevFrom?: Currency;
 };
 
-export type OrderInfo = {
-  order: PlaceOrderResponse | PlaceUtxoOrderResponse;
+type BaseOrderInfo = {
   providerCode: ExecuteOrderRequest['providerCode'];
+};
+
+export type OrderInfo = BaseOrderInfo & {
+  order: PlaceOrderResponse | PlaceUtxoOrderResponse;
+};
+
+export type StxOrderInfo = BaseOrderInfo & {
+  order: PlaceStxOrderResponse;
 };

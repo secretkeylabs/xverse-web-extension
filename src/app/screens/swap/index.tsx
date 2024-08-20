@@ -17,12 +17,14 @@ import {
   type Token,
   type UtxoQuote,
 } from '@secretkeylabs/xverse-core';
+import { deserializeTransaction } from '@stacks/transactions';
 import Button, { LinkButton } from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
 import SnackBar from '@ui-library/snackBar';
 import { satsToBtcString } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { getFtBalance } from '@utils/tokens';
+import RoutePaths from 'app/routes/paths';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -37,7 +39,7 @@ import TokenToBottomSheet from './components/tokenToBottomSheet';
 import trackSwapMixPanel from './mixpanel';
 import QuoteSummary from './quoteSummary';
 import QuotesModal from './quotesModal';
-import type { OrderInfo } from './types';
+import type { OrderInfo, StxOrderInfo } from './types';
 import useMasterCoinsList from './useMasterCoinsList';
 import {
   mapFTNativeSwapTokenToTokenBasic,
@@ -138,6 +140,8 @@ export default function SwapScreen() {
   const [inputError, setInputError] = useState('');
   const [hasQuoteError, setHasQuoteError] = useState(false);
   const [orderInfo, setOrderInfo] = useState<OrderInfo | undefined>();
+  const [stxOrderInfo, setStxOrderInfo] = useState<StxOrderInfo | undefined>();
+
   const [selectedUtxos, setSelectedUtxos] = useState<Omit<MarketUtxo, 'token'>[]>();
   const [utxoProviderSendAmount, setUtxoProviderSendAmount] = useState<string | undefined>();
 
@@ -170,7 +174,10 @@ export default function SwapScreen() {
       return;
     }
 
-    if ((quotes.amm.length === 0 && quotes.utxo.length === 0) || quotesError) {
+    if (
+      (quotes.amm.length === 0 && quotes.utxo.length === 0 && quotes.stx.length === 0) ||
+      quotesError
+    ) {
       return setHasQuoteError(true);
     }
 
@@ -400,6 +407,7 @@ export default function SwapScreen() {
       }}
       ammProviders={quotes?.amm || []}
       utxoProviders={quotes?.utxo || []}
+      stxProviders={quotes?.stx || []}
       toToken={toToken}
       ammProviderClicked={(provider: Quote) => {
         setProvider(true, provider);
@@ -420,6 +428,17 @@ export default function SwapScreen() {
     );
   }
 
+  if (stxOrderInfo?.order.unsignedTransaction) {
+    const unsignedTransaction = deserializeTransaction(stxOrderInfo.order.unsignedTransaction);
+
+    navigate(RoutePaths.ConfirmStacksTransaction, {
+      state: {
+        unsignedTx: unsignedTransaction,
+        fee: unsignedTransaction.auth.spendingCondition.fee.toString(),
+      },
+    });
+  }
+
   if (quote) {
     return (
       <>
@@ -433,6 +452,7 @@ export default function SwapScreen() {
             setGetQuotesModalVisible(true);
           }}
           onOrderPlaced={setOrderInfo}
+          onStxOrderPlaced={setStxOrderInfo}
           onError={setErrorMessage}
           selectedIdentifiers={selectedUtxos}
         />

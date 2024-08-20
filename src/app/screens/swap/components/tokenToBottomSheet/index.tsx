@@ -79,7 +79,12 @@ interface Props {
   resetFrom: () => void;
 }
 
-const supportedProtocols: Protocol[] = ['runes']; // add more protocols here
+const supportedProtocols: Protocol[] = ['runes', 'sip10']; // add more protocols here
+
+const mapProtocolName = (protocol: Protocol) => {
+  if (protocol === 'sip10') return 'SIP-10';
+  return protocol.toUpperCase();
+};
 
 export default function TokenToBottomSheet({
   visible,
@@ -138,7 +143,7 @@ export default function TokenToBottomSheet({
                   selected={key === selectedProtocol}
                   onClick={onChangeProtocol(key)}
                 >
-                  {key.toUpperCase()}
+                  {mapProtocolName(key)}
                 </ProtocolItem>
               ))}
             </ProtocolList>
@@ -168,7 +173,7 @@ export default function TokenToBottomSheet({
                 />
               );
             }
-            if (token.protocol === 'runes') {
+            if (token.protocol === 'runes' || token.protocol === 'sip10') {
               return (
                 <StyledTokenTile
                   key={token.ticker}
