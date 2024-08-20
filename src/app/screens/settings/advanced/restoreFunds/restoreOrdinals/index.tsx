@@ -207,7 +207,6 @@ function RestoreOrdinals() {
     <>
       <TopRow title={t('RESTORE_ORDINAL_SCREEN.TITLE')} onClick={handleOnCancelClick} />
       <Container>
-        <RestoreFundTitle>{t('RESTORE_ORDINAL_SCREEN.DESCRIPTION')}</RestoreFundTitle>
         {ordinalsQuery.ordinals?.length === 0 ? (
           <>
             <RestoreFundTitle>{t('RESTORE_ORDINAL_SCREEN.NO_FUNDS')}</RestoreFundTitle>
@@ -216,21 +215,24 @@ function RestoreOrdinals() {
             </ButtonContainer>
           </>
         ) : (
-          ordinalsQuery.ordinals?.map((ordinal) => (
-            <OrdinalRow
-              isLoading={selectedOrdinal === ordinal}
-              disableTransfer={isLoading}
-              feeRate={btcFeeRate!.regular.toString()}
-              handleOrdinalTransfer={onClickTransfer}
-              ordinal={ordinal}
-              key={ordinal.id}
-            />
-          ))
-        )}
-        {error && (
-          <ErrorContainer>
-            <ErrorText>{error}</ErrorText>
-          </ErrorContainer>
+          <>
+            <RestoreFundTitle>{t('RESTORE_ORDINAL_SCREEN.DESCRIPTION')}</RestoreFundTitle>
+            {ordinalsQuery.ordinals?.map((ordinal) => (
+              <OrdinalRow
+                isLoading={selectedOrdinal === ordinal}
+                disableTransfer={isLoading}
+                feeRate={btcFeeRate!.regular.toString()}
+                handleOrdinalTransfer={onClickTransfer}
+                ordinal={ordinal}
+                key={ordinal.id}
+              />
+            ))}
+            {error && (
+              <ErrorContainer>
+                <ErrorText>{error}</ErrorText>
+              </ErrorContainer>
+            )}
+          </>
         )}
       </Container>
       <BottomTabBar tab="settings" />
