@@ -160,9 +160,9 @@ function RecoverRunes() {
           {t('DESCRIPTION')}
         </Description>
         <ScrollContainer>
-          {(runeSummary?.transfers ?? []).map((transfer) => (
-            <RowContainer key={transfer.runeName}>
-              <RuneAmount rune={transfer} hasSufficientBalance={transfer.hasSufficientBalance} />
+          {(runeSummary?.receipts ?? []).map((receipt) => (
+            <RowContainer key={receipt.runeName}>
+              <RuneAmount rune={receipt} hasSufficientBalance />
             </RowContainer>
           ))}
         </ScrollContainer>
