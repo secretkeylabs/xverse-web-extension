@@ -26,7 +26,7 @@ function Preferences() {
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
   const { fiatCurrency, walletLockPeriod } = useWalletSelector();
   const navigate = useNavigate();
-  const [isPriorityWallet, setIsPriorityWallet] = useChromeLocalStorage<boolean>(
+  const [isPriorityWallet, setIsPriorityWallet] = useChromeLocalStorage<boolean | undefined>(
     chromeLocalStorageKeys.isPriorityWallet,
     true,
   );
@@ -71,6 +71,7 @@ function Preferences() {
         <SettingComponent
           text={t('PRIVACY_PREFERENCES.TITLE')}
           onClick={openPrivacyPreferencesScreen}
+          showDivider
         />
         <SettingComponent
           text={t('XVERSE_DEFAULT')}
@@ -78,7 +79,6 @@ function Preferences() {
           toggle
           toggleFunction={switchIsPriorityWallet}
           toggleValue={isPriorityWallet}
-          showDivider
         />
       </Container>
     </>

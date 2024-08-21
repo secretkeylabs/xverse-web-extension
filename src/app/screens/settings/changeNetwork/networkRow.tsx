@@ -3,7 +3,8 @@ import type { SettingsNetwork } from '@secretkeylabs/xverse-core';
 import styled, { useTheme } from 'styled-components';
 
 interface TitleProps {
-  color: string;
+  isActive: boolean;
+  variant: React.CSSProperties;
 }
 
 interface ButtonProps {
@@ -20,8 +21,8 @@ const Button = styled.button<ButtonProps>((props) => ({
 }));
 
 const Text = styled.h1<TitleProps>((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.color,
+  ...props.variant,
+  color: props.isActive ? props.theme.colors.white_0 : props.theme.colors.white_0,
   flex: 1,
   textAlign: 'left',
 }));
@@ -44,7 +45,12 @@ function NetworkRow({ network, isSelected, onNetworkSelected, showDivider }: Pro
       onClick={onClick}
       border={showDivider ? `1px solid ${theme.colors.white_900}` : 'transparent'}
     >
-      <Text color={isSelected ? theme.colors.white_0 : theme.colors.white_400}>{network.type}</Text>
+      <Text
+        isActive={isSelected}
+        variant={isSelected ? theme.typography.body_bold_m : theme.typography.body_m}
+      >
+        {network.type}
+      </Text>
       {isSelected && <img src={TickIcon} alt="tick" />}
     </Button>
   );

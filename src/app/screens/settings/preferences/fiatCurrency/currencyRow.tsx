@@ -6,8 +6,9 @@ import styled, { useTheme } from 'styled-components';
 const Button = styled.button<{
   $border: string;
   $color: string;
+  $variant: React.CSSProperties;
 }>((props) => ({
-  ...props.theme.typography.body_medium_m,
+  ...props.$variant,
   color: props.$color,
   display: 'flex',
   alignItems: 'center',
@@ -50,6 +51,7 @@ function CurrencyRow({ currency, isSelected, onCurrencySelected, showDivider }: 
       onClick={onClick}
       $border={showDivider ? `1px solid ${theme.colors.white_900}` : 'transparent'}
       $color={isSelected ? theme.colors.white_0 : theme.colors.white_400}
+      $variant={isSelected ? theme.typography.body_bold_l : theme.typography.body_medium_l}
     >
       <CurrencyWrapper>
         <StyledImg src={currency.flag} alt="flag" />

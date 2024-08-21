@@ -45,7 +45,8 @@ const ComponentText = styled.h1<{
 
 const ComponentDescriptionText = styled.h1((props) => ({
   ...props.theme.typography.body_medium_l,
-  color: props.theme.colors.white_200,
+  marginRight: props.theme.space.xxs,
+  color: props.theme.colors.white_0,
 }));
 
 const DescriptionText = styled.p((props) => ({
@@ -107,12 +108,10 @@ function SettingComponent({
   toggleFunction,
 }: SettingComponentProps) {
   const theme = useTheme();
-
   return (
     <Wrapper>
       <ColumnContainer>
         {title && <TitleText>{title}</TitleText>}
-
         <Button
           onClick={onClick}
           border={showDivider ? `1px solid ${theme.colors.elevation2}` : 'transparent'}
@@ -126,19 +125,14 @@ function SettingComponent({
             {description && <DescriptionText>{description}</DescriptionText>}
           </Column>
           {textDetail && <ComponentDescriptionText>{textDetail}</ComponentDescriptionText>}
-          {!toggle ? (
-            link ? (
-              <ArrowUpRight color={theme.colors.white_0} size={16} />
-            ) : (
-              <CaretRight color={theme.colors.white_0} size={16} />
-            )
-          ) : null}
-          {toggle && toggleFunction && (
+          {!toggle && link && <ArrowUpRight color={theme.colors.white_0} size={16} weight="bold" />}
+          {!toggle && !link && <CaretRight color={theme.colors.white_0} size={16} weight="bold" />}
+          {toggle && toggleFunction && toggleValue !== undefined && (
             <CustomSwitch
-              onColor={theme.colors.orange_main}
+              onColor={theme.colors.tangerine}
               offColor={theme.colors.elevation3}
               onChange={toggleFunction}
-              checked={toggleValue ?? false}
+              checked={toggleValue}
               uncheckedIcon={false}
               checkedIcon={false}
             />
