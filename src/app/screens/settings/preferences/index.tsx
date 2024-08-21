@@ -26,10 +26,9 @@ function Preferences() {
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
   const { fiatCurrency, walletLockPeriod } = useWalletSelector();
   const navigate = useNavigate();
-  const [isPriorityWallet, setIsPriorityWallet] = useChromeLocalStorage<boolean | undefined>(
-    chromeLocalStorageKeys.isPriorityWallet,
-    true,
-  );
+  const [isPriorityWallet, setIsPriorityWallet, isLoading] = useChromeLocalStorage<
+    boolean | undefined
+  >(chromeLocalStorageKeys.isPriorityWallet, true);
 
   const switchIsPriorityWallet = () => {
     setIsPriorityWallet(!isPriorityWallet);
@@ -79,6 +78,7 @@ function Preferences() {
           toggle
           toggleFunction={switchIsPriorityWallet}
           toggleValue={isPriorityWallet}
+          isLoading={isLoading}
         />
       </Container>
     </>
