@@ -239,7 +239,8 @@ export default function QuoteSummary({
   const isSip10Swap = fromToken?.protocol === 'stacks' || toToken?.protocol === 'sip10';
 
   const [showSlippageModal, setShowSlippageModal] = useState(false);
-  const [slippage, setSlippage] = useSearchParamsState('slippage', 0.05);
+  const DEFAULT_SLIPPAGE = quote.provider.code === 'velar' ? 0.04 : 0.05;
+  const [slippage, setSlippage] = useSearchParamsState('slippage', DEFAULT_SLIPPAGE);
 
   const handleSwap = async () => {
     if (!fromToken || !toToken) {
@@ -417,7 +418,13 @@ export default function QuoteSummary({
                     ? undefined
                     : fromToken,
               }}
-              subtitle={fromToken?.principal === 'BTC' ? 'Bitcoin' : fromToken?.assetName}
+              subtitle={
+                fromToken?.principal === 'BTC'
+                  ? 'Bitcoin'
+                  : fromToken?.assetName !== ''
+                  ? fromToken?.assetName
+                  : fromToken?.name
+              }
               subtitleColor="white_400"
               unit={fromUnit}
               fiatValue={fromTokenFiatValue}
@@ -554,6 +561,7 @@ export default function QuoteSummary({
           onClose={() => setShowSlippageModal(false)}
         >
           <SlippageModalContent
+            defaultSlippage={DEFAULT_SLIPPAGE}
             slippage={slippage}
             slippageThreshold={quote.slippageThreshold}
             slippageDecimals={quote.slippageDecimals}

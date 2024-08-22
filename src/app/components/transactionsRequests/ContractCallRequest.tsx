@@ -387,7 +387,7 @@ export default function ContractCallRequest({
         onCancelClick={cancelCallback}
         loading={isLoading}
         title={request.functionName}
-        subTitle={`Requested by ${request.appDetails?.name}`}
+        subTitle={request.appDetails?.name ? `Requested by ${request.appDetails.name}` : undefined}
         hasSignatures={hasSignatures}
         fee={fee ? microstacksToStx(fee).toString() : undefined}
         setFeeRate={(feeRate: string) => {

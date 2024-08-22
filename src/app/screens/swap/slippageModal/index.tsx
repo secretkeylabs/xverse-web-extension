@@ -36,13 +36,14 @@ const Description = styled.p((props) => ({
   color: props.theme.colors.white_400,
 }));
 
-const DEFAULT_SLIPPAGE = '5';
 export function SlippageModalContent({
+  defaultSlippage,
   slippage,
   slippageThreshold,
   slippageDecimals,
   onChange,
 }: {
+  defaultSlippage: number;
   slippage: number;
   slippageThreshold?: number;
   slippageDecimals?: number;
@@ -53,6 +54,7 @@ export function SlippageModalContent({
   const result = Number(percentage);
   const invalid = !Number.isNaN(result) && result >= 100;
   const showSlippageWarning = slippageThreshold ? result > slippageThreshold * 100 : false;
+  const DEFAULT_SLIPPAGE = (defaultSlippage * 100).toString();
 
   const allowDecimalsNumber = slippageDecimals ?? 2;
 
