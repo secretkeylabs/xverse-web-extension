@@ -141,7 +141,7 @@ export default function SwapScreen() {
   }, [defaultFrom, coinsMasterList.length]);
 
   const handleGoBack = () => {
-    navigate(-1);
+    navigate('/');
   };
 
   useEffect(() => {

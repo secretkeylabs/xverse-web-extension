@@ -17,7 +17,10 @@ const useRuneMintRequestParams = () => {
   const payloadToken = params.get('payload') ?? '';
 
   const payload = SuperJSON.parse<Params<'runes_mint'>>(payloadToken);
-  const mintRequest = { ...payload };
+  const mintRequest = payload;
+  // network is not needed in the mint request and the api will use the current network
+  // we need to remove it because the api will throw an error if it's present
+  delete mintRequest.network;
 
   return { mintRequest, tabId, requestId, network: payload.network };
 };

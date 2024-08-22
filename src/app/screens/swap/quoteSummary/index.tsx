@@ -18,6 +18,7 @@ import {
   type Token,
 } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
+import Callout from '@ui-library/callout';
 import { StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import { formatNumber } from '@utils/helper';
@@ -30,6 +31,7 @@ import QuoteTile from '../quotesModal/quoteTile';
 import { SlippageModalContent } from '../slippageModal';
 import type { OrderInfo, StxOrderInfo } from '../types';
 import {
+  BAD_QUOTE_PERCENTAGE,
   mapFTNativeSwapTokenToTokenBasic,
   mapFtToCurrencyType,
   mapSwapTokenToFT,
@@ -61,6 +63,10 @@ const Container = styled.div((props) => ({
   zIndex: 1,
   backgroundColor: props.theme.colors.elevation0,
 }));
+
+const CalloutContainer = styled.div`
+  margin-bottom: ${(props) => props.theme.space.m};
+`;
 
 const Flex1 = styled.div`
   flex: 1;
@@ -292,10 +298,49 @@ export default function QuoteSummary({
     quote.slippageSupported && quote.slippageThreshold && slippage > quote.slippageThreshold,
   );
 
+  const fromTokenFiatValue =
+    fromToken?.principal === 'BTC'
+      ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcFiatRate)).toFixed(2)
+      : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2);
+
+  const toTokenFiatValue =
+    toToken?.protocol === 'btc'
+      ? getBtcFiatEquivalent(
+          new BigNumber(quote.receiveAmount),
+          new BigNumber(btcFiatRate),
+        ).toFixed(2)
+      : getBtcFiatEquivalent(
+          new BigNumber(runeFloorPrice ?? 0).multipliedBy(quote.receiveAmount),
+          new BigNumber(btcFiatRate),
+        ).toFixed(2);
+
+  const showBadQuoteWarning =
+    quote.slippageSupported &&
+    new BigNumber(toTokenFiatValue).isLessThan(
+      new BigNumber(fromTokenFiatValue).multipliedBy(BAD_QUOTE_PERCENTAGE),
+    );
+  const valueLossPercentage = new BigNumber(fromTokenFiatValue)
+    .minus(new BigNumber(toTokenFiatValue))
+    .dividedBy(new BigNumber(fromTokenFiatValue))
+    .multipliedBy(100)
+    .toFixed(0);
+
   return (
     <>
       <TopRow onClick={onClose} />
+
       <Container>
+        {showBadQuoteWarning && (
+          <CalloutContainer>
+            <Callout
+              titleText={t('SWAP_SCREEN.BAD_QUOTE_WARNING_TITLE')}
+              bodyText={t('SWAP_SCREEN.BAD_QUOTE_WARNING_DESC', {
+                percentage: valueLossPercentage,
+              })}
+              variant="warning"
+            />
+          </CalloutContainer>
+        )}
         <StyledP typography="headline_s" color="white_0">
           {t('SWAP_SCREEN.QUOTE')}
         </StyledP>
@@ -326,13 +371,7 @@ export default function QuoteSummary({
               subtitle={fromToken?.principal === 'BTC' ? 'Bitcoin' : fromToken?.assetName}
               subtitleColor="white_400"
               unit={fromToken?.principal === 'BTC' ? 'Sats' : fromToken?.runeSymbol ?? ''}
-              fiatValue={
-                fromToken?.principal === 'BTC'
-                  ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcFiatRate)).toFixed(
-                      2,
-                    )
-                  : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2)
-              }
+              fiatValue={fromTokenFiatValue}
             />
             <ArrowOuterContainer>
               <ArrowInnerContainer>
@@ -359,17 +398,7 @@ export default function QuoteSummary({
               subtitle={toToken?.protocol === 'btc' ? 'Bitcoin' : toToken?.name}
               subtitleColor="white_400"
               unit={toToken?.protocol === 'btc' ? 'Sats' : toToken?.symbol}
-              fiatValue={
-                toToken?.protocol === 'btc'
-                  ? getBtcFiatEquivalent(
-                      new BigNumber(quote.receiveAmount),
-                      new BigNumber(btcFiatRate),
-                    ).toFixed(2)
-                  : getBtcFiatEquivalent(
-                      new BigNumber(runeFloorPrice ?? 0).multipliedBy(quote.receiveAmount),
-                      new BigNumber(btcFiatRate),
-                    ).toFixed(2)
-              }
+              fiatValue={toTokenFiatValue}
             />
           </QuoteToBaseContainer>
 

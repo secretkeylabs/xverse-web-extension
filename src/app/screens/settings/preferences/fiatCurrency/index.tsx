@@ -3,26 +3,14 @@ import TopRow from '@components/topRow';
 import { useGetBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
 import { useGetSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { Container, Title } from '@screens/settings/index.styles';
 import type { SupportedCurrency } from '@secretkeylabs/xverse-core';
 import { ChangeFiatCurrencyAction } from '@stores/wallet/actions/actionCreators';
+import { currencyList } from '@utils/currency';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
-import { currencyList } from '../../../utils/currency';
 import CurrencyRow from './currencyRow';
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  overflow-y: auto;
-  padding: ${(props) => props.theme.space.m};
-  padding-top: 0;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`;
 
 function FiatCurrencyScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
@@ -34,7 +22,7 @@ function FiatCurrencyScreen() {
   useGetBrc20FungibleTokens();
 
   const handleBackButtonClick = () => {
-    navigate('/settings');
+    navigate(-1);
   };
 
   const handleCurrencyClick = (currency: SupportedCurrency) => {
@@ -48,8 +36,9 @@ function FiatCurrencyScreen() {
 
   return (
     <>
-      <TopRow title={t('CURRENCY')} onClick={handleBackButtonClick} />
+      <TopRow onClick={handleBackButtonClick} />
       <Container>
+        <Title>{t('CURRENCY')}</Title>
         {currencyList.map((coin, index) => (
           <CurrencyRow
             currency={coin}

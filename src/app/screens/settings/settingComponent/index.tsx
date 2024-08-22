@@ -1,3 +1,5 @@
+import { ArrowUpRight, CaretRight } from '@phosphor-icons/react';
+import Spinner from '@ui-library/spinner';
 import Switch from 'react-switch';
 import styled, { useTheme } from 'styled-components';
 
@@ -17,7 +19,7 @@ const Button = styled.button<{
   background: 'transparent',
   justifyContent: 'flex-start',
   paddingTop: props.theme.space.m,
-  paddingBottom: props.theme.space.m,
+  paddingBottom: props.theme.space.l,
   borderBottom: props.border,
 }));
 
@@ -36,14 +38,15 @@ const TitleText = styled.h1((props) => ({
 const ComponentText = styled.h1<{
   textColor: string;
 }>((props) => ({
-  ...props.theme.typography.body_m,
+  ...props.theme.typography.body_medium_l,
   color: props.textColor,
   flex: 1,
   textAlign: 'left',
 }));
 
 const ComponentDescriptionText = styled.h1((props) => ({
-  ...props.theme.typography.body_bold_m,
+  ...props.theme.typography.body_medium_l,
+  marginRight: props.theme.space.xxs,
   color: props.theme.colors.white_0,
 }));
 
@@ -52,7 +55,8 @@ const DescriptionText = styled.p((props) => ({
   marginTop: props.theme.space.xxs,
   color: props.theme.colors.white_400,
   textAlign: 'left',
-  paddingRight: props.theme.space.m,
+  paddingRight: props.theme.space.s,
+  maxWidth: 270,
 }));
 
 const Column = styled.div({
@@ -76,12 +80,12 @@ const Wrapper = styled.div({
   display: 'inline-block', // This makes sure the wrapper size fits the content
 });
 
-interface SettingComponentProps {
+type Props = {
   title?: string;
   text: string;
   textDetail?: string;
+  link?: boolean;
   onClick?: () => void;
-  icon?: string;
   showDivider?: boolean;
   showWarningTitle?: boolean;
   toggle?: boolean;
@@ -89,14 +93,15 @@ interface SettingComponentProps {
   description?: string;
   disabled?: boolean;
   toggleFunction?: () => void;
-}
+  isLoading?: boolean;
+};
 
 function SettingComponent({
   title,
   text,
   textDetail,
   onClick,
-  icon,
+  link,
   showDivider,
   showWarningTitle,
   toggle,
@@ -104,17 +109,16 @@ function SettingComponent({
   description,
   disabled,
   toggleFunction,
-}: SettingComponentProps) {
+  isLoading,
+}: Props) {
   const theme = useTheme();
-
   return (
     <Wrapper>
       <ColumnContainer>
         {title && <TitleText>{title}</TitleText>}
-
         <Button
           onClick={onClick}
-          border={showDivider ? `1px solid ${theme.colors.white_900}` : 'transparent'}
+          border={showDivider ? `1px solid ${theme.colors.elevation2}` : 'transparent'}
         >
           <Column>
             <ComponentText
@@ -125,13 +129,15 @@ function SettingComponent({
             {description && <DescriptionText>{description}</DescriptionText>}
           </Column>
           {textDetail && <ComponentDescriptionText>{textDetail}</ComponentDescriptionText>}
-          {icon && <img src={icon} alt="arrow icon" />}
-          {toggle && toggleFunction && (
+          {!toggle && link && <ArrowUpRight color={theme.colors.white_0} size={16} weight="bold" />}
+          {!toggle && !link && <CaretRight color={theme.colors.white_0} size={16} weight="bold" />}
+          {isLoading && <Spinner color="white" size={16} />}
+          {toggle && toggleFunction && toggleValue !== undefined && !isLoading && (
             <CustomSwitch
-              onColor={theme.colors.orange_main}
+              onColor={theme.colors.tangerine}
               offColor={theme.colors.elevation3}
               onChange={toggleFunction}
-              checked={toggleValue ?? false}
+              checked={toggleValue}
               uncheckedIcon={false}
               checkedIcon={false}
             />

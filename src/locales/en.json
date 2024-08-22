@@ -459,7 +459,9 @@
     "RUNE_DELEGATION_DESCRIPTION": "This is a partial transaction with undetermined Runes recipients. You are delegating your Runes to the requesting app. The requesting app can burn your runes or transfer them to any recipient",
     "YOU_WILL_DELEGATE": "You will delegate",
     "POST_CONDITION_MODE_WARNING_TEXT": "This transaction might be unsafe. Be sure you trust the source of this transaction before confirming it. (Unsafe post condition mode)",
-    "QUOTE_EXPIRES_IN": "Note that this swap quote will expire after {{seconds}} seconds"
+    "QUOTE_EXPIRES_IN": "Note that this swap quote will expire after {{seconds}} seconds",
+    "INSCRIPTION_SERVICE_FEE": "Inscription Service Fee",
+    "TOTAL_FEES": "Total fees"
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "The requested transaction cannot be created due to insufficient balance",
@@ -811,6 +813,14 @@
     "INCORRECT_PASSWORD_ERROR": "Incorrect password"
   },
   "SETTING_SCREEN": {
+    "TITLE": "Settings",
+    "CATEGORIES": {
+      "ABOUT": "About",
+      "PREFERENCES": "Preferences",
+      "ADVANCED": "Advanced",
+      "SECURITY": "Security",
+      "CONNECTED_APPS": "Connected Apps"
+    },
     "GENERAL": "General",
     "CURRENCY": "Fiat Currency",
     "PRIVACY_PREFERENCES": {
@@ -821,12 +831,12 @@
     "BTC_URL": "BTC URL",
     "STACKS_URL": "Stacks URL",
     "FALLBACK_BTC_URL": "Fallback BTC URL",
-    "RESET_TO_DEFAULT": "Reset to default",
+    "RESET_TO_DEFAULT": "Reset URL",
     "REQUIRED": "Required",
     "NETWORK": "Network",
     "SECURITY": "Security",
     "UPDATE_PASSWORD": "Update Password",
-    "BACKUP_WALLET": "Backup Wallet",
+    "BACKUP_WALLET": "Show Seedphrase",
     "AUTO_LOCK": "Auto Lock",
     "RESET_WALLET": "Reset Wallet",
     "ABOUT": "About",
@@ -862,12 +872,18 @@
     "CONFIRM_YOUR_NEW_PASSWORD": "Confirm your new password",
     "TEXT_INPUT_NEW_PASSWORD_LABEL": "New Password",
     "ENABLE_RARE_SATS": "Enable Rare Sats (experimental)",
-    "ENABLE_RARE_SATS_DETAIL": "Automatically scan and display rare sats in your Ordinals wallet.",
+    "ENABLE_ORDINALS_DETAIL": "Automatically scan your ordinal address for ordinals and display them in your collectibles and transaction review screens",
+    "ENABLE_RARE_SATS_DETAIL": "Automatically scan your ordinal address for rare sats and display them in your collectibles and transaction review screens",
     "ENABLE_SPEED_UP_TRANSACTIONS": "Enable speed up transactions",
     "ENABLE_SPEED_UP_TRANSACTIONS_DETAIL": "Allows you to speed up unconfirmed transactions by paying a higher fee.",
     "ADVANCED": "Advanced",
     "XVERSE_DEFAULT": "Use Xverse as default wallet",
     "XVERSE_DEFAULT_DESCRIPTION": "Allow apps to prioritize Xverse when looking for a wallet with which to connect."
+  },
+  "CONNECTED_APPS": {
+    "TITLE": "Connected Apps",
+    "SUBTITLE": "You are connected to the following apps.",
+    "EMPTY_MESSAGE": "You're not currently connected to any app."
   },
   "EXPLORE_SCREEN": {
     "TITLE": "Explore",
@@ -1334,7 +1350,9 @@
     "SWAP_FROM": "Swap from",
     "SWAP_TO": "Swap to",
     "LIST_YOUR_RUNES": "List your Runes on Magic Eden",
-    "SLIPPAGE_WARNING": "Your transaction may be frontrun and result in an unfavorable trade"
+    "SLIPPAGE_WARNING": "Your transaction may be frontrun and result in an unfavorable trade",
+    "BAD_QUOTE_WARNING_TITLE": "The quote you are receiving may result in significant value loss.",
+    "BAD_QUOTE_WARNING_DESC": "The minimum amount you will receive will result in a loss of over {{percentage}}% of your trade’s value. This is due to low liquidity in the pool, causing discrepancies in pricing. Please review the details carefully before proceeding with the swap."
   },
   "SWAP_CONFIRM_SCREEN": {
     "TOKEN_SWAP": "Token swap",

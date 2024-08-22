@@ -275,7 +275,7 @@ function SignBatchPsbtRequest() {
   const runeBurns = parsedPsbts.map((psbt) => psbt.runeSummary?.burns ?? []).flat();
   const runeDelegations = parsedPsbts
     .filter((psbt) => !psbt.summary.isFinal)
-    .map((psbt) => psbt.runeSummary?.transfers ?? [])
+    .map((psbt) => psbt.runeSummary?.receipts ?? [])
     .flat();
   const hasSomeRuneDelegation = runeDelegations.length > 0;
 

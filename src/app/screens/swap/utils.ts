@@ -25,6 +25,8 @@ export const mapTokenToCurrencyType = (t?: Token): CurrencyTypes => {
   return t ? protocolToCurrencyTypeMap[t.protocol] ?? 'FT' : 'FT';
 };
 
+export const BAD_QUOTE_PERCENTAGE = 0.25;
+
 export const mapFTProtocolToSwapProtocol = (ft: FungibleToken): Protocol => {
   if (ft.principal === 'BTC') return 'btc';
   if (ft.principal === 'STX') return 'stx';

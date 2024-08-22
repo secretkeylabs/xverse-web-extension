@@ -13,10 +13,10 @@ test.describe('Settings Tab', () => {
     await wallet.checkVisualsStartpage();
     await wallet.navigationSettings.click();
     await expect(page.url()).toContain('settings');
-    await expect(wallet.buttonUpdatePassword).toBeVisible();
+    await expect(wallet.buttonPreferences).toBeVisible();
     await expect(wallet.buttonNetwork).toBeVisible();
-    await expect(wallet.buttonCurrency).toBeVisible();
-    await expect(wallet.buttonBackupWallet).toBeVisible();
+    await expect(wallet.buttonSecurity).toBeVisible();
+    await expect(wallet.buttonAdvanced).toBeVisible();
   });
 
   test('switch to testnet and back to mainnet', async ({
@@ -65,6 +65,9 @@ test.describe('Settings Tab', () => {
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
     await wallet.checkVisualsStartpage();
     await wallet.navigationSettings.click();
+    await expect(wallet.buttonSecurity).toBeVisible();
+    await wallet.buttonSecurity.click();
+    await expect(page.url()).toContain('security');
     await expect(wallet.buttonUpdatePassword).toBeVisible();
     await wallet.buttonUpdatePassword.click();
     await expect(page.url()).toContain('change-password');
@@ -93,7 +96,7 @@ test.describe('Settings Tab', () => {
     await onboardingPage.buttonContinue.click();
     await expect(wallet.infoUpdatePassword).toBeVisible();
   });
-  test('Backup wallet', async ({ page, extensionId }) => {
+  test('Show Seedphrase', async ({ page, extensionId }) => {
     const onboardingPage = new Onboarding(page);
     const wallet = new Wallet(page);
     await onboardingPage.createWalletSkipBackup(strongPW);
@@ -101,8 +104,11 @@ test.describe('Settings Tab', () => {
     await wallet.checkVisualsStartpage();
     await wallet.navigationSettings.click();
     await expect(page.url()).toContain('settings');
-    await expect(wallet.buttonBackupWallet).toBeVisible();
-    await wallet.buttonBackupWallet.click();
+    await expect(wallet.buttonSecurity).toBeVisible();
+    await wallet.buttonSecurity.click();
+    await expect(page.url()).toContain('security');
+    await expect(wallet.buttonShowSeedphrase).toBeVisible();
+    await wallet.buttonShowSeedphrase.click();
     await expect(onboardingPage.inputPassword).toBeVisible();
     await expect(onboardingPage.buttonContinue).toBeDisabled();
     await onboardingPage.inputPassword.fill(strongPW);
@@ -122,6 +128,9 @@ test.describe('Settings Tab', () => {
     await expect(wallet.textCurrency).toHaveText('USD');
     await wallet.navigationSettings.click();
     await expect(page.url()).toContain('settings');
+    await expect(wallet.buttonPreferences).toBeVisible();
+    await wallet.buttonPreferences.click();
+    await expect(page.url()).toContain('preferences');
     await expect(wallet.buttonCurrency).toBeVisible();
     await expect(wallet.buttonCurrency).toHaveText('Fiat CurrencyUSD');
     await wallet.buttonCurrency.click();
@@ -130,6 +139,7 @@ test.describe('Settings Tab', () => {
     await wallet.selectCurrency.filter({ hasText: 'SGD' }).click();
     await expect(wallet.buttonCurrency).toBeVisible();
     await expect(wallet.buttonCurrency).toHaveText('Fiat CurrencySGD');
+    await wallet.buttonBack.click();
     await wallet.navigationDashboard.click();
     await expect(wallet.textCurrency).toHaveText('SGD');
   });

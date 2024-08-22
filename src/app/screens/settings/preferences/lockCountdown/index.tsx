@@ -11,25 +11,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-
-const Container = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-  overflowY: 'auto',
-  padding: props.theme.space.m,
-  paddingTop: 0,
-  '&::-webkit-scrollbar': {
-    display: 'none',
-  },
-}));
-
-const Title = styled.p((props) => ({
-  ...props.theme.typography.body_m,
-  color: props.theme.colors.white_200,
-  marginTop: props.theme.space.l,
-  marginBottom: props.theme.space.l,
-}));
+import { Container, SubTitle, Title } from '../../index.styles';
 
 interface TimeSelectionBoxProps {
   selected: boolean;
@@ -85,9 +67,10 @@ function LockCountdown() {
 
   return (
     <>
-      <TopRow title={t('LOCK_COUNTDOWN')} onClick={handleGoBack} />
+      <TopRow onClick={handleGoBack} />
       <Container>
-        <Title>{t('LOCK_COUNTDOWN_TITLE')}</Title>
+        <Title>{t('LOCK_COUNTDOWN')}</Title>
+        <SubTitle>{t('LOCK_COUNTDOWN_TITLE')}</SubTitle>
         {periodOptions.map((period) => (
           <TimeSelectionBox
             key={period}

@@ -3,22 +3,11 @@ import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useSeedVault from '@hooks/useSeedVault';
 import SeedCheck from '@screens/backupWalletSteps/seedCheck';
+import { Container, Title } from '@screens/settings/index.styles';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  overflow-y: auto;
-  padding-left: 16px;
-  padding-right: 16px;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`;
 
 const EnterPasswordContainer = styled.div((props) => ({
   width: '100%',
@@ -29,7 +18,7 @@ const EnterPasswordContainer = styled.div((props) => ({
   right: 0,
   position: 'fixed',
   zIndex: 10,
-  background: 'rgba(25, 25, 48, 0.5)',
+  background: props.theme.colors.elevation0,
   backdropFilter: 'blur(16px)',
   padding: 16,
   paddingTop: props.theme.spacing(40),
@@ -60,8 +49,8 @@ function BackupWalletScreen() {
     };
   }, []);
 
-  const goToSettingScreen = () => {
-    navigate('/settings');
+  const goBack = () => {
+    navigate(-1);
   };
 
   const handlePasswordNextClick = async () => {
@@ -80,8 +69,9 @@ function BackupWalletScreen() {
 
   return (
     <>
-      <TopRow title={t('SETTING_SCREEN.BACKUP_WALLET')} onClick={goToSettingScreen} />
+      <TopRow onClick={goBack} />
       <Container>
+        <Title>{t('SETTING_SCREEN.BACKUP_WALLET')}</Title>
         {!showSeed && (
           <EnterPasswordContainer>
             <PasswordInput
@@ -90,7 +80,7 @@ function BackupWalletScreen() {
               enteredPassword={password}
               setEnteredPassword={setPassword}
               handleContinue={handlePasswordNextClick}
-              handleBack={goToSettingScreen}
+              handleBack={goBack}
               passwordError={error}
               stackButtonAlignment
               loading={loading}
@@ -98,7 +88,7 @@ function BackupWalletScreen() {
           </EnterPasswordContainer>
         )}
         <SeedphraseContainer>
-          {showSeed && <SeedCheck seedPhrase={seed} onContinue={goToSettingScreen} />}
+          {showSeed && <SeedCheck seedPhrase={seed} onContinue={goBack} />}
         </SeedphraseContainer>
       </Container>
       <BottomBar tab="settings" />

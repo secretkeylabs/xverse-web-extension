@@ -1,6 +1,7 @@
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
+import { Container, SubTitle, Title } from '@screens/settings/index.styles';
 import { hasOptedInMixPanelTracking, optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,28 +9,11 @@ import { useNavigate } from 'react-router-dom';
 import Switch from 'react-switch';
 import styled, { useTheme } from 'styled-components';
 
-const Container = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-  overflowY: 'auto',
-  padding: props.theme.spacing(8),
-  fontSize: '0.875rem',
-  color: props.theme.colors.white['200'],
-  '&::-webkit-scrollbar': {
-    display: 'none',
-  },
-}));
-
-const TextContainer = styled.div({
-  lineHeight: '140%',
-});
-
 const SwitchContainer = styled.div((props) => ({
+  ...props.theme.typography.body_medium_m,
   display: 'flex',
   justifyContent: 'space-between',
   alignItems: 'center',
-  marginTop: props.theme.spacing(16),
   fontWeight: 500,
 }));
 
@@ -49,7 +33,7 @@ function PrivacyPreferencesScreen() {
   const [isEnabled, setIsEnabled] = useState(false);
 
   const handleBackButtonClick = () => {
-    navigate('/settings');
+    navigate(-1);
   };
 
   const handleSwitchChange = (checked: boolean) => {
@@ -76,9 +60,10 @@ function PrivacyPreferencesScreen() {
 
   return (
     <>
-      <TopRow title={t('PRIVACY_PREFERENCES.TITLE')} onClick={handleBackButtonClick} />
+      <TopRow onClick={handleBackButtonClick} />
       <Container>
-        <TextContainer>{t('PRIVACY_PREFERENCES.DESCRIPTION')}</TextContainer>
+        <Title>{t('PRIVACY_PREFERENCES.TITLE')}</Title>
+        <SubTitle>{t('PRIVACY_PREFERENCES.DESCRIPTION')}</SubTitle>
         <SwitchContainer>
           <div>{t('PRIVACY_PREFERENCES.AUTHORIZE_DATA_COLLECTION')}</div>
           <CustomSwitch
