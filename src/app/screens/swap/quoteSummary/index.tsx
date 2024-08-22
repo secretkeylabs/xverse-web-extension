@@ -1,6 +1,7 @@
 import SlippageEditIcon from '@assets/img/swap/slippageEdit.svg';
 import TopRow from '@components/topRow';
 import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery';
+import { useGetSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useSearchParamsState from '@hooks/useSearchParamsState';
@@ -11,6 +12,8 @@ import {
   AnalyticsEvents,
   RUNE_DISPLAY_DEFAULTS,
   getBtcFiatEquivalent,
+  getStxFiatEquivalent,
+  stxToMicrostacks,
   type FungibleToken,
   type MarketUtxo,
   type PlaceUtxoOrderRequest,
@@ -167,8 +170,9 @@ export default function QuoteSummary({
   selectedIdentifiers,
 }: QuoteSummaryProps) {
   const { t } = useTranslation('translation');
+  const { data: sip10CoinsList } = useGetSip10FungibleTokens();
   const theme = useTheme();
-  const { btcFiatRate, btcUsdRate } = useCoinRates();
+  const { btcFiatRate, btcUsdRate, stxBtcRate } = useCoinRates();
   const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey, stxAddress, stxPublicKey } =
     useSelectedAccount();
   const {
@@ -201,15 +205,35 @@ export default function QuoteSummary({
 
   const { fiatCurrency } = useWalletSelector();
 
-  const fromUnit =
-    fromToken?.principal === 'BTC'
-      ? 'Sats'
-      : (fromToken as FungibleToken)?.runeSymbol ??
-        (fromToken as FungibleToken).assetName ??
-        RUNE_DISPLAY_DEFAULTS.symbol;
+  const fromUnit = (() => {
+    if (fromToken?.principal === 'BTC') {
+      return 'Sats';
+    }
+    if (fromToken?.principal === 'STX') {
+      return 'STX';
+    }
+    if (fromToken?.protocol === 'runes') {
+      return fromToken?.runeSymbol ?? RUNE_DISPLAY_DEFAULTS.symbol;
+    }
 
-  const toUnit =
-    toToken?.protocol === 'btc' ? 'Sats' : toToken?.symbol ?? RUNE_DISPLAY_DEFAULTS.symbol;
+    return fromToken?.ticker;
+  })();
+
+  const toUnit = (() => {
+    if (toToken?.protocol === 'btc') {
+      return 'Sats';
+    }
+    if (toToken?.symbol) {
+      return toToken.symbol;
+    }
+    if (toToken?.protocol === 'runes') {
+      return RUNE_DISPLAY_DEFAULTS.symbol;
+    }
+    if (toToken?.ticker === 'STX') {
+      return 'STX';
+    }
+    return toToken?.name;
+  })();
 
   const isRunesSwap = fromToken?.protocol === 'runes' || toToken?.protocol === 'runes';
   const isSip10Swap = fromToken?.protocol === 'stacks' || toToken?.protocol === 'sip10';
@@ -301,6 +325,12 @@ export default function QuoteSummary({
   const fromTokenFiatValue =
     fromToken?.principal === 'BTC'
       ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcFiatRate)).toFixed(2)
+      : fromToken?.principal === 'STX'
+      ? getStxFiatEquivalent(
+          stxToMicrostacks(new BigNumber(amount)),
+          new BigNumber(stxBtcRate),
+          new BigNumber(btcFiatRate),
+        ).toFixed(2)
       : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2);
 
   const toTokenFiatValue =
@@ -309,10 +339,22 @@ export default function QuoteSummary({
           new BigNumber(quote.receiveAmount),
           new BigNumber(btcFiatRate),
         ).toFixed(2)
-      : getBtcFiatEquivalent(
+      : toToken?.protocol === 'runes'
+      ? getBtcFiatEquivalent(
           new BigNumber(runeFloorPrice ?? 0).multipliedBy(quote.receiveAmount),
           new BigNumber(btcFiatRate),
-        ).toFixed(2);
+        ).toFixed(2)
+      : toToken?.protocol === 'stx'
+      ? getStxFiatEquivalent(
+          stxToMicrostacks(new BigNumber(quote.receiveAmount)),
+          new BigNumber(stxBtcRate),
+          new BigNumber(btcFiatRate),
+        ).toFixed(2)
+      : new BigNumber(
+          sip10CoinsList?.find((s) => s.principal === toToken?.ticker)?.tokenFiatRate ?? 0,
+        )
+          .multipliedBy(quote.receiveAmount)
+          .toFixed(2);
 
   const showBadQuoteWarning =
     quote.slippageSupported &&
@@ -370,7 +412,7 @@ export default function QuoteSummary({
               }}
               subtitle={fromToken?.principal === 'BTC' ? 'Bitcoin' : fromToken?.assetName}
               subtitleColor="white_400"
-              unit={fromToken?.principal === 'BTC' ? 'Sats' : fromToken?.runeSymbol ?? ''}
+              unit={fromUnit}
               fiatValue={fromTokenFiatValue}
             />
             <ArrowOuterContainer>
@@ -397,7 +439,7 @@ export default function QuoteSummary({
               }}
               subtitle={toToken?.protocol === 'btc' ? 'Bitcoin' : toToken?.name}
               subtitleColor="white_400"
-              unit={toToken?.protocol === 'btc' ? 'Sats' : toToken?.symbol}
+              unit={toUnit}
               fiatValue={toTokenFiatValue}
             />
           </QuoteToBaseContainer>

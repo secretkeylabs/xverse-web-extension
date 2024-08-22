@@ -40,8 +40,18 @@ export const mapFTProtocolToSwapProtocol = (ft: FungibleToken): Protocol => {
   return protocolMap[ft.protocol];
 };
 
+export const mapFTMotherProtocolToSwapProtocol = (ft: FungibleToken): Protocol => {
+  if (ft.principal === 'BTC') return 'runes';
+  if (ft.principal === 'STX') return 'sip10';
+  if (ft.protocol === 'stacks') return 'sip10';
+  if (ft.protocol === 'runes') return 'runes';
+  return 'runes';
+};
+
 export const mapSwapProtocolToFTProtocol = (protocol: Protocol): FungibleTokenProtocol => {
   const protocolMap: Partial<Record<Protocol, FungibleTokenProtocol>> = {
+    stx: 'stacks',
+    btc: 'runes',
     sip10: 'stacks',
     runes: 'runes',
     brc20: 'brc-20',

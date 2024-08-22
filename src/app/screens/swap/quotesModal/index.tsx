@@ -1,7 +1,9 @@
+import { microStxToStx } from '@components/postCondition/postConditionView/helper';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import {
   getBtcFiatEquivalent,
   getStxFiatEquivalent,
+  stxToMicrostacks,
   type FungibleToken,
   type Quote,
   type StxQuote,
@@ -147,11 +149,11 @@ function QuotesModal({
             onClick={() => ammProviderClicked && ammProviderClicked(stx)}
             subtitle={t('RECOMMENDED')}
             subtitleColor="success_light"
-            unit={stx.to.protocol === 'stx' ? 'STX' : toToken?.symbol || ''}
+            unit={stx.to.protocol === 'stx' ? 'STX' : toToken?.name || ''}
             fiatValue={
               stx.to.protocol === 'stx'
                 ? getStxFiatEquivalent(
-                    new BigNumber(stx.receiveAmount),
+                    stxToMicrostacks(new BigNumber(stx.receiveAmount)),
                     new BigNumber(stxBtcRate),
                     new BigNumber(btcFiatRate),
                   ).toFixed(2)

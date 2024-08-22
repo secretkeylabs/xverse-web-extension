@@ -3,9 +3,11 @@ import RequestsRoutes from '@common/utils/route-urls';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery';
+import { useGetSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useGetQuotes from '@hooks/queries/swaps/useGetQuotes';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useCoinRates from '@hooks/queries/useCoinRates';
+import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import type { DataStxSignTransaction } from '@screens/transactionRequest/useStxTransactionRequest';
@@ -13,6 +15,7 @@ import {
   AnalyticsEvents,
   btcToSats,
   getBtcFiatEquivalent,
+  microstacksToStx,
   type FungibleToken,
   type GetUtxosRequest,
   type MarketUtxo,
@@ -23,7 +26,7 @@ import {
 import Button, { LinkButton } from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
 import SnackBar from '@ui-library/snackBar';
-import { satsToBtcString } from '@utils/helper';
+import { formatNumber, satsToBtcString } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { getFtBalance } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
@@ -103,6 +106,7 @@ export default function SwapScreen() {
   const [quote, setQuote] = useState<Quote>();
   const [selectedUtxoProvider, setSelectedUtxoProvider] = useState<UtxoQuote>();
   const [errorMessage, setErrorMessage] = useState('');
+  const { data: sip10CoinsList } = useGetSip10FungibleTokens();
 
   const [getQuotesModalVisible, setGetQuotesModalVisible] = useState(false);
   const [tokenSelectionBottomSheet, setTokenSelectionBottomSheet] = useState<'from' | 'to' | null>(
@@ -123,6 +127,8 @@ export default function SwapScreen() {
   const { stxPublicKey } = useSelectedAccount();
 
   const { data: btcBalance } = useBtcWalletData();
+  const { data: stxData } = useStxWalletData();
+
   const { btcFiatRate, btcUsdRate } = useCoinRates();
   const navigate = useNavigate();
   const { t } = useTranslation('translation');
@@ -196,6 +202,8 @@ export default function SwapScreen() {
     switch (ftProtocol) {
       case 'runes':
         return coinsMasterList.find((coin) => coin.principal === ticker);
+      case 'stacks':
+        return coinsMasterList.find((coin) => coin.principal === ticker);
       default:
         return undefined;
     }
@@ -264,7 +272,11 @@ export default function SwapScreen() {
       return satsToBtcString(BigNumber(btcBalance ?? 0));
     }
 
-    if (fromToken.protocol === 'runes') {
+    if (fromToken.principal === 'STX') {
+      return formatNumber(microstacksToStx(BigNumber(stxData?.availableBalance ?? 0)).toString());
+    }
+
+    if (fromToken.protocol === 'runes' || fromToken.protocol === 'stacks') {
       return getFtBalance(fromToken);
     }
   };
@@ -278,7 +290,7 @@ export default function SwapScreen() {
       return getBtcFiatEquivalent(amountInSats, new BigNumber(btcFiatRate)).toFixed(2);
     }
 
-    if (fromToken?.protocol !== 'runes' || !fromToken?.tokenFiatRate || !fromToken.decimals) {
+    if (!fromToken?.tokenFiatRate || !fromToken.decimals) {
       return '0.00';
     }
 
@@ -309,7 +321,10 @@ export default function SwapScreen() {
   const isGetQuotesDisabled = ifFormInValid || quotesLoading || Boolean(quotesError);
 
   const isMaxDisabled =
-    !fromToken || fromToken.principal === 'BTC' || BigNumber(amount).eq(getFtBalance(fromToken));
+    !fromToken ||
+    fromToken.principal === 'BTC' ||
+    fromToken.principal === 'STX' ||
+    BigNumber(amount).eq(getFtBalance(fromToken));
   const isRunesToBtcRoute =
     fromToken?.principal !== 'BTC' &&
     fromToken?.protocol === 'runes' &&
@@ -527,7 +542,7 @@ export default function SwapScreen() {
               unit: fromToken?.principal === 'BTC' ? 'BTC' : fromToken?.runeSymbol ?? '',
             }}
             max={
-              fromToken?.principal === 'BTC'
+              fromToken?.principal === 'BTC' || fromToken?.principal === 'STX'
                 ? undefined
                 : { isDisabled: isMaxDisabled, onClick: onClickMax }
             }

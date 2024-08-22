@@ -15,6 +15,7 @@ export const btcFt: FungibleToken = {
   principal: 'BTC',
   assetName: 'Bitcoin',
   image: IconBitcoin,
+  protocol: 'runes',
 };
 
 export const stxFt: FungibleToken = {
@@ -25,6 +26,7 @@ export const stxFt: FungibleToken = {
   principal: 'STX',
   assetName: 'Stacks',
   image: IconStacks,
+  protocol: 'stacks',
 };
 
 const useMasterCoinsList = () => {

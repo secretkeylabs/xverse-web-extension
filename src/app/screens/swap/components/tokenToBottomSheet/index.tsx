@@ -1,7 +1,11 @@
 import TokenTile from '@components/tokenTile';
 import useDebounce from '@hooks/useDebounce';
 import { MagnifyingGlass } from '@phosphor-icons/react';
-import { mapFTProtocolToSwapProtocol, mapSwapTokenToFT } from '@screens/swap/utils';
+import {
+  mapFTMotherProtocolToSwapProtocol,
+  mapFTProtocolToSwapProtocol,
+  mapSwapTokenToFT,
+} from '@screens/swap/utils';
 import {
   AnalyticsEvents,
   type FungibleToken,
@@ -14,7 +18,7 @@ import Input from '@ui-library/input';
 import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
 import { trackMixPanel } from '@utils/mixpanel';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import Theme from 'theme';
@@ -95,7 +99,14 @@ export default function TokenToBottomSheet({
   resetFrom,
 }: Props) {
   const [query, setQuery] = useState('');
+
   const [selectedProtocol, setSelectedProtocol] = useState<Protocol>(supportedProtocols[0]);
+
+  useEffect(() => {
+    if (from) {
+      setSelectedProtocol(mapFTMotherProtocolToSwapProtocol(from));
+    }
+  }, [from]);
 
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
   const search = useDebounce(query, 500);
@@ -111,7 +122,7 @@ export default function TokenToBottomSheet({
     if (selectedProtocol === protocol) {
       return;
     }
-    resetFrom();
+    // resetFrom();
     setQuery('');
     setSelectedProtocol(protocol);
   };
@@ -156,7 +167,7 @@ export default function TokenToBottomSheet({
         )}
         {!!(data && !isLoading) &&
           data.map((token) => {
-            if (token.protocol === 'btc') {
+            if (token.protocol === 'btc' && selectedProtocol === 'runes') {
               return (
                 <StyledTokenTile
                   key={token.name}
@@ -166,6 +177,23 @@ export default function TokenToBottomSheet({
                     onSelectCoin(token);
                     trackMixPanel(AnalyticsEvents.SelectTokenToSwapTo, {
                       selectedToken: 'Bitcoin',
+                    });
+                    handleClose();
+                  }}
+                  hideBalance
+                />
+              );
+            }
+            if (token.protocol === 'stx' && selectedProtocol === 'sip10') {
+              return (
+                <StyledTokenTile
+                  key={token.name}
+                  title={token.name ?? token.ticker}
+                  currency="STX"
+                  onPress={() => {
+                    onSelectCoin(token);
+                    trackMixPanel(AnalyticsEvents.SelectTokenToSwapTo, {
+                      selectedToken: 'Stacks',
                     });
                     handleClose();
                   }}

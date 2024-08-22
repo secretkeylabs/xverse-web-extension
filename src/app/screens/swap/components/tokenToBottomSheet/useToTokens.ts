@@ -26,7 +26,13 @@ const useToTokens = (protocol: Protocol, from?: TokenBasic, query?: string) => {
       userTokens,
     });
 
-    const sortedResponse = response.items.sort((a) => (a.protocol === 'btc' ? -1 : 1));
+    const sortedResponse = response.items.sort((a, b) => {
+      if (a.protocol === 'btc') return -1;
+      if (b.protocol === 'btc') return 1;
+      if (a.protocol === 'stx') return -1;
+      if (b.protocol === 'stx') return 1;
+      return 0;
+    });
 
     const filteredResponse = from
       ? sortedResponse.filter((s) => s.ticker !== from.ticker)

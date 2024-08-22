@@ -1,5 +1,6 @@
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useMasterCoinsList from '@screens/swap/useMasterCoinsList';
+import { mapSwapProtocolToFTProtocol } from '@screens/swap/utils';
 import { type Token } from '@secretkeylabs/xverse-core';
 import { sortFtByFiatBalance } from '@utils/tokens';
 
@@ -17,7 +18,11 @@ const useFromTokens = (toToken?: Token) => {
   });
 
   const filteredTokens = toToken
-    ? sortedTokens.filter((token) => token.principal !== toToken.ticker)
+    ? sortedTokens.filter(
+        (token) =>
+          token.principal !== toToken.ticker &&
+          mapSwapProtocolToFTProtocol(toToken.protocol) === token.protocol,
+      )
     : sortedTokens;
 
   return filteredTokens;
