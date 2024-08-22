@@ -1,5 +1,5 @@
 import { parseData } from '@common/utils';
-import { getPopupPayload } from '@common/utils/popup';
+import { getPopupPayload, type Context } from '@common/utils/popup';
 import { callContractParamsSchema } from '@common/utils/rpc/stx/callContract/paramsSchema';
 import { deployContractParamsSchema } from '@common/utils/rpc/stx/deployContract/paramsSchema';
 import useNetworkSelector from '@hooks/useNetwork';
@@ -18,7 +18,23 @@ import * as v from 'valibot';
 import type { Return } from './types';
 import { getPayload, isDeployContractPayload } from './utils';
 
-const useStxTransactionRequest = (): Return => {
+export type DataStxSignTransaction = {
+  context: Context;
+  data: {
+    method: 'stx_signTransaction';
+    params: {
+      transaction: string;
+      pubkey?: string | undefined;
+      broadcast?: boolean | undefined;
+    };
+    id: string;
+    jsonrpc: '2.0';
+  };
+} | null;
+
+const useStxTransactionRequest = (
+  dataStxSignTransactionOverride?: DataStxSignTransaction,
+): Return => {
   // Params
   const { search } = useLocation();
   const params = new URLSearchParams(search);
@@ -30,12 +46,18 @@ const useStxTransactionRequest = (): Return => {
   // Common to all WebBTC RPC methods
   const tabId = Number(params.get('tabId')) ?? 0;
   const messageId = params.get('messageId') ?? '';
-  const rpcMethod = params.get('rpcMethod') ?? '';
+  let rpcMethod = params.get('rpcMethod') ?? '';
 
-  const [errorStxSignTransaction, dataStxSignTransaction] = getPopupPayload((data) =>
+  const [errorStxSignTransaction, payloadDataStxSignTransaction] = getPopupPayload((data) =>
     v.parse(stxSignTransactionRequestMessageSchema, data),
   );
-  if (!errorStxSignTransaction) {
+
+  const dataStxSignTransaction = dataStxSignTransactionOverride ?? payloadDataStxSignTransaction;
+
+  if (dataStxSignTransaction) {
+    if (dataStxSignTransaction.data.method) {
+      rpcMethod = dataStxSignTransaction.data.method;
+    }
     const { transaction: transactionHex } = dataStxSignTransaction.data.params;
     const transaction = deserializeTransaction(transactionHex);
 

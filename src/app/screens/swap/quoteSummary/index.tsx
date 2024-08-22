@@ -29,7 +29,12 @@ import trackSwapMixPanel from '../mixpanel';
 import QuoteTile from '../quotesModal/quoteTile';
 import { SlippageModalContent } from '../slippageModal';
 import type { OrderInfo, StxOrderInfo } from '../types';
-import { mapFTNativeSwapTokenToTokenBasic } from '../utils';
+import {
+  mapFTNativeSwapTokenToTokenBasic,
+  mapFtToCurrencyType,
+  mapSwapTokenToFT,
+  mapTokenToCurrencyType,
+} from '../utils';
 import EditFee from './EditFee';
 import QuoteSummaryTile from './quoteSummaryTile';
 import usePlaceOrder from './usePlaceOrder';
@@ -312,8 +317,11 @@ export default function QuoteSummary({
               provider="Amount"
               price={amount}
               image={{
-                currency: fromToken?.principal === 'BTC' ? 'BTC' : 'FT',
-                ft: fromToken?.principal === 'BTC' ? undefined : fromToken,
+                currency: mapFtToCurrencyType(fromToken),
+                ft:
+                  fromToken?.principal === 'BTC' || fromToken?.principal === 'STX'
+                    ? undefined
+                    : fromToken,
               }}
               subtitle={fromToken?.principal === 'BTC' ? 'Bitcoin' : fromToken?.assetName}
               subtitleColor="white_400"
@@ -335,16 +343,18 @@ export default function QuoteSummary({
               provider="Amount"
               price={quote.receiveAmount}
               image={{
-                currency: toToken?.protocol === 'btc' ? 'BTC' : 'FT',
+                currency: mapTokenToCurrencyType(toToken),
                 ft:
-                  toToken?.protocol === 'btc'
-                    ? undefined
-                    : ({
+                  toToken?.protocol === 'runes'
+                    ? ({
                         runeSymbol: toToken?.symbol,
                         runeInscriptionId: toToken?.logo,
                         ticker: toToken?.name,
                         protocol: 'runes',
-                      } as FungibleToken),
+                      } as FungibleToken)
+                    : toToken?.protocol === 'sip10'
+                    ? mapSwapTokenToFT(toToken)
+                    : undefined,
               }}
               subtitle={toToken?.protocol === 'btc' ? 'Bitcoin' : toToken?.name}
               subtitleColor="white_400"

@@ -3,6 +3,7 @@ import {
   getXverseApiClient,
   type ExecuteOrderRequest,
   type ExecuteOrderResponse,
+  type ExecuteStxOrderRequest,
 } from '@secretkeylabs/xverse-core';
 import { useState } from 'react';
 
@@ -28,7 +29,21 @@ const useExecuteOrder = () => {
     }
   };
 
-  return { order, loading, error, executeOrder };
+  const executeStxOrder = async (request: ExecuteStxOrderRequest) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await xverseApiClient.swaps.executeStxOrder(request);
+      setOrder(response);
+      return response;
+    } catch (err: any) {
+      setError(err?.response?.data?.message ?? 'Failed to execute order');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { order, loading, error, executeOrder, executeStxOrder };
 };
 
 export default useExecuteOrder;

@@ -15,6 +15,7 @@ import StxPostConditionCard from '@components/postCondition/stxPostConditionCard
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
+import useExecuteOrder from '@screens/swap/components/psbtConfirmation/useExecuteOrder';
 import {
   addressToString,
   broadcastSignedTransaction,
@@ -26,6 +27,7 @@ import {
   type Args,
   type Coin,
   type ContractFunction,
+  type ExecuteStxOrderRequest,
 } from '@secretkeylabs/xverse-core';
 import type { ContractCallPayload } from '@stacks/connect';
 import {
@@ -110,6 +112,8 @@ export default function ContractCallRequest({
   const [hasTabClosed, setHasTabClosed] = useState(false);
   const { t } = useTranslation('translation');
   const [fee, setFee] = useState<BigNumber | undefined>(undefined);
+  const { executeStxOrder } = useExecuteOrder();
+  const [isLoading, setIsLoading] = useState(false);
 
   // SignTransaction Params
   const isMultiSigTx = isMultiSig(unsignedTx);
@@ -262,7 +266,32 @@ export default function ContractCallRequest({
     }
   };
 
-  const confirmCallback = (transactions: StacksTransaction[]) => {
+  const confirmCallback = async (transactions: StacksTransaction[]) => {
+    if (messageId === 'velar') {
+      const order: ExecuteStxOrderRequest = {
+        providerCode: 'velar',
+        signedTransaction: buf2hex(transactions[0].serialize()),
+      };
+      setIsLoading(true);
+      const response = await executeStxOrder(order);
+      setIsLoading(false);
+
+      if (response) {
+        navigate('/tx-status', {
+          state: {
+            txid: response.txid,
+            currency: 'STX',
+            error: '',
+            browserTx: false,
+            tabId,
+            messageId,
+            rpcMethod,
+          },
+        });
+      }
+      return;
+    }
+
     if (request?.sponsored) {
       if (rpcMethod && tabId && messageId) {
         switch (rpcMethod) {
@@ -356,7 +385,7 @@ export default function ContractCallRequest({
         initialStxTransactions={[unsignedTx]}
         onConfirmClick={confirmCallback}
         onCancelClick={cancelCallback}
-        loading={false}
+        loading={isLoading}
         title={request.functionName}
         subTitle={`Requested by ${request.appDetails?.name}`}
         hasSignatures={hasSignatures}

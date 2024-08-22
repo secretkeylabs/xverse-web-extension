@@ -1,11 +1,14 @@
 import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
+import RequestsRoutes from '@common/utils/route-urls';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery';
 import useGetQuotes from '@hooks/queries/swaps/useGetQuotes';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useCoinRates from '@hooks/queries/useCoinRates';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
+import type { DataStxSignTransaction } from '@screens/transactionRequest/useStxTransactionRequest';
 import {
   AnalyticsEvents,
   btcToSats,
@@ -17,14 +20,12 @@ import {
   type Token,
   type UtxoQuote,
 } from '@secretkeylabs/xverse-core';
-import { deserializeTransaction } from '@stacks/transactions';
 import Button, { LinkButton } from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
 import SnackBar from '@ui-library/snackBar';
 import { satsToBtcString } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { getFtBalance } from '@utils/tokens';
-import RoutePaths from 'app/routes/paths';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -44,6 +45,7 @@ import useMasterCoinsList from './useMasterCoinsList';
 import {
   mapFTNativeSwapTokenToTokenBasic,
   mapFTProtocolToSwapProtocol,
+  mapFtToSwapToken,
   mapSwapProtocolToFTProtocol,
   mapSwapTokenToFT,
 } from './utils';
@@ -96,34 +98,6 @@ const Icon = styled.img`
   rotate: 90deg;
 `;
 
-const mapFtToSwapToken = (st: FungibleToken): Token => {
-  if (st.principal === 'BTC') {
-    return {
-      ticker: 'BTC',
-      name: 'Bitcoin',
-      protocol: 'btc',
-      divisibility: 8,
-    };
-  }
-  if (st.principal === 'STX') {
-    return {
-      ticker: 'STX',
-      name: 'Stacks',
-      protocol: 'stx',
-      divisibility: 6,
-    };
-  }
-
-  return {
-    ticker: st.principal ?? '',
-    name: st.name ?? st.assetName ?? '',
-    protocol: mapFTProtocolToSwapProtocol(st),
-    divisibility: st.decimals ?? 0,
-    logo: st.image ?? st.runeInscriptionId ?? '',
-    symbol: st.runeSymbol ?? '',
-  };
-};
-
 export default function SwapScreen() {
   const [amount, setAmount] = useState('');
   const [quote, setQuote] = useState<Quote>();
@@ -146,6 +120,7 @@ export default function SwapScreen() {
   const [utxoProviderSendAmount, setUtxoProviderSendAmount] = useState<string | undefined>();
 
   const { fiatCurrency } = useWalletSelector();
+  const { stxPublicKey } = useSelectedAccount();
 
   const { data: btcBalance } = useBtcWalletData();
   const { btcFiatRate, btcUsdRate } = useCoinRates();
@@ -428,13 +403,29 @@ export default function SwapScreen() {
     );
   }
 
-  if (stxOrderInfo?.order.unsignedTransaction) {
-    const unsignedTransaction = deserializeTransaction(stxOrderInfo.order.unsignedTransaction);
+  const unsignedTransactionHexString = stxOrderInfo?.order.unsignedTransaction;
 
-    navigate(RoutePaths.ConfirmStacksTransaction, {
+  if (unsignedTransactionHexString) {
+    const dataStxSignTransactionOverride: DataStxSignTransaction = {
+      context: {
+        origin: 'extension',
+        tabId: 0,
+      },
+      data: {
+        method: 'stx_signTransaction',
+        params: {
+          transaction: unsignedTransactionHexString,
+          pubkey: stxPublicKey,
+          broadcast: true,
+        },
+        id: 'velar',
+        jsonrpc: '2.0',
+      },
+    };
+
+    navigate(RequestsRoutes.TransactionRequest, {
       state: {
-        unsignedTx: unsignedTransaction,
-        fee: unsignedTransaction.auth.spendingCondition.fee.toString(),
+        dataStxSignTransactionOverride,
       },
     });
   }
