@@ -289,6 +289,17 @@ export default function QuoteSummary({
     .multipliedBy(100)
     .toFixed(0);
 
+  const getTokenRate = (): string => {
+    if (toToken?.protocol === 'btc') {
+      return new BigNumber(quote.receiveAmount)
+        .dividedBy(new BigNumber(amount))
+        .decimalPlaces(2)
+        .toString();
+    }
+    const satsPerRune = new BigNumber(amount).dividedBy(new BigNumber(quote.receiveAmount));
+    return new BigNumber(1).dividedBy(satsPerRune).toString();
+  };
+
   return (
     <>
       <TopRow onClick={onClose} />
@@ -312,11 +323,7 @@ export default function QuoteSummary({
           <QuoteSummaryTile
             fromUnit={fromUnit}
             toUnit={toUnit}
-            rate={
-              toToken?.protocol === 'btc'
-                ? new BigNumber(quote.receiveAmount).dividedBy(new BigNumber(amount)).toString()
-                : new BigNumber(amount).dividedBy(new BigNumber(quote.receiveAmount)).toString()
-            }
+            rate={getTokenRate()}
             provider={quote.provider.name}
             image={quote.provider.logo}
             onClick={onChangeProvider}
