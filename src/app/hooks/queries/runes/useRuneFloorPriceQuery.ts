@@ -5,19 +5,20 @@ import { useCallback } from 'react';
 
 export default function useRuneFloorPriceQuery(runeName: string, backgroundRefetch = true) {
   const { network } = useWalletSelector();
-  if (network.type !== 'Mainnet') {
-    throw new Error('Only available on Mainnet');
-  }
+
   const runesApi = useRunesApi();
-  const queryFn = useCallback(async () => {
-    const res = await runesApi.getRuneMarketData(runeName);
-    return Number(res.floorUnitPrice.formatted);
-  }, [runeName, runesApi]);
+  const queryFn = useCallback(
+    async () =>
+      runesApi
+        .getRuneMarketData(runeName)
+        .then((res) => Number(res.floorUnitPrice?.formatted ?? 0)),
+    [runeName, runesApi],
+  );
   return useQuery({
     refetchOnWindowFocus: backgroundRefetch,
     refetchOnReconnect: backgroundRefetch,
     queryKey: ['get-rune-floor-price', runeName],
-    enabled: Boolean(runeName),
+    enabled: Boolean(runeName) && network.type === 'Mainnet',
     queryFn,
   });
 }

@@ -1,6 +1,6 @@
 import PlaceholderImage from '@assets/img/nftDashboard/nft_fallback.svg';
 import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
-import { Brc20Definition } from '@secretkeylabs/xverse-core';
+import type { Brc20Definition } from '@secretkeylabs/xverse-core';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import stc from 'string-to-color';
@@ -169,7 +169,11 @@ export default function Brc20Tile(props: Brc20TileProps) {
         isGalleryOpen={isGalleryOpen}
         isSmallImage={isSmallImage}
       >
-        <TickerIconText enlargeTicker={withoutTitles} isGalleryOpen={isGalleryOpen}>
+        <TickerIconText
+          data-testid="token-image"
+          enlargeTicker={withoutTitles}
+          isGalleryOpen={isGalleryOpen}
+        >
           {ticker}
         </TickerIconText>
       </TickerIconContainer>

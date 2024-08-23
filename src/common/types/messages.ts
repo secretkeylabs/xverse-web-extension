@@ -1,4 +1,4 @@
-import { ExtensionMethods, InternalMethods, Message } from './message-types';
+import type { ExtensionMethods, InternalMethods, Message } from './message-types';
 
 /**
  * Popup <-> Background Script

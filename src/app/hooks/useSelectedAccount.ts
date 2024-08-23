@@ -1,6 +1,6 @@
 import getSelectedAccount from '@common/utils/getSelectedAccount';
-import { Account } from '@secretkeylabs/xverse-core';
-import { StoreState } from '@stores/index';
+import type { Account } from '@secretkeylabs/xverse-core';
+import type { StoreState } from '@stores/index';
 import { useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import useWalletReducer from './useWalletReducer';

@@ -8,7 +8,7 @@ import { ArrowsOut } from '@phosphor-icons/react';
 import { StyledHeading } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
 import { XVERSE_EXPLORE_URL } from '@utils/constants';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -63,17 +63,16 @@ const LoaderContainer = styled.div((props) => ({
 
 function ExploreScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'EXPLORE_SCREEN' });
-  const { data, isLoading } = useFeaturedDapps();
-  const { featured, recommended } = data || {};
+  const { featured, recommended, tabs, isLoading } = useFeaturedDapps();
+  const [activeTab, setActiveTab] = useState<string | undefined>();
 
-  const categories = new Set(recommended?.map((r) => r.category!) || []);
-  const tabs = Array.from(categories).map((c: string) => ({
-    label: c,
-    value: c,
-  }));
+  useEffect(() => {
+    if (tabs && tabs.length > 0 && !activeTab) {
+      setActiveTab(tabs[0].value);
+    }
+  }, [tabs, activeTab]);
 
-  const [activeTab, setActiveTab] = useState<string>(tabs[0]?.value || '');
-  const category = activeTab ? recommended?.filter((r) => r.category === activeTab) : recommended;
+  const category = recommended?.filter((r) => r.category === activeTab);
 
   return isLoading ? (
     <LoaderContainer>
@@ -92,11 +91,7 @@ function ExploreScreen() {
           <SwiperNavigation />
         </Subheader>
         {!!featured?.length && <FeaturedCardCarousel items={featured} />}
-        {activeTab ? (
-          <Tabs tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />
-        ) : (
-          <Subheader>{t('RECOMMENDED')}</Subheader>
-        )}
+        {tabs && <Tabs tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />}
         {!!category?.length && <RecommendedApps items={category} />}
       </Container>
       <BottomBar tab="explore" />

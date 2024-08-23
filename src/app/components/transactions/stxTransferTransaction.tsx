@@ -5,8 +5,8 @@ import TransactionStatusIcon from '@components/transactions/transactionStatusIco
 import TransactionTitle from '@components/transactions/transactionTitle';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { FastForward } from '@phosphor-icons/react';
-import { StxTransactionData } from '@secretkeylabs/xverse-core';
-import { CurrencyTypes } from '@utils/constants';
+import type { StxTransactionData } from '@secretkeylabs/xverse-core';
+import type { CurrencyTypes } from '@utils/constants';
 import { getStxTxStatusUrl } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -93,7 +93,7 @@ export default function StxTransferTransaction({
       <TransactionStatusIcon transaction={transaction} currency="STX" />
       <TransactionInfoContainer>
         <TransactionRow>
-          <div>
+          <div data-testid="transaction-info">
             <TransactionTitle transaction={transaction} />
             <TransactionRecipient transaction={transaction} />
           </div>

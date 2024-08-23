@@ -2,9 +2,16 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { parse } from 'superjson';
 import * as v from 'valibot';
 import { permissionsPersistantStoreKeyName } from './constants';
-import { Client, Permission, Resource, permissionsStoreV1Schema } from './schemas';
-import { TPermissionsStoreContext, TPermissionsUtilsContext } from './types';
+import { permissionsStoreSchema, type Client, type Permission, type Resource } from './schemas';
+import type { TPermissionsStoreContext, TPermissionsUtilsContext } from './types';
 import * as utils from './utils';
+
+function isStoreOutdatedError(error: Error): boolean {
+  return v.is(
+    v.array(v.object({ path: v.array(v.object({ key: v.literal('version') })) })),
+    error.cause,
+  );
+}
 
 const PermissionsStoreContext = createContext<TPermissionsStoreContext>({
   isLoading: true,
@@ -23,16 +30,35 @@ function PermissionsStoreProvider({ children }: { children: React.ReactNode }) {
       const [e, loadedStore] = await utils.loadPermissionsStore();
 
       if (e) {
+        if (isStoreOutdatedError(e)) {
+          // The store is outdated, we need to migrate it. For now we recreate a
+          // brand new store and overwrite the previous one. As the store
+          // becomes more complex, a more comprehensive migration may be
+          // required.
+          const newStore = utils.makePermissionsStore();
+          await utils.savePermissionsStore(newStore);
+          setValue({
+            isLoading: false,
+            error: undefined,
+            store: newStore,
+          });
+          return;
+        }
+
+        // For all other errors not related to an outdated store, we log the
+        // error and set the store to undefined.
         setValue({
           isLoading: false,
           error: e,
           store: undefined,
         });
+        // eslint-disable-next-line no-console
+        console.error('Failed to load permissions store', e);
         return;
       }
 
       if (!loadedStore) {
-        const newStore = utils.makePermissionsStoreV1();
+        const newStore = utils.makePermissionsStore();
         await utils.savePermissionsStore(newStore);
         setValue({
           isLoading: false,
@@ -55,7 +81,7 @@ function PermissionsStoreProvider({ children }: { children: React.ReactNode }) {
     if (permissionsStoreChanges) {
       const { newValue } = permissionsStoreChanges;
       const hydrated = parse(newValue);
-      const parseResult = v.safeParse(permissionsStoreV1Schema, hydrated);
+      const parseResult = v.safeParse(permissionsStoreSchema, hydrated);
       if (!parseResult.success) {
         setValue({
           isLoading: false,

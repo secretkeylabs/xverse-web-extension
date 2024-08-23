@@ -1,4 +1,4 @@
-import {
+import type {
   Brc20HistoryTransactionData,
   BtcTransactionData,
   GetRunesActivityForAddressEvent,

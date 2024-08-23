@@ -26,7 +26,7 @@ import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowUp, Plus } from '@phosphor-icons/react';
 import CoinSelectModal from '@screens/home/coinSelectModal';
-import { FeatureId, getFiatEquivalent, type FungibleToken } from '@secretkeylabs/xverse-core';
+import { AnalyticsEvents, FeatureId, type FungibleToken } from '@secretkeylabs/xverse-core';
 import {
   changeShowDataCollectionAlertAction,
   setBrc20ManageTokensAction,
@@ -37,10 +37,10 @@ import {
 import Button from '@ui-library/button';
 import Sheet from '@ui-library/sheet';
 import SnackBar from '@ui-library/snackBar';
-import { CurrencyTypes } from '@utils/constants';
+import type { CurrencyTypes } from '@utils/constants';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
-import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
-import { getBalanceAmount } from '@utils/tokens';
+import { optInMixPanel, optOutMixPanel, trackMixPanel } from '@utils/mixpanel';
+import { sortFtByFiatBalance } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -147,26 +147,29 @@ function Home() {
         <SnackBar
           text={t('TOKEN_HIDDEN')}
           type="neutral"
-          actionButtonText={t('UNDO')}
-          actionButtonCallback={() => {
-            toast.remove(toastId);
+          dismissToast={() => toast.remove(toastId)}
+          action={{
+            text: t('UNDO'),
+            onClick: () => {
+              toast.remove(toastId);
 
-            // set the visibility back to true
-            const payload = {
-              principal: spamToken.principal,
-              isEnabled: true,
-            };
+              // set the visibility back to true
+              const payload = {
+                principal: spamToken.principal,
+                isEnabled: true,
+              };
 
-            if (fullRunesCoinsList?.find((ft) => ft.principal === spamToken.principal)) {
-              dispatch(setRunesManageTokensAction(payload));
-            } else if (fullSip10CoinsList?.find((ft) => ft.principal === spamToken.principal)) {
-              dispatch(setSip10ManageTokensAction(payload));
-            } else if (fullBrc20CoinsList?.find((ft) => ft.principal === spamToken.principal)) {
-              dispatch(setBrc20ManageTokensAction(payload));
-            }
+              if (fullRunesCoinsList?.find((ft) => ft.principal === spamToken.principal)) {
+                dispatch(setRunesManageTokensAction(payload));
+              } else if (fullSip10CoinsList?.find((ft) => ft.principal === spamToken.principal)) {
+                dispatch(setSip10ManageTokensAction(payload));
+              } else if (fullBrc20CoinsList?.find((ft) => ft.principal === spamToken.principal)) {
+                dispatch(setBrc20ManageTokensAction(payload));
+              }
 
-            removeFromSpamTokens(spamToken.principal);
-            dispatch(setSpamTokenAction(null));
+              removeFromSpamTokens(spamToken.principal);
+              dispatch(setSpamTokenAction(null));
+            },
           }}
         />,
       );
@@ -177,30 +180,7 @@ function Home() {
   const combinedFtList = sip10CoinsList
     .concat(brc20CoinsList)
     .concat(runesCoinsList)
-    .sort((a, b) => {
-      const aFiatAmount = getFiatEquivalent(
-        Number(getBalanceAmount('FT', a)),
-        'FT',
-        BigNumber(stxBtcRate),
-        BigNumber(btcFiatRate),
-        a,
-      );
-      const bFiatAmount = getFiatEquivalent(
-        Number(getBalanceAmount('FT', b)),
-        'FT',
-        BigNumber(stxBtcRate),
-        BigNumber(btcFiatRate),
-        b,
-      );
-      // Handle empty values explicitly
-      if (aFiatAmount === '' && bFiatAmount === '') return 0;
-      if (aFiatAmount === '') return 1;
-      if (bFiatAmount === '') return -1;
-
-      const aAmount = BigNumber(aFiatAmount || 0);
-      const bAmount = BigNumber(bFiatAmount || 0);
-      return aAmount.isLessThan(bAmount) ? 1 : aAmount.isGreaterThan(bAmount) ? -1 : 0;
-    });
+    .sort((a, b) => sortFtByFiatBalance(a, b, stxBtcRate, btcFiatRate));
 
   const showNotificationBanner =
     notificationBannersArr?.length &&
@@ -272,7 +252,7 @@ function Home() {
     let route = '';
     switch (fungibleToken?.protocol) {
       case 'stacks':
-        route = `/send-sip10?principal=${fungibleToken?.principal}`;
+        route = `/send-stx?principal=${fungibleToken?.principal}`;
         break;
       case 'brc-20':
         route = `/send-brc20-one-step?principal=${fungibleToken?.principal}`;
@@ -332,6 +312,7 @@ function Home() {
   };
 
   const onSwapPressed = () => {
+    trackMixPanel(AnalyticsEvents.InitiateSwapFlow, {});
     navigate('/swap');
   };
 
@@ -429,10 +410,8 @@ function Home() {
     dispatch(changeShowDataCollectionAlertAction(false));
   };
 
-  const showSwaps =
-    useHasFeature(FeatureId.SWAPS) &&
-    !isLedgerAccount(selectedAccount) &&
-    network.type === 'Mainnet';
+  const isCrossChainSwapsEnabled = useHasFeature(FeatureId.CROSS_CHAIN_SWAPS);
+  const showSwaps = isCrossChainSwapsEnabled;
 
   return (
     <>

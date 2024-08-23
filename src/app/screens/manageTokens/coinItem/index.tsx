@@ -1,5 +1,5 @@
 import TokenImage from '@components/tokenImage';
-import { FungibleToken } from '@secretkeylabs/xverse-core';
+import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import { useState } from 'react';
 import Switch from 'react-switch';
 import styled from 'styled-components';

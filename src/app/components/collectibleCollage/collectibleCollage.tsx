@@ -1,6 +1,6 @@
 import Nft from '@screens/nftDashboard/nft';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
-import { CondensedInscription, NonFungibleToken } from '@secretkeylabs/xverse-core';
+import type { CondensedInscription, NonFungibleToken } from '@secretkeylabs/xverse-core';
 import styled from 'styled-components';
 
 const CollageContainer = styled.div`

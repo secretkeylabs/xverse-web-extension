@@ -1,24 +1,11 @@
 import {
-  addressToString,
-  STXPostCondition,
-  FungiblePostCondition,
-  NonFungiblePostCondition,
   PostConditionType,
+  type FungiblePostCondition,
+  type NonFungiblePostCondition,
+  type STXPostCondition,
 } from '@stacks/transactions';
-import BigNumber from 'bignumber.js';
 import { initBigNumber } from '@utils/helper';
-
-export const getIconStringFromPostCondition = (
-  pc: STXPostCondition | FungiblePostCondition | NonFungiblePostCondition,
-) => {
-  if (pc.conditionType === PostConditionType.Fungible) {
-    return `${addressToString(pc.assetInfo.address)}.${pc.assetInfo.contractName}.${
-      pc.assetInfo.assetName.content
-    }`;
-  }
-  if (pc.conditionType === PostConditionType.STX) return 'STX';
-  return pc.assetInfo.assetName.content;
-};
+import BigNumber from 'bignumber.js';
 
 const abbreviateNumber = (n: number) => {
   if (n < 1e3) return n.toString();

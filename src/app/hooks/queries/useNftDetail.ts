@@ -1,4 +1,8 @@
-import { getNftDetail, NftDetailResponse, NonFungibleToken } from '@secretkeylabs/xverse-core';
+import {
+  getNftDetail,
+  type NftDetailResponse,
+  type NonFungibleToken,
+} from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import { getIdentifier, isBnsCollection } from '@utils/nfts';
 import { handleRetries } from '@utils/query';

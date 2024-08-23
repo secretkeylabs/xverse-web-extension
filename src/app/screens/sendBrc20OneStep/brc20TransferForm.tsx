@@ -1,9 +1,13 @@
 import ActionButton from '@components/button';
 import TokenImage from '@components/tokenImage';
-import { FungibleToken } from '@secretkeylabs/xverse-core';
+import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import Callout from '@ui-library/callout';
 import { StickyButtonContainer } from '@ui-library/common.styled';
-import { InputFeedback, InputFeedbackProps, isDangerFeedback } from '@ui-library/inputFeedback';
+import {
+  InputFeedback,
+  isDangerFeedback,
+  type InputFeedbackProps,
+} from '@ui-library/inputFeedback';
 import { getFtTicker } from '@utils/tokens';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
@@ -172,6 +176,7 @@ function Brc20TransferForm(props: Props) {
               <InputField
                 value={amountToSend}
                 placeholder="0"
+                type="text"
                 onChange={onAmountChange}
                 autoFocus
               />
@@ -188,6 +193,7 @@ function Brc20TransferForm(props: Props) {
             <InputFieldContainer>
               <InputField
                 value={recipientAddress}
+                type="text"
                 placeholder="Ordinals address"
                 onChange={onAddressChange}
               />

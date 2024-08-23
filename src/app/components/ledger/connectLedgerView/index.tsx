@@ -17,7 +17,7 @@ export const ConnectLedgerContainer = styled.div`
   }
 `;
 
-export const ConnectLedgerTitle = styled.h1((props) => ({
+const ConnectLedgerTitle = styled.h1((props) => ({
   ...props.theme.headline_s,
 }));
 

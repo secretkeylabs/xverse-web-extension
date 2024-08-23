@@ -116,4 +116,3 @@ export function CircularSvgAnimation({
     </animated.div>
   );
 }
-export default CircularSvgAnimation;

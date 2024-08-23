@@ -1,4 +1,4 @@
-import { MESSAGE_SOURCE, WebBtcMessage } from '@common/types/message-types';
+import { MESSAGE_SOURCE, type WebBtcMessage } from '@common/types/message-types';
 import { getTabIdFromPort, isUndefined } from '@common/utils';
 import {
   listenForPopupClose,
@@ -14,12 +14,10 @@ import {
   sendMissingParametersMessage,
 } from '../../responseMessages/errors';
 
-export const rpcParamsSchema = z.object({
+const rpcParamsSchema = z.object({
   message: z.string(),
   domain: z.string(),
 });
-
-export type Params = z.infer<typeof rpcParamsSchema>;
 
 async function handleStacksSignStructuredMessage(
   message: WebBtcMessage<'stx_signStructuredMessage'>,

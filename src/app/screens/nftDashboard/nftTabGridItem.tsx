@@ -1,5 +1,5 @@
 import CollectibleCollage from '@components/collectibleCollage/collectibleCollage';
-import { StacksCollectionData } from '@secretkeylabs/xverse-core';
+import type { StacksCollectionData } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { getNftsTabGridItemSubText } from '@utils/nfts';
 import { useNavigate } from 'react-router-dom';

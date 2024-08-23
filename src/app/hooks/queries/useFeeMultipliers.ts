@@ -5,7 +5,7 @@ import { setFeeMultiplierAction } from '@stores/wallet/actions/actionCreators';
 import { useQuery } from '@tanstack/react-query';
 import { useDispatch } from 'react-redux';
 
-export const useFeeMultipliers = () => {
+const useFeeMultipliers = () => {
   const { network } = useWalletSelector();
   const dispatch = useDispatch();
 

@@ -1,13 +1,13 @@
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import {
-  BtcTransactionData,
-  RecommendedFeeResponse,
-  SettingsNetwork,
-  StacksTransaction,
-  StxTransactionData,
   mempoolApi,
   microstacksToStx,
   rbf,
+  type BtcTransactionData,
+  type RecommendedFeeResponse,
+  type SettingsNetwork,
+  type StacksTransaction,
+  type StxTransactionData,
 } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction, estimateTransaction } from '@stacks/transactions';
 import { isLedgerAccount } from '@utils/helper';

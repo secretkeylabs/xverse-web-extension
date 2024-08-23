@@ -1,41 +1,21 @@
-import { WebBtcMessage } from '@common/types/message-types';
+/* eslint-disable import/prefer-default-export */
 import { getTabIdFromPort } from '@common/utils';
 import getSelectedAccount from '@common/utils/getSelectedAccount';
-import { makeContext } from '@common/utils/popup';
-import { AddressPurpose, RpcErrorCode } from '@sats-connect/core';
+import { makeContext, openPopup } from '@common/utils/popup';
+import { getAddressesRequestMessageSchema, type RpcRequestMessage } from '@sats-connect/core';
 import rootStore from '@stores/index';
-import { z } from 'zod';
-import {
-  ParamsKeyValueArray,
-  listenForOriginTabClose,
-  listenForPopupClose,
-  makeSearchParamsWithDefaults,
-  triggerRequestWindowOpen,
-} from '../../../legacy-external-message-handler';
+import * as v from 'valibot';
 import RequestsRoutes from '../../../route-urls';
-import { hasPermissions, makeRPCError, sendRpcResponse } from '../../helpers';
+import { handleInvalidMessage } from '../../handle-invalid-message';
+import { hasPermissions, makeSendPopupClosedUserRejectionMessage } from '../../helpers';
 import { sendGetAddressesSuccessResponseMessage } from '../../responseMessages/bitcoin';
 import { accountPurposeAddresses } from './utils';
 
-const AddressPurposeSchema = z.enum([AddressPurpose.Ordinals, AddressPurpose.Payment]);
+export const handleGetAddresses = async (message: RpcRequestMessage, port: chrome.runtime.Port) => {
+  const parseResult = v.safeParse(getAddressesRequestMessageSchema, message);
 
-const GetAddressesParamsSchema = z.object({
-  purposes: z.array(AddressPurposeSchema),
-  message: z.string().optional(),
-});
-
-export const handleGetAddresses = async (
-  message: WebBtcMessage<'getAddresses'>,
-  port: chrome.runtime.Port,
-) => {
-  const paramsParseResult = GetAddressesParamsSchema.safeParse(message.params);
-
-  if (!paramsParseResult.success) {
-    const invalidParamsError = makeRPCError(message.id, {
-      code: RpcErrorCode.INVALID_PARAMS,
-      message: 'Invalid params',
-    });
-    sendRpcResponse(getTabIdFromPort(port), invalidParamsError);
+  if (!parseResult.success) {
+    handleInvalidMessage(message, getTabIdFromPort(port), parseResult.issues);
     return;
   }
 
@@ -56,7 +36,7 @@ export const handleGetAddresses = async (
     });
 
     if (account) {
-      const addresses = accountPurposeAddresses(account, message.params.purposes);
+      const addresses = accountPurposeAddresses(account, parseResult.output.params.purposes);
       sendGetAddressesSuccessResponseMessage({
         tabId,
         messageId: message.id,
@@ -68,28 +48,13 @@ export const handleGetAddresses = async (
     }
   }
 
-  const requestParams: ParamsKeyValueArray = [
-    ['purposes', message.params.purposes.toString()],
-    ['requestId', message.id as string],
-    ['rpcMethod', message.method],
-  ];
-
-  if (message.params.message) {
-    requestParams.push(['message', message.params.message]);
-  }
-
-  const { urlParams } = makeSearchParamsWithDefaults(port, requestParams);
-
-  const { id } = await triggerRequestWindowOpen(RequestsRoutes.AddressRequest, urlParams);
-  listenForPopupClose({
-    tabId,
-    id,
-    response: makeRPCError(message.id, {
-      code: RpcErrorCode.USER_REJECTION,
-      message: 'User rejected request to get addresses',
+  await openPopup({
+    path: RequestsRoutes.AddressRequest,
+    data: parseResult.output,
+    context: makeContext(port),
+    onClose: makeSendPopupClosedUserRejectionMessage({
+      tabId: getTabIdFromPort(port),
+      messageId: parseResult.output.id,
     }),
   });
-  listenForOriginTabClose({ tabId });
 };
-
-export default handleGetAddresses;

@@ -2,12 +2,12 @@ import useNetworkSelector from '@hooks/useNetwork';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  FungibleToken,
-  SettingsNetwork,
   StacksNetwork,
   // getCoinMetaData,
   getCoinsInfo,
   getFtData,
+  type FungibleToken,
+  type SettingsNetwork,
 } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
@@ -92,11 +92,21 @@ export const useVisibleSip10FungibleTokens = (): ReturnType<typeof useGetSip10Fu
 } => {
   const { sip10ManageTokens } = useWalletSelector();
   const sip10Query = useGetSip10FungibleTokens();
+  // set visible false for unsupported tokens
+  const sip10FTList = sip10Query.data || [];
+  sip10FTList.forEach((ft) => {
+    ft.visible = !!ft.supported;
+  });
+
   return {
     ...sip10Query,
-    visible: (sip10Query.data ?? []).filter((ft) => {
+    visible: sip10FTList.filter((ft) => {
       const userSetting = sip10ManageTokens[ft.principal];
-      return userSetting === true || (userSetting === undefined && new BigNumber(ft.balance).gt(0));
+
+      return (
+        userSetting === true ||
+        (userSetting === undefined && ft.supported && new BigNumber(ft.balance).gt(0))
+      );
     }),
   };
 };

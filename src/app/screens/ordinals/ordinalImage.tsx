@@ -5,10 +5,10 @@ import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { TextT } from '@phosphor-icons/react';
 import {
-  CondensedInscription,
-  Inscription,
   getBrc20Details,
   getErc721Metadata,
+  type CondensedInscription,
+  type Inscription,
 } from '@secretkeylabs/xverse-core';
 import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
 import { getFetchableUrl } from '@utils/helper';
@@ -208,6 +208,7 @@ function OrdinalImage({
   const renderImage = (tag: string, src?: string) => (
     <ImageContainer>
       <StyledImage
+        data-testid="token-image"
         width="100%"
         height="100%"
         placeholder={
@@ -280,7 +281,7 @@ function OrdinalImage({
 
     if (contentType.includes('html')) {
       return (
-        <ImageContainer inNftDetail={inNftDetail}>
+        <ImageContainer data-testid="token-image" inNftDetail={inNftDetail}>
           <FillImg
             src={`${XVERSE_ORDIVIEW_URL(network.type)}/thumbnail/${ordinal.id}`}
             alt="/html/"
@@ -297,7 +298,7 @@ function OrdinalImage({
 
     if (showContentTypeThumbnail) {
       return (
-        <ImageContainer>
+        <ImageContainer data-testid="token-image">
           <ContentTypeThumbnailContainer>
             <TextT width="50%" height="50%" color={Theme.colors.elevation0} />
           </ContentTypeThumbnailContainer>
@@ -326,7 +327,7 @@ function OrdinalImage({
   }
 
   return (
-    <ImageContainer>
+    <ImageContainer data-testid="token-image">
       <img src={placeholderIcon ?? PlaceholderImage} alt="ordinal" />
     </ImageContainer>
   );

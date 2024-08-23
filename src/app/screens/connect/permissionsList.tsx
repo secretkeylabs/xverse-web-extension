@@ -40,6 +40,12 @@ function PermissionsList() {
         </PermissionIcon>
         {t('PERMISSION_REQUEST_TX')}
       </Permission>
+      <Permission>
+        <PermissionIcon>
+          <Check size={theme.space.m} color={theme.colors.success_light} weight="bold" />
+        </PermissionIcon>
+        {t('WALLET_TYPE_ACCESS')}
+      </Permission>
     </>
   );
 }

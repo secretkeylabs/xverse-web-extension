@@ -1,6 +1,6 @@
-import { Return } from '@sats-connect/core';
+import type { Return } from '@sats-connect/core';
 import { makeRpcSuccessResponse, sendRpcResponse } from '../helpers';
-import { BaseArgs } from './types';
+import type { BaseArgs } from './types';
 
 type RequestPermissionsSuccessArgs = BaseArgs & {
   result: Return<'wallet_requestPermissions'>;
@@ -21,5 +21,16 @@ export function sendRenouncePermissionsSuccessResponseMessage({
   messageId,
   result,
 }: RenouncePermissionsSuccessArgs) {
+  sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
+}
+
+type GetWalletTypeSuccessArgs = BaseArgs & {
+  result: Return<'wallet_getWalletType'>;
+};
+export function sendGetWalletTypeSuccessResponseMessage({
+  tabId,
+  messageId,
+  result,
+}: GetWalletTypeSuccessArgs) {
   sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
 }

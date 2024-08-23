@@ -1,12 +1,14 @@
+/* eslint-disable import/prefer-default-export */
 import ActionButton from '@components/button';
-import { useState } from 'react';
+import { StyledP } from '@ui-library/common.styled';
+import Input from '@ui-library/input';
+import { useState, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 16px;
   row-gap: 16px;
 `;
 
@@ -29,55 +31,43 @@ const Title = styled.div((props) => ({
   color: props.theme.colors.white_0,
 }));
 
-const Input = styled.input<{ error: boolean }>((props) => ({
-  ...props.theme.body_medium_m,
-  height: 48,
-  backgroundColor: props.theme.colors.elevation1,
-  borderStyle: 'solid',
-  borderWidth: 1,
-  borderRadius: 8,
-  color: props.theme.colors.white_0,
-  padding: '14px 16px',
-  outline: 'none',
-  borderColor: props.error ? props.theme.colors.feedback.error_700 : 'transparent',
-  ':focus-within': {
-    border: '1px solid',
-    'border-color': props.error
-      ? props.theme.colors.feedback.error_700
-      : props.theme.colors.elevation6,
-  },
-}));
-
-const InputFeedback = styled.span((props) => ({
-  ...props.theme.body_s,
-  color: props.theme.colors.feedback.error,
-}));
-
-const InputRow = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: props.theme.spacing(4),
-}));
-
 const Description = styled.p((props) => ({
   ...props.theme.body_medium_m,
   color: props.theme.colors.white_400,
 }));
 
-const DEFAULT_SLIPPAGE = '4%';
+const DEFAULT_SLIPPAGE = '5';
 export function SlippageModalContent({
   slippage,
+  slippageThreshold,
+  slippageDecimals,
   onChange,
 }: {
   slippage: number;
+  slippageThreshold?: number;
+  slippageDecimals?: number;
   onChange: (slippage: number) => void;
 }) {
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
-  const [percentage, setPercentage] = useState(`${(slippage * 100).toString()}%`);
-  const result = Number(percentage.replace('%', ''));
-  const invalid = Number.isNaN(result) || result >= 100 || result <= 0;
+  const [percentage, setPercentage] = useState(`${(slippage * 100).toString()}`);
+  const result = Number(percentage);
+  const invalid = !Number.isNaN(result) && result >= 100;
+  const showSlippageWarning = slippageThreshold ? result > slippageThreshold * 100 : false;
+
+  const allowDecimalsNumber = slippageDecimals ?? 2;
+
+  const regex = new RegExp(
+    `^(?:[0-9]+(?:\\${allowDecimalsNumber === 0 ? '' : '.'}[0-9]{0,${allowDecimalsNumber}})?)?$`,
+  );
 
   const handleClickResetSlippage = () => setPercentage(DEFAULT_SLIPPAGE);
+
+  const handleOnChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    if (regex.test(value)) {
+      setPercentage(value);
+    }
+  };
 
   return (
     <Container>
@@ -85,22 +75,38 @@ export function SlippageModalContent({
         <Title>{t('SLIPPAGE')}</Title>
         <ResetButton onClick={handleClickResetSlippage}>{t('RESET_TO_DEFAULT')}</ResetButton>
       </TitleRow>
-      <InputRow>
-        <Input
-          error={invalid}
-          placeholder={DEFAULT_SLIPPAGE}
-          value={percentage}
-          onChange={(e) => setPercentage(e.target.value)}
-          onFocus={(e) => {
-            const current = e.target.value.replace('%', '');
-            e.target.setSelectionRange(0, current.length);
-          }}
-        />
-        {invalid && <InputFeedback>{t('ERRORS.SLIPPAGE_TOLERANCE_CANNOT_EXCEED')}</InputFeedback>}
-      </InputRow>
+      <Input
+        placeholder={DEFAULT_SLIPPAGE}
+        value={percentage}
+        onChange={handleOnChange}
+        complications={
+          <StyledP typography="body_medium_m" color="white_200">
+            %
+          </StyledP>
+        }
+        feedback={[
+          ...(invalid
+            ? [
+                {
+                  message: t('ERRORS.SLIPPAGE_TOLERANCE_CANNOT_EXCEED'),
+                  variant: 'danger' as const,
+                },
+              ]
+            : []),
+          ...(!invalid && showSlippageWarning
+            ? [
+                {
+                  message: t('SLIPPAGE_WARNING'),
+                  variant: 'warning' as const,
+                },
+              ]
+            : []),
+        ]}
+        autoFocus
+      />
       <Description>{t('SLIPPAGE_DESC')}</Description>
       <ActionButton
-        disabled={invalid}
+        disabled={invalid || !result}
         warning={invalid}
         text={t('APPLY')}
         onPress={() => onChange(result / 100)}
@@ -108,4 +114,3 @@ export function SlippageModalContent({
     </Container>
   );
 }
-export default SlippageModalContent;

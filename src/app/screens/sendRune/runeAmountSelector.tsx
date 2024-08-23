@@ -1,4 +1,4 @@
-import { FungibleToken } from '@secretkeylabs/xverse-core';
+import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import Input, { MaxButton, VertRule } from '@ui-library/input';
 import { getFtBalance } from '@utils/tokens';
 import { useEffect } from 'react';
@@ -58,11 +58,12 @@ function RuneAmountSelector({
   return (
     <Input
       title={t('AMOUNT', { currency: token.ticker })}
+      dataTestID="send-input"
       value={amountToSend}
       onChange={(e) => handleAmountChange(e.target.value)}
       placeholder="0"
       infoPanel={
-        <BalanceDiv>
+        <BalanceDiv data-testid="balance-label">
           <BalanceText>{t('BALANCE')} </BalanceText>
           <NumericFormat value={balance} displayType="text" thousandSeparator />
         </BalanceDiv>

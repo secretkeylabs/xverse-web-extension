@@ -1,28 +1,29 @@
-import AccountHeaderComponent from '@components/accountHeader';
-import ActionButton from '@components/button';
 import InfoContainer from '@components/infoContainer';
 import BottomBar from '@components/tabBar';
+import TopRow from '@components/topRow';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
 import useCoinRates from '@hooks/queries/useCoinRates';
+import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useDebounce from '@hooks/useDebounce';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { FadersHorizontal } from '@phosphor-icons/react';
-import type { BRC20ErrorCode, SettingsNetwork } from '@secretkeylabs/xverse-core';
+import type { BRC20ErrorCode } from '@secretkeylabs/xverse-core';
 import {
   AnalyticsEvents,
+  brc20TransferEstimateFees,
   getBtcFiatEquivalent,
   useBrc20TransferFees,
   validateBtcAddressIsTaproot,
 } from '@secretkeylabs/xverse-core';
-import Callout, { CalloutProps } from '@ui-library/callout';
+import SelectFeeRate from '@ui-components/selectFeeRate';
+import Button from '@ui-library/button';
+import Callout, { type CalloutProps } from '@ui-library/callout';
 import {
-  Brc20TransferEstimateFeesParams,
-  ConfirmBrc20TransferState,
-  ExecuteBrc20TransferState,
   getFeeValuesForBrc20OneStepTransfer,
+  type ConfirmBrc20TransferState,
+  type ExecuteBrc20TransferState,
 } from '@utils/brc20';
 import { isInOptions } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
@@ -30,112 +31,23 @@ import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 import Brc20FeesComponent from './brc20FeesComponent';
-import { EditFees, OnChangeFeeRate } from './editFees';
-import RecipientCard, { RecipientCardProps } from './recipientCard';
+import {
+  ButtonContainer,
+  Container,
+  ErrorContainer,
+  ErrorText,
+  FeeContainer,
+  OuterContainer,
+  RecipientCardContainer,
+  ReviewTransactionText,
+  ScrollContainer,
+  StyledCallouts,
+  Subtitle,
+} from './index.styled';
+import RecipientCard, { type RecipientCardProps } from './recipientCard';
 
-const ScrollContainer = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  overflow-y: auto;
-`;
-
-const OuterContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-`;
-
-const Container = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-  marginTop: props.theme.spacing(16),
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(8),
-}));
-
-const ButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  gap: props.theme.spacing(8),
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-  marginTop: props.theme.spacing(12),
-  marginBottom: props.theme.spacing(12),
-}));
-
-const EditFeesButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  gap: props.theme.spacing(3),
-  borderRadius: props.theme.radius(1),
-  backgroundColor: 'transparent',
-  marginTop: props.theme.spacing(12),
-}));
-
-const ButtonText = styled.div((props) => ({
-  ...props.theme.body_medium_m,
-  color: props.theme.colors.white['0'],
-  textAlign: 'center',
-}));
-
-const FadersHorizontalIcon = styled(FadersHorizontal)((props) => ({
-  color: props.theme.colors.white_0,
-}));
-
-const ErrorContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(8),
-}));
-
-const ErrorText = styled.p((props) => ({
-  ...props.theme.body_xs,
-  color: props.theme.colors.feedback.error,
-}));
-
-const ReviewTransactionText = styled.h1((props) => ({
-  ...props.theme.headline_s,
-  color: props.theme.colors.white[0],
-  marginBottom: props.theme.spacing(10),
-  textAlign: 'left',
-}));
-
-const StyledCallouts = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${(props) => props.theme.spacing(6)}px;
-  margin-bottom: ${(props) => props.theme.spacing(12)}px;
-`;
-
-const RecipientCardContainer = styled.div`
-  margin-bottom: ${(props) => props.theme.spacing(6)}px;
-`;
-
-const useConfirmBrc20Transfer = (): {
-  callouts: CalloutProps[];
-  errorMessage: string;
-  estimateFeesParams: Brc20TransferEstimateFeesParams;
-  fees: any[];
-  handleClickAdvancedSetting: () => void;
-  handleClickApplyFee: OnChangeFeeRate;
-  handleClickCancel: () => void;
-  handleClickCloseFees: () => void;
-  handleClickConfirm: () => void;
-  isConfirmLoading: boolean;
-  isFeeLoading: boolean;
-  network: SettingsNetwork;
-  recipient: RecipientCardProps;
-  showFeeSettings: boolean;
-  txFee: BigNumber;
-  showFeeWarning: boolean;
-} => {
+function ConfirmBrc20Transaction() {
   /* hooks */
   const { t } = useTranslation('translation');
   const { network, fiatCurrency, feeMultipliers } = useWalletSelector();
@@ -151,15 +63,15 @@ const useConfirmBrc20Transfer = (): {
   }: ConfirmBrc20TransferState = useLocation().state;
   const [showFeeWarning, setShowFeeWarning] = useState(false);
   const transactionContext = useTransactionContext();
+  const { data: recommendedFees } = useBtcFeeRate();
 
   useResetUserFlow('/confirm-brc20-tx');
 
   /* state */
   const [isConfirmLoading, setIsConfirmLoading] = useState(false);
-  const [showFeeSettings, setShowFeeSettings] = useState(false);
-  const [userInputFeeRate, setUserInputFeeRate] = useState('');
+  const [userInputFeeRate, setUserInputFeeRate] = useState(estimateFeesParams.feeRate.toString());
   const [error, setError] = useState<BRC20ErrorCode | ''>('');
-  const debouncedUserInputFeeRate = useDebounce(userInputFeeRate, 100);
+  const debouncedUserInputFeeRate = useDebounce(userInputFeeRate, 500);
 
   const {
     commitValueBreakdown,
@@ -168,7 +80,7 @@ const useConfirmBrc20Transfer = (): {
   } = useBrc20TransferFees({
     ...estimateFeesParams,
     feeRate: Number(debouncedUserInputFeeRate),
-    skipInitialFetch: true,
+    skipInitialFetch: false,
     context: transactionContext,
   });
 
@@ -208,45 +120,7 @@ const useConfirmBrc20Transfer = (): {
     setIsConfirmLoading(false);
   };
 
-  const handleClickCancel = () => {
-    navigate(-1);
-  };
-
-  const handleClickApplyFee: OnChangeFeeRate = (feeRate: string) => {
-    if (feeRate) {
-      setUserInputFeeRate(feeRate);
-    }
-  };
-
-  const handleClickAdvancedSetting = () => {
-    setShowFeeSettings(true);
-  };
-
-  const handleClickCloseFees = () => {
-    setShowFeeSettings(false);
-  };
-
   /* other */
-  const fees = [
-    {
-      label: 'Transaction Fee',
-      value: txFee,
-      suffix: 'sats',
-    },
-    {
-      label: 'Inscription Fee',
-      value: inscriptionFee,
-      suffix: 'sats',
-    },
-    {
-      label: 'Total Fee',
-      value: totalFee,
-      suffix: 'sats',
-      fiatValue: getBtcFiatEquivalent(totalFee, BigNumber(btcFiatRate)),
-      fiatCurrency,
-    },
-  ];
-
   const errorMessage = errorCode ? t(`CONFIRM_BRC20.ERROR_CODES.${errorCode}`) : error;
 
   const recipient: RecipientCardProps = {
@@ -270,50 +144,31 @@ const useConfirmBrc20Transfer = (): {
     });
   }
 
-  return {
-    callouts,
-    errorMessage,
-    estimateFeesParams,
-    fees,
-    handleClickAdvancedSetting,
-    handleClickApplyFee,
-    handleClickCancel,
-    handleClickCloseFees,
-    handleClickConfirm,
-    isConfirmLoading,
-    isFeeLoading,
-    network,
-    recipient,
-    showFeeSettings,
-    txFee,
-    showFeeWarning,
+  const handleGoBack = () => {
+    navigate(`/send-brc20-one-step?principal=${token.principal}`, {
+      state: {
+        amount: estimateFeesParams.amount.toString(),
+        recipientAddress,
+      },
+    });
   };
-};
 
-function ConfirmBrc20Transaction() {
-  const { t } = useTranslation('translation');
-  const {
-    callouts,
-    errorMessage,
-    estimateFeesParams,
-    fees,
-    handleClickAdvancedSetting,
-    handleClickApplyFee,
-    handleClickCancel,
-    handleClickCloseFees,
-    handleClickConfirm,
-    isConfirmLoading,
-    isFeeLoading,
-    network,
-    recipient,
-    showFeeSettings,
-    txFee,
-    showFeeWarning,
-  } = useConfirmBrc20Transfer();
+  const handleClickCancel = () => {
+    navigate(`/coinDashboard/FT?ftKey=${token.principal}&protocol=brc-20`);
+  };
+
+  const getFeeForFeeRate = async (feeRate) => {
+    const estimatedFees = await brc20TransferEstimateFees(
+      { ...estimateFeesParams, feeRate },
+      transactionContext,
+    );
+    const { txFee: newTxFee } = getFeeValuesForBrc20OneStepTransfer(estimatedFees.valueBreakdown);
+    return newTxFee.toNumber();
+  };
 
   return (
     <>
-      <AccountHeaderComponent disableMenuOption disableAccountSwitch />
+      <TopRow onClick={handleGoBack} />
       <ScrollContainer>
         <OuterContainer>
           <Container>
@@ -334,6 +189,9 @@ function ConfirmBrc20Transaction() {
                 ))}
               </StyledCallouts>
             )}
+
+            <Subtitle>{t('CONFIRM_TRANSACTION.YOU_WILL_SEND')}</Subtitle>
+
             <RecipientCardContainer>
               <RecipientCard
                 address={recipient.address}
@@ -342,17 +200,54 @@ function ConfirmBrc20Transaction() {
                 fungibleToken={recipient.fungibleToken}
               />
             </RecipientCardContainer>
+
+            <Subtitle>{t('CONFIRM_TRANSACTION.TRANSACTION_DETAILS')}</Subtitle>
+
             <TransactionDetailComponent
               title={t('CONFIRM_TRANSACTION.NETWORK')}
               value={network.type}
             />
-            <Brc20FeesComponent fees={fees} />
-            <div>
-              <EditFeesButton onClick={handleClickAdvancedSetting}>
-                <FadersHorizontalIcon size={20} />
-                <ButtonText>{t('CONFIRM_TRANSACTION.EDIT_FEES')}</ButtonText>
-              </EditFeesButton>
-            </div>
+
+            <Subtitle>{t('CONFIRM_TRANSACTION.FEES')}</Subtitle>
+
+            <FeeContainer>
+              <Brc20FeesComponent
+                label={t('CONFIRM_TRANSACTION.INSCRIPTION_SERVICE_FEE')}
+                value={inscriptionFee}
+                suffix="sats"
+                fiatValue={getBtcFiatEquivalent(inscriptionFee, BigNumber(btcFiatRate))}
+                fiatCurrency={fiatCurrency}
+              />
+              {recommendedFees && (
+                <SelectFeeRate
+                  fee={txFee.toString()}
+                  feeUnits="sats"
+                  feeRate={debouncedUserInputFeeRate}
+                  feeRateUnits="sats/vB"
+                  setFeeRate={(newFeeRate) => setUserInputFeeRate(newFeeRate)}
+                  baseToFiat={(amount) =>
+                    getBtcFiatEquivalent(new BigNumber(amount), BigNumber(btcFiatRate)).toString()
+                  }
+                  fiatUnit={fiatCurrency}
+                  getFeeForFeeRate={getFeeForFeeRate}
+                  feeRates={{
+                    medium: recommendedFees.regular,
+                    high: recommendedFees.priority,
+                  }}
+                  feeRateLimits={recommendedFees.limits}
+                  isLoading={isFeeLoading}
+                  amount={estimateFeesParams.amount}
+                />
+              )}
+              <Brc20FeesComponent
+                label={t('CONFIRM_TRANSACTION.TOTAL_FEES')}
+                value={totalFee}
+                suffix="sats"
+                fiatValue={getBtcFiatEquivalent(totalFee, BigNumber(btcFiatRate))}
+                fiatCurrency={fiatCurrency}
+              />
+            </FeeContainer>
+
             {errorMessage && (
               <ErrorContainer>
                 <ErrorText>{errorMessage}</ErrorText>
@@ -361,29 +256,20 @@ function ConfirmBrc20Transaction() {
           </Container>
         </OuterContainer>
         <ButtonContainer>
-          <ActionButton
-            text={t('CONFIRM_TRANSACTION.CANCEL')}
-            transparent
-            onPress={handleClickCancel}
+          <Button
+            title={t('CONFIRM_TRANSACTION.CANCEL')}
+            variant="secondary"
+            onClick={handleClickCancel}
             disabled={isConfirmLoading || isFeeLoading}
           />
-          <ActionButton
-            text={t('CONFIRM_TRANSACTION.CONFIRM')}
+          <Button
+            title={t('CONFIRM_TRANSACTION.CONFIRM')}
             disabled={isConfirmLoading || isFeeLoading}
-            processing={isConfirmLoading}
-            onPress={handleClickConfirm}
+            loading={isConfirmLoading}
+            onClick={handleClickConfirm}
           />
         </ButtonContainer>
-        <EditFees
-          visible={showFeeSettings}
-          onClose={handleClickCloseFees}
-          fee={txFee.toString()}
-          initialFeeRate={estimateFeesParams.feeRate.toString()}
-          onClickApply={handleClickApplyFee}
-          onChangeFeeRate={handleClickApplyFee}
-          isFeeLoading={isFeeLoading}
-          error={errorMessage}
-        />
+
         {!isInOptions() && <BottomBar tab="dashboard" />}
       </ScrollContainer>
     </>

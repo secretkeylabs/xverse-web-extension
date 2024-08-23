@@ -6,18 +6,18 @@ import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import { useLocation } from 'react-router-dom';
 
-import { CreateInscriptionPayload, CreateRepeatInscriptionsPayload } from '@sats-connect/core';
+import type { CreateInscriptionPayload, CreateRepeatInscriptionsPayload } from '@sats-connect/core';
 import {
   AnalyticsEvents,
-  BtcFeeResponse,
   InscriptionErrorCode,
-  Transport,
-  UTXO,
   currencySymbolMap,
   fetchBtcFeeRate,
   getNonOrdinalUtxo,
   useInscriptionExecute,
   useInscriptionFees,
+  type BtcFeeResponse,
+  type Transport,
+  type UTXO,
 } from '@secretkeylabs/xverse-core';
 
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';

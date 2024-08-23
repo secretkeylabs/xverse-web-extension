@@ -3,14 +3,15 @@ import { MESSAGE_SOURCE } from '@common/types/message-types';
 import { sendUserRejectionMessage } from '@common/utils/rpc/responseMessages/errors';
 import { sendGetAccountsSuccessResponseMessage } from '@common/utils/rpc/responseMessages/stacks';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { GetAddressOptions } from '@sats-connect/core';
+import type { GetAddressOptions } from '@sats-connect/core';
 import { bip32, bip39, bs58 } from '@secretkeylabs/xverse-core';
-import { GAIA_HUB_URL } from '@secretkeylabs/xverse-core/constant';
 import { decodeToken } from 'jsontokens';
 import { useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import useSeedVault from './useSeedVault';
 import useSelectedAccount from './useSelectedAccount';
+
+const GAIA_HUB_URL = 'https://hub.hiro.so';
 
 const useStxAccountRequest = () => {
   // Params

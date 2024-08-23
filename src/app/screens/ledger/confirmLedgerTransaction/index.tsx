@@ -4,7 +4,7 @@ import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import ledgerConfirmOrdinalsIcon from '@assets/img/ledger/ordinals_icon_big.svg';
-import { LedgerTransactionType } from '@common/types/ledger';
+import { type LedgerTransactionType } from '@common/types/ledger';
 import { delay } from '@common/utils/ledger';
 import ActionButton from '@components/button';
 import InfoContainer from '@components/infoContainer';
@@ -21,15 +21,15 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { useTransition } from '@react-spring/web';
 import {
-  Recipient,
-  StacksRecipient,
-  UTXO,
   broadcastSignedTransaction,
   microstacksToStx,
   satsToBtc,
   signLedgerMixedBtcTransaction,
   signLedgerNativeSegwitBtcTransaction,
   signLedgerStxTransaction,
+  type Recipient,
+  type StacksRecipient,
+  type UTXO,
 } from '@secretkeylabs/xverse-core';
 import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
 import { getBtcTxStatusUrl, getStxTxStatusUrl, getTruncatedAddress } from '@utils/helper';
@@ -38,6 +38,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 
+import { makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import {
   ConfirmTxIconBig,
@@ -93,6 +94,8 @@ function ConfirmLedgerTransaction(): JSX.Element {
     ordinalUtxo,
     feeRateInput,
     fee,
+    tabId,
+    tabMessageId: messageId,
   }: {
     amount: BigNumber;
     recipients: Recipient[] | StacksRecipient[];
@@ -102,6 +105,8 @@ function ConfirmLedgerTransaction(): JSX.Element {
     feeRateInput?: string;
     fee?: BigNumber;
     messageId?: string;
+    tabId?: number;
+    tabMessageId?: string;
   } = location.state;
 
   const transition = useTransition(currentStep, DEFAULT_TRANSITION_OPTIONS);
@@ -129,6 +134,10 @@ function ConfirmLedgerTransaction(): JSX.Element {
       const transactionId = await btcClient.sendRawTransaction(txHex || taprootSignedValue);
       setTxId(transactionId.tx.hash);
       setCurrentStep(Steps.TransactionConfirmed);
+      if (tabId) {
+        const response = makeRpcSuccessResponse(messageId, { txid: transactionId.tx.hash });
+        sendRpcResponse(tabId, response);
+      }
     } catch (err) {
       console.error(err);
       setIsTxRejected(true);
@@ -153,6 +162,10 @@ function ConfirmLedgerTransaction(): JSX.Element {
       const transactionId = await btcClient.sendRawTransaction(result);
       setTxId(transactionId.tx.hash);
       setCurrentStep(Steps.TransactionConfirmed);
+      if (tabId) {
+        const response = makeRpcSuccessResponse(messageId, { txid: transactionId.tx.hash });
+        sendRpcResponse(tabId, response);
+      }
     } catch (err) {
       console.error(err);
       setIsTxRejected(true);

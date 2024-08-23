@@ -1,10 +1,16 @@
-import { WebBtcMessage } from '@common/types/message-types';
+import { type WebBtcMessage } from '@common/types/message-types';
 import {
-  RpcErrorCode,
-  RpcRequestMessage,
+  getAccountsMethodName,
+  getAddressesMethodName,
   getBalanceMethodName,
+  getInfoMethodName,
+  getWalletTypeMethodName,
   renouncePermissionsMethodName,
   requestPermissionsMethodName,
+  RpcErrorCode,
+  sendInscriptionsMethodName,
+  stxSignTransactionMethodName,
+  type RpcRequestMessage,
 } from '@sats-connect/core';
 import { getTabIdFromPort } from '..';
 import {
@@ -18,17 +24,20 @@ import handleGetBalance from './btc/getBalance';
 import handleGetInfo from './getInfo';
 import { makeRPCError, sendRpcResponse } from './helpers';
 import handleGetInscriptions from './ordinals/getInscriptions';
+import handleSendInscriptions from './ordinals/sendInscriptions';
 import handleEtchRune from './runes/etch';
 import handleGetRunesBalance from './runes/getBalance';
 import handleMintRune from './runes/mint';
-import callContract from './stx/callContract/index.ts';
-import deployContract from './stx/deployContract/index.ts';
+import handleTransferRunes from './runes/transfer';
+import callContract from './stx/callContract';
+import deployContract from './stx/deployContract';
 import handleGetStxAccounts from './stx/getAccounts';
 import handleGetStxAddresses from './stx/getAddresses';
 import handleStacksSignMessage from './stx/signMessage';
 import handleStacksSignStructuredMessage from './stx/signStructuredMessage';
 import signTransaction from './stx/signTransaction';
 import transferStx from './stx/transferStx';
+import { handleGetWalletType } from './wallet/getWalletType';
 import { handleRenouncePermissions } from './wallet/renouncePermissions';
 import { handleRequestPermissions } from './wallet/requestPermissions';
 
@@ -43,21 +52,24 @@ async function handleRPCRequest(message: RpcRequestMessage, port: chrome.runtime
         await handleRenouncePermissions(message, port);
         break;
       }
+      case getWalletTypeMethodName: {
+        await handleGetWalletType(message, port);
+        break;
+      }
       case getBalanceMethodName: {
         await handleGetBalance(message, port);
         break;
       }
-
-      case 'getInfo': {
-        handleGetInfo(message.id as string, getTabIdFromPort(port));
+      case getInfoMethodName: {
+        handleGetInfo(message, port);
         break;
       }
-      case 'getAddresses': {
-        await handleGetAddresses(message as unknown as WebBtcMessage<'getAddresses'>, port);
+      case getAddressesMethodName: {
+        await handleGetAddresses(message, port);
         break;
       }
-      case 'getAccounts': {
-        await handleGetAccounts(message as unknown as WebBtcMessage<'getAccounts'>, port);
+      case getAccountsMethodName: {
+        await handleGetAccounts(message, port);
         break;
       }
       case 'signMessage': {
@@ -91,8 +103,8 @@ async function handleRPCRequest(message: RpcRequestMessage, port: chrome.runtime
         await handleGetStxAddresses(message as unknown as WebBtcMessage<'stx_getAddresses'>, port);
         break;
       }
-      case 'stx_signTransaction': {
-        await signTransaction(message as unknown as WebBtcMessage<'stx_signTransaction'>, port);
+      case stxSignTransactionMethodName: {
+        await signTransaction(message, port);
         break;
       }
       case 'stx_transferStx': {
@@ -118,12 +130,20 @@ async function handleRPCRequest(message: RpcRequestMessage, port: chrome.runtime
         await handleGetInscriptions(message, port);
         break;
       }
+      case sendInscriptionsMethodName: {
+        await handleSendInscriptions(message, port);
+        break;
+      }
       case 'runes_mint': {
         await handleMintRune(message as unknown as WebBtcMessage<'runes_mint'>, port);
         break;
       }
       case 'runes_etch': {
         await handleEtchRune(message as unknown as WebBtcMessage<'runes_etch'>, port);
+        break;
+      }
+      case 'runes_transfer': {
+        await handleTransferRunes(message, port);
         break;
       }
       default:

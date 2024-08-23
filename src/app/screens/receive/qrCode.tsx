@@ -1,4 +1,4 @@
-import QRCodeStyling, { DotType, Options } from 'qr-code-styling';
+import QRCodeStyling, { type DotType, type Options } from 'qr-code-styling';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 

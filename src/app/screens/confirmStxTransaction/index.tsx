@@ -1,5 +1,5 @@
 import IconStacks from '@assets/img/dashboard/stx_icon.svg';
-import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
+import type { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import {
   sendInternalErrorMessage,
   sendUserRejectionMessage,
@@ -23,19 +23,19 @@ import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { StxRequests } from '@sats-connect/core';
+import type { StxRequests } from '@sats-connect/core';
 import {
   AnalyticsEvents,
-  StacksTransaction,
-  TokenTransferPayload,
   addressToString,
   broadcastSignedTransaction,
   buf2hex,
   isMultiSig,
   microstacksToStx,
   stxToMicrostacks,
+  type StacksTransaction,
+  type TokenTransferPayload,
 } from '@secretkeylabs/xverse-core';
-import { MultiSigSpendingCondition, deserializeTransaction } from '@stacks/transactions';
+import { deserializeTransaction, type MultiSigSpendingCondition } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import Callout from '@ui-library/callout';
 import { XVERSE_POOL_ADDRESS } from '@utils/constants';
@@ -77,11 +77,13 @@ function ConfirmStxTransaction() {
     rpcMethod,
     requestToken,
     fee: stateFee,
+    broadcast = true,
   } = location.state as {
     tabId?: chrome.tabs.Tab['id'];
     messageId?: string;
     rpcMethod?: keyof StxRequests;
     [key: string]: any;
+    broadcast: boolean;
   };
   const unsignedTx = useMemo(() => deserializeTransaction(stringHex), [stringHex]);
 
@@ -169,6 +171,7 @@ function ConfirmStxTransaction() {
               sendInternalErrorMessage({ tabId, messageId });
             }
           }
+          if (!broadcast) window.close();
         } else {
           finalizeTxSignature({
             requestPayload: requestToken,
@@ -246,6 +249,7 @@ function ConfirmStxTransaction() {
             sendInternalErrorMessage({ tabId, messageId });
           }
         }
+        if (!broadcast) window.close();
       } else {
         finalizeTxSignature({
           requestPayload: requestToken,
@@ -262,7 +266,32 @@ function ConfirmStxTransaction() {
         wallet_type: selectedAccount?.accountType || 'software',
       });
 
-      broadcastTransaction({ signedTx: txs[0] });
+      if (broadcast) {
+        broadcastTransaction({ signedTx: txs[0] });
+      } else if (tabId) {
+        switch (rpcMethod) {
+          case 'stx_signTransaction': {
+            sendSignTransactionSuccessResponseMessage({
+              tabId,
+              messageId,
+              result: { transaction: rawTx },
+            });
+            break;
+          }
+          case 'stx_transferStx': {
+            sendStxTransferSuccessResponseMessage({
+              tabId,
+              messageId,
+              result: { transaction: rawTx, txid: stxTxBroadcastData ?? '' },
+            });
+            break;
+          }
+          default: {
+            sendInternalErrorMessage({ tabId, messageId });
+          }
+        }
+        if (!broadcast) window.close();
+      }
     }
   };
 

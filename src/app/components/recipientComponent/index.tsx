@@ -1,15 +1,15 @@
 import ArrowIcon from '@assets/img/transactions/ArrowDown.svg';
-import OutputIcon from '@assets/img/transactions/output.svg';
 import WalletIcon from '@assets/img/transactions/wallet.svg';
-import FiatAmountText from '@components/fiatAmountText';
+import { StyledFiatAmountText } from '@components/fiatAmountText';
 import TokenImage from '@components/tokenImage';
 import TransferDetailView from '@components/transferDetailView';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CubeTransparent } from '@phosphor-icons/react';
-import { FungibleToken, getFiatEquivalent } from '@secretkeylabs/xverse-core';
-import { CurrencyTypes } from '@utils/constants';
+import { type FungibleToken, getFiatEquivalent } from '@secretkeylabs/xverse-core';
+import { StyledP } from '@ui-library/common.styled';
+import type { CurrencyTypes } from '@utils/constants';
 import { getTicker } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
@@ -20,11 +20,12 @@ import styled from 'styled-components';
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
+  justifyContent: 'center',
   background: props.theme.colors.elevation1,
   borderRadius: 12,
-  padding: '16px 16px',
-  justifyContent: 'center',
-  marginBottom: 12,
+  padding: props.theme.space.m,
+  paddingBottom: 20,
+  marginBottom: props.theme.space.s,
 }));
 
 const RecipientTitleText = styled.p((props) => ({
@@ -33,16 +34,16 @@ const RecipientTitleText = styled.p((props) => ({
   marginBottom: props.theme.space.xs,
 }));
 
-const RowContainer = styled.div({
+const RowContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   width: '100%',
   alignItems: 'flex-start',
-  marginBottom: 12,
-});
+  marginTop: props.theme.space.m,
+}));
 
 const Icon = styled.img((props) => ({
-  marginRight: props.theme.space.xs,
+  marginRight: props.theme.space.m,
   width: 32,
   height: 32,
   borderRadius: 30,
@@ -56,11 +57,19 @@ const DownArrowIcon = styled.img((props) => ({
   marginBottom: props.theme.space.xs,
 }));
 
+const TitleContainer = styled.div({
+  display: 'flex',
+  alignItems: 'center',
+});
+
 const TitleText = styled.p((props) => ({
   ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_200,
-  textAlign: 'center',
-  marginTop: 5,
+  color: props.theme.colors.white_0,
+}));
+
+const Subtitle = styled(StyledP)((props) => ({
+  color: props.theme.colors.white_400,
+  marginTop: props.theme.space.xxxs,
 }));
 
 const ValueText = styled.p((props) => ({
@@ -79,7 +88,6 @@ const ColumnContainer = styled.div({
   flex: 1,
   justifyContent: 'flex-end',
   alignItems: 'flex-end',
-  paddingTop: 5,
 });
 
 const MultipleAddressContainer = styled.div({
@@ -87,9 +95,9 @@ const MultipleAddressContainer = styled.div({
   flexDirection: 'column',
 });
 
-const TokenContainer = styled.div({
-  marginRight: 10,
-});
+const TokenContainer = styled.div((props) => ({
+  marginRight: props.theme.space.m,
+}));
 
 const IconContainer = styled.div((props) => ({
   display: 'flex',
@@ -100,7 +108,11 @@ const IconContainer = styled.div((props) => ({
   backgroundColor: props.theme.colors.elevation3,
   width: 32,
   height: 32,
-  marginRight: props.theme.space.xs,
+  marginRight: props.theme.space.m,
+}));
+
+const FiatText = styled(StyledFiatAmountText)((props) => ({
+  marginTop: props.theme.space.xxxs,
 }));
 
 type Props = {
@@ -187,16 +199,36 @@ function RecipientComponent({
 
   return (
     <Container>
-      {recipientIndex && totalRecipient && totalRecipient !== 1 && (
-        <RecipientTitleText>
-          {`${t('RECIPIENT')} ${recipientIndex}/${totalRecipient}`}
-        </RecipientTitleText>
+      {address && (
+        <div>
+          {showSenderAddress ? (
+            <MultipleAddressContainer>
+              <TransferDetailView icon={WalletIcon} title={t('FROM')} address={ordinalsAddress} />
+              <DownArrowIcon src={ArrowIcon} />
+              <TransferDetailView icon={WalletIcon} title={t('TO')} address={address} />
+            </MultipleAddressContainer>
+          ) : (
+            <TransferDetailView
+              title={t('TO')}
+              address={address}
+              hideCopyButton
+              titleColor="white_400"
+            />
+          )}
+        </div>
       )}
+
       {heading && <RecipientTitleText>{heading}</RecipientTitleText>}
       {value && (
         <RowContainer>
-          {renderIcon()}
-          <TitleText>{title}</TitleText>
+          <TitleContainer>
+            {renderIcon()}
+            <div>
+              <TitleText>{title}</TitleText>
+              {currencyType === 'BTC' && <Subtitle typography="body_medium_s">Bitcoin</Subtitle>}
+              {currencyType === 'STX' && <Subtitle typography="body_medium_s">Stacks</Subtitle>}
+            </div>
+          </TitleContainer>
           {currencyType === 'NFT' || currencyType === 'Ordinal' || currencyType === 'RareSat' ? (
             <ColumnContainer>
               <ValueText data-testid={dataTestID}>{value}</ValueText>
@@ -211,23 +243,10 @@ function RecipientComponent({
                 suffix={currencyType === 'FT' ? ` ${getFtTicker()} ` : ` ${currencyType}`}
                 renderText={(amount) => <ValueText data-testid={dataTestID}>{amount}</ValueText>}
               />
-              <FiatAmountText fiatAmount={BigNumber(fiatAmount!)} fiatCurrency={fiatCurrency} />
+              <FiatText fiatAmount={BigNumber(fiatAmount!)} fiatCurrency={fiatCurrency} />
             </ColumnContainer>
           )}
         </RowContainer>
-      )}
-      {address && (
-        <div>
-          {showSenderAddress ? (
-            <MultipleAddressContainer>
-              <TransferDetailView icon={WalletIcon} title={t('FROM')} address={ordinalsAddress} />
-              <DownArrowIcon src={ArrowIcon} />
-              <TransferDetailView icon={WalletIcon} title={t('To')} address={address} />
-            </MultipleAddressContainer>
-          ) : (
-            <TransferDetailView icon={OutputIcon} title={t('RECIPIENT')} address={address} />
-          )}
-        </div>
       )}
     </Container>
   );

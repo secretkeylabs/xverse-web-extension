@@ -1,5 +1,5 @@
 import { XCircle } from '@phosphor-icons/react';
-import InputFeedback from '@ui-library/inputFeedback';
+import { InputFeedback } from '@ui-library/inputFeedback';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
 
@@ -20,7 +20,7 @@ const NodeText = styled.label`
 const NodeResetButton = styled.button`
   ${(props) => props.theme.typography.body_medium_m}
   background: none;
-  color: ${(props) => props.theme.colors.white_200};
+  color: ${(props) => props.theme.colors.tangerine};
 `;
 
 // TODO create and use a ui-library input with proper input box styling

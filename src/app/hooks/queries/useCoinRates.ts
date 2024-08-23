@@ -1,9 +1,9 @@
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  NetworkType,
-  SupportedCurrency,
   fetchBtcToCurrencyRate,
   fetchStxToBtcRate,
+  type NetworkType,
+  type SupportedCurrency,
 } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 
@@ -13,8 +13,16 @@ const useGetRates = (fiatCurrency: SupportedCurrency, networkType: NetworkType) 
       const btcFiatRate = await fetchBtcToCurrencyRate(networkType, {
         fiatCurrency,
       });
+
+      const btcUsdRate =
+        fiatCurrency === 'USD'
+          ? btcFiatRate
+          : await fetchBtcToCurrencyRate(networkType, {
+              fiatCurrency: 'USD' as SupportedCurrency,
+            });
+
       const stxBtcRate = await fetchStxToBtcRate(networkType);
-      return { stxBtcRate, btcFiatRate };
+      return { stxBtcRate, btcFiatRate, btcUsdRate };
     } catch (e: any) {
       return Promise.reject(e);
     }
@@ -27,15 +35,16 @@ const useGetRates = (fiatCurrency: SupportedCurrency, networkType: NetworkType) 
   });
 };
 
-export const useCoinRates = () => {
+const useCoinRates = () => {
   const { fiatCurrency, network } = useWalletSelector();
 
   const { data } = useGetRates(fiatCurrency, network.type);
 
   const stxBtcRate = data?.stxBtcRate.toString() || '0';
   const btcFiatRate = data?.btcFiatRate.toString() || '0';
+  const btcUsdRate = data?.btcUsdRate?.toString() || '0';
 
-  return { stxBtcRate, btcFiatRate };
+  return { stxBtcRate, btcFiatRate, btcUsdRate };
 };
 
 export default useCoinRates;

@@ -1,9 +1,9 @@
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import useOrdinalsServiceApi from '@hooks/apiClients/useOrdinalsServiceApi';
 import useTransactionContext from '@hooks/useTransactionContext';
-import { Params, RpcErrorCode } from '@sats-connect/core';
-import { TransactionBuildPayload, generateTransaction } from '@screens/sendBtc/helpers';
-import { Transport } from '@secretkeylabs/xverse-core';
+import { RpcErrorCode, type Params } from '@sats-connect/core';
+import { generateTransaction, type TransactionBuildPayload } from '@screens/sendBtc/helpers';
+import { type Transport } from '@secretkeylabs/xverse-core';
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import SuperJSON from 'superjson';
@@ -16,7 +16,10 @@ const useEtchRequestRequestParams = () => {
   const payloadToken = params.get('payload') ?? '';
 
   const payload = SuperJSON.parse<Params<'runes_etch'>>(payloadToken);
-  const etchRequest = { ...payload, network: undefined };
+  const etchRequest = payload;
+  // network is not needed in the etch request and the api will use the current network
+  // we need to remove it because the api will throw an error if it's present
+  delete etchRequest.network;
 
   return { etchRequest, tabId, requestId, network: payload.network };
 };

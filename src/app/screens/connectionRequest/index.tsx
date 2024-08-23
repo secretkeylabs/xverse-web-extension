@@ -1,9 +1,9 @@
 /* eslint-disable import/prefer-default-export */
-import { Context, getPopupPayload } from '@common/utils/popup';
+import { getPopupPayload, type Context } from '@common/utils/popup';
 import { sendRequestPermissionsSuccessResponseMessage } from '@common/utils/rpc/responseMessages/wallet';
 import { usePermissionsUtils } from '@components/permissionsManager';
 import { makeAccountResource } from '@components/permissionsManager/resources';
-import { Client, Permission } from '@components/permissionsManager/schemas';
+import type { Client, Permission } from '@components/permissionsManager/schemas';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { requestPermissionsRequestMessageSchema } from '@sats-connect/core';
@@ -42,6 +42,7 @@ function ConnectionRequestInner({ data, context }: ConnectionRequestInnerProps) 
     const client: Client = {
       id: context.origin,
       name: context.origin,
+      origin: context.origin,
     };
 
     const resource = makeAccountResource({
@@ -93,6 +94,8 @@ function ConnectionRequestInner({ data, context }: ConnectionRequestInnerProps) 
         <PermissionDescriptionsContainer>
           <Permissions.Title />
           <Permissions.Description description={t('PERMISSION_WALLET_BALANCE')} />
+          <Permissions.Description description={t('PERMISSION_REQUEST_TX')} />
+          <Permissions.Description description={t('PERMISSION_WALLET_TYPE_ACCESS')} />
         </PermissionDescriptionsContainer>
       </ContentContainer>
 

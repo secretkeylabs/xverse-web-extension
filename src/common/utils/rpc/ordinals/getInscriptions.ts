@@ -3,7 +3,7 @@ import getSelectedAccount from '@common/utils/getSelectedAccount';
 import { makeContext } from '@common/utils/popup';
 import { makeAccountResourceId } from '@components/permissionsManager/resources';
 import * as utils from '@components/permissionsManager/utils';
-import { RpcErrorCode, RpcRequestMessage, getInscriptionsSchema } from '@sats-connect/core';
+import { RpcErrorCode, getInscriptionsSchema, type RpcRequestMessage } from '@sats-connect/core';
 import { OrdinalsApi } from '@secretkeylabs/xverse-core';
 import rootStore from '@stores/index';
 import * as v from 'valibot';

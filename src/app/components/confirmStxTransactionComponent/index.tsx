@@ -23,14 +23,14 @@ import {
   signTransaction,
   stxToMicrostacks,
 } from '@secretkeylabs/xverse-core';
-import { estimateTransaction } from '@stacks/transactions';
+import { estimateTransaction, PostConditionMode } from '@stacks/transactions';
 import SelectFeeRate from '@ui-components/selectFeeRate';
 import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
 import { isHardwareAccount } from '@utils/helper';
 import { modifyRecommendedStxFees } from '@utils/transactions/transactions';
 import BigNumber from 'bignumber.js';
-import { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import Theme from 'theme';
 import {
@@ -325,6 +325,10 @@ function ConfirmStxTransactionComponent({
     return Promise.resolve(totalFee);
   };
 
+  const showPostConditionModeWarning = initialStxTransactions.some(
+    (tx) => tx.postConditionMode === PostConditionMode.Allow,
+  );
+
   return (
     <>
       <Container>
@@ -341,8 +345,13 @@ function ConfirmStxTransactionComponent({
           </WarningWrapper>
         )}
 
-        {children}
+        {showPostConditionModeWarning && (
+          <WarningWrapper>
+            <Callout variant="warning" bodyText={t('POST_CONDITION_MODE_WARNING_TEXT')} />
+          </WarningWrapper>
+        )}
 
+        {children}
         <FeeRateContainer>
           <SelectFeeRate
             fee={fee}

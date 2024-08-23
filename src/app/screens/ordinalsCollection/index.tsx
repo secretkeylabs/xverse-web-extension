@@ -180,7 +180,7 @@ function OrdinalsCollection() {
             <BackButtonContainer>
               <BackButton onClick={handleBackButtonClick}>
                 <ArrowLeft size={16} color="currentColor" />
-                <StyledP typography="body_m" color="white_0">
+                <StyledP data-testid="back-to-gallery" typography="body_m" color="white_0">
                   {t('BACK_TO_GALLERY')}
                 </StyledP>
               </BackButton>

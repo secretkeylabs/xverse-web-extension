@@ -1,4 +1,4 @@
-import { RuneItem } from '@utils/runes';
+import type { RuneItem } from '@utils/runes';
 
 interface ListRunesState {
   listItemsMap: Record<string, RuneItem>;

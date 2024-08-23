@@ -3,7 +3,6 @@ import TokenImage from '@components/tokenImage';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core';
-import Avatar from '@ui-library/avatar';
 import { StyledP } from '@ui-library/common.styled';
 import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
@@ -16,14 +15,23 @@ const RowCenter = styled.div<{ spaceBetween?: boolean }>((props) => ({
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: props.spaceBetween ? 'space-between' : 'initial',
+  columnGap: props.theme.space.m,
+  marginBottom: props.theme.space.s,
 }));
 
 const NumberTypeContainer = styled.div`
   text-align: right;
 `;
 
-const AvatarContainer = styled.div`
-  margin-right: ${(props) => props.theme.space.xs};
+const StyledFiatAmountText = styled(FiatAmountText)`
+  display: block;
+  ${(props) => props.theme.typography.body_medium_s}
+  color: ${(props) => props.theme.colors.white_400};
+  margin-top: ${(props) => props.theme.space.xxxs};
+`;
+
+const StyledBtcTitle = styled(StyledP)`
+  margin-top: ${(props) => props.theme.space.xxxs};
 `;
 
 type Props = {
@@ -35,16 +43,19 @@ export default function Amount({ amount }: Props) {
   const { btcFiatRate } = useCoinRates();
   const { t } = useTranslation('translation');
 
+  if (!amount) return null;
+
   return (
     <RowCenter>
-      <AvatarContainer>
-        <Avatar src={<TokenImage currency="BTC" loading={false} size={32} />} />
-      </AvatarContainer>
+      <TokenImage currency="BTC" loading={false} size={32} />
       <RowCenter spaceBetween>
         <div>
-          <StyledP typography="body_medium_m" color="white_200">
+          <StyledP typography="body_medium_m" color="white_0">
             {t('CONFIRM_TRANSACTION.AMOUNT')}
           </StyledP>
+          <StyledBtcTitle typography="body_medium_s" color="white_400">
+            Bitcoin
+          </StyledBtcTitle>
         </div>
         <NumberTypeContainer>
           <NumericFormat
@@ -58,7 +69,7 @@ export default function Amount({ amount }: Props) {
               </StyledP>
             )}
           />
-          <FiatAmountText
+          <StyledFiatAmountText
             fiatAmount={getBtcFiatEquivalent(BigNumber(amount), BigNumber(btcFiatRate))}
             fiatCurrency={fiatCurrency}
             dataTestId="confirm-currency-amount"

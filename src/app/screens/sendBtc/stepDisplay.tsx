@@ -1,11 +1,12 @@
-import ConfirmBitcoinTransaction from '@components/confirmBtcTransaction';
+import RecipientSelector from '@components/recipientSelector';
 import TokenImage from '@components/tokenImage';
+import type { RuneSummary } from '@secretkeylabs/xverse-core';
+import ConfirmBtcTransaction from 'app/components/confirmBtcTransaction';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import SendLayout from '../../layouts/sendLayout';
 import AmountSelector from './amountSelector';
-import BtcRecipientSelector from './btcRecipientSelector';
-import { TransactionSummary } from './helpers';
+import type { TransactionSummary } from './helpers';
 import { Step, getNextStep } from './steps';
 
 const TitleContainer = styled.div`
@@ -29,6 +30,7 @@ const Container = styled.div`
 
 type Props = {
   summary: TransactionSummary | undefined;
+  runeSummary: RuneSummary | undefined;
   currentStep: Step;
   setCurrentStep: (step: Step) => void;
   recipientAddress: string;
@@ -40,8 +42,6 @@ type Props = {
   sendMax: boolean;
   setSendMax: (sendMax: boolean) => void;
   getFeeForFeeRate: (feeRate: number, useEffectiveFeeRate?: boolean) => Promise<number | undefined>;
-  addressEditable: boolean;
-  amountEditable: boolean;
   onConfirm: () => void;
   onBack: () => void;
   onCancel: () => void;
@@ -51,6 +51,7 @@ type Props = {
 
 function StepDisplay({
   summary,
+  runeSummary,
   currentStep,
   setCurrentStep,
   recipientAddress,
@@ -62,8 +63,6 @@ function StepDisplay({
   sendMax,
   setSendMax,
   getFeeForFeeRate,
-  addressEditable,
-  amountEditable,
   onConfirm,
   onBack,
   onCancel,
@@ -77,17 +76,17 @@ function StepDisplay({
       <Title>{t('SEND.SEND')}</Title>
     </TitleContainer>
   );
-
   switch (currentStep) {
     case Step.SelectRecipient:
       return (
         <SendLayout selectedBottomTab="dashboard" onClickBack={onBack}>
           <Container>
-            <BtcRecipientSelector
+            <RecipientSelector
               header={header}
               recipientAddress={recipientAddress}
               setRecipientAddress={setRecipientAddress}
-              onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient, amountEditable))}
+              onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient))}
+              isLoading={isLoading}
             />
           </Container>
         </SendLayout>
@@ -104,10 +103,10 @@ function StepDisplay({
               setFeeRate={setFeeRate}
               sendMax={sendMax}
               setSendMax={setSendMax}
-              fee={summary?.fee.toString()}
+              fee={(summary as TransactionSummary)?.fee.toString()}
               getFeeForFeeRate={getFeeForFeeRate}
-              dustFiltered={summary?.dustFiltered ?? false}
-              onNext={() => setCurrentStep(getNextStep(Step.SelectAmount, amountEditable))}
+              dustFiltered={(summary as TransactionSummary)?.dustFiltered ?? false}
+              onNext={() => setCurrentStep(getNextStep(Step.SelectAmount))}
               hasSufficientFunds={!!summary || isLoading}
               isLoading={isLoading}
             />
@@ -120,11 +119,9 @@ function StepDisplay({
         return null;
       }
       return (
-        <ConfirmBitcoinTransaction
-          inputs={summary.inputs}
-          outputs={summary.outputs}
-          feeOutput={summary.feeOutput}
-          showCenotaphCallout={!!summary?.runeOp?.Cenotaph?.flaws}
+        <ConfirmBtcTransaction
+          summary={summary}
+          runeSummary={runeSummary}
           isLoading={false}
           confirmText={t('COMMON.CONFIRM')}
           cancelText={t('COMMON.CANCEL')}

@@ -14,10 +14,12 @@
     "NEXT": "Next",
     "CANCEL": "Cancel",
     "CONFIRM": "Confirm",
-    "APPLY": "Apply"
+    "APPLY": "Apply",
+    "IN": "In",
+    "TO": "To"
   },
   "UNITS": {
-    "SATS_PER_VB": "sats/vByte"
+    "SATS_PER_VB": "sats/vB"
   },
   "LANDING_SCREEN": {
     "BETA": "Beta",
@@ -308,18 +310,21 @@
     "YOU_ARE_TRANSFERRING_TO_YOURSELF": "You are transferring to yourself",
     "COPYRIGHT": "© {{year}} Secret Key Labs Limited",
     "INSUFFICIENT_FUNDS": "Insufficient funds",
-    "RATE_TOO_LOW": "Set fee is below minimum of {{minFee}} Sats/vByte",
-    "RATE_TOO_HIGH": "Set fee is above maximum of {{maxFee}} Sats/vByte",
+    "RATE_TOO_LOW": "Set fee is below minimum of {{minFee}} sats/vB",
+    "RATE_TOO_HIGH": "Set fee is above maximum of {{maxFee}} sats/vB",
     "SPEND_DELEGATED_STX": "You are transferring some STX that is registered for the next stacking cycle. The amount transferred will be subtracted from your current stacking pool delegation, and will not be locked to generate rewards in the next cycle.",
     "INVALID_FEE_RATE": "Invalid fee rate"
   },
   "CONFIRM_TRANSACTION": {
     "SEND": "Confirm Transaction",
+    "CUSTOM": "Custom",
+    "EDIT": "Edit",
+    "NETWORK_FEE": "Network Fee",
     "INDICATION": "You will send",
     "RECIPIENT_ADDRESS": "recipient address",
     "MEMO": "Attached memo",
     "NETWORK": "Network",
-    "FEES": "Network fee",
+    "FEES": "Fees",
     "TRANSACTION": "Transaction",
     "PREVIOUS": "Previous",
     "NEXT": "Next",
@@ -342,7 +347,7 @@
     "SIGN_TRANSACTIONS": "Sign {{count}} transactions",
     "AMOUNT": "Amount",
     "INSUFFICIENT_BALANCE": "Insufficient balance",
-    "YOUR_ADDRESS": "Your address",
+    "YOUR_ADDRESS": "My address",
     "FROM": "From",
     "INPUT": "Inputs",
     "INPUT_AND_OUTPUT": "Inputs & Outputs",
@@ -378,7 +383,7 @@
     "PSBT_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction is invalid and cannot be processed. Please contact the developer of the requesting app for support.",
     "PSBT_INDEX_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction at {{index}} index is invalid and cannot be processed. Please contact the developer of the requesting app for support.",
     "PSBT_CANT_SIGN_ERROR_TITLE": "Failed to sign transaction",
-    "To": "To",
+    "TO": "To",
     "YOU_WILL_TRANSFER": "You will transfer",
     "YOU_WILL_RECEIVE": "You will receive",
     "YOU_WILL_BURN": "You will burn",
@@ -402,6 +407,9 @@
     "HIGH_FEE_WARNING_TEXT": "The estimated transaction fee for this transaction is very high.",
     "UNCONFIRMED_BALANCE_WARNING": "You are spending unconfirmed outputs in this transaction. This may lower the effective fee rate causing delays in transaction confirmation",
     "RUNES_CENOTAPH_WARNING": "This transaction will burn all input Runes. Make sure you trust the requesting app.",
+    "YOU_WILL_SEND": "You will send",
+    "TRANSACTION_DETAILS": "Transaction details",
+    "BTC_TRANSFER_WARNING": "This amount may include the tx fee & postage associated to transferred ordinals, runes & BRC-20.",
     "LEDGER": {
       "CONNECT": {
         "TITLE": "Connect your hardware wallet",
@@ -437,7 +445,7 @@
       "ORDINAL": "Ordinal",
       "RECIPIENT": "Recipient",
       "TO": "To",
-      "YOUR_ADDRESS": "Your address"
+      "YOUR_ADDRESS": "My address"
     },
     "YOUR_ORDINAL_ADDRESS": "Your ordinals address",
     "YOUR_PAYMENT_ADDRESS": "Your payment address",
@@ -449,7 +457,11 @@
     "RUNE_IS_CLOSED": "This rune is closed and cannot be minted.",
     "UNKNOWN_RUNE_RECIPIENTS": "Undetermined Runes recipients ",
     "RUNE_DELEGATION_DESCRIPTION": "This is a partial transaction with undetermined Runes recipients. You are delegating your Runes to the requesting app. The requesting app can burn your runes or transfer them to any recipient",
-    "YOU_WILL_DELEGATE": "You will delegate"
+    "YOU_WILL_DELEGATE": "You will delegate",
+    "POST_CONDITION_MODE_WARNING_TEXT": "This transaction might be unsafe. Be sure you trust the source of this transaction before confirming it. (Unsafe post condition mode)",
+    "QUOTE_EXPIRES_IN": "Note that this swap quote will expire after {{seconds}} seconds",
+    "INSCRIPTION_SERVICE_FEE": "Inscription Service Fee",
+    "TOTAL_FEES": "Total fees"
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "The requested transaction cannot be created due to insufficient balance",
@@ -462,7 +474,7 @@
     "ADVANCED_SETTING_NONCE_OPTION": "Edit nonce",
     "EDIT_FEE": "Edit Fees",
     "FEE": "Fee",
-    "NETWORK_FEE": "Network fee",
+    "NETWORK_FEE": "Network Fee",
     "FEE_RATE": "Fee Rate",
     "STANDARD": "Regular",
     "HIGH": "Fast",
@@ -489,7 +501,7 @@
     }
   },
   "TRANSACTION_STATUS": {
-    "BROADCASTED": "Transaction Broadcasted",
+    "BROADCASTED": "Transaction broadcasted",
     "SUCCESS_MSG": "Your transaction has been successfully submitted.",
     "SEE_ON": "See on",
     "SEE_ON_MAGICEDEN": "See {{runeSymbol}} on Magic Eden",
@@ -583,6 +595,7 @@
     "PERMISSIONS_TITLE": "The app will be able to:",
     "PERMISSION_WALLET_BALANCE": "See your wallet balance and activity",
     "PERMISSION_REQUEST_TX": "Request transaction signing",
+    "PERMISSION_WALLET_TYPE_ACCESS": "See which type of wallet you are using (software or hardware wallet)",
     "NO_STACKS_AUTH_SUPPORT": {
       "TITLE": "This wallet does not have a Stacks address.",
       "LINK": "Create a Stacks address"
@@ -678,7 +691,7 @@
     "ACTIVATE_ORDINALS_INFO": "You have Bitcoin Ordinals in your wallet. Would you like to display them? This is an experimental feature. You can change this setting at anytime.",
     "ACTIVATE": "Activate",
     "DENY": "No",
-    "COPIED": "Copied!",
+    "COPIED": "Copied",
     "MINT": "Mint",
     "TRANSFER": "Transfer",
     "DEPLOY": "Deploy",
@@ -686,7 +699,8 @@
     "VIEW_ADDRESS": "View address",
     "ADD_STACKS_ADDRESS": "Add a Stacks address",
     "NFTS": "NFTs",
-    "RARE_SATS": "Rare Sats",
+    "RARE_SAT": "Rare sat",
+    "RARE_SATS": "Rare sats",
     "NEW_FEATURE": "New Feature, Rare Sats",
     "NEW_FEAT_RARE_SATS_DESCRIPTION": "Enable rare sats to display rare, interesting and unique sats in your wallet. You can change this setting at any time.",
     "NEW_FEAT_RARE_SATS_ORDINALS_ENABLE": "Enable rare sats to display rare, interesting and unique sats in your wallet. Note than enabling rare sats will also enable Ordinals. You can change this setting at any time.",
@@ -799,6 +813,14 @@
     "INCORRECT_PASSWORD_ERROR": "Incorrect password"
   },
   "SETTING_SCREEN": {
+    "TITLE": "Settings",
+    "CATEGORIES": {
+      "ABOUT": "About",
+      "PREFERENCES": "Preferences",
+      "ADVANCED": "Advanced",
+      "SECURITY": "Security",
+      "CONNECTED_APPS": "Connected Apps"
+    },
     "GENERAL": "General",
     "CURRENCY": "Fiat Currency",
     "PRIVACY_PREFERENCES": {
@@ -809,12 +831,12 @@
     "BTC_URL": "BTC URL",
     "STACKS_URL": "Stacks URL",
     "FALLBACK_BTC_URL": "Fallback BTC URL",
-    "RESET_TO_DEFAULT": "Reset to default",
+    "RESET_TO_DEFAULT": "Reset URL",
     "REQUIRED": "Required",
     "NETWORK": "Network",
     "SECURITY": "Security",
     "UPDATE_PASSWORD": "Update Password",
-    "BACKUP_WALLET": "Backup Wallet",
+    "BACKUP_WALLET": "Show Seedphrase",
     "AUTO_LOCK": "Auto Lock",
     "RESET_WALLET": "Reset Wallet",
     "ABOUT": "About",
@@ -850,12 +872,18 @@
     "CONFIRM_YOUR_NEW_PASSWORD": "Confirm your new password",
     "TEXT_INPUT_NEW_PASSWORD_LABEL": "New Password",
     "ENABLE_RARE_SATS": "Enable Rare Sats (experimental)",
-    "ENABLE_RARE_SATS_DETAIL": "Automatically scan and display rare sats in your Ordinals wallet.",
+    "ENABLE_ORDINALS_DETAIL": "Automatically scan your ordinal address for ordinals and display them in your collectibles and transaction review screens",
+    "ENABLE_RARE_SATS_DETAIL": "Automatically scan your ordinal address for rare sats and display them in your collectibles and transaction review screens",
     "ENABLE_SPEED_UP_TRANSACTIONS": "Enable speed up transactions",
     "ENABLE_SPEED_UP_TRANSACTIONS_DETAIL": "Allows you to speed up unconfirmed transactions by paying a higher fee.",
     "ADVANCED": "Advanced",
     "XVERSE_DEFAULT": "Use Xverse as default wallet",
     "XVERSE_DEFAULT_DESCRIPTION": "Allow apps to prioritize Xverse when looking for a wallet with which to connect."
+  },
+  "CONNECTED_APPS": {
+    "TITLE": "Connected Apps",
+    "SUBTITLE": "You are connected to the following apps.",
+    "EMPTY_MESSAGE": "You're not currently connected to any app."
   },
   "EXPLORE_SCREEN": {
     "TITLE": "Explore",
@@ -900,6 +928,7 @@
     "DESELECT_ALL": "Deselect all",
     "SET_PRICES": "Set price",
     "MAGIC_EDEN_FLOOR_PRICE": "The Magic Eden floor price is currently {{sats}} Sats/{{symbol}}",
+    "NO_FLOOR_PRICE": "There is no floor price for {{symbol}}",
     "TOTAL_LISTED": "Total listed",
     "TOTAL_RECEIVED_IF_SOLD": "Total received if sold",
     "LISTING_PRICE": "Listing price",
@@ -907,10 +936,10 @@
     "AT_FLOOR_PRICE_LABEL": "This listing is at floor price",
     "BELOW_FLOOR_PRICE_LABEL": "This listing is {{percentage}}% below floor price",
     "ABOVE_FLOOR_PRICE_LABEL": "This listing is {{percentage}}% above floor price",
-    "LISTING_PRICE_TOO_LOW": "Your listing price is too low",
+    "LISTING_PRICE_TOO_LOW": "Bundle price must be > 10000 sats",
     "LISTING_PRICE_TOO_HIGH": "Your bundle price price must be < 10 BTC",
     "EDIT": "Edit",
-    "MIN_PRICE_LABEL": "The listing price per {{symbol}} must be at least {{price}} Sats",
+    "MIN_PRICE_LABEL": "The listing price per {{symbol}} must be at least {{price}} sats",
     "NO_LISTED_ITEMS": "There're no listed items for this rune.",
     "NO_UNLISTED_ITEMS": "There're no unlisted items for this rune."
   },
@@ -1093,7 +1122,7 @@
       "ORDINAL": "Ordinal",
       "RECIPIENT": "Recipient",
       "TO": "To",
-      "YOUR_ADDRESS": "Your address"
+      "YOUR_ADDRESS": "My address"
     },
     "PREVIEW": {
       "SATS": {
@@ -1199,6 +1228,7 @@
     "INVALID_PURPOSE_ERROR_DESCRIPTION": "The app is requesting a wallet address with an invalid purpose. Please contact the developer of the requesting app for support.",
     "PERMISSIONS_TITLE": "The app will be able to:",
     "PERMISSION_WALLET_BALANCE": "See your wallet balance and activity",
+    "WALLET_TYPE_ACCESS": "See which type of wallet you are using (software or hardware wallet)",
     "PERMISSION_REQUEST_TX": "Request transaction signing"
   },
   "SEND_BRC20": {
@@ -1272,7 +1302,9 @@
     "CLOSE_TAB": "Close"
   },
   "SWAP_SCREEN": {
+    "QUOTE": "Quote",
     "SWAP": "Swap",
+    "RATE": "Rate",
     "CONVERT": "Convert",
     "BALANCE": "Balance",
     "FROM": "From",
@@ -1289,16 +1321,38 @@
     "SPONSOR_TRANSACTION": "Sponsor transaction (no fees)",
     "POWERED_BY_ALEX": "Powered by ALEX",
     "CONTINUE": "Continue",
-    "SLIPPAGE_DESC": "Your transaction will reverse if the price changes unfavorably by more of this percentage.",
+    "SLIPPAGE_DESC": "You can adjust the slippage tolerance to account for price fluctuations and ensure your transaction goes through.",
     "APPLY": "Apply",
     "RESET_TO_DEFAULT": "Reset to default",
     "ERRORS": {
       "INVALID_AMOUNT": "Invalid amount",
       "INSUFFICIENT_BALANCE_FEES": "Insufficient balance",
-      "SLIPPAGE_TOLERANCE_CANNOT_EXCEED": "The slippage tolerance cannot exceed 100%"
+      "SLIPPAGE_TOLERANCE_CANNOT_EXCEED": "The slippage tolerance cannot exceed 100%",
+      "NO_PAIR_LIQUIDITY": "We couldn't find any quote for this pair.",
+      "TRY_ANOTHER_PAIR": "You can try another pair, or try again later.",
+      "NO_TOKENS_FOUND": "No tokens found",
+      "MISSING_UTXOS": "Selected bundles are not available anymore",
+      "SOME_MISSING_UTXOS": "Some selected bundles are not available anymore",
+      "NO_UTXOS_FOR_PURCHASE": "The selected bundles are no longer available for purchase"
     },
     "SWAP_TRANSACTION_CANNOT_BE_SPONSORED": "Swap transaction cannot be sponsored while you have a pending transaction.",
-    "LEARN_MORE": "Learn more"
+    "LEARN_MORE": "Learn more",
+    "GET_QUOTES": "Get quotes",
+    "SEARCH_BY_NAME": "Search by token name",
+    "GET_QUOTES_TITLE": "Rates",
+    "QUOTE_TITLE": "We found the following rates for your swap",
+    "EXCHANGE": "EXCHANGE",
+    "MARKETPLACE": "MARKETPLACE",
+    "FLOOR_PRICE": "Floor price",
+    "RECOMMENDED": "Recommended",
+    "BEST": "Best",
+    "SELECT_BUNDLES": "Select bundles to proceed with the swap",
+    "SWAP_FROM": "Swap from",
+    "SWAP_TO": "Swap to",
+    "LIST_YOUR_RUNES": "List your Runes on Magic Eden",
+    "SLIPPAGE_WARNING": "Your transaction may be frontrun and result in an unfavorable trade",
+    "BAD_QUOTE_WARNING_TITLE": "The quote you are receiving may result in significant value loss.",
+    "BAD_QUOTE_WARNING_DESC": "The minimum amount you will receive will result in a loss of over {{percentage}}% of your trade’s value. This is due to low liquidity in the pool, causing discrepancies in pricing. Please review the details carefully before proceeding with the swap."
   },
   "SWAP_CONFIRM_SCREEN": {
     "TOKEN_SWAP": "Token swap",
@@ -1309,13 +1363,13 @@
     "LESS_THAN_OR_EQUAL_TO": "Less than or equal to",
     "FROM": "From",
     "TO": "To",
-    "YOUR_ADDRESS": "Your address",
+    "YOUR_ADDRESS": "My address",
     "CANCEL": "Cancel",
     "CONFIRM": "Confirm",
     "FEES": "Fees",
     "ROUTE": "Route",
     "COPIED": "Copied",
-    "COPY_YOUR_ADDRESS": "copy your address",
+    "COPY_YOUR_ADDRESS": "Copy my address",
     "ADVANCED_SETTING": "Advanced settings",
     "THIS_IS_A_SPONSORED_TRANSACTION": "This is a sponsored transaction, no transaction fees will be deducted from your account.",
     "SWAP_TRANSACTION_CANNOT_BE_SPONSORED": "Swap transaction cannot be sponsored while you have a pending transaction.",
