@@ -6,9 +6,9 @@ const strongPW = Onboarding.generateSecurePasswordCrypto();
 
 test.describe('Explore Tab', () => {
   test('Check explore Tab', async ({ page, extensionId }) => {
-    const onboardingpage = new Onboarding(page);
+    const onboardingPage = new Onboarding(page);
     const wallet = new Wallet(page);
-    await onboardingpage.createWalletSkipBackup(strongPW);
+    await onboardingPage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
     await wallet.checkVisualsStartpage();
     await wallet.navigationExplore.click();

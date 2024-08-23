@@ -1,6 +1,6 @@
 import ActionButton from '@components/button';
 import FiatAmountText from '@components/fiatAmountText';
-import InputFeedback from '@ui-library/inputFeedback';
+import { InputFeedback } from '@ui-library/inputFeedback';
 import styled from 'styled-components';
 
 export const Container = styled.div((props) => ({

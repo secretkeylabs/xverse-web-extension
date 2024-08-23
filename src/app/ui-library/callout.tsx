@@ -1,4 +1,11 @@
-import { ArrowRight, CheckCircle, Icon, Info, Warning, WarningCircle } from '@phosphor-icons/react';
+import {
+  ArrowRight,
+  CheckCircle,
+  Info,
+  Warning,
+  WarningCircle,
+  type Icon,
+} from '@phosphor-icons/react';
 import styled from 'styled-components';
 import Theme from 'theme';
 import { StyledHeading, StyledP } from './common.styled';

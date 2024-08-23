@@ -1,9 +1,9 @@
 import AccountHeaderComponent from '@components/accountHeader';
-import BottomBar, { Tab } from '@components/tabBar';
+import BottomBar, { type Tab } from '@components/tabBar';
 import TopRow from '@components/topRow';
 import { ArrowLeft } from '@phosphor-icons/react';
 import { StyledP } from '@ui-library/common.styled';
-import { PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { breakpoints, devices } from 'theme';

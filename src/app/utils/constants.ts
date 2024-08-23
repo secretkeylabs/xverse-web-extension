@@ -1,11 +1,14 @@
 /* eslint-disable prefer-destructuring */
-import { Provider } from '@sats-connect/core';
+/* eslint-disable prefer-destructuring */
+import type { Provider } from '@sats-connect/core';
 import type { NetworkType } from '@secretkeylabs/xverse-core';
 
 export const GAMMA_URL = 'https://gamma.io/';
 export const TERMS_LINK = 'https://xverse.app/terms';
 export const PRIVACY_POLICY_LINK = 'https://xverse.app/privacy';
 export const SUPPORT_LINK = 'https://support.xverse.app/hc/en-us';
+export const STORE_LISTING =
+  'https://chromewebstore.google.com/detail/xverse-wallet/idnnbdplmphpflfnlkomgpfbpcgelopg';
 export const BLOG_LINK = 'https:/xverse.app/blog';
 export const SUPPORT_EMAIL = 'support@xverse.app';
 export const BTC_TRANSACTION_STATUS_URL = 'https://mempool.space/tx/';

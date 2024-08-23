@@ -1,5 +1,5 @@
-import { LoadingTransactionStatus } from '@components/loadingTransactionStatus';
-import { ConfirmationStatus } from '@components/loadingTransactionStatus/circularSvgAnimation';
+import LoadingTransactionStatus from '@components/loadingTransactionStatus';
+import type { ConfirmationStatus } from '@components/loadingTransactionStatus/circularSvgAnimation';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -11,7 +11,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import Sheet from '@ui-library/sheet';
-import { ExecuteBrc20TransferState } from '@utils/brc20';
+import type { ExecuteBrc20TransferState } from '@utils/brc20';
 import { getBtcTxStatusUrl, isInOptions, isLedgerAccount } from '@utils/helper';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

@@ -2,7 +2,7 @@ import useCoinRates from '@hooks/queries/useCoinRates';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useWalletSelector from '@hooks/useWalletSelector';
 import RuneAmountSelector from '@screens/sendRune/runeAmountSelector';
-import { FungibleToken, getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
+import { getBtcFiatEquivalent, type FungibleToken } from '@secretkeylabs/xverse-core';
 import SelectFeeRate from '@ui-components/selectFeeRate';
 import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
@@ -93,7 +93,7 @@ function AmountSelector({
         <FeeRateContainer>
           <SelectFeeRate
             fee={fee}
-            feeUnits="Sats"
+            feeUnits="sats"
             feeRate={feeRate}
             feeRateUnits={tUnits('SATS_PER_VB')}
             setFeeRate={setFeeRate}

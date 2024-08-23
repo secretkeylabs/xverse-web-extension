@@ -15,9 +15,9 @@ import { AddressPurpose } from '@sats-connect/core';
 import SelectAccount from '@screens/connect/selectAccount';
 import {
   AnalyticsEvents,
-  AuthRequest,
   createAuthResponse,
   handleLedgerStxJWTAuth,
+  type AuthRequest,
 } from '@secretkeylabs/xverse-core';
 import { AddressVersion, StacksMessageType, publicKeyToAddress } from '@stacks/transactions';
 import Callout from '@ui-library/callout';

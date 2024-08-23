@@ -31,6 +31,7 @@ jobs:
         run: npm ci
       - name: Test
         run: |
+          npm run knip
           npx eslint .
           npx tsc --noEmit
           npm test

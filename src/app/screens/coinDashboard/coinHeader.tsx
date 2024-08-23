@@ -15,14 +15,16 @@ import useHasFeature from '@hooks/useHasFeature';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  AnalyticsEvents,
   FeatureId,
-  FungibleToken,
   currencySymbolMap,
   getFiatEquivalent,
   microstacksToStx,
+  type FungibleToken,
 } from '@secretkeylabs/xverse-core';
-import { CurrencyTypes } from '@utils/constants';
+import type { CurrencyTypes } from '@utils/constants';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
+import { trackMixPanel } from '@utils/mixpanel';
 import { getBalanceAmount, getFtTicker } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
@@ -63,11 +65,6 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const isReceivingAddressesVisible = !isLedgerAccount(selectedAccount);
-  const showSwaps =
-    useHasFeature(FeatureId.SWAPS) &&
-    currency === 'STX' &&
-    !isLedgerAccount(selectedAccount) &&
-    network.type !== 'Testnet';
 
   const showRunesListing =
     (useHasFeature(FeatureId.RUNES_LISTING) || process.env.NODE_ENV === 'development') &&
@@ -129,7 +126,7 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
     } else {
       switch (fungibleToken?.protocol) {
         case 'stacks':
-          route = `/send-sip10?principal=${fungibleToken?.principal}`;
+          route = `/send-stx?principal=${fungibleToken?.principal}`;
           break;
         case 'brc-20':
           route = `/send-brc20-one-step?principal=${fungibleToken?.principal}`;
@@ -167,6 +164,34 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
       return `Bitcoin ${t('BALANCE')}`;
     }
     return `${currency} ${t('BALANCE')}`;
+  };
+
+  const isCrossChainSwapsEnabled = useHasFeature(FeatureId.CROSS_CHAIN_SWAPS);
+  const showRunesSwap =
+    (currency === 'FT' && fungibleToken?.protocol === 'runes') || currency === 'BTC';
+  const showSwaps = isCrossChainSwapsEnabled && showRunesSwap;
+
+  const navigateToSwaps = () => {
+    if (!showSwaps) {
+      return;
+    }
+    trackMixPanel(AnalyticsEvents.InitiateSwapFlow, {
+      selectedToken: fungibleToken ? fungibleToken.name ?? fungibleToken.principal : currency,
+    });
+    navigate(`/swap?from=${fungibleToken ? fungibleToken.principal : currency}`);
+  };
+
+  const navigateToReceive = () => {
+    if (fungibleToken) {
+      // RUNES & BRC20s => ordinal wallet, SIP-10 => STX wallet
+      return navigate(`/receive/${fungibleToken?.protocol === 'stacks' ? 'STX' : 'ORD'}`);
+    }
+
+    if (isReceivingAddressesVisible) {
+      return navigate(`/receive/${currency}`);
+    }
+
+    handleReceiveModalOpen();
   };
 
   return (
@@ -214,51 +239,24 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
       </BalanceInfoContainer>
       {renderStackingBalances()}
       <RowButtonContainer>
-        <SmallActionButton src={ArrowUp} text={t('SEND')} onPress={() => goToSendScreen()} />
-        {fungibleToken ? (
-          <>
-            <SmallActionButton
-              src={ArrowDown}
-              text={t('RECEIVE')}
-              // RUNES & BRC20s => ordinal wallet, SIP-10 => STX wallet
-              onPress={() =>
-                navigate(`/receive/${fungibleToken?.protocol === 'stacks' ? 'STX' : 'ORD'}`)
-              }
-            />
-            {showRunesListing && fungibleToken.protocol === 'runes' && (
-              <SmallActionButton
-                src={List}
-                text={t('LIST')}
-                onPress={() => navigate(`/list-rune/${fungibleToken.principal}`)}
-              />
-            )}
-          </>
-        ) : (
-          <>
-            <SmallActionButton
-              src={ArrowDown}
-              text={t('RECEIVE')}
-              onPress={() => {
-                if (isReceivingAddressesVisible) {
-                  navigate(`/receive/${currency}`);
-                } else {
-                  handleReceiveModalOpen();
-                }
-              }}
-            />
-            {showSwaps && (
-              <SmallActionButton
-                src={ArrowSwap}
-                text={t('SWAP')}
-                onPress={() => navigate(`/swap?from=${currency}`)}
-              />
-            )}
-            <SmallActionButton
-              src={Buy}
-              text={t('BUY')}
-              onPress={() => navigate(`/buy/${currency}`)}
-            />
-          </>
+        <SmallActionButton src={ArrowUp} text={t('SEND')} onPress={goToSendScreen} />
+        <SmallActionButton src={ArrowDown} text={t('RECEIVE')} onPress={navigateToReceive} />
+        {showSwaps && (
+          <SmallActionButton src={ArrowSwap} text={t('SWAP')} onPress={navigateToSwaps} />
+        )}
+        {showRunesListing && fungibleToken?.protocol === 'runes' && (
+          <SmallActionButton
+            src={List}
+            text={t('LIST')}
+            onPress={() => navigate(`/list-rune/${fungibleToken.principal}`)}
+          />
+        )}
+        {!fungibleToken && (
+          <SmallActionButton
+            src={Buy}
+            text={t('BUY')}
+            onPress={() => navigate(`/buy/${currency}`)}
+          />
         )}
       </RowButtonContainer>
       <BottomModal

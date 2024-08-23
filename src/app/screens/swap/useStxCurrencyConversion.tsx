@@ -1,11 +1,15 @@
 import { useGetSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
-import { FungibleToken, getFiatEquivalent, microstacksToStx } from '@secretkeylabs/xverse-core';
+import {
+  getFiatEquivalent,
+  microstacksToStx,
+  type FungibleToken,
+} from '@secretkeylabs/xverse-core';
 import { ftDecimals } from '@utils/helper';
 import { AlexSDK, Currency } from 'alex-sdk';
 import BigNumber from 'bignumber.js';
-import { SwapToken } from './types';
+import type { SwapToken } from './types';
 
 // eslint-disable-next-line import/prefer-default-export
 export function useStxCurrencyConversion() {

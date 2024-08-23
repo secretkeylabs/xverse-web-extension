@@ -1,4 +1,4 @@
-import { Account, AccountType } from '@secretkeylabs/xverse-core';
+import type { Account, AccountType } from '@secretkeylabs/xverse-core';
 
 type GetSelectedAccountProps = {
   selectedAccountType: AccountType;

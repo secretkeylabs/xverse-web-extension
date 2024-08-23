@@ -7,7 +7,7 @@ import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import { ArrowLeft, ArrowUp, Share } from '@phosphor-icons/react';
 import NftImage from '@screens/nftDashboard/nftImage';
-import { Attribute } from '@secretkeylabs/xverse-core';
+import type { Attribute } from '@secretkeylabs/xverse-core';
 import { EMPTY_LABEL } from '@utils/constants';
 import { useTranslation } from 'react-i18next';
 import {
@@ -198,7 +198,7 @@ function NftDetailScreen() {
     <GalleryScrollContainer>
       <GalleryContainer>
         <BackButtonContainer>
-          <BackButton onClick={handleBackButtonClick}>
+          <BackButton data-testid="back-button" onClick={handleBackButtonClick}>
             <>
               <ArrowLeft weight="regular" size="20" color="white" />
               <AssetDeatilButtonText>{t('MOVE_TO_ASSET_DETAIL')}</AssetDeatilButtonText>
@@ -232,7 +232,7 @@ function NftDetailScreen() {
     <GalleryScrollContainer>
       <GalleryContainer>
         <BackButtonContainer>
-          <BackButton onClick={handleBackButtonClick}>
+          <BackButton data-testid="back-button" onClick={handleBackButtonClick}>
             <ArrowLeft weight="regular" size="20" color="white" />
             <AssetDeatilButtonText>{t('MOVE_TO_ASSET_DETAIL')}</AssetDeatilButtonText>
           </BackButton>

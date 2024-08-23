@@ -1,11 +1,9 @@
 import {
-  Inscription,
-  InscriptionCollectionsData,
   isBrcTransferValid,
+  type Inscription,
+  type InscriptionCollectionsData,
 } from '@secretkeylabs/xverse-core';
 import type { Color } from 'theme';
-
-export type Brc20Status = 'valid' | 'used';
 
 export const isCollection = (collection: InscriptionCollectionsData): boolean =>
   collection.collection_id !== null;

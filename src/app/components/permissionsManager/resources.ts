@@ -1,5 +1,5 @@
-import { Account, NetworkType } from '@secretkeylabs/xverse-core';
-import { Resource } from './schemas';
+import type { Account, NetworkType } from '@secretkeylabs/xverse-core';
+import type { Resource } from './schemas';
 
 type AccountResourceIdArgs = {
   masterPubKey: Account['masterPubKey'];

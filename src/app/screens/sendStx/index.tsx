@@ -1,12 +1,13 @@
 import TokenImage from '@components/tokenImage';
-import useResetUserFlow from '@hooks/useResetUserFlow';
+import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
+import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core';
 import { isInOptions } from '@utils/helper';
 import SendLayout from 'app/layouts/sendLayout';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { Step, getNextStep, getPreviousStep } from './stepResolver';
 import Step1SelectRecipientAndMemo from './steps/Step1SelectRecipient';
@@ -59,10 +60,16 @@ function SendStxScreen() {
   // Will be used in the future when the summary screen is refactored
   const [, setRecipientDomain] = useState('');
   const [memo, setMemo] = useState(stxMemo ?? '');
+  const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
+  const [searchParams] = useSearchParams();
+  const principal = searchParams.get('principal');
+  const fungibleToken = sip10CoinsList?.find((coin) => coin.principal === principal);
 
   // Step 2 states
   const [amount, setAmount] = useState(
-    amountToSend ? stxToMicrostacks(new BigNumber(amountToSend)).toString() : '',
+    (amountToSend &&
+      (fungibleToken ? amountToSend : stxToMicrostacks(new BigNumber(amountToSend)).toString())) ??
+      '',
   );
   const [sendMax, setSendMax] = useState(false);
   const [feeRate, setFeeRate] = useState(
@@ -88,7 +95,7 @@ function SendStxScreen() {
 
   const header = (
     <TitleContainer>
-      <TokenImage currency="STX" />
+      <TokenImage currency={fungibleToken ? 'FT' : 'STX'} fungibleToken={fungibleToken} />
       <Title>{t('SEND.SEND')}</Title>
     </TitleContainer>
   );
@@ -99,6 +106,7 @@ function SendStxScreen() {
         <SendLayout selectedBottomTab="dashboard" onClickBack={handleBackButtonClick}>
           <Container>
             <Step1SelectRecipientAndMemo
+              dataTestID="address-receive"
               header={header}
               recipientAddress={recipientAddress}
               setRecipientAddress={setRecipientAddress}
@@ -135,12 +143,30 @@ function SendStxScreen() {
               setUnsignedSendStxTx={setUnsignedSendStxTx}
               recipientAddress={recipientAddress}
               memo={memo}
+              fungibleToken={fungibleToken}
             />
           </Container>
         </SendLayout>
       );
     case Step.Confirm:
-      return <Step3Confirm unsignedSendStxTx={unsignedSendStxTx} fee={feeRate} />;
+      return (
+        <Step3Confirm
+          unsignedSendStxTx={unsignedSendStxTx}
+          fee={feeRate}
+          ftConfirmParams={
+            fungibleToken
+              ? {
+                  unsignedTx: unsignedSendStxTx,
+                  amount,
+                  fungibleToken,
+                  memo,
+                  recipientAddress,
+                  selectedFee: stxToMicrostacks(new BigNumber(feeRate)).toString(),
+                }
+              : undefined
+          }
+        />
+      );
     default:
       throw new Error(`Unknown step: ${currentStep}`);
   }

@@ -1,4 +1,6 @@
-import { btcTransaction, BundleSatRange, FungibleToken } from '@secretkeylabs/xverse-core';
+import type { btcTransaction, BundleSatRange, FungibleToken } from '@secretkeylabs/xverse-core';
+
+// TODO this should all be in core and unit tested
 
 export type SatRangeTx = {
   totalSats: number;
@@ -29,8 +31,8 @@ export const isAddressOutput = (
   (output as btcTransaction.TransactionOutput).address !== undefined;
 
 type CommonInputOutputUtilProps = {
-  inputs: btcTransaction.EnhancedInput[];
-  outputs: btcTransaction.EnhancedOutput[];
+  inputs?: btcTransaction.EnhancedInput[];
+  outputs?: btcTransaction.EnhancedOutput[];
   btcAddress: string;
   ordinalsAddress: string;
 };
@@ -41,6 +43,10 @@ export const getNetAmount = ({
   btcAddress,
   ordinalsAddress,
 }: CommonInputOutputUtilProps) => {
+  if (!inputs || !outputs) {
+    return 0;
+  }
+
   const initialValue = 0;
 
   const totalUserSpend = inputs.reduce((accumulator: number, input) => {
@@ -67,7 +73,10 @@ export const getOutputsWithAssetsFromUserAddress = ({
   btcAddress,
   ordinalsAddress,
   outputs,
-}: Omit<CommonInputOutputUtilProps, 'inputs'>) => {
+}: Omit<CommonInputOutputUtilProps, 'inputs'>): {
+  outputsFromPayment: (btcTransaction.TransactionOutput | btcTransaction.TransactionPubKeyOutput)[];
+  outputsFromOrdinal: (btcTransaction.TransactionOutput | btcTransaction.TransactionPubKeyOutput)[];
+} => {
   // we want to discard outputs that are script, are not from user address and do not have inscriptions or satributes
   const outputsFromPayment: (
     | btcTransaction.TransactionOutput
@@ -77,7 +86,7 @@ export const getOutputsWithAssetsFromUserAddress = ({
     | btcTransaction.TransactionOutput
     | btcTransaction.TransactionPubKeyOutput
   )[] = [];
-  outputs.forEach((output) => {
+  outputs?.forEach((output) => {
     if (isScriptOutput(output)) {
       return;
     }
@@ -104,38 +113,44 @@ export const getOutputsWithAssetsFromUserAddress = ({
   return { outputsFromPayment, outputsFromOrdinal };
 };
 
-export const getInputsWitAssetsFromUserAddress = ({
+export const getInputsWithAssetsFromUserAddress = ({
   btcAddress,
   ordinalsAddress,
   inputs,
-}: Omit<CommonInputOutputUtilProps, 'outputs'>) => {
+}: Omit<CommonInputOutputUtilProps, 'outputs'>): {
+  inputsFromPayment: btcTransaction.EnhancedInput[];
+  inputsFromOrdinal: btcTransaction.EnhancedInput[];
+} => {
   // we want to discard inputs that are not from user address and do not have inscriptions or satributes
-  const inputFromPayment: btcTransaction.EnhancedInput[] = [];
-  const inputFromOrdinal: btcTransaction.EnhancedInput[] = [];
-  inputs.forEach((input) => {
+  const inputsFromPayment: btcTransaction.EnhancedInput[] = [];
+  const inputsFromOrdinal: btcTransaction.EnhancedInput[] = [];
+  inputs?.forEach((input) => {
     if (!input.inscriptions.length && !input.satributes.length) {
       return;
     }
 
     if (input.extendedUtxo.address === btcAddress) {
-      return inputFromPayment.push(input);
+      return inputsFromPayment.push(input);
     }
     if (input.extendedUtxo.address === ordinalsAddress) {
-      inputFromOrdinal.push(input);
+      inputsFromOrdinal.push(input);
     }
   });
 
-  return { inputFromPayment, inputFromOrdinal };
+  return { inputsFromPayment, inputsFromOrdinal };
 };
 
 export const getOutputsWithAssetsToUserAddress = ({
   btcAddress,
   ordinalsAddress,
   outputs,
-}: Omit<CommonInputOutputUtilProps, 'inputs'>) => {
+}: Omit<CommonInputOutputUtilProps, 'inputs'>): {
+  outputsToPayment: btcTransaction.TransactionOutput[];
+  outputsToOrdinal: btcTransaction.TransactionOutput[];
+} => {
   const outputsToPayment: btcTransaction.TransactionOutput[] = [];
   const outputsToOrdinal: btcTransaction.TransactionOutput[] = [];
-  outputs.forEach((output) => {
+  outputs?.forEach((output) => {
     // we want to discard outputs that are not spendable or are not to user address
     if (
       isScriptOutput(output) ||

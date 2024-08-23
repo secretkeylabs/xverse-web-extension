@@ -1,7 +1,7 @@
 import ChevronIcon from '@assets/img/swap/chevron.svg';
 import TokenImage from '@components/tokenImage';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { SwapToken } from '@screens/swap/types';
+import { type SwapToken } from '@screens/swap/types';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core';
 import { EMPTY_LABEL } from '@utils/constants';
 import { useTranslation } from 'react-i18next';
@@ -137,7 +137,7 @@ function SwapTokenBlock({
             <CoinButtonArrow src={ChevronIcon} />
           </CoinButtonContainer>
           <AmountInput
-            data-testid="coin-input"
+            data-testid="swap-amount"
             error={error}
             placeholder="0"
             disabled={onAmountChange == null}

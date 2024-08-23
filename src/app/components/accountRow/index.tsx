@@ -4,7 +4,7 @@ import OptionsDialog from '@components/optionsDialog/optionsDialog';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CaretDown, DotsThreeVertical } from '@phosphor-icons/react';
-import { Account, currencySymbolMap } from '@secretkeylabs/xverse-core';
+import { currencySymbolMap, type Account } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import Input from '@ui-library/input';
 import Sheet from '@ui-library/sheet';

@@ -3,7 +3,7 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import { Navigation, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import FeaturedCard, { FeaturedCardProps } from './FeaturedCard';
+import FeaturedCard, { type FeaturedCardProps } from './FeaturedCard';
 
 const CarouselContainer = styled.div`
   margin-top: ${({ theme }) => theme.space.l};

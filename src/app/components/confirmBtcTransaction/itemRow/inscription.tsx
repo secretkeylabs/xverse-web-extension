@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 import Theme from 'theme';
+import { useParsedTxSummaryContext } from '../hooks/useParsedTxSummaryContext';
 
 type Props = {
   inscription: btcTransaction.IOInscription;
@@ -34,7 +35,7 @@ const NumberTypeContainer = styled.div`
 `;
 
 const AvatarContainer = styled.div`
-  margin-right: ${(props) => props.theme.space.xs};
+  margin-right: ${(props) => props.theme.space.m};
 `;
 
 const InscriptionNumber = styled(StyledP)`
@@ -44,6 +45,10 @@ const ContentType = styled(StyledP)`
   word-break: break-word;
 `;
 
+const Dot = styled(StyledP)`
+  margin: 0 ${(props) => props.theme.space.xxs};
+`;
+
 export default function Inscription({
   inscription,
   bundleSize,
@@ -51,6 +56,7 @@ export default function Inscription({
   onShowInscription,
 }: Props) {
   const { t } = useTranslation('translation');
+  const { brc20Summary } = useParsedTxSummaryContext();
 
   return (
     <RowCenter>
@@ -73,7 +79,7 @@ export default function Inscription({
         <div>
           {!hideTypeSizeInfo && (
             <>
-              <StyledP typography="body_medium_m" color="white_200">
+              <StyledP typography="body_medium_m" color="white_0">
                 {t('COMMON.INSCRIPTION')}
               </StyledP>
               {bundleSize && (
@@ -93,24 +99,59 @@ export default function Inscription({
             </>
           )}
         </div>
-        <NumberTypeContainer>
-          <InscriptionNumberContainer
-            type="button"
-            onClick={() => {
-              onShowInscription(inscription);
-            }}
-          >
+        {brc20Summary ? (
+          <NumberTypeContainer>
             <RowCenter>
-              <InscriptionNumber typography="body_medium_m" color="white_200">
-                {inscription.number}
-              </InscriptionNumber>
-              <Eye color={Theme.colors.white_0} size={20} weight="fill" />
+              <StyledP typography="body_medium_m" color="white_0">
+                BRC20 {brc20Summary.op.charAt(0).toUpperCase() + brc20Summary.op.slice(1)}
+              </StyledP>
+              {!!brc20Summary.status && (
+                <>
+                  <Dot typography="body_medium_m" color="white_0">
+                    ·
+                  </Dot>
+                  <StyledP typography="body_medium_m" color={brc20Summary.statusColor}>
+                    {brc20Summary.status}
+                  </StyledP>
+                </>
+              )}
             </RowCenter>
-          </InscriptionNumberContainer>
-          <ContentType typography="body_medium_s" color="white_400">
-            {inscription.contentType}
-          </ContentType>
-        </NumberTypeContainer>
+            <NumericFormat
+              value={brc20Summary.value}
+              displayType="text"
+              thousandSeparator
+              renderText={(text) => (
+                <ContentType typography="body_medium_s" color="white_400">
+                  {text}
+                </ContentType>
+              )}
+              suffix={` ${brc20Summary.tick}`}
+            />
+          </NumberTypeContainer>
+        ) : (
+          <NumberTypeContainer>
+            <InscriptionNumberContainer
+              type="button"
+              onClick={() => {
+                onShowInscription(inscription);
+              }}
+            >
+              <RowCenter>
+                <InscriptionNumber
+                  data-testid="inscription-number"
+                  typography="body_medium_m"
+                  color="white_0"
+                >
+                  {inscription.number}
+                </InscriptionNumber>
+                <Eye color={Theme.colors.white_0} size={20} weight="fill" />
+              </RowCenter>
+            </InscriptionNumberContainer>
+            <ContentType typography="body_medium_s" color="white_400">
+              {inscription.contentType}
+            </ContentType>
+          </NumberTypeContainer>
+        )}
       </RowCenter>
     </RowCenter>
   );

@@ -5,7 +5,7 @@ import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
 import { formatNumber } from '@utils/helper';
 import axios from 'axios';
 import BigNumber from 'bignumber.js';
-import { MouseEvent as ReactMouseEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { ContentType } from './common';

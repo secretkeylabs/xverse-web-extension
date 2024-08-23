@@ -1,6 +1,6 @@
 import TokenTicker from '@assets/img/dashboard/stx_icon.svg';
 import useStackingData from '@hooks/queries/useStackingData';
-import { StackingState } from '@secretkeylabs/xverse-core';
+import { type StackingState } from '@secretkeylabs/xverse-core';
 import { XVERSE_WEB_POOL_URL } from '@utils/constants';
 import { useTranslation } from 'react-i18next';
 import {

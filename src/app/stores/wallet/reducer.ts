@@ -28,9 +28,9 @@ import {
   UpdateLedgerAccountsKey,
   UpdateSavedNamesKey,
   UpdateSoftwareAccountsKey,
-  WalletActions,
   WalletSessionPeriods,
-  WalletState,
+  type WalletActions,
+  type WalletState,
 } from './actions/types';
 
 /*

@@ -5,8 +5,8 @@ import { makeAccountResourceId } from '@components/permissionsManager/resources'
 import * as utils from '@components/permissionsManager/utils';
 import {
   RpcErrorCode,
-  RpcRequestMessage,
   getRunesBalanceRequestMessageSchema,
+  type RpcRequestMessage,
 } from '@sats-connect/core';
 import { getRunesClient } from '@secretkeylabs/xverse-core';
 import rootStore from '@stores/index';

@@ -5,23 +5,28 @@ import useNetworkSelector from '@hooks/useNetwork';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  StacksTransaction,
   buf2hex,
   generateUnsignedStxTokenTransferTransaction,
+  generateUnsignedTransaction,
   getStxFiatEquivalent,
   microstacksToStx,
   stxToMicrostacks,
+  type FungibleToken,
+  type StacksTransaction,
 } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction, estimateTransaction } from '@stacks/transactions';
-import SelectFeeRate, { FeeRates } from '@ui-components/selectFeeRate';
+import SelectFeeRate, { type FeeRates } from '@ui-components/selectFeeRate';
 import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
+import { convertAmountToFtDecimalPlaces } from '@utils/helper';
+import { getFtBalance } from '@utils/tokens';
 import { modifyRecommendedStxFees } from '@utils/transactions/transactions';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import FtAmountSelector from '../ftAmountSelector';
 import StxAmountSelector from '../stxAmountSelector';
 
 const Container = styled.div`
@@ -57,6 +62,7 @@ type Props = {
   memo: string;
   unsignedSendStxTx: string;
   setUnsignedSendStxTx: (unsignedSendStxTx: string) => void;
+  fungibleToken?: FungibleToken;
 };
 
 function Step2SelectAmount({
@@ -76,15 +82,17 @@ function Step2SelectAmount({
   header,
   unsignedSendStxTx,
   setUnsignedSendStxTx,
+  fungibleToken,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
 
-  const { stxPublicKey } = useSelectedAccount();
+  const { stxAddress, stxPublicKey } = useSelectedAccount();
   const { fiatCurrency, feeMultipliers } = useWalletSelector();
   const { data: stxData } = useStxWalletData();
   const { btcFiatRate, stxBtcRate } = useCoinRates();
   const stxBalance = stxData?.availableBalance.toString() ?? '0';
+  const ftBalance = fungibleToken ? getFtBalance(fungibleToken) : '0';
 
   const stxToFiat = (stx: string) =>
     getStxFiatEquivalent(
@@ -95,15 +103,24 @@ function Step2SelectAmount({
 
   const hasStx = +stxBalance > 0;
 
-  const hasInsufficientFunds =
+  let hasInsufficientFunds =
     amount &&
     new BigNumber(stxBalance).isLessThan(
       new BigNumber(amount).plus(stxToMicrostacks(new BigNumber(fee ?? 0))),
     );
 
+  if (fungibleToken) {
+    hasInsufficientFunds =
+      amount &&
+      (new BigNumber(ftBalance).isLessThan(new BigNumber(amount)) ||
+        new BigNumber(stxBalance).isLessThan(stxToMicrostacks(new BigNumber(fee ?? 0))));
+  }
+
   useEffect(() => {
     if (sendMax) {
-      const newAmount = new BigNumber(stxBalance).minus(stxToMicrostacks(new BigNumber(fee ?? 0)));
+      const newAmount = fungibleToken
+        ? new BigNumber(ftBalance)
+        : new BigNumber(stxBalance).minus(stxToMicrostacks(new BigNumber(fee ?? 0)));
 
       if (newAmount.isGreaterThan(new BigNumber(0))) {
         setAmount(newAmount.toString());
@@ -123,6 +140,34 @@ function Step2SelectAmount({
     const createTx = async () => {
       try {
         setIsLoading(true);
+
+        if (fungibleToken) {
+          // Create FT transfer transaction
+          let convertedAmount = amount;
+          if (amount && fungibleToken.decimals) {
+            convertedAmount = convertAmountToFtDecimalPlaces(
+              amount,
+              fungibleToken.decimals,
+            ).toString();
+          }
+
+          const rawUnsignedSendFtTx: StacksTransaction = await generateUnsignedTransaction({
+            amount: convertedAmount,
+            senderAddress: stxAddress,
+            recipientAddress,
+            contractAddress: fungibleToken.principal.split('.')[0],
+            contractName: fungibleToken.principal.split('.')[1],
+            assetName: fungibleToken?.assetName ?? '',
+            publicKey: stxPublicKey,
+            network: selectedNetwork,
+            pendingTxs: stxPendingTxData?.pendingTransactions ?? [],
+            memo,
+          });
+          setUnsignedSendStxTx(buf2hex(rawUnsignedSendFtTx.serialize()));
+          return;
+        }
+
+        // Create STX transfer transaction
         const rawUnsignedSendStxTx: StacksTransaction =
           await generateUnsignedStxTokenTransferTransaction(
             recipientAddress,
@@ -151,6 +196,8 @@ function Step2SelectAmount({
     setUnsignedSendStxTx,
     stxPendingTxData?.pendingTransactions,
     stxPublicKey,
+    fungibleToken,
+    stxAddress,
   ]);
 
   // Reactively estimate fees
@@ -196,13 +243,24 @@ function Step2SelectAmount({
     <Container>
       <div>
         {header}
-        <StxAmountSelector
-          amount={amount}
-          setAmount={setAmount}
-          sendMax={sendMax}
-          setSendMax={setSendMax}
-          disabled={!hasStx}
-        />
+        {fungibleToken ? (
+          <FtAmountSelector
+            amount={amount}
+            setAmount={setAmount}
+            sendMax={sendMax}
+            setSendMax={setSendMax}
+            disabled={!hasStx}
+            fungibleToken={fungibleToken}
+          />
+        ) : (
+          <StxAmountSelector
+            amount={amount}
+            setAmount={setAmount}
+            sendMax={sendMax}
+            setSendMax={setSendMax}
+            disabled={!hasStx}
+          />
+        )}
         {hasStx && (
           <FeeRateContainer>
             <SelectFeeRate
@@ -235,6 +293,7 @@ function Step2SelectAmount({
         )}
         {!hasStx && (
           <Callout
+            dataTestID="no-funds-message"
             titleText={t('BTC.NO_FUNDS_TITLE')}
             bodyText={t('BTC.NO_FUNDS')}
             redirectText={t('STX.BUY_STX')}

@@ -1,5 +1,5 @@
 import { animated, useSpring } from '@react-spring/web';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import styled from 'styled-components';
 
 const ContainerInner = styled(animated.div)((props) => ({

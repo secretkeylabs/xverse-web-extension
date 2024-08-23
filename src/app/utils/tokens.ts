@@ -1,10 +1,11 @@
 import {
-  FungibleToken,
+  getFiatEquivalent,
   microstacksToStx,
   satsToBtc,
-  StxAddressData,
+  type FungibleToken,
+  type StxAddressData,
 } from '@secretkeylabs/xverse-core';
-import { CurrencyTypes } from '@utils/constants';
+import type { CurrencyTypes } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import { ftDecimals, getTicker } from './helper';
 
@@ -42,3 +43,32 @@ export function getBalanceAmount(
       return '';
   }
 }
+
+export const sortFtByFiatBalance = (
+  a: FungibleToken,
+  b: FungibleToken,
+  stxBtcRate: string,
+  btcFiatRate: string,
+) => {
+  const aFiatAmount = getFiatEquivalent(
+    Number(getFtBalance(a)),
+    'FT',
+    BigNumber(stxBtcRate),
+    BigNumber(btcFiatRate),
+    a,
+  );
+  const bFiatAmount = getFiatEquivalent(
+    Number(getFtBalance(b)),
+    'FT',
+    BigNumber(stxBtcRate),
+    BigNumber(btcFiatRate),
+    b,
+  );
+  // Handle empty values explicitly
+  if (aFiatAmount === '' && bFiatAmount === '') return 0;
+  if (aFiatAmount === '') return 1;
+  if (bFiatAmount === '') return -1;
+  const aAmount = BigNumber(aFiatAmount || 0);
+  const bAmount = BigNumber(bFiatAmount || 0);
+  return aAmount.isLessThan(bAmount) ? 1 : aAmount.isGreaterThan(bAmount) ? -1 : 0;
+};

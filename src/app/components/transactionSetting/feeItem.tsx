@@ -23,6 +23,15 @@ const FeeItemContainer = styled.button<{
   background: ${(props) => (props.isSelected ? props.theme.colors.elevation6_600 : 'transparent')};
   margin-top: ${(props) => props.theme.space.xs};
   flex: 1;
+  transition: background-color 0.1s ease;
+
+  &:hover:enabled {
+    background-color: ${(props) => props.theme.colors.elevation6_400};
+  }
+
+  &:active:enabled {
+    background-color: ${(props) => props.theme.colors.elevation6_600};
+  }
 `;
 
 const IconContainer = styled.div`
@@ -147,13 +156,13 @@ function FeeItem({
           <StyledSubText
             typography="body_medium_s"
             color="white_200"
-          >{`${feeRate} Sats/ vByte`}</StyledSubText>
+          >{`${feeRate} sats/vB`}</StyledSubText>
         </ColumnsTexts>
 
         <EndColumnTexts>
           {totalFee && (
             <StyledHeading typography="body_medium_m" color="white_0">
-              {`${totalFee} Sats`}
+              {`${totalFee} sats`}
             </StyledHeading>
           )}
           <StyledFiatAmountText fiatAmount={fiatAmount} fiatCurrency={fiatCurrency} />

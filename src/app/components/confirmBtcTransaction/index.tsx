@@ -1,25 +1,25 @@
 import { delay } from '@common/utils/ledger';
-import ActionButton from '@components/button';
-import { Tab } from '@components/tabBar';
+import {
+  ParsedTxSummaryContext,
+  type ParsedTxSummaryContextProps,
+  useParsedTxSummaryContext,
+} from '@components/confirmBtcTransaction/hooks/useParsedTxSummaryContext';
+import TransactionSummary from '@components/confirmBtcTransaction/transactionSummary';
+import type { Tab } from '@components/tabBar';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import TransportFactory from '@ledgerhq/hw-transport-webusb';
-import {
-  RuneSummary,
-  RuneSummaryActions,
-  Transport,
-  btcTransaction,
-} from '@secretkeylabs/xverse-core';
-import Callout from '@ui-library/callout';
+import type { Transport } from '@secretkeylabs/xverse-core';
+import Button from '@ui-library/button';
+import Callout, { type CalloutProps } from '@ui-library/callout';
 import { StickyHorizontalSplitButtonContainer, StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
 import { isLedgerAccount } from '@utils/helper';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import SendLayout from '../../layouts/sendLayout';
 import LedgerStepView, { Steps } from './ledgerStepView';
-import TransactionSummary from './transactionSummary';
 
 const LoaderContainer = styled.div(() => ({
   display: 'flex',
@@ -49,11 +49,9 @@ const SuccessActionsContainer = styled.div((props) => ({
 }));
 
 type Props = {
-  inputs: btcTransaction.EnhancedInput[];
-  outputs: btcTransaction.EnhancedOutput[];
-  feeOutput?: btcTransaction.TransactionFeeOutput;
-  runeSummary?: RuneSummaryActions | RuneSummary;
-  showCenotaphCallout: boolean;
+  summary?: ParsedTxSummaryContextProps['summary'];
+  runeSummary?: ParsedTxSummaryContextProps['runeSummary'];
+  brc20Summary?: ParsedTxSummaryContextProps['brc20Summary'];
   isLoading: boolean;
   isSubmitting: boolean;
   isBroadcast?: boolean;
@@ -72,20 +70,14 @@ type Props = {
   ) => Promise<number | undefined>;
   onFeeRateSet?: (feeRate: number) => void;
   feeRate?: number;
-  isFinal?: boolean;
-  // TODO: add sighash single warning
-  hasSigHashSingle?: boolean;
-  hasSigHashNone?: boolean;
   title?: string;
   selectedBottomTab?: Tab;
+  customCallout?: CalloutProps;
 };
 
 function ConfirmBtcTransaction({
-  inputs,
-  outputs,
-  feeOutput,
+  summary,
   runeSummary,
-  showCenotaphCallout,
   isLoading,
   isSubmitting,
   isBroadcast,
@@ -101,18 +93,22 @@ function ConfirmBtcTransaction({
   getFeeForFeeRate,
   onFeeRateSet,
   feeRate,
-  hasSigHashNone = false,
-  isFinal = true,
-  hasSigHashSingle = false,
   title,
   selectedBottomTab,
+  brc20Summary,
+  customCallout,
 }: Props) {
+  const parsedTxSummaryContextValue = useMemo(
+    () => ({ summary, runeSummary, brc20Summary }),
+    [summary, runeSummary, brc20Summary],
+  );
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [currentStep, setCurrentStep] = useState(Steps.ConnectLedger);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isConnectSuccess, setIsConnectSuccess] = useState(false);
   const [isConnectFailed, setIsConnectFailed] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
+  const { hasInsufficientRunes, hasSigHashNone, validMintingRune } = useParsedTxSummaryContext();
 
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { t: signatureRequestTranslate } = useTranslation('translation', {
@@ -121,17 +117,11 @@ function ConfirmBtcTransaction({
   const selectedAccount = useSelectedAccount();
 
   const hideBackButton = !onBackClick;
-  const hasInsufficientRunes =
-    runeSummary?.transfers?.some((transfer) => !transfer.hasSufficientBalance) ?? false;
-  const validMintingRune =
-    !runeSummary?.mint ||
-    (runeSummary?.mint && runeSummary.mint.runeIsOpen && runeSummary.mint.runeIsMintable);
 
   const onConfirmPress = async () => {
     if (!isLedgerAccount(selectedAccount)) {
       return onConfirm();
     }
-
     // show ledger connection screens
     setIsModalVisible(true);
   };
@@ -189,7 +179,8 @@ function ConfirmBtcTransaction({
       <Spinner size={50} />
     </LoaderContainer>
   ) : (
-    <>
+    <ParsedTxSummaryContext.Provider value={parsedTxSummaryContextValue}>
+      {/* TODO start a new layout. SendLayout was not intended for the review screens */}
       <SendLayout
         selectedBottomTab={selectedBottomTab ?? 'dashboard'}
         onClickBack={onBackClick}
@@ -200,6 +191,7 @@ function ConfirmBtcTransaction({
         <ReviewTransactionText typography="headline_s">
           {title || t('REVIEW_TRANSACTION')}
         </ReviewTransactionText>
+        {/* TODO: add sighash single warning */}
         {hasSigHashNone && (
           <SpacedCallout
             variant="danger"
@@ -208,13 +200,8 @@ function ConfirmBtcTransaction({
           />
         )}
         {!isBroadcast && <SpacedCallout bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />}
+        {customCallout && <Callout {...customCallout} />}
         <TransactionSummary
-          runeSummary={runeSummary}
-          inputs={inputs}
-          outputs={outputs}
-          feeOutput={feeOutput}
-          transactionIsFinal={isFinal}
-          showCenotaphCallout={showCenotaphCallout}
           getFeeForFeeRate={getFeeForFeeRate}
           onFeeRateSet={onFeeRateSet}
           feeRate={feeRate}
@@ -222,13 +209,13 @@ function ConfirmBtcTransaction({
         />
         {!isLoading && (
           <StickyHorizontalSplitButtonContainer>
-            <ActionButton onPress={onCancel} text={cancelText} transparent />
-            <ActionButton
-              onPress={onConfirmPress}
+            <Button onClick={onCancel} title={cancelText} variant="secondary" />
+            <Button
+              onClick={onConfirmPress}
               disabled={confirmDisabled || hasInsufficientRunes || !validMintingRune}
-              processing={isSubmitting}
-              text={hasInsufficientRunes ? t('INSUFFICIENT_BALANCE') : confirmText}
-              warning={isError || hasInsufficientRunes}
+              loading={isSubmitting}
+              title={hasInsufficientRunes ? t('INSUFFICIENT_BALANCE') : confirmText}
+              variant={isError || hasInsufficientRunes ? 'danger' : 'primary'}
             />
           </StickyHorizontalSplitButtonContainer>
         )}
@@ -244,27 +231,27 @@ function ConfirmBtcTransaction({
         />
         <SuccessActionsContainer>
           {currentStep === Steps.ExternalInputs && !isTxRejected && !isConnectFailed ? (
-            <ActionButton onPress={goToConfirmationStep} text={t('LEDGER.CONTINUE_BUTTON')} />
+            <Button onClick={goToConfirmationStep} title={t('LEDGER.CONTINUE_BUTTON')} />
           ) : (
             <>
-              <ActionButton
-                onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}
-                text={signatureRequestTranslate(
+              <Button
+                onClick={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}
+                title={signatureRequestTranslate(
                   isTxRejected || isConnectFailed ? 'LEDGER.RETRY_BUTTON' : 'LEDGER.CONNECT_BUTTON',
                 )}
                 disabled={isButtonDisabled}
-                processing={isButtonDisabled}
+                loading={isButtonDisabled}
               />
-              <ActionButton
-                onPress={onCancel}
-                text={signatureRequestTranslate('LEDGER.CANCEL_BUTTON')}
-                transparent
+              <Button
+                onClick={onCancel}
+                title={signatureRequestTranslate('LEDGER.CANCEL_BUTTON')}
+                variant="secondary"
               />
             </>
           )}
         </SuccessActionsContainer>
       </Sheet>
-    </>
+    </ParsedTxSummaryContext.Provider>
   );
 }
 

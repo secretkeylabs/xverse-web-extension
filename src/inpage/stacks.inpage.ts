@@ -1,16 +1,16 @@
 import {
-  AuthenticationRequestEventDetails,
   DomEventName,
-  SignatureRequestEventDetails,
-  TransactionRequestEventDetails,
+  type AuthenticationRequestEventDetails,
+  type SignatureRequestEventDetails,
+  type TransactionRequestEventDetails,
 } from '@common/types/inpage-types';
 import {
-  AuthenticationResponseMessage,
-  SignatureResponseMessage,
   StacksLegacyMethods,
-  TransactionResponseMessage,
+  type AuthenticationResponseMessage,
+  type SignatureResponseMessage,
+  type TransactionResponseMessage,
 } from '@common/types/message-types';
-import { StacksProvider } from '@stacks/connect';
+import type { StacksProvider } from '@stacks/connect';
 import { callAndReceive, isValidLegacyEvent } from './utils';
 
 declare const VERSION: string;

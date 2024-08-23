@@ -1,4 +1,4 @@
-import { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
+import type { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
 import ConfirmStxTransactionComponent from '@components/confirmStxTransactionComponent';
 import TransferMemoView from '@components/confirmStxTransactionComponent/transferMemoView';
 import RecipientComponent from '@components/recipientComponent';
@@ -11,10 +11,10 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   AnalyticsEvents,
-  StacksTransaction,
   broadcastSignedTransaction,
   microstacksToStx,
   stxToMicrostacks,
+  type StacksTransaction,
 } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
@@ -36,8 +36,9 @@ function ConfirmFtTransaction() {
     fungibleToken,
     memo,
     recipientAddress,
+    selectedFee,
   } = location.state;
-  const [fee, setFee] = useState<BigNumber>();
+  const [fee, setFee] = useState(BigNumber(selectedFee));
   const unsignedTx = useMemo(() => deserializeTransaction(unsignedTxHex), [unsignedTxHex]);
   const { refetch } = useStxWalletData();
   const selectedAccount = useSelectedAccount();
@@ -102,13 +103,16 @@ function ConfirmFtTransaction() {
     mutate({ signedTx: txs[0] });
   };
 
+  const handleCancelClick = () => {
+    navigate(`/coinDashboard/FT?ftKey=${fungibleToken?.principal}&protocol=stacks`);
+  };
+
   const handleBackButtonClick = () => {
-    navigate('/send-sip10', {
+    navigate(`/send-stx?principal=${fungibleToken?.principal}`, {
       state: {
         recipientAddress,
         amountToSend: amount.toString(),
         stxMemo: memo,
-        fungibleToken,
       },
     });
   };
@@ -120,7 +124,7 @@ function ConfirmFtTransaction() {
         initialStxTransactions={[unsignedTx]}
         loading={isLoading}
         onConfirmClick={handleOnConfirmClick}
-        onCancelClick={handleBackButtonClick}
+        onCancelClick={handleCancelClick}
         skipModal={isLedgerAccount(selectedAccount)}
         fee={fee ? microstacksToStx(fee).toString() : undefined}
         setFeeRate={(feeRate: string) => {

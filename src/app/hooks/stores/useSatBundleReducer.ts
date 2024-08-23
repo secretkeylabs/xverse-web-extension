@@ -2,7 +2,7 @@ import {
   setSelectedSatBundleAction,
   setSelectedSatBundleItemIndexAction,
 } from '@stores/nftData/actions/actionCreator';
-import { NftDataState } from '@stores/nftData/actions/types';
+import type { NftDataState } from '@stores/nftData/actions/types';
 import { useDispatch } from 'react-redux';
 
 const useSatBundleDataReducer = () => {

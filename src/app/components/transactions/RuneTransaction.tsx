@@ -1,5 +1,5 @@
 import useWalletSelector from '@hooks/useWalletSelector';
-import { GetRunesActivityForAddressEvent } from '@secretkeylabs/xverse-core';
+import type { GetRunesActivityForAddressEvent } from '@secretkeylabs/xverse-core';
 import { ftDecimals, getBtcTxStatusUrl } from '@utils/helper';
 import { useCallback } from 'react';
 import styled from 'styled-components';
@@ -65,7 +65,7 @@ export default function RuneTransactionHistoryItem({
   }, []);
 
   return (
-    <TransactionContainer onClick={openBtcTxStatusLink}>
+    <TransactionContainer data-testid="transaction-container" onClick={openBtcTxStatusLink}>
       <TransactionStatusIcon transaction={transaction} currency={currency} protocol={protocol} />
       <TransactionInfoContainer>
         <TransactionRow>
@@ -73,7 +73,7 @@ export default function RuneTransactionHistoryItem({
             <TransactionTitle transaction={transaction} />
             <TransactionRecipient transaction={transaction} />
           </div>
-          <TransactionAmountContainer>
+          <TransactionAmountContainer data-testid="transaction-amount">
             <TransactionAmount
               transaction={{ ...transaction, amount: ftDecimals(transaction.amount, runeDecimals) }}
               currency={currency}

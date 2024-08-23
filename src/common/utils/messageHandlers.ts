@@ -1,4 +1,4 @@
-import { BackgroundMessages } from 'common/types/messages';
+import type { BackgroundMessages } from 'common/types/messages';
 
 function validateMessagesAreFromExtension(sender: chrome.runtime.MessageSender) {
   // Only respond to internal messages from our UI, not content scripts in other applications

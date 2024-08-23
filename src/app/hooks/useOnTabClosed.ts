@@ -1,5 +1,5 @@
 import { InternalMethods } from '@common/types/message-types';
-import { BackgroundMessages } from '@common/types/messages';
+import type { BackgroundMessages } from '@common/types/messages';
 import { useEffect } from 'react';
 
 export default function useOnOriginTabClose(tabId: number, handler: () => void) {

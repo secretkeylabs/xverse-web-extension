@@ -179,7 +179,7 @@ function StxAmountSelector({ amount, setAmount, sendMax, setSendMax, disabled = 
           thousandSeparator
           prefix={useStxValue ? '' : `~ ${currencySymbolMap[fiatCurrency]}`}
           renderText={(value: string) => (
-            <div>
+            <div data-testid="balance-label">
               <BalanceText>{t('BALANCE')}</BalanceText> {value} {useStxValue ? 'STX' : fiatCurrency}
             </div>
           )}

@@ -45,7 +45,7 @@ function App(): React.ReactNode {
                     position="bottom-center"
                     containerStyle={{ bottom: 32 }}
                     toastOptions={{
-                      duration: 1500,
+                      duration: 2000,
                       success: {
                         icon: (
                           <StyledIcon>

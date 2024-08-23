@@ -1,7 +1,8 @@
 /* eslint-disable import/prefer-default-export */
-import { Return } from '@sats-connect/core';
+/* eslint-disable import/prefer-default-export */
+import type { Return } from '@sats-connect/core';
 import { makeRpcSuccessResponse, sendRpcResponse } from '../helpers';
-import { BaseArgs } from './types';
+import type { BaseArgs } from './types';
 
 type GetBalanceSuccess = BaseArgs & {
   result: Return<'getBalance'>;
@@ -22,5 +23,16 @@ export function sendGetAddressesSuccessResponseMessage({
   messageId,
   result,
 }: GetAddressesSuccess) {
+  sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
+}
+
+type SignMessageSuccess = BaseArgs & {
+  result: Return<'signMessage'>;
+};
+export function sendSignMessageSuccessResponseMessage({
+  tabId,
+  messageId,
+  result,
+}: SignMessageSuccess) {
   sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
 }

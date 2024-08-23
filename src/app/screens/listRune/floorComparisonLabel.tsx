@@ -28,6 +28,7 @@ function FloorComparisonLabel({
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'LIST_RUNE_SCREEN' });
   const percentageDifference = ((priceSats / floorPriceSats - 1) * 100).toFixed(2);
+  const noFloorPrice = floorPriceSats === 0;
   return (
     <div>
       {lowError && (
@@ -46,7 +47,7 @@ function FloorComparisonLabel({
           </StyledP>
         </FlexContainer>
       )}
-      {!lowError && !highError && (
+      {!lowError && !highError && !noFloorPrice && (
         <>
           {priceSats === floorPriceSats && (
             <StyledP typography={typography} color="white_200">

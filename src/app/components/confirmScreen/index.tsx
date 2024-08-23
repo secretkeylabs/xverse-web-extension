@@ -1,5 +1,5 @@
-import ActionButton from '@components/button';
-import { ReactNode } from 'react';
+import Button from '@ui-library/button';
+import type { ReactNode } from 'react';
 import styled from 'styled-components';
 
 const MainContainer = styled.div`
@@ -54,14 +54,14 @@ function ConfirmScreen({
     <>
       <MainContainer>{children}</MainContainer>
       <ButtonsContainer>
-        <ActionButton onPress={onCancel} text={cancelText} transparent />
+        <Button onClick={onCancel} title={cancelText} variant="secondary" />
         <ConfirmButtonContainer>
-          <ActionButton
-            onPress={onConfirm}
+          <Button
+            onClick={onConfirm}
             disabled={disabled}
-            processing={loading}
-            text={confirmText}
-            warning={isError}
+            loading={loading}
+            title={confirmText}
+            variant={isError ? 'danger' : 'primary'}
           />
         </ConfirmButtonContainer>
       </ButtonsContainer>

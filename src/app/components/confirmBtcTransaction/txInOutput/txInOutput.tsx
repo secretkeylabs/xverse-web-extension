@@ -1,6 +1,6 @@
 import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
+import { useParsedTxSummaryContext } from '@components/confirmBtcTransaction/hooks/useParsedTxSummaryContext';
 import { animated, config, useSpring } from '@react-spring/web';
-import { btcTransaction } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -14,7 +14,7 @@ const Container = styled.div((props) => ({
   flexDirection: 'column',
   borderRadius: props.theme.space.s,
   background: props.theme.colors.elevation1,
-  padding: `${props.theme.space.s} ${props.theme.space.m}`,
+  padding: props.theme.space.m,
   marginBottom: props.theme.space.s,
 }));
 
@@ -33,7 +33,7 @@ const Row = styled.div`
 `;
 
 const OutputTitleText = styled(StyledP)((props) => ({
-  marginBottom: props.theme.space.s,
+  marginBottom: props.theme.space.m,
 }));
 
 const ExpandedContainer = styled(animated.div)((props) => ({
@@ -42,15 +42,11 @@ const ExpandedContainer = styled(animated.div)((props) => ({
   marginTop: props.theme.space.m,
 }));
 
-type Props = {
-  inputs: btcTransaction.EnhancedInput[];
-  outputs: btcTransaction.EnhancedOutput[];
-};
-
-function TxInOutput({ inputs, outputs }: Props) {
+function TxInOutput() {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
+  const { summary } = useParsedTxSummaryContext();
 
   const slideInStyles = useSpring({
     config: { ...config.gentle, duration: 400 },
@@ -72,7 +68,7 @@ function TxInOutput({ inputs, outputs }: Props) {
     <Container>
       <Button type="button" onClick={() => setIsExpanded((prevState) => !prevState)}>
         <Row>
-          <StyledP typography="body_medium_m" color="white_200">
+          <StyledP typography="body_medium_m" color="white_400">
             {isExpanded ? t('INPUT') : t('INPUT_AND_OUTPUT')}
           </StyledP>
         </Row>
@@ -80,13 +76,13 @@ function TxInOutput({ inputs, outputs }: Props) {
       </Button>
       {isExpanded && (
         <ExpandedContainer style={slideInStyles}>
-          {inputs.map((input) => (
+          {summary?.inputs.map((input) => (
             <TransactionInput input={input} key={input.extendedUtxo.outpoint} />
           ))}
-          <OutputTitleText typography="body_medium_m" color="white_200">
+          <OutputTitleText typography="body_medium_m" color="white_400">
             {t('OUTPUT')}
           </OutputTitleText>
-          {outputs.map((output, index) => (
+          {summary?.outputs.map((output, index) => (
             <TransactionOutput
               // eslint-disable-next-line react/no-array-index-key
               key={index}

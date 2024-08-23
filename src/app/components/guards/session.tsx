@@ -1,6 +1,6 @@
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSession from '@hooks/useWalletSession';
-import { ReactNode, useLayoutEffect, useState } from 'react';
+import { useLayoutEffect, useState, type ReactNode } from 'react';
 
 interface SessionGuardProps {
   children: ReactNode;

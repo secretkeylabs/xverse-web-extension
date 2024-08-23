@@ -1,8 +1,8 @@
 import {
-  LegacyMessageToContentScript,
   MESSAGE_SOURCE,
-  SatsConnectMessageToContentScript,
   StacksLegacyMethods,
+  type LegacyMessageToContentScript,
+  type SatsConnectMessageToContentScript,
 } from '@common/types/message-types';
 
 type CallableMethods = keyof typeof StacksLegacyMethods;
@@ -22,11 +22,6 @@ export const isValidLegacyEvent = (
   const correctSource = data.source === MESSAGE_SOURCE;
   const correctMethod = data.method === method;
   return correctSource && correctMethod && !!data.payload;
-};
-
-export const isValidRpcEvent = (event: MessageEvent) => {
-  const { data } = event;
-  return data.source === MESSAGE_SOURCE;
 };
 
 export const callAndReceive = async (

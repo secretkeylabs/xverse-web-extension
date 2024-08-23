@@ -5,8 +5,8 @@ import { useEffect, useMemo, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import {
   WalletExistsContext,
-  WalletExistsContextProps,
   useWalletExistsContext,
+  type WalletExistsContextProps,
 } from './WalletExistsContext';
 
 interface WalletExistsGuardProps {

@@ -1,16 +1,16 @@
-import { RpcErrorResponse } from '@sats-connect/core';
-import { SignatureData } from '@stacks/connect';
+import { type RpcErrorResponse } from '@sats-connect/core';
+import { type SignatureData } from '@stacks/connect';
 import { getOriginFromPort, getTabIdFromPort } from '.';
 import {
   InternalMethods,
-  LegacyMessageFromContentScript,
-  LegacyMessageToContentScript,
   MESSAGE_SOURCE,
-  SatsConnectMessageFromContentScript,
-  SatsConnectMessageToContentScript,
   SatsConnectMethods,
-  SignatureResponseMessage,
   StacksLegacyMethods,
+  type LegacyMessageFromContentScript,
+  type LegacyMessageToContentScript,
+  type SatsConnectMessageFromContentScript,
+  type SatsConnectMessageToContentScript,
+  type SignatureResponseMessage,
 } from '../types/message-types';
 import { sendMessage } from '../types/messages';
 import popupCenter from './popup-center';

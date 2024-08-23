@@ -1,4 +1,8 @@
-import { getBnsNftName, NonFungibleToken, StacksCollectionData } from '@secretkeylabs/xverse-core';
+import {
+  getBnsNftName,
+  type NonFungibleToken,
+  type StacksCollectionData,
+} from '@secretkeylabs/xverse-core';
 
 export const getNftsTabGridItemSubText = (collection: StacksCollectionData) =>
   collection?.all_nfts?.length > 1 ? `${collection.all_nfts.length} Items` : '1 Item';

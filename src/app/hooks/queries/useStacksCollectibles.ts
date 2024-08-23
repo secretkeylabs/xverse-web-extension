@@ -1,6 +1,6 @@
 import useNetworkSelector from '@hooks/useNetwork';
 import useSelectedAccount from '@hooks/useSelectedAccount';
-import { getNftCollections, StacksCollectionList } from '@secretkeylabs/xverse-core';
+import { getNftCollections, type StacksCollectionList } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import { handleRetries } from '@utils/query';
 

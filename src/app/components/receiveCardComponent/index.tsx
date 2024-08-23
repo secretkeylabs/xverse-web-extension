@@ -3,7 +3,7 @@ import QrCode from '@assets/img/nftDashboard/QrCode.svg';
 import Tick from '@assets/img/tick.svg';
 import ActionButton from '@components/button';
 import { getShortTruncatedAddress } from '@utils/helper';
-import { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
@@ -114,11 +114,11 @@ function ReceiveCardComponent({
   };
 
   return (
-    <ReceiveCard className={className}>
+    <ReceiveCard data-testid="address-div" className={className}>
       <ColumnContainer>
         {children}
         <TitleText>{title}</TitleText>
-        <AddressText>
+        <AddressText data-testid="address-label">
           {showVerifyButton ? addressText : getShortTruncatedAddress(address)}
         </AddressText>
       </ColumnContainer>
@@ -147,7 +147,7 @@ function ReceiveCardComponent({
             place="top"
             hidden={!isCopied}
           />
-          <Button onClick={onQrAddressClick}>
+          <Button data-testid="qr-button" onClick={onQrAddressClick}>
             <ButtonIcon src={QrCode} />
           </Button>
         </RowContainer>

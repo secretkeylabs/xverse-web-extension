@@ -8,11 +8,10 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import {
   AnalyticsEvents,
   FeatureId,
-  FungibleToken,
-  RuneSummary,
-  Transport,
   btcTransaction,
   parseSummaryForRunes,
+  type RuneSummary,
+  type Transport,
 } from '@secretkeylabs/xverse-core';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
@@ -37,8 +36,10 @@ function SendRuneScreen() {
   const selectedAccount = useSelectedAccount();
   const { network } = useWalletSelector();
   const { data: runesCoinsList } = useRuneFungibleTokensQuery();
-  const context = useTransactionContext();
-  const [recipientAddress, setRecipientAddress] = useState(location.state?.recipientAddress || '');
+  // TODO: can we remove location.state here?
+  const [recipientAddress, setRecipientAddress] = useState<string>(
+    location.state?.recipientAddress || '',
+  );
   const [amountError, setAmountError] = useState('');
   const [amountToSend, setAmountToSend] = useState<string>(location.state?.amount || '');
   const [feeRate, setFeeRate] = useState('');
@@ -118,7 +119,12 @@ function SendRuneScreen() {
         if (transactionDetails.summary) {
           setSummary(transactionDetails.summary);
           setRuneSummary(
-            await parseSummaryForRunes(context, transactionDetails.summary, network.type),
+            await parseSummaryForRunes(
+              transactionContext,
+              transactionDetails.summary,
+              network.type,
+              { separateTransfersOnNoExternalInputs: true },
+            ),
           );
         }
       } catch (e) {
@@ -225,9 +231,9 @@ function SendRuneScreen() {
 
   return (
     <StepDisplay
-      token={fungibleToken}
       summary={summary}
       runeSummary={runeSummary}
+      token={fungibleToken}
       amountToSend={amountToSend}
       setAmountToSend={setAmount}
       amountError={amountError}

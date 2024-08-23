@@ -1,6 +1,6 @@
 import path from 'path';
 
-import { BrowserContext, Page, test as baseTest, chromium } from '@playwright/test';
+import { test as baseTest, chromium, type BrowserContext, type Page } from '@playwright/test';
 
 const respInfo = {
   challenge_text: '["gaiahub","0","storage2.hiro.so","blockstack_storage_please_sign"]',

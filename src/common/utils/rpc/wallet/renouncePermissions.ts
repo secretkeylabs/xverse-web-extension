@@ -2,7 +2,10 @@
 import { getTabIdFromPort } from '@common/utils';
 import { makeContext } from '@common/utils/popup';
 import * as utils from '@components/permissionsManager/utils';
-import { RpcRequestMessage, renouncePermissionsRequestMessageSchema } from '@sats-connect/core';
+import {
+  renouncePermissionsRequestMessageSchema,
+  type RpcRequestMessage,
+} from '@sats-connect/core';
 import * as v from 'valibot';
 import { handleInvalidMessage } from '../handle-invalid-message';
 import {

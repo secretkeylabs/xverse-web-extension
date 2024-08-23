@@ -8,10 +8,10 @@ import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungib
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useSpamTokens from '@hooks/queries/useSpamTokens';
-import useResetUserFlow, { broadcastResetUserFlow } from '@hooks/useResetUserFlow';
+import { broadcastResetUserFlow, useResetUserFlow } from '@hooks/useResetUserFlow';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import { Flag } from '@phosphor-icons/react';
-import { FungibleToken } from '@secretkeylabs/xverse-core';
+import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import {
   setBrc20ManageTokensAction,
   setRunesManageTokensAction,
@@ -19,7 +19,7 @@ import {
   setSpamTokenAction,
 } from '@stores/wallet/actions/actionCreators';
 import { StyledP } from '@ui-library/common.styled';
-import { CurrencyTypes, SPAM_OPTIONS_WIDTH } from '@utils/constants';
+import { SPAM_OPTIONS_WIDTH, type CurrencyTypes } from '@utils/constants';
 import { getExplorerUrl } from '@utils/helper';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -299,17 +299,19 @@ export default function CoinDashboard() {
             </ContractDeploymentButton>
           </TokenContractContainer>
         )}
-        <TransactionsHistoryList
-          coin={currency as CurrencyTypes}
-          stxTxFilter={
-            selectedFt?.protocol === 'runes'
-              ? selectedFt?.name
-              : `${selectedFt?.principal}::${selectedFt?.assetName}`
-          }
-          brc20Token={protocol === 'brc-20' ? selectedFt?.principal || null : null}
-          runeToken={protocol === 'runes' ? selectedFt?.name || null : null}
-          runeSymbol={protocol === 'runes' ? selectedFt?.runeSymbol || null : null}
-        />
+        {!showFtContractDetails && (
+          <TransactionsHistoryList
+            coin={currency as CurrencyTypes}
+            stxTxFilter={
+              selectedFt?.protocol === 'runes'
+                ? selectedFt?.name
+                : `${selectedFt?.principal}::${selectedFt?.assetName}`
+            }
+            brc20Token={protocol === 'brc-20' ? selectedFt?.principal || null : null}
+            runeToken={protocol === 'runes' ? selectedFt?.name || null : null}
+            runeSymbol={protocol === 'runes' ? selectedFt?.runeSymbol || null : null}
+          />
+        )}
       </Container>
       <BottomBar tab="dashboard" />
     </>

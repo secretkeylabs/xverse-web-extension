@@ -1,14 +1,21 @@
 import { parseData } from '@common/utils';
+import { getPopupPayload } from '@common/utils/popup';
 import { callContractParamsSchema } from '@common/utils/rpc/stx/callContract/paramsSchema';
 import { deployContractParamsSchema } from '@common/utils/rpc/stx/deployContract/paramsSchema';
 import useNetworkSelector from '@hooks/useNetwork';
 import useSelectedAccount from '@hooks/useSelectedAccount';
+import { stxSignTransactionRequestMessageSchema } from '@sats-connect/core';
 import { txPayloadToRequest } from '@secretkeylabs/xverse-core';
-import { ContractCallPayload, ContractDeployPayload, TransactionTypes } from '@stacks/connect';
+import {
+  TransactionTypes,
+  type ContractCallPayload,
+  type ContractDeployPayload,
+} from '@stacks/connect';
 import { AuthType, PayloadType, deserializeTransaction } from '@stacks/transactions';
 import { createUnsecuredToken, decodeToken } from 'jsontokens';
 import { useLocation } from 'react-router-dom';
-import { Return } from './types';
+import * as v from 'valibot';
+import type { Return } from './types';
 import { getPayload, isDeployContractPayload } from './utils';
 
 const useStxTransactionRequest = (): Return => {
@@ -25,6 +32,49 @@ const useStxTransactionRequest = (): Return => {
   const messageId = params.get('messageId') ?? '';
   const rpcMethod = params.get('rpcMethod') ?? '';
 
+  const [errorStxSignTransaction, dataStxSignTransaction] = getPopupPayload((data) =>
+    v.parse(stxSignTransactionRequestMessageSchema, data),
+  );
+  if (!errorStxSignTransaction) {
+    const { transaction: transactionHex } = dataStxSignTransaction.data.params;
+    const transaction = deserializeTransaction(transactionHex);
+
+    let legacyPayload: any;
+    const txPayload = transaction.payload;
+    if (txPayload.payloadType === PayloadType.TokenTransfer) {
+      legacyPayload = {
+        txType: 'token_transfer',
+        recipient: txPayload.recipient,
+        amount: txPayload.amount,
+        memo: txPayload.memo,
+        sponsored: transaction.auth.authType === AuthType.Sponsored,
+      };
+    }
+    if (txPayload.payloadType === PayloadType.ContractCall) {
+      legacyPayload = txPayloadToRequest(transaction, stxAddress);
+    }
+
+    if (isDeployContractPayload(txPayload.payloadType)) {
+      legacyPayload = {
+        network,
+        ...txPayloadToRequest(transaction, stxAddress),
+      };
+    }
+
+    return {
+      // Metadata
+      tabId: dataStxSignTransaction.context.tabId,
+      messageId: dataStxSignTransaction.data.id,
+      rpcMethod: 'stx_signTransaction',
+      broadcast: dataStxSignTransaction.data.params.broadcast ?? true,
+
+      // Legacy
+      payload: legacyPayload,
+      transaction,
+      requestToken: '',
+    };
+  }
+
   switch (rpcMethod) {
     case 'stx_transferStx': {
       const payload = {
@@ -39,6 +89,7 @@ const useStxTransactionRequest = (): Return => {
         messageId,
         tabId,
         rpcMethod,
+        broadcast: true,
 
         // Legacy
         payload,
@@ -76,6 +127,7 @@ const useStxTransactionRequest = (): Return => {
         tabId,
         messageId,
         rpcMethod,
+        broadcast: true,
 
         // Legacy
         payload: legacyPayload,
@@ -91,6 +143,7 @@ const useStxTransactionRequest = (): Return => {
 
       const argumentsArray = error
         ? (() => {
+            // eslint-disable-next-line no-console
             console.error('Error parsing arguments', error);
             return undefined;
           })()
@@ -113,6 +166,7 @@ const useStxTransactionRequest = (): Return => {
         tabId,
         messageId,
         rpcMethod,
+        broadcast: true,
 
         // Legacy
         payload,
@@ -142,6 +196,7 @@ const useStxTransactionRequest = (): Return => {
         tabId,
         messageId,
         rpcMethod,
+        broadcast: true,
 
         // Legacy
         payload,
@@ -158,6 +213,7 @@ const useStxTransactionRequest = (): Return => {
       const txPayload = getPayload({ decodedToken, transaction });
 
       return {
+        broadcast: true,
         payload: txPayload,
         transaction,
         tabId,
