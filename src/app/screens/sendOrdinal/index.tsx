@@ -97,6 +97,7 @@ function SendOrdinalScreen() {
               context,
               await transactionDetails.getSummary(),
               context.network,
+              { separateTransfersOnNoExternalInputs: true },
             ),
           );
         }

@@ -16,6 +16,7 @@ const RowCenter = styled.div<{ spaceBetween?: boolean }>((props) => ({
   alignItems: 'center',
   justifyContent: props.spaceBetween ? 'space-between' : 'initial',
   columnGap: props.theme.space.m,
+  marginBottom: props.theme.space.s,
 }));
 
 const NumberTypeContainer = styled.div`

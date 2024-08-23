@@ -55,7 +55,7 @@ const Title = styled(StyledP)`
 `;
 
 type Props = {
-  delegations?: RuneSummary['transfers'];
+  delegations?: RuneSummary['receipts'];
 };
 
 function DelegateSection({ delegations }: Props) {

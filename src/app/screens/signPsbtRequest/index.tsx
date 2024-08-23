@@ -64,7 +64,11 @@ function SignPsbtRequest() {
       .then(async (txSummary) => {
         setSummary(txSummary);
         if (hasRunesSupport) {
-          setRuneSummary(await parseSummaryForRunes(txnContext, txSummary, network.type));
+          setRuneSummary(
+            await parseSummaryForRunes(txnContext, txSummary, network.type, {
+              separateTransfersOnNoExternalInputs: true,
+            }),
+          );
         }
         setIsLoading(false);
       })

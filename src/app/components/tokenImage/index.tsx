@@ -118,7 +118,7 @@ export default function TokenImage({
     if (imageError) {
       return (
         <TickerIconContainer size={size} round={round}>
-          <TickerIconText>{ticker.substring(0, 4)}</TickerIconText>
+          <TickerIconText data-testid="token-image">{ticker.substring(0, 4)}</TickerIconText>
         </TickerIconContainer>
       );
     }
@@ -156,14 +156,14 @@ export default function TokenImage({
     if (fungibleToken.runeSymbol) {
       return (
         <TickerIconContainer size={size} round={round}>
-          <TickerIconText>{fungibleToken.runeSymbol}</TickerIconText>
+          <TickerIconText data-testid="token-image">{fungibleToken.runeSymbol}</TickerIconText>
         </TickerIconContainer>
       );
     }
 
     return (
       <TickerIconContainer size={size} round={round}>
-        <TickerIconText>{ticker.substring(0, 4)}</TickerIconText>
+        <TickerIconText data-testid="token-image">{ticker.substring(0, 4)}</TickerIconText>
       </TickerIconContainer>
     );
   };

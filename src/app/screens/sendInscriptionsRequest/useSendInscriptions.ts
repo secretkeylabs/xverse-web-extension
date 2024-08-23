@@ -74,7 +74,11 @@ const useSendInscriptions = () => {
       setTransaction(tx);
       setSummary(txSummary);
       if (hasRunesSupport) {
-        setRuneSummary(await parseSummaryForRunes(txContext, txSummary, txContext.network));
+        setRuneSummary(
+          await parseSummaryForRunes(txContext, txSummary, txContext.network, {
+            separateTransfersOnNoExternalInputs: true,
+          }),
+        );
       }
     } catch (e) {
       setTransaction(undefined);

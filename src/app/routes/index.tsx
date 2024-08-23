@@ -45,26 +45,29 @@ import OrdinalsCollection from '@screens/ordinalsCollection';
 import RareSatsBundle from '@screens/rareSatsBundle';
 import RareSatsDetailScreen from '@screens/rareSatsDetail/rareSatsDetail';
 import Receive from '@screens/receive';
-import RestoreFunds from '@screens/restoreFunds';
-import RecoverRunes from '@screens/restoreFunds/recoverRunes';
-import RestoreOrdinals from '@screens/restoreFunds/restoreOrdinals';
 import RestoreWallet from '@screens/restoreWallet';
 import SendBrc20OneStepScreen from '@screens/sendBrc20OneStep';
 import SendBtcScreen from '@screens/sendBtc';
-import SendSip10Screen from '@screens/sendFt';
 import SendInscriptionsRequest from '@screens/sendInscriptionsRequest';
 import SendNft from '@screens/sendNft';
 import SendOrdinal from '@screens/sendOrdinal';
 import SendRuneScreen from '@screens/sendRune';
 import SendStxScreen from '@screens/sendStx';
 import Setting from '@screens/settings';
-import BackupWalletScreen from '@screens/settings/backupWallet';
+import About from '@screens/settings/about';
+import AdvancedSettings from '@screens/settings/advanced';
+import RestoreFunds from '@screens/settings/advanced/restoreFunds';
+import RecoverRunes from '@screens/settings/advanced/restoreFunds/recoverRunes';
+import RestoreOrdinals from '@screens/settings/advanced/restoreFunds/restoreOrdinals';
 import ChangeNetworkScreen from '@screens/settings/changeNetwork';
-import ChangePasswordScreen from '@screens/settings/changePassword';
 import ConnectedAppsAndPermissionsScreen from '@screens/settings/connectedAppsAndPermissions';
-import FiatCurrencyScreen from '@screens/settings/fiatCurrency';
-import LockCountdown from '@screens/settings/lockCountdown';
-import PrivacyPreferencesScreen from '@screens/settings/privacyPreferences';
+import Preferences from '@screens/settings/preferences';
+import FiatCurrencyScreen from '@screens/settings/preferences/fiatCurrency';
+import LockCountdown from '@screens/settings/preferences/lockCountdown';
+import PrivacyPreferencesScreen from '@screens/settings/preferences/privacyPreferences';
+import Security from '@screens/settings/security';
+import BackupWalletScreen from '@screens/settings/security/backupWallet';
+import ChangePasswordScreen from '@screens/settings/security/changePassword';
 import SignBatchPsbtRequest from '@screens/signBatchPsbtRequest';
 import SignMessageRequest from '@screens/signMessageRequest';
 import SignMessageRequestInApp from '@screens/signMessageRequestInApp';
@@ -77,6 +80,7 @@ import SwapStacksScreen from '@screens/swap/swap-stacks';
 import SwapStacksConfirmation from '@screens/swap/swapStacksConfirmation';
 import TransactionRequest from '@screens/transactionRequest';
 import TransactionStatus from '@screens/transactionStatus';
+import TransferRunesRequest from '@screens/transferRunesRequest';
 import UnlistRuneScreen from '@screens/unlistRune';
 import WalletExists from '@screens/walletExists';
 import BtcSendRequest from 'app/screens/btcSendRequest';
@@ -141,10 +145,6 @@ const router = createHashRouter([
       {
         path: 'receive/:currency',
         element: <Receive />,
-      },
-      {
-        path: 'send-sip10',
-        element: <SendSip10Screen />,
       },
       {
         path: 'add-stx-address-ledger',
@@ -331,10 +331,42 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'settings',
+        path: RoutePaths.Settings,
         element: (
           <AuthGuard>
             <Setting />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: RoutePaths.About,
+        element: (
+          <AuthGuard>
+            <About />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: RoutePaths.Preferences,
+        element: (
+          <AuthGuard>
+            <Preferences />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: RoutePaths.Security,
+        element: (
+          <AuthGuard>
+            <Security />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: RoutePaths.AdvancedSettings,
+        element: (
+          <AuthGuard>
+            <AdvancedSettings />
           </AuthGuard>
         ),
       },
@@ -431,6 +463,14 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <SendInscriptionsRequest />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: RoutePaths.TransferRunesRequest,
+        element: (
+          <AuthGuard>
+            <TransferRunesRequest />
           </AuthGuard>
         ),
       },

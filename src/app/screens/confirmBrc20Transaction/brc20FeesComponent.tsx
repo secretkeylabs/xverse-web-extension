@@ -33,6 +33,11 @@ const FeeRateText = styled.p`
   margin-top: ${(props) => props.theme.space.xxs};
 `;
 
+const FiatAmountText = styled(StyledFiatAmountText)`
+  display: flex;
+  justify-content: flex-end;
+`;
+
 type Props = {
   label: string;
   value: BigNumber;
@@ -50,6 +55,7 @@ function Brc20FeesComponent({ label, value, suffix, fiatValue, fiatCurrency, fee
           <TextLabel>{label}</TextLabel>
           <TextValue>
             <NumericFormat
+              data-testid="brc20-fee"
               value={value.toString()}
               displayType="text"
               thousandSeparator
@@ -63,7 +69,7 @@ function Brc20FeesComponent({ label, value, suffix, fiatValue, fiatCurrency, fee
           </FeeRateText>
         )}
         {fiatValue && fiatCurrency && (
-          <StyledFiatAmountText fiatAmount={fiatValue} fiatCurrency={fiatCurrency} />
+          <FiatAmountText fiatAmount={fiatValue} fiatCurrency={fiatCurrency} />
         )}
       </div>
     </Rows>

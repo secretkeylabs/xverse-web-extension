@@ -120,6 +120,7 @@ function EditFee({
     <div>
       <EditRow>
         <Label
+          data-testid="fee-button"
           $size="m"
           $variant="action"
           $clickable={!isLoading}

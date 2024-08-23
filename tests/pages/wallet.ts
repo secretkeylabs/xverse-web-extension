@@ -6,7 +6,7 @@ const strongPW = Onboarding.generateSecurePasswordCrypto();
 export default class Wallet {
   readonly balance: Locator;
 
-  readonly allupperButtons: Locator;
+  readonly allUpperButtons: Locator;
 
   readonly labelAccountName: Locator;
 
@@ -98,7 +98,7 @@ export default class Wallet {
 
   readonly buttonDownArrow: Locator;
 
-  readonly inputCoinAmount: Locator;
+  readonly inputSwapAmount: Locator;
 
   readonly buttonSelectCoin: Locator;
 
@@ -106,7 +106,7 @@ export default class Wallet {
 
   readonly buttonDetails: Locator;
 
-  readonly coinText: Locator;
+  readonly nameToken: Locator;
 
   readonly buttonInsufficientBalance: Locator;
 
@@ -134,7 +134,7 @@ export default class Wallet {
 
   readonly buttonCurrency: Locator;
 
-  readonly buttonBackupWallet: Locator;
+  readonly buttonShowSeedphrase: Locator;
 
   readonly textCurrency: Locator;
 
@@ -306,6 +306,10 @@ export default class Wallet {
 
   readonly listedRunePrice: Locator;
 
+  readonly buttonGetQuotes: Locator;
+
+  readonly buttonSwap: Locator;
+
   readonly inputField: Locator;
 
   readonly buttonEditFee: Locator;
@@ -320,11 +324,51 @@ export default class Wallet {
 
   readonly buttonInsufficientFunds: Locator;
 
+  readonly nameSwapPlace: Locator;
+
+  readonly quoteAmount: Locator;
+
+  readonly infoMessage: Locator;
+
+  readonly buttonSwapPlace: Locator;
+
+  readonly buttonSlippage: Locator;
+
+  readonly buttonSwapToken: Locator;
+
+  readonly minReceivedAmount: Locator;
+
+  readonly nameRune: Locator;
+
+  readonly buttonSelectFee: Locator;
+
+  readonly labelTotalFee: Locator;
+
+  readonly itemUTXO: Locator;
+
+  readonly titleUTXO: Locator;
+
   readonly buttonQRAddress: Locator;
 
   readonly labelAddress: Locator;
 
   readonly containerQRCode: Locator;
+
+  readonly labelFeePriority: Locator;
+
+  readonly divAddress: Locator;
+
+  readonly buttonPreferences: Locator;
+
+  readonly buttonSecurity: Locator;
+
+  readonly buttonAdvanced: Locator;
+
+  readonly errorInsufficientBRC20Balance: Locator;
+
+  readonly BRC20FeeAmount: Locator;
+
+  readonly buttonTransactionSend: Locator;
 
   constructor(readonly page: Page) {
     this.page = page;
@@ -335,7 +379,8 @@ export default class Wallet {
     this.navigationSettings = page.getByTestId('nav-settings');
     this.balance = page.getByTestId('total-balance-value');
     this.textCurrency = page.getByTestId('currency-text');
-    this.allupperButtons = page.getByTestId('transaction-buttons-row').getByRole('button');
+    this.allUpperButtons = page.getByTestId('transaction-buttons-row').getByRole('button');
+    this.buttonTransactionSend = this.allUpperButtons.nth(0);
     this.manageTokenButton = page.getByRole('button', { name: 'Manage token list' });
     this.buttonMenu = page.getByRole('button', { name: 'Open Header Options' });
     this.buttonLock = page.getByRole('button', { name: 'Lock' });
@@ -346,6 +391,10 @@ export default class Wallet {
     this.buttonClose = page.getByRole('button', { name: 'Close' });
     this.buttonEditFee = page.getByTestId('fee-button');
     this.feeAmount = page.getByTestId('fee-amount');
+    this.BRC20FeeAmount = page.getByTestId('brc20-fee');
+    this.buttonSelectFee = page.getByTestId('fee-select-button');
+    this.labelTotalFee = page.getByTestId('total-fee');
+    this.labelFeePriority = page.getByTestId('fee-priority');
 
     // Account
     this.labelAccountName = page.getByLabel('Account Name');
@@ -370,6 +419,9 @@ export default class Wallet {
     this.buttonSave = page.getByRole('button', { name: 'Save' });
     this.buttonMainnet = page.getByRole('button', { name: 'Mainnet' });
     this.buttonTestnet = page.getByRole('button', { name: 'Testnet' });
+    this.buttonPreferences = page.getByRole('button', { name: 'Preferences' });
+    this.buttonSecurity = page.getByRole('button', { name: 'Security' });
+    this.buttonAdvanced = page.getByRole('button', { name: 'Advanced' });
     this.buttonBack = page.getByTestId('back-button');
     this.buttonNext = page.getByRole('button', { name: 'Next' });
     this.inputStacksURL = page.getByTestId('Stacks URL');
@@ -380,7 +432,7 @@ export default class Wallet {
     this.headerNewPassword = page.getByRole('heading', { name: 'Enter your new password' });
     this.infoUpdatePassword = page.getByRole('heading', { name: 'Password successfully updated' });
     this.buttonCurrency = page.getByRole('button', { name: 'Fiat Currency' });
-    this.buttonBackupWallet = page.getByRole('button', { name: 'Backup Wallet' });
+    this.buttonShowSeedphrase = page.getByRole('button', { name: 'Show Seedphrase' });
     this.selectCurrency = page.getByTestId('currency-button');
     this.iconFlag = page.locator('img[alt="flag"]');
 
@@ -454,18 +506,33 @@ export default class Wallet {
     // Receive
     this.buttonQRAddress = page.getByTestId('qr-button');
     this.labelAddress = page.getByTestId('address-label');
+    this.divAddress = page.getByTestId('address-div');
     this.containerQRCode = page.getByTestId('qr-container');
 
     // Swap
+    this.imageToken = page.getByTestId('token-image');
     this.buttonSelectCoin = page.getByTestId('select-coin-button');
-    this.inputCoinAmount = page.getByTestId('coin-input');
-    this.coinText = page.getByTestId('coin-text');
+    this.inputSwapAmount = page.getByTestId('swap-amount');
+    this.nameToken = page.getByTestId('token-name');
     this.buttonDownArrow = page.getByTestId('down-arrow-button');
     this.buttonContinue = page.getByRole('button', { name: 'Continue' });
+    this.buttonGetQuotes = page.getByRole('button', { name: 'Get quotes' });
+    this.buttonSwap = page.getByRole('button', { name: 'Swap', exact: true });
+    this.nameSwapPlace = page.getByTestId('place-name');
+    this.quoteAmount = page.getByTestId('quote-label');
+    this.infoMessage = page.getByTestId('info-message');
+    this.buttonSwapPlace = page.getByTestId('swap-place-button');
+    this.buttonSwapToken = page.getByTestId('swap-token-button');
+    this.buttonSlippage = page.getByTestId('slippage-button');
+    this.minReceivedAmount = page.getByTestId('min-received-amount');
+    this.nameRune = page.getByTestId('rune-name');
+    this.itemUTXO = page.getByTestId('utxo-item');
+    this.titleUTXO = page.getByTestId('utxo-title');
+
     this.buttonDetails = page.getByRole('button', { name: 'Details' });
     this.buttonInsufficientBalance = page.getByRole('button', { name: 'Insufficient balance' });
     this.buttonInsufficientFunds = page.getByRole('button', { name: 'Insufficient funds' });
-    this.imageToken = page.getByTestId('token-image');
+
     this.swapTokenBalance = page.getByTestId('swap-token-balance');
     this.textUSD = page.getByTestId('usd-text');
     this.noFundsBTCMessage = page.getByTestId('no-funds-message');
@@ -485,11 +552,14 @@ export default class Wallet {
       .filter({ hasText: 'You are transferring to yourself' });
     this.errorMessageSendSelf = page.locator('p').filter({ hasText: 'Cannot send to self' });
     this.errorInsufficientBalance = page.locator('p').filter({ hasText: 'Insufficient balance' });
+    this.errorInsufficientBRC20Balance = page
+      .locator('p')
+      .filter({ hasText: 'Insufficient BRC20 balance' });
     this.errorInsufficientFunds = page.locator('p').filter({ hasText: 'Insufficient funds' });
     this.containerFeeRate = page.getByTestId('feerate-container');
     this.inputBTCAddress = page.locator('input[type="text"]');
     this.inputBTCAmount = page.getByTestId('btc-amount');
-    this.buttonExpand = page.getByRole('button', { name: 'Inputs & Outputs Dropdown' });
+    this.buttonExpand = page.getByRole('button', { name: 'Inputs & Outputs' });
     this.confirmTotalAmount = page.getByTestId('confirm-total-amount');
     this.confirmCurrencyAmount = page.getByTestId('confirm-currency-amount');
     this.confirmAmount = page.getByTestId('confirm-amount');
@@ -502,7 +572,6 @@ export default class Wallet {
     this.sendSTXValue = page.getByTestId('send-value');
     this.inputField = page.locator('input[type="text"]');
     this.sendRuneAmount = page.getByTestId('send-rune-amount');
-    //
 
     // List
     this.buttonList = page.getByTestId('action-button').filter({ hasText: 'List' });
@@ -541,8 +610,8 @@ export default class Wallet {
 
   // Helper function to restore the wallet, switch to testnet if parameter is true and navigate to dashboard
   async setupTest(extensionId, wallet, testnet) {
-    const onboardingpage = new Onboarding(this.page);
-    await onboardingpage.restoreWallet(strongPW, wallet);
+    const onboardingPage = new Onboarding(this.page);
+    await onboardingPage.restoreWallet(strongPW, wallet);
     await this.page.goto(`chrome-extension://${extensionId}/popup.html`);
     await this.checkVisualsStartpage();
     if (testnet) {
@@ -574,32 +643,6 @@ export default class Wallet {
     await expect(await this.divTokenRow.count()).toBeGreaterThan(1);
   }
 
-  async checkVisualsSendSTXPage1() {
-    await expect(this.page.url()).toContain('send-stx');
-    await expect(this.buttonNext).toBeVisible();
-    await expect(this.buttonNext).toBeDisabled();
-    // Receiver Address
-    await expect(this.inputField.first()).toBeVisible();
-    // Memo
-    await expect(this.inputField.last()).toBeVisible();
-    await expect(this.imageToken).toBeVisible();
-    // await expect(this.buttonBack).toBeVisible();
-  }
-
-  async checkVisualsSendSTXPage2() {
-    await expect(this.page.url()).toContain('send-stx');
-    await expect(this.buttonNext).toBeVisible();
-    await expect(this.buttonNext).toBeDisabled();
-    // STX amount
-    await expect(this.inputField.first()).toBeVisible();
-    await expect(this.labelBalanceAmountSelector).toBeVisible();
-    // Edit Fee
-    await expect(this.buttonEditFee).toBeVisible();
-    await expect(this.feeAmount).toBeVisible();
-    await expect(this.imageToken).toBeVisible();
-    // await expect(this.buttonBack).toBeVisible();
-  }
-
   async checkVisualsSendSTXPage3() {
     await expect(this.page.url()).toContain('confirm-stx-tx');
     await expect(this.buttonConfirm).toBeVisible();
@@ -611,75 +654,120 @@ export default class Wallet {
     await expect(this.buttonBack).toBeVisible();
   }
 
-  async checkVisualsSendInscriptionsPage2(ordinalAddress, ordinalNumber, collection) {
-    await expect(this.confirmTotalAmount).toBeVisible();
-    await expect(this.confirmCurrencyAmount).toBeVisible();
-    await expect(this.buttonExpand).toBeVisible();
-    await expect(this.buttonCancel).toBeEnabled();
-    await expect(this.buttonConfirm).toBeEnabled();
+  /**
+   * Checks the visibility and state of UI elements state on first page in Send Flow
+   *
+   * @param {string} url - The expected URL to validate the correct page navigation.
+   * @param {boolean} isSTX - Optional flag to apply STX-specific element checks (default: false).
+   */
+  async checkVisualsSendPage1(url: string, moreInputFields: boolean = false) {
+    await expect(this.page.url()).toContain(url);
+    await expect(this.buttonNext).toBeVisible();
+    await expect(this.buttonNext).toBeDisabled();
+
+    if (moreInputFields) {
+      // Recipient Address for STX or amount for BRC20
+      await expect(this.inputField.first()).toBeVisible();
+      // Memo for STX or recipient for BRC20
+      await expect(this.inputField.last()).toBeVisible();
+    } else {
+      await expect(this.receiveAddress).toBeVisible();
+    }
+
+    await expect(this.imageToken).toBeVisible();
+    // await expect(this.buttonBack).toBeVisible();
+  }
+
+  /**
+   * Validates UI element visibility and state on second page in Send Flow
+   *
+   * @param {string} url - URL to verify page navigation; ensures the test is on the correct page.
+   * @param {boolean} isSTX - Indicates if the page is STX-specific; adjusts element checks accordingly (default: false).
+   */
+  async checkVisualsSendPage2(url: string, isSTX: boolean = false) {
+    await expect(this.page.url()).toContain(url);
+    await expect(this.buttonNext).toBeVisible();
+    await expect(this.buttonNext).toBeDisabled();
+
+    // Conditional check based on the type of token
+    if (isSTX) {
+      // STX-specific fields
+      await expect(this.inputField.first()).toBeVisible();
+    } else {
+      // General send amount field
+      await expect(this.inputSendAmount).toBeVisible();
+    }
+
+    await expect(this.labelBalanceAmountSelector).toBeVisible();
     await expect(this.buttonEditFee).toBeVisible();
     await expect(this.feeAmount).toBeVisible();
     await expect(this.imageToken).toBeVisible();
+    // await expect(this.buttonBack).toBeVisible();
+  }
+
+  /**
+   * Checks the visuals and elements on the send transaction review page.
+   *
+   * @param {string} url - The expected partial URL of the review page.
+   * @param {boolean} editableFees - Optional. Indicates whether the fees can be edited on the Review page
+   * @param {string} sendAddress - Optional. The expected last 4 characters of the sender's address
+   * @param {string} recipientAddress - Optional. The expected last 4 characters of the receiver's address
+   * @param {boolean} totalAmountShown - Optional. Indicates whether the total amount is shown. Default is true.
+   * @param {boolean} tokenImageShown - Optional. Indicates whether the token image is shown. Default is true.
+   * @param {string} ordinalNumber - Optional. The expected ordinal number to be displayed for single Inscriptions
+   */
+  async checkVisualsSendTransactionReview(
+    url: string,
+    editableFees?: boolean,
+    sendAddress?: string,
+    recipientAddress?: string,
+    totalAmountShown: boolean = true,
+    tokenImageShown: boolean = true,
+    ordinalNumber?: string,
+  ) {
+    await expect(this.page.url()).toContain(url);
+    await expect(this.buttonExpand).toBeVisible();
+    await expect(this.buttonCancel).toBeEnabled();
+    await expect(this.buttonConfirm).toBeEnabled();
+    await expect(this.feeAmount).toBeVisible();
+
+    // Not all TX Screens show a total amount
+    if (totalAmountShown) {
+      await expect(this.confirmTotalAmount).toBeVisible();
+      await expect(this.confirmCurrencyAmount).toBeVisible();
+    }
+
+    if (tokenImageShown) {
+      await expect(this.imageToken.first()).toBeVisible();
+    }
+
+    if (editableFees) {
+      await expect(this.buttonEditFee).toBeVisible();
+    }
 
     await this.buttonExpand.click();
-    await expect(this.sendAddress.first()).toBeVisible();
-    await expect(this.receiveAddress.first()).toBeVisible();
     await expect(this.confirmAmount.first()).toBeVisible();
     await expect(this.confirmBalance.first()).toBeVisible();
-    await expect(await this.receiveAddress.first().innerText()).toContain(ordinalAddress.slice(-4));
 
+    // Execute these checks only if sendAddress is provided
+    if (sendAddress) {
+      await expect(this.sendAddress.first()).toBeVisible();
+      await expect(await this.sendAddress.first().innerText()).toContain(sendAddress.slice(-4));
+    }
+
+    // Execute these checks only if recipientAddress is provided
+    if (recipientAddress) {
+      await expect(this.receiveAddress.first()).toBeVisible();
+      await expect(await this.receiveAddress.first().innerText()).toContain(
+        recipientAddress.slice(-4),
+      );
+    }
     // Collection Inscriptions don't have the ordinal number displayed in the Review
     // Check if the right ordinal number is shown
-    if (!collection) {
+    if (ordinalNumber) {
       const reviewNumberOrdinal = await this.numberInscription.first().innerText();
       await expect(ordinalNumber).toMatch(reviewNumberOrdinal);
     }
-  }
-
-  async checkVisualsSendPage1(url) {
-    await expect(this.page.url()).toContain(url);
-    await expect(this.buttonNext).toBeVisible();
-    await expect(this.buttonNext).toBeDisabled();
-    // Receiver Address
-    await expect(this.receiveAddress).toBeVisible();
-    await expect(this.imageToken).toBeVisible();
-    // await expect(this.buttonBack).toBeVisible();
-  }
-
-  async checkVisualsSendPage2(url) {
-    await expect(this.page.url()).toContain(url);
-    await expect(this.buttonNext).toBeVisible();
-    await expect(this.buttonNext).toBeDisabled();
-    // Send amount field
-    await expect(this.inputSendAmount).toBeVisible();
-    await expect(this.labelBalanceAmountSelector).toBeVisible();
-    // Edit Fee
-    await expect(this.buttonEditFee).toBeVisible();
-    await expect(this.feeAmount).toBeVisible();
-    await expect(this.imageToken).toBeVisible();
-    // await expect(this.buttonBack).toBeVisible();
-  }
-
-  async checkVisualsSendTransactionReview(url, sendAddress, receiverAddress) {
-    await expect(this.page.url()).toContain(url);
-    await expect(this.confirmTotalAmount).toBeVisible();
-    await expect(this.confirmCurrencyAmount).toBeVisible();
-    await expect(this.buttonExpand).toBeVisible();
-    await expect(this.buttonCancel).toBeEnabled();
-    await expect(this.buttonConfirm).toBeEnabled();
-    await expect(this.buttonEditFee).toBeVisible();
-    await expect(this.feeAmount).toBeVisible();
-    await expect(this.imageToken.first()).toBeVisible();
-
-    await this.buttonExpand.click();
-    await expect(this.sendAddress.first()).toBeVisible();
-    await expect(this.receiveAddress.first()).toBeVisible();
-    await expect(this.confirmAmount.first()).toBeVisible();
-    await expect(this.confirmBalance.first()).toBeVisible();
-    await expect(await this.sendAddress.first().innerText()).toContain(sendAddress.slice(-4));
-    await expect(await this.receiveAddress.first().innerText()).toContain(
-      receiverAddress.slice(-4),
-    );
   }
 
   // Check Visuals of Rune Dashboard (without List button), return balance amount
@@ -704,6 +792,72 @@ export default class Wallet {
     await expect(await this.runeItem.count()).toBeGreaterThanOrEqual(1);
   }
 
+  async checkVisualsSwapPage() {
+    await expect(this.page.url()).toContain('swap');
+    await expect(this.buttonDownArrow.first()).toBeVisible();
+    await expect(this.buttonGetQuotes.first()).toBeVisible();
+    await expect(this.buttonGetQuotes.first()).toBeDisabled();
+    await expect(this.inputSwapAmount.first()).toBeVisible();
+    await expect(this.swapTokenBalance).toContainText('--');
+    await expect(this.buttonBack).toBeVisible();
+    await expect(this.nameToken.first()).toContainText('Select asset');
+    await expect(await this.nameToken).toHaveCount(2);
+    await expect(await this.buttonDownArrow).toHaveCount(2);
+    await expect(this.buttonGetQuotes).toBeVisible();
+    await expect(this.textUSD).toBeVisible();
+    await expect(this.buttonSwapToken).toBeVisible();
+  }
+
+  // Helper function to fill in swap amount and returns usd value as number
+  async fillSwapAmount(amount) {
+    // .Fill() did not work with the field so we need to use this method
+    await this.inputSwapAmount.pressSequentially(amount.toString());
+    await expect(this.buttonGetQuotes).toBeEnabled();
+
+    const usdAmount = await this.textUSD.innerText();
+    const numericUSDValue = parseFloat(usdAmount.replace(/[^0-9.]/g, ''));
+    await expect(numericUSDValue).toBeGreaterThan(0);
+
+    return numericUSDValue;
+  }
+
+  // had to disable this rule as my first assertion was always changed to a wrong assertion
+  /* eslint-disable playwright/prefer-web-first-assertions */
+  async checkVisualsQuotePage(
+    tokenName: string,
+    slippage: boolean,
+    numericQuoteValue,
+    numericUSDValue,
+  ) {
+    await expect(this.buttonSwap).toBeVisible();
+    await expect(this.buttonEditFee).toBeVisible();
+    if (slippage) {
+      await expect(this.buttonSlippage).toBeVisible();
+    }
+    // Only 2 token should be visible
+    await expect(await this.buttonSwapPlace.count()).toBe(2);
+    // await expect(await this.imageToken.count()).toBe(2);
+
+    // Check Rune token name
+    await expect(this.infoMessage.last()).toContainText(tokenName);
+
+    // Check if USD amount from quote page is the same as from th swap start flow page
+    const usdAmountQuote = await this.textUSD.first().innerText();
+    const numericUSDQuote = parseFloat(usdAmountQuote.replace(/[^0-9.]/g, ''));
+    await expect(numericUSDQuote).toEqual(numericUSDValue);
+
+    // min-received-amount value should be the same as quoteAmount
+    const minReceivedAmount = await this.minReceivedAmount.innerText();
+    const numericMinReceivedAmount = parseFloat(minReceivedAmount.replace(/[^0-9.]/g, ''));
+    const formattedNumericMinReceivedAmount = parseFloat(numericMinReceivedAmount.toFixed(3));
+    await expect(formattedNumericMinReceivedAmount).toEqual(numericQuoteValue);
+
+    // check if quoteAmount is the same from the page before
+    const quoteAmount2Page = await this.quoteAmount.last().innerText();
+    const numericQuote2Page = parseFloat(quoteAmount2Page.replace(/[^0-9.]/g, ''));
+    await expect(numericQuote2Page).toEqual(numericQuoteValue);
+  }
+
   async checkVisualsListOnMEPage() {
     await expect(this.buttonFloorPrice).toBeVisible();
     await expect(this.button5Price).toBeVisible();
@@ -715,11 +869,48 @@ export default class Wallet {
     await expect(this.runeContainer.first()).toBeVisible();
   }
 
-  async invalidAddressCheck(adressfield) {
-    await adressfield.fill(`Test Address 123`);
+  async invalidAddressCheck(addressField) {
+    await addressField.fill(`Test Address 123`);
     await this.buttonNext.click();
     await expect(this.errorMessageAddressInvalid).toBeVisible();
     await expect(this.buttonNext).toBeDisabled();
+  }
+
+  // had to disable this rule as my first assertion was always changed to a wrong assertion
+  /* eslint-disable playwright/prefer-web-first-assertions */
+  async switchToHighFees(feePriorityShown: boolean = true) {
+    // Save the current fee amount for comparison
+    const originalFee = await this.feeAmount.innerText();
+    const numericOriginalFee = parseFloat(originalFee.replace(/[^0-9.]/g, ''));
+    await expect(numericOriginalFee).toBeGreaterThan(0);
+    let feePriority = 'Medium';
+    if (feePriorityShown) {
+      feePriority = await this.labelFeePriority.innerText();
+    }
+
+    // Click on edit Fee button
+    await this.buttonEditFee.click();
+    await expect(this.buttonSelectFee.first()).toBeVisible();
+    await expect(this.labelTotalFee.first()).toBeVisible();
+
+    // Compare fee to previous saved fee
+    const fee = await this.buttonSelectFee
+      .filter({ hasText: feePriority })
+      .locator(this.labelTotalFee)
+      .innerText();
+    const numericFee = parseFloat(fee.replace(/[^0-9.]/g, ''));
+    await expect(numericFee).toBe(numericOriginalFee);
+
+    // Save high fee rate for comparison
+    const highFee = await this.labelTotalFee.first().innerText();
+    const numericHighFee = parseFloat(highFee.replace(/[^0-9.]/g, ''));
+
+    // Switch to high fee
+    await this.buttonSelectFee.first().click();
+
+    const newFee = await this.feeAmount.innerText();
+    const numericNewFee = parseFloat(newFee.replace(/[^0-9.]/g, ''));
+    await expect(numericNewFee).toBe(numericHighFee);
   }
 
   async navigateToCollectibles() {
@@ -755,40 +946,48 @@ export default class Wallet {
   async checkAmountsSendingBTC(selfBTCTest, BTCTest, amountBTCSend) {
     // Sending amount without Fee
     const amountText = await this.confirmAmount.first().innerText();
-    const numericValueamountText = parseFloat(amountText.replace(/[^0-9.]/g, ''));
-    await expect(numericValueamountText).toEqual(amountBTCSend);
+    const numericValueAmountText = parseFloat(amountText.replace(/[^0-9.]/g, ''));
+    await expect(numericValueAmountText).toEqual(amountBTCSend);
 
     // Address check sending and receiving
     await expect(await this.sendAddress.innerText()).toContain(selfBTCTest.slice(-4));
     await expect(await this.receiveAddress.first().innerText()).toContain(BTCTest.slice(-4));
 
     const confirmAmountAfter = await this.confirmAmount.last().innerText();
-    const confirmTotalAmount = await this.confirmTotalAmount.innerText();
+    const originalFee = await this.feeAmount.innerText();
     const confirmBalance = await this.confirmBalance.innerText();
     // Extract amounts for balance, sending amount and amount afterwards
     const num1 = parseFloat(confirmAmountAfter.replace(/[^0-9.]/g, ''));
-    const num2 = parseFloat(confirmTotalAmount.replace(/[^0-9.]/g, ''));
+    // We need to convert the sats value to BTC for this calculation
+    const feeSatsAmount = parseFloat(originalFee.replace(/[^0-9.]/g, ''));
+    const num2 = feeSatsAmount / 100000000;
     const num3 = parseFloat(confirmBalance.replace(/[^0-9.]/g, ''));
 
-    const roundedResult = Number((num3 - num2).toFixed(9));
+    // Balance - fees - sending amount
+    const roundedResult = Number((num3 - num2 - amountBTCSend).toFixed(9));
+    // Check if Balance value after the transaction is the same as the calculated value
     await expect(num1).toEqual(roundedResult);
   }
 
-  async confirmSendTransaction() {
+  async confirmSendTransaction(transactionIDShown: boolean = true) {
     await expect(this.buttonConfirm).toBeEnabled();
     await this.buttonConfirm.click();
-    await expect(this.buttonClose).toBeVisible();
-    await expect(this.sendTransactionID).toBeVisible();
+    await expect(this.buttonClose).toBeVisible({ timeout: 30000 });
+    if (transactionIDShown) {
+      await expect(this.sendTransactionID).toBeVisible();
+    }
     await this.buttonClose.click();
   }
 
   async getAddress(whichAddress): Promise<string> {
     // click on 'Receive' button
-    await this.allupperButtons.nth(1).click();
+    await this.allUpperButtons.nth(1).click();
+
+    // Locate the QR button to the address
+    const button = this.divAddress.filter({ hasText: whichAddress }).locator(this.buttonQRAddress);
 
     // Need to click on the QR Code button to get the full Address
-
-    await this.buttonQRAddress.nth(whichAddress).click();
+    await button.click();
     await expect(this.containerQRCode).toBeVisible();
 
     const address = await this.labelAddress.innerText();
@@ -816,10 +1015,10 @@ export default class Wallet {
     await specificToken.last().click();
   }
 
-  async clickOnSpecificInscription(inscriptionname) {
+  async clickOnSpecificInscription(inscriptionName) {
     const specificToken = this.containersCollectibleItem
       .filter({
-        has: this.nameInscription.getByText(inscriptionname, { exact: true }),
+        has: this.nameInscription.getByText(inscriptionName, { exact: true }),
       })
       .getByTestId('inscription-container');
     await specificToken.last().click();
@@ -836,7 +1035,7 @@ export default class Wallet {
       // Execute alternative commands if an error occurs
       console.log('Test Rune is not active and need to be enabled');
       // Insert your fallback logic here
-      // check if the test rune is enbaled
+      // check if the test rune is enabled
       await this.manageTokenButton.click();
       await this.buttonRunes.click();
       await expect(this.divTokenRow.first()).toBeVisible();
@@ -961,75 +1160,75 @@ export default class Wallet {
     return totalBalance;
   }
 
-  async enableRandomBRC20Token(): Promise<string> {
+  // The enableRandomToken function takes a parameter tokenType which can either be ‘BRC20’ or ‘SIP10’. This parameter determines additional actions specific to BRC20 tokens.
+  async enableRandomToken(tokenType: 'BRC20' | 'SIP10'): Promise<string> {
     await this.manageTokenButton.click();
     await expect(this.page.url()).toContain('manage-tokens');
-    await this.buttonBRC20.click();
-    const tokenName = await this.enableARandomToken();
+
+    // Click on the specific token type button if BRC20 is selected
+    if (tokenType === 'BRC20') {
+      await this.buttonBRC20.click();
+    }
+
+    // Enable a random token
+    const tokenName = await this.toggleRandomToken(true);
+
+    // Navigate back and verify the token is visible
     await this.buttonBack.click();
     await expect(this.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeVisible();
+
     return tokenName;
   }
 
-  async enableRandomSIP10Token(): Promise<string> {
-    await this.manageTokenButton.click();
-    await expect(this.page.url()).toContain('manage-tokens');
-    const tokenName = await this.enableARandomToken();
-    await this.buttonBack.click();
-    await expect(this.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeVisible();
+  // The function toggleRandomToken takes a boolean parameter enable to determine the action:
+  //	true indicates enabling a token (using inactive tokens).
+  //	false indicates disabling a token (using active tokens).
+  async toggleRandomToken(enable: boolean): Promise<string> {
+    const tokenStateLocator = enable ? this.checkboxTokenInactive : this.checkboxTokenActive;
+    await expect(tokenStateLocator.first()).toBeVisible();
+    const numberOfTokens = await tokenStateLocator.count();
+
+    // Generate a random index within the range of available tokens
+    const chosenIndex = Math.floor(Math.random() * numberOfTokens);
+
+    // Access the nth token (adjusting for zero-based indexing)
+    const chosenToken = this.divTokenRow.filter({ has: tokenStateLocator }).nth(chosenIndex);
+    const tokenName = (await chosenToken.getAttribute('data-testid')) || 'default-value';
+
+    // Click the switch handle to toggle the token's state
+    await chosenToken.locator('div.react-switch-handle').click();
+
     return tokenName;
   }
 
-  async enableARandomToken(): Promise<string> {
-    await expect(this.checkboxTokenInactive.first()).toBeVisible();
-    const numberOfUnselectedTokens = await this.checkboxTokenInactive.count();
+  // The function toggleAllTokens takes a boolean parameter enable.
+  //	true indicates enabling token (using inactive tokens).
+  //	false indicates disabling token (using active tokens).
+  async toggleAllTokens(enable: boolean) {
+    // Determine which tokens to interact with based on the 'enable' parameter
+    const tokenSelector = enable ? this.checkboxTokenInactive : this.checkboxTokenActive;
+    const actionTokens = this.divTokenRow.filter({ has: tokenSelector });
+    const count = await actionTokens.count();
 
-    // Generate a random number within the range of available select elements
-    const chosenNumber = Math.floor(Math.random() * numberOfUnselectedTokens) + 1;
-
-    // Access the nth select element (note the adjustment for zero-based indexing)
-    const adjustChosenNumber = chosenNumber - 1;
-    const chosenUnselectedToken = this.divTokenRow
-      .filter({ has: this.checkboxTokenInactive })
-      .nth(adjustChosenNumber);
-    const enabledTokenName =
-      (await chosenUnselectedToken.getAttribute('data-testid')) || 'default-value';
-    await chosenUnselectedToken.locator('div.react-switch-handle').click();
-    return enabledTokenName;
-  }
-
-  async disableARandomToken(): Promise<string> {
-    await expect(this.checkboxTokenActive.first()).toBeVisible();
-    const numberOfUnselectedTokens = await this.checkboxTokenActive.count();
-
-    // Generate a random number within the range of available select elements
-    const chosenNumber = Math.floor(Math.random() * numberOfUnselectedTokens) + 1;
-
-    // Access the nth select element (note the adjustment for zero-based indexing)
-    const adjustChosenNumber = chosenNumber - 1;
-    const chosenUnselectedToken = this.divTokenRow
-      .filter({ has: this.checkboxTokenActive })
-      .nth(adjustChosenNumber);
-    const disabledTokenName =
-      (await chosenUnselectedToken.getAttribute('data-testid')) || 'default-value';
-    await chosenUnselectedToken.locator('div.react-switch-handle').click();
-    return disabledTokenName;
-  }
-
-  async disableAllTokens() {
-    const allActiveTokens = this.divTokenRow.filter({ has: this.checkboxTokenActive });
-    const count = await allActiveTokens.count();
     for (let i = 0; i < count; i++) {
-      await allActiveTokens.first().locator('div.react-switch-handle').click();
+      // Since clicking the switch will change its state, always interact with the first one
+      await actionTokens.first().locator('div.react-switch-handle').click();
     }
   }
 
-  async enableAllTokens() {
-    const allInactiveTokens = this.divTokenRow.filter({ has: this.checkboxTokenInactive });
-    const count = await allInactiveTokens.count();
-    for (let i = 0; i < count; i++) {
-      // We click the first inactive Token and when this inactive token becomes active we need to click the next one which becomes the first then
-      await allInactiveTokens.first().locator('div.react-switch-handle').click();
+  // Helper function to wait for a field to get greater than 0. Some fields are slowly to load for the E2E so we need to ensure that their is a value loaded before continue
+  async waitForTextAboveZero(selector, timeout = 30000) {
+    const startTime = Date.now();
+    while (true) {
+      if (Date.now() - startTime > timeout) {
+        throw new Error('Timeout waiting for text to be above 0');
+      }
+      const text = await selector.innerText();
+      const numericValue = parseFloat(text.replace(/[^0-9.]/g, ''));
+      if (numericValue > 0) {
+        return; // Exit the function when the condition is met
+      }
+      await this.page.waitForTimeout(1000); // Check every second
     }
   }
 }

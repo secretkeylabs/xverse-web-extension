@@ -1,5 +1,10 @@
 import { type TokenImageProps } from '@components/tokenImage';
-import { type FungibleToken } from '@secretkeylabs/xverse-core';
+import {
+  type ExecuteOrderRequest,
+  type FungibleToken,
+  type PlaceOrderResponse,
+  type PlaceUtxoOrderResponse,
+} from '@secretkeylabs/xverse-core';
 import { Currency } from 'alex-sdk';
 
 export type STXOrFungibleToken = 'STX' | FungibleToken;
@@ -45,4 +50,9 @@ export type SelectedCurrencyState = {
   from?: Currency;
   prevTo?: Currency;
   prevFrom?: Currency;
+};
+
+export type OrderInfo = {
+  order: PlaceOrderResponse | PlaceUtxoOrderResponse;
+  providerCode: ExecuteOrderRequest['providerCode'];
 };

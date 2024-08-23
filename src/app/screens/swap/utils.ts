@@ -6,6 +6,8 @@ import type {
   TokenBasic,
 } from '@secretkeylabs/xverse-core';
 
+export const BAD_QUOTE_PERCENTAGE = 0.25;
+
 export const mapFTProtocolToSwapProtocol = (protocol: FungibleTokenProtocol): Protocol => {
   const protocolMap: Record<FungibleTokenProtocol, Protocol> = {
     stacks: 'sip10',
@@ -55,3 +57,12 @@ export const mapFTNativeSwapTokenToTokenBasic = (
   const safeTypeToken = token as Token;
   return { ticker: safeTypeToken.ticker, protocol: safeTypeToken.protocol };
 };
+
+export const mapFtToSwapToken = (ft: FungibleToken | 'BTC'): Token => ({
+  ticker: ft === 'BTC' ? 'BTC' : ft.principal ?? '',
+  name: ft === 'BTC' ? 'Bitcoin' : ft.name ?? ft.assetName ?? '',
+  protocol: ft === 'BTC' ? 'btc' : mapFTProtocolToSwapProtocol(ft.protocol ?? 'runes'),
+  divisibility: ft === 'BTC' ? 8 : ft?.decimals ?? 0,
+  logo: ft === 'BTC' ? undefined : ft.image ?? ft.runeInscriptionId ?? '',
+  symbol: ft === 'BTC' ? undefined : ft.runeSymbol ?? '',
+});

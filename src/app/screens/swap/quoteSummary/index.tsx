@@ -6,21 +6,19 @@ import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useSearchParamsState from '@hooks/useSearchParamsState';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { ArrowDown, ArrowRight } from '@phosphor-icons/react';
+import { ArrowDown, ArrowRight, WarningOctagon } from '@phosphor-icons/react';
 import {
   AnalyticsEvents,
   RUNE_DISPLAY_DEFAULTS,
   getBtcFiatEquivalent,
-  type ExecuteOrderRequest,
   type FungibleToken,
   type MarketUtxo,
-  type PlaceOrderResponse,
   type PlaceUtxoOrderRequest,
-  type PlaceUtxoOrderResponse,
   type Quote,
   type Token,
 } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
+import Callout from '@ui-library/callout';
 import { StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import { formatNumber } from '@utils/helper';
@@ -31,23 +29,25 @@ import styled, { useTheme } from 'styled-components';
 import trackSwapMixPanel from '../mixpanel';
 import QuoteTile from '../quotesModal/quoteTile';
 import { SlippageModalContent } from '../slippageModal';
-import { mapFTNativeSwapTokenToTokenBasic } from '../utils';
+import type { OrderInfo } from '../types';
+import { BAD_QUOTE_PERCENTAGE, mapFTNativeSwapTokenToTokenBasic } from '../utils';
 import EditFee from './EditFee';
 import QuoteSummaryTile from './quoteSummaryTile';
 import usePlaceOrder from './usePlaceOrder';
 import usePlaceUtxoOrder from './usePlaceUtxoOrder';
 
-const SlippageButton = styled.button`
+const SlippageButton = styled.button<{ showWarning: boolean }>`
   display: flex;
   flex-direction: row;
   column-gap: ${(props) => props.theme.space.xxs};
   background: transparent;
   align-items: center;
   ${(props) => props.theme.typography.body_medium_m};
-  color: ${(props) => props.theme.colors.white_0};
   border-radius: 24px;
   border: 1px solid ${(props) => props.theme.colors.white_800};
-  padding: 1.75px 10px;
+  padding: ${(props) => props.theme.space.xxs} ${(props) => props.theme.space.s};
+  color: ${(props) =>
+    props.showWarning ? props.theme.colors.caution : props.theme.colors.white_0};
 `;
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -57,6 +57,10 @@ const Container = styled.div((props) => ({
   zIndex: 1,
   backgroundColor: props.theme.colors.elevation0,
 }));
+
+const CalloutContainer = styled.div`
+  margin-bottom: ${(props) => props.theme.space.m};
+`;
 
 const Flex1 = styled.div`
   flex: 1;
@@ -139,13 +143,7 @@ type QuoteSummaryProps = {
   onClose: () => void;
   onChangeProvider: () => void;
   onError: (errorMessage: string) => void;
-  onOrderPlaced: ({
-    order,
-    providerCode,
-  }: {
-    order: PlaceOrderResponse | PlaceUtxoOrderResponse;
-    providerCode: ExecuteOrderRequest['providerCode'];
-  }) => void;
+  onOrderPlaced: ({ order, providerCode }: OrderInfo) => void;
   selectedIdentifiers?: Omit<MarketUtxo, 'token'>[];
 };
 
@@ -162,7 +160,7 @@ export default function QuoteSummary({
 }: QuoteSummaryProps) {
   const { t } = useTranslation('translation');
   const theme = useTheme();
-  const { btcFiatRate } = useCoinRates();
+  const { btcFiatRate, btcUsdRate } = useCoinRates();
   const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey } = useSelectedAccount();
   const { loading: isPlaceOrderLoading, error: placeOrderError, placeOrder } = usePlaceOrder();
   const {
@@ -211,7 +209,7 @@ export default function QuoteSummary({
       toToken,
       amount,
       quote,
-      btcFiatRate,
+      btcUsdRate,
       runeFloorPrice,
     });
 
@@ -260,10 +258,64 @@ export default function QuoteSummary({
 
   const feeUnits = toToken?.protocol === 'sip10' || toToken?.protocol === 'stx' ? 'STX' : 'Sats';
 
+  const showSlippageWarning = Boolean(
+    quote.slippageSupported && quote.slippageThreshold && slippage > quote.slippageThreshold,
+  );
+
+  const fromTokenFiatValue =
+    fromToken === 'BTC'
+      ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcFiatRate)).toFixed(2)
+      : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2);
+
+  const toTokenFiatValue =
+    toToken?.protocol === 'btc'
+      ? getBtcFiatEquivalent(
+          new BigNumber(quote.receiveAmount),
+          new BigNumber(btcFiatRate),
+        ).toFixed(2)
+      : getBtcFiatEquivalent(
+          new BigNumber(runeFloorPrice ?? 0).multipliedBy(quote.receiveAmount),
+          new BigNumber(btcFiatRate),
+        ).toFixed(2);
+
+  const showBadQuoteWarning =
+    quote.slippageSupported &&
+    new BigNumber(toTokenFiatValue).isLessThan(
+      new BigNumber(fromTokenFiatValue).multipliedBy(BAD_QUOTE_PERCENTAGE),
+    );
+  const valueLossPercentage = new BigNumber(fromTokenFiatValue)
+    .minus(new BigNumber(toTokenFiatValue))
+    .dividedBy(new BigNumber(fromTokenFiatValue))
+    .multipliedBy(100)
+    .toFixed(0);
+
+  const getTokenRate = (): string => {
+    if (toToken?.protocol === 'btc') {
+      return new BigNumber(quote.receiveAmount)
+        .dividedBy(new BigNumber(amount))
+        .decimalPlaces(2)
+        .toString();
+    }
+    const satsPerRune = new BigNumber(amount).dividedBy(new BigNumber(quote.receiveAmount));
+    return new BigNumber(1).dividedBy(satsPerRune).toString();
+  };
+
   return (
     <>
       <TopRow onClick={onClose} />
+
       <Container>
+        {showBadQuoteWarning && (
+          <CalloutContainer>
+            <Callout
+              titleText={t('SWAP_SCREEN.BAD_QUOTE_WARNING_TITLE')}
+              bodyText={t('SWAP_SCREEN.BAD_QUOTE_WARNING_DESC', {
+                percentage: valueLossPercentage,
+              })}
+              variant="warning"
+            />
+          </CalloutContainer>
+        )}
         <StyledP typography="headline_s" color="white_0">
           {t('SWAP_SCREEN.QUOTE')}
         </StyledP>
@@ -271,11 +323,7 @@ export default function QuoteSummary({
           <QuoteSummaryTile
             fromUnit={fromUnit}
             toUnit={toUnit}
-            rate={
-              toToken?.protocol === 'btc'
-                ? new BigNumber(quote.receiveAmount).dividedBy(new BigNumber(amount)).toString()
-                : new BigNumber(amount).dividedBy(new BigNumber(quote.receiveAmount)).toString()
-            }
+            rate={getTokenRate()}
             provider={quote.provider.name}
             image={quote.provider.logo}
             onClick={onChangeProvider}
@@ -291,13 +339,7 @@ export default function QuoteSummary({
               subtitle={fromToken === 'BTC' ? 'Bitcoin' : fromToken?.assetName}
               subtitleColor="white_400"
               unit={fromToken === 'BTC' ? 'Sats' : fromToken?.runeSymbol ?? ''}
-              fiatValue={
-                fromToken === 'BTC'
-                  ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcFiatRate)).toFixed(
-                      2,
-                    )
-                  : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2)
-              }
+              fiatValue={fromTokenFiatValue}
             />
             <ArrowOuterContainer>
               <ArrowInnerContainer>
@@ -322,17 +364,7 @@ export default function QuoteSummary({
               subtitle={toToken?.protocol === 'btc' ? 'Bitcoin' : toToken?.name}
               subtitleColor="white_400"
               unit={toToken?.protocol === 'btc' ? 'Sats' : toToken?.symbol}
-              fiatValue={
-                toToken?.protocol === 'btc'
-                  ? getBtcFiatEquivalent(
-                      new BigNumber(quote.receiveAmount),
-                      new BigNumber(btcFiatRate),
-                    ).toFixed(2)
-                  : getBtcFiatEquivalent(
-                      new BigNumber(runeFloorPrice ?? 0).multipliedBy(quote.receiveAmount),
-                      new BigNumber(btcFiatRate),
-                    ).toFixed(2)
-              }
+              fiatValue={toTokenFiatValue}
             />
           </QuoteToBaseContainer>
 
@@ -342,7 +374,14 @@ export default function QuoteSummary({
                 <StyledP typography="body_medium_m" color="white_200">
                   {t('SWAP_SCREEN.SLIPPAGE')}
                 </StyledP>
-                <SlippageButton onClick={() => setShowSlippageModal(true)}>
+                <SlippageButton
+                  data-testid="slippage-button"
+                  onClick={() => setShowSlippageModal(true)}
+                  showWarning={showSlippageWarning}
+                >
+                  {showSlippageWarning && (
+                    <WarningOctagon weight="fill" color={theme.colors.caution} size={16} />
+                  )}
                   {slippage * 100}%
                   <img alt={t('SLIPPAGE')} src={SlippageEditIcon} />
                 </SlippageButton>
@@ -352,7 +391,7 @@ export default function QuoteSummary({
               <StyledP typography="body_medium_m" color="white_200">
                 {t('SWAP_SCREEN.MIN_RECEIVE')}
               </StyledP>
-              <StyledP typography="body_medium_m" color="white_0">
+              <StyledP data-testid="min-received-amount" typography="body_medium_m" color="white_0">
                 {formatNumber(quote.receiveAmount)} {toUnit}
               </StyledP>
             </ListingDescriptionRow>
@@ -411,7 +450,7 @@ export default function QuoteSummary({
                   />
                 </EditFeeRateContainer>
               </StyledP>
-              <FeeRate>
+              <FeeRate data-testid="fee-amount">
                 {feeRate} {t('UNITS.SATS_PER_VB')}
               </FeeRate>
             </ListingDescriptionRow>
@@ -433,6 +472,8 @@ export default function QuoteSummary({
         >
           <SlippageModalContent
             slippage={slippage}
+            slippageThreshold={quote.slippageThreshold}
+            slippageDecimals={quote.slippageDecimals}
             onChange={(newSlippage) => {
               setSlippage(newSlippage);
               setShowSlippageModal(false);

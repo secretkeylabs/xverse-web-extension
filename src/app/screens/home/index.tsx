@@ -252,7 +252,7 @@ function Home() {
     let route = '';
     switch (fungibleToken?.protocol) {
       case 'stacks':
-        route = `/send-sip10?principal=${fungibleToken?.principal}`;
+        route = `/send-stx?principal=${fungibleToken?.principal}`;
         break;
       case 'brc-20':
         route = `/send-brc20-one-step?principal=${fungibleToken?.principal}`;
@@ -411,8 +411,7 @@ function Home() {
   };
 
   const isCrossChainSwapsEnabled = useHasFeature(FeatureId.CROSS_CHAIN_SWAPS);
-  // ledger is disabled for now
-  const showSwaps = isCrossChainSwapsEnabled && !isLedgerAccount(selectedAccount);
+  const showSwaps = isCrossChainSwapsEnabled;
 
   return (
     <>

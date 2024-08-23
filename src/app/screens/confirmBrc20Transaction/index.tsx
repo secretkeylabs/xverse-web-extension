@@ -212,7 +212,7 @@ function ConfirmBrc20Transaction() {
 
             <FeeContainer>
               <Brc20FeesComponent
-                label="Inscription Service Fee"
+                label={t('CONFIRM_TRANSACTION.INSCRIPTION_SERVICE_FEE')}
                 value={inscriptionFee}
                 suffix="sats"
                 fiatValue={getBtcFiatEquivalent(inscriptionFee, BigNumber(btcFiatRate))}
@@ -240,7 +240,7 @@ function ConfirmBrc20Transaction() {
                 />
               )}
               <Brc20FeesComponent
-                label="Total fees"
+                label={t('CONFIRM_TRANSACTION.TOTAL_FEES')}
                 value={totalFee}
                 suffix="sats"
                 fiatValue={getBtcFiatEquivalent(totalFee, BigNumber(btcFiatRate))}

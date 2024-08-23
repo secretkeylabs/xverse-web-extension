@@ -6,7 +6,7 @@ test.describe('Transaction', () => {
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
-    const tokenName = await wallet.enableRandomSIP10Token();
+    const tokenName = await wallet.enableRandomToken('SIP10');
 
     await wallet.clickOnSpecificToken(tokenName);
 
@@ -26,7 +26,7 @@ test.describe('Transaction', () => {
   test('Visual Check BRC 20 Token Transaction history mainnet', async ({ page, extensionId }) => {
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
-    const tokenName = await wallet.enableRandomBRC20Token();
+    const tokenName = await wallet.enableRandomToken('BRC20');
 
     await wallet.clickOnSpecificToken(tokenName);
     await expect(page.url()).toContain('coinDashboard');

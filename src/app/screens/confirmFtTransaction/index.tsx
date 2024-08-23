@@ -36,8 +36,9 @@ function ConfirmFtTransaction() {
     fungibleToken,
     memo,
     recipientAddress,
+    selectedFee,
   } = location.state;
-  const [fee, setFee] = useState<BigNumber>();
+  const [fee, setFee] = useState(BigNumber(selectedFee));
   const unsignedTx = useMemo(() => deserializeTransaction(unsignedTxHex), [unsignedTxHex]);
   const { refetch } = useStxWalletData();
   const selectedAccount = useSelectedAccount();
@@ -102,13 +103,16 @@ function ConfirmFtTransaction() {
     mutate({ signedTx: txs[0] });
   };
 
+  const handleCancelClick = () => {
+    navigate(`/coinDashboard/FT?ftKey=${fungibleToken?.principal}&protocol=stacks`);
+  };
+
   const handleBackButtonClick = () => {
-    navigate('/send-sip10', {
+    navigate(`/send-stx?principal=${fungibleToken?.principal}`, {
       state: {
         recipientAddress,
         amountToSend: amount.toString(),
         stxMemo: memo,
-        fungibleToken,
       },
     });
   };
@@ -120,7 +124,7 @@ function ConfirmFtTransaction() {
         initialStxTransactions={[unsignedTx]}
         loading={isLoading}
         onConfirmClick={handleOnConfirmClick}
-        onCancelClick={handleBackButtonClick}
+        onCancelClick={handleCancelClick}
         skipModal={isLedgerAccount(selectedAccount)}
         fee={fee ? microstacksToStx(fee).toString() : undefined}
         setFeeRate={(feeRate: string) => {
