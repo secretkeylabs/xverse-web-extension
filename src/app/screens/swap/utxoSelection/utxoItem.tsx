@@ -89,7 +89,7 @@ function UtxoItem({ utxo, selected, token, onSelect }: Props) {
             suffix={` ${token?.symbol}`}
             thousandSeparator
             renderText={(value: string) => (
-              <RuneTitle typography="body_medium_m" color="white_0">
+              <RuneTitle data-testid="utxo-title" typography="body_medium_m" color="white_0">
                 {value}
               </RuneTitle>
             )}

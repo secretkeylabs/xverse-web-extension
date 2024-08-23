@@ -16,6 +16,7 @@ const RowCenter = styled.div<{ spaceBetween?: boolean }>((props) => ({
   alignItems: 'center',
   justifyContent: props.spaceBetween ? 'space-between' : 'initial',
   columnGap: props.theme.space.m,
+  marginBottom: props.theme.space.s,
 }));
 
 const NumberTypeContainer = styled.div`
@@ -41,6 +42,8 @@ export default function Amount({ amount }: Props) {
   const { fiatCurrency } = useWalletSelector();
   const { btcFiatRate } = useCoinRates();
   const { t } = useTranslation('translation');
+
+  if (!amount) return null;
 
   return (
     <RowCenter>

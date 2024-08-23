@@ -1,10 +1,10 @@
 import { test } from '../fixtures/base';
 import Landing from '../pages/landing';
 
-test.describe('healthcheck', () => {
-  test('healthcheck #smoketest', async ({ page, extensionId }) => {
+test.describe('healthCheck', () => {
+  test('healthCheck #smoketest', async ({ page, extensionId }) => {
     await page.goto(`chrome-extension://${extensionId}/options.html#/landing`);
-    const landingpage = new Landing(page);
-    await landingpage.initialize();
+    const landingPage = new Landing(page);
+    await landingPage.initialize();
   });
 });

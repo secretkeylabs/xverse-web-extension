@@ -1,16 +1,15 @@
-import ConfirmBitcoinTransaction from '@components/confirmBtcTransaction';
+import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RequestError from '@components/requests/requestError';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
+import type { OrderInfo } from '@screens/swap/types';
 import {
   btcTransaction,
   parseSummaryForRunes,
-  type ExecuteOrderRequest,
   type ExecuteUtxoOrderRequest,
-  type PlaceOrderResponse,
-  type PlaceUtxoOrderResponse,
   type RuneSummary,
+  type Transport,
 } from '@secretkeylabs/xverse-core';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -22,10 +21,7 @@ import useExecuteUtxoOrder from './useExecuteUtxoOrder';
 type PSBTSummary = Awaited<ReturnType<btcTransaction.EnhancedPsbt['getSummary']>>;
 
 type Props = {
-  orderInfo: {
-    order: PlaceOrderResponse | PlaceUtxoOrderResponse;
-    providerCode: ExecuteOrderRequest['providerCode'];
-  };
+  orderInfo: OrderInfo;
   onClose: () => void;
   onConfirm: () => void;
 };
@@ -65,7 +61,7 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
           currency: 'BTC',
           errorTitle: '',
           error,
-          browserTx: true,
+          browserTx: false,
         },
       });
     }
@@ -78,7 +74,11 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
       .getSummary()
       .then(async (txSummary) => {
         setSummary(txSummary);
-        setRuneSummary(await parseSummaryForRunes(txnContext, txSummary, network.type));
+        setRuneSummary(
+          await parseSummaryForRunes(txnContext, txSummary, network.type, {
+            separateTransfersOnNoExternalInputs: true,
+          }),
+        );
         setIsLoading(false);
       })
       .catch((err) => {
@@ -119,11 +119,13 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
     return executeOrderResponse;
   };
 
-  const handleConfirm = async () => {
+  const handleConfirm = async (ledgerTransport?: Transport) => {
     setIsSigning(true);
     try {
-      // TODO: add ledger support
-      const signedPsbt = await parsedPsbt?.getSignedPsbtBase64({ finalize: false });
+      const signedPsbt = await parsedPsbt?.getSignedPsbtBase64({
+        finalize: false,
+        ledgerTransport,
+      });
 
       if (!signedPsbt) {
         throw new Error(t('PSBT_CANT_SIGN_ERROR_TITLE'));
@@ -135,6 +137,10 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
         return setIsSigning(false);
       }
 
+      if (ledgerTransport) {
+        await ledgerTransport.close();
+      }
+
       onConfirm();
 
       setIsSigning(false);
@@ -143,7 +149,7 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
           txid: orderResponse.txid,
           currency: 'BTC',
           error: '',
-          browserTx: true,
+          browserTx: false,
         },
       });
     } catch (err) {
@@ -155,7 +161,7 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
             currency: 'BTC',
             errorTitle: '',
             error: err.message,
-            browserTx: true,
+            browserTx: false,
           },
         });
       }
@@ -176,19 +182,22 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
     );
   }
 
+  const quoteExpiryCallout =
+    'expiresInMilliseconds' in orderInfo.order && orderInfo.order.expiresInMilliseconds
+      ? {
+          bodyText: t('QUOTE_EXPIRES_IN', {
+            seconds: orderInfo.order.expiresInMilliseconds / 1000,
+          }),
+        }
+      : undefined;
+
   return (
-    <ConfirmBitcoinTransaction
-      inputs={summary?.inputs ?? []}
-      outputs={summary?.outputs ?? []}
-      feeOutput={summary?.feeOutput}
-      showCenotaphCallout={!!summary?.runeOp?.Cenotaph?.flaws}
+    <ConfirmBtcTransaction
+      summary={summary}
       runeSummary={runeSummary}
       isLoading={isLoading}
       isSubmitting={isSigning}
       isBroadcast
-      isFinal={summary?.isFinal}
-      hasSigHashSingle={summary?.hasSigHashSingle}
-      hasSigHashNone={summary?.hasSigHashNone}
       confirmText={t('CONFIRM')}
       cancelText={t('CANCEL')}
       onCancel={onCancel}
@@ -196,6 +205,7 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
       onBackClick={onClose}
       hideBottomBar
       showAccountHeader={false}
+      customCallout={quoteExpiryCallout}
     />
   );
 }

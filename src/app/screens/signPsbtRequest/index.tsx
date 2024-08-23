@@ -24,8 +24,7 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import useSignPsbt from './useSignPsbt';
 import useSignPsbtValidationGate from './useSignPsbtValidationGate';
 
-// TODO: export this from core
-type PSBTSummary = Awaited<ReturnType<btcTransaction.EnhancedPsbt['getSummary']>>;
+type PSBTSummary = btcTransaction.PsbtSummary;
 
 function SignPsbtRequest() {
   const navigate = useNavigate();
@@ -47,13 +46,10 @@ function SignPsbtRequest() {
     payload,
     parsedPsbt,
   });
-
   // extend in future if necessary
   const isInAppPsbt = magicEdenPsbt && runeId;
 
   useTrackMixPanelPageViewed();
-
-  useSignPsbtValidationGate({ payload, parsedPsbt });
 
   const { network } = useWalletSelector();
 
@@ -64,10 +60,15 @@ function SignPsbtRequest() {
 
     parsedPsbt
       .getSummary()
+      // TODO move this block into useSignPsbt
       .then(async (txSummary) => {
         setSummary(txSummary);
         if (hasRunesSupport) {
-          setRuneSummary(await parseSummaryForRunes(txnContext, txSummary, network.type));
+          setRuneSummary(
+            await parseSummaryForRunes(txnContext, txSummary, network.type, {
+              separateTransfersOnNoExternalInputs: true,
+            }),
+          );
         }
         setIsLoading(false);
       })
@@ -100,7 +101,7 @@ function SignPsbtRequest() {
         wallet_type: selectedAccount?.accountType || 'software',
       });
       if (ledgerTransport) {
-        await ledgerTransport?.close();
+        await ledgerTransport.close();
       }
       if (signedPsbt && magicEdenPsbt && runeId) {
         return await submitRuneSellPsbt(signedPsbt, location.state.selectedRune?.name ?? '')
@@ -178,17 +179,11 @@ function SignPsbtRequest() {
 
   return (
     <ConfirmBtcTransaction
-      inputs={summary?.inputs ?? []}
-      outputs={summary?.outputs ?? []}
-      feeOutput={summary?.feeOutput}
-      showCenotaphCallout={!!summary?.runeOp?.Cenotaph?.flaws}
+      summary={summary}
       runeSummary={runeSummary}
       isLoading={isLoading}
       isSubmitting={isSigning}
       isBroadcast={payload.broadcast}
-      isFinal={summary?.isFinal}
-      hasSigHashSingle={summary?.hasSigHashSingle}
-      hasSigHashNone={summary?.hasSigHashNone}
       confirmText={t('CONFIRM')}
       cancelText={t('CANCEL')}
       onCancel={onCancel}

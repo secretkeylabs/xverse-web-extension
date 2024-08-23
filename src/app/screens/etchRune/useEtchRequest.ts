@@ -16,7 +16,10 @@ const useEtchRequestRequestParams = () => {
   const payloadToken = params.get('payload') ?? '';
 
   const payload = SuperJSON.parse<Params<'runes_etch'>>(payloadToken);
-  const etchRequest = { ...payload, network: undefined };
+  const etchRequest = payload;
+  // network is not needed in the etch request and the api will use the current network
+  // we need to remove it because the api will throw an error if it's present
+  delete etchRequest.network;
 
   return { etchRequest, tabId, requestId, network: payload.network };
 };

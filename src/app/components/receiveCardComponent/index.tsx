@@ -114,11 +114,11 @@ function ReceiveCardComponent({
   };
 
   return (
-    <ReceiveCard className={className}>
+    <ReceiveCard data-testid="address-div" className={className}>
       <ColumnContainer>
         {children}
         <TitleText>{title}</TitleText>
-        <AddressText>
+        <AddressText data-testid="address-label">
           {showVerifyButton ? addressText : getShortTruncatedAddress(address)}
         </AddressText>
       </ColumnContainer>
@@ -147,7 +147,7 @@ function ReceiveCardComponent({
             place="top"
             hidden={!isCopied}
           />
-          <Button onClick={onQrAddressClick}>
+          <Button data-testid="qr-button" onClick={onQrAddressClick}>
             <ButtonIcon src={QrCode} />
           </Button>
         </RowContainer>

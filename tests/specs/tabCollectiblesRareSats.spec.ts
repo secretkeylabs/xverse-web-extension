@@ -30,6 +30,9 @@ test.describe('Collectibles Tab - Rare sats', () => {
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
+    // get own Ordinals Address for address check on review page
+    const addressOrdinals = await wallet.getAddress('Ordinals');
+
     // Navigate to Collectibles tab
     await wallet.navigateToCollectibles();
     // Click on Rare Sats in Tab list
@@ -49,42 +52,40 @@ test.describe('Collectibles Tab - Rare sats', () => {
 
     // Address invalid check
     const inputAddress = page.locator('input');
-    await inputAddress.fill(`Test Address 123`);
-    await expect(wallet.errorMessageAddressInvalid).toBeVisible();
-    await expect(wallet.buttonNext).toBeDisabled();
-    await inputAddress.fill(TEST_ORDINALS_ADDRESS);
+    await wallet.invalidAddressCheck(inputAddress);
+    await inputAddress.fill(addressOrdinals);
     await expect(wallet.buttonNext).toBeEnabled();
     await wallet.buttonNext.click();
 
     // Transaction Review Page
-    await expect(wallet.receiveAddress.first()).toBeVisible();
-    await expect(await wallet.receiveAddress.first().innerText()).toContain(
-      TEST_ORDINALS_ADDRESS.slice(-4),
+    await wallet.checkVisualsSendTransactionReview(
+      'send-ordinal',
+      false,
+      addressOrdinals,
+      addressOrdinals,
+      false,
+      false,
     );
-    await expect(wallet.buttonCancel).toBeEnabled();
-    await expect(wallet.buttonConfirm).toBeEnabled();
+
+    await wallet.switchToHighFees();
 
     // Cancel the transaction
-    // TODO: Enable the following code when this is fixed: https://linear.app/xverseapp/issue/ENG-4305/cancel-transaction-functionality-is-inconsistent-between-stx-and-btc
-    /*
     await wallet.buttonCancel.click();
 
-    // TODO: Check where the cancel button leads the user
-    // Navigate to Collectibles tab
-    await wallet.navigateToCollectibles();
-    // Click on Rare Sats in Tab list
-    await wallet.tabsCollectiblesItems.nth(2).click();
+    await expect(wallet.buttonBack).toBeVisible();
+    await wallet.buttonBack.click();
     await expect(wallet.containerRareSats).toBeVisible();
-    // at least two Rare Sats should be visible
-    const childCRareStats = await wallet.containerRareSats.getByRole('button').count();
-    await expect(childCRareStats).toBeGreaterThan(2);
-     */
+    const childCRareStats2 = await wallet.containerRareSats.getByRole('button').count();
+    await expect(childCRareStats2).toBeGreaterThan(2);
   });
 
   test('Send rare stats testnet #localexecution', async ({ page, extensionId }) => {
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
+    // get own Ordinals Address for address check on review page
+    const addressOrdinals = await wallet.getAddress('Ordinals');
+
     // Navigate to Collectibles tab
     await wallet.navigateToCollectibles();
     // Click on Rare Sats in Tab list
@@ -102,22 +103,22 @@ test.describe('Collectibles Tab - Rare sats', () => {
     await expect(wallet.buttonNext).toBeVisible();
     await expect(wallet.buttonNext).toBeDisabled();
 
-    // Address invalid check
+    // Address input
     const inputAddress = page.locator('input');
-    await inputAddress.fill(`Test Address 123`);
-    await expect(wallet.errorMessageAddressInvalid).toBeVisible();
     await expect(wallet.buttonNext).toBeDisabled();
     await inputAddress.fill(TEST_ORDINALS_ADDRESS);
     await expect(wallet.buttonNext).toBeEnabled();
     await wallet.buttonNext.click();
 
     // Transaction Review Page
-    await expect(wallet.receiveAddress.first()).toBeVisible();
-    await expect(await wallet.receiveAddress.first().innerText()).toContain(
-      TEST_ORDINALS_ADDRESS.slice(-4),
+    await wallet.checkVisualsSendTransactionReview(
+      'send-ordinal',
+      false,
+      addressOrdinals,
+      addressOrdinals,
+      false,
+      false,
     );
-    await expect(wallet.buttonCancel).toBeEnabled();
-    await expect(wallet.buttonConfirm).toBeEnabled();
 
     await wallet.confirmSendTransaction();
 

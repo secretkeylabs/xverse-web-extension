@@ -1,23 +1,30 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import chromeStorage from '@utils/chromeStorage';
-import { useEffect, useState } from 'react';
 
 const useChromeLocalStorage = <T extends unknown>(key: string, defaultValue?: T) => {
-  const [value, setValueState] = useState<T | undefined>(undefined);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    setValueState(undefined);
-    chromeStorage.local.getItem<T>(key).then((result) => {
-      const newValue = result === undefined ? defaultValue : result;
-      setValueState(newValue);
-    });
-  }, [key]);
+  const { data: value, isFetching } = useQuery({
+    queryKey: ['chromeLocalStorage', key],
+    queryFn: async () => {
+      const result = await chromeStorage.local.getItem<T>(key);
+      return result === undefined ? defaultValue : result;
+    },
+    refetchOnWindowFocus: false,
+  });
+
+  const mutation = useMutation({
+    mutationFn: async (newValue: T) => {
+      await chromeStorage.local.setItem(key, newValue);
+      queryClient.setQueryData(['chromeLocalStorage', key], newValue);
+    },
+  });
 
   const setValue = (newValue: T) => {
-    chromeStorage.local.setItem(key, newValue);
-    setValueState(newValue);
+    mutation.mutate(newValue);
   };
 
-  return [value, setValue] as const;
+  return [value, setValue, isFetching] as const;
 };
 
 export default useChromeLocalStorage;

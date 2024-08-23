@@ -147,7 +147,7 @@ function SelectFeeRate({
       <RowContainer>
         <EditRow>
           {feeRateSpeed && (
-            <Label $size="m" $variant="dark">
+            <Label data-testid="fee-priority" $size="m" $variant="dark">
               {feeRateSpeed}{' '}
             </Label>
           )}

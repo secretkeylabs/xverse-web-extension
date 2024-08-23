@@ -1,7 +1,7 @@
 import { expect, test } from '../fixtures/base';
 import Wallet from '../pages/wallet';
 
-const price1 = (Math.random() + 1).toFixed(4);
+const price = (Math.random() + 1).toFixed(4);
 const runeName = 'SKIBIDI•OHIO•RIZZ';
 
 test.describe('List runes', () => {
@@ -13,12 +13,8 @@ test.describe('List runes', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
     // get own BTC  & Ordinals Address for address check on review page
-    await wallet.allupperButtons.nth(1).click();
-    const selfBTC = await wallet.getAddress(wallet.buttonCopyBitcoinAddress);
-    const selfOrdinals = await wallet.getAddress(wallet.buttonCopyOrdinalsAddress);
-
-    // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
-    await page.reload();
+    const selfBTC = await wallet.getAddress('Bitcoin');
+    const selfOrdinals = await wallet.getAddress('Ordinals');
 
     // Check if Rune is enabled and if not enable the rune and click on it
     await wallet.checkAndClickOnSpecificRune(runeName);
@@ -68,14 +64,14 @@ test.describe('List runes', () => {
     await expect(wallet.buttonApply).toBeDisabled();
     await expect(wallet.inputListingPrice).toBeVisible();
 
-    await wallet.inputListingPrice.fill(price1);
+    await wallet.inputListingPrice.fill(price);
     await expect(wallet.buttonApply).toBeEnabled();
     await wallet.buttonApply.click();
 
     // Check Price
     const displayPrice = await wallet.runePrice.innerText();
     const displayPriceNumerical = parseFloat(displayPrice.replace(/[^0-9.]/g, ''));
-    await expect(parseFloat(price1)).toEqual(displayPriceNumerical);
+    await expect(parseFloat(price)).toEqual(displayPriceNumerical);
 
     // Save the send amounts
     const sendAmount = await wallet.sendAmount.innerText();
@@ -111,8 +107,8 @@ test.describe('List runes', () => {
     // Expected: 0.02323232
     // Received: 0.02323
     const num2 = parseFloat(confirmTotalAmount.replace(/[^0-9.]/g, ''));
-    const truncatenum2 = Number(num2.toFixed(5));
-    await expect(num1).toEqual(truncatenum2);
+    const truncateNum2 = Number(num2.toFixed(5));
+    await expect(num1).toEqual(truncateNum2);
 
     // Cancle the transaction
     await expect(wallet.buttonCancel).toBeEnabled();
@@ -150,12 +146,8 @@ test.describe('List runes', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
     // get own BTC  & Ordinals Address for address check on review page
-    await wallet.allupperButtons.nth(1).click();
-    const selfBTC = await wallet.getAddress(wallet.buttonCopyBitcoinAddress);
-    const selfOrdinals = await wallet.getAddress(wallet.buttonCopyOrdinalsAddress);
-
-    // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
-    await page.reload();
+    const selfBTC = await wallet.getAddress('Bitcoin');
+    const selfOrdinals = await wallet.getAddress('Ordinals');
 
     // Check if Rune is enabled and if not enable the rune and click on it
     await wallet.checkAndClickOnSpecificRune(runeName);
@@ -205,14 +197,14 @@ test.describe('List runes', () => {
     await expect(wallet.buttonApply).toBeDisabled();
     await expect(wallet.inputListingPrice).toBeVisible();
 
-    await wallet.inputListingPrice.fill(price1);
+    await wallet.inputListingPrice.fill(price);
     await expect(wallet.buttonApply).toBeEnabled();
     await wallet.buttonApply.click();
 
     // Check Price
     const displayPrice = await wallet.runePrice.innerText();
     const displayPriceNumerical = parseFloat(displayPrice.replace(/[^0-9.]/g, ''));
-    await expect(parseFloat(price1)).toEqual(displayPriceNumerical);
+    await expect(parseFloat(price)).toEqual(displayPriceNumerical);
 
     // Save the send amounts
     const sendAmount = await wallet.sendAmount.innerText();
@@ -248,8 +240,8 @@ test.describe('List runes', () => {
     // Expected: 0.02323232
     // Received: 0.02323
     const num2 = parseFloat(confirmTotalAmount.replace(/[^0-9.]/g, ''));
-    const truncatenum2 = Number(num2.toFixed(5));
-    await expect(num1).toEqual(truncatenum2);
+    const truncateNum2 = Number(num2.toFixed(5));
+    await expect(num1).toEqual(truncateNum2);
 
     // Confirm the transaction
     await expect(wallet.buttonConfirm).toBeEnabled();

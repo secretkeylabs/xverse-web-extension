@@ -1,5 +1,6 @@
 import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RequestError from '@components/requests/requestError';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import type { Transport } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
 import { useCallback, useEffect } from 'react';
@@ -18,6 +19,7 @@ const LoaderContainer = styled.div(() => ({
 function EtchRune() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const navigate = useNavigate();
+  const { btcAddress, ordinalsAddress } = useSelectedAccount();
   const {
     etchRequest,
     orderTx,
@@ -64,24 +66,26 @@ function EtchRune() {
       )}
       {orderTx && orderTx.summary && !etchError && (
         <ConfirmBtcTransaction
-          inputs={orderTx.summary.inputs}
-          outputs={orderTx.summary.outputs}
-          feeOutput={orderTx.summary.feeOutput}
-          feeRate={+feeRate}
-          showCenotaphCallout={false}
-          confirmText={t('CONFIRM')}
-          cancelText={t('CANCEL')}
-          isBroadcast
-          isLoading={false}
-          onCancel={onClickCancel}
-          onConfirm={onClickConfirm}
+          summary={orderTx.summary}
           runeSummary={{
             etch: etchRequest,
             burns: [],
             receipts: [],
             transfers: [],
             inputsHadRunes: false,
+            txnHasExternalInputs: orderTx.summary?.inputs.some(
+              (input) =>
+                input.extendedUtxo.address !== btcAddress &&
+                input.extendedUtxo.address !== ordinalsAddress,
+            ),
           }}
+          feeRate={+feeRate}
+          confirmText={t('CONFIRM')}
+          cancelText={t('CANCEL')}
+          isBroadcast
+          isLoading={false}
+          onCancel={onClickCancel}
+          onConfirm={onClickConfirm}
           isSubmitting={isExecuting}
           hideBottomBar
           showAccountHeader

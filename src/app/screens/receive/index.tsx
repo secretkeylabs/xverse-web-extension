@@ -162,7 +162,7 @@ function Receive() {
       <OuterContainer>
         <TopTitleText>{renderData[currency].title}</TopTitleText>
         <DescriptionText>{renderData[currency].desc}</DescriptionText>
-        <QRCodeContainer marginBottom={showBnsName ? 24 : 50}>
+        <QRCodeContainer data-testid="qr-container" marginBottom={showBnsName ? 24 : 50}>
           <QrCode
             image={renderData[currency].icon}
             data={renderData[currency].address}
@@ -171,7 +171,7 @@ function Receive() {
         </QRCodeContainer>
         {showBnsName && <BnsNameText>{selectedAccount?.bnsName}</BnsNameText>}
         <AddressContainer>
-          <AddressText>{renderData[currency].address}</AddressText>
+          <AddressText data-testid="address-label">{renderData[currency].address}</AddressText>
           <Button id={`copy-${renderData[currency].address}`} onClick={handleOnClick}>
             {addressCopied ? <Check color="white" size="20" /> : <Copy color="white" size="20" />}
           </Button>

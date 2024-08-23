@@ -7,12 +7,14 @@ import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 
-const Container = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: row;
-  align-items: 'center';
-`;
+const Container = styled.div<{ topMargin?: boolean }>((props) => ({
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginBottom: props.theme.space.s,
+  marginTop: props.topMargin ? props.theme.space.s : 0,
+}));
 
 const AvatarContainer = styled.div`
   margin-right: ${(props) => props.theme.space.m};
@@ -42,14 +44,19 @@ const StyledPRight = styled(StyledP)`
 type Props = {
   rune: RuneBase;
   hasSufficientBalance?: boolean;
+  topMargin?: boolean;
 };
 
-export default function RuneAmount({ rune, hasSufficientBalance = true }: Props) {
+export default function RuneAmount({
+  rune,
+  hasSufficientBalance = true,
+  topMargin = false,
+}: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { runeName, amount, divisibility, symbol, inscriptionId } = rune;
   const amountWithDecimals = ftDecimals(String(amount), divisibility);
   return (
-    <Container>
+    <Container topMargin={topMargin}>
       <AvatarContainer>
         <TokenImage
           currency="FT"
@@ -80,7 +87,7 @@ export default function RuneAmount({ rune, hasSufficientBalance = true }: Props)
             )}
           />
         </Row>
-        <StyledP typography="body_medium_s" color="white_400">
+        <StyledP data-testid="rune-name" typography="body_medium_s" color="white_400">
           {runeName}
         </StyledP>
       </Column>

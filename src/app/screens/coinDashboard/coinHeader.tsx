@@ -126,7 +126,7 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
     } else {
       switch (fungibleToken?.protocol) {
         case 'stacks':
-          route = `/send-sip10?principal=${fungibleToken?.principal}`;
+          route = `/send-stx?principal=${fungibleToken?.principal}`;
           break;
         case 'brc-20':
           route = `/send-brc20-one-step?principal=${fungibleToken?.principal}`;
@@ -169,15 +169,14 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
   const isCrossChainSwapsEnabled = useHasFeature(FeatureId.CROSS_CHAIN_SWAPS);
   const showRunesSwap =
     (currency === 'FT' && fungibleToken?.protocol === 'runes') || currency === 'BTC';
-  // ledger is disabled for now
-  const showSwaps = isCrossChainSwapsEnabled && showRunesSwap && !isLedgerAccount(selectedAccount);
+  const showSwaps = isCrossChainSwapsEnabled && showRunesSwap;
 
   const navigateToSwaps = () => {
     if (!showSwaps) {
       return;
     }
     trackMixPanel(AnalyticsEvents.InitiateSwapFlow, {
-      token: fungibleToken ? fungibleToken.name ?? fungibleToken.principal : currency,
+      selectedToken: fungibleToken ? fungibleToken.name ?? fungibleToken.principal : currency,
     });
     navigate(`/swap?from=${fungibleToken ? fungibleToken.principal : currency}`);
   };
@@ -242,15 +241,15 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
       <RowButtonContainer>
         <SmallActionButton src={ArrowUp} text={t('SEND')} onPress={goToSendScreen} />
         <SmallActionButton src={ArrowDown} text={t('RECEIVE')} onPress={navigateToReceive} />
+        {showSwaps && (
+          <SmallActionButton src={ArrowSwap} text={t('SWAP')} onPress={navigateToSwaps} />
+        )}
         {showRunesListing && fungibleToken?.protocol === 'runes' && (
           <SmallActionButton
             src={List}
             text={t('LIST')}
             onPress={() => navigate(`/list-rune/${fungibleToken.principal}`)}
           />
-        )}
-        {showSwaps && (
-          <SmallActionButton src={ArrowSwap} text={t('SWAP')} onPress={navigateToSwaps} />
         )}
         {!fungibleToken && (
           <SmallActionButton

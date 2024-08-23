@@ -49,11 +49,11 @@ const TickerProtocolContainer = styled.div`
 `;
 
 const ProtocolIcon = styled.div<{ isSquare?: boolean }>((props) => ({
-  width: props.isSquare ? 18 : 22,
-  height: props.isSquare ? 18 : 22,
-  borderRadius: props.isSquare ? 0 : 22,
+  width: props.isSquare ? 18 : 20,
+  height: props.isSquare ? 18 : 20,
+  borderRadius: props.isSquare ? 0 : 20,
   position: 'absolute',
-  right: props.isSquare ? -9 : -11,
+  right: props.isSquare ? -9 : -10,
   bottom: -2,
   backgroundColor: props.theme.colors.elevation0,
   padding: 2,
@@ -118,7 +118,7 @@ export default function TokenImage({
     if (imageError) {
       return (
         <TickerIconContainer size={size} round={round}>
-          <TickerIconText>{ticker.substring(0, 4)}</TickerIconText>
+          <TickerIconText data-testid="token-image">{ticker.substring(0, 4)}</TickerIconText>
         </TickerIconContainer>
       );
     }
@@ -156,14 +156,14 @@ export default function TokenImage({
     if (fungibleToken.runeSymbol) {
       return (
         <TickerIconContainer size={size} round={round}>
-          <TickerIconText>{fungibleToken.runeSymbol}</TickerIconText>
+          <TickerIconText data-testid="token-image">{fungibleToken.runeSymbol}</TickerIconText>
         </TickerIconContainer>
       );
     }
 
     return (
       <TickerIconContainer size={size} round={round}>
-        <TickerIconText>{ticker.substring(0, 4)}</TickerIconText>
+        <TickerIconText data-testid="token-image">{ticker.substring(0, 4)}</TickerIconText>
       </TickerIconContainer>
     );
   };

@@ -1,5 +1,6 @@
 import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RequestError from '@components/requests/requestError';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import { RUNE_DISPLAY_DEFAULTS, type Transport } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
 import { useCallback, useEffect } from 'react';
@@ -17,6 +18,7 @@ const LoaderContainer = styled.div(() => ({
 
 function MintRune() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
+  const { btcAddress, ordinalsAddress } = useSelectedAccount();
   const navigate = useNavigate();
   const {
     mintRequest,
@@ -67,35 +69,37 @@ function MintRune() {
       )}
       {orderTx && orderTx.summary && runeInfo && !mintError && (
         <ConfirmBtcTransaction
-          inputs={orderTx.summary.inputs}
-          outputs={orderTx.summary.outputs}
-          feeOutput={orderTx.summary.feeOutput}
+          summary={orderTx.summary}
+          runeSummary={{
+            burns: [],
+            inputsHadRunes: false,
+            txnHasExternalInputs: orderTx.summary?.inputs.some(
+              (input) =>
+                input.extendedUtxo.address !== btcAddress &&
+                input.extendedUtxo.address !== ordinalsAddress,
+            ),
+            receipts: [],
+            transfers: [],
+            mint: {
+              runeName: runeInfo.entry.spaced_rune,
+              amount: BigInt(runeInfo.entry.terms.amount?.toNumber() ?? 0),
+              divisibility: runeInfo.entry.divisibility.toNumber(),
+              symbol: runeInfo.entry.symbol,
+              inscriptionId: runeInfo.parent ?? '',
+              runeIsOpen: runeInfo.mintable,
+              runeIsMintable: runeInfo.mintable,
+              destinationAddress: mintRequest.destinationAddress,
+              repeats: mintRequest.repeats,
+              runeSize: RUNE_DISPLAY_DEFAULTS.size,
+            },
+          }}
           feeRate={+feeRate}
-          showCenotaphCallout={false}
           confirmText={t('CONFIRM')}
           cancelText={t('CANCEL')}
           isBroadcast
           isLoading={false}
           onCancel={onClickCancel}
           onConfirm={onClickConfirm}
-          runeSummary={{
-            burns: [],
-            inputsHadRunes: false,
-            receipts: [],
-            transfers: [],
-            mint: {
-              repeats: mintRequest.repeats,
-              runeSize: RUNE_DISPLAY_DEFAULTS.size,
-              runeName: runeInfo.entry.spaced_rune,
-              amount: BigInt(runeInfo.entry.terms.amount?.toNumber() ?? 0),
-              inscriptionId: runeInfo.parent ?? '',
-              runeIsMintable: runeInfo.mintable,
-              runeIsOpen: runeInfo.mintable,
-              symbol: runeInfo.entry.symbol,
-              divisibility: runeInfo.entry.divisibility.toNumber(),
-              destinationAddress: mintRequest.destinationAddress,
-            },
-          }}
           isSubmitting={isExecuting}
           hideBottomBar
           showAccountHeader

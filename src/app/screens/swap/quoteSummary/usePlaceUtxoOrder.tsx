@@ -22,7 +22,6 @@ const usePlaceUtxoOrder = () => {
       setOrder(response);
       return response;
     } catch (err: any) {
-      console.log(err);
       setError(err?.response?.data?.message ?? 'Failed to place order');
     } finally {
       setLoading(false);

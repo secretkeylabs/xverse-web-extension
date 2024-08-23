@@ -69,7 +69,7 @@ function TransferFeeView({
     <Container>
       <Row>
         <FeeTitleContainer>
-          <StyledP typography="body_medium_m" color="white_400">
+          <StyledP typography="body_medium_m" color="white_0">
             {t('NETWORK_FEE')}
           </StyledP>
         </FeeTitleContainer>
@@ -80,7 +80,7 @@ function TransferFeeView({
             thousandSeparator
             suffix={` ${currency}`}
             renderText={(value: string) => (
-              <StyledP data-testid="send-value" typography="body_medium_m" color="white_0">
+              <StyledP data-testid="fee-amount" typography="body_medium_m" color="white_0">
                 {value}
               </StyledP>
             )}

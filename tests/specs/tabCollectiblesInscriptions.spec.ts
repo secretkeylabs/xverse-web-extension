@@ -9,11 +9,7 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
     // get own Ordinals Address for address check on review page
-    await wallet.allupperButtons.nth(1).click();
-    const addressOrdinals = await wallet.getAddress(wallet.buttonCopyOrdinalsAddress);
-
-    // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
-    await page.reload();
+    const addressOrdinals = await wallet.getAddress('Ordinals');
 
     // Navigate to Collectibles tab
     await wallet.navigateToCollectibles();
@@ -55,7 +51,7 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     await expect(wallet.buttonNext).toBeDisabled();
 
     // Address invalid check
-    await wallet.invalidAdressCheck(wallet.receiveAddress);
+    await wallet.invalidAddressCheck(wallet.receiveAddress);
 
     // Check Info message
     await wallet.receiveAddress.fill(addressOrdinals);
@@ -66,7 +62,15 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     await wallet.buttonNext.click();
 
     // Transaction Review Page
-    await wallet.checkVisualsSendInscriptionsPage2(TEST_ORDINALS_ADDRESS, orgNumberOrdinal);
+    await wallet.checkVisualsSendTransactionReview(
+      'send-ordinal',
+      true,
+      '',
+      TEST_ORDINALS_ADDRESS,
+      false,
+    );
+
+    await wallet.switchToHighFees();
 
     // Cancel the transaction
     await wallet.buttonCancel.click();
@@ -139,14 +143,20 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     await expect(wallet.buttonNext).toBeDisabled();
 
     // Address invalid check
-    await wallet.invalidAdressCheck(wallet.receiveAddress);
+    await wallet.invalidAddressCheck(wallet.receiveAddress);
 
     await wallet.receiveAddress.fill(TEST_ORDINALS_ADDRESS);
     await expect(wallet.buttonNext).toBeEnabled();
     await wallet.buttonNext.click();
 
     // Transaction Review Page
-    await wallet.checkVisualsSendInscriptionsPage2(TEST_ORDINALS_ADDRESS, orgNumberOrdinal);
+    await wallet.checkVisualsSendTransactionReview(
+      'send-ordinal',
+      true,
+      '',
+      TEST_ORDINALS_ADDRESS,
+      false,
+    );
 
     await wallet.confirmSendTransaction();
 
@@ -166,11 +176,7 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
     // get own Ordinals Address for address check on review page
-    await wallet.allupperButtons.nth(1).click();
-    const addressOrdinals = await wallet.getAddress(wallet.buttonCopyOrdinalsAddress);
-
-    // Reload the page to close the modal window for the addresses as the X button needs to have a better locator
-    await page.reload();
+    const addressOrdinals = await wallet.getAddress('Ordinals');
 
     // Navigate to Collectibles tab
     await wallet.navigateToCollectibles();
@@ -207,7 +213,7 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     await expect(wallet.buttonNext).toBeDisabled();
 
     // Address invalid check
-    await wallet.invalidAdressCheck(wallet.receiveAddress);
+    await wallet.invalidAddressCheck(wallet.receiveAddress);
 
     // Check Info message
     await wallet.receiveAddress.fill(addressOrdinals);
@@ -218,7 +224,17 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     await wallet.buttonNext.click();
 
     // Transaction Review Page
-    await wallet.checkVisualsSendInscriptionsPage2(TEST_ORDINALS_ADDRESS, orgNumberOrdinal);
+    await wallet.checkVisualsSendTransactionReview(
+      'send-ordinal',
+      true,
+      '',
+      TEST_ORDINALS_ADDRESS,
+      false,
+      true,
+      orgNumberOrdinal,
+    );
+
+    await wallet.switchToHighFees();
 
     // Cancel the transaction
     await wallet.buttonCancel.click();
@@ -282,7 +298,15 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     await wallet.buttonNext.click();
 
     // Transaction Review Page
-    await wallet.checkVisualsSendInscriptionsPage2(TEST_ORDINALS_ADDRESS, orgNumberOrdinal);
+    await wallet.checkVisualsSendTransactionReview(
+      'send-ordinal',
+      true,
+      '',
+      TEST_ORDINALS_ADDRESS,
+      false,
+      true,
+      orgNumberOrdinal,
+    );
 
     await wallet.confirmSendTransaction();
 

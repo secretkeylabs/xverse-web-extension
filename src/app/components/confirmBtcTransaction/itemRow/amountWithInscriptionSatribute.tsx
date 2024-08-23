@@ -1,5 +1,4 @@
 import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
-import BundleItem from '@components/confirmBtcTransactionComponent/bundleItem';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { WarningOctagon } from '@phosphor-icons/react';
 import { animated, config, useSpring } from '@react-spring/web';
@@ -11,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import Theme from 'theme';
 import { mapTxSatributeInfoToBundleInfo } from '../utils';
+import BundleItem from './bundleItem';
 import Inscription from './inscription';
 
 const WarningContainer = styled.div`
@@ -25,7 +25,6 @@ const WarningButton = styled.button`
   align-items: center;
   justify-content: space-between;
   background-color: ${(props) => props.theme.colors.elevation1};
-  padding-top: ${(props) => props.theme.space.m};
 `;
 
 const ItemsContainer = styled(animated.div)((props) => ({

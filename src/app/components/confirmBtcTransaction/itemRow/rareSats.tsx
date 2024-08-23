@@ -1,5 +1,4 @@
 import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
-import BundleItem from '@components/confirmBtcTransactionComponent/bundleItem';
 import { Butterfly } from '@phosphor-icons/react';
 import { animated, config, useSpring } from '@react-spring/web';
 import { StyledP } from '@ui-library/common.styled';
@@ -11,11 +10,13 @@ import styled from 'styled-components';
 import Theme from 'theme';
 import Avatar from '../../../ui-library/avatar';
 import { mapTxSatributeInfoToBundleInfo, type SatRangeTx } from '../utils';
+import BundleItem from './bundleItem';
 
 const SatsBundleContainer = styled.div`
   display: flex;
   flex-direction: column;
   border-radius: ${(props) => props.theme.space.s};
+  margin-bottom: ${(props) => props.theme.space.s};
 `;
 
 const SatsBundleButton = styled.button`
@@ -84,9 +85,13 @@ function RareSats({
         <Row>
           <Avatar icon={<Butterfly size={18} color={Theme.colors.elevation0} />} />
           <BundleInfo>
-            <StyledP typography="body_medium_m" color="white_200">{`${
+            <StyledP typography="body_medium_m" color="white_0">{`${
               satributesInfo.totalExoticSats
-            } ${t('NFT_DASHBOARD_SCREEN.RARE_SATS')}`}</StyledP>
+            } ${t(
+              satributesInfo.totalExoticSats > 1
+                ? 'NFT_DASHBOARD_SCREEN.RARE_SATS'
+                : 'NFT_DASHBOARD_SCREEN.RARE_SAT',
+            )}`}</StyledP>
             {bundleSize && (
               <NumericFormat
                 value={bundleSize}
