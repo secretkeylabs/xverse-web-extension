@@ -1,5 +1,6 @@
 import { MESSAGE_SOURCE } from '@common/types/message-types';
 import { makeAccountResourceId } from '@components/permissionsManager/resources';
+import type { PermissionsStore } from '@components/permissionsManager/schemas';
 import * as utils from '@components/permissionsManager/utils';
 import {
   RpcErrorCode,
@@ -55,16 +56,7 @@ export function makeSendPopupClosedUserRejectionMessage({
   };
 }
 
-export async function hasPermissions(origin: string): Promise<boolean> {
-  const [error, store] = await utils.loadPermissionsStore();
-  if (error) {
-    return false;
-  }
-
-  if (!store) {
-    return false;
-  }
-
+export function hasAccountReadPermissions(origin: string, store: PermissionsStore): boolean {
   const {
     selectedAccountIndex,
     selectedAccountType,
