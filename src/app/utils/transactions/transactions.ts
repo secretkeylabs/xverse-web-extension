@@ -1,7 +1,6 @@
 import {
   API_TIMEOUT_MILLI,
   StacksNetwork,
-  getNetworkURL,
   type APIGetRunesActivityForAddressResponse,
   type AppInfo,
   type Brc20HistoryTransactionData,
@@ -31,9 +30,7 @@ async function getTransferTransactions(reqParams: {
   offset: number;
 }): Promise<AddressTransactionWithTransfers[]> {
   const { stxAddress, limit, network, offset } = reqParams;
-  const apiUrl = `${getNetworkURL(
-    network,
-  )}/extended/v1/address/${stxAddress}/transactions_with_transfers`;
+  const apiUrl = `${network.coreApiUrl}/extended/v1/address/${stxAddress}/transactions_with_transfers`;
   const response = await axios.get<PaginatedResults<AddressTransactionWithTransfers>>(apiUrl, {
     params: {
       limit,

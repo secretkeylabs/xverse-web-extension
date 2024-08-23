@@ -5,7 +5,6 @@ import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   API_TIMEOUT_MILLI,
-  getNetworkURL,
   type Account,
   type BtcAddressData,
   type FungibleToken,
@@ -73,9 +72,7 @@ const useAccountBalance = () => {
         });
       }
       if (account.stxAddress) {
-        const apiUrl = `${getNetworkURL(stacksNetwork)}/extended/v1/address/${
-          account.stxAddress
-        }/balances`;
+        const apiUrl = `${stacksNetwork.coreApiUrl}/extended/v1/address/${account.stxAddress}/balances`;
 
         const response = await axios.get<TokensResponse>(apiUrl, {
           timeout: API_TIMEOUT_MILLI,
