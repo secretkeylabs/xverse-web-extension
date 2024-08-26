@@ -1,4 +1,4 @@
-import type { Client, Permission, PermissionsStoreV1, Resource } from './schemas';
+import type { Client, Permission, PermissionsStore, Resource } from './schemas';
 
 export type TPermissionsStoreContext<TError = unknown> =
   | {
@@ -7,7 +7,7 @@ export type TPermissionsStoreContext<TError = unknown> =
       store: undefined;
     }
   | { isLoading: false; error: TError; store: undefined }
-  | { isLoading: false; error: undefined; store: PermissionsStoreV1 };
+  | { isLoading: false; error: undefined; store: PermissionsStore };
 
 export type TPermissionsUtilsContext = {
   // Queries

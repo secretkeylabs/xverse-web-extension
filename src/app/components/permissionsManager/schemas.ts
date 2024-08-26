@@ -105,4 +105,4 @@ export const permissionsStoreSchema = v.object({
 /**
  * @public
  */
-export type PermissionsStoreV1 = v.InferOutput<typeof permissionsStoreSchema>;
+export type PermissionsStore = v.InferOutput<typeof permissionsStoreSchema>;
