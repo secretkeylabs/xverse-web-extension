@@ -342,6 +342,9 @@ export default function ContractCallRequest({
     }
   };
   const cancelCallback = () => {
+    if (messageId === 'velar') {
+      return navigate(-1);
+    }
     if (tabId && messageId) {
       sendUserRejectionMessage({ tabId, messageId });
     } else {
