@@ -6,6 +6,7 @@ import type {
   TokenBasic,
 } from '@secretkeylabs/xverse-core';
 import type { CurrencyTypes } from '@utils/constants';
+import { btcFt, stxFt } from './useMasterCoinsList';
 
 export const mapFtToCurrencyType = (ft?: FungibleToken): CurrencyTypes => {
   const principalToCurrencyTypeMap: Record<string, CurrencyTypes> = {
@@ -86,21 +87,11 @@ export const mapFTNativeSwapTokenToTokenBasic = (token: FungibleToken | Token): 
 };
 
 export const mapFtToSwapToken = (st: FungibleToken): Token => {
-  if (st.principal === 'BTC') {
-    return {
-      ticker: 'BTC',
-      name: 'Bitcoin',
-      protocol: 'btc',
-      divisibility: 8,
-    };
+  if (st.principal === 'BTC' && st !== btcFt) {
+    return mapFtToSwapToken(btcFt);
   }
-  if (st.principal === 'STX') {
-    return {
-      ticker: 'STX',
-      name: 'Stacks',
-      protocol: 'stx',
-      divisibility: 6,
-    };
+  if (st.principal === 'STX' && st !== stxFt) {
+    return mapFtToSwapToken(stxFt);
   }
 
   return {
