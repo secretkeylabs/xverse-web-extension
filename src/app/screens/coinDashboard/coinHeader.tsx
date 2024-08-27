@@ -174,7 +174,7 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
       (fungibleToken?.protocol === 'runes' ||
         (isStacksSwapsEnabled && fungibleToken?.protocol === 'stacks'))) ||
     currency === 'BTC' ||
-    currency === 'STX';
+    (currency === 'STX' && isStacksSwapsEnabled);
   const showSwaps = isCrossChainSwapsEnabled && isSwapEligibleCurrency;
 
   const navigateToSwaps = () => {
