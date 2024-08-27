@@ -42,7 +42,7 @@ const useMasterCoinsList = () => {
         btcFt,
         ...(!hideStx && isStacksSwapsEnabled ? [stxFt, ...sip10FtList] : []),
       ] ?? [],
-    [sip10FtList, runesFtList],
+    [runesFtList, hideStx, isStacksSwapsEnabled, sip10FtList],
   );
 
   return coinsMasterList;
