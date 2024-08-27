@@ -53,10 +53,6 @@ export const PAGINATION_LIMIT = 50;
 export const SEND_MANY_TOKEN_TRANSFER_CONTRACT_PRINCIPAL =
   'SP3FBR2AGK5H9QBDH3EEN6DF8EK8JY7RX8QJ5SVTE.send-many-memo';
 
-export const SWAP_SPONSOR_DISABLED_SUPPORT_URL =
-  'https://support.xverse.app/hc/en-us/articles/18319388355981';
-export const SUPPORT_URL_TAB_TARGET = 'SupportURLTabTarget';
-
 export const DEFAULT_TRANSITION_OPTIONS = {
   from: {
     x: 24,

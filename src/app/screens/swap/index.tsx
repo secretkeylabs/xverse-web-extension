@@ -44,7 +44,7 @@ import TokenToBottomSheet from './components/tokenToBottomSheet';
 import trackSwapMixPanel from './mixpanel';
 import QuoteSummary from './quoteSummary';
 import QuotesModal from './quotesModal';
-import type { OrderInfo, StxOrderInfo } from './types';
+import type { OrderInfo, Side, StxOrderInfo } from './types';
 import useMasterCoinsList from './useMasterCoinsList';
 import {
   mapFTNativeSwapTokenToTokenBasic,
@@ -109,9 +109,7 @@ export default function SwapScreen() {
   const [errorMessage, setErrorMessage] = useState('');
 
   const [getQuotesModalVisible, setGetQuotesModalVisible] = useState(false);
-  const [tokenSelectionBottomSheet, setTokenSelectionBottomSheet] = useState<'from' | 'to' | null>(
-    null,
-  );
+  const [tokenSelectionBottomSheet, setTokenSelectionBottomSheet] = useState<Side | null>(null);
   const [fromToken, setFromToken] = useState<FungibleToken | undefined>();
   const [toToken, setToToken] = useState<Token | undefined>();
   const [utxosRequest, setUtxosRequest] = useState<GetUtxosRequest | null>(null);
