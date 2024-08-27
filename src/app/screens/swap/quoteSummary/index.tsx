@@ -323,39 +323,46 @@ export default function QuoteSummary({
     quote.slippageSupported && quote.slippageThreshold && slippage > quote.slippageThreshold,
   );
 
-  const fromTokenFiatValue =
-    fromToken?.principal === 'BTC'
-      ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcFiatRate)).toFixed(2)
-      : fromToken?.principal === 'STX'
-      ? getStxFiatEquivalent(
-          stxToMicrostacks(new BigNumber(amount)),
-          new BigNumber(stxBtcRate),
-          new BigNumber(btcFiatRate),
-        ).toFixed(2)
-      : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2);
+  const fromTokenFiatValue = (() => {
+    if (fromToken?.principal === 'BTC') {
+      return getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcFiatRate)).toFixed(2);
+    }
+    if (fromToken?.principal === 'STX') {
+      return getStxFiatEquivalent(
+        stxToMicrostacks(new BigNumber(amount)),
+        new BigNumber(stxBtcRate),
+        new BigNumber(btcFiatRate),
+      ).toFixed(2);
+    }
+    return new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2);
+  })();
 
-  const toTokenFiatValue =
-    toToken?.protocol === 'btc'
-      ? getBtcFiatEquivalent(
-          new BigNumber(quote.receiveAmount),
-          new BigNumber(btcFiatRate),
-        ).toFixed(2)
-      : toToken?.protocol === 'runes'
-      ? getBtcFiatEquivalent(
-          new BigNumber(runeFloorPrice ?? 0).multipliedBy(quote.receiveAmount),
-          new BigNumber(btcFiatRate),
-        ).toFixed(2)
-      : toToken?.protocol === 'stx'
-      ? getStxFiatEquivalent(
-          stxToMicrostacks(new BigNumber(quote.receiveAmount)),
-          new BigNumber(stxBtcRate),
-          new BigNumber(btcFiatRate),
-        ).toFixed(2)
-      : new BigNumber(
-          sip10CoinsList?.find((s) => s.principal === toToken?.ticker)?.tokenFiatRate ?? 0,
-        )
-          .multipliedBy(quote.receiveAmount)
-          .toFixed(2);
+  const toTokenFiatValue = (() => {
+    if (toToken?.protocol === 'btc') {
+      return getBtcFiatEquivalent(
+        new BigNumber(quote.receiveAmount),
+        new BigNumber(btcFiatRate),
+      ).toFixed(2);
+    }
+    if (toToken?.protocol === 'runes') {
+      return getBtcFiatEquivalent(
+        new BigNumber(runeFloorPrice ?? 0).multipliedBy(quote.receiveAmount),
+        new BigNumber(btcFiatRate),
+      ).toFixed(2);
+    }
+    if (toToken?.protocol === 'stx') {
+      return getStxFiatEquivalent(
+        stxToMicrostacks(new BigNumber(quote.receiveAmount)),
+        new BigNumber(stxBtcRate),
+        new BigNumber(btcFiatRate),
+      ).toFixed(2);
+    }
+    return new BigNumber(
+      sip10CoinsList?.find((s) => s.principal === toToken?.ticker)?.tokenFiatRate ?? 0,
+    )
+      .multipliedBy(quote.receiveAmount)
+      .toFixed(2);
+  })();
 
   const showBadQuoteWarning =
     quote.slippageSupported &&
