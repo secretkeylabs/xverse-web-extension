@@ -1,6 +1,7 @@
 import { StyledFiatAmountText } from '@components/fiatAmountText';
 import useWalletSelector from '@hooks/useWalletSelector';
 import BigNumber from 'bignumber.js';
+import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
@@ -47,6 +48,13 @@ const FiatText = styled(StyledFiatAmountText)((props) => ({
   marginTop: props.theme.space.xxxs,
 }));
 
+const Subtitle = styled.p`
+  ${(props) => props.theme.typography.body_medium_m};
+  color: ${(props) => props.theme.colors.white_200};
+  margin-top: ${(props) => props.theme.space.s};
+  margin-bottom: ${(props) => props.theme.space.xs};
+`;
+
 type Props = {
   title: string;
   subTitle?: string;
@@ -65,19 +73,23 @@ function TransactionDetailComponent({
   titleColor,
 }: Props) {
   const { fiatCurrency } = useWalletSelector();
+  const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
 
   return (
-    <Container>
-      <TitleContainer>
-        <TitleText $color={titleColor}>{title}</TitleText>
-        {subTitle && <SubValueText>{subTitle}</SubValueText>}
-      </TitleContainer>
-      <ColumnContainer>
-        {value && <ValueText>{value}</ValueText>}
-        {description && <SubValueText>{description}</SubValueText>}
-        {subValue && <FiatText fiatAmount={subValue} fiatCurrency={fiatCurrency} />}
-      </ColumnContainer>
-    </Container>
+    <>
+      <Subtitle>{t('TRANSACTION_DETAILS')}</Subtitle>
+      <Container>
+        <TitleContainer>
+          <TitleText $color={titleColor}>{title}</TitleText>
+          {subTitle && <SubValueText>{subTitle}</SubValueText>}
+        </TitleContainer>
+        <ColumnContainer>
+          {value && <ValueText>{value}</ValueText>}
+          {description && <SubValueText>{description}</SubValueText>}
+          {subValue && <FiatText fiatAmount={subValue} fiatCurrency={fiatCurrency} />}
+        </ColumnContainer>
+      </Container>
+    </>
   );
 }
 
