@@ -114,7 +114,6 @@ function QuotesModal({
               {t('EXCHANGE')}
             </Heading>
           ))}
-        {/* todo: get fiat rates of rune from API */}
         {ammProviders.map((amm) => (
           <QuoteTile
             key={amm.provider.name}
