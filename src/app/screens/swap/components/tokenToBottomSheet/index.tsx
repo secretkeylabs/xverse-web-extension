@@ -106,7 +106,7 @@ export default function TokenToBottomSheet({
     if (from) {
       setSelectedProtocol(mapFTMotherProtocolToSwapProtocol(from));
     }
-  }, [from]);
+  }, [from, visible]);
 
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
   const search = useDebounce(query, 500);
@@ -122,7 +122,7 @@ export default function TokenToBottomSheet({
     if (selectedProtocol === protocol) {
       return;
     }
-    // resetFrom();
+    resetFrom();
     setQuery('');
     setSelectedProtocol(protocol);
   };
