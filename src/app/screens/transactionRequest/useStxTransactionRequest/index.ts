@@ -24,8 +24,8 @@ export type DataStxSignTransaction = {
     method: 'stx_signTransaction';
     params: {
       transaction: string;
-      pubkey?: string | undefined;
-      broadcast?: boolean | undefined;
+      pubkey?: string;
+      broadcast?: boolean;
     };
     id: string;
     jsonrpc: '2.0';

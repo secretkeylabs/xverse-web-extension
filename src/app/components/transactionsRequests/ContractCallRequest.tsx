@@ -114,6 +114,7 @@ export default function ContractCallRequest({
   const [fee, setFee] = useState<BigNumber | undefined>(undefined);
   const { executeStxOrder } = useExecuteOrder();
   const [isLoading, setIsLoading] = useState(false);
+  const isStxSwap = messageId === 'velar' || messageId === 'alex';
 
   // SignTransaction Params
   const isMultiSigTx = isMultiSig(unsignedTx);
@@ -267,9 +268,9 @@ export default function ContractCallRequest({
   };
 
   const confirmCallback = async (transactions: StacksTransaction[]) => {
-    if (messageId === 'velar') {
+    if (isStxSwap) {
       const order: ExecuteStxOrderRequest = {
-        providerCode: 'velar',
+        providerCode: messageId,
         signedTransaction: buf2hex(transactions[0].serialize()),
       };
       setIsLoading(true);
@@ -342,7 +343,7 @@ export default function ContractCallRequest({
     }
   };
   const cancelCallback = () => {
-    if (messageId === 'velar') {
+    if (isStxSwap) {
       return navigate(-1);
     }
     if (tabId && messageId) {

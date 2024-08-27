@@ -239,7 +239,7 @@ export default function QuoteSummary({
   const isSip10Swap = fromToken?.protocol === 'stacks' || toToken?.protocol === 'sip10';
 
   const [showSlippageModal, setShowSlippageModal] = useState(false);
-  const DEFAULT_SLIPPAGE = quote.provider.code === 'velar' ? 0.04 : 0.05;
+  const DEFAULT_SLIPPAGE = quote.slippageThreshold ?? 0.05;
   const [slippage, setSlippage] = useSearchParamsState('slippage', DEFAULT_SLIPPAGE);
 
   const handleSwap = async () => {

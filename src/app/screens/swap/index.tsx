@@ -429,7 +429,7 @@ export default function SwapScreen() {
 
   const unsignedTransactionHexString = stxOrderInfo?.order.unsignedTransaction;
 
-  if (unsignedTransactionHexString) {
+  if (unsignedTransactionHexString && quote) {
     const dataStxSignTransactionOverride: DataStxSignTransaction = {
       context: {
         origin: 'extension',
@@ -442,7 +442,7 @@ export default function SwapScreen() {
           pubkey: stxPublicKey,
           broadcast: true,
         },
-        id: 'velar',
+        id: quote?.provider.code,
         jsonrpc: '2.0',
       },
     };
