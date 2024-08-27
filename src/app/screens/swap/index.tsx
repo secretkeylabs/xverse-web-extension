@@ -15,7 +15,9 @@ import {
   AnalyticsEvents,
   btcToSats,
   getBtcFiatEquivalent,
+  getStxFiatEquivalent,
   microstacksToStx,
+  stxToMicrostacks,
   type FungibleToken,
   type GetUtxosRequest,
   type MarketUtxo,
@@ -129,7 +131,7 @@ export default function SwapScreen() {
   const { data: btcBalance } = useBtcWalletData();
   const { data: stxData } = useStxWalletData();
 
-  const { btcFiatRate, btcUsdRate } = useCoinRates();
+  const { btcFiatRate, btcUsdRate, stxBtcRate } = useCoinRates();
   const navigate = useNavigate();
   const { t } = useTranslation('translation');
   const location = useLocation();
@@ -288,6 +290,15 @@ export default function SwapScreen() {
     if (fromToken?.principal === 'BTC') {
       const amountInSats = btcToSats(new BigNumber(balance));
       return getBtcFiatEquivalent(amountInSats, new BigNumber(btcFiatRate)).toFixed(2);
+    }
+
+    if (fromToken?.principal === 'STX') {
+      const amountInMicroStx = stxToMicrostacks(new BigNumber(balance));
+      return getStxFiatEquivalent(
+        amountInMicroStx,
+        new BigNumber(stxBtcRate),
+        new BigNumber(btcFiatRate),
+      ).toFixed(2);
     }
 
     if (!fromToken?.tokenFiatRate || !fromToken.decimals) {
