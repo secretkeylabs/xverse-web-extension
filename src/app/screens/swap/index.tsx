@@ -3,7 +3,6 @@ import RequestsRoutes from '@common/utils/route-urls';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery';
-import { useGetSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useGetQuotes from '@hooks/queries/swaps/useGetQuotes';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useCoinRates from '@hooks/queries/useCoinRates';
@@ -108,7 +107,6 @@ export default function SwapScreen() {
   const [quote, setQuote] = useState<Quote>();
   const [selectedUtxoProvider, setSelectedUtxoProvider] = useState<UtxoQuote>();
   const [errorMessage, setErrorMessage] = useState('');
-  const { data: sip10CoinsList } = useGetSip10FungibleTokens();
 
   const [getQuotesModalVisible, setGetQuotesModalVisible] = useState(false);
   const [tokenSelectionBottomSheet, setTokenSelectionBottomSheet] = useState<'from' | 'to' | null>(
