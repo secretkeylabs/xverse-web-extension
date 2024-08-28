@@ -1,5 +1,5 @@
 import type { Permission } from '@components/permissionsManager/schemas';
-import { loadPermissionsStore } from '@components/permissionsManager/utils';
+import { getPermissionsStore } from '@components/permissionsManager/utils';
 import { type ContentScriptMessage } from '../schemas';
 
 /**
@@ -37,7 +37,7 @@ function clientOriginToUrlMatchPattern(tabOrigin: string) {
  * @public
  */
 export async function sendMessageConnectedClient(id: string, message: ContentScriptMessage) {
-  const [error, store] = await loadPermissionsStore();
+  const [error, store] = await getPermissionsStore();
   if (error) {
     // eslint-disable-next-line no-console
     console.error('Failed to load permissions store:', error);
@@ -76,7 +76,7 @@ export async function sendMessageConnectedClient(id: string, message: ContentScr
  * @public
  */
 export async function sendMessageConnectedClients(message: ContentScriptMessage) {
-  const [error, store] = await loadPermissionsStore();
+  const [error, store] = await getPermissionsStore();
   if (error) {
     // eslint-disable-next-line no-console
     console.error('Failed to load permissions store:', error);
@@ -111,7 +111,7 @@ export async function sendMessageAuthorizedConnectedClients(
   permission: Omit<Permission, 'clientId'>,
   message: ContentScriptMessage,
 ) {
-  const [error, store] = await loadPermissionsStore();
+  const [error, store] = await getPermissionsStore();
   if (error) {
     // eslint-disable-next-line no-console
     console.error('Failed to load permissions store:', error);
