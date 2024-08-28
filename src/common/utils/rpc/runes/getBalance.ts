@@ -26,10 +26,14 @@ const handleGetRunesBalance = async (message: RpcRequestMessage, port: chrome.ru
     return;
   }
   const { origin, tabId } = makeContext(port);
-  const [loadError, store] = await utils.loadPermissionsStore();
+  const [loadError, store] = await utils.getPermissionsStore();
 
   if (loadError) {
-    sendInternalErrorMessage({ tabId, messageId: message.id });
+    sendInternalErrorMessage({
+      tabId,
+      messageId: message.id,
+      message: 'Error loading permissions store.',
+    });
     return;
   }
 

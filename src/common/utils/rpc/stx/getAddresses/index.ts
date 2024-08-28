@@ -1,6 +1,7 @@
 import { type WebBtcMessage } from '@common/types/message-types';
 import getSelectedAccount from '@common/utils/getSelectedAccount';
 import { makeContext } from '@common/utils/popup';
+import * as utils from '@components/permissionsManager/utils';
 import { AddressPurpose, AddressType, RpcErrorCode } from '@sats-connect/core';
 import rootStore from '@stores/index';
 import {
@@ -9,7 +10,11 @@ import {
   triggerRequestWindowOpen,
 } from '../../../legacy-external-message-handler';
 import RequestsRoutes from '../../../route-urls';
-import { hasPermissions, makeRPCError } from '../../helpers';
+import { hasAccountReadPermissions, makeRPCError } from '../../helpers';
+import {
+  sendAccessDeniedResponseMessage,
+  sendInternalErrorMessage,
+} from '../../responseMessages/errors';
 import { sendGetAddressesSuccessResponseMessage } from '../../responseMessages/stacks';
 
 const handleGetStxAddresses = async (
@@ -20,52 +25,65 @@ const handleGetStxAddresses = async (
     messageId: String(message.id),
     rpcMethod: 'stx_getAddresses',
   };
-
   const { origin, tabId } = makeContext(port);
-  if (await hasPermissions(origin)) {
-    const {
-      selectedAccountIndex,
-      selectedAccountType,
-      accountsList: softwareAccountsList,
-      ledgerAccountsList,
-    } = rootStore.store.getState().walletState;
 
-    const account = getSelectedAccount({
-      selectedAccountIndex,
-      selectedAccountType,
-      softwareAccountsList,
-      ledgerAccountsList,
+  const [error, store] = await utils.getPermissionsStore();
+  if (error) {
+    sendInternalErrorMessage({
+      tabId,
+      messageId: message.id,
+      message: 'Error loading permissions store.',
     });
-
-    if (account) {
-      sendGetAddressesSuccessResponseMessage({
-        tabId,
-        messageId: message.id,
-        result: {
-          addresses: [
-            {
-              address: account.stxAddress,
-              publicKey: account.stxPublicKey,
-              addressType: AddressType.stacks,
-              purpose: AddressPurpose.Stacks,
-            },
-          ],
-        },
-      });
-      return;
-    }
+    return;
   }
 
-  const { urlParams } = makeSearchParamsWithDefaults(port, popupParams);
+  if (!hasAccountReadPermissions(origin, store)) {
+    sendAccessDeniedResponseMessage({ tabId, messageId: message.id });
+    return;
+  }
 
-  const { id } = await triggerRequestWindowOpen(RequestsRoutes.StxAddressRequest, urlParams);
-  listenForPopupClose({
+  const {
+    selectedAccountIndex,
+    selectedAccountType,
+    accountsList: softwareAccountsList,
+    ledgerAccountsList,
+  } = rootStore.store.getState().walletState;
+
+  const account = getSelectedAccount({
+    selectedAccountIndex,
+    selectedAccountType,
+    softwareAccountsList,
+    ledgerAccountsList,
+  });
+
+  if (!account) {
+    const { urlParams } = makeSearchParamsWithDefaults(port, popupParams);
+
+    const { id } = await triggerRequestWindowOpen(RequestsRoutes.StxAddressRequest, urlParams);
+    listenForPopupClose({
+      tabId,
+      id,
+      response: makeRPCError(message.id, {
+        code: RpcErrorCode.USER_REJECTION,
+        message: 'User rejected request to get addresses',
+      }),
+    });
+    return;
+  }
+
+  sendGetAddressesSuccessResponseMessage({
     tabId,
-    id,
-    response: makeRPCError(message.id, {
-      code: RpcErrorCode.USER_REJECTION,
-      message: 'User rejected request to get addresses',
-    }),
+    messageId: message.id,
+    result: {
+      addresses: [
+        {
+          address: account.stxAddress,
+          publicKey: account.stxPublicKey,
+          addressType: AddressType.stacks,
+          purpose: AddressPurpose.Stacks,
+        },
+      ],
+    },
   });
 };
 

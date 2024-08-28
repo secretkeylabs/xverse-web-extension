@@ -1,4 +1,4 @@
-import { safePromise, type Result } from '@common/utils/safe';
+import { error, safePromise, success, type Result, type SafeError } from '@common/utils/safe';
 import storage from '@utils/chromeStorage';
 import { Mutex } from 'async-mutex';
 import { parse, stringify } from 'superjson';
@@ -9,7 +9,7 @@ import {
   type Client,
   type ClientsTable,
   type Permission,
-  type PermissionsStoreV1 as PermissionsStore,
+  type PermissionsStore,
   type PermissionsTable,
   type Resource,
   type ResourcesTable,
@@ -30,26 +30,39 @@ export function getClientPermission(
 ) {
   return [...permissions].find((p) => p.clientId === clientId && p.resourceId === resourceId);
 }
-export async function loadPermissionsStore(): Promise<Result<PermissionsStore | null>> {
-  const [error, persistedData] = await safePromise(
+export async function getPermissionsStore(): Promise<
+  Result<PermissionsStore, SafeError<'StorageRetrievalError' | 'StoreNotFoundError' | 'ParseError'>>
+> {
+  const [getItemError, persistedData] = await safePromise(
     storage.local.getItem(permissionsPersistantStoreKeyName),
   );
 
-  if (error) {
-    return [error, null];
+  if (getItemError) {
+    return error({
+      name: 'StorageRetrievalError',
+      message: 'Failed to retrieve permissions store from storage.',
+      data: getItemError,
+    });
   }
 
   if (!persistedData) {
-    return [null, null];
+    return error({
+      name: 'StoreNotFoundError',
+      message: 'Permissions store not found in storage.',
+    });
   }
 
   const hydrated = parse(persistedData);
   const parseResult = v.safeParse(permissionsStoreSchema, hydrated);
   if (!parseResult.success) {
-    return [new Error('Failed to parse permissions store.', { cause: parseResult.issues }), null];
+    return error({
+      name: 'ParseError',
+      message: 'Failed to parse permissions store.',
+      data: parseResult.issues,
+    });
   }
 
-  return [null, parseResult.output];
+  return success(parseResult.output);
 }
 
 /**
@@ -147,7 +160,7 @@ function makeResourcesTable() {
 function makePermissionsTable() {
   return new Set<Permission>();
 }
-export function makePermissionsStore(): PermissionsStore {
+function makePermissionsStore(): PermissionsStore {
   return {
     version: 2,
     clients: makeClientsTable(),
@@ -155,4 +168,43 @@ export function makePermissionsStore(): PermissionsStore {
     permissions: makePermissionsTable(),
   };
 }
+
+/**
+ * Loads the permissions store, and creates or migrates it to the latest version
+ * if necessary. Since this operation may result in the store being mutated, it
+ * should be called within a mutex.
+ */
+export async function initPermissionsStore(): Promise<Result<PermissionsStore>> {
+  const [getStoreError, store] = await getPermissionsStore();
+
+  if (getStoreError) {
+    if (getStoreError.name === 'ParseError') {
+      // The store is outdated and needs to be migrated. For now, the store is
+      // migrated by creating a new store using the current schema and
+      // overwriting the previous one. As the store becomes more complex, a more
+      // comprehensive migration may be required.
+      const newStore = makePermissionsStore();
+      await savePermissionsStore(newStore);
+      return success(newStore);
+    }
+
+    if (getStoreError.name === 'StoreNotFoundError') {
+      // The store doesn't exist yet, so we create a new one.
+      const newStore = makePermissionsStore();
+      await savePermissionsStore(newStore);
+      return success(newStore);
+    }
+
+    return error({
+      name: 'InitError',
+      message: 'Failed to initialize permissions store.',
+      data: getStoreError,
+    });
+  }
+
+  return success(store);
+}
+/**
+ * This mutex is intended to be used when mutating the permissions store.
+ */
 export const permissionsStoreMutex = new Mutex();

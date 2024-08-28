@@ -6,13 +6,6 @@ import { permissionsStoreSchema, type Client, type Permission, type Resource } f
 import type { TPermissionsStoreContext, TPermissionsUtilsContext } from './types';
 import * as utils from './utils';
 
-function isStoreOutdatedError(error: Error): boolean {
-  return v.is(
-    v.array(v.object({ path: v.array(v.object({ key: v.literal('version') })) })),
-    error.cause,
-  );
-}
-
 const PermissionsStoreContext = createContext<TPermissionsStoreContext>({
   isLoading: true,
   error: undefined,
@@ -27,26 +20,9 @@ function PermissionsStoreProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     utils.permissionsStoreMutex.runExclusive(async () => {
-      const [e, loadedStore] = await utils.loadPermissionsStore();
+      const [e, store] = await utils.initPermissionsStore();
 
       if (e) {
-        if (isStoreOutdatedError(e)) {
-          // The store is outdated, we need to migrate it. For now we recreate a
-          // brand new store and overwrite the previous one. As the store
-          // becomes more complex, a more comprehensive migration may be
-          // required.
-          const newStore = utils.makePermissionsStore();
-          await utils.savePermissionsStore(newStore);
-          setValue({
-            isLoading: false,
-            error: undefined,
-            store: newStore,
-          });
-          return;
-        }
-
-        // For all other errors not related to an outdated store, we log the
-        // error and set the store to undefined.
         setValue({
           isLoading: false,
           error: e,
@@ -57,21 +33,10 @@ function PermissionsStoreProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      if (!loadedStore) {
-        const newStore = utils.makePermissionsStore();
-        await utils.savePermissionsStore(newStore);
-        setValue({
-          isLoading: false,
-          error: undefined,
-          store: newStore,
-        });
-        return;
-      }
-
       setValue({
         isLoading: false,
         error: undefined,
-        store: loadedStore,
+        store,
       });
     });
   }, []);

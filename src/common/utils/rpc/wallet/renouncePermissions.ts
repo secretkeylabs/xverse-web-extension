@@ -8,10 +8,7 @@ import {
 } from '@sats-connect/core';
 import * as v from 'valibot';
 import { handleInvalidMessage } from '../handle-invalid-message';
-import {
-  sendAccessDeniedResponseMessage,
-  sendInternalErrorMessage,
-} from '../responseMessages/errors';
+import { sendInternalErrorMessage } from '../responseMessages/errors';
 import { sendRenouncePermissionsSuccessResponseMessage } from '../responseMessages/wallet';
 
 export const handleRenouncePermissions = async (
@@ -26,15 +23,14 @@ export const handleRenouncePermissions = async (
   }
 
   const { origin, tabId } = makeContext(port);
-  const [error, store] = await utils.loadPermissionsStore();
+  const [error, store] = await utils.getPermissionsStore();
 
   if (error) {
-    sendInternalErrorMessage({ tabId, messageId: parseResult.output.id });
-    return;
-  }
-
-  if (!store) {
-    sendAccessDeniedResponseMessage({ tabId, messageId: parseResult.output.id });
+    sendInternalErrorMessage({
+      tabId,
+      messageId: parseResult.output.id,
+      message: 'Error loading permissions store.',
+    });
     return;
   }
 
