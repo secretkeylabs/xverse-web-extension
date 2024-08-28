@@ -113,9 +113,7 @@ function TransactionSummary({ isSubmitting, getFeeForFeeRate, onFeeRateSet, feeR
       {!hasRuneDelegation && <BurnSection burns={runeSummary?.burns} />}
       <MintSection mints={[runeSummary?.mint]} />
       <EtchSection etch={(runeSummary as RuneSummaryActions)?.etch} />
-
       <Subtitle>{t('TRANSACTION_DETAILS')}</Subtitle>
-
       <TransactionDetailComponent title={t('NETWORK')} value={network.type} />
       <TxInOutput />
       {hasOutputScript && !runeSummary && <WarningCallout bodyText={t('SCRIPT_OUTPUT_TX')} />}
