@@ -10,7 +10,7 @@ import { CubeTransparent } from '@phosphor-icons/react';
 import { type FungibleToken, getFiatEquivalent } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import type { CurrencyTypes } from '@utils/constants';
-import { getTicker } from '@utils/helper';
+import { getFtTicker } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -115,6 +115,13 @@ const FiatText = styled(StyledFiatAmountText)((props) => ({
   marginTop: props.theme.space.xxxs,
 }));
 
+const Title = styled.p`
+  ${(props) => props.theme.typography.body_medium_m};
+  color: ${(props) => props.theme.colors.white_200};
+  margin-top: ${(props) => props.theme.space.s};
+  margin-bottom: ${(props) => props.theme.space.xs};
+`;
+
 type Props = {
   address?: string;
   value: string;
@@ -162,16 +169,6 @@ function RecipientComponent({
     );
   }, [value]);
 
-  const getFtTicker = () => {
-    if (fungibleToken?.ticker) {
-      return fungibleToken?.ticker.toUpperCase();
-    }
-    if (fungibleToken?.name) {
-      return getTicker(fungibleToken.name).toUpperCase();
-    }
-    return '';
-  };
-
   const renderIcon = () => {
     if (currencyType === 'RareSat') {
       return (
@@ -180,11 +177,9 @@ function RecipientComponent({
         </IconContainer>
       );
     }
-
     if (icon) {
       return <Icon src={icon} />;
     }
-
     return (
       <TokenContainer>
         <TokenImage
@@ -198,57 +193,63 @@ function RecipientComponent({
   };
 
   return (
-    <Container>
-      {address && (
-        <div>
-          {showSenderAddress ? (
-            <MultipleAddressContainer>
-              <TransferDetailView icon={WalletIcon} title={t('FROM')} address={ordinalsAddress} />
-              <DownArrowIcon src={ArrowIcon} />
-              <TransferDetailView icon={WalletIcon} title={t('TO')} address={address} />
-            </MultipleAddressContainer>
-          ) : (
-            <TransferDetailView
-              title={t('TO')}
-              address={address}
-              hideCopyButton
-              titleColor="white_400"
-            />
-          )}
-        </div>
-      )}
-
-      {heading && <RecipientTitleText>{heading}</RecipientTitleText>}
-      {value && (
-        <RowContainer>
-          <TitleContainer>
-            {renderIcon()}
-            <div>
-              <TitleText>{title}</TitleText>
-              {currencyType === 'BTC' && <Subtitle typography="body_medium_s">Bitcoin</Subtitle>}
-              {currencyType === 'STX' && <Subtitle typography="body_medium_s">Stacks</Subtitle>}
-            </div>
-          </TitleContainer>
-          {currencyType === 'NFT' || currencyType === 'Ordinal' || currencyType === 'RareSat' ? (
-            <ColumnContainer>
-              <ValueText data-testid={dataTestID}>{value}</ValueText>
-              {valueDetail && <SubValueText>{valueDetail}</SubValueText>}
-            </ColumnContainer>
-          ) : (
-            <ColumnContainer>
-              <NumericFormat
-                value={Number(value)}
-                displayType="text"
-                thousandSeparator
-                suffix={currencyType === 'FT' ? ` ${getFtTicker()} ` : ` ${currencyType}`}
-                renderText={(amount) => <ValueText data-testid={dataTestID}>{amount}</ValueText>}
+    <>
+      <Title>{t('YOU_WILL_SEND')}</Title>
+      <Container>
+        {address && (
+          <div>
+            {showSenderAddress ? (
+              <MultipleAddressContainer>
+                <TransferDetailView icon={WalletIcon} title={t('FROM')} address={ordinalsAddress} />
+                <DownArrowIcon src={ArrowIcon} />
+                <TransferDetailView icon={WalletIcon} title={t('TO')} address={address} />
+              </MultipleAddressContainer>
+            ) : (
+              <TransferDetailView
+                title={t('TO')}
+                address={address}
+                hideCopyButton
+                titleColor="white_400"
               />
-              <FiatText fiatAmount={BigNumber(fiatAmount!)} fiatCurrency={fiatCurrency} />
-            </ColumnContainer>
-          )}
-        </RowContainer>
-      )}
-    </Container>
+            )}
+          </div>
+        )}
+        {heading && <RecipientTitleText>{heading}</RecipientTitleText>}
+        {value && (
+          <RowContainer>
+            <TitleContainer>
+              {renderIcon()}
+              <div>
+                <TitleText>{title}</TitleText>
+                {currencyType === 'BTC' && <Subtitle typography="body_medium_s">Bitcoin</Subtitle>}
+                {currencyType === 'STX' && <Subtitle typography="body_medium_s">Stacks</Subtitle>}
+              </div>
+            </TitleContainer>
+            {currencyType === 'NFT' || currencyType === 'Ordinal' || currencyType === 'RareSat' ? (
+              <ColumnContainer>
+                <ValueText data-testid={dataTestID}>{value}</ValueText>
+                {valueDetail && <SubValueText>{valueDetail}</SubValueText>}
+              </ColumnContainer>
+            ) : (
+              <ColumnContainer>
+                <NumericFormat
+                  value={Number(value)}
+                  displayType="text"
+                  thousandSeparator
+                  suffix={
+                    currencyType === 'FT' && fungibleToken
+                      ? ` ${getFtTicker(fungibleToken).toUpperCase()} `
+                      : ` ${currencyType}`
+                  }
+                  renderText={(amount) => <ValueText data-testid={dataTestID}>{amount}</ValueText>}
+                />
+                <FiatText fiatAmount={BigNumber(fiatAmount!)} fiatCurrency={fiatCurrency} />
+              </ColumnContainer>
+            )}
+          </RowContainer>
+        )}
+      </Container>
+    </>
   );
 }
 

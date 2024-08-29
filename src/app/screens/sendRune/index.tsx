@@ -181,7 +181,6 @@ function SendRuneScreen() {
     try {
       setIsSubmitting(true);
       const txnId = await transaction?.broadcast({ ledgerTransport, rbfEnabled: true });
-
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
         protocol: 'runes',
         action: 'transfer',

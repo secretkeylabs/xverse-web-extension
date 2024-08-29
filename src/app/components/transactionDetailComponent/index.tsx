@@ -65,7 +65,6 @@ function TransactionDetailComponent({
   titleColor,
 }: Props) {
   const { fiatCurrency } = useWalletSelector();
-
   return (
     <Container>
       <TitleContainer>

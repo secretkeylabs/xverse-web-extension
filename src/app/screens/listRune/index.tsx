@@ -540,7 +540,7 @@ export default function ListRuneScreen() {
                 <SetCustomPriceModal
                   runeSymbol={selectedRune?.runeSymbol ?? ''}
                   visible={toggleCustomPriceModal}
-                  title={t('SET_PRICES')}
+                  title={t('EDIT_PRICE')}
                   floorPriceSats={runeFloorPrice}
                   minPriceSats={
                     individualCustomItem
