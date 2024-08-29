@@ -418,7 +418,13 @@ export default function ListRuneScreen() {
                       <StyledButton
                         title="Custom"
                         onClick={() =>
-                          dispatch({ type: 'SET_TOGGLE_CUSTOM_PRICE_MODAL', payload: true })
+                          dispatch({
+                            type: 'SET_TOGGLE_CUSTOM_PRICE_MODAL',
+                            payload: {
+                              title: t('SET_PRICES'),
+                              visible: true,
+                            },
+                          })
                         }
                         variant={
                           runePriceOption === 'custom' && !individualCustomPriceUsed
@@ -458,7 +464,13 @@ export default function ListRuneScreen() {
                             }
                             handleShowCustomPriceModal={() => {
                               dispatch({ type: 'SET_INDIVIDUAL_CUSTOM_ITEM', payload: fullTxId });
-                              dispatch({ type: 'SET_TOGGLE_CUSTOM_PRICE_MODAL', payload: true });
+                              dispatch({
+                                type: 'SET_TOGGLE_CUSTOM_PRICE_MODAL',
+                                payload: {
+                                  title: t('EDIT_PRICE'),
+                                  visible: true,
+                                },
+                              });
                             }}
                           />
                         ))}
@@ -539,8 +551,8 @@ export default function ListRuneScreen() {
                 </PaddingContainer>
                 <SetCustomPriceModal
                   runeSymbol={selectedRune?.runeSymbol ?? ''}
-                  visible={toggleCustomPriceModal}
-                  title={t('EDIT_PRICE')}
+                  visible={toggleCustomPriceModal.visible}
+                  title={toggleCustomPriceModal.title}
                   floorPriceSats={runeFloorPrice}
                   minPriceSats={
                     individualCustomItem
@@ -554,7 +566,13 @@ export default function ListRuneScreen() {
                   }
                   onClose={() => {
                     dispatch({ type: 'SET_INDIVIDUAL_CUSTOM_ITEM', payload: null });
-                    dispatch({ type: 'SET_TOGGLE_CUSTOM_PRICE_MODAL', payload: false });
+                    dispatch({
+                      type: 'SET_TOGGLE_CUSTOM_PRICE_MODAL',
+                      payload: {
+                        ...toggleCustomPriceModal,
+                        visible: false,
+                      },
+                    });
                   }}
                   onApplyPrice={(priceSats: number) => {
                     if (individualCustomItem) {
@@ -565,7 +583,13 @@ export default function ListRuneScreen() {
                       dispatch({ type: 'SET_RUNE_PRICE_OPTION', payload: 'custom' });
                     }
                     dispatch({ type: 'SET_INDIVIDUAL_CUSTOM_ITEM', payload: null });
-                    dispatch({ type: 'SET_TOGGLE_CUSTOM_PRICE_MODAL', payload: false });
+                    dispatch({
+                      type: 'SET_TOGGLE_CUSTOM_PRICE_MODAL',
+                      payload: {
+                        ...toggleCustomPriceModal,
+                        visible: false,
+                      },
+                    });
                   }}
                 />
               </>

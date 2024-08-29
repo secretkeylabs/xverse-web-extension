@@ -31,6 +31,8 @@ type Props = {
   token: FungibleToken;
   amountToSend: string;
   setAmountToSend: (amount: string) => void;
+  useTokenValue: boolean;
+  setUseTokenValue: (toggle: boolean) => void;
   amountError: string;
   feeRate: string;
   setFeeRate: (feeRate: string) => void;
@@ -49,6 +51,8 @@ function AmountSelector({
   token,
   amountToSend,
   setAmountToSend,
+  useTokenValue,
+  setUseTokenValue,
   amountError,
   feeRate,
   setFeeRate,
@@ -86,6 +90,8 @@ function AmountSelector({
           token={token}
           amountToSend={amountToSend}
           setAmountToSend={setAmountToSend}
+          useTokenValue={useTokenValue}
+          setUseTokenValue={setUseTokenValue}
           amountError={amountError}
           sendMax={sendMax}
           setSendMax={setSendMax}

@@ -34,6 +34,8 @@ type Props = {
   runeSummary: RuneSummary | undefined;
   amountToSend: string;
   setAmountToSend: (amount: string) => void;
+  useTokenValue: boolean;
+  setUseTokenValue: (toggle: boolean) => void;
   amountError: string;
   currentStep: Step;
   setCurrentStep: (step: Step) => void;
@@ -57,6 +59,8 @@ function StepDisplay({
   runeSummary,
   amountToSend,
   setAmountToSend,
+  useTokenValue,
+  setUseTokenValue,
   amountError,
   currentStep,
   setCurrentStep,
@@ -106,6 +110,8 @@ function StepDisplay({
               header={header}
               amountToSend={amountToSend}
               setAmountToSend={setAmountToSend}
+              useTokenValue={useTokenValue}
+              setUseTokenValue={setUseTokenValue}
               amountError={amountError}
               feeRate={feeRate}
               setFeeRate={setFeeRate}

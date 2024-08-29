@@ -7,7 +7,10 @@ interface ListRunesState {
   runePriceOption: 1 | 1.05 | 1.1 | 1.2 | 'custom';
   customRunePrice: number | null;
   individualCustomItem: string | null;
-  toggleCustomPriceModal: boolean;
+  toggleCustomPriceModal: {
+    title: string;
+    visible: boolean;
+  };
 }
 
 type Action =
@@ -20,7 +23,7 @@ type Action =
   | { type: 'SET_RUNE_PRICE_OPTION'; payload: 1 | 1.05 | 1.1 | 1.2 | 'custom' }
   | { type: 'SET_CUSTOM_RUNE_PRICE'; payload: number | null }
   | { type: 'SET_INDIVIDUAL_CUSTOM_ITEM'; payload: string | null }
-  | { type: 'SET_TOGGLE_CUSTOM_PRICE_MODAL'; payload: boolean }
+  | { type: 'SET_TOGGLE_CUSTOM_PRICE_MODAL'; payload: { title: string; visible: boolean } }
   | { type: 'RESTORE_STATE_FROM_PSBT'; payload: ListRunesState };
 
 export const initialListRunesState: ListRunesState = {
@@ -30,7 +33,10 @@ export const initialListRunesState: ListRunesState = {
   runePriceOption: 1,
   customRunePrice: null,
   individualCustomItem: null,
-  toggleCustomPriceModal: false,
+  toggleCustomPriceModal: {
+    title: '',
+    visible: false,
+  },
 };
 
 export function ListRunesReducer(state: ListRunesState, action: Action): ListRunesState {
