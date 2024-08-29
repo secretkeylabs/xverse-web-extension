@@ -81,8 +81,8 @@ function MintRune() {
             receipts: [],
             transfers: [],
             mint: {
-              runeId: runeInfo.id,
               runeName: runeInfo.entry.spaced_rune,
+              runeId: runeInfo.id,
               amount: BigInt(runeInfo.entry.terms.amount?.toNumber() ?? 0),
               divisibility: runeInfo.entry.divisibility.toNumber(),
               symbol: runeInfo.entry.symbol,

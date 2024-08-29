@@ -1,8 +1,12 @@
 import { mapRuneNameToPlaceholder } from '@components/confirmBtcTransaction/utils';
+import { StyledFiatAmountText } from '@components/fiatAmountText';
 import TokenImage from '@components/tokenImage';
+import useRuneFiatRateQuery from '@hooks/queries/runes/useRuneFiatRateQuery';
+import useWalletSelector from '@hooks/useWalletSelector';
 import type { RuneBase } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { ftDecimals } from '@utils/helper';
+import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
@@ -36,11 +40,6 @@ const Column = styled.div`
   overflow: hidden;
 `;
 
-const StyledPRight = styled(StyledP)`
-  word-break: break-all;
-  text-align: end;
-`;
-
 type Props = {
   rune: RuneBase;
   hasSufficientBalance?: boolean;
@@ -55,6 +54,8 @@ export default function RuneAmount({
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { runeName, amount, divisibility, symbol, inscriptionId } = rune;
   const amountWithDecimals = ftDecimals(String(amount), divisibility);
+  const { fiatCurrency } = useWalletSelector();
+  const { data: runeFiatRate } = useRuneFiatRateQuery(rune);
   return (
     <Container topMargin={topMargin}>
       <AvatarContainer>
@@ -77,19 +78,29 @@ export default function RuneAmount({
             thousandSeparator
             suffix={` ${symbol}`}
             renderText={(value: string) => (
-              <StyledPRight
+              <StyledP
                 data-testid="send-rune-amount"
                 typography="body_medium_m"
                 color={hasSufficientBalance ? 'white_0' : 'danger_light'}
               >
                 {value}
-              </StyledPRight>
+              </StyledP>
             )}
           />
         </Row>
-        <StyledP data-testid="rune-name" typography="body_medium_s" color="white_400">
-          {runeName}
-        </StyledP>
+        <Row>
+          <StyledP data-testid="rune-name" typography="body_medium_s" color="white_400">
+            {runeName}
+          </StyledP>
+          {typeof runeFiatRate === 'number' && runeFiatRate > 0 && (
+            <StyledFiatAmountText
+              fiatAmount={
+                new BigNumber(BigNumber(amountWithDecimals).multipliedBy(runeFiatRate).toFixed(2))
+              }
+              fiatCurrency={fiatCurrency}
+            />
+          )}
+        </Row>
       </Column>
     </Container>
   );
