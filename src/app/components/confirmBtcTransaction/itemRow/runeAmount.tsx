@@ -92,7 +92,7 @@ export default function RuneAmount({
           <StyledP data-testid="rune-name" typography="body_medium_s" color="white_400">
             {runeName}
           </StyledP>
-          {typeof runeFiatRate === 'number' && runeFiatRate > 0 && (
+          {runeFiatRate !== undefined && runeFiatRate > 0 && (
             <StyledFiatAmountText
               fiatAmount={
                 new BigNumber(BigNumber(amountWithDecimals).multipliedBy(runeFiatRate).toFixed(2))
