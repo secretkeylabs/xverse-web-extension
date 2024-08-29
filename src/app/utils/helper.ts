@@ -325,15 +325,6 @@ export const getLockCountdownLabel = (
   return t('LOCK_COUNTDOWN_HS', { count: hours });
 };
 
-export const isFungibleToken = (token: any): token is FungibleToken =>
-  token &&
-  typeof token === 'object' &&
-  'balance' in token &&
-  'total_sent' in token &&
-  'total_received' in token &&
-  'principal' in token &&
-  'assetName' in token;
-
 export const satsToBtcString = (num: BigNumber) =>
   satsToBtc(num)
     .toFixed(8)
