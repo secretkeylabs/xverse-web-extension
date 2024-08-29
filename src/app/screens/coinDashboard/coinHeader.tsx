@@ -167,9 +167,15 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
   };
 
   const isCrossChainSwapsEnabled = useHasFeature(FeatureId.CROSS_CHAIN_SWAPS);
-  const showRunesSwap =
-    (currency === 'FT' && fungibleToken?.protocol === 'runes') || currency === 'BTC';
-  const showSwaps = isCrossChainSwapsEnabled && showRunesSwap;
+  const isStacksSwapsEnabled = useHasFeature(FeatureId.STACKS_SWAPS);
+
+  const isSwapEligibleCurrency =
+    (currency === 'FT' &&
+      (fungibleToken?.protocol === 'runes' ||
+        (isStacksSwapsEnabled && fungibleToken?.protocol === 'stacks'))) ||
+    currency === 'BTC' ||
+    (currency === 'STX' && isStacksSwapsEnabled);
+  const showSwaps = isCrossChainSwapsEnabled && isSwapEligibleCurrency;
 
   const navigateToSwaps = () => {
     if (!showSwaps) {

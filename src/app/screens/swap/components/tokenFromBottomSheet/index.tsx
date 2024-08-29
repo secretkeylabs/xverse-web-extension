@@ -23,7 +23,7 @@ const StyledTokenTile = styled(TokenTile)`
 interface Props {
   visible: boolean;
   title: string;
-  onSelectCoin: (token: FungibleToken | 'BTC') => void;
+  onSelectCoin: (token: FungibleToken) => void;
   onClose: () => void;
   to?: Token;
 }
@@ -36,10 +36,10 @@ export default function TokenFromBottomSheet({ visible, title, onSelectCoin, onC
     <Sheet visible={visible} title={title} onClose={onClose}>
       <Container>
         {fromTokens.map((token) => {
-          if (token === 'BTC') {
+          if (token.principal === 'BTC') {
             return (
               <StyledTokenTile
-                key={token}
+                key={token.principal}
                 title="Bitcoin"
                 currency="BTC"
                 onPress={() => {
@@ -52,7 +52,23 @@ export default function TokenFromBottomSheet({ visible, title, onSelectCoin, onC
               />
             );
           }
-          if (token.protocol === 'runes' && 'principal' in token) {
+          if (token.principal === 'STX') {
+            return (
+              <StyledTokenTile
+                key={token.principal}
+                title="Stacks"
+                currency="STX"
+                onPress={() => {
+                  onSelectCoin(token);
+                  trackMixPanel(AnalyticsEvents.SelectTokenToSwapFrom, {
+                    selectedToken: 'Stacks',
+                  });
+                  onClose();
+                }}
+              />
+            );
+          }
+          if ((token.protocol === 'runes' || token.protocol === 'stacks') && 'principal' in token) {
             return (
               <StyledTokenTile
                 key={token.principal}

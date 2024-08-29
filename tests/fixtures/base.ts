@@ -32,7 +32,7 @@ export const test = baseTest.extend<{
     // Xverse opens the landing page on install. Wait for it to load and
     // use it as the main page by closing the default page.
     // we give it 5 secs to start up
-    const MAX_STARTUP_TIME = 5000;
+    const MAX_STARTUP_TIME = 5_000;
     const startTime = Date.now();
     while (context.pages().length === 1) {
       if (Date.now() - startTime > MAX_STARTUP_TIME) {
