@@ -18,6 +18,7 @@ import {
   getNonce,
   getStxFiatEquivalent,
   microstacksToStx,
+  possiblNexteNonce,
   signLedgerStxTransaction,
   signMultiStxTransactions,
   signTransaction,
@@ -99,7 +100,7 @@ function ConfirmStxTransactionComponent({
   const { getSeed } = useSeedVault();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
   const selectedAccount = useSelectedAccount();
-  const { feeMultipliers, fiatCurrency } = useWalletSelector();
+  const { feeMultipliers, fiatCurrency, network } = useWalletSelector();
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(loading);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -220,8 +221,11 @@ function ConfirmStxTransactionComponent({
     }
 
     if (initialStxTransactions.length === 1) {
+      const transaction = initialStxTransactions[0];
+      const nonce = await possiblNexteNonce(selectedAccount.stxAddress, network);
+      transaction.setNonce(nonce);
       const signedContractCall = await signTransaction(
-        initialStxTransactions[0],
+        transaction,
         seed,
         selectedAccount?.id ?? 0,
         selectedNetwork,
