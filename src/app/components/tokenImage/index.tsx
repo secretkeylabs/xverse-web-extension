@@ -95,7 +95,6 @@ export default function TokenImage({
   }, [currency]);
 
   const ticker =
-    fungibleToken?.runeSymbol ||
     fungibleToken?.ticker ||
     (fungibleToken?.name ? getTicker(fungibleToken.name) : fungibleToken?.assetName || '');
 
@@ -132,15 +131,26 @@ export default function TokenImage({
         />
       );
     }
-    if (fungibleToken.runeInscriptionId) {
-      return (
-        <TickerImage
-          data-testid="token-image"
-          size={size}
-          src={`${XVERSE_ORDIVIEW_URL(network.type)}/thumbnail/${fungibleToken.runeInscriptionId}`}
-          onError={() => setImageError(true)}
-        />
-      );
+    if (fungibleToken.protocol === 'runes') {
+      if (fungibleToken.runeInscriptionId) {
+        return (
+          <TickerImage
+            data-testid="token-image"
+            size={size}
+            src={`${XVERSE_ORDIVIEW_URL(network.type)}/thumbnail/${
+              fungibleToken.runeInscriptionId
+            }`}
+            onError={() => setImageError(true)}
+          />
+        );
+      }
+      if (fungibleToken?.runeSymbol) {
+        return (
+          <TickerIconContainer size={size} round={round}>
+            <TickerIconText data-testid="token-image">{fungibleToken.runeSymbol}</TickerIconText>
+          </TickerIconContainer>
+        );
+      }
     }
     if (fungibleToken?.image) {
       return (
