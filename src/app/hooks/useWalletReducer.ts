@@ -181,12 +181,14 @@ const useWalletReducer = () => {
 
     // Load custom account names for the new network
     const savedCustomAccountNames = savedNames[currentNetwork.type];
-    walletAccounts.forEach((account) => {
-      const savedAccount = savedCustomAccountNames?.find((acc) => acc.id === account.id);
-      if (savedAccount) {
-        account.accountName = savedAccount.name;
-      }
-    });
+    if (savedCustomAccountNames?.length) {
+      walletAccounts.forEach((account) => {
+        const savedAccount = savedCustomAccountNames.find((acc) => acc.id === account.id);
+        if (savedAccount) {
+          account.accountName = savedAccount.name;
+        }
+      });
+    }
 
     // ledger accounts initially didn't have a deviceAccountIndex
     // this is a migration to add the deviceAccountIndex to the ledger accounts without them
@@ -221,6 +223,19 @@ const useWalletReducer = () => {
     });
   };
 
+  const loadAccountNames = () => {
+    const updatedSavedNames = softwareAccountsList.reduce<{ id: number; name: string }[]>(
+      (acc, account) => {
+        if (account.accountName) {
+          acc.push({ id: account.id, name: account.accountName });
+        }
+        return acc;
+      },
+      [],
+    );
+    dispatch(updateSavedNamesAction(network.type, updatedSavedNames));
+  };
+
   const loadWallet = async () => {
     const seedPhrase = await seedVault.getSeed();
     const currentAccounts = softwareAccountsList || [];
@@ -243,6 +258,16 @@ const useWalletReducer = () => {
     }
 
     await ensureSelectedAccountValid();
+
+    if (
+      !savedNames[network.type]?.length &&
+      softwareAccountsList.some((account) => !!account.accountName)
+    ) {
+      // there was no savedNames store object initially
+      // this is a migration to add the savedNames if there are custom account names that are not saved
+      // it should only fire once if ever
+      loadAccountNames();
+    }
 
     dispatch(setWalletUnlockedAction(true));
     setSessionStartTimeAndMigrate();

@@ -90,10 +90,10 @@ test.describe('Settings Tab', () => {
     await expect(onboardingPage.buttonContinue).toBeEnabled();
     await onboardingPage.buttonContinue.click();
     await expect(onboardingPage.inputPassword).toBeVisible();
-    await expect(onboardingPage.buttonContinue).toBeDisabled();
+    await expect(wallet.buttonConfirm).toBeDisabled();
     await onboardingPage.inputPassword.fill(`${strongPW}ABC`);
-    await expect(onboardingPage.buttonContinue).toBeEnabled();
-    await onboardingPage.buttonContinue.click();
+    await expect(wallet.buttonConfirm).toBeEnabled();
+    await wallet.buttonConfirm.click();
     await expect(wallet.infoUpdatePassword).toBeVisible();
   });
   test('Show Seedphrase', async ({ page, extensionId }) => {

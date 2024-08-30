@@ -428,9 +428,9 @@ export default class Wallet {
     this.inputBTCURL = page.getByTestId('BTC URL');
     this.inputFallbackBTCURL = page.getByTestId('Fallback BTC URL');
     this.buttonUpdatePassword = page.getByRole('button', { name: 'Update Password' });
-    this.errorMessage = page.getByRole('heading', { name: 'Incorrect password' });
+    this.errorMessage = page.getByText(/incorrect password/i);
     this.headerNewPassword = page.getByRole('heading', { name: 'Enter your new password' });
-    this.infoUpdatePassword = page.getByRole('heading', { name: 'Password successfully updated' });
+    this.infoUpdatePassword = page.getByText(/password successfully updated/i);
     this.buttonCurrency = page.getByRole('button', { name: 'Fiat Currency' });
     this.buttonShowSeedphrase = page.getByRole('button', { name: 'Show Seedphrase' });
     this.selectCurrency = page.getByTestId('currency-button');

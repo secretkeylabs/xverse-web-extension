@@ -94,6 +94,16 @@ export default function TokenImage({
     }
   }, [currency]);
 
+  const ticker =
+    fungibleToken?.ticker ||
+    (fungibleToken?.name ? getTicker(fungibleToken.name) : fungibleToken?.assetName || '');
+
+  const tickerComponent = () => (
+    <TickerIconContainer size={size} round={round}>
+      <TickerIconText data-testid="token-image">{ticker.substring(0, 4)}</TickerIconText>
+    </TickerIconContainer>
+  );
+
   const getProtocolIcon = () => {
     if (!ftProtocol) {
       return null;
@@ -111,18 +121,6 @@ export default function TokenImage({
   };
 
   const renderIcon = () => {
-    const ticker =
-      fungibleToken?.ticker ||
-      (fungibleToken?.name ? getTicker(fungibleToken.name) : fungibleToken?.assetName || '');
-
-    if (imageError) {
-      return (
-        <TickerIconContainer size={size} round={round}>
-          <TickerIconText data-testid="token-image">{ticker.substring(0, 4)}</TickerIconText>
-        </TickerIconContainer>
-      );
-    }
-
     if (!fungibleToken) {
       return (
         <TickerImage
@@ -132,6 +130,27 @@ export default function TokenImage({
           onError={() => setImageError(true)}
         />
       );
+    }
+    if (fungibleToken.protocol === 'runes') {
+      if (fungibleToken.runeInscriptionId) {
+        return (
+          <TickerImage
+            data-testid="token-image"
+            size={size}
+            src={`${XVERSE_ORDIVIEW_URL(network.type)}/thumbnail/${
+              fungibleToken.runeInscriptionId
+            }`}
+            onError={() => setImageError(true)}
+          />
+        );
+      }
+      if (fungibleToken?.runeSymbol) {
+        return (
+          <TickerIconContainer size={size} round={round}>
+            <TickerIconText data-testid="token-image">{fungibleToken.runeSymbol}</TickerIconText>
+          </TickerIconContainer>
+        );
+      }
     }
     if (fungibleToken?.image) {
       return (
@@ -143,29 +162,7 @@ export default function TokenImage({
         />
       );
     }
-    if (fungibleToken.runeInscriptionId) {
-      return (
-        <TickerImage
-          data-testid="token-image"
-          size={size}
-          src={`${XVERSE_ORDIVIEW_URL(network.type)}/thumbnail/${fungibleToken.runeInscriptionId}`}
-          onError={() => setImageError(true)}
-        />
-      );
-    }
-    if (fungibleToken.runeSymbol) {
-      return (
-        <TickerIconContainer size={size} round={round}>
-          <TickerIconText data-testid="token-image">{fungibleToken.runeSymbol}</TickerIconText>
-        </TickerIconContainer>
-      );
-    }
-
-    return (
-      <TickerIconContainer size={size} round={round}>
-        <TickerIconText data-testid="token-image">{ticker.substring(0, 4)}</TickerIconText>
-      </TickerIconContainer>
-    );
+    return tickerComponent();
   };
 
   if (loading) {
@@ -180,7 +177,7 @@ export default function TokenImage({
 
   return (
     <TickerProtocolContainer>
-      {renderIcon()}
+      {imageError ? tickerComponent() : renderIcon()}
       {ftProtocol && showProtocolIcon && (
         <ProtocolIcon isSquare={ftProtocol === 'runes'}>{getProtocolIcon()}</ProtocolIcon>
       )}

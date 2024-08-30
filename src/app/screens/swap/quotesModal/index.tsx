@@ -1,8 +1,12 @@
+import { microStxToStx } from '@components/postCondition/postConditionView/helper';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import {
   getBtcFiatEquivalent,
+  getStxFiatEquivalent,
+  stxToMicrostacks,
   type FungibleToken,
   type Quote,
+  type StxQuote,
   type Token,
   type UtxoQuote,
 } from '@secretkeylabs/xverse-core';
@@ -19,6 +23,7 @@ interface Props {
   onClose: () => void;
   ammProviders: Quote[];
   utxoProviders: UtxoQuote[];
+  stxProviders: StxQuote[];
   toToken?: Token;
   ammProviderClicked?: (amm: Quote) => void;
   utxoProviderClicked?: (utxoProvider: UtxoQuote) => void;
@@ -54,13 +59,14 @@ function QuotesModal({
   onClose,
   ammProviders,
   utxoProviders,
+  stxProviders,
   toToken,
   ammProviderClicked,
   utxoProviderClicked,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
 
-  const { btcFiatRate } = useCoinRates();
+  const { btcFiatRate, stxBtcRate } = useCoinRates();
 
   const numberOfUtxoProviders = utxoProviders.length;
   const lowestUtxoQuoteFloorRate = Math.min(
@@ -102,12 +108,12 @@ function QuotesModal({
         <StyledP typography="body_m" color="white_200">
           {t('QUOTE_TITLE')}
         </StyledP>
-        {ammProviders.length > 0 && (
-          <Heading typography="headline_s" color="white_0">
-            {t('EXCHANGE')}
-          </Heading>
-        )}
-        {/* todo: get fiat rates of rune from API */}
+        {ammProviders.length > 0 ||
+          (stxProviders.length > 0 && (
+            <Heading typography="headline_s" color="white_0">
+              {t('EXCHANGE')}
+            </Heading>
+          ))}
         {ammProviders.map((amm) => (
           <QuoteTile
             key={amm.provider.name}
@@ -133,6 +139,27 @@ function QuotesModal({
             {t('MARKETPLACE')}
           </SecondHeading>
         )}
+        {stxProviders.map((stx) => (
+          <QuoteTile
+            key={stx.provider.name}
+            provider={stx.provider.name}
+            price={stx.receiveAmount}
+            image={{ ft: { image: stx.provider.logo } as FungibleToken }}
+            onClick={() => ammProviderClicked && ammProviderClicked(stx)}
+            subtitle={t('RECOMMENDED')}
+            subtitleColor="success_light"
+            unit={stx.to.protocol === 'stx' ? 'STX' : toToken?.name || ''}
+            fiatValue={
+              stx.to.protocol === 'stx'
+                ? getStxFiatEquivalent(
+                    stxToMicrostacks(new BigNumber(stx.receiveAmount)),
+                    new BigNumber(stxBtcRate),
+                    new BigNumber(btcFiatRate),
+                  ).toFixed(2)
+                : ''
+            }
+          />
+        ))}
         {utxoQuotes.map((utxoProvider) => {
           const subTitle = getSubtitle(utxoProvider);
           let subTitleColour: Color = 'success_light';

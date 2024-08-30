@@ -180,7 +180,7 @@ type Props = {
   dataTestID?: string;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (event: ChangeEvent<HTMLInputElement>) => void;
-  type?: 'text' | 'number';
+  type?: 'text' | 'number' | 'password';
   hideClear?: boolean;
   infoPanel?: React.ReactNode;
   complications?: React.ReactNode;

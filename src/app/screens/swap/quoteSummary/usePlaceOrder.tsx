@@ -2,12 +2,11 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import {
   getXverseApiClient,
   type PlaceOrderRequest,
-  type PlaceOrderResponse,
+  type PlaceStxOrderRequest,
 } from '@secretkeylabs/xverse-core';
 import { useState } from 'react';
 
 const usePlaceOrder = () => {
-  const [order, setOrder] = useState<PlaceOrderResponse>();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const { network } = useWalletSelector();
@@ -19,7 +18,6 @@ const usePlaceOrder = () => {
     setError(null);
     try {
       const response = await xverseApiClient.swaps.placeOrder(request);
-      setOrder(response);
       return response;
     } catch (err: any) {
       setError(err?.response?.data?.message ?? 'Failed to place order');
@@ -28,7 +26,21 @@ const usePlaceOrder = () => {
     }
   };
 
-  return { order, loading, error, placeOrder };
+  const placeStxOrder = async (request: PlaceStxOrderRequest) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await xverseApiClient.swaps.placeStxOrder(request);
+
+      return response;
+    } catch (err: any) {
+      setError(err?.response?.data?.message ?? 'Failed to place order');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { loading, error, placeOrder, placeStxOrder };
 };
 
 export default usePlaceOrder;
