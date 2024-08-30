@@ -94,6 +94,17 @@ export default function TokenImage({
     }
   }, [currency]);
 
+  const ticker =
+    fungibleToken?.runeSymbol ||
+    fungibleToken?.ticker ||
+    (fungibleToken?.name ? getTicker(fungibleToken.name) : fungibleToken?.assetName || '');
+
+  const tickerComponent = () => (
+    <TickerIconContainer size={size} round={round}>
+      <TickerIconText data-testid="token-image">{ticker.substring(0, 4)}</TickerIconText>
+    </TickerIconContainer>
+  );
+
   const getProtocolIcon = () => {
     if (!ftProtocol) {
       return null;
@@ -111,34 +122,12 @@ export default function TokenImage({
   };
 
   const renderIcon = () => {
-    const ticker =
-      fungibleToken?.ticker ||
-      (fungibleToken?.name ? getTicker(fungibleToken.name) : fungibleToken?.assetName || '');
-
-    if (imageError) {
-      return (
-        <TickerIconContainer size={size} round={round}>
-          <TickerIconText data-testid="token-image">{ticker.substring(0, 4)}</TickerIconText>
-        </TickerIconContainer>
-      );
-    }
-
     if (!fungibleToken) {
       return (
         <TickerImage
           data-testid="token-image"
           size={size}
           src={getCurrencyIcon()}
-          onError={() => setImageError(true)}
-        />
-      );
-    }
-    if (fungibleToken?.image) {
-      return (
-        <TickerImage
-          data-testid="token-image"
-          size={size}
-          src={fungibleToken.image}
           onError={() => setImageError(true)}
         />
       );
@@ -153,19 +142,17 @@ export default function TokenImage({
         />
       );
     }
-    if (fungibleToken.runeSymbol) {
+    if (fungibleToken?.image) {
       return (
-        <TickerIconContainer size={size} round={round}>
-          <TickerIconText data-testid="token-image">{fungibleToken.runeSymbol}</TickerIconText>
-        </TickerIconContainer>
+        <TickerImage
+          data-testid="token-image"
+          size={size}
+          src={fungibleToken.image}
+          onError={() => setImageError(true)}
+        />
       );
     }
-
-    return (
-      <TickerIconContainer size={size} round={round}>
-        <TickerIconText data-testid="token-image">{ticker.substring(0, 4)}</TickerIconText>
-      </TickerIconContainer>
-    );
+    return tickerComponent();
   };
 
   if (loading) {
@@ -180,7 +167,7 @@ export default function TokenImage({
 
   return (
     <TickerProtocolContainer>
-      {renderIcon()}
+      {imageError ? tickerComponent() : renderIcon()}
       {ftProtocol && showProtocolIcon && (
         <ProtocolIcon isSquare={ftProtocol === 'runes'}>{getProtocolIcon()}</ProtocolIcon>
       )}
