@@ -73,18 +73,20 @@ function trackSwapMixPanel(
         : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2);
 
     receiveAmount = quote?.receiveAmount ? new BigNumber(quote?.receiveAmount) : undefined;
-    toAmount =
-      toToken?.protocol === 'stx'
-        ? getStxFiatEquivalent(
-            stxToMicrostacks(receiveAmount),
-            new BigNumber(stxBtcRate),
-            new BigNumber(btcUsdRate),
-          ).toFixed(2)
-        : new BigNumber(
-            sip10CoinsList?.find((s) => s.principal === toToken?.ticker)?.tokenFiatRate ?? 0,
-          )
-            .multipliedBy(receiveAmount)
-            .toFixed(2);
+    if (receiveAmount) {
+      toAmount =
+        toToken?.protocol === 'stx'
+          ? getStxFiatEquivalent(
+              stxToMicrostacks(receiveAmount),
+              new BigNumber(stxBtcRate),
+              new BigNumber(btcUsdRate),
+            ).toFixed(2)
+          : new BigNumber(
+              sip10CoinsList?.find((s) => s.principal === toToken?.ticker)?.tokenFiatRate ?? 0,
+            )
+              .multipliedBy(receiveAmount)
+              .toFixed(2);
+    }
   }
 
   trackMixPanel(eventName, {
