@@ -146,7 +146,7 @@ export const modifyRecommendedStxFees = (
   },
   appInfo: AppInfo | undefined | null,
 ): { low: number; medium: number; high: number } => {
-  const multiplier = appInfo?.stxSendTxMultiplier || 1;
+  const multiplier = appInfo?.otherTxMultiplier || 1;
   const highCap = appInfo?.thresholdHighStacksFee;
 
   let adjustedLow = Math.round(baseFees.low * multiplier);
