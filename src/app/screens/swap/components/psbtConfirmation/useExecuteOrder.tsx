@@ -35,6 +35,7 @@ const useExecuteOrder = () => {
     try {
       const response = await xverseApiClient.swaps.executeStxOrder(request);
       setOrder(response);
+
       return response;
     } catch (err: any) {
       setError(err?.response?.data?.message ?? 'Failed to execute order');

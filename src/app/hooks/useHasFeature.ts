@@ -17,9 +17,5 @@ const useAppFeatures = () => {
 
 export default function useHasFeature(feature: FeatureId): boolean {
   const { data } = useAppFeatures();
-
-  // Remove before merging
-  if (feature === FeatureId.STACKS_SWAPS) return true;
-
   return data?.[feature]?.enabled ?? false;
 }

@@ -1,4 +1,9 @@
-import type { btcTransaction, BundleSatRange, FungibleToken } from '@secretkeylabs/xverse-core';
+import type {
+  btcTransaction,
+  BundleSatRange,
+  FungibleToken,
+  RuneBase,
+} from '@secretkeylabs/xverse-core';
 
 // TODO this should all be in core and unit tested
 
@@ -298,18 +303,14 @@ export const getSatRangesWithInscriptions = ({
   return { satRanges: satRangesArray, totalExoticSats };
 };
 
-export const mapRuneNameToPlaceholder = (
-  runeName: string,
-  symbol: string,
-  inscriptionId: string,
-): FungibleToken => ({
+export const mapRuneBaseToFungibleToken = (rune: RuneBase): FungibleToken => ({
   protocol: 'runes',
-  name: runeName,
+  name: rune.runeName,
+  principal: rune.runeId,
   assetName: '',
   balance: '',
-  principal: '',
   total_received: '',
   total_sent: '',
-  runeSymbol: symbol,
-  runeInscriptionId: inscriptionId,
+  runeSymbol: rune.symbol,
+  runeInscriptionId: rune.inscriptionId,
 });

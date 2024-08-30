@@ -33,8 +33,10 @@ import trackSwapMixPanel from '../mixpanel';
 import QuoteTile from '../quotesModal/quoteTile';
 import { SlippageModalContent } from '../slippageModal';
 import type { OrderInfo, StxOrderInfo } from '../types';
+import { useStxCurrencyConversion } from '../useStxCurrencyConversion';
 import {
   BAD_QUOTE_PERCENTAGE,
+  isRunesTx,
   mapFTNativeSwapTokenToTokenBasic,
   mapFtToCurrencyType,
   mapSwapTokenToFT,
@@ -175,6 +177,7 @@ export default function QuoteSummary({
   const { btcFiatRate, btcUsdRate, stxBtcRate } = useCoinRates();
   const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey, stxAddress, stxPublicKey } =
     useSelectedAccount();
+
   const {
     loading: isPlaceOrderLoading,
     error: placeOrderError,
@@ -255,6 +258,8 @@ export default function QuoteSummary({
       quote,
       btcUsdRate,
       runeFloorPrice,
+      stxBtcRate,
+      sip10CoinsList,
     });
 
     if (selectedIdentifiers) {
@@ -524,33 +529,35 @@ export default function QuoteSummary({
                 </RouteContainer>
               </StyledP>
             </ListingDescriptionRow>
-            <ListingDescriptionRow>
-              <StyledP typography="body_medium_m" color="white_200">
-                {t('TRANSACTION_SETTING.FEE_RATE')}
-                <EditFeeRateContainer>
-                  <EditFee
-                    feeUnits={feeUnits}
-                    feeRate={feeRate}
-                    feeRateUnits={t('UNITS.SATS_PER_VB')}
-                    setFeeRate={setFeeRate}
-                    // We only know the rate, not the absolute amount
-                    // It is impossible to determine the fiat value
-                    baseToFiat={() => ''}
-                    fiatUnit={fiatCurrency}
-                    getFeeForFeeRate={(fee) => Promise.resolve(fee)}
-                    feeRates={{
-                      medium: recommendedFees?.regular,
-                      high: recommendedFees?.priority,
-                    }}
-                    feeRateLimits={{ ...recommendedFees?.limits, min: recommendedFees?.regular }}
-                    onFeeChange={setFeeRate}
-                  />
-                </EditFeeRateContainer>
-              </StyledP>
-              <FeeRate data-testid="fee-amount">
-                {feeRate} {t('UNITS.SATS_PER_VB')}
-              </FeeRate>
-            </ListingDescriptionRow>
+            {isRunesTx({ toToken }) && (
+              <ListingDescriptionRow>
+                <StyledP typography="body_medium_m" color="white_200">
+                  {t('TRANSACTION_SETTING.FEE_RATE')}
+                  <EditFeeRateContainer>
+                    <EditFee
+                      feeUnits={feeUnits}
+                      feeRate={feeRate}
+                      feeRateUnits={t('UNITS.SATS_PER_VB')}
+                      setFeeRate={setFeeRate}
+                      // We only know the rate, not the absolute amount
+                      // It is impossible to determine the fiat value
+                      baseToFiat={() => ''}
+                      fiatUnit={fiatCurrency}
+                      getFeeForFeeRate={(fee) => Promise.resolve(fee)}
+                      feeRates={{
+                        medium: recommendedFees?.regular,
+                        high: recommendedFees?.priority,
+                      }}
+                      feeRateLimits={{ ...recommendedFees?.limits, min: recommendedFees?.regular }}
+                      onFeeChange={setFeeRate}
+                    />
+                  </EditFeeRateContainer>
+                </StyledP>
+                <FeeRate data-testid="fee-amount">
+                  {feeRate} {t('UNITS.SATS_PER_VB')}
+                </FeeRate>
+              </ListingDescriptionRow>
+            )}
           </ListingDescContainer>
         </Flex1>
         <SendButtonContainer>
