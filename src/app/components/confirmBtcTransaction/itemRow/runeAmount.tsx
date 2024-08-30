@@ -1,5 +1,5 @@
-import { mapRuneNameToPlaceholder } from '@components/confirmBtcTransaction/utils';
-import { StyledFiatAmountText } from '@components/fiatAmountText';
+import { mapRuneBaseToFungibleToken } from '@components/confirmBtcTransaction/utils';
+import { RightAlignedStyledFiatAmountText } from '@components/fiatAmountText';
 import TokenImage from '@components/tokenImage';
 import useRuneFiatRateQuery from '@hooks/queries/runes/useRuneFiatRateQuery';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -52,7 +52,7 @@ export default function RuneAmount({
   topMargin = false,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const { runeName, amount, divisibility, symbol, inscriptionId } = rune;
+  const { runeName, amount, divisibility, symbol } = rune;
   const amountWithDecimals = ftDecimals(String(amount), divisibility);
   const { fiatCurrency } = useWalletSelector();
   const { data: runeFiatRate } = useRuneFiatRateQuery(rune);
@@ -61,7 +61,7 @@ export default function RuneAmount({
       <AvatarContainer>
         <TokenImage
           currency="FT"
-          fungibleToken={mapRuneNameToPlaceholder(runeName, symbol, inscriptionId)}
+          fungibleToken={mapRuneBaseToFungibleToken(rune)}
           showProtocolIcon
           loading={false}
           size={32}
@@ -93,7 +93,7 @@ export default function RuneAmount({
             {runeName}
           </StyledP>
           {runeFiatRate !== undefined && runeFiatRate > 0 && (
-            <StyledFiatAmountText
+            <RightAlignedStyledFiatAmountText
               fiatAmount={
                 new BigNumber(BigNumber(amountWithDecimals).multipliedBy(runeFiatRate).toFixed(2))
               }

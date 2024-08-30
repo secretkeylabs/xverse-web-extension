@@ -62,6 +62,7 @@ export default function TokenFromBottomSheet({ visible, title, onSelectCoin, onC
                   onSelectCoin(token);
                   trackMixPanel(AnalyticsEvents.SelectTokenToSwapFrom, {
                     selectedToken: 'Stacks',
+                    principal: 'STX',
                   });
                   onClose();
                 }}
@@ -78,6 +79,7 @@ export default function TokenFromBottomSheet({ visible, title, onSelectCoin, onC
                   onSelectCoin(token);
                   trackMixPanel(AnalyticsEvents.SelectTokenToSwapFrom, {
                     selectedToken: token.name,
+                    principal: token.protocol === 'stacks' ? token.principal : undefined,
                   });
                   onClose();
                 }}

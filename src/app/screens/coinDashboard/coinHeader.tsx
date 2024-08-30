@@ -182,7 +182,12 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
       return;
     }
     trackMixPanel(AnalyticsEvents.InitiateSwapFlow, {
-      selectedToken: fungibleToken ? fungibleToken.name ?? fungibleToken.principal : currency,
+      selectedToken: fungibleToken ? fungibleToken.name : currency,
+      principal: fungibleToken
+        ? fungibleToken?.principal
+        : currency === 'STX'
+        ? currency
+        : undefined,
     });
     navigate(`/swap?from=${fungibleToken ? fungibleToken.principal : currency}`);
   };

@@ -103,3 +103,27 @@ export const mapFtToSwapToken = (st: FungibleToken): Token => {
     symbol: st.runeSymbol ?? '',
   };
 };
+
+export const isRunesTx = ({
+  fromToken,
+  toToken,
+}: {
+  fromToken?: FungibleToken;
+  toToken?: Token;
+}): boolean =>
+  fromToken?.protocol === 'runes' ||
+  fromToken?.principal === 'BTC' ||
+  toToken?.protocol === 'runes' ||
+  toToken?.ticker === 'BTC';
+
+export const isStxTx = ({
+  fromToken,
+  toToken,
+}: {
+  fromToken?: FungibleToken;
+  toToken?: Token;
+}): boolean =>
+  fromToken?.protocol === 'stacks' ||
+  fromToken?.principal === 'STX' ||
+  toToken?.protocol === 'sip10' ||
+  toToken?.ticker === 'STX';

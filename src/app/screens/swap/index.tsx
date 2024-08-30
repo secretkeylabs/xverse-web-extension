@@ -46,7 +46,9 @@ import QuoteSummary from './quoteSummary';
 import QuotesModal from './quotesModal';
 import type { OrderInfo, Side, StxOrderInfo } from './types';
 import useMasterCoinsList from './useMasterCoinsList';
+import { useStxCurrencyConversion } from './useStxCurrencyConversion';
 import {
+  isStxTx,
   mapFTNativeSwapTokenToTokenBasic,
   mapFTProtocolToSwapProtocol,
   mapFtToSwapToken,
@@ -136,6 +138,7 @@ export default function SwapScreen() {
   const { quotes, loading: quotesLoading, error: quotesError, fetchQuotes } = useGetQuotes();
   const { data: runeFloorPrice } = useRuneFloorPriceQuery(toToken?.name ?? '');
   const coinsMasterList = useMasterCoinsList();
+  const { acceptableCoinList: sip10CoinsList } = useStxCurrencyConversion();
 
   useEffect(() => {
     if (defaultFrom) {
@@ -178,6 +181,8 @@ export default function SwapScreen() {
       quote,
       btcUsdRate,
       runeFloorPrice,
+      stxBtcRate,
+      sip10CoinsList,
     });
 
     fetchQuotes({
@@ -213,7 +218,6 @@ export default function SwapScreen() {
     if (isSwapRouteDisabled) {
       return;
     }
-
     setInputError('');
     setAmount('');
     setHasQuoteError(false);
@@ -356,8 +360,10 @@ export default function SwapScreen() {
 
     trackMixPanel(AnalyticsEvents.SelectSwapQuote, {
       provider: provider.provider.name,
-      from: fromToken.principal === 'BTC' ? 'BTC' : fromToken.name,
-      to: toToken.protocol === 'btc' ? 'BTC' : toToken.name ?? toToken.ticker,
+      from: fromToken.name,
+      to: toToken.name ?? toToken.ticker,
+      fromPrincipal: isStxTx({ fromToken, toToken }) ? fromToken.principal : undefined,
+      toPrincipal: isStxTx({ fromToken, toToken }) ? toToken.ticker : undefined,
     });
 
     if (isAmm) {
@@ -393,6 +399,8 @@ export default function SwapScreen() {
       quote,
       btcUsdRate,
       runeFloorPrice,
+      stxBtcRate,
+      sip10CoinsList,
     });
   };
 

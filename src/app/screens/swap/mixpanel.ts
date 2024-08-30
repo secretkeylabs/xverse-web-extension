@@ -1,5 +1,7 @@
 import {
   getBtcFiatEquivalent,
+  getStxFiatEquivalent,
+  stxToMicrostacks,
   type FungibleToken,
   type Provider,
   type Quote,
@@ -7,6 +9,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
+import { isRunesTx } from './utils';
 
 function trackSwapMixPanel(
   eventName,
@@ -18,6 +21,8 @@ function trackSwapMixPanel(
     quote,
     btcUsdRate,
     runeFloorPrice,
+    stxBtcRate,
+    sip10CoinsList,
   }: {
     provider?: Provider;
     fromToken?: FungibleToken;
@@ -26,30 +31,70 @@ function trackSwapMixPanel(
     quote?: Quote;
     btcUsdRate: string;
     runeFloorPrice?: number;
+    stxBtcRate?: string;
+    sip10CoinsList?: any;
   },
 ) {
+  let fromAmount;
+  let receiveAmount;
+  let toAmount;
+  let fromPrincipal;
+  let toPrincipal;
+
   const from = fromToken?.name;
-  const to = toToken?.protocol === 'btc' ? 'BTC' : toToken?.name ?? toToken?.ticker;
+  const to = toToken?.name ?? toToken?.ticker;
 
-  const fromAmount =
-    fromToken?.principal === 'BTC'
-      ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcUsdRate)).toFixed(2)
-      : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2);
+  if (isRunesTx({ fromToken, toToken })) {
+    fromAmount =
+      fromToken?.principal === 'BTC'
+        ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcUsdRate)).toFixed(2)
+        : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2);
 
-  const receiveAmount = quote?.receiveAmount ? new BigNumber(quote?.receiveAmount) : undefined;
-  const toAmount = receiveAmount
-    ? getBtcFiatEquivalent(
-        toToken?.protocol === 'btc'
-          ? receiveAmount
-          : receiveAmount.multipliedBy(runeFloorPrice ?? 0),
-        new BigNumber(btcUsdRate),
-      ).toFixed(2)
-    : undefined;
+    receiveAmount = quote?.receiveAmount ? new BigNumber(quote?.receiveAmount) : undefined;
+    toAmount = receiveAmount
+      ? getBtcFiatEquivalent(
+          toToken?.protocol === 'btc'
+            ? receiveAmount
+            : receiveAmount.multipliedBy(runeFloorPrice ?? 0),
+          new BigNumber(btcUsdRate),
+        ).toFixed(2)
+      : undefined;
+  } else if (stxBtcRate) {
+    fromPrincipal = fromToken?.principal;
+    toPrincipal = toToken?.ticker;
+
+    fromAmount =
+      fromToken?.principal === 'STX'
+        ? getStxFiatEquivalent(
+            stxToMicrostacks(new BigNumber(amount)),
+            new BigNumber(stxBtcRate),
+            new BigNumber(btcUsdRate),
+          ).toFixed(2)
+        : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2);
+
+    receiveAmount = quote?.receiveAmount ? new BigNumber(quote?.receiveAmount) : undefined;
+    if (receiveAmount) {
+      toAmount =
+        toToken?.protocol === 'stx'
+          ? getStxFiatEquivalent(
+              stxToMicrostacks(receiveAmount),
+              new BigNumber(stxBtcRate),
+              new BigNumber(btcUsdRate),
+            ).toFixed(2)
+          : new BigNumber(
+              sip10CoinsList?.find((s) => s.principal === toToken?.ticker)?.tokenFiatRate ?? 0,
+            )
+              .multipliedBy(receiveAmount)
+              .toFixed(2);
+    }
+  }
 
   trackMixPanel(eventName, {
     ...(provider ? { provider: provider?.name } : {}),
     ...(from ? { from } : {}),
     ...(to ? { to } : {}),
+    ...(fromPrincipal ? { fromPrincipal } : {}),
+    ...(toPrincipal ? { toPrincipal } : {}),
     fromAmount,
     ...(toAmount ? { toAmount } : {}),
   });

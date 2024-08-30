@@ -2,8 +2,10 @@ import TokenTile from '@components/tokenTile';
 import useDebounce from '@hooks/useDebounce';
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import {
+  isStxTx,
   mapFTMotherProtocolToSwapProtocol,
   mapFTProtocolToSwapProtocol,
+  mapSwapProtocolToFTProtocol,
   mapSwapTokenToFT,
 } from '@screens/swap/utils';
 import {
@@ -194,6 +196,7 @@ export default function TokenToBottomSheet({
                     onSelectCoin(token);
                     trackMixPanel(AnalyticsEvents.SelectTokenToSwapTo, {
                       selectedToken: 'Stacks',
+                      principal: 'STX',
                     });
                     handleClose();
                   }}
@@ -211,6 +214,7 @@ export default function TokenToBottomSheet({
                     onSelectCoin(token);
                     trackMixPanel(AnalyticsEvents.SelectTokenToSwapTo, {
                       selectedToken: token.name ?? token.ticker,
+                      principal: isStxTx({ toToken: token }) ? token.ticker : undefined,
                     });
                     handleClose();
                   }}
