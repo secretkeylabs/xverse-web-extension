@@ -15,6 +15,7 @@ import {
   type MempoolTransactionListResponse,
   type Transaction,
 } from '@stacks/stacks-blockchain-api-types';
+import { PayloadType } from '@stacks/transactions';
 import axios from 'axios';
 
 interface PaginatedResults<T> {
@@ -145,8 +146,13 @@ export const modifyRecommendedStxFees = (
     high: number;
   },
   appInfo: AppInfo | undefined | null,
+  txType: PayloadType,
 ): { low: number; medium: number; high: number } => {
-  const multiplier = appInfo?.otherTxMultiplier || 1;
+  const multiplier = appInfo
+    ? txType === PayloadType.ContractCall
+      ? appInfo.otherTxMultiplier
+      : appInfo.stxSendTxMultiplier
+    : 1;
   const highCap = appInfo?.thresholdHighStacksFee;
 
   let adjustedLow = Math.round(baseFees.low * multiplier);

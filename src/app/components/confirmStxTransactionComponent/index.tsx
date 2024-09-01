@@ -141,6 +141,7 @@ function ConfirmStxTransactionComponent({
             high: high.fee,
           },
           feeMultipliers,
+          initialStxTransactions[0].payload.payloadType,
         );
 
         setFeeRates({
