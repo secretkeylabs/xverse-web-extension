@@ -1,15 +1,20 @@
+import useStacksAPI from '@hooks/apiClients/useStacksApi';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import type { StxAddressData } from '@secretkeylabs/xverse-core';
-import { fetchStxAddressData } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
-import { PAGINATION_LIMIT } from '@utils/constants';
-import useNetworkSelector from '../useNetwork';
 
 const useStxWalletData = () => {
   const { stxAddress } = useSelectedAccount();
-  const currentNetworkInstance = useNetworkSelector();
-  const fetchStxWalletData = async (): Promise<StxAddressData> =>
-    fetchStxAddressData(stxAddress, currentNetworkInstance, 0, PAGINATION_LIMIT);
+  const StacksAPI = useStacksAPI();
+  const fetchStxWalletData = async (): Promise<StxAddressData> => {
+    const response = await StacksAPI.getAddressBalance(stxAddress);
+    return {
+      ...response,
+      balance: response.totalBalance,
+      locked: response.lockedBalance,
+      transactions: [],
+    };
+  };
 
   return useQuery({
     queryKey: ['stx-wallet-data', stxAddress],
