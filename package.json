@@ -1,7 +1,7 @@
 {
   "name": "xverse-web-extension",
   "description": "A Bitcoin wallet for Web3",
-  "version": "0.40.1",
+  "version": "0.41.0",
   "private": true,
   "engines": {
     "node": "^18.18.2"
@@ -11,7 +11,6 @@
     "build-named": "npm run clean && NODE_ENV=production node scripts/build-named.js",
     "start": "npx node webpack/utils/devServer.js",
     "clean": "rimraf build",
-    "test": "vitest ./src",
     "style": "prettier --write \"src/**/*.{ts,tsx}\"",
     "prepare": "husky install",
     "e2etest": "npx playwright test -g \"\" --grep-invert \"#localexecution\"",
@@ -44,10 +43,10 @@
     "@react-spring/web": "^9.6.1",
     "@sats-connect/core": "0.2.1",
     "@scure/btc-signer": "1.2.1",
-    "@secretkeylabs/xverse-core": "18.7.0",
+    "@secretkeylabs/xverse-core": "18.8.1",
     "@stacks/connect": "7.4.1",
     "@stacks/stacks-blockchain-api-types": "6.1.1",
-    "@stacks/transactions": "6.13.1",
+    "@stacks/transactions": "6.16.1",
     "@tanstack/query-sync-storage-persister": "^4.29.1",
     "@tanstack/react-query": "^4.29.3",
     "@tanstack/react-query-devtools": "^4.29.3",
@@ -153,9 +152,6 @@
     "type-fest": "^2.19.0",
     "typescript": "^5.5.4",
     "typescript-plugin-styled-components": "^3.0.0",
-    "vite": "5.3.2",
-    "vite-tsconfig-paths": "4.3.2",
-    "vitest": "0.34.6",
     "webpack": "^5.89.0",
     "webpack-dev-server": "^4.11.0"
   }

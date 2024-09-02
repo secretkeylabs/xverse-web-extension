@@ -61,6 +61,11 @@ const InfoRowContainer = styled.div`
   gap: ${(props) => props.theme.space.xs};
 `;
 
+const RightAlignContainer = styled.div(() => ({
+  display: 'flex',
+  justifyContent: 'end',
+}));
+
 type Props = {
   runeAmount: number;
   runeSymbol: string;
@@ -150,13 +155,15 @@ function SetRunePriceItem({
           </InfoRowContainer>
         </InfoContainer>
       </ItemContainer>
-      <FloorComparisonLabel
-        floorPriceSats={floorPriceSats}
-        priceSats={satPrice}
-        lowError={satPrice * runeAmount < 10000}
-        highError={satPrice * runeAmount > 1000000000}
-        typography="body_medium_s"
-      />
+      <RightAlignContainer>
+        <FloorComparisonLabel
+          floorPriceSats={floorPriceSats}
+          priceSats={satPrice}
+          lowError={satPrice * runeAmount < 10000}
+          highError={satPrice * runeAmount > 1000000000}
+          typography="body_medium_s"
+        />
+      </RightAlignContainer>
     </>
   );
 }

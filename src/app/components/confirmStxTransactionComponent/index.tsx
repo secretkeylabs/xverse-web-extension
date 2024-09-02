@@ -18,6 +18,7 @@ import {
   getNonce,
   getStxFiatEquivalent,
   microstacksToStx,
+  possiblNexteNonce,
   signLedgerStxTransaction,
   signMultiStxTransactions,
   signTransaction,
@@ -32,6 +33,7 @@ import { modifyRecommendedStxFees } from '@utils/transactions/transactions';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
 import Theme from 'theme';
 import {
   ButtonsContainer,
@@ -45,6 +47,13 @@ import {
   TitleContainer,
   WarningWrapper,
 } from './index.styled';
+
+const Subtitle = styled.p`
+  ${(props) => props.theme.typography.body_medium_m};
+  color: ${(props) => props.theme.colors.white_200};
+  margin-top: ${(props) => props.theme.space.s};
+  margin-bottom: ${(props) => props.theme.space.xs};
+`;
 
 // todo: make fee non option - that'll require change in all components using it
 type Props = {
@@ -91,7 +100,7 @@ function ConfirmStxTransactionComponent({
   const { getSeed } = useSeedVault();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
   const selectedAccount = useSelectedAccount();
-  const { feeMultipliers, fiatCurrency } = useWalletSelector();
+  const { feeMultipliers, fiatCurrency, network } = useWalletSelector();
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(loading);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -212,8 +221,11 @@ function ConfirmStxTransactionComponent({
     }
 
     if (initialStxTransactions.length === 1) {
+      const transaction = initialStxTransactions[0];
+      const nonce = await possiblNexteNonce(selectedAccount.stxAddress, network);
+      transaction.setNonce(nonce);
       const signedContractCall = await signTransaction(
-        initialStxTransactions[0],
+        transaction,
         seed,
         selectedAccount?.id ?? 0,
         selectedNetwork,
@@ -352,6 +364,8 @@ function ConfirmStxTransactionComponent({
         )}
 
         {children}
+
+        <Subtitle>{t('FEES')}</Subtitle>
         <FeeRateContainer>
           <SelectFeeRate
             fee={fee}

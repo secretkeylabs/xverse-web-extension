@@ -55,6 +55,13 @@ const SpendDelegatedStxWarning = styled(Callout)((props) => ({
   marginBottom: props.theme.space.m,
 }));
 
+const Subtitle = styled.p`
+  ${(props) => props.theme.typography.body_medium_m};
+  color: ${(props) => props.theme.colors.white_200};
+  margin-top: ${(props) => props.theme.space.s};
+  margin-bottom: ${(props) => props.theme.space.xs};
+`;
+
 function ConfirmStxTransaction() {
   const { t } = useTranslation('translation');
   const [hasTabClosed, setHasTabClosed] = useState(false);
@@ -350,6 +357,7 @@ function ConfirmStxTransaction() {
           currencyType="STX"
           title={t('CONFIRM_TRANSACTION.AMOUNT')}
         />
+        <Subtitle>{t('CONFIRM_TRANSACTION.TRANSACTION_DETAILS')}</Subtitle>
         <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
         {memo && <TransferMemoView memo={memo} />}
         {hasTabClosed && (

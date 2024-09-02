@@ -42,6 +42,7 @@ function SendRuneScreen() {
   );
   const [amountError, setAmountError] = useState('');
   const [amountToSend, setAmountToSend] = useState<string>(location.state?.amount || '');
+  const [useTokenValue, setUseTokenValue] = useState(true);
   const [feeRate, setFeeRate] = useState('');
   const [sendMax, setSendMax] = useState(false);
   const [currentStep, setCurrentStep] = useState<Step>(Step.SelectRecipient);
@@ -181,7 +182,6 @@ function SendRuneScreen() {
     try {
       setIsSubmitting(true);
       const txnId = await transaction?.broadcast({ ledgerTransport, rbfEnabled: true });
-
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
         protocol: 'runes',
         action: 'transfer',
@@ -236,6 +236,8 @@ function SendRuneScreen() {
       token={fungibleToken}
       amountToSend={amountToSend}
       setAmountToSend={setAmount}
+      useTokenValue={useTokenValue}
+      setUseTokenValue={setUseTokenValue}
       amountError={amountError}
       currentStep={currentStep}
       setCurrentStep={setCurrentStep}

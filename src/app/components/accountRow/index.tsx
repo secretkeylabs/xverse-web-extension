@@ -16,148 +16,25 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import 'react-tooltip/dist/react-tooltip.css';
-import styled from 'styled-components';
-
-const GradientCircle = styled.div<{
-  firstGradient: string;
-  secondGradient: string;
-  thirdGradient: string;
-  isBig: boolean;
-}>((props) => ({
-  width: props.isBig ? 32 : 20,
-  height: props.isBig ? 32 : 20,
-  borderRadius: 25,
-  background: `linear-gradient(to bottom,${props.firstGradient}, ${props.secondGradient},${props.thirdGradient} )`,
-}));
-
-const TopSectionContainer = styled.div<{ disableClick?: boolean }>((props) => ({
-  position: 'relative',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  backgroundColor: 'transparent',
-  cursor: props.disableClick ? 'initial' : 'pointer',
-}));
-
-const AccountInfoContainer = styled.div({
-  width: '100%',
-  display: 'flex',
-  alignItems: 'center',
-});
-
-const CurrentAccountContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  paddingLeft: props.theme.space.s,
-}));
-
-const CurrentAccountTextContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  gap: props.theme.space.xs,
-}));
-
-const AccountName = styled.span<{ isSelected: boolean }>((props) => ({
-  ...props.theme.typography.body_bold_m,
-  color: props.isSelected ? props.theme.colors.white_0 : props.theme.colors.white_400,
-  textAlign: 'start',
-  maxWidth: 160,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-}));
-
-const BarLoaderContainer = styled.div((props) => ({
-  width: 200,
-  paddingTop: props.theme.space.xxs,
-  backgroundColor: 'transparent',
-}));
-
-const TransparentSpan = styled.span`
-  background: transparent;
-`;
-
-const OptionsButton = styled.button({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'flex-end',
-  background: 'transparent',
-});
-
-const ModalContent = styled.form((props) => ({
-  paddingBottom: props.theme.space.xxl,
-}));
-
-const ModalDescription = styled.div((props) => ({
-  ...props.theme.typography.body_m,
-  color: props.theme.colors.white_200,
-}));
-
-const ModalControlsContainer = styled.div<{
-  $bigSpacing?: boolean;
-}>((props) => ({
-  display: 'flex',
-  columnGap: props.theme.space.s,
-  marginTop: props.$bigSpacing ? props.theme.space.l : props.theme.space.m,
-}));
-
-const ModalButtonContainer = styled.div({
-  width: '100%',
-});
-
-const ButtonRow = styled.button`
-  display: flex;
-  align-items: center;
-  background-color: transparent;
-  justify-content: flex-start;
-  padding: ${(props) => props.theme.space.l};
-  padding-top: ${(props) => props.theme.space.s};
-  padding-bottom: ${(props) => props.theme.space.s};
-  font: ${(props) => props.theme.typography.body_medium_m};
-  color: ${(props) => props.theme.colors.white_0};
-  transition: background-color 0.2s ease;
-  :hover {
-    background-color: ${(props) => props.theme.colors.elevation3};
-  }
-  :active {
-    background-color: ${(props) => props.theme.colors.elevation3};
-  }
-`;
-
-const InputLabel = styled.div((props) => ({
-  ...props.theme.typography.body_medium_m,
-  display: 'flex',
-  justifyContent: 'space-between',
-  alignItems: 'center',
-  color: props.theme.colors.white_200,
-  marginTop: props.theme.space.m,
-  marginBottom: props.theme.space.xs,
-}));
-
-const Balance = styled.div<{ isSelected?: boolean }>((props) => ({
-  ...props.theme.typography.body_medium_m,
-  marginTop: props.theme.space.xxs,
-  color: props.isSelected ? props.theme.colors.white_200 : props.theme.colors.white_400,
-  display: 'flex',
-  alignItems: 'center',
-  columnGap: props.theme.space.xs,
-}));
-
-const StyledButton = styled(Button)((props) => ({
-  padding: 0,
-  width: 'auto',
-  transition: 'opacity 0.1s ease',
-  div: {
-    color: props.theme.colors.tangerine,
-  },
-  ':hover:enabled': {
-    opacity: 0.8,
-  },
-  ':active:enabled': {
-    opacity: 0.6,
-  },
-}));
+import {
+  AccountInfoContainer,
+  AccountName,
+  Balance,
+  BarLoaderContainer,
+  ButtonRow,
+  CurrentAccountContainer,
+  CurrentAccountTextContainer,
+  GradientCircle,
+  InputLabel,
+  ModalButtonContainer,
+  ModalContent,
+  ModalControlsContainer,
+  ModalDescription,
+  OptionsButton,
+  StyledButton,
+  TopSectionContainer,
+  TransparentSpan,
+} from './index.styled';
 
 function AccountRow({
   account,
@@ -319,16 +196,17 @@ function AccountRow({
     <TopSectionContainer disableClick={disabledAccountSelect}>
       <AccountInfoContainer onClick={handleClick}>
         <GradientCircle
-          firstGradient={gradient[0]}
-          secondGradient={gradient[1]}
-          thirdGradient={gradient[2]}
-          isBig={isAccountListView}
+          $firstGradient={gradient[0]}
+          $secondGradient={gradient[1]}
+          $thirdGradient={gradient[2]}
+          $isBig={isAccountListView}
+          $isSelected={isSelected}
         />
         <CurrentAccountContainer>
           {account && (
             <TransparentSpan>
               <CurrentAccountTextContainer>
-                <AccountName aria-label="Account Name" isSelected={isSelected}>
+                <AccountName aria-label="Account Name" $isSelected={isSelected}>
                   {account?.accountName ??
                     account?.bnsName ??
                     `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`}
@@ -345,14 +223,14 @@ function AccountRow({
                   prefix={`${currencySymbolMap[fiatCurrency]}`}
                   thousandSeparator
                   renderText={(value: string) => (
-                    <Balance data-testid="account-balance" isSelected={isSelected}>
+                    <Balance data-testid="account-balance" $isSelected={isSelected}>
                       {value}
                     </Balance>
                   )}
                 />
               )}
               {isAccountListView && !totalBalance && (
-                <Balance isSelected={isSelected}>
+                <Balance $isSelected={isSelected}>
                   {EMPTY_LABEL}
                   <Spinner color="white" size={12} />
                 </Balance>
