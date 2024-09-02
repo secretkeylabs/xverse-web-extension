@@ -161,12 +161,13 @@ function ConfirmStxTransactionComponent({
   }, [selectedNetwork, initialStxTransactions, feeMultipliers, fee, setFeeRate]);
 
   useEffect(() => {
-    const stxTxFee = BigNumber(initialStxTransactions[0].auth.spendingCondition.fee.toString());
+    if (!feeMultipliers || !fee) return;
 
-    if (
-      feeMultipliers &&
-      stxTxFee.isGreaterThan(BigNumber(feeMultipliers.thresholdHighStacksFee))
-    ) {
+    const feeExceedsThreshold = stxToMicrostacks(new BigNumber(fee)).isGreaterThan(
+      BigNumber(feeMultipliers.thresholdHighStacksFee),
+    );
+
+    if (feeExceedsThreshold) {
       setShowFeeWarning(true);
     } else if (showFeeWarning) {
       setShowFeeWarning(false);
