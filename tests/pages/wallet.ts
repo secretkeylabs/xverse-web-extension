@@ -1097,6 +1097,9 @@ export default class Wallet {
 
     await this.checkTestnetUrls(true);
 
+    // Wait for the network to be switched so that API doesn't fail because of the rate limiting
+    await this.page.waitForTimeout(15000);
+
     await this.buttonSave.click();
     await expect(this.buttonNetwork).toBeVisible({ timeout: 30000 });
     await expect(this.buttonNetwork).toHaveText('NetworkTestnet');
@@ -1115,6 +1118,9 @@ export default class Wallet {
     await expect(this.buttonTestnet.locator('img[alt="tick"]')).toHaveCount(0);
 
     await this.checkTestnetUrls(false);
+
+    // Wait for the network to be switched so that API doesn't fail because of the rate limiting
+    await this.page.waitForTimeout(15000);
 
     await this.buttonSave.click();
     await expect(this.buttonNetwork).toBeVisible({ timeout: 30000 });
