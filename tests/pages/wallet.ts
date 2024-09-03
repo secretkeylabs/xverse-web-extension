@@ -36,8 +36,6 @@ export default class Wallet {
 
   readonly buttonConfirm: Locator;
 
-  readonly buttonResetWallet: Locator;
-
   readonly buttonDenyDataCollection: Locator;
 
   readonly buttonNetwork: Locator;
@@ -385,7 +383,6 @@ export default class Wallet {
     this.buttonMenu = page.getByRole('button', { name: 'Open Header Options' });
     this.buttonLock = page.getByRole('button', { name: 'Lock' });
     this.buttonConfirm = page.getByRole('button', { name: 'Confirm' });
-    this.buttonResetWallet = page.getByRole('button', { name: 'Reset Wallet' });
     this.buttonDenyDataCollection = page.getByRole('button', { name: 'Deny' });
     this.labelBalanceAmountSelector = page.getByTestId('balance-label');
     this.buttonClose = page.getByRole('button', { name: 'Close' });
