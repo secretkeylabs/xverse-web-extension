@@ -218,7 +218,11 @@ function Step2SelectAmount({
         };
 
         if (feeMultipliers?.thresholdHighStacksFee) {
-          stxFees = modifyRecommendedStxFees(stxFees, feeMultipliers);
+          stxFees = modifyRecommendedStxFees(
+            stxFees,
+            feeMultipliers,
+            unsignedTx.payload.payloadType,
+          );
         }
         setFees({
           low: Number(microstacksToStx(new BigNumber(stxFees.low))),
