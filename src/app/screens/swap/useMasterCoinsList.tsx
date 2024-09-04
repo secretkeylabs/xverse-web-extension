@@ -1,11 +1,11 @@
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import IconStacks from '@assets/img/dashboard/stx_icon.svg';
 import { useRuneFungibleTokensQuery } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
+import { useGetSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useHasFeature from '@hooks/useHasFeature';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { FeatureId, type FungibleToken } from '@secretkeylabs/xverse-core';
 import { useMemo } from 'react';
-import { useStxCurrencyConversion } from './useStxCurrencyConversion';
 
 export const btcFt: FungibleToken = {
   name: 'Bitcoin',
@@ -30,7 +30,7 @@ export const stxFt: FungibleToken = {
 };
 
 const useMasterCoinsList = () => {
-  const { acceptableCoinList: sip10FtList } = useStxCurrencyConversion();
+  const { data: sip10FtList } = useGetSip10FungibleTokens();
   const { unfilteredData: runesFtList } = useRuneFungibleTokensQuery();
   const { hideStx } = useWalletSelector();
   const isStacksSwapsEnabled = useHasFeature(FeatureId.STACKS_SWAPS);
@@ -40,7 +40,7 @@ const useMasterCoinsList = () => {
       [
         ...(runesFtList || []),
         btcFt,
-        ...(!hideStx && isStacksSwapsEnabled ? [stxFt, ...sip10FtList] : []),
+        ...(!hideStx && isStacksSwapsEnabled ? [stxFt, ...(sip10FtList ?? [])] : []),
       ] ?? [],
     [runesFtList, hideStx, isStacksSwapsEnabled, sip10FtList],
   );

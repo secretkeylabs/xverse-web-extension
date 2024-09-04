@@ -36,8 +36,6 @@ export default class Wallet {
 
   readonly buttonConfirm: Locator;
 
-  readonly buttonResetWallet: Locator;
-
   readonly buttonDenyDataCollection: Locator;
 
   readonly buttonNetwork: Locator;
@@ -385,7 +383,6 @@ export default class Wallet {
     this.buttonMenu = page.getByRole('button', { name: 'Open Header Options' });
     this.buttonLock = page.getByRole('button', { name: 'Lock' });
     this.buttonConfirm = page.getByRole('button', { name: 'Confirm' });
-    this.buttonResetWallet = page.getByRole('button', { name: 'Reset Wallet' });
     this.buttonDenyDataCollection = page.getByRole('button', { name: 'Deny' });
     this.labelBalanceAmountSelector = page.getByTestId('balance-label');
     this.buttonClose = page.getByRole('button', { name: 'Close' });
@@ -1100,6 +1097,9 @@ export default class Wallet {
 
     await this.checkTestnetUrls(true);
 
+    // Wait for the network to be switched so that API doesn't fail because of the rate limiting
+    await this.page.waitForTimeout(15000);
+
     await this.buttonSave.click();
     await expect(this.buttonNetwork).toBeVisible({ timeout: 30000 });
     await expect(this.buttonNetwork).toHaveText('NetworkTestnet');
@@ -1118,6 +1118,9 @@ export default class Wallet {
     await expect(this.buttonTestnet.locator('img[alt="tick"]')).toHaveCount(0);
 
     await this.checkTestnetUrls(false);
+
+    // Wait for the network to be switched so that API doesn't fail because of the rate limiting
+    await this.page.waitForTimeout(15000);
 
     await this.buttonSave.click();
     await expect(this.buttonNetwork).toBeVisible({ timeout: 30000 });

@@ -141,6 +141,7 @@ function ConfirmStxTransactionComponent({
             high: high.fee,
           },
           feeMultipliers,
+          initialStxTransactions[0].payload.payloadType,
         );
 
         setFeeRates({
@@ -148,7 +149,7 @@ function ConfirmStxTransactionComponent({
           medium: microstacksToStx(BigNumber(modifiedFees.medium)).toNumber(),
           high: microstacksToStx(BigNumber(modifiedFees.high)).toNumber(),
         });
-        if (!fee) setFeeRate?.(Number(microstacksToStx(BigNumber(medium.fee))).toString());
+        if (!fee) setFeeRate?.(Number(microstacksToStx(BigNumber(modifiedFees.low))).toString());
       } catch (e) {
         console.error(e);
       } finally {
@@ -157,15 +158,16 @@ function ConfirmStxTransactionComponent({
     };
 
     fetchStxFees();
-  }, [selectedNetwork, initialStxTransactions]);
+  }, [selectedNetwork, initialStxTransactions, feeMultipliers, fee, setFeeRate]);
 
   useEffect(() => {
-    const stxTxFee = BigNumber(initialStxTransactions[0].auth.spendingCondition.fee.toString());
+    if (!feeMultipliers || !fee) return;
 
-    if (
-      feeMultipliers &&
-      stxTxFee.isGreaterThan(BigNumber(feeMultipliers.thresholdHighStacksFee))
-    ) {
+    const feeExceedsThreshold = stxToMicrostacks(new BigNumber(fee)).isGreaterThan(
+      BigNumber(feeMultipliers.thresholdHighStacksFee),
+    );
+
+    if (feeExceedsThreshold) {
       setShowFeeWarning(true);
     } else if (showFeeWarning) {
       setShowFeeWarning(false);
