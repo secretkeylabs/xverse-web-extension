@@ -2,7 +2,7 @@ import TokenTile from '@components/tokenTile';
 import Divider from '@ui-library/divider';
 import styled from 'styled-components';
 
-export const Container = styled.div<{ $applyIndent?: boolean }>`
+export const Container = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;

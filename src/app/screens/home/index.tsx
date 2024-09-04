@@ -50,7 +50,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from 'styled-components';
 import SquareButton from '../../components/squareButton';
 import BalanceCard from './balanceCard';
-import Banner from './banner';
+import BannerCarousel from './bannerCarousel';
 import {
   ButtonImage,
   ButtonText,
@@ -109,7 +109,8 @@ function Home() {
   const { isInitialLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } =
     useStxWalletData();
   const { btcFiatRate, stxBtcRate } = useCoinRates();
-  const { data: notificationBannersArr } = useNotificationBanners();
+  const { data: notificationBannersArr, isFetching: isFetchingNotificationBannersArr } =
+    useNotificationBanners();
   const {
     unfilteredData: fullSip10CoinsList,
     visible: sip10CoinsList,
@@ -182,10 +183,11 @@ function Home() {
     .concat(runesCoinsList)
     .sort((a, b) => sortFtByFiatBalance(a, b, stxBtcRate, btcFiatRate));
 
-  const showNotificationBanner =
-    notificationBannersArr?.length &&
-    notificationBannersArr.length > 0 &&
-    !notificationBanners[notificationBannersArr[0].id];
+  const filteredNotificationBannersArr = notificationBannersArr
+    ? notificationBannersArr.filter((banner) => !notificationBanners[banner.id])
+    : [];
+  const showBannerCarousel =
+    !isFetchingNotificationBannersArr && !!filteredNotificationBannersArr?.length;
 
   const onReceiveModalOpen = () => {
     setOpenReceiveModal(true);
@@ -422,7 +424,7 @@ function Home() {
       {isOrdinalReceiveAlertVisible && (
         <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose} />
       )}
-      <Container $applyIndent={!showNotificationBanner}>
+      <Container>
         <BalanceCard
           isLoading={loadingStxWalletData || loadingBtcWalletData}
           isRefetching={
@@ -452,11 +454,11 @@ function Home() {
           />
         </RowButtonContainer>
 
-        {showNotificationBanner ? (
+        {showBannerCarousel ? (
           <>
             <br />
             <StyledDivider color="white_850" verticalMargin="m" />
-            <Banner {...notificationBannersArr[0]} />
+            <BannerCarousel items={filteredNotificationBannersArr} />
             <StyledDivider color="white_850" verticalMargin="xxs" />
           </>
         ) : (

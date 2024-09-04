@@ -1,25 +1,18 @@
-import { XCircle } from '@phosphor-icons/react';
 import { AnalyticsEvents, type NotificationBanner } from '@secretkeylabs/xverse-core';
-import { setNotificationBannersAction } from '@stores/wallet/actions/actionCreators';
-import { CrossButton } from '@ui-library/sheet';
 import { trackMixPanel } from '@utils/mixpanel';
-import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import Theme from 'theme';
 
 const Container = styled.div`
   position: relative;
   width: 100%;
   color: ${({ theme }) => theme.colors.white_0};
-  padding-top: ${({ theme }) => theme.space.xxs};
-  padding-bottom: ${({ theme }) => theme.space.m};
 `;
 
 const BannerContent = styled.button`
   cursor: pointer;
   display: flex;
   align-items: center;
-  column-gap: ${({ theme }) => theme.space.m};
+  column-gap: ${({ theme }) => theme.space.s};
   padding-left: ${({ theme }) => theme.space.m};
   padding-right: ${({ theme }) => theme.space.m};
   color: ${({ theme }) => theme.colors.white_0};
@@ -55,25 +48,9 @@ const BannerText = styled.div`
   overflow: hidden;
 `;
 
-const StyledCrossButton = styled(CrossButton)`
-  z-index: 1;
-  position: absolute;
-  top: -${(props) => props.theme.space.xs};
-  right: -${(props) => props.theme.space.xxs};
-`;
-
-function Banner({ id, name, url, icon, description }: NotificationBanner) {
-  const dispatch = useDispatch();
-
-  const dismissBanner = () => {
-    dispatch(setNotificationBannersAction({ id, isDismissed: true }));
-  };
-
+function Banner({ name, url, icon, description }: NotificationBanner) {
   return (
     <Container>
-      <StyledCrossButton onClick={dismissBanner}>
-        <XCircle size={24} weight="fill" color={Theme.colors.white_200} />
-      </StyledCrossButton>
       <BannerContent
         onClick={() => {
           trackMixPanel(
