@@ -2,6 +2,7 @@ import {
   getBtcFiatEquivalent,
   getStxFiatEquivalent,
   stxToMicrostacks,
+  type Coin,
   type FungibleToken,
   type Provider,
   type Quote,
@@ -22,7 +23,7 @@ function trackSwapMixPanel(
     btcUsdRate,
     runeFloorPrice,
     stxBtcRate,
-    sip10CoinsList,
+    toTokenInfo,
   }: {
     provider?: Provider;
     fromToken?: FungibleToken;
@@ -32,7 +33,7 @@ function trackSwapMixPanel(
     btcUsdRate: string;
     runeFloorPrice?: number;
     stxBtcRate?: string;
-    sip10CoinsList?: any;
+    toTokenInfo?: Coin;
   },
 ) {
   let fromAmount;
@@ -81,11 +82,7 @@ function trackSwapMixPanel(
               new BigNumber(stxBtcRate),
               new BigNumber(btcUsdRate),
             ).toFixed(2)
-          : new BigNumber(
-              sip10CoinsList?.find((s) => s.principal === toToken?.ticker)?.tokenFiatRate ?? 0,
-            )
-              .multipliedBy(receiveAmount)
-              .toFixed(2);
+          : new BigNumber(toTokenInfo?.tokenFiatRate ?? 0).multipliedBy(receiveAmount).toFixed(2);
     }
   }
 

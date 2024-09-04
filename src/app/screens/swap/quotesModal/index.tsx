@@ -1,4 +1,3 @@
-import { microStxToStx } from '@components/postCondition/postConditionView/helper';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import {
   getBtcFiatEquivalent,
