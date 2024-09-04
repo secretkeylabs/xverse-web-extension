@@ -84,6 +84,7 @@ function PasswordInput({
     const keyDownHandler = (event) => {
       if (
         event.key === 'Enter' &&
+        document.activeElement?.id === 'password-input' &&
         !!enteredPassword &&
         enteredPasswordLength >= REQUIRED_PASSWORD_LENGTH &&
         (checkPasswordStrength ? score >= PasswordStrength.AverageScore : true)
@@ -194,6 +195,7 @@ function PasswordInput({
       <PasswordInputLabel>{inputLabel}</PasswordInputLabel>
       <Input
         key={`${title}-${inputLabel}`}
+        id="password-input"
         type={isPasswordVisible ? 'text' : 'password'}
         value={enteredPassword}
         onChange={handlePasswordChange}
@@ -211,11 +213,11 @@ function PasswordInput({
         hideClear
       />
       {checkPasswordStrength ? renderStrengthBar() : null}
-      <ButtonsContainer stackButtonAlignment={stackButtonAlignment} ifError={error !== ''}>
-        <ButtonContainer stackButtonAlignment={stackButtonAlignment}>
-          <Button title={t('BACK_BUTTON')} onClick={handleBack} variant="secondary" />
+      <ButtonsContainer $stackButtonAlignment={stackButtonAlignment} $ifError={error !== ''}>
+        <ButtonContainer $stackButtonAlignment={stackButtonAlignment}>
+          <Button title={t('BACK_BUTTON')} onClick={handleBack} variant="secondary" type="button" />
         </ButtonContainer>
-        <ButtonContainer stackButtonAlignment={stackButtonAlignment}>
+        <ButtonContainer $stackButtonAlignment={stackButtonAlignment}>
           <Button
             loading={loading}
             disabled={
@@ -223,6 +225,7 @@ function PasswordInput({
             }
             title={submitButtonText || t('CONTINUE_BUTTON')}
             onClick={handleContinue}
+            type="submit"
           />
         </ButtonContainer>
       </ButtonsContainer>

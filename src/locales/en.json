@@ -624,6 +624,7 @@
     }
   },
   "LOGIN_SCREEN": {
+    "BETA_VERSION": "Beta",
     "WELCOME_MESSAGE_FIRST_LOGIN": "Welcome!",
     "WELCOME_MESSAGE": "Welcome back!",
     "PASSWORD_INPUT_LABEL": "Password",

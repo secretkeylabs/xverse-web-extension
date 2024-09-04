@@ -40,6 +40,13 @@ const StyledFiatAmountText = styled(FiatAmountText)`
   color: ${(props) => props.theme.colors.white_200};
 `;
 
+const ConvertedAmountWrapper = styled.div`
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
 const inputValidator = /^[0-9.]*$/;
 const stxInputExtractor = /[0-9]+[.]?[0-9]{0,6}/;
 const stxInputValidator = /^[0-9]+[.]?[0-9]{0,6}$/;
@@ -188,29 +195,29 @@ function StxAmountSelector({ amount, setAmount, sendMax, setSendMax, disabled = 
       complications={
         <>
           <ConvertComplication disabled={disabled} onClick={handleUseStxValueChange}>
-            {useStxValue ? (
-              <StyledFiatAmountText
-                fiatAmount={getStxFiatEquivalent(
-                  BigNumber(amount),
-                  BigNumber(stxBtcRate),
-                  BigNumber(btcFiatRate),
-                )}
-                fiatCurrency={fiatCurrency}
-              />
-            ) : (
-              <NumericFormat
-                value={microStxToStxString(amount)}
-                displayType="text"
-                thousandSeparator
-                renderText={(value: string) => (
-                  <div>
+            <ConvertedAmountWrapper>
+              {useStxValue ? (
+                <StyledFiatAmountText
+                  fiatAmount={getStxFiatEquivalent(
+                    BigNumber(amount),
+                    BigNumber(stxBtcRate),
+                    BigNumber(btcFiatRate),
+                  )}
+                  fiatCurrency={fiatCurrency}
+                />
+              ) : (
+                <NumericFormat
+                  value={microStxToStxString(amount)}
+                  displayType="text"
+                  thousandSeparator
+                  renderText={(value: string) => (
                     <AmountText typography="body_medium_s" color="white_200">
                       {value} STX
                     </AmountText>
-                  </div>
-                )}
-              />
-            )}
+                  )}
+                />
+              )}
+            </ConvertedAmountWrapper>
             <ArrowsDownUp size={16} color={Theme.colors.white_200} />
           </ConvertComplication>
           <VertRule />

@@ -15,16 +15,14 @@ export const ColumnContainer = styled.div((props) => ({
   flexDirection: 'column',
   alignItems: 'space-between',
   justifyContent: 'space-between',
-  gap: props.theme.space.s,
-  marginTop: props.theme.space.l,
   marginBottom: props.theme.space.s,
 }));
 
 export const ReceiveContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  marginTop: props.theme.spacing(12),
-  marginBottom: props.theme.spacing(16),
+  marginTop: props.theme.space.l,
+  marginBottom: props.theme.space.xl,
   gap: props.theme.space.m,
 }));
 
@@ -64,12 +62,12 @@ export const TokenListButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
-  marginTop: props.theme.spacing(6),
+  marginTop: props.theme.space.s,
   marginBottom: props.theme.spacing(22),
 }));
 
 export const StyledTokenTile = styled(TokenTile)`
-  background-color: ${(props) => props.theme.colors.elevation1};
+  background-color: transparent;
 `;
 
 export const Icon = styled.img({
@@ -83,7 +81,7 @@ export const MergedOrdinalsIcon = styled.img({
 });
 
 export const VerifyOrViewContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(16),
+  marginTop: props.theme.space.xl,
   marginBottom: props.theme.spacing(20),
 }));
 
@@ -92,9 +90,9 @@ export const VerifyButtonContainer = styled.div((props) => ({
 }));
 
 export const ModalContent = styled.div((props) => ({
-  padding: props.theme.spacing(8),
+  padding: props.theme.space.m,
   paddingTop: 0,
-  paddingBottom: props.theme.spacing(16),
+  paddingBottom: props.theme.space.xl,
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
@@ -106,14 +104,14 @@ export const ModalIcon = styled.img((props) => ({
 
 export const ModalTitle = styled.div((props) => ({
   ...props.theme.typography.body_bold_l,
-  marginBottom: props.theme.spacing(4),
+  marginBottom: props.theme.space.xs,
   textAlign: 'center',
 }));
 
 export const ModalDescription = styled.div((props) => ({
   ...props.theme.typography.body_m,
   color: props.theme.colors.white_200,
-  marginBottom: props.theme.spacing(16),
+  marginBottom: props.theme.space.xl,
   textAlign: 'center',
 }));
 
@@ -140,7 +138,7 @@ export const StacksIcon = styled.img({
 
 export const MergedIcon = styled.div((props) => ({
   position: 'relative',
-  marginBottom: props.theme.spacing(12),
+  marginBottom: props.theme.space.l,
 }));
 
 export const IconBackground = styled.div((props) => ({
@@ -162,4 +160,8 @@ export const StyledDivider = styled(Divider)`
   width: calc(100% + ${(props) => props.theme.space.xl});
   margin-left: -${(props) => props.theme.space.m};
   margin-right: -${(props) => props.theme.space.m};
+`;
+
+export const StyledDividerSingle = styled(StyledDivider)`
+  margin-top: ${(props) => props.theme.space.xl};
 `;

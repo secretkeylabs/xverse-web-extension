@@ -2,14 +2,16 @@ import { AnalyticsEvents } from '@secretkeylabs/xverse-core';
 import { trackMixPanel } from '@utils/mixpanel';
 import styled from 'styled-components';
 
-const Card = styled.div`
+const Card = styled.button`
   cursor: pointer;
-  display: block;
+  display: flex;
+  flex-direction: column;
   border-radius: 12px;
   background-color: ${({ theme }) => theme.colors.elevation2};
   height: 182px;
   width: 212px;
   color: ${({ theme }) => theme.colors.white_0};
+  text-align: left;
   transition: opacity 0.1s ease;
 
   &:hover {

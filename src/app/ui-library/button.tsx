@@ -32,7 +32,6 @@ const StyledButton = styled.button`
     border: 1px solid;
     color: ${(props) => props.theme.colors.elevation0};
 
-    :focus-visible,
     :hover:enabled {
       background-color: ${(props) => props.theme.colors.white_200};
     }
@@ -49,7 +48,6 @@ const StyledButton = styled.button`
     border: 1px solid ${(props) => props.theme.colors.white_800};
     color: ${(props) => props.theme.colors.white_0};
 
-    :focus-visible,
     :hover:enabled {
       background-color: ${(props) => props.theme.colors.elevation6_800};
       border: 1px solid ${(props) => props.theme.colors.white_850};
@@ -71,7 +69,6 @@ const StyledButton = styled.button`
     border: none;
     color: ${(props) => props.theme.colors.white_0};
 
-    :focus-visible,
     :hover:enabled {
       color: ${(props) => props.theme.colors.white_200};
     }
@@ -88,7 +85,6 @@ const StyledButton = styled.button`
     border: none;
     color: ${(props) => props.theme.colors.white_0};
 
-    :focus-visible,
     :hover:enabled {
       background-color: ${(props) => props.theme.colors.danger_dark_100};
       color: ${(props) => props.theme.colors.white_0};
@@ -119,6 +115,8 @@ type Props = {
   className?: string;
   variant?: ButtonVariant;
   type?: 'button' | 'submit' | 'reset';
+  id?: string;
+  dataTestId?: string;
 };
 
 function Button({
@@ -131,6 +129,8 @@ function Button({
   disabled = false,
   variant = 'primary',
   type,
+  id,
+  dataTestId,
 }: Props) {
   return (
     <StyledButton
@@ -139,6 +139,8 @@ function Button({
       tabIndex={0}
       disabled={disabled || loading}
       type={type}
+      id={id}
+      data-testid={dataTestId}
     >
       {loading ? (
         <Spinner />

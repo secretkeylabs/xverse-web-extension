@@ -1,4 +1,3 @@
-import ActionButton from '@components/button';
 import useAddressInscriptionCollections from '@hooks/queries/ordinals/useAddressInscriptionCollections';
 import { useAddressRareSats } from '@hooks/queries/ordinals/useAddressRareSats';
 import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
@@ -10,6 +9,7 @@ import {
   ChangeActivateRareSatsAction,
   SetRareSatsNoticeDismissedAction,
 } from '@stores/wallet/actions/actionCreators';
+import Button from '@ui-library/button';
 import { getCollectionKey } from '@utils/inscriptions';
 import { InvalidParamsError } from '@utils/query';
 import { useCallback, useEffect, useMemo, useRef, useState, type PropsWithChildren } from 'react';
@@ -178,12 +178,12 @@ const useNftDashboard = (): NftDashboardState => {
         </GridContainer>
         {inscriptionsQuery.hasNextPage && (
           <LoadMoreButtonContainer>
-            <ActionButton
-              transparent
-              text={t('LOAD_MORE')}
-              processing={inscriptionsQuery.isFetchingNextPage}
+            <Button
+              variant="secondary"
+              title={t('LOAD_MORE')}
+              loading={inscriptionsQuery.isFetchingNextPage}
               disabled={inscriptionsQuery.isFetchingNextPage}
-              onPress={() => inscriptionsQuery.fetchNextPage()}
+              onClick={() => inscriptionsQuery.fetchNextPage()}
             />
           </LoadMoreButtonContainer>
         )}

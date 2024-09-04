@@ -31,9 +31,13 @@ export const GalleryContainer = styled.div({
 
 export const BackButtonContainer = styled.div((props) => ({
   display: 'flex',
-  flexDirection: 'row',
-  width: 820,
+  justifyContent: 'flex-start',
+  width: '100%',
+  maxWidth: 820,
   marginTop: props.theme.spacing(40),
+  button: {
+    width: 'auto',
+  },
 }));
 
 export const ButtonContainer = styled.div((props) => ({
@@ -41,7 +45,7 @@ export const ButtonContainer = styled.div((props) => ({
   position: 'relative',
   flexDirection: 'row',
   maxWidth: 400,
-  columnGap: props.theme.spacing(8),
+  columnGap: props.theme.space.m,
   marginBottom: props.theme.spacing(10.5),
 }));
 
@@ -49,11 +53,11 @@ export const ExtensionContainer = styled.div((props) => ({
   ...props.theme.scrollbar,
   display: 'flex',
   flexDirection: 'column',
-  marginTop: props.theme.spacing(4),
+  marginTop: props.theme.space.xs,
   alignItems: 'center',
   flex: 1,
-  paddingLeft: props.theme.spacing(4),
-  paddingRight: props.theme.spacing(4),
+  paddingLeft: props.theme.space.xs,
+  paddingRight: props.theme.space.xs,
 }));
 
 export const OrdinalsContainer = styled.div((props) => ({
@@ -65,7 +69,7 @@ export const OrdinalsContainer = styled.div((props) => ({
   justifyContent: 'flex-start',
   alignItems: 'flex-start',
   borderRadius: 8,
-  marginBottom: props.theme.spacing(12),
+  marginBottom: props.theme.space.l,
 }));
 
 export const ExtensionOrdinalsContainer = styled.div((props) => ({
@@ -76,7 +80,7 @@ export const ExtensionOrdinalsContainer = styled.div((props) => ({
   justifyContent: 'center',
   alignItems: 'center',
   borderRadius: props.theme.radius(1),
-  marginTop: props.theme.spacing(12),
+  marginTop: props.theme.space.l,
   marginBottom: props.theme.space.m,
 }));
 
@@ -184,29 +188,6 @@ export const StyledTooltip = styled(Tooltip)`
   }
 `;
 
-export const ButtonImage = styled.img((props) => ({
-  marginRight: props.theme.spacing(3),
-  alignSelf: 'center',
-  transform: 'all',
-}));
-
-export const Button = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'flex-start',
-  alignItems: 'center',
-  background: 'transparent',
-  marginBottom: props.theme.spacing(12),
-}));
-
-export const AssetDeatilButtonText = styled.div((props) => ({
-  ...props.theme.typography.body_s,
-  fontWeight: 400,
-  fontSize: 14,
-  color: props.theme.colors.white_0,
-  textAlign: 'center',
-}));
-
 export const CollectibleText = styled.h1((props) => ({
   ...props.theme.typography.body_bold_m,
   color: props.theme.colors.white_400,
@@ -286,14 +267,14 @@ export const ActionButtonLoader = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  rowGap: props.theme.spacing(4),
+  rowGap: props.theme.space.xs,
 }));
 
 export const InfoContainer = styled.div((props) => ({
   width: '100%',
   display: 'flex',
   justifyContent: 'space-between',
-  padding: `0 ${props.theme.spacing(8)}px`,
+  padding: `0 ${props.theme.space.m}`,
 }));
 
 export const RareSatsBundleCallout = styled(Callout)<DetailSectionProps>((props) => ({

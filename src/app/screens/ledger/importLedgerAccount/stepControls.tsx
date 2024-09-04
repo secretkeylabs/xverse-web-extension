@@ -1,4 +1,4 @@
-import ActionButton from '@components/button';
+import Button from '@ui-library/button';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { ImportLedgerSteps } from './types';
@@ -6,11 +6,11 @@ import { ImportLedgerSteps } from './types';
 const ButtonContainer = styled.div((props) => ({
   marginLeft: 3,
   marginRight: 3,
-  marginTop: props.theme.spacing(4),
+  marginTop: props.theme.space.xs,
   width: '100%',
 }));
 
-interface Props {
+type Props = {
   isBitcoinSelected: boolean;
   isStacksSelected: boolean;
   isTogglerChecked: boolean;
@@ -29,7 +29,7 @@ interface Props {
     isStxAddressRejected: boolean;
     accountNameError?: string;
   };
-}
+};
 
 function StepControls({
   isBitcoinSelected,
@@ -62,38 +62,38 @@ function StepControls({
 
   switch (currentStep) {
     case ImportLedgerSteps.START:
-      return <ActionButton onPress={handleClickNext} text={t('LEDGER_IMPORT_1_BUTTON')} />;
+      return <Button onClick={handleClickNext} title={t('LEDGER_IMPORT_1_BUTTON')} />;
     case ImportLedgerSteps.SELECT_ASSET:
       return (
-        <ActionButton
-          onPress={handleClickNext}
-          text={t('LEDGER_IMPORT_CONTINUE_BUTTON')}
+        <Button
+          onClick={handleClickNext}
+          title={t('LEDGER_IMPORT_CONTINUE_BUTTON')}
           disabled={!isBitcoinSelected && !isStacksSelected}
         />
       );
     case ImportLedgerSteps.BEFORE_START:
       return (
-        <ActionButton
-          onPress={handleClickNext}
-          text={t('LEDGER_IMPORT_CONTINUE_BUTTON')}
+        <Button
+          onClick={handleClickNext}
+          title={t('LEDGER_IMPORT_CONTINUE_BUTTON')}
           disabled={selectedLedgerLiveOption === null}
         />
       );
     case ImportLedgerSteps.IMPORTANT_WARNING:
       return (
-        <ActionButton
-          onPress={handleClickNext}
-          text={t('LEDGER_IMPORT_CONTINUE_BUTTON')}
+        <Button
+          onClick={handleClickNext}
+          title={t('LEDGER_IMPORT_CONTINUE_BUTTON')}
           disabled={!isTogglerChecked}
         />
       );
     case ImportLedgerSteps.CONNECT_LEDGER:
       return (
-        <ActionButton
-          processing={isButtonDisabled}
+        <Button
+          loading={isButtonDisabled}
           disabled={isButtonDisabled}
-          onPress={checkDeviceConnection}
-          text={t(
+          onClick={checkDeviceConnection}
+          title={t(
             isConnectFailed ? 'LEDGER_IMPORT_TRY_AGAIN_BUTTON' : 'LEDGER_IMPORT_CONNECT_BUTTON',
           )}
         />
@@ -102,20 +102,20 @@ function StepControls({
       return (
         <>
           <ButtonContainer>
-            <ActionButton
+            <Button
               disabled={isButtonDisabled}
-              processing={isButtonDisabled}
-              onPress={backToAssetSelection}
-              transparent
-              text={t('LEDGER_IMPORT_CANCEL_BUTTON')}
+              loading={isButtonDisabled}
+              onClick={backToAssetSelection}
+              variant="secondary"
+              title={t('LEDGER_IMPORT_CANCEL_BUTTON')}
             />
           </ButtonContainer>
           <ButtonContainer>
-            <ActionButton
+            <Button
               disabled={isButtonDisabled}
-              processing={isButtonDisabled}
-              onPress={handleClickMultipleAccounts}
-              text={t('LEDGER_IMPORT_YES_BUTTON')}
+              loading={isButtonDisabled}
+              onClick={handleClickMultipleAccounts}
+              title={t('LEDGER_IMPORT_YES_BUTTON')}
             />
           </ButtonContainer>
         </>
@@ -129,33 +129,40 @@ function StepControls({
         isStxAddressRejected
       ) {
         return (
-          <ActionButton
-            processing={isButtonDisabled}
+          <Button
+            loading={isButtonDisabled}
             disabled={isButtonDisabled}
-            onPress={backToAssetSelection}
-            text={t('LEDGER_IMPORT_TRY_AGAIN_BUTTON')}
+            onClick={backToAssetSelection}
+            title={t('LEDGER_IMPORT_TRY_AGAIN_BUTTON')}
           />
         );
       }
       break;
     case ImportLedgerSteps.ADDRESS_ADDED:
-      return <ActionButton onPress={handleClickNext} text={t('LEDGER_IMPORT_NEXT_BUTTON')} />;
+      return (
+        <Button
+          loading={isButtonDisabled}
+          disabled={isButtonDisabled}
+          onClick={handleClickNext}
+          title={t('LEDGER_IMPORT_NEXT_BUTTON')}
+        />
+      );
     case ImportLedgerSteps.ADD_ACCOUNT_NAME:
       return (
-        <ActionButton
+        <Button
+          loading={isButtonDisabled}
           disabled={isButtonDisabled}
-          processing={isButtonDisabled}
-          onPress={updateAccountName}
-          text={t('LEDGER_IMPORT_CONFIRM_BUTTON')}
+          onClick={updateAccountName}
+          title={t('LEDGER_IMPORT_CONFIRM_BUTTON')}
         />
       );
     case ImportLedgerSteps.IMPORT_END:
       return (
-        <ActionButton
+        <Button
+          loading={isButtonDisabled}
           disabled={isButtonDisabled}
-          processing={isButtonDisabled}
-          onPress={handleWindowClose}
-          text={t('LEDGER_IMPORT_CLOSE_BUTTON')}
+          onClick={handleWindowClose}
+          title={t('LEDGER_IMPORT_CLOSE_BUTTON')}
         />
       );
     default:
