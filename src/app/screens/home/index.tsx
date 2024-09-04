@@ -70,6 +70,7 @@ import {
   RowButtonContainer,
   StacksIcon,
   StyledDivider,
+  StyledDividerSingle,
   StyledTokenTile,
   TokenListButton,
   TokenListButtonContainer,
@@ -87,7 +88,6 @@ function Home() {
     showBtcReceiveAlert,
     showOrdinalReceiveAlert,
     showDataCollectionAlert,
-    network,
     hideStx,
     spamToken,
     notificationBanners,
@@ -452,13 +452,15 @@ function Home() {
           />
         </RowButtonContainer>
 
-        {showNotificationBanner && (
+        {showNotificationBanner ? (
           <>
             <br />
             <StyledDivider color="white_850" verticalMargin="m" />
             <Banner {...notificationBannersArr[0]} />
             <StyledDivider color="white_850" verticalMargin="xxs" />
           </>
+        ) : (
+          <StyledDividerSingle color="elevation3" verticalMargin="xs" />
         )}
 
         <ColumnContainer>
