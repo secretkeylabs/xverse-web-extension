@@ -18,12 +18,8 @@ const TileContainer = styled.button((props) => ({
   flexDirection: 'row',
   backgroundColor: props.color,
   width: '100%',
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-  paddingTop: props.theme.spacing(7.25),
-  paddingBottom: props.theme.spacing(7.25),
+  padding: `${props.theme.space.m} 0`,
   borderRadius: props.theme.radius(2),
-  marginBottom: props.theme.spacing(0),
 }));
 
 const RowContainer = styled.div({
@@ -59,11 +55,11 @@ const CoinTickerText = styled.p((props) => ({
 }));
 
 const SubText = styled.p<{ fullWidth: boolean }>((props) => ({
-  ...props.theme.typography.body_medium_m,
+  ...props.theme.typography.body_medium_s,
   color: props.theme.colors.white_200,
-  fontSize: 12,
   textAlign: 'left',
-  maxWidth: props.fullWidth ? undefined : 100,
+  maxWidth: props.fullWidth ? 'unset' : 120,
+  whiteSpace: props.fullWidth ? 'normal' : 'nowrap',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
 }));
@@ -88,7 +84,7 @@ const StyledBarLoader = styled(BetterBarLoader)<{
 }>((props) => ({
   padding: 0,
   borderRadius: props.theme.radius(1),
-  marginBottom: props.withMarginBottom ? props.theme.spacing(2) : 0,
+  marginBottom: props.withMarginBottom ? props.theme.space.xxs : 0,
 }));
 
 function TokenLoader() {
@@ -100,7 +96,7 @@ function TokenLoader() {
   );
 }
 
-interface Props {
+type Props = {
   title: string;
   loading?: boolean;
   currency: CurrencyTypes;
@@ -110,7 +106,7 @@ interface Props {
   className?: string;
   showProtocolIcon?: boolean;
   hideBalance?: boolean;
-}
+};
 
 function TokenTile({
   title,

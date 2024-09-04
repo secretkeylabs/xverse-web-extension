@@ -8,14 +8,6 @@ export const Container = styled.div<{ $applyIndent?: boolean }>`
   flex: 1;
   padding: 0 ${(props) => props.theme.space.xs};
   ${(props) => props.theme.scrollbar}
-
-  ${(props) =>
-    props.$applyIndent &&
-    // When elements are in focus with the keyboard, we need to indent the content to the right to avoid cutting the right side of the elements
-    `
-    padding-left: ${props.theme.space.m};
-    scrollbar-gutter: stable;
-  `}
 `;
 
 export const ColumnContainer = styled.div((props) => ({
@@ -23,8 +15,6 @@ export const ColumnContainer = styled.div((props) => ({
   flexDirection: 'column',
   alignItems: 'space-between',
   justifyContent: 'space-between',
-  gap: props.theme.space.s,
-  marginTop: props.theme.space.l,
   marginBottom: props.theme.space.s,
 }));
 
@@ -77,7 +67,7 @@ export const TokenListButtonContainer = styled.div((props) => ({
 }));
 
 export const StyledTokenTile = styled(TokenTile)`
-  background-color: ${(props) => props.theme.colors.elevation1};
+  background-color: transparent;
 `;
 
 export const Icon = styled.img({
@@ -170,4 +160,8 @@ export const StyledDivider = styled(Divider)`
   width: calc(100% + ${(props) => props.theme.space.xl});
   margin-left: -${(props) => props.theme.space.m};
   margin-right: -${(props) => props.theme.space.m};
+`;
+
+export const StyledDividerSingle = styled(StyledDivider)`
+  margin-top: ${(props) => props.theme.space.xl};
 `;
