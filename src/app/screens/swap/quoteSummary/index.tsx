@@ -484,7 +484,7 @@ export default function QuoteSummary({
                   {showSlippageWarning && (
                     <WarningOctagon weight="fill" color={theme.colors.caution} size={16} />
                   )}
-                  {slippage * 100}%
+                  {formatNumber(slippage * 100)}%
                   <img alt={t('SLIPPAGE')} src={SlippageEditIcon} />
                 </SlippageButton>
               </ListingDescriptionRow>
