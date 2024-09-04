@@ -13,7 +13,6 @@ const CarouselContainer = styled.div`
     padding-bottom: 35px;
   }
 
-  // So silly that they don't have a native API for this
   .swiper-slide {
     width: fit-content !important;
   }
@@ -24,11 +23,17 @@ const CarouselContainer = styled.div`
   }
 
   .swiper-pagination-bullet {
-    background: ${(props) => props.theme.colors.white_800};
+    width: 6px;
+    height: 6px;
+    background: ${(props) => props.theme.colors.white_600};
+    opacity: 1;
+    border-radius: 50px;
+    transition: width 0.2s ease, background 0.1s ease;
   }
 
   .swiper-pagination-bullet-active {
-    background: ${(props) => props.theme.colors.white_200};
+    width: 18px;
+    background: ${(props) => props.theme.colors.white_0};
   }
 `;
 

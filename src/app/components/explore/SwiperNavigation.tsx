@@ -8,6 +8,9 @@ const Container = styled.div`
 
 const Button = styled.button`
   background-color: transparent;
+  width: 18px;
+  height: 18px;
+  margin: 6px;
 
   svg {
     color: ${({ theme }) => theme.colors.white_0};
@@ -21,13 +24,11 @@ const Button = styled.button`
   }
 
   &:disabled {
+    cursor: default;
     svg {
-      color: ${({ theme }) => theme.colors.white_400};
+      color: ${({ theme }) => theme.colors.white_600};
     }
   }
-  width: 18px;
-  height: 18px;
-  margin: 6px;
 `;
 
 function SwiperNavigation() {
