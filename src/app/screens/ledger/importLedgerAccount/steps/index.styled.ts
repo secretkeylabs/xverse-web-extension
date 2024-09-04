@@ -1,4 +1,3 @@
-import Switch from 'react-switch';
 import styled from 'styled-components';
 
 export const ImportStartImage = styled.img((props) => ({
@@ -171,8 +170,9 @@ export const OptionsContainer = styled.div((props) => ({
 interface OptionProps {
   selected?: boolean;
 }
-export const Option = styled.div<OptionProps>((props) => ({
+export const Option = styled.button<OptionProps>((props) => ({
   width: '100%',
+  color: props.theme.colors.white_0,
   backgroundColor: props.theme.colors.elevation3,
   padding: props.theme.spacing(8),
   paddingTop: props.theme.spacing(7),
@@ -221,15 +221,6 @@ export const ConfirmationStep = styled.div<{
     marginRight: props.theme.spacing(4),
   },
 }));
-
-// TODO create custom switch in ui-library
-export const CustomSwitch = styled(Switch)`
-  .react-switch-handle {
-    background-color: ${({ checked }) =>
-      checked ? '#FFFFFF' : 'rgba(255, 255, 255, 0.2)'} !important;
-    border: ${({ checked }) => (checked ? '' : '4px solid rgba(255, 255, 255, 0.2)')} !important;
-  }
-`;
 
 export const TogglerContainer = styled.div((props) => ({
   display: 'flex',

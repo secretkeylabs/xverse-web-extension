@@ -82,7 +82,6 @@
     "react-qr-code": "^2.0.8",
     "react-redux": "^7.2.1",
     "react-router-dom": "^6.4.0",
-    "react-switch": "^7.0.0",
     "react-tabs": "^6.0.2",
     "react-tooltip": "^5.4.0",
     "redux": "^4.0.5",

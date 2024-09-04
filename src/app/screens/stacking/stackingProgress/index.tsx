@@ -6,21 +6,22 @@ const Container = styled.div((props) => ({
   display: 'flex',
   flex: 1,
   flexDirection: 'column',
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
+  marginLeft: props.theme.space.m,
+  marginRight: props.theme.space.m,
 }));
 
 const TitleText = styled.h1((props) => ({
   ...props.theme.headline_s,
-  marginTop: props.theme.spacing(16),
+  marginTop: props.theme.space.xl,
 }));
 
 const StackingDescriptionText = styled.h1((props) => ({
-  ...props.theme.body_m,
-  marginTop: props.theme.spacing(4),
-  marginBottom: props.theme.spacing(18),
+  ...props.theme.typography.body_m,
+  marginTop: props.theme.space.xs,
+  marginBottom: props.theme.space.l,
   color: props.theme.colors.white_200,
 }));
+
 function StackingProgress() {
   const { t } = useTranslation('translation', { keyPrefix: 'STACKING_SCREEN' });
 

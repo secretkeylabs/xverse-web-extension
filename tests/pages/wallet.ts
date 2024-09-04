@@ -435,9 +435,9 @@ export default class Wallet {
 
     // Token
     this.labelCoinTitle = page.getByLabel('Coin Title');
-    this.checkboxToken = page.locator('input[type="checkbox"]');
-    this.checkboxTokenActive = page.locator('input[type="checkbox"]:checked');
-    this.checkboxTokenInactive = page.locator('input[type="checkbox"]:not(:checked)');
+    this.checkboxToken = page.locator('label[role="checkbox"]');
+    this.checkboxTokenActive = page.locator('label[role="checkbox"][aria-checked="true"]');
+    this.checkboxTokenInactive = page.locator('label[role="checkbox"][aria-checked="false"]');
     this.buttonSip10 = page.getByRole('button', { name: 'SIP-10' });
     this.buttonBRC20 = page.getByRole('button', { name: 'BRC-20' });
     this.buttonRunes = page.getByRole('button', { name: 'RUNES' });
@@ -459,7 +459,7 @@ export default class Wallet {
 
     // Collectibles
     this.totalItem = page.getByTestId('total-items');
-    this.tabsCollectiblesItems = page.getByTestId('tab-list').locator('li');
+    this.tabsCollectiblesItems = page.getByTestId('tab-list').locator('button');
     this.containerRareSats = page.getByTestId('rareSats-container');
     this.nameInscription = page.getByTestId('inscription-name');
     this.containersCollectibleItem = page.getByTestId('collection-container');
@@ -1046,7 +1046,7 @@ export default class Wallet {
           'No active token checkbox found or there are multiple, taking alternative action.',
         );
         // Activate Test rune
-        await this.runeSKIBIDI.locator('div.react-switch-handle').click();
+        await this.runeSKIBIDI.locator('label[role="checkbox"]').click();
       } else {
         console.log('One active token checkbox is present.');
       }
@@ -1199,7 +1199,7 @@ export default class Wallet {
     const tokenName = (await chosenToken.getAttribute('data-testid')) || 'default-value';
 
     // Click the switch handle to toggle the token's state
-    await chosenToken.locator('div.react-switch-handle').click();
+    await chosenToken.locator('label[role="checkbox"]').click();
 
     return tokenName;
   }
@@ -1215,7 +1215,7 @@ export default class Wallet {
 
     for (let i = 0; i < count; i++) {
       // Since clicking the switch will change its state, always interact with the first one
-      await actionTokens.first().locator('div.react-switch-handle').click();
+      await actionTokens.first().locator('label[role="checkbox"]').click();
     }
   }
 

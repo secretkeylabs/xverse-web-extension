@@ -1,9 +1,10 @@
-import ActionButton from '@components/button';
 import { StyledBarLoader, TilesSkeletonLoader } from '@components/tilesSkeletonLoader';
 import WrenchErrorMessage from '@components/wrenchErrorMessage';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import { mapRareSatsAPIResponseToBundle, type Bundle } from '@secretkeylabs/xverse-core';
-import { StyledP, StyledTab, StyledTabList } from '@ui-library/common.styled';
+import Button from '@ui-library/button';
+import { StyledP, StyledTabList } from '@ui-library/common.styled';
+import { TabItem } from '@ui-library/tabs';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -47,7 +48,7 @@ const StyledTotalItems = styled(StyledP)`
 `;
 
 const NoticeContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(8),
+  marginTop: props.theme.space.m,
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
@@ -100,6 +101,7 @@ type TabButton = {
   key: string;
   label: string;
 };
+
 const tabs: TabButton[] = [
   {
     key: 'inscriptions',
@@ -179,10 +181,17 @@ export default function CollectiblesTabs({
 
   return (
     <Tabs className={className} selectedIndex={tabIndex} onSelect={handleSelectTab}>
+      {/* TODO: replace with Tabs component from `src/app/components/tabs/index.tsx` */}
       {visibleTabButtons.length > 1 && (
         <StickyStyledTabList data-testid="tab-list">
           {visibleTabButtons.map(({ key, label }) => (
-            <StyledTab key={key}>{t(label)}</StyledTab>
+            <TabItem
+              key={key}
+              $active={tabIndex === tabKeyToIndex(key)}
+              onClick={() => handleSelectTab(tabKeyToIndex(key))}
+            >
+              {t(label)}
+            </TabItem>
           ))}
         </StickyStyledTabList>
       )}
@@ -278,12 +287,12 @@ export default function CollectiblesTabs({
           )}
           {rareSatsQuery.hasNextPage && (
             <LoadMoreButtonContainer>
-              <ActionButton
-                transparent
-                text={t('LOAD_MORE')}
-                processing={rareSatsQuery.isFetchingNextPage}
+              <Button
+                variant="secondary"
+                title={t('LOAD_MORE')}
+                loading={rareSatsQuery.isFetchingNextPage}
                 disabled={rareSatsQuery.isFetchingNextPage}
-                onPress={() => rareSatsQuery.fetchNextPage()}
+                onClick={() => rareSatsQuery.fetchNextPage()}
               />
             </LoadMoreButtonContainer>
           )}

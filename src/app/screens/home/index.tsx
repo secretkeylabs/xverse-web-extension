@@ -422,7 +422,7 @@ function Home() {
       {isOrdinalReceiveAlertVisible && (
         <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose} />
       )}
-      <Container>
+      <Container $applyIndent={!showNotificationBanner}>
         <BalanceCard
           isLoading={loadingStxWalletData || loadingBtcWalletData}
           isRefetching={

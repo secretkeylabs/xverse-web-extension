@@ -97,7 +97,7 @@ function Sheet({
   return (
     <CustomisedModal
       isOpen={visible}
-      parentSelector={() => document.getElementById('app') as HTMLElement}
+      appElement={document.getElementById('app') as HTMLElement}
       ariaHideApp={false}
       style={customStyles}
       className={className}

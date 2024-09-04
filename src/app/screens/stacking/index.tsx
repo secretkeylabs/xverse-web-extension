@@ -13,11 +13,11 @@ const LoaderContainer = styled.div((props) => ({
   flex: 1,
   justifyContent: 'center',
   alignItems: 'center',
-  marginTop: props.theme.spacing(12),
+  marginTop: props.theme.space.l,
 }));
 
 const Text = styled.h1((props) => ({
-  ...props.theme.body_bold_m,
+  ...props.theme.typography.body_bold_m,
   color: props.theme.colors.white_200,
   marginTop: 'auto',
   marginBottom: 'auto',

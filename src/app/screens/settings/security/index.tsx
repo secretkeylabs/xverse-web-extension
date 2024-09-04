@@ -83,7 +83,7 @@ function Security() {
     <>
       <TopRow onClick={handleBackButtonClick} />
       <Container>
-        <Title>Security</Title>
+        <Title>{t('CATEGORIES.SECURITY')}</Title>
         {showResetWalletDisplay && (
           <ResetWalletContainer>
             <PasswordInput

@@ -27,15 +27,15 @@ export const PasswordInputLabel = styled.h2((props) => ({
 }));
 
 export const ButtonsContainer = styled.div<{
-  stackButtonAlignment: boolean;
-  ifError: boolean;
+  $stackButtonAlignment: boolean;
+  $ifError: boolean;
 }>((props) => ({
   display: 'flex',
-  flexDirection: props.stackButtonAlignment ? 'column-reverse' : 'row',
-  alignItems: props.stackButtonAlignment ? 'center' : 'flex-end',
+  flexDirection: props.$stackButtonAlignment ? 'column-reverse' : 'row',
+  alignItems: props.$stackButtonAlignment ? 'center' : 'flex-end',
   flex: 1,
-  marginTop: props.ifError ? props.theme.spacing(30) : props.theme.spacing(40),
-  marginBottom: props.theme.spacing(8),
+  marginTop: props.$ifError ? props.theme.spacing(30) : props.theme.spacing(40),
+  marginBottom: props.theme.space.m,
 }));
 
 export const StyledButton = styled.button({
@@ -48,11 +48,11 @@ export const StyledButton = styled.button({
 });
 
 export const PasswordStrengthContainer = styled.div((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   display: 'flex',
   alignItems: 'center',
   width: '100%',
-  marginTop: props.theme.spacing(8),
+  marginTop: props.theme.space.m,
   span: {
     opacity: 0.6,
   },
@@ -82,10 +82,10 @@ export const StrengthBar = styled(animated.div)<{
 }));
 
 export const ButtonContainer = styled.div<{
-  stackButtonAlignment: boolean;
+  $stackButtonAlignment: boolean;
 }>((props) => ({
-  marginLeft: props.stackButtonAlignment ? 0 : 3,
-  marginRight: props.stackButtonAlignment ? 0 : 3,
-  marginTop: props.theme.spacing(4),
+  marginLeft: props.$stackButtonAlignment ? 0 : 3,
+  marginRight: props.$stackButtonAlignment ? 0 : 3,
+  marginTop: props.theme.space.xs,
   width: '100%',
 }));

@@ -1,6 +1,8 @@
 import Cross from '@assets/img/dashboard/X.svg';
 import ActionButton from '@components/button';
+import Button from '@ui-library/button';
 import Checkbox from '@ui-library/checkbox';
+import { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
@@ -75,7 +77,7 @@ const OuterContainer = styled.div((props) => ({
   opacity: 0.6,
 }));
 
-interface Props {
+type Props = {
   onClose: () => void;
   title: string;
   description: string;
@@ -87,7 +89,7 @@ interface Props {
   onSecondButtonClick?: () => void;
   tickMarkButtonClick?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   tickMarkButtonChecked?: boolean;
-}
+};
 
 function AlertMessage({
   onClose,
@@ -102,13 +104,30 @@ function AlertMessage({
   tickMarkButtonClick,
   tickMarkButtonChecked,
 }: Props) {
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    previousFocusRef.current = document.activeElement as HTMLElement;
+
+    if (buttonRef.current) {
+      buttonRef.current.focus();
+    }
+
+    return () => {
+      if (previousFocusRef.current) {
+        previousFocusRef.current.focus();
+      }
+    };
+  }, []);
+
   return (
     <>
       <OuterContainer />
       <Container>
         <RowContainer>
           <HeaderText>{title}</HeaderText>
-          <ButtonImage onClick={onClose}>
+          <ButtonImage onClick={onClose} ref={buttonRef}>
             <img src={Cross} alt="cross" />
           </ButtonImage>
         </RowContainer>
@@ -127,7 +146,7 @@ function AlertMessage({
         )}
         {!onSecondButtonClick && onButtonClick && (
           <ButtonContainer>
-            <ActionButton text={buttonText ?? 'Yes'} onPress={onButtonClick} />
+            <Button title={buttonText ?? 'Yes'} onClick={onButtonClick} />
           </ButtonContainer>
         )}
         {tickMarkButtonText && tickMarkButtonClick && (

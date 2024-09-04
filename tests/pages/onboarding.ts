@@ -129,7 +129,7 @@ export default class Onboarding {
     for (let i = 0; i < (await linkList.count()); i++) {
       expect(await linkList.nth(i).getAttribute('href')).not.toBeNull();
     }
-    await expect(this.page.locator('input[type="checkbox"]')).toBeVisible();
+    await expect(this.page.locator('label[role="checkbox"]')).toBeVisible();
     await expect(this.buttonAccept).toBeVisible();
 
     // check links

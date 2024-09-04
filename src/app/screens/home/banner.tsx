@@ -15,13 +15,16 @@ const Container = styled.div`
   padding-bottom: ${({ theme }) => theme.space.m};
 `;
 
-const BannerContent = styled.div`
+const BannerContent = styled.button`
   cursor: pointer;
   display: flex;
   align-items: center;
   column-gap: ${({ theme }) => theme.space.m};
   padding-left: ${({ theme }) => theme.space.m};
   padding-right: ${({ theme }) => theme.space.m};
+  color: ${({ theme }) => theme.colors.white_0};
+  background-color: transparent;
+  text-align: left;
   transition: opacity 0.1s ease;
 
   &:hover {
