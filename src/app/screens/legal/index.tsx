@@ -1,8 +1,8 @@
 import LinkIcon from '@assets/img/linkIcon.svg';
 import Separator from '@components/separator';
 import useWalletReducer from '@hooks/useWalletReducer';
-import { CustomSwitch } from '@screens/ledger/importLedgerAccount/steps/index.styled';
 import Button from '@ui-library/button';
+import Toggle from '@ui-library/toggle';
 import { PRIVACY_POLICY_LINK, TERMS_LINK } from '@utils/constants';
 import { saveIsTermsAccepted } from '@utils/localStorage';
 import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
@@ -116,14 +116,7 @@ function Legal() {
           </DataCollectionDescription>
           <SwitchContainer>
             <div>{t('AUTHORIZE_DATA_COLLECTION.TITLE')}</div>
-            <CustomSwitch
-              onColor={theme.colors.orange_main}
-              offColor={theme.colors.background.elevation3}
-              onChange={handleSwitchToggle}
-              checked={isToggleEnabled}
-              uncheckedIcon={false}
-              checkedIcon={false}
-            />
+            <Toggle onChange={handleSwitchToggle} checked={isToggleEnabled} />
           </SwitchContainer>
         </LinksContainer>
       </div>

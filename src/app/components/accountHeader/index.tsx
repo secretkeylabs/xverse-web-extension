@@ -16,10 +16,8 @@ const SelectedAccountContainer = styled.div<{ showBorderBottom?: boolean }>((pro
   position: 'relative',
   alignItems: 'center',
   justifyContent: 'space-between',
-  padding: `${props.theme.spacing(10)}px ${props.theme.spacing(8)}px`,
-  borderBottom: props.showBorderBottom
-    ? `0.5px solid ${props.theme.colors.background.elevation3}`
-    : 'none',
+  padding: `${props.theme.spacing(10)}px ${props.theme.space.m}`,
+  borderBottom: props.showBorderBottom ? `0.5px solid ${props.theme.colors.elevation3}` : 'none',
 }));
 
 const OptionsButton = styled.button(() => ({
@@ -38,7 +36,7 @@ const ButtonRow = styled.button`
   padding-bottom: ${(props) => props.theme.space.s};
   padding-left: ${(props) => props.theme.space.l};
   padding-right: ${(props) => props.theme.space.l};
-  font: ${(props) => props.theme.body_medium_m};
+  font: ${(props) => props.theme.typography.body_medium_m};
   color: ${(props) => props.theme.colors.white_0};
   transition: background-color 0.2s ease;
   :hover {

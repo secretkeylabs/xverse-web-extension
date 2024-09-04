@@ -1,7 +1,6 @@
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import AlertMessage from '@components/alertMessage';
-import ActionButton from '@components/button';
 import CollectibleDetailTile from '@components/collectibleDetailTile';
 import RareSatIcon from '@components/rareSatIcon/rareSatIcon';
 import SquareButton from '@components/squareButton';
@@ -10,6 +9,7 @@ import TopRow from '@components/topRow';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { ArrowUp, Share } from '@phosphor-icons/react';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
+import Button from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
 import { EMPTY_LABEL } from '@utils/constants';
 import { getRareSatsColorsByRareSatsType, getRareSatsLabelByType } from '@utils/rareSats';
@@ -17,14 +17,11 @@ import { useTranslation } from 'react-i18next';
 import {
   ActionButtonLoader,
   ActionButtonsLoader,
-  AssetDeatilButtonText,
   BackButtonContainer,
   Badge,
   BottomBarContainer,
-  Button,
   ButtonContainer,
   ButtonHiglightedText,
-  ButtonImage,
   ButtonText,
   CollectibleText,
   ColumnContainer,
@@ -372,12 +369,13 @@ function OrdinalDetailScreen() {
     <GalleryScrollContainer>
       <GalleryContainer>
         <BackButtonContainer>
-          <Button data-testid="back-to-gallery" onClick={handleBackButtonClick}>
-            <>
-              <ButtonImage src={ArrowLeft} />
-              <AssetDeatilButtonText>{backButtonText}</AssetDeatilButtonText>
-            </>
-          </Button>
+          <Button
+            variant="tertiary"
+            icon={<img src={ArrowLeft} alt="go back" />}
+            dataTestId="back-to-gallery"
+            onClick={handleBackButtonClick}
+            title={backButtonText}
+          />
         </BackButtonContainer>
 
         <RowContainer withGap>
@@ -406,12 +404,13 @@ function OrdinalDetailScreen() {
     <GalleryScrollContainer>
       <GalleryContainer>
         <BackButtonContainer>
-          <Button data-testid="back-button" onClick={handleBackButtonClick}>
-            <>
-              <ButtonImage src={ArrowLeft} />
-              <AssetDeatilButtonText>{backButtonText}</AssetDeatilButtonText>
-            </>
-          </Button>
+          <Button
+            variant="tertiary"
+            icon={<img src={ArrowLeft} alt="go back" />}
+            dataTestId="back-button"
+            onClick={handleBackButtonClick}
+            title={backButtonText}
+          />
         </BackButtonContainer>
 
         <RowContainer withGap>
@@ -441,19 +440,19 @@ function OrdinalDetailScreen() {
 
             <ButtonContainer>
               <GalleryButtonContainer>
-                <ActionButton
+                <Button
                   icon={<ArrowUp weight="bold" size="16" />}
-                  text={t('SEND')}
-                  onPress={handleSendOrdinal}
+                  title={t('SEND')}
+                  onClick={handleSendOrdinal}
                 />
               </GalleryButtonContainer>
               <GalleryButtonContainer>
-                <ActionButton
+                <Button
                   icon={<Share weight="bold" color="white" size="16" />}
-                  text={t('SHARE')}
-                  onPress={onCopyClick}
-                  hoverDialogId={`copy-url-${ordinal?.id}`}
-                  transparent
+                  title={t('SHARE')}
+                  onClick={onCopyClick}
+                  id={`copy-url-${ordinal?.id}`}
+                  variant="secondary"
                 />
                 <StyledTooltip
                   anchorId={`copy-url-${ordinal?.id}`}

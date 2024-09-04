@@ -71,7 +71,7 @@ const VerifyButtonContainer = styled.div({
   width: 68,
 });
 
-interface Props {
+type Props = {
   className?: string;
   title: string;
   address: string;
@@ -80,7 +80,7 @@ interface Props {
   onCopyAddressClick?: () => void;
   showVerifyButton?: boolean;
   currency?: string;
-}
+};
 
 function ReceiveCardComponent({
   className,

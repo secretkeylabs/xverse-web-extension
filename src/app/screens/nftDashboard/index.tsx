@@ -1,10 +1,10 @@
 import FeatureIcon from '@assets/img/nftDashboard/rareSats/NewFeature.svg';
 import AccountHeaderComponent from '@components/accountHeader';
-import ActionButton from '@components/button';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import BottomTabBar from '@components/tabBar';
 import WebGalleryButton from '@components/webGalleryButton';
 import { ArrowDown } from '@phosphor-icons/react';
+import Button from '@ui-library/button';
 import { StyledHeading } from '@ui-library/common.styled';
 import Dialog from '@ui-library/dialog';
 import { useTranslation } from 'react-i18next';
@@ -54,7 +54,7 @@ const ReceiveNftContainer = styled.div((props) => ({
 }));
 
 const CollectibleContainer = styled.div((props) => ({
-  marginBottom: props.theme.spacing(12),
+  marginBottom: props.theme.space.l,
 }));
 
 const ButtonContainer = styled.div({
@@ -124,10 +124,10 @@ function NftDashboard() {
           </CollectibleContainer>
           <ButtonContainer data-testid="receive-button">
             <ReceiveButtonContainer>
-              <ActionButton
+              <Button
                 icon={<ArrowDown weight="bold" size={16} />}
-                text={t('RECEIVE')}
-                onPress={onReceiveModalOpen}
+                title={t('RECEIVE')}
+                onClick={onReceiveModalOpen}
               />
             </ReceiveButtonContainer>
             {openReceiveModal && (

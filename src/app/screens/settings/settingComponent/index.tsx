@@ -1,26 +1,17 @@
 import { ArrowUpRight, CaretRight } from '@phosphor-icons/react';
 import Spinner from '@ui-library/spinner';
-import Switch from 'react-switch';
+import Toggle from '@ui-library/toggle';
 import styled, { useTheme } from 'styled-components';
 
-const CustomSwitch = styled(Switch)`
-  .react-switch-handle {
-    background-color: ${({ checked }) =>
-      checked ? '#FFFFFF' : 'rgba(255, 255, 255, 0.2)'} !important;
-    border: ${({ checked }) => (checked ? '' : '4px solid rgba(255, 255, 255, 0.2)')} !important;
-  }
-`;
-
 const Button = styled.button<{
-  border: string;
+  $border: string;
 }>((props) => ({
   display: 'flex',
   alignItems: 'center',
   background: 'transparent',
   justifyContent: 'flex-start',
-  paddingTop: props.theme.space.m,
-  paddingBottom: props.theme.space.l,
-  borderBottom: props.border,
+  padding: `20px 0 ${props.theme.space.l}`,
+  borderBottom: props.$border,
 }));
 
 const ColumnContainer = styled.div({
@@ -118,7 +109,7 @@ function SettingComponent({
         {title && <TitleText>{title}</TitleText>}
         <Button
           onClick={onClick}
-          border={showDivider ? `1px solid ${theme.colors.elevation2}` : 'transparent'}
+          $border={showDivider ? `1px solid ${theme.colors.elevation2}` : 'transparent'}
         >
           <Column>
             <ComponentText
@@ -132,15 +123,8 @@ function SettingComponent({
           {!toggle && link && <ArrowUpRight color={theme.colors.white_0} size={16} weight="bold" />}
           {!toggle && !link && <CaretRight color={theme.colors.white_0} size={16} weight="bold" />}
           {isLoading && <Spinner color="white" size={16} />}
-          {toggle && toggleFunction && toggleValue !== undefined && !isLoading && (
-            <CustomSwitch
-              onColor={theme.colors.tangerine}
-              offColor={theme.colors.elevation3}
-              onChange={toggleFunction}
-              checked={toggleValue}
-              uncheckedIcon={false}
-              checkedIcon={false}
-            />
+          {toggle && toggleFunction && !isLoading && (
+            <Toggle onChange={toggleFunction} checked={toggleValue ?? false} disabled={disabled} />
           )}
         </Button>
       </ColumnContainer>

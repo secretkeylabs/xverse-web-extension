@@ -19,7 +19,6 @@ const RouteItemButtonContainer = styled.button((props) => ({
   marginTop: props.theme.space.xs,
   width: 135,
   height: 56,
-  overflow: 'hidden',
   ':hover': {
     opacity: 0.8,
   },
@@ -35,13 +34,13 @@ const TokenName = styled(StyledP)`
   text-align: left;
 `;
 
-type RouteItemProps = {
+type Props = {
   label: string;
   token?: FungibleToken | Token;
   onClick: () => void;
 };
 
-export default function RouteItem({ label, token, onClick }: RouteItemProps) {
+export default function RouteItem({ label, token, onClick }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
 
   const currency =

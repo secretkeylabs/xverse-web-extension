@@ -10,13 +10,15 @@ const Container = styled.div`
   width: 100%;
 `;
 
-const Card = styled.div`
+const Card = styled.button`
   cursor: pointer;
   display: flex;
   align-items: center;
   column-gap: ${({ theme }) => theme.space.m};
   width: 100%;
   color: ${({ theme }) => theme.colors.white_0};
+  background-color: transparent;
+  text-align: left;
   transition: opacity 0.1s ease;
 
   &:hover {
@@ -47,7 +49,14 @@ const CardText = styled.div`
   overflow: hidden;
 `;
 
-type Props = { items: { url: string; icon: string; name: string; description: string }[] };
+type Props = {
+  items: {
+    url: string;
+    icon: string;
+    name: string;
+    description: string;
+  }[];
+};
 
 function RecommendedApps({ items }: Props) {
   return (
