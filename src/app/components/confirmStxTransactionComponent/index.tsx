@@ -18,7 +18,7 @@ import {
   getNonce,
   getStxFiatEquivalent,
   microstacksToStx,
-  possiblNexteNonce,
+  nextBestNonce,
   signLedgerStxTransaction,
   signMultiStxTransactions,
   signTransaction,
@@ -222,7 +222,7 @@ function ConfirmStxTransactionComponent({
 
     if (initialStxTransactions.length === 1) {
       const transaction = initialStxTransactions[0];
-      const nonce = await possiblNexteNonce(selectedAccount.stxAddress, network);
+      const nonce = await nextBestNonce(selectedAccount.stxAddress, network);
       transaction.setNonce(nonce);
       const signedContractCall = await signTransaction(
         transaction,
