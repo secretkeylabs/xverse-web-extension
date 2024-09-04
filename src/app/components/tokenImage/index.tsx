@@ -64,7 +64,7 @@ const ProtocolImage = styled.img({
   width: '100%',
 });
 
-export interface TokenImageProps {
+interface TokenImageProps {
   currency?: CurrencyTypes;
   fungibleToken?: FungibleToken;
   loading?: boolean;
