@@ -1,3 +1,4 @@
+import useGetSip10TokenInfo from '@hooks/queries/stx/useGetSip10TokenInfo';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import {
   getBtcFiatEquivalent,
@@ -101,6 +102,8 @@ function QuotesModal({
     BigNumber(b.floorRate).gte(a.floorRate) ? -1 : BigNumber(a.floorRate).gte(b.floorRate) ? 1 : 0,
   );
 
+  const { tokenInfo: toTokenInfo } = useGetSip10TokenInfo(toToken?.ticker);
+
   return (
     <Sheet visible={visible} title={t('GET_QUOTES_TITLE')} onClose={onClose}>
       <Container>
@@ -155,7 +158,11 @@ function QuotesModal({
                     new BigNumber(stxBtcRate),
                     new BigNumber(btcFiatRate),
                   ).toFixed(2)
-                : ''
+                : toTokenInfo?.tokenFiatRate
+                ? new BigNumber(toTokenInfo?.tokenFiatRate)
+                    .multipliedBy(stx.receiveAmount)
+                    .toFixed(2)
+                : '--'
             }
           />
         ))}

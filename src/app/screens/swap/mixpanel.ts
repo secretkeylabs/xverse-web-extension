@@ -71,7 +71,9 @@ function trackSwapMixPanel(
             new BigNumber(stxBtcRate),
             new BigNumber(btcUsdRate),
           ).toFixed(2)
-        : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2);
+        : fromToken?.tokenFiatRate
+        ? new BigNumber(fromToken?.tokenFiatRate).multipliedBy(amount).toFixed(2)
+        : '--';
 
     receiveAmount = quote?.receiveAmount ? new BigNumber(quote?.receiveAmount) : undefined;
     if (receiveAmount) {
@@ -82,7 +84,9 @@ function trackSwapMixPanel(
               new BigNumber(stxBtcRate),
               new BigNumber(btcUsdRate),
             ).toFixed(2)
-          : new BigNumber(toTokenInfo?.tokenFiatRate ?? 0).multipliedBy(receiveAmount).toFixed(2);
+          : toTokenInfo?.tokenFiatRate
+          ? new BigNumber(toTokenInfo?.tokenFiatRate).multipliedBy(receiveAmount).toFixed(2)
+          : '--';
     }
   }
 

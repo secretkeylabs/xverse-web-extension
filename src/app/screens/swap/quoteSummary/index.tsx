@@ -338,7 +338,9 @@ export default function QuoteSummary({
         new BigNumber(btcFiatRate),
       ).toFixed(2);
     }
-    return new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2);
+    return fromToken?.tokenFiatRate
+      ? new BigNumber(fromToken?.tokenFiatRate).multipliedBy(amount).toFixed(2)
+      : '--';
   })();
 
   const toTokenFiatValue = (() => {
@@ -361,9 +363,10 @@ export default function QuoteSummary({
         new BigNumber(btcFiatRate),
       ).toFixed(2);
     }
-    return new BigNumber(toTokenInfo?.tokenFiatRate ?? 0)
-      .multipliedBy(quote.receiveAmount)
-      .toFixed(2);
+    if (!toTokenInfo?.tokenFiatRate) {
+      return '--';
+    }
+    return new BigNumber(toTokenInfo?.tokenFiatRate).multipliedBy(quote.receiveAmount).toFixed(2);
   })();
 
   const showBadQuoteWarning =

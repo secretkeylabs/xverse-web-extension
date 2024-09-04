@@ -302,7 +302,7 @@ export default function SwapScreen() {
     }
 
     if (!fromToken?.tokenFiatRate || !fromToken.decimals) {
-      return '0.00';
+      return '--';
     }
 
     const rate = new BigNumber(fromToken.tokenFiatRate);
