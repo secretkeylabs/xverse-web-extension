@@ -31,9 +31,8 @@ import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
 import trackSwapMixPanel from '../mixpanel';
 import QuoteTile from '../quotesModal/quoteTile';
-import { SlippageModalContent } from '../slippageModal';
+import SlippageModalContent from '../slippageModal';
 import type { OrderInfo, StxOrderInfo } from '../types';
-import { useStxCurrencyConversion } from '../useStxCurrencyConversion';
 import {
   BAD_QUOTE_PERCENTAGE,
   isRunesTx,
@@ -484,7 +483,7 @@ export default function QuoteSummary({
                   {showSlippageWarning && (
                     <WarningOctagon weight="fill" color={theme.colors.caution} size={16} />
                   )}
-                  {slippage * 100}%
+                  {formatNumber(slippage * 100)}%
                   <img alt={t('SLIPPAGE')} src={SlippageEditIcon} />
                 </SlippageButton>
               </ListingDescriptionRow>

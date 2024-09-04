@@ -47,7 +47,6 @@ import QuoteSummary from './quoteSummary';
 import QuotesModal from './quotesModal';
 import type { OrderInfo, Side, StxOrderInfo } from './types';
 import useMasterCoinsList from './useMasterCoinsList';
-import { useStxCurrencyConversion } from './useStxCurrencyConversion';
 import {
   isStxTx,
   mapFTNativeSwapTokenToTokenBasic,
