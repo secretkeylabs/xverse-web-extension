@@ -967,7 +967,14 @@
     "LISTED_ON": "Listed on",
     "LISTING": "Listing",
     "DELIST": "Delist",
-    "LOWEST_LISTING": "Lowest listing:"
+    "LOWEST_LISTING": "Lowest listing:",
+    "UNISAT_DIALOG": {
+      "TITLE": "Delist on Unisat",
+      "DESCRIPTION": "Delisting on Unisat will perform on-chain delisting for your runes bundle on all marketplaces. The transaction needs to confirm before you can relist.",
+      "BACK": "Back",
+      "CONTINUE": "Continue",
+      "CALLOUT": "This transaction will perform on-chain delisting for your runes on all marketplaces and has to confirm before you can list again."
+    }
   },
   "COIN_DASHBOARD_SCREEN": {
     "SEND": "Send",

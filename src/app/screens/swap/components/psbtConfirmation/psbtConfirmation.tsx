@@ -25,9 +25,16 @@ type Props = {
   onClose: () => void;
   onConfirm: () => void;
   customExecute?: (signedPsbt: string) => void;
+  customCallout?: { bodyText: string };
 };
 
-export default function PsbtConfirmation({ orderInfo, onClose, onConfirm, customExecute }: Props) {
+export default function PsbtConfirmation({
+  orderInfo,
+  onClose,
+  onConfirm,
+  customExecute,
+  customCallout,
+}: Props) {
   const [isLoading, setIsLoading] = useState(true);
   const [isSigning, setIsSigning] = useState(false);
   const [summary, setSummary] = useState<PSBTSummary | undefined>();
@@ -210,7 +217,7 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm, custom
       onBackClick={onClose}
       hideBottomBar
       showAccountHeader={false}
-      customCallout={quoteExpiryCallout}
+      customCallout={customCallout || quoteExpiryCallout}
     />
   );
 }

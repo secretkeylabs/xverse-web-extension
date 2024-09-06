@@ -12,6 +12,7 @@ import type {
 import { satsToBtc, type FungibleToken } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import { StyledHeading, StyledP } from '@ui-library/common.styled';
+import Dialog from '@ui-library/dialog';
 import { ftDecimals } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
@@ -80,11 +81,12 @@ export default function UnlistRuneUtxoScreen() {
   const xverseApi = useXverseApi();
 
   const [loading, setLoading] = useState(false);
-  const [unisatCancellation, setUnisatCancellation] = useState<{
+  const [unisatDialogCallback, setUnisatDialogCallback] = useState<null | { cb: () => void }>(null);
+  const [unisatCancellation, setUnisatCancellation] = useState<null | {
     psbt: string;
     orderId: string;
     listing: ListingWithListingProvider;
-  } | null>(null);
+  }>(null);
 
   const { item, selectedRune } = location.state as {
     item: ListedUtxoWithProvider;
@@ -148,6 +150,9 @@ export default function UnlistRuneUtxoScreen() {
         }}
         onConfirm={() => {}}
         onClose={() => setUnisatCancellation(null)}
+        customCallout={{
+          bodyText: t('UNISAT_DIALOG.CALLOUT'),
+        }}
         customExecute={async (signedPsbt) => {
           const response = await xverseApi.listings.submitRuneCancelOrder({
             cancellationsPerMarketplace: [
@@ -168,6 +173,23 @@ export default function UnlistRuneUtxoScreen() {
             },
           });
         }}
+      />
+    );
+  }
+
+  if (unisatDialogCallback) {
+    return (
+      <Dialog
+        title={t('UNISAT_DIALOG.TITLE')}
+        description={t('UNISAT_DIALOG.DESCRIPTION')}
+        rightButtonText={t('UNISAT_DIALOG.CONTINUE')}
+        onRightButtonClick={unisatDialogCallback.cb}
+        rightButtonDisabled={loading}
+        leftButtonText={t('UNISAT_DIALOG.BACK')}
+        onLeftButtonClick={() => setUnisatDialogCallback(null)}
+        leftButtonDisabled={loading}
+        onClose={() => setUnisatDialogCallback(null)}
+        type="default"
       />
     );
   }
@@ -224,8 +246,14 @@ export default function UnlistRuneUtxoScreen() {
               <StyledButton
                 title={t('DELIST')}
                 variant="secondary"
-                onClick={() => handleUnlist(listing)}
                 loading={loading}
+                onClick={() => {
+                  if (listing.marketplaceName === 'Unisat') {
+                    setUnisatDialogCallback({ cb: handleUnlist.bind({}, listing) });
+                  } else {
+                    handleUnlist(listing);
+                  }
+                }}
               />
             </ListingsContainer>
           ))}
