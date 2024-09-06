@@ -42,6 +42,7 @@ export const handleGetAddresses = async (message: RpcRequestMessage, port: chrom
         messageId: parseResult.output.id,
       }),
     });
+    return;
   }
 
   const {
