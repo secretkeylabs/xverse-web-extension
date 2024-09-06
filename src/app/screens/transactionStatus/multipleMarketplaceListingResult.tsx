@@ -52,7 +52,7 @@ export default function MultipleMarketplaceListingResult() {
     orders: [
       {
         marketplace: ListingProvider;
-        successfull: boolean;
+        successful: boolean;
       },
     ];
   };
@@ -66,14 +66,14 @@ export default function MultipleMarketplaceListingResult() {
       </BackButtonContainer>
       <HeaderContainer>{t('LISTING_STATUS')}</HeaderContainer>
       <MarketplacesContainer>
-        {orders?.map(({ marketplace, successfull }, index) => (
+        {orders?.map(({ marketplace, successful }, index) => (
           <MarketplaceRuneListingResult
             // eslint-disable-next-line
             key={index}
             minPriceSats={minPriceSats || 0}
             marketplace={marketplace}
             rune={rune}
-            successfull={successfull}
+            successful={successful}
           />
         ))}
       </MarketplacesContainer>

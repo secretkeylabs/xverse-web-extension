@@ -4,7 +4,7 @@ import TopRow from '@components/topRow';
 import useRuneFloorPricePerMarketplaceQuery from '@hooks/queries/runes/useRuneFloorPricePerMarketplaceQuery';
 import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
 import useRuneSellPsbtPerMarketplace from '@hooks/queries/runes/useRuneSellPsbtPerMarketplace';
-import useRuneUtxosQuery from '@hooks/queries/runes/useRuneUtxosQuery';
+import useRuneUtxosQueryPerMarketplace from '@hooks/queries/runes/useRuneUtxosQueryPerMarketplace';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useHasFeature from '@hooks/useHasFeature';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
@@ -20,13 +20,14 @@ import {
   getBtcFiatEquivalent,
   satsToBtc,
   type FungibleToken,
+  type GetListedUtxosResponseUtxo,
   type Marketplace,
 } from '@secretkeylabs/xverse-core';
 import Button, { LinkButton } from '@ui-library/button';
 import { StickyButtonContainer, StyledP } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
 import { formatToXDecimalPlaces, ftDecimals } from '@utils/helper';
-import { getFullTxId, getTxIdFromFullTxId, getVoutFromFullTxId } from '@utils/runes';
+import { getTxIdFromFullTxId, getVoutFromFullTxId } from '@utils/runes';
 import BigNumber from 'bignumber.js';
 import { useEffect, useMemo, useReducer, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -64,6 +65,8 @@ const joinedSelectedMarketplaces = (selectedMarketplaces: Marketplace[]) => {
   return [selectedMarketplaces.join(', '), last].filter((s) => s).join(' and ');
 };
 
+const getFullTxId = (item: GetListedUtxosResponseUtxo) => `${item.txid}:${item.vout.toString()}`;
+
 export default function ListRuneScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'LIST_RUNE_SCREEN' });
   const navigate = useNavigate();
@@ -85,13 +88,14 @@ export default function ListRuneScreen() {
   useTrackMixPanelPageViewed();
 
   const {
-    data: listItemsResponse,
+    data,
     isInitialLoading: listItemsLoading,
     isRefetching: listItemsRefetching,
     refetch,
-  } = useRuneUtxosQuery(selectedRune?.name ?? '', 'unlisted', false);
+  } = useRuneUtxosQueryPerMarketplace(selectedRune as FungibleToken, false);
+  const listItemsResponse = data?.unlistedItems || [];
 
-  const supportedMarketplaces: Marketplace[] = ['Unisat', 'Magic Eden'];
+  const supportedMarketplaces: Marketplace[] = ['Unisat', 'Magic Eden', 'OKX'];
   const {
     data: floorPriceData,
     isInitialLoading: floorPriceLoading,

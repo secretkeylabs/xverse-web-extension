@@ -181,7 +181,7 @@ function TransactionStatus() {
 
   const multipleOrders = useMemo(() => !!orders?.length, [orders]);
   const failedMultipleOrders = useMemo(
-    () => orders?.filter((order) => !order.successfull).length,
+    () => orders?.filter((order) => !order.successful).length,
     [orders],
   );
 

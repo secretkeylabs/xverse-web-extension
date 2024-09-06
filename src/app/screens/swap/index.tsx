@@ -38,7 +38,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import AmountInput from './components/amountInput';
-import PsbtConfimation from './components/psbtConfirmation/psbtConfirmation';
+import PsbtConfirmation from './components/psbtConfirmation/psbtConfirmation';
 import RouteItem from './components/routeItem';
 import TokenFromBottomSheet from './components/tokenFromBottomSheet';
 import TokenToBottomSheet from './components/tokenToBottomSheet';
@@ -425,7 +425,7 @@ export default function SwapScreen() {
 
   if (orderInfo?.order.psbt) {
     return (
-      <PsbtConfimation
+      <PsbtConfirmation
         orderInfo={orderInfo}
         onConfirm={onConfirmExecute}
         onClose={() => setOrderInfo(undefined)}

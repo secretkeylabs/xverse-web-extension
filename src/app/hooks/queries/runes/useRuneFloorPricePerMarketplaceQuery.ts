@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
 export default function useRuneFloorPricePerMarketplaceQuery(
-  token: TokenId,
+  rune: TokenId,
   marketplaces: Marketplace[],
   backgroundRefetch = true,
 ) {
@@ -14,7 +14,7 @@ export default function useRuneFloorPricePerMarketplaceQuery(
 
   const queryFn = useCallback(
     () =>
-      xverseApi.listings.getRuneMarketData(token, marketplaces).then((res) =>
+      xverseApi.listings.getRuneMarketData({ rune, marketplaces }).then((res) =>
         res
           .filter((data) => marketplaces.includes(data.marketplace.name))
           .sort((a, b) => (a.marketplace.name < b.marketplace.name ? -1 : 1))
@@ -23,14 +23,14 @@ export default function useRuneFloorPricePerMarketplaceQuery(
             marketplace: data.marketplace,
           })),
       ),
-    [token, marketplaces, xverseApi],
+    [rune, marketplaces, xverseApi],
   );
 
   return useQuery({
     refetchOnWindowFocus: backgroundRefetch,
     refetchOnReconnect: backgroundRefetch,
-    queryKey: ['get-rune-floor-price-per-marketplace', token],
-    enabled: Boolean(Object.keys(token).length) && network.type === 'Mainnet',
+    queryKey: ['get-rune-floor-price-per-marketplace', rune],
+    enabled: Boolean(Object.keys(rune).length) && network.type === 'Mainnet',
     queryFn,
   });
 }

@@ -961,6 +961,14 @@
     "NO_LISTED_ITEMS": "There're no listed items for this rune.",
     "NO_UNLISTED_ITEMS": "There're no unlisted items for this rune."
   },
+  "UNLIST_RUNE_SCREEN": {
+    "AMOUNT": "Amount",
+    "BUNDLE": "Bundle",
+    "LISTED_ON": "Listed on",
+    "LISTING": "Listing",
+    "DELIST": "Delist",
+    "LOWEST_LISTING": "Lowest listing:"
+  },
   "COIN_DASHBOARD_SCREEN": {
     "SEND": "Send",
     "RECEIVE": "Receive",

@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import theme from 'theme';
 
-const Container = styled.div<{ $successfull: boolean }>`
+const Container = styled.div<{ $successful: boolean }>`
   display: flex;
   align-items: center;
   flex-direction: row;
@@ -22,11 +22,11 @@ const Container = styled.div<{ $successfull: boolean }>`
   border-radius: ${(props) => props.theme.space.s};
   border: 1px solid;
   border-color: ${(props) =>
-    props.$successfull ? props.theme.colors.white_800 : props.theme.colors.white_900};
+    props.$successful ? props.theme.colors.white_800 : props.theme.colors.white_900};
   transition: background-color 0.1s ease, border-color 0.1s ease;
   width: 100%;
   gap: 10px;
-  cursor: ${(props) => (props.$successfull ? 'pointer' : 'auto')};
+  cursor: ${(props) => (props.$successful ? 'pointer' : 'auto')};
 `;
 
 const InfoContainer = styled.div`
@@ -43,10 +43,10 @@ type Props = {
   minPriceSats: number;
   marketplace: ListingProvider;
   rune: FungibleToken;
-  successfull: boolean;
+  successful: boolean;
 };
 
-function MarketplaceRuneListingResult({ minPriceSats, marketplace, rune, successfull }: Props) {
+function MarketplaceRuneListingResult({ minPriceSats, marketplace, rune, successful }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'LIST_RUNE_SCREEN' });
   const floorPrice = formatNumber(minPriceSats);
 
@@ -57,19 +57,19 @@ function MarketplaceRuneListingResult({ minPriceSats, marketplace, rune, success
   };
 
   const handleClick = () =>
-    successfull && window.open(marketplaceToUrl[marketplace.name], '_blank', 'noopener,noreferrer');
+    successful && window.open(marketplaceToUrl[marketplace.name], '_blank', 'noopener,noreferrer');
 
   return (
     <Container
       data-testid="marketplace-listing-result"
-      $successfull={successfull}
+      $successful={successful}
       onClick={handleClick}
     >
       <div style={{ marginRight: theme.space.s }}>
         <TokenImage
           fungibleToken={{ image: marketplace.logo } as FungibleToken}
           size={32}
-          customProtocolIcon={successfull ? CheckCircle : XCircle}
+          customProtocolIcon={successful ? CheckCircle : XCircle}
           showProtocolIcon
         />
       </div>
@@ -81,7 +81,7 @@ function MarketplaceRuneListingResult({ minPriceSats, marketplace, rune, success
         </RowCenter>
         <RowCenter>
           <SubtitleContainer>
-            {successfull ? (
+            {successful ? (
               <StyledP typography="body_medium_m" color="white_200">
                 {t('LISTED_FOR', {
                   floor_price: floorPrice,
@@ -96,7 +96,7 @@ function MarketplaceRuneListingResult({ minPriceSats, marketplace, rune, success
           </SubtitleContainer>
         </RowCenter>
       </InfoContainer>
-      {successfull && <ArrowUpRight size="16" color={theme.colors.white_0} />}
+      {successful && <ArrowUpRight size="16" color={theme.colors.white_0} />}
     </Container>
   );
 }
