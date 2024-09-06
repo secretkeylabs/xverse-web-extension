@@ -1,4 +1,3 @@
-import { microStxToStx } from '@components/postCondition/postConditionView/helper';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import {
   getBtcFiatEquivalent,
@@ -15,7 +14,6 @@ import Sheet from '@ui-library/sheet';
 import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import type { Color } from 'theme';
 import QuoteTile from './quoteTile';
 
 interface Props {
@@ -29,10 +27,10 @@ interface Props {
   utxoProviderClicked?: (utxoProvider: UtxoQuote) => void;
 }
 
-const Container = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-}));
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
 
 const Heading = styled(StyledP)`
   margin-top: ${(props) => props.theme.space.l};
@@ -68,20 +66,61 @@ function QuotesModal({
 
   const { btcFiatRate, stxBtcRate } = useCoinRates();
 
-  const numberOfUtxoProviders = utxoProviders.length;
-  const lowestUtxoQuoteFloorRate = Math.min(
-    ...utxoProviders.map((provider) => Number(provider.floorRate)),
+  const sortQuotesByReceiveAmount = <T extends StxQuote | Quote>(quotes: T[]): T[] =>
+    [...quotes].sort((a, b) =>
+      BigNumber(b.receiveAmount).gte(a.receiveAmount)
+        ? 1
+        : BigNumber(a.receiveAmount).gte(b.receiveAmount)
+        ? -1
+        : 0,
+    );
+
+  const sortedAmmQuotes = sortQuotesByReceiveAmount<Quote>(ammProviders);
+  const sortedStxQuotes = sortQuotesByReceiveAmount<StxQuote>(stxProviders);
+  const sortedUtxoQuotes = [...utxoProviders].sort((a, b) =>
+    BigNumber(b.floorRate).gte(a.floorRate) ? -1 : BigNumber(a.floorRate).gte(b.floorRate) ? 1 : 0,
   );
 
-  const getSubtitle = (provider: UtxoQuote): string => {
-    if (numberOfUtxoProviders === 1) {
+  const getReceiveAmountSubtitle = (
+    quote: StxQuote | Quote,
+    quotes: (StxQuote | Quote)[],
+  ): string => {
+    const highestReceiveAmount = BigNumber.max(
+      ...quotes.map((q) => new BigNumber(q.receiveAmount)),
+    );
+
+    if (quote.provider.code === 'dotswap') {
+      return t('RECOMMENDED');
+    }
+
+    if (new BigNumber(quote.receiveAmount).eq(highestReceiveAmount)) {
+      return t('BEST');
+    }
+
+    const difference = highestReceiveAmount.minus(quote.receiveAmount);
+    const percentageDifference = difference.div(highestReceiveAmount).times(100);
+
+    if (percentageDifference.gt(0)) {
+      return `+${percentageDifference.toFixed(2)}%`;
+    }
+
+    return `-${percentageDifference.abs().toFixed(2)}%`;
+  };
+
+  const getFloorPriceSubtitle = (quote: UtxoQuote, quotes: UtxoQuote[]): string => {
+    if (quotes.length === 1) {
       return '';
     }
-    if (Number(provider.floorRate) === lowestUtxoQuoteFloorRate) {
+
+    const lowestUtxoQuoteFloorRate = Math.min(
+      ...utxoProviders.map((provider) => Number(provider.floorRate)),
+    );
+
+    if (Number(quote.floorRate) === lowestUtxoQuoteFloorRate) {
       return t('BEST');
     }
     const difference = lowestUtxoQuoteFloorRate
-      ? Number(provider.floorRate) - lowestUtxoQuoteFloorRate
+      ? Number(quote.floorRate) - lowestUtxoQuoteFloorRate
       : 0;
     const percentageDifference = (difference / lowestUtxoQuoteFloorRate) * 100;
     if (percentageDifference > 0) {
@@ -89,18 +128,6 @@ function QuotesModal({
     }
     return `-${Math.abs(percentageDifference).toFixed(2)}%`;
   };
-
-  const ammQuotes = [...ammProviders].sort((a, b) =>
-    BigNumber(b.receiveAmount).gte(a.receiveAmount)
-      ? 1
-      : BigNumber(a.receiveAmount).gte(b.receiveAmount)
-      ? -1
-      : 0,
-  );
-
-  const utxoQuotes = [...utxoProviders].sort((a, b) =>
-    BigNumber(b.floorRate).gte(a.floorRate) ? -1 : BigNumber(a.floorRate).gte(b.floorRate) ? 1 : 0,
-  );
 
   return (
     <Sheet visible={visible} title={t('GET_QUOTES_TITLE')} onClose={onClose}>
@@ -114,15 +141,14 @@ function QuotesModal({
               {t('EXCHANGE')}
             </Heading>
           ))}
-        {ammProviders.map((amm) => (
+        {sortedAmmQuotes.map((amm) => (
           <QuoteTile
             key={amm.provider.name}
             provider={amm.provider.name}
             price={amm.receiveAmount}
             image={{ ft: { image: amm.provider.logo } as FungibleToken }}
             onClick={() => ammProviderClicked && ammProviderClicked(amm)}
-            subtitle={t('RECOMMENDED')}
-            subtitleColor="success_light"
+            subtitle={getReceiveAmountSubtitle(amm, ammProviders)}
             unit={amm.to.protocol === 'btc' ? 'Sats' : toToken?.symbol || ''}
             fiatValue={
               amm.to.protocol === 'btc'
@@ -139,15 +165,14 @@ function QuotesModal({
             {t('MARKETPLACE')}
           </SecondHeading>
         )}
-        {stxProviders.map((stx) => (
+        {sortedStxQuotes.map((stx) => (
           <QuoteTile
             key={stx.provider.name}
             provider={stx.provider.name}
             price={stx.receiveAmount}
             image={{ ft: { image: stx.provider.logo } as FungibleToken }}
             onClick={() => ammProviderClicked && ammProviderClicked(stx)}
-            subtitle={t('RECOMMENDED')}
-            subtitleColor="success_light"
+            subtitle={getReceiveAmountSubtitle(stx, stxProviders)}
             unit={stx.to.protocol === 'stx' ? 'STX' : toToken?.name || ''}
             fiatValue={
               stx.to.protocol === 'stx'
@@ -160,27 +185,18 @@ function QuotesModal({
             }
           />
         ))}
-        {utxoQuotes.map((utxoProvider) => {
-          const subTitle = getSubtitle(utxoProvider);
-          let subTitleColour: Color = 'success_light';
-
-          if (subTitle.startsWith('+')) {
-            subTitleColour = 'danger_light';
-          }
-          return (
-            <QuoteTile
-              key={utxoProvider.provider.name}
-              provider={utxoProvider.provider.name}
-              price={utxoProvider.floorRate}
-              image={{ ft: { image: utxoProvider.provider.logo } as FungibleToken }}
-              floorText={t('FLOOR_PRICE')}
-              onClick={() => utxoProviderClicked && utxoProviderClicked(utxoProvider)}
-              subtitle={subTitle}
-              subtitleColor={subTitleColour}
-              unit={toToken?.symbol ? `Sats / ${toToken.symbol}` : ''}
-            />
-          );
-        })}
+        {sortedUtxoQuotes.map((utxoProvider) => (
+          <QuoteTile
+            key={utxoProvider.provider.name}
+            provider={utxoProvider.provider.name}
+            price={utxoProvider.floorRate}
+            image={{ ft: { image: utxoProvider.provider.logo } as FungibleToken }}
+            floorText={t('FLOOR_PRICE')}
+            onClick={() => utxoProviderClicked && utxoProviderClicked(utxoProvider)}
+            subtitle={getFloorPriceSubtitle(utxoProvider, utxoProviders)}
+            unit={toToken?.symbol ? `Sats / ${toToken.symbol}` : ''}
+          />
+        ))}
       </Container>
     </Sheet>
   );
