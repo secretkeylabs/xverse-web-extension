@@ -24,7 +24,7 @@ test.describe('Token Management', () => {
     await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
     const amounttokenSIP = await wallet.labelCoinTitle.count();
 
-    await await expect(amounttokenSIP).toBeGreaterThanOrEqual(15);
+    await expect(amounttokenSIP).toBeGreaterThanOrEqual(15);
     await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenSIP - 1);
     await expect(wallet.checkboxTokenActive).toHaveCount(1);
     await expect(wallet.checkboxToken).toHaveCount(amounttokenSIP);
@@ -56,7 +56,7 @@ test.describe('Token Management', () => {
       await wallet.checkVisualsStartpage();
       // Check balances
       await expect(wallet.balance).toBeVisible();
-      await await expect(wallet.balance).toHaveText('$0.00');
+      await expect(wallet.balance).toHaveText('$0.00');
       let balanceText = await wallet.getBalanceOfAllTokens();
       await expect(balanceText).toBe(0);
       await wallet.manageTokenButton.click();

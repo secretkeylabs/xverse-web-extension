@@ -43,9 +43,9 @@ test.describe('Transaction STX', () => {
     await expect(wallet.buttonNext).toBeHidden();
     // Amount input is visible
     await expect(wallet.inputField.first()).toBeVisible();
+    await expect(wallet.inputField.first()).toBeEnabled();
     await expect(wallet.labelBalanceAmountSelector).toBeVisible();
     await expect(wallet.imageToken).toBeVisible();
-    await expect(wallet.inputField.first()).toBeDisabled();
     await expect(wallet.noFundsBTCMessage).toBeVisible();
   });
 

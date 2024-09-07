@@ -17,6 +17,10 @@ const Container = styled.div<{ topMargin?: boolean }>((props) => ({
   flexDirection: 'row',
   alignItems: 'center',
   marginBottom: props.theme.space.s,
+  marginTop: props.topMargin ? props.theme.space.s : 0,
+  backgroundColor: props.theme.colors.elevation1,
+  padding: props.theme.space.m,
+  borderRadius: props.theme.space.xs,
 }));
 
 const AvatarContainer = styled.div`
@@ -42,16 +46,21 @@ const Column = styled.div`
 type Props = {
   rune: RuneBase;
   hasSufficientBalance?: boolean;
+  topMargin?: boolean;
 };
 
-export default function RuneAmount({ rune, hasSufficientBalance = true }: Props) {
+export default function RuneAmount({
+  rune,
+  hasSufficientBalance = true,
+  topMargin = false,
+}: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { runeName, amount, divisibility, symbol } = rune;
   const amountWithDecimals = ftDecimals(String(amount), divisibility);
   const { fiatCurrency } = useWalletSelector();
   const { data: runeFiatRate } = useRuneFiatRateQuery(rune);
   return (
-    <Container>
+    <Container topMargin={topMargin}>
       <AvatarContainer>
         <TokenImage
           currency="FT"

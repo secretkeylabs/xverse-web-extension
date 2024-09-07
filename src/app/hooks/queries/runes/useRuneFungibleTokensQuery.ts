@@ -44,7 +44,6 @@ export const useRuneFungibleTokensQuery = (backgroundRefetch = true) => {
     refetchOnReconnect: backgroundRefetch,
     queryFn,
   });
-
   return {
     ...query,
     unfilteredData: query.data,

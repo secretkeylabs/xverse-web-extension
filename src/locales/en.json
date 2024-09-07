@@ -665,6 +665,7 @@
     "NO_EARN_OPTION": "No Earn options currently available for this wallet type."
   },
   "NFT_DASHBOARD_SCREEN": {
+    "BUNDLE": "Bundle",
     "COLLECTIBLES": "Collectibles",
     "NO_COLLECTIBLES": "There's nothing here yet.",
     "INSCRIPTIONS": "Inscriptions",
@@ -750,6 +751,7 @@
     "TRANSFER_ALL": "Transfer all"
   },
   "NFT_DETAIL_SCREEN": {
+    "RARE_SATS": "Rare Sats",
     "NFT_DETAIL": "Item detail",
     "WEB_GALLERY": "Open gallery",
     "SEND": "Send",
@@ -769,6 +771,7 @@
     "GAMMA": "Gamma.io",
     "MOVE_TO_ASSET_DETAIL": "Back to gallery",
     "BACK_TO_COLLECTION": "Back to collection",
+    "BACK_TO_RUNES": "Back to runes",
     "ORDINALS": "Ordinal",
     "ORDINAL_PENDING_SEND_TITLE": "Transfer Pending",
     "ORDINAL_PENDING_SEND_DESCRIPTION": "This Ordinal is already in a pending transfer.",
@@ -803,7 +806,8 @@
     "SAT": "Sat",
     "NFT_TYPE": "Asset Type",
     "DATA": "Data",
-    "COPIED": "Sharing Link Copied"
+    "COPIED": "Sharing Link Copied",
+    "CONTENT": "Content"
   },
   "RESET_WALLET_SCREEN": {
     "ENTER_PASSWORD": "Enter your password to reset your wallet",
@@ -984,6 +988,7 @@
     "BALANCE": "Balance",
     "TRANSACTIONS": "TRANSACTIONS",
     "CONTRACT": "CONTRACT",
+    "BUNDLES": "BUNDLES",
     "COMING_SOON": "Coming soon",
     "VERIFY_ADDRESS_ON_LEDGER": "Verify address on Ledger",
     "VIEW_ADDRESS": "View address",
