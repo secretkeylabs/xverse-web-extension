@@ -15,10 +15,15 @@ import Banner from './banner';
 const CarouselContainer = styled.div`
   position: relative;
   margin-top: ${({ theme }) => theme.space.xxs};
-  margin-bottom: ${({ theme }) => theme.space.m};
+  margin-bottom: ${({ theme }) => theme.space.xxs};
 
   .swiper {
     padding: 0;
+    z-index: 0;
+  }
+
+  .swiper-wrapper {
+    align-items: center;
   }
 
   .swiper-pagination {
@@ -85,7 +90,7 @@ const PaginationContainer = styled.div`
 const StyledCrossButton = styled(CrossButton)`
   z-index: 1;
   position: absolute;
-  top: -14px;
+  top: -8px;
   right: -6px;
 `;
 
@@ -116,7 +121,6 @@ function BannerCarousel({ items }: Props) {
           setActiveIndex(swiper.activeIndex);
         }}
         allowTouchMove
-        autoHeight
       >
         {items.map((item) => (
           <SwiperSlide data-testid="app-slide" key={item.id}>

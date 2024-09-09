@@ -437,7 +437,7 @@ export default function QuoteSummary({
                   ? fromToken?.assetName
                   : fromToken?.name
               }
-              subtitleColor="white_400"
+              subtitleColorOverride="white_400"
               unit={fromUnit}
               fiatValue={fromTokenFiatValue}
             />
@@ -464,7 +464,7 @@ export default function QuoteSummary({
                     : undefined,
               }}
               subtitle={toToken?.protocol === 'btc' ? 'Bitcoin' : toToken?.name}
-              subtitleColor="white_400"
+              subtitleColorOverride="white_400"
               unit={toUnit}
               fiatValue={toTokenFiatValue}
             />

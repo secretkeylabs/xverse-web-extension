@@ -26,9 +26,9 @@ const Container = styled.div((props) => ({
   marginBottom: props.theme.space.s,
 }));
 
-const RowContainer = styled.div<{ noPadding?: boolean; noMargin?: boolean }>((props) => ({
-  padding: props.noPadding ? 0 : `0 ${props.theme.space.m}`,
-  marginBottom: props.noMargin ? 0 : props.theme.space.m,
+const RowContainer = styled.div((props) => ({
+  padding: `0 ${props.theme.space.m}`,
+  marginBottom: props.theme.space.s,
 }));
 
 const BundleHeader = styled.div((props) => ({
@@ -57,7 +57,7 @@ function SendSection({
       <Title>{t('CONFIRM_TRANSACTION.YOU_WILL_SEND')}</Title>
       {Object.entries(bundledOutputs).map(([address, bundle], index) => (
         <Container key={address}>
-          <RowContainer key={address} noMargin>
+          <RowContainer>
             <BundleHeader>
               <StyledP typography="body_medium_m" color="white_400">
                 {t('COMMON.TO')}
@@ -66,20 +66,17 @@ function SendSection({
                 {getTruncatedAddress(address, 6)}
               </StyledP>
             </BundleHeader>
-            <RowContainer noPadding>
-              <Amount amount={bundle.netBtcAmount} />
-              <AmountWithInscriptionSatribute
-                inscriptions={inscriptionsFromPayment}
-                satributes={satributesFromPayment}
-                onShowInscription={onShowInscription}
-              />
-            </RowContainer>
-            {bundle.runeTransfers.map((runeTransfer, i) => (
+            <Amount amount={bundle.netBtcAmount} />
+            <AmountWithInscriptionSatribute
+              inscriptions={inscriptionsFromPayment}
+              satributes={satributesFromPayment}
+              onShowInscription={onShowInscription}
+            />
+            {bundle.runeTransfers.map((runeTransfer) => (
               <RuneAmount
                 // eslint-disable-next-line react/no-array-index-key
                 key={index}
                 rune={runeTransfer}
-                topMargin={i === 0 && bundle.netBtcAmount > 0}
                 hasSufficientBalance={runeTransfer.hasSufficientBalance}
               />
             ))}

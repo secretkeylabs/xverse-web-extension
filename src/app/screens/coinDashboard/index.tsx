@@ -5,13 +5,15 @@ import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import { useVisibleBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
 import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
+import useRuneUtxosQuery from '@hooks/queries/runes/useRuneUtxosQuery';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
-import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useSpamTokens from '@hooks/queries/useSpamTokens';
 import { broadcastResetUserFlow, useResetUserFlow } from '@hooks/useResetUserFlow';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import { Flag } from '@phosphor-icons/react';
+import RuneBundleRow from '@screens/coinDashboard/runes/bundleRow';
 import type { FungibleToken } from '@secretkeylabs/xverse-core';
+import { mapRareSatsAPIResponseToBundle } from '@secretkeylabs/xverse-core';
 import {
   setBrc20ManageTokensAction,
   setRunesManageTokensAction,
@@ -20,7 +22,9 @@ import {
 } from '@stores/wallet/actions/actionCreators';
 import { StyledP } from '@ui-library/common.styled';
 import { SPAM_OPTIONS_WIDTH, type CurrencyTypes } from '@utils/constants';
-import { getExplorerUrl } from '@utils/helper';
+import { ftDecimals, getExplorerUrl, getTruncatedAddress } from '@utils/helper';
+import { getFullTxId, getTxIdFromFullTxId, getVoutFromFullTxId } from '@utils/runes';
+import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -33,7 +37,7 @@ import TransactionsHistoryList from './transactionsHistoryList';
 const Container = styled.div((props) => ({
   display: 'flex',
   flex: 1,
-  marginTop: props.theme.spacing(4),
+  marginTop: props.theme.space.xs,
   flexDirection: 'column',
   overflowY: 'auto',
   '&::-webkit-scrollbar': {
@@ -41,12 +45,13 @@ const Container = styled.div((props) => ({
   },
 }));
 
-const TokenContractContainer = styled.div((props) => ({
+const SecondaryContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-  marginTop: props.theme.spacing(16),
+  paddingLeft: props.theme.space.m,
+  paddingRight: props.theme.space.m,
+  marginTop: props.theme.space.xl,
+  marginBottom: props.theme.space.xl,
   h1: {
     ...props.theme.typography.body_medium_m,
     color: props.theme.colors.white_400,
@@ -55,7 +60,7 @@ const TokenContractContainer = styled.div((props) => ({
 
 const ContractAddressCopyButton = styled.button((props) => ({
   display: 'flex',
-  marginTop: props.theme.spacing(2),
+  marginTop: props.theme.space.xxs,
   background: 'transparent',
 }));
 
@@ -71,10 +76,9 @@ const FtInfoContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   borderTop: `1px solid ${props.theme.colors.elevation2}`,
-  paddingTop: props.theme.spacing(12),
-  marginTop: props.theme.spacing(16),
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(14),
+  paddingTop: props.theme.space.l,
+  marginTop: props.theme.space.xl,
+  paddingLeft: props.theme.space.m,
 }));
 
 const ShareIcon = styled.img({
@@ -83,22 +87,22 @@ const ShareIcon = styled.img({
 });
 
 const CopyButtonContainer = styled.div((props) => ({
-  marginRight: props.theme.spacing(2),
+  marginRight: props.theme.space.xxs,
 }));
 
 const ContractDeploymentButton = styled.button((props) => ({
   ...props.theme.typography.body_m,
   display: 'flex',
   alignItems: 'center',
-  marginTop: props.theme.spacing(12),
+  marginTop: props.theme.space.l,
   background: 'none',
   color: props.theme.colors.white_400,
   span: {
     color: props.theme.colors.white_0,
-    marginLeft: props.theme.spacing(3),
+    marginLeft: props.theme.space.xs,
   },
   img: {
-    marginLeft: props.theme.spacing(3),
+    marginLeft: props.theme.space.xs,
   },
 }));
 
@@ -111,9 +115,9 @@ const Button = styled.button<{
   justifyContent: 'center',
   alignItems: 'center',
   height: 31,
-  paddingLeft: props.theme.spacing(6),
-  paddingRight: props.theme.spacing(6),
-  marginRight: props.theme.spacing(2),
+  paddingLeft: props.theme.space.s,
+  paddingRight: props.theme.space.s,
+  marginRight: props.theme.space.xxs,
   borderRadius: 44,
   background: props.isSelected ? props.theme.colors.elevation2 : 'transparent',
   color: props.theme.colors.white_0,
@@ -142,14 +146,23 @@ const TokenText = styled(StyledP)`
   margin-left: ${(props) => props.theme.space.m};
 `;
 
+const RuneBundlesContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${(props) => props.theme.space.s};
+`;
+
 export default function CoinDashboard() {
+  const [searchParams] = useSearchParams();
+  const ftKey = searchParams.get('ftKey') ?? '';
+  const protocol = searchParams.get('protocol') ?? '';
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
-  const [showFtContractDetails, setShowFtContractDetails] = useState(false);
+  const fromSecondaryTab = searchParams.get('secondaryTab') === 'true' ? 'secondary' : 'primary';
+  const [currentTab, setCurrentTab] = useState<'primary' | 'secondary'>(fromSecondaryTab);
   const [showOptionsDialog, setShowOptionsDialog] = useState(false);
   const [optionsDialogIndents, setOptionsDialogIndents] = useState<
     { top: string; left: string } | undefined
   >();
-  const [searchParams] = useSearchParams();
   const { addToSpamTokens } = useSpamTokens();
   const dispatch = useDispatch();
   const { currency } = useParams();
@@ -157,8 +170,6 @@ export default function CoinDashboard() {
   const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
   const { visible: brc20CoinsList } = useVisibleBrc20FungibleTokens();
 
-  const ftKey = searchParams.get('ftKey');
-  const protocol = searchParams.get('protocol');
   let selectedFt: FungibleToken | undefined;
 
   if (ftKey && protocol) {
@@ -176,9 +187,16 @@ export default function CoinDashboard() {
         selectedFt = undefined;
     }
   }
+  const { data: runeUtxos } = useRuneUtxosQuery(
+    selectedFt?.protocol === 'runes' ? selectedFt?.name : '',
+  );
+
+  const showTxHistory = currentTab === 'primary';
+  const displayTabs = ['stacks', 'runes'].includes(protocol);
+  const showStxContract = currentTab === 'secondary' && selectedFt && protocol === 'stacks';
+  const showRuneBundles = currentTab === 'secondary' && selectedFt && protocol === 'runes';
 
   useResetUserFlow('/coinDashboard');
-  useBtcWalletData();
 
   const handleGoBack = () => broadcastResetUserFlow();
 
@@ -192,29 +210,13 @@ export default function CoinDashboard() {
 
   const openOptionsDialog = (event: React.MouseEvent<HTMLButtonElement>) => {
     setShowOptionsDialog(true);
-
     setOptionsDialogIndents({
       top: `${(event.target as HTMLElement).parentElement?.getBoundingClientRect().top}px`,
       left: `calc(100% - ${SPAM_OPTIONS_WIDTH}px)`,
     });
   };
 
-  const closeOptionsDialog = () => {
-    setShowOptionsDialog(false);
-  };
-
-  const openContractDeployment = () =>
-    window.open(getExplorerUrl(selectedFt?.principal as string), '_blank');
-
-  const onContractClick = () => setShowFtContractDetails(true);
-
-  const handleCopyContractAddress = () =>
-    navigator.clipboard.writeText(selectedFt?.principal as string);
-
-  const onTransactionsClick = () => setShowFtContractDetails(false);
-
-  const formatAddress = (addr: string): string =>
-    addr ? `${addr.substring(0, 20)}...${addr.substring(addr.length - 20, addr.length)}` : '';
+  const closeOptionsDialog = () => setShowOptionsDialog(false);
 
   return (
     <>
@@ -262,44 +264,27 @@ export default function CoinDashboard() {
       )}
       <Container>
         <CoinHeader currency={currency as CurrencyTypes} fungibleToken={selectedFt} />
-        {protocol === 'stacks' && (
+        {displayTabs && (
           <FtInfoContainer>
             <Button
-              disabled={!showFtContractDetails}
-              isSelected={!showFtContractDetails}
-              onClick={onTransactionsClick}
+              disabled={currentTab === 'primary'}
+              isSelected={currentTab === 'primary'}
+              onClick={() => setCurrentTab('primary')}
             >
               {t('TRANSACTIONS')}
             </Button>
             <Button
-              data-testid="coin-contract-button"
-              disabled={showFtContractDetails}
-              onClick={onContractClick}
-              isSelected={showFtContractDetails}
+              data-testid="coin-secondary-button"
+              disabled={currentTab === 'secondary'}
+              isSelected={currentTab === 'secondary'}
+              onClick={() => setCurrentTab('secondary')}
             >
-              {t('CONTRACT')}
+              {protocol === 'stacks' && t('CONTRACT')}
+              {protocol === 'runes' && t('BUNDLES')}
             </Button>
           </FtInfoContainer>
         )}
-        {selectedFt && protocol === 'stacks' && showFtContractDetails && (
-          <TokenContractContainer data-testid="coin-contract-container">
-            <h1>{t('FT_CONTRACT_PREFIX')}</h1>
-            <ContractAddressCopyButton onClick={handleCopyContractAddress}>
-              <TokenContractAddress data-testid="coin-contract-address">
-                {formatAddress(selectedFt?.principal as string)}
-              </TokenContractAddress>
-              <CopyButtonContainer>
-                <CopyButton text={selectedFt?.principal as string} />
-              </CopyButtonContainer>
-            </ContractAddressCopyButton>
-            <ContractDeploymentButton onClick={openContractDeployment}>
-              {t('OPEN_FT_CONTRACT_DEPLOYMENT')}
-              <span>{t('STACKS_EXPLORER')}</span>
-              <ShareIcon src={linkIcon} alt="link" />
-            </ContractDeploymentButton>
-          </TokenContractContainer>
-        )}
-        {!showFtContractDetails && (
+        {showTxHistory && (
           <TransactionsHistoryList
             coin={currency as CurrencyTypes}
             stxTxFilter={
@@ -311,6 +296,51 @@ export default function CoinDashboard() {
             runeToken={protocol === 'runes' ? selectedFt?.name || null : null}
             runeSymbol={protocol === 'runes' ? selectedFt?.runeSymbol || null : null}
           />
+        )}
+        {showStxContract && (
+          <SecondaryContainer data-testid="coin-secondary-container">
+            <h1>{t('FT_CONTRACT_PREFIX')}</h1>
+            <ContractAddressCopyButton
+              onClick={() => navigator.clipboard.writeText(selectedFt?.principal as string)}
+            >
+              <TokenContractAddress data-testid="coin-contract-address">
+                {getTruncatedAddress(selectedFt?.principal as string, 20)}
+              </TokenContractAddress>
+              <CopyButtonContainer>
+                <CopyButton text={selectedFt?.principal as string} />
+              </CopyButtonContainer>
+            </ContractAddressCopyButton>
+            <ContractDeploymentButton
+              onClick={() => window.open(getExplorerUrl(selectedFt?.principal as string), '_blank')}
+            >
+              {t('OPEN_FT_CONTRACT_DEPLOYMENT')}
+              <span>{t('STACKS_EXPLORER')}</span>
+              <ShareIcon src={linkIcon} alt="link" />
+            </ContractDeploymentButton>
+          </SecondaryContainer>
+        )}
+        {showRuneBundles && (
+          <SecondaryContainer data-testid="coin-secondary-container">
+            <RuneBundlesContainer>
+              {runeUtxos?.map((utxo) => {
+                const fullTxId = getFullTxId(utxo);
+                const runeAmount = utxo.runes?.filter((rune) => rune[0] === selectedFt?.name)[0][1]
+                  .amount;
+                return (
+                  <RuneBundleRow
+                    key={fullTxId}
+                    txId={getTxIdFromFullTxId(fullTxId)}
+                    vout={getVoutFromFullTxId(fullTxId)}
+                    runeAmount={String(ftDecimals(runeAmount ?? 0, selectedFt?.decimals ?? 0))}
+                    runeId={selectedFt?.principal ?? ''}
+                    runeSymbol={selectedFt?.runeSymbol ?? ''}
+                    satAmount={BigNumber(utxo.value).toNumber()}
+                    bundle={mapRareSatsAPIResponseToBundle(utxo)}
+                  />
+                );
+              })}
+            </RuneBundlesContainer>
+          </SecondaryContainer>
         )}
       </Container>
       <BottomBar tab="dashboard" />

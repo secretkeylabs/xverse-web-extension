@@ -10,12 +10,12 @@ export default function useRuneUtxosQuery(
   backgroundRefetch = true,
 ) {
   const { network } = useWalletSelector();
-  const { ordinalsAddress } = useSelectedAccount();
-  if (network.type !== 'Mainnet') {
-    throw new Error('Only available on Mainnet');
-  }
   const runesApi = useRunesApi();
+  const { ordinalsAddress } = useSelectedAccount();
   const queryFn = useCallback(async () => {
+    if (network.type !== 'Mainnet') {
+      return [];
+    }
     const res = await runesApi.getRunesUtxos({ address: ordinalsAddress, rune: runeName });
     const sortedRes = res.sort((a, b) => {
       const amountA = Number(a.runes?.[0][1].amount);
@@ -28,7 +28,8 @@ export default function useRuneUtxosQuery(
     if (filter === 'listed') {
       return sortedRes.filter((item) => item.listing[0] !== null);
     }
-  }, [runesApi, ordinalsAddress, filter, runeName]);
+    return sortedRes;
+  }, [network.type, runesApi, ordinalsAddress, runeName, filter]);
   return useQuery({
     refetchOnWindowFocus: backgroundRefetch,
     refetchOnReconnect: backgroundRefetch,

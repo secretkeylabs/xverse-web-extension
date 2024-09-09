@@ -22,7 +22,7 @@ test.describe('Collectibles Tab - Rare sats', () => {
     await expect(wallet.buttonSend).toBeVisible();
     await expect(wallet.labelSatsValue).toBeVisible();
     await expect(wallet.labelOwnedBy).toBeVisible();
-    await expect(wallet.labelRareSats).toBeVisible();
+    await expect(wallet.labelBundle).toBeVisible();
     await expect(wallet.buttonSupportRarity).toBeVisible();
   });
 

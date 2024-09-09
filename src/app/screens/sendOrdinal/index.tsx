@@ -31,6 +31,7 @@ function SendOrdinalScreen() {
   const isRareSatParam = params.get('isRareSat');
   const vout = params.get('vout');
   const isRareSat = isRareSatParam === 'true';
+  const fromRune = params.get('fromRune');
 
   const context = useTransactionContext();
   const { data: selectedOrdinal } = useAddressInscription(isRareSat ? undefined : id);
@@ -136,7 +137,7 @@ function SendOrdinalScreen() {
     }
     navigate(
       isRareSat
-        ? `/nft-dashboard/rare-sats-bundle`
+        ? `/nft-dashboard/rare-sats-bundle${fromRune ? `?fromRune=${fromRune}` : ''}`
         : `/nft-dashboard/ordinal-detail/${selectedOrdinal?.id}`,
     );
   };

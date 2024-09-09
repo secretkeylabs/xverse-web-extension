@@ -10,6 +10,8 @@ const Container = styled.div`
 
 const BannerContent = styled.button`
   cursor: pointer;
+  width: 100%;
+  min-height: 60px;
   display: flex;
   align-items: center;
   column-gap: ${({ theme }) => theme.space.s};

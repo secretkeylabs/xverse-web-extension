@@ -60,7 +60,7 @@ interface Props {
     ft?: FungibleToken;
   };
   subtitle?: string;
-  subtitleColor?: Color;
+  subtitleColorOverride?: Color;
   fiatValue?: string;
   floorText?: string;
   onClick?: () => void;
@@ -72,7 +72,7 @@ function QuoteTile({
   price,
   image,
   subtitle,
-  subtitleColor,
+  subtitleColorOverride,
   fiatValue,
   floorText,
   onClick,
@@ -80,6 +80,13 @@ function QuoteTile({
 }: Props) {
   const theme = useTheme();
   const { fiatCurrency } = useWalletSelector();
+
+  const getSubtitleColor = (): Color | undefined => {
+    if (!subtitle) return undefined;
+    return subtitle.startsWith('+') ? 'danger_light' : 'success_light';
+  };
+
+  const subtitleColor = subtitleColorOverride ?? getSubtitleColor();
 
   return (
     <Container data-testid="swap-place-button" onClick={onClick} clickable={Boolean(onClick)}>

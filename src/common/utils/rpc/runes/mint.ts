@@ -49,7 +49,7 @@ const handleMintRune = async (message: WebBtcMessage<'runes_mint'>, port: chrome
     id,
     response: makeRPCError(message.id, {
       code: RpcErrorCode.USER_REJECTION,
-      message: 'User rejected request to send transfer',
+      message: 'User rejected request to mint a rune',
     }),
   });
   listenForOriginTabClose({ tabId });

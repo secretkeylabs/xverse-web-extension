@@ -142,7 +142,7 @@ test.describe('Create and Restore Wallet Flow', () => {
       await newWallet.checkVisualsStartpage();
 
       const balanceText = newWallet.balance;
-      await await expect(balanceText).toHaveText('$0.00');
+      await expect(balanceText).toHaveText('$0.00');
 
       // Get the Addresses
       const addressBitcoinCheck = await newWallet.getAddress('Bitcoin');

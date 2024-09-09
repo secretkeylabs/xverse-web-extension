@@ -212,9 +212,9 @@ export default class Wallet {
 
   readonly noFundsBTCMessage: Locator;
 
-  readonly buttonCoinContract: Locator;
+  readonly coinSecondaryButton: Locator;
 
-  readonly coinContractContainer: Locator;
+  readonly coinSecondaryContainer: Locator;
 
   readonly coinContractAddress: Locator;
 
@@ -266,7 +266,7 @@ export default class Wallet {
 
   readonly labelOwnedBy: Locator;
 
-  readonly labelRareSats: Locator;
+  readonly labelBundle: Locator;
 
   readonly buttonSupportRarity: Locator;
 
@@ -452,8 +452,8 @@ export default class Wallet {
     this.containerTransactionHistory = page.getByTestId('transaction-container');
     this.transactionHistoryAmount = page.getByTestId('transaction-amount');
     this.transactionHistoryInfo = page.getByTestId('transaction-info');
-    this.buttonCoinContract = page.getByTestId('coin-contract-button');
-    this.coinContractContainer = page.getByTestId('coin-contract-container');
+    this.coinSecondaryButton = page.getByTestId('coin-secondary-button');
+    this.coinSecondaryContainer = page.getByTestId('coin-secondary-container');
     this.coinContractAddress = page.getByTestId('coin-contract-address');
     this.textCoinTitle = page.getByTestId('coin-title-text');
 
@@ -487,9 +487,9 @@ export default class Wallet {
     this.buttonShare = page.getByRole('button', { name: 'Share' });
     this.buttonReceive = page.getByRole('button', { name: 'Receive', exact: true });
     this.buttonOpenOrdinalViewer = page.getByRole('button', { name: 'Open in Ordinal Viewer' });
+    this.labelBundle = page.locator('h1').filter({ hasText: 'Bundle' });
     this.labelSatsValue = page.locator('h1').filter({ hasText: 'Sats value' });
     this.labelOwnedBy = page.locator('h1').filter({ hasText: 'Owned by' });
-    this.labelRareSats = page.locator('p').filter({ hasText: 'Rare Sats' });
     this.buttonSupportRarity = page.getByRole('button', { name: 'See supported rarity scale' });
     this.numberInscription = page.getByTestId('inscription-number');
     this.numberOrdinal = page.getByTestId('ordinal-number');
