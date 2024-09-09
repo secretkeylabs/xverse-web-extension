@@ -1,4 +1,5 @@
 import TokenTile from '@components/tokenTile';
+import { animated } from '@react-spring/web';
 import Divider from '@ui-library/divider';
 import styled from 'styled-components';
 
@@ -15,6 +16,7 @@ export const ColumnContainer = styled.div((props) => ({
   flexDirection: 'column',
   alignItems: 'space-between',
   justifyContent: 'space-between',
+  marginTop: props.theme.space.xs,
   marginBottom: props.theme.space.s,
 }));
 
@@ -155,13 +157,19 @@ export const IconBackground = styled.div((props) => ({
   alignItems: 'center',
 }));
 
-export const StyledDivider = styled(Divider)`
+export const StyledDivider = styled(Divider)<{ $noMarginBottom?: boolean }>`
   flex: 1 0 auto;
   width: calc(100% + ${(props) => props.theme.space.xl});
   margin-left: -${(props) => props.theme.space.m};
   margin-right: -${(props) => props.theme.space.m};
+  transition: margin-bottom 0.1s ease;
+  ${(props) =>
+    props.$noMarginBottom &&
+    `
+      margin-bottom: 0;
+    `}
 `;
 
 export const StyledDividerSingle = styled(StyledDivider)`
-  margin-top: ${(props) => props.theme.space.xl};
+  margin-bottom: 0;
 `;

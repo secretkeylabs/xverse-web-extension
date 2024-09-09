@@ -25,6 +25,7 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowUp, Plus } from '@phosphor-icons/react';
+import { animated, useTransition } from '@react-spring/web';
 import CoinSelectModal from '@screens/home/coinSelectModal';
 import { AnalyticsEvents, FeatureId, type FungibleToken } from '@secretkeylabs/xverse-core';
 import {
@@ -415,6 +416,21 @@ function Home() {
   const isCrossChainSwapsEnabled = useHasFeature(FeatureId.CROSS_CHAIN_SWAPS);
   const showSwaps = isCrossChainSwapsEnabled;
 
+  const transitions = useTransition(showBannerCarousel, {
+    from: { maxHeight: '1000px', opacity: 0.5 },
+    enter: { maxHeight: '1000px', opacity: 1 },
+    leave: { maxHeight: '0px', opacity: 0 },
+    config: (item, index, phase) =>
+      phase === 'leave'
+        ? {
+            duration: 300,
+            easing: (progress) => 1 - (1 - progress) ** 4,
+          }
+        : {
+            duration: 200,
+          },
+  });
+
   return (
     <>
       <AccountHeaderComponent />
@@ -454,15 +470,23 @@ function Home() {
           />
         </RowButtonContainer>
 
-        {showBannerCarousel ? (
-          <>
-            <br />
-            <StyledDivider color="white_850" verticalMargin="m" />
-            <BannerCarousel items={filteredNotificationBannersArr} />
-            <StyledDivider color="white_850" verticalMargin="xxs" />
-          </>
-        ) : (
-          <StyledDividerSingle color="elevation3" verticalMargin="xs" />
+        {transitions((style, item) =>
+          item ? (
+            <animated.div style={style}>
+              <br />
+              <StyledDivider color="white_850" verticalMargin="m" />
+              <BannerCarousel items={filteredNotificationBannersArr} />
+              <StyledDivider
+                color="white_850"
+                verticalMargin="m"
+                $noMarginBottom={filteredNotificationBannersArr.length === 1}
+              />
+            </animated.div>
+          ) : (
+            <animated.div style={style}>
+              <StyledDividerSingle color="elevation3" verticalMargin="xl" />
+            </animated.div>
+          ),
         )}
 
         <ColumnContainer>
