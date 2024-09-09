@@ -529,7 +529,7 @@ export default function QuoteSummary({
                 </RouteContainer>
               </StyledP>
             </ListingDescriptionRow>
-            {isRunesTx({ toToken }) && (
+            {fromToken && toToken && isRunesTx({ fromToken, toToken }) && (
               <ListingDescriptionRow>
                 <StyledP typography="body_medium_m" color="white_200">
                   {t('TRANSACTION_SETTING.FEE_RATE')}

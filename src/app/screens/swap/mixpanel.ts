@@ -10,7 +10,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
-import { isRunesTx } from './utils';
+import { getTrackingIdentifier, isRunesTx } from './utils';
 
 function trackSwapMixPanel(
   eventName,
@@ -42,10 +42,10 @@ function trackSwapMixPanel(
   let fromPrincipal;
   let toPrincipal;
 
-  const from = fromToken?.name;
-  const to = toToken?.name ?? toToken?.ticker;
+  const from = getTrackingIdentifier(fromToken);
+  const to = getTrackingIdentifier(toToken);
 
-  if (isRunesTx({ fromToken, toToken })) {
+  if (fromToken && toToken && isRunesTx({ fromToken, toToken })) {
     fromAmount =
       fromToken?.principal === 'BTC'
         ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcUsdRate)).toFixed(2)
