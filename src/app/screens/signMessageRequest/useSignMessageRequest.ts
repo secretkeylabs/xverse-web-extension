@@ -59,6 +59,7 @@ export const useSignMessageValidation = (requestPayload: SignMessagePayload | un
   const { t } = useTranslation('translation', { keyPrefix: 'REQUEST_ERRORS' });
   const selectedAccount = useSelectedAccount();
   const { accountsList, network } = useWalletSelector();
+  const { btcAddress } = useSelectedAccount();
   const { switchAccount } = useWalletReducer();
 
   const checkAddressAvailability = () => {
@@ -83,13 +84,17 @@ export const useSignMessageValidation = (requestPayload: SignMessagePayload | un
       return;
     }
     const account = checkAddressAvailability();
-    if (account) {
-      switchAccount(account);
-    } else {
+
+    if (!account) {
       setValidationError({
         error: t('ADDRESS_MISMATCH'),
       });
+      return;
     }
+
+    if (btcAddress === account.btcAddress) return;
+
+    switchAccount(account);
   };
 
   useEffect(() => {
