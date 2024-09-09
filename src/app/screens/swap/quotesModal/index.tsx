@@ -1,3 +1,4 @@
+import useGetSip10TokenInfo from '@hooks/queries/stx/useGetSip10TokenInfo';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import {
   getBtcFiatEquivalent,
@@ -65,6 +66,7 @@ function QuotesModal({
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
 
   const { btcFiatRate, stxBtcRate } = useCoinRates();
+  const { tokenInfo: toTokenInfo } = useGetSip10TokenInfo(toToken?.ticker);
 
   const sortQuotesByReceiveAmount = <T extends StxQuote | Quote>(quotes: T[]): T[] =>
     [...quotes].sort((a, b) => BigNumber(b.receiveAmount).comparedTo(a.receiveAmount));
@@ -176,7 +178,11 @@ function QuotesModal({
                     new BigNumber(stxBtcRate),
                     new BigNumber(btcFiatRate),
                   ).toFixed(2)
-                : ''
+                : toTokenInfo?.tokenFiatRate
+                ? new BigNumber(toTokenInfo?.tokenFiatRate)
+                    .multipliedBy(stx.receiveAmount)
+                    .toFixed(2)
+                : '--'
             }
           />
         ))}

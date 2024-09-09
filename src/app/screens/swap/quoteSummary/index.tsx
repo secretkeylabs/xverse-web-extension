@@ -1,7 +1,7 @@
 import SlippageEditIcon from '@assets/img/swap/slippageEdit.svg';
 import TopRow from '@components/topRow';
 import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery';
-import { useGetSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
+import useGetSip10TokenInfo from '@hooks/queries/stx/useGetSip10TokenInfo';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useSearchParamsState from '@hooks/useSearchParamsState';
@@ -171,7 +171,7 @@ export default function QuoteSummary({
   selectedIdentifiers,
 }: QuoteSummaryProps) {
   const { t } = useTranslation('translation');
-  const { data: sip10CoinsList } = useGetSip10FungibleTokens();
+  const { tokenInfo: toTokenInfo } = useGetSip10TokenInfo(toToken?.ticker);
   const theme = useTheme();
   const { btcFiatRate, btcUsdRate, stxBtcRate } = useCoinRates();
   const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey, stxAddress, stxPublicKey } =
@@ -258,7 +258,7 @@ export default function QuoteSummary({
       btcUsdRate,
       runeFloorPrice,
       stxBtcRate,
-      sip10CoinsList,
+      toTokenInfo,
     });
 
     if (selectedIdentifiers) {
@@ -338,7 +338,9 @@ export default function QuoteSummary({
         new BigNumber(btcFiatRate),
       ).toFixed(2);
     }
-    return new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2);
+    return fromToken?.tokenFiatRate
+      ? new BigNumber(fromToken?.tokenFiatRate).multipliedBy(amount).toFixed(2)
+      : '--';
   })();
 
   const toTokenFiatValue = (() => {
@@ -361,11 +363,10 @@ export default function QuoteSummary({
         new BigNumber(btcFiatRate),
       ).toFixed(2);
     }
-    return new BigNumber(
-      sip10CoinsList?.find((s) => s.principal === toToken?.ticker)?.tokenFiatRate ?? 0,
-    )
-      .multipliedBy(quote.receiveAmount)
-      .toFixed(2);
+    if (!toTokenInfo?.tokenFiatRate) {
+      return '--';
+    }
+    return new BigNumber(toTokenInfo?.tokenFiatRate).multipliedBy(quote.receiveAmount).toFixed(2);
   })();
 
   const showBadQuoteWarning =
