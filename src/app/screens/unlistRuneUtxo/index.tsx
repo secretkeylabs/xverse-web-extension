@@ -113,13 +113,13 @@ export default function UnlistRuneUtxoScreen() {
       });
       const data = response[0];
 
-      if (listing.marketplaceName === 'Magic Eden' && data.magicEden) {
+      if (listing.marketplaceName === 'Magic Eden' && data.type === 'withMessage') {
         navigate(RequestsRoutes.SignMessageRequestInApp, {
           state: {
             requestPayload: {
               payload: {
-                token: data.magicEden.token,
-                message: data.magicEden.message,
+                token: data.token,
+                message: data.message,
                 address: selectedAccount?.ordinalsAddress,
                 selectedRuneId: selectedRune.principal,
                 orderIds: [listing.orderId],
@@ -127,8 +127,8 @@ export default function UnlistRuneUtxoScreen() {
             },
           },
         });
-      } else if (listing.marketplaceName === 'Unisat' && data.unisat) {
-        setUnisatCancellation({ psbt: data.unisat.psbt, orderId: data.orderId, listing });
+      } else if (listing.marketplaceName === 'Unisat' && data.type === 'withPsbt') {
+        setUnisatCancellation({ psbt: data.psbt, orderId: data.orderId, listing });
       }
     } catch (error) {
       console.error(error);
@@ -166,7 +166,7 @@ export default function UnlistRuneUtxoScreen() {
 
           navigate('/tx-status', {
             state: {
-              txid: response[0].unisat?.txid,
+              txid: response[0].txid,
               currency: 'BTC',
               error: '',
               browserTx: false,
