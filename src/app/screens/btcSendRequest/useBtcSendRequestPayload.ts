@@ -10,7 +10,7 @@ import { useLocation } from 'react-router-dom';
 
 const useBtcSendRequestPayload = (btcAddress: string, network: SettingsNetwork) => {
   const { search } = useLocation();
-  const params = new URLSearchParams(search);
+  const params = useMemo(() => new URLSearchParams(search), [search]);
   const tabId = params.get('tabId') ?? '0';
   const requestId = params.get('requestId') ?? '';
 
@@ -38,7 +38,7 @@ const useBtcSendRequestPayload = (btcAddress: string, network: SettingsNetwork) 
       payload: rpcPayload,
       requestToken: null,
     };
-  }, []);
+  }, [params, btcAddress, network]);
 
   return { payload, tabId, requestToken, requestId };
 };

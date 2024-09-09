@@ -1,4 +1,4 @@
-import { makeRPCError, sendRpcResponse } from '@common/utils/rpc/helpers';
+import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useHasFeature from '@hooks/useHasFeature';
@@ -166,6 +166,15 @@ function BtcSendRequest() {
     checkIfValidAmount();
   }, [payload]);
 
+  const handleCancel = () => {
+    const response = makeRPCError(requestId, {
+      code: RpcErrorCode.USER_REJECTION,
+      message: 'User rejected request to send transfer',
+    });
+    sendRpcResponse(+tabId, response);
+    window.close();
+  };
+
   const handleSubmit = async (ledgerTransport?: Transport) => {
     try {
       setIsSubmitting(true);
@@ -175,16 +184,26 @@ function BtcSendRequest() {
         action: 'transfer',
         wallet_type: selectedAccount.accountType || 'software',
       });
-      navigate('/tx-status', {
-        state: {
+      if (txnId) {
+        const sendTransferResponse = makeRpcSuccessResponse<'sendTransfer'>(requestId, {
           txid: txnId,
-          currency: 'BTC',
-          error: '',
-          browserTx: true,
-        },
-      });
+        });
+        sendRpcResponse(+tabId, sendTransferResponse);
+        navigate('/tx-status', {
+          state: {
+            txid: txnId,
+            currency: 'BTC',
+            error: '',
+            browserTx: true,
+          },
+        });
+      }
     } catch (e) {
-      console.error(e);
+      const response = makeRPCError(requestId, {
+        code: RpcErrorCode.INTERNAL_ERROR,
+        message: (e as any).message,
+      });
+      sendRpcResponse(+tabId, response);
       navigate('/tx-status', {
         state: {
           txid: '',
@@ -216,7 +235,7 @@ function BtcSendRequest() {
       isLoading={isLoading}
       confirmText={t('COMMON.CONFIRM')}
       cancelText={t('COMMON.CANCEL')}
-      onCancel={() => window.close()}
+      onCancel={handleCancel}
       onConfirm={handleSubmit}
       getFeeForFeeRate={calculateFeeForFeeRate}
       onFeeRateSet={(newFeeRate) => setFeeRate(newFeeRate.toString())}
