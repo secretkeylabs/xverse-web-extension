@@ -67,19 +67,14 @@ function QuotesModal({
   const { btcFiatRate, stxBtcRate } = useCoinRates();
 
   const sortQuotesByReceiveAmount = <T extends StxQuote | Quote>(quotes: T[]): T[] =>
-    [...quotes].sort((a, b) =>
-      BigNumber(b.receiveAmount).gte(a.receiveAmount)
-        ? 1
-        : BigNumber(a.receiveAmount).gte(b.receiveAmount)
-        ? -1
-        : 0,
-    );
+    [...quotes].sort((a, b) => BigNumber(b.receiveAmount).comparedTo(a.receiveAmount));
+
+  const sortQuotesByFloorPrice = <T extends UtxoQuote>(quotes: T[]): T[] =>
+    [...quotes].sort((a, b) => BigNumber(a.floorRate).comparedTo(b.floorRate));
 
   const sortedAmmQuotes = sortQuotesByReceiveAmount<Quote>(ammProviders);
   const sortedStxQuotes = sortQuotesByReceiveAmount<StxQuote>(stxProviders);
-  const sortedUtxoQuotes = [...utxoProviders].sort((a, b) =>
-    BigNumber(b.floorRate).gte(a.floorRate) ? -1 : BigNumber(a.floorRate).gte(b.floorRate) ? 1 : 0,
-  );
+  const sortedUtxoQuotes = sortQuotesByFloorPrice<UtxoQuote>(utxoProviders);
 
   const getReceiveAmountSubtitle = (
     quote: StxQuote | Quote,
