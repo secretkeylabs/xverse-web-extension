@@ -28,7 +28,7 @@ test.describe('Velar sip-10 swap flow', () => {
     await page.getByText(/velar/i).first().click();
     page.getByRole('textbox', { name: '0' }).fill('0.1');
     page.getByRole('button', { name: /get quotes/i }).click();
-    page.getByRole('heading', { name: /rates/i }).isVisible();
+    await expect(page.getByText('Rates', { exact: true })).toBeVisible();
     await page.getByText(/^\d+\.\d+\s+Velar$/i).click();
 
     // Arrive to Quotes page
@@ -40,11 +40,9 @@ test.describe('Velar sip-10 swap flow', () => {
 
     // Arrive to the final step - swap contract page
     await expect(page.getByText(/swap-exact-tokens-for-tokens/i)).toHaveCount(2);
-    page
-      .getByText(/network fee/i)
-      .getByText(/^\d+\.\d+\s+STX$/i)
-      .isVisible();
-    page.getByRole('button', { name: /edit nonce/i }).isVisible();
+    await expect(page.getByText(/network fee/i)).toBeVisible();
+    await expect(page.getByText(/^\d+\.\d+\s+STX$/i)).toBeVisible();
+    await expect(page.getByRole('button', { name: /edit nonce/i })).toBeVisible();
 
     // User clicks confirm
     page.getByRole('button', { name: /confirm/i }).click();
