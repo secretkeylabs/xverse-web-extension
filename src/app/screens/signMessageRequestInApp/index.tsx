@@ -110,7 +110,7 @@ function SignMessageRequestInApp() {
     setCurrentStepIndex(0);
   };
 
-  const handleGoBack = () => navigate(-1);
+  const handleGoBack = () => navigate(-2);
 
   const handleConnectAndConfirm = async () => {
     if (!selectedAccount) {
