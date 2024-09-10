@@ -122,7 +122,7 @@ function QuoteTile({
               displayType="text"
               thousandSeparator
               prefix="~ $"
-              suffix={fiatCurrency}
+              suffix={` ${fiatCurrency}`}
               renderText={(value: string) => (
                 <StyledP data-testid="usd-text" typography="body_s" color="white_200">
                   {value || '--'}

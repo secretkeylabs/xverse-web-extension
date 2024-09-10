@@ -133,7 +133,7 @@ export default function AmountInput({ max, input, balance }: Props) {
           displayType="text"
           thousandSeparator
           prefix={`~${currencySymbolMap[input.fiatCurrency]}`}
-          suffix={input.fiatCurrency}
+          suffix={` ${input.fiatCurrency}`}
           renderText={(value: string) => (
             <ConvertedFiatP data-testid="usd-text" typography="body_s" color="white_400">
               {value || '--'}
