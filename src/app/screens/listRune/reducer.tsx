@@ -1,6 +1,6 @@
 import type { RuneItem } from '@utils/runes';
 
-export type SupportedSections = 'SELECT_RUNES' | 'SELECT_MARKETPLACES' | 'SET_PRICES';
+type SupportedSections = 'SELECT_RUNES' | 'SELECT_MARKETPLACES' | 'SET_PRICES';
 
 interface ListRunesState {
   listItemsMap: Record<string, RuneItem>;
