@@ -23,6 +23,7 @@ function trackSwapMixPanel(
     btcUsdRate,
     runeFloorPrice,
     stxBtcRate,
+    fromTokenInfo,
     toTokenInfo,
   }: {
     provider?: Provider;
@@ -33,6 +34,7 @@ function trackSwapMixPanel(
     btcUsdRate: string;
     runeFloorPrice?: number;
     stxBtcRate?: string;
+    fromTokenInfo?: Coin;
     toTokenInfo?: Coin;
   },
 ) {
@@ -71,8 +73,8 @@ function trackSwapMixPanel(
             new BigNumber(stxBtcRate),
             new BigNumber(btcUsdRate),
           ).toFixed(2)
-        : fromToken?.tokenFiatRate
-        ? new BigNumber(fromToken?.tokenFiatRate).multipliedBy(amount).toFixed(2)
+        : fromTokenInfo?.tokenFiatRate
+        ? new BigNumber(fromTokenInfo?.tokenFiatRate).multipliedBy(amount).toFixed(2)
         : '--';
 
     receiveAmount = quote?.receiveAmount ? new BigNumber(quote?.receiveAmount) : undefined;
@@ -88,6 +90,16 @@ function trackSwapMixPanel(
           ? new BigNumber(toTokenInfo?.tokenFiatRate).multipliedBy(receiveAmount).toFixed(2)
           : '--';
     }
+  }
+
+  // Don't track for zero-like fiat values
+  if (
+    Number.isNaN(parseFloat(fromAmount)) ||
+    parseFloat(fromAmount) <= 0 ||
+    Number.isNaN(parseFloat(toAmount)) ||
+    parseFloat(toAmount) <= 0
+  ) {
+    return;
   }
 
   trackMixPanel(eventName, {

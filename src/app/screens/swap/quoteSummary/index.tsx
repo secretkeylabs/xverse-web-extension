@@ -171,7 +171,16 @@ export default function QuoteSummary({
   selectedIdentifiers,
 }: QuoteSummaryProps) {
   const { t } = useTranslation('translation');
-  const { tokenInfo: toTokenInfo } = useGetSip10TokenInfo(toToken?.ticker);
+  const { tokenInfo: sip10ToTokenInfoUSD } = useGetSip10TokenInfo({
+    principal: toToken?.ticker,
+    fiatCurrency: 'USD',
+  });
+
+  const { tokenInfo: sip10FromTokenInfoUSD } = useGetSip10TokenInfo({
+    principal: fromToken?.principal,
+    fiatCurrency: 'USD',
+  });
+
   const theme = useTheme();
   const { btcFiatRate, btcUsdRate, stxBtcRate } = useCoinRates();
   const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey, stxAddress, stxPublicKey } =
@@ -258,7 +267,8 @@ export default function QuoteSummary({
       btcUsdRate,
       runeFloorPrice,
       stxBtcRate,
-      toTokenInfo,
+      fromTokenInfo: sip10FromTokenInfoUSD,
+      toTokenInfo: sip10ToTokenInfoUSD,
     });
 
     if (selectedIdentifiers) {
@@ -363,10 +373,12 @@ export default function QuoteSummary({
         new BigNumber(btcFiatRate),
       ).toFixed(2);
     }
-    if (!toTokenInfo?.tokenFiatRate) {
+    if (!sip10ToTokenInfoUSD?.tokenFiatRate) {
       return '--';
     }
-    return new BigNumber(toTokenInfo?.tokenFiatRate).multipliedBy(quote.receiveAmount).toFixed(2);
+    return new BigNumber(sip10ToTokenInfoUSD?.tokenFiatRate)
+      .multipliedBy(quote.receiveAmount)
+      .toFixed(2);
   })();
 
   const showBadQuoteWarning =
