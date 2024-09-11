@@ -4,7 +4,7 @@ import Wallet from '../pages/wallet';
 const TEST_ORDINALS_ADDRESS = 'tb1pprpcu07x8fd02keqx9wtfncz99fhg6hepvpw34w9l2lnazmmf7rspw96ql';
 
 test.describe('Collectibles Tab - Rare sats', () => {
-  test('Check rare sats testnet', async ({ page, extensionId }) => {
+  test('Check rare sats testnet #localexecution', async ({ page, extensionId }) => {
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
@@ -26,7 +26,7 @@ test.describe('Collectibles Tab - Rare sats', () => {
     await expect(wallet.buttonSupportRarity).toBeVisible();
   });
 
-  test('Cancel send rare sats testnet', async ({ page, extensionId }) => {
+  test('Cancel send rare sats testnet #localexecution', async ({ page, extensionId }) => {
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
