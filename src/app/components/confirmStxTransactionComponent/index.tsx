@@ -224,8 +224,6 @@ function ConfirmStxTransactionComponent({
 
     if (initialStxTransactions.length === 1) {
       const transaction = initialStxTransactions[0];
-      const nonce = await nextBestNonce(selectedAccount.stxAddress, network);
-      transaction.setNonce(nonce);
       const signedContractCall = await signTransaction(
         transaction,
         seed,
