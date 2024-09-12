@@ -1,6 +1,22 @@
 import Button from '@ui-library/button';
 import styled from 'styled-components';
 
+export const Container = styled.div({
+  position: 'relative',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  backgroundColor: 'transparent',
+});
+
+export const AccountInfoContainer = styled.button<{ $disableClick?: boolean }>((props) => ({
+  width: '100%',
+  display: 'flex',
+  alignItems: 'center',
+  backgroundColor: 'transparent',
+  cursor: props.$disableClick ? 'initial' : 'pointer',
+}));
+
 export const GradientCircle = styled.div<{
   $firstGradient: string;
   $secondGradient: string;
@@ -14,21 +30,6 @@ export const GradientCircle = styled.div<{
   background: `linear-gradient(to bottom, ${props.$firstGradient}, ${props.$secondGradient}, ${props.$thirdGradient})`,
   opacity: props.$isSelected ? 1 : 0.5,
 }));
-
-export const TopSectionContainer = styled.div<{ disableClick?: boolean }>((props) => ({
-  position: 'relative',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  backgroundColor: 'transparent',
-  cursor: props.disableClick ? 'initial' : 'pointer',
-}));
-
-export const AccountInfoContainer = styled.div({
-  width: '100%',
-  display: 'flex',
-  alignItems: 'center',
-});
 
 export const CurrentAccountContainer = styled.div((props) => ({
   display: 'flex',

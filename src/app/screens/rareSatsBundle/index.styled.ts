@@ -7,10 +7,12 @@ interface DetailSectionProps {
 }
 
 /* layout */
-export const Container = styled.div`
+export const Container = styled.div<DetailSectionProps>`
   ...${(props) => props.theme.scrollbar};
   overflow-y: auto;
   padding-bottom: ${(props) => props.theme.space.l};
+  padding-left: ${(props) => (props.isGalleryOpen ? 0 : props.theme.space.m)};
+  padding-right: ${(props) => (props.isGalleryOpen ? 0 : props.theme.space.m)};
 `;
 
 export const PageHeader = styled.div<DetailSectionProps>`
@@ -32,7 +34,6 @@ export const PageHeaderContent = styled.div<DetailSectionProps>`
 
 export const AttributesContainer = styled.div<DetailSectionProps>((props) => ({
   maxWidth: props.isGalleryOpen ? '285px' : '100%',
-  padding: props.isGalleryOpen ? 0 : `0 ${props.theme.space.m}`,
 }));
 
 export const StyledSeparator = styled(Separator)`
@@ -48,7 +49,7 @@ export const StyledWebGalleryButton = styled(WebGalleryButton)`
 
 export const SendButtonContainer = styled.div<DetailSectionProps>`
   margin-top: ${(props) => props.theme.space.l};
-  width: ${(props) => (props.isGalleryOpen ? '222px' : '155px')};
+  width: ${(props) => (props.isGalleryOpen ? '222px' : '100%')};
 `;
 
 export const BundleRarityLinkContainer = styled.button`
@@ -112,11 +113,11 @@ export const NoCollectiblesText = styled.p((props) => ({
 export const Header = styled.div<{ isGalleryOpen: boolean }>((props) => ({
   display: props.isGalleryOpen ? 'block' : 'flex',
   flexDirection: props.isGalleryOpen ? 'row' : 'column',
-  alignItems: props.isGalleryOpen ? 'flex-start' : 'center',
+  alignItems: 'flex-start',
 }));
 
 export const SatRangeContainer = styled.div<DetailSectionProps>((props) => ({
-  marginTop: props.isGalleryOpen ? 0 : props.theme.space.xl,
+  marginTop: props.isGalleryOpen ? 0 : props.theme.space.s,
   maxWidth: '1224px',
   marginLeft: 'auto',
   marginRight: 'auto',
@@ -134,3 +135,8 @@ export const DetailSection = styled.div<DetailSectionProps>((props) => ({
 export const SeeRarityContainer = styled.div`
   padding: ${(props) => props.theme.space.l} ${(props) => props.theme.space.m};
 `;
+
+export const RuneAmountContainer = styled.div<{ isGalleryOpen?: boolean }>((props) => ({
+  padding: props.isGalleryOpen ? `0 ${props.theme.space.m}` : 0,
+  marginBottom: props.theme.space.s,
+}));

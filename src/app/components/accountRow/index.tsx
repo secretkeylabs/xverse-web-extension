@@ -16,12 +16,14 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import 'react-tooltip/dist/react-tooltip.css';
+import Theme from 'theme';
 import {
   AccountInfoContainer,
   AccountName,
   Balance,
   BarLoaderContainer,
   ButtonRow,
+  Container,
   CurrentAccountContainer,
   CurrentAccountTextContainer,
   GradientCircle,
@@ -32,7 +34,6 @@ import {
   ModalDescription,
   OptionsButton,
   StyledButton,
-  TopSectionContainer,
   TransparentSpan,
 } from './index.styled';
 
@@ -193,8 +194,8 @@ function AccountRow({
   };
 
   return (
-    <TopSectionContainer disableClick={disabledAccountSelect}>
-      <AccountInfoContainer onClick={handleClick}>
+    <Container>
+      <AccountInfoContainer $disableClick={disabledAccountSelect} onClick={handleClick}>
         <GradientCircle
           $firstGradient={gradient[0]}
           $secondGradient={gradient[1]}
@@ -213,7 +214,7 @@ function AccountRow({
                 </AccountName>
                 {isLedgerAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
                 {isSelected && !disabledAccountSelect && !isAccountListView && (
-                  <CaretDown weight="bold" size={16} />
+                  <CaretDown color={Theme.colors.white_0} weight="bold" size={16} />
                 )}
               </CurrentAccountTextContainer>
               {isAccountListView && totalBalance && (
@@ -337,7 +338,7 @@ function AccountRow({
           </ModalContent>
         </Sheet>
       )}
-    </TopSectionContainer>
+    </Container>
   );
 }
 

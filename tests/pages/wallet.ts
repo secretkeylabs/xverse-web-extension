@@ -36,8 +36,6 @@ export default class Wallet {
 
   readonly buttonConfirm: Locator;
 
-  readonly buttonResetWallet: Locator;
-
   readonly buttonDenyDataCollection: Locator;
 
   readonly buttonNetwork: Locator;
@@ -214,9 +212,9 @@ export default class Wallet {
 
   readonly noFundsBTCMessage: Locator;
 
-  readonly buttonCoinContract: Locator;
+  readonly coinSecondaryButton: Locator;
 
-  readonly coinContractContainer: Locator;
+  readonly coinSecondaryContainer: Locator;
 
   readonly coinContractAddress: Locator;
 
@@ -268,7 +266,7 @@ export default class Wallet {
 
   readonly labelOwnedBy: Locator;
 
-  readonly labelRareSats: Locator;
+  readonly labelBundle: Locator;
 
   readonly buttonSupportRarity: Locator;
 
@@ -385,7 +383,6 @@ export default class Wallet {
     this.buttonMenu = page.getByRole('button', { name: 'Open Header Options' });
     this.buttonLock = page.getByRole('button', { name: 'Lock' });
     this.buttonConfirm = page.getByRole('button', { name: 'Confirm' });
-    this.buttonResetWallet = page.getByRole('button', { name: 'Reset Wallet' });
     this.buttonDenyDataCollection = page.getByRole('button', { name: 'Deny' });
     this.labelBalanceAmountSelector = page.getByTestId('balance-label');
     this.buttonClose = page.getByRole('button', { name: 'Close' });
@@ -438,9 +435,9 @@ export default class Wallet {
 
     // Token
     this.labelCoinTitle = page.getByLabel('Coin Title');
-    this.checkboxToken = page.locator('input[type="checkbox"]');
-    this.checkboxTokenActive = page.locator('input[type="checkbox"]:checked');
-    this.checkboxTokenInactive = page.locator('input[type="checkbox"]:not(:checked)');
+    this.checkboxToken = page.locator('label[role="checkbox"]');
+    this.checkboxTokenActive = page.locator('label[role="checkbox"][aria-checked="true"]');
+    this.checkboxTokenInactive = page.locator('label[role="checkbox"][aria-checked="false"]');
     this.buttonSip10 = page.getByRole('button', { name: 'SIP-10' });
     this.buttonBRC20 = page.getByRole('button', { name: 'BRC-20' });
     this.buttonRunes = page.getByRole('button', { name: 'RUNES' });
@@ -455,14 +452,14 @@ export default class Wallet {
     this.containerTransactionHistory = page.getByTestId('transaction-container');
     this.transactionHistoryAmount = page.getByTestId('transaction-amount');
     this.transactionHistoryInfo = page.getByTestId('transaction-info');
-    this.buttonCoinContract = page.getByTestId('coin-contract-button');
-    this.coinContractContainer = page.getByTestId('coin-contract-container');
+    this.coinSecondaryButton = page.getByTestId('coin-secondary-button');
+    this.coinSecondaryContainer = page.getByTestId('coin-secondary-container');
     this.coinContractAddress = page.getByTestId('coin-contract-address');
     this.textCoinTitle = page.getByTestId('coin-title-text');
 
     // Collectibles
     this.totalItem = page.getByTestId('total-items');
-    this.tabsCollectiblesItems = page.getByTestId('tab-list').locator('li');
+    this.tabsCollectiblesItems = page.getByTestId('tab-list').locator('button');
     this.containerRareSats = page.getByTestId('rareSats-container');
     this.nameInscription = page.getByTestId('inscription-name');
     this.containersCollectibleItem = page.getByTestId('collection-container');
@@ -490,9 +487,9 @@ export default class Wallet {
     this.buttonShare = page.getByRole('button', { name: 'Share' });
     this.buttonReceive = page.getByRole('button', { name: 'Receive', exact: true });
     this.buttonOpenOrdinalViewer = page.getByRole('button', { name: 'Open in Ordinal Viewer' });
+    this.labelBundle = page.locator('h1').filter({ hasText: 'Bundle' });
     this.labelSatsValue = page.locator('h1').filter({ hasText: 'Sats value' });
     this.labelOwnedBy = page.locator('h1').filter({ hasText: 'Owned by' });
-    this.labelRareSats = page.locator('p').filter({ hasText: 'Rare Sats' });
     this.buttonSupportRarity = page.getByRole('button', { name: 'See supported rarity scale' });
     this.numberInscription = page.getByTestId('inscription-number');
     this.numberOrdinal = page.getByTestId('ordinal-number');
@@ -1049,7 +1046,7 @@ export default class Wallet {
           'No active token checkbox found or there are multiple, taking alternative action.',
         );
         // Activate Test rune
-        await this.runeSKIBIDI.locator('div.react-switch-handle').click();
+        await this.runeSKIBIDI.locator('label[role="checkbox"]').click();
       } else {
         console.log('One active token checkbox is present.');
       }
@@ -1100,6 +1097,9 @@ export default class Wallet {
 
     await this.checkTestnetUrls(true);
 
+    // Wait for the network to be switched so that API doesn't fail because of the rate limiting
+    await this.page.waitForTimeout(15000);
+
     await this.buttonSave.click();
     await expect(this.buttonNetwork).toBeVisible({ timeout: 30000 });
     await expect(this.buttonNetwork).toHaveText('NetworkTestnet');
@@ -1118,6 +1118,9 @@ export default class Wallet {
     await expect(this.buttonTestnet.locator('img[alt="tick"]')).toHaveCount(0);
 
     await this.checkTestnetUrls(false);
+
+    // Wait for the network to be switched so that API doesn't fail because of the rate limiting
+    await this.page.waitForTimeout(15000);
 
     await this.buttonSave.click();
     await expect(this.buttonNetwork).toBeVisible({ timeout: 30000 });
@@ -1196,7 +1199,7 @@ export default class Wallet {
     const tokenName = (await chosenToken.getAttribute('data-testid')) || 'default-value';
 
     // Click the switch handle to toggle the token's state
-    await chosenToken.locator('div.react-switch-handle').click();
+    await chosenToken.locator('label[role="checkbox"]').click();
 
     return tokenName;
   }
@@ -1212,7 +1215,7 @@ export default class Wallet {
 
     for (let i = 0; i < count; i++) {
       // Since clicking the switch will change its state, always interact with the first one
-      await actionTokens.first().locator('div.react-switch-handle').click();
+      await actionTokens.first().locator('label[role="checkbox"]').click();
     }
   }
 

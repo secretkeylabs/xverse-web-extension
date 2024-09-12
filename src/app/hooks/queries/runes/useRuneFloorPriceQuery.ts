@@ -5,7 +5,6 @@ import { useCallback } from 'react';
 
 export default function useRuneFloorPriceQuery(runeName: string, backgroundRefetch = true) {
   const { network } = useWalletSelector();
-
   const runesApi = useRunesApi();
   const queryFn = useCallback(
     async () =>

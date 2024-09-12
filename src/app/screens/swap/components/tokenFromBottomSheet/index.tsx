@@ -1,4 +1,5 @@
 import TokenTile from '@components/tokenTile';
+import { getTrackingIdentifier } from '@screens/swap/utils';
 import { AnalyticsEvents, type FungibleToken, type Token } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
@@ -45,7 +46,7 @@ export default function TokenFromBottomSheet({ visible, title, onSelectCoin, onC
                 onPress={() => {
                   onSelectCoin(token);
                   trackMixPanel(AnalyticsEvents.SelectTokenToSwapFrom, {
-                    selectedToken: 'Bitcoin',
+                    selectedToken: 'BTC',
                   });
                   onClose();
                 }}
@@ -61,7 +62,7 @@ export default function TokenFromBottomSheet({ visible, title, onSelectCoin, onC
                 onPress={() => {
                   onSelectCoin(token);
                   trackMixPanel(AnalyticsEvents.SelectTokenToSwapFrom, {
-                    selectedToken: 'Stacks',
+                    selectedToken: 'STX',
                     principal: 'STX',
                   });
                   onClose();
@@ -78,7 +79,7 @@ export default function TokenFromBottomSheet({ visible, title, onSelectCoin, onC
                 onPress={() => {
                   onSelectCoin(token);
                   trackMixPanel(AnalyticsEvents.SelectTokenToSwapFrom, {
-                    selectedToken: token.name,
+                    selectedToken: getTrackingIdentifier(token),
                     principal: token.protocol === 'stacks' ? token.principal : undefined,
                   });
                   onClose();

@@ -51,7 +51,7 @@ export const handleSignPsbt = async (
     id,
     response: makeRPCError(message.id, {
       code: RpcErrorCode.USER_REJECTION,
-      message: 'User rejected request to send transfer',
+      message: 'User rejected request to sign a psbt',
     }),
   });
 

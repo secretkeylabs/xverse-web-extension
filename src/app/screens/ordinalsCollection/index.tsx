@@ -1,6 +1,5 @@
 import AccountHeaderComponent from '@components/accountHeader';
 import { BetterBarLoader } from '@components/barLoader';
-import ActionButton from '@components/button';
 import CollectibleCollectionGridItem from '@components/collectibleCollectionGridItem';
 import CollectibleDetailTile from '@components/collectibleDetailTile';
 import Separator from '@components/separator';
@@ -15,6 +14,7 @@ import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { ArrowLeft } from '@phosphor-icons/react';
 import { GridContainer } from '@screens/nftDashboard/collectiblesTabs';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
+import Button from '@ui-library/button';
 import { StyledHeading, StyledP } from '@ui-library/common.styled';
 import { EMPTY_LABEL } from '@utils/constants';
 import {
@@ -242,12 +242,12 @@ function OrdinalsCollection() {
           </StyledGridContainer>
           {hasNextPage && (
             <LoadMoreButtonContainer>
-              <ActionButton
-                transparent
-                text={t('LOAD_MORE')}
-                processing={isFetchingNextPage}
+              <Button
+                variant="secondary"
+                title={t('LOAD_MORE')}
+                loading={isFetchingNextPage}
                 disabled={isFetchingNextPage}
-                onPress={() => fetchNextPage()}
+                onClick={() => fetchNextPage()}
               />
             </LoadMoreButtonContainer>
           )}

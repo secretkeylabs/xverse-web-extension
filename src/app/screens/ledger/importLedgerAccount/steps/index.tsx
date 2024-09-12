@@ -13,10 +13,10 @@ import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
 import LedgerAssetSelectCard from '@components/ledger/ledgerAssetSelectCard';
 import LedgerInput from '@components/ledger/ledgerInput';
 import { useTranslation } from 'react-i18next';
-import { useTheme } from 'styled-components';
 import LedgerConnectionView from '../../../../components/ledger/connectLedgerView';
 import { ImportLedgerSteps, LedgerLiveOptions } from '../types';
 
+import Toggle from '@ui-library/toggle';
 import {
   AddAccountNameContainer,
   AddAccountNameTitleContainer,
@@ -29,7 +29,6 @@ import {
   CreateAnotherAccountContainer,
   CreateMultipleAccountsText,
   CustomLink,
-  CustomSwitch,
   EndScreenContainer,
   EndScreenTextContainer,
   ImportBeforeStartContainer,
@@ -57,7 +56,7 @@ const LINK_TO_LEDGER_ACCOUNT_ISSUE_GUIDE =
 const LINK_TO_LEDGER_PASSPHRASE_GUIDE =
   'https://support.xverse.app/hc/en-us/articles/17901278165773';
 
-interface Props {
+type Props = {
   isConnectSuccess: boolean;
   isBitcoinSelected: boolean;
   isStacksSelected: boolean;
@@ -68,7 +67,7 @@ interface Props {
   accountName: string;
   accountId: number;
   selectedLedgerLiveOption: LedgerLiveOptions | null;
-  handleAssetSelect: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleAssetSelect: (selectedAsset: 'Bitcoin' | 'Stacks') => void;
   setSelectedLedgerLiveOption: (option: LedgerLiveOptions) => void;
   setIsTogglerChecked: (checked: boolean) => void;
   setAccountName: (name: string) => void;
@@ -84,7 +83,7 @@ interface Props {
     isStxAddressRejected: boolean;
     accountNameError?: string;
   };
-}
+};
 
 function Steps({
   isConnectSuccess,
@@ -105,7 +104,6 @@ function Steps({
   errors,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'LEDGER_IMPORT_SCREEN' });
-  const theme = useTheme();
   const { bitcoinCredentials, ordinalsCredentials, stacksCredentials } = creds;
   const {
     isConnectFailed,
@@ -137,18 +135,18 @@ function Steps({
               icon={btcOrdinalsIcon}
               title={t('LEDGER_IMPORT_2_SELECT.BTC_TITLE')}
               text={t('LEDGER_IMPORT_2_SELECT.BTC_SUBTITLE')}
-              id="btc_select_card"
+              name="Bitcoin"
               isChecked={isBitcoinSelected}
-              onChange={handleAssetSelect}
+              onClick={handleAssetSelect}
             />
 
             <LedgerAssetSelectCard
               icon={stxIcon}
               title={t('LEDGER_IMPORT_2_SELECT.STACKS_TITLE')}
               text={t('LEDGER_IMPORT_2_SELECT.STACKS_SUBTITLE')}
-              id="stx_select_card"
+              name="Stacks"
               isChecked={isStacksSelected}
-              onChange={handleAssetSelect}
+              onClick={handleAssetSelect}
               squareIcon
             />
             <SelectAssetFootNote>{t('LEDGER_IMPORT_2_FOOTNOTE')}</SelectAssetFootNote>
@@ -239,13 +237,9 @@ function Steps({
             </ImportBeforeStartText>
           )}
           <TogglerContainer>
-            <CustomSwitch
-              onColor={theme.colors.orange_main}
-              offColor={theme.colors.background.elevation3}
+            <Toggle
               onChange={() => setIsTogglerChecked(!isTogglerChecked)}
               checked={isTogglerChecked}
-              uncheckedIcon={false}
-              checkedIcon={false}
             />
             {selectedLedgerLiveOption === LedgerLiveOptions.USING ? (
               <TogglerText>

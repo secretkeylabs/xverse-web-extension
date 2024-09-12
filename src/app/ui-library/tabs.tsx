@@ -5,12 +5,13 @@ const TabContainer = styled.div`
   gap: ${(props) => props.theme.space.xxs};
 `;
 
-const TabItem = styled.div<{ $active?: boolean }>`
-  padding: 7px 12px 8px;
-  border-radius: 12px;
+export const TabItem = styled.button<{ $active?: boolean }>`
   ${(props) => props.theme.typography.body_bold_s};
+  padding: ${(props) => props.theme.space.xs} ${(props) => props.theme.space.s};
+  border-radius: 12px;
   color: ${(props) => props.theme.colors.white_200};
   text-transform: uppercase;
+  background-color: transparent;
   cursor: pointer;
   user-select: none;
   transition: color 0.1s ease;
@@ -29,12 +30,13 @@ const TabItem = styled.div<{ $active?: boolean }>`
         `}
 `;
 
-interface TabProps<T> {
+type TabProps<T> = {
   tabs: { label: string; value: T }[];
   activeTab: T;
   onTabClick: (value: T) => void;
   className?: string;
-}
+};
+
 function Tabs<T extends unknown>({ tabs, activeTab, onTabClick, className }: TabProps<T>) {
   return (
     <TabContainer className={className}>

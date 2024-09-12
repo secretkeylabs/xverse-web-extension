@@ -14,6 +14,7 @@ import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useHasFeature from '@hooks/useHasFeature';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { getTrackingIdentifier, isMotherToken } from '@screens/swap/utils';
 import {
   AnalyticsEvents,
   FeatureId,
@@ -182,12 +183,8 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
       return;
     }
     trackMixPanel(AnalyticsEvents.InitiateSwapFlow, {
-      selectedToken: fungibleToken ? fungibleToken.name : currency,
-      principal: fungibleToken
-        ? fungibleToken?.principal
-        : currency === 'STX'
-        ? currency
-        : undefined,
+      selectedToken: fungibleToken ? getTrackingIdentifier(fungibleToken) : currency,
+      principal: isMotherToken(fungibleToken) ? getTrackingIdentifier(fungibleToken) : undefined,
     });
     navigate(`/swap?from=${fungibleToken ? fungibleToken.principal : currency}`);
   };

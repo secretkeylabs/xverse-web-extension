@@ -1,7 +1,7 @@
 import SlippageEditIcon from '@assets/img/swap/slippageEdit.svg';
 import TopRow from '@components/topRow';
 import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery';
-import { useGetSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
+import useGetSip10TokenInfo from '@hooks/queries/stx/useGetSip10TokenInfo';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useSearchParamsState from '@hooks/useSearchParamsState';
@@ -31,9 +31,8 @@ import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
 import trackSwapMixPanel from '../mixpanel';
 import QuoteTile from '../quotesModal/quoteTile';
-import { SlippageModalContent } from '../slippageModal';
+import SlippageModalContent from '../slippageModal';
 import type { OrderInfo, StxOrderInfo } from '../types';
-import { useStxCurrencyConversion } from '../useStxCurrencyConversion';
 import {
   BAD_QUOTE_PERCENTAGE,
   isRunesTx,
@@ -172,7 +171,7 @@ export default function QuoteSummary({
   selectedIdentifiers,
 }: QuoteSummaryProps) {
   const { t } = useTranslation('translation');
-  const { data: sip10CoinsList } = useGetSip10FungibleTokens();
+  const { tokenInfo: toTokenInfo } = useGetSip10TokenInfo(toToken?.ticker);
   const theme = useTheme();
   const { btcFiatRate, btcUsdRate, stxBtcRate } = useCoinRates();
   const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey, stxAddress, stxPublicKey } =
@@ -259,7 +258,7 @@ export default function QuoteSummary({
       btcUsdRate,
       runeFloorPrice,
       stxBtcRate,
-      sip10CoinsList,
+      toTokenInfo,
     });
 
     if (selectedIdentifiers) {
@@ -339,7 +338,9 @@ export default function QuoteSummary({
         new BigNumber(btcFiatRate),
       ).toFixed(2);
     }
-    return new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2);
+    return fromToken?.tokenFiatRate
+      ? new BigNumber(fromToken?.tokenFiatRate).multipliedBy(amount).toFixed(2)
+      : '--';
   })();
 
   const toTokenFiatValue = (() => {
@@ -362,11 +363,10 @@ export default function QuoteSummary({
         new BigNumber(btcFiatRate),
       ).toFixed(2);
     }
-    return new BigNumber(
-      sip10CoinsList?.find((s) => s.principal === toToken?.ticker)?.tokenFiatRate ?? 0,
-    )
-      .multipliedBy(quote.receiveAmount)
-      .toFixed(2);
+    if (!toTokenInfo?.tokenFiatRate) {
+      return '--';
+    }
+    return new BigNumber(toTokenInfo?.tokenFiatRate).multipliedBy(quote.receiveAmount).toFixed(2);
   })();
 
   const showBadQuoteWarning =
@@ -437,7 +437,7 @@ export default function QuoteSummary({
                   ? fromToken?.assetName
                   : fromToken?.name
               }
-              subtitleColor="white_400"
+              subtitleColorOverride="white_400"
               unit={fromUnit}
               fiatValue={fromTokenFiatValue}
             />
@@ -464,7 +464,7 @@ export default function QuoteSummary({
                     : undefined,
               }}
               subtitle={toToken?.protocol === 'btc' ? 'Bitcoin' : toToken?.name}
-              subtitleColor="white_400"
+              subtitleColorOverride="white_400"
               unit={toUnit}
               fiatValue={toTokenFiatValue}
             />
@@ -484,7 +484,7 @@ export default function QuoteSummary({
                   {showSlippageWarning && (
                     <WarningOctagon weight="fill" color={theme.colors.caution} size={16} />
                   )}
-                  {slippage * 100}%
+                  {formatNumber(slippage * 100)}%
                   <img alt={t('SLIPPAGE')} src={SlippageEditIcon} />
                 </SlippageButton>
               </ListingDescriptionRow>
@@ -529,7 +529,7 @@ export default function QuoteSummary({
                 </RouteContainer>
               </StyledP>
             </ListingDescriptionRow>
-            {isRunesTx({ toToken }) && (
+            {fromToken && toToken && isRunesTx({ fromToken, toToken }) && (
               <ListingDescriptionRow>
                 <StyledP typography="body_medium_m" color="white_200">
                   {t('TRANSACTION_SETTING.FEE_RATE')}

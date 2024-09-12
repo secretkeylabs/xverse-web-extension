@@ -10,6 +10,7 @@ const StyledButton = styled.button`
   gap: ${(props) => props.theme.space.xs};
   background-color: transparent;
   color: ${(props) => props.theme.colors.white_0};
+  transition: color 0.1s ease;
   :hover:enabled {
     color: ${(props) => props.theme.colors.white_200};
   }

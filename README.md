@@ -4,7 +4,7 @@
 
 ### Procedures
 
-1. Check if your [Node.js](https://nodejs.org/) version is >= **14**.
+1. Check if your [Node.js](https://nodejs.org/) version is >= **18**.
 2. Clone this repository.
 3. Make sure you're logged in to the @secretkeylabs scope on the GitHub NPM package registry. See the [Guide](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#authenticating-with-a-personal-access-token)
    1. Create a GitHub personal access token (classic)
@@ -31,31 +31,4 @@ make or pull your local changes to xverse-core, then:
 ```
 cd ../xverse-core && npm i && npm run build:esm && \
 cd $OLDPWD && npm i --legacy-peer-deps @secretkeylabs/xverse-core@../xverse-core && npm start
-```
-
-### Run E2E Tests
-
-Our End-to-end (E2E) test suite is build with Playwright.
-To run the whole E2E test suite, run:
-
-```
-npm run e2etest
-```
-
-If you only want to run the smoke test suite, run
-
-```
-npm run e2etest:smoketest
-```
-
-If you want to run the e2e test in UI Mode:
-
-```
-npm run e2etest:ui
-```
-
-To generate test report, run:
-
-```
-npm run e2etest:report
 ```

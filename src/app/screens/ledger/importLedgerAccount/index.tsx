@@ -383,8 +383,8 @@ function ImportLedger(): JSX.Element {
     setCurrentStep(ImportLedgerSteps.START);
   };
 
-  const handleAssetSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.id === 'stx_select_card') {
+  const handleAssetSelect = (selectedAsset: 'Bitcoin' | 'Stacks') => {
+    if (selectedAsset === 'Stacks') {
       setIsStacksSelected(!isStacksSelected);
     }
   };
