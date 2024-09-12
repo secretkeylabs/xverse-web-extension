@@ -108,13 +108,11 @@ export const isRunesTx = ({
   fromToken,
   toToken,
 }: {
-  fromToken?: FungibleToken;
-  toToken?: Token;
+  fromToken: FungibleToken;
+  toToken: Token;
 }): boolean =>
-  fromToken?.protocol === 'runes' ||
-  fromToken?.principal === 'BTC' ||
-  toToken?.protocol === 'runes' ||
-  toToken?.ticker === 'BTC';
+  (fromToken?.protocol === 'runes' || toToken?.protocol === 'runes') &&
+  (fromToken?.principal === 'BTC' || toToken?.ticker === 'BTC');
 
 export const isStxTx = ({
   fromToken,
@@ -127,3 +125,18 @@ export const isStxTx = ({
   fromToken?.principal === 'STX' ||
   toToken?.protocol === 'sip10' ||
   toToken?.ticker === 'STX';
+
+const getIdentifier = (token?: Token | FungibleToken) => {
+  if (!token) return '';
+  return 'principal' in token ? token.principal : token.ticker;
+};
+
+export const isMotherToken = (token?: Token | FungibleToken) => {
+  const identifier = getIdentifier(token);
+  return identifier === 'BTC' || identifier === 'STX';
+};
+
+export const getTrackingIdentifier = (token?: Token | FungibleToken) => {
+  const identifier = getIdentifier(token);
+  return isMotherToken(token) ? identifier : token?.name ?? identifier;
+};

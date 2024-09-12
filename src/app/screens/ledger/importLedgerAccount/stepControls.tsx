@@ -3,10 +3,10 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { ImportLedgerSteps } from './types';
 
-const ButtonContainer = styled.div((props) => ({
-  marginLeft: 3,
-  marginRight: 3,
-  marginTop: props.theme.space.xs,
+const VerticalButtonContainer = styled.div((props) => ({
+  display: 'flex',
+  gap: props.theme.space.s,
+  flexDirection: 'column',
   width: '100%',
 }));
 
@@ -100,25 +100,21 @@ function StepControls({
       );
     case ImportLedgerSteps.ADD_MULTIPLE_ACCOUNTS:
       return (
-        <>
-          <ButtonContainer>
-            <Button
-              disabled={isButtonDisabled}
-              loading={isButtonDisabled}
-              onClick={backToAssetSelection}
-              variant="secondary"
-              title={t('LEDGER_IMPORT_CANCEL_BUTTON')}
-            />
-          </ButtonContainer>
-          <ButtonContainer>
-            <Button
-              disabled={isButtonDisabled}
-              loading={isButtonDisabled}
-              onClick={handleClickMultipleAccounts}
-              title={t('LEDGER_IMPORT_YES_BUTTON')}
-            />
-          </ButtonContainer>
-        </>
+        <VerticalButtonContainer>
+          <Button
+            disabled={isButtonDisabled}
+            loading={isButtonDisabled}
+            onClick={handleClickMultipleAccounts}
+            title={t('LEDGER_IMPORT_YES_BUTTON')}
+          />
+          <Button
+            disabled={isButtonDisabled}
+            loading={isButtonDisabled}
+            onClick={backToAssetSelection}
+            variant="secondary"
+            title={t('LEDGER_IMPORT_CANCEL_BUTTON')}
+          />
+        </VerticalButtonContainer>
       );
     case ImportLedgerSteps.ADD_ADDRESS:
     case ImportLedgerSteps.ADD_ORDINALS_ADDRESS:

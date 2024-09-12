@@ -2,6 +2,7 @@ import {
   getBtcFiatEquivalent,
   getStxFiatEquivalent,
   stxToMicrostacks,
+  type Coin,
   type FungibleToken,
   type Provider,
   type Quote,
@@ -9,7 +10,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
-import { isRunesTx } from './utils';
+import { getTrackingIdentifier, isRunesTx } from './utils';
 
 function trackSwapMixPanel(
   eventName,
@@ -22,7 +23,7 @@ function trackSwapMixPanel(
     btcUsdRate,
     runeFloorPrice,
     stxBtcRate,
-    sip10CoinsList,
+    toTokenInfo,
   }: {
     provider?: Provider;
     fromToken?: FungibleToken;
@@ -32,7 +33,7 @@ function trackSwapMixPanel(
     btcUsdRate: string;
     runeFloorPrice?: number;
     stxBtcRate?: string;
-    sip10CoinsList?: any;
+    toTokenInfo?: Coin;
   },
 ) {
   let fromAmount;
@@ -41,10 +42,10 @@ function trackSwapMixPanel(
   let fromPrincipal;
   let toPrincipal;
 
-  const from = fromToken?.name;
-  const to = toToken?.name ?? toToken?.ticker;
+  const from = getTrackingIdentifier(fromToken);
+  const to = getTrackingIdentifier(toToken);
 
-  if (isRunesTx({ fromToken, toToken })) {
+  if (fromToken && toToken && isRunesTx({ fromToken, toToken })) {
     fromAmount =
       fromToken?.principal === 'BTC'
         ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcUsdRate)).toFixed(2)
@@ -70,7 +71,9 @@ function trackSwapMixPanel(
             new BigNumber(stxBtcRate),
             new BigNumber(btcUsdRate),
           ).toFixed(2)
-        : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2);
+        : fromToken?.tokenFiatRate
+        ? new BigNumber(fromToken?.tokenFiatRate).multipliedBy(amount).toFixed(2)
+        : '--';
 
     receiveAmount = quote?.receiveAmount ? new BigNumber(quote?.receiveAmount) : undefined;
     if (receiveAmount) {
@@ -81,11 +84,9 @@ function trackSwapMixPanel(
               new BigNumber(stxBtcRate),
               new BigNumber(btcUsdRate),
             ).toFixed(2)
-          : new BigNumber(
-              sip10CoinsList?.find((s) => s.principal === toToken?.ticker)?.tokenFiatRate ?? 0,
-            )
-              .multipliedBy(receiveAmount)
-              .toFixed(2);
+          : toTokenInfo?.tokenFiatRate
+          ? new BigNumber(toTokenInfo?.tokenFiatRate).multipliedBy(receiveAmount).toFixed(2)
+          : '--';
     }
   }
 

@@ -178,7 +178,7 @@ export default function TokenToBottomSheet({
                   onPress={() => {
                     onSelectCoin(token);
                     trackMixPanel(AnalyticsEvents.SelectTokenToSwapTo, {
-                      selectedToken: 'Bitcoin',
+                      selectedToken: 'BTC',
                     });
                     handleClose();
                   }}
@@ -195,7 +195,7 @@ export default function TokenToBottomSheet({
                   onPress={() => {
                     onSelectCoin(token);
                     trackMixPanel(AnalyticsEvents.SelectTokenToSwapTo, {
-                      selectedToken: 'Stacks',
+                      selectedToken: 'STX',
                       principal: 'STX',
                     });
                     handleClose();
