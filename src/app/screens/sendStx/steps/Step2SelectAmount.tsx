@@ -6,7 +6,7 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   buf2hex,
-  estimateStacksTransaction,
+  estimateStacksTransactionWithFallback,
   generateUnsignedStxTokenTransferTransaction,
   generateUnsignedTransaction,
   getStxFiatEquivalent,
@@ -206,8 +206,8 @@ function Step2SelectAmount({
     const fetchStxFees = async () => {
       try {
         const unsignedTx: StacksTransaction = deserializeTransaction(unsignedSendStxTx);
-        const [low, medium, high] = await estimateStacksTransaction(
-          unsignedTx.payload,
+        const [low, medium, high] = await estimateStacksTransactionWithFallback(
+          unsignedTx,
           selectedNetwork,
         );
 

@@ -15,7 +15,7 @@ import Transport from '@ledgerhq/hw-transport-webusb';
 import { FadersHorizontal } from '@phosphor-icons/react';
 import type { StacksTransaction } from '@secretkeylabs/xverse-core';
 import {
-  estimateStacksTransaction,
+  estimateStacksTransactionWithFallback,
   getNonce,
   getStxFiatEquivalent,
   microstacksToStx,
@@ -129,8 +129,8 @@ function ConfirmStxTransactionComponent({
     const fetchStxFees = async () => {
       try {
         setFeesLoading(true);
-        const [low, medium, high] = await estimateStacksTransaction(
-          initialStxTransactions[0].payload,
+        const [low, medium, high] = await estimateStacksTransactionWithFallback(
+          initialStxTransactions[0],
           selectedNetwork,
         );
 

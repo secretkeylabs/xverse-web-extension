@@ -1,6 +1,6 @@
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import {
-  estimateStacksTransaction,
+  estimateStacksTransactionWithFallback,
   mempoolApi,
   microstacksToStx,
   rbf,
@@ -138,8 +138,8 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
       const txRaw: string = await getRawTransaction(transaction.txid, network);
       const unsignedTx: StacksTransaction = deserializeTransaction(txRaw);
 
-      const [slow, medium, high] = await estimateStacksTransaction(
-        unsignedTx.payload,
+      const [slow, medium, high] = await estimateStacksTransactionWithFallback(
+        unsignedTx,
         selectedNetwork,
       );
 
