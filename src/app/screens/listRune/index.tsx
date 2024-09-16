@@ -143,7 +143,7 @@ export default function ListRuneScreen() {
     signPsbtPayload,
     loading: psbtLoading,
     error: psbtError,
-  } = useRuneSellPsbtPerMarketplace(selectedRune?.name ?? '', listItemsMap, [
+  } = useRuneSellPsbtPerMarketplace(selectedRune as FungibleToken, listItemsMap, [
     ...selectedMarketplaces,
   ]);
 
@@ -294,6 +294,7 @@ export default function ListRuneScreen() {
       navigate(`${RequestsRoutes.SignBatchBtcTx}?signBatchPsbtsInApp=true`, {
         state: {
           payload: signPsbtPayload,
+          utxos: listItemsMap,
           minPriceSats: Math.min(...Object.values(listItemsMap).map((item) => item.priceSats)),
           selectedRune,
         },

@@ -2,6 +2,7 @@ import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types'
 import useWalletSelector from '@hooks/useWalletSelector';
 import type { SignMultiplePsbtPayload, SignMultipleTransactionOptions } from '@sats-connect/core';
 import { signPsbt, type InputToSign } from '@secretkeylabs/xverse-core';
+import type { RuneItem } from '@utils/runes';
 import { decodeToken } from 'jsontokens';
 import { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -70,6 +71,7 @@ const useSignBatchPsbtTx = () => {
     cancelSignPsbt,
     selectedRune: locationState.selectedRune,
     minPriceSats: locationState.minPriceSats,
+    utxos: locationState.utxos as Record<string, RuneItem>,
   };
 };
 

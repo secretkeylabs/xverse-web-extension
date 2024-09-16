@@ -21,7 +21,7 @@ export default function useRuneUtxosQueryPerMarketplace(
       address: ordinalsAddress,
       rune: {
         name: rune.name,
-        id: rune.ticker || '',
+        id: rune.principal,
       },
     });
 
