@@ -130,7 +130,7 @@ jobs:
   publish-rc:
     # TODO also keep the develop PR description up to date
     if: ${{ github.base_ref == 'main' }}
-    needs: [UItest]
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: write
