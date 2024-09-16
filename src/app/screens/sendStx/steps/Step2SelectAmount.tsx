@@ -6,6 +6,7 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   buf2hex,
+  estimateStacksTransaction,
   generateUnsignedStxTokenTransferTransaction,
   generateUnsignedTransaction,
   getStxFiatEquivalent,
@@ -14,7 +15,7 @@ import {
   type FungibleToken,
   type StacksTransaction,
 } from '@secretkeylabs/xverse-core';
-import { deserializeTransaction, estimateTransaction } from '@stacks/transactions';
+import { deserializeTransaction } from '@stacks/transactions';
 import SelectFeeRate, { type FeeRates } from '@ui-components/selectFeeRate';
 import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
@@ -205,9 +206,8 @@ function Step2SelectAmount({
     const fetchStxFees = async () => {
       try {
         const unsignedTx: StacksTransaction = deserializeTransaction(unsignedSendStxTx);
-        const [low, medium, high] = await estimateTransaction(
+        const [low, medium, high] = await estimateStacksTransaction(
           unsignedTx.payload,
-          undefined,
           selectedNetwork,
         );
 

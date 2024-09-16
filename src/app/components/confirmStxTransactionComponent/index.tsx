@@ -15,6 +15,7 @@ import Transport from '@ledgerhq/hw-transport-webusb';
 import { FadersHorizontal } from '@phosphor-icons/react';
 import type { StacksTransaction } from '@secretkeylabs/xverse-core';
 import {
+  estimateStacksTransaction,
   getNonce,
   getStxFiatEquivalent,
   microstacksToStx,
@@ -24,7 +25,7 @@ import {
   signTransaction,
   stxToMicrostacks,
 } from '@secretkeylabs/xverse-core';
-import { estimateTransaction, PostConditionMode } from '@stacks/transactions';
+import { PostConditionMode } from '@stacks/transactions';
 import SelectFeeRate from '@ui-components/selectFeeRate';
 import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
@@ -128,9 +129,8 @@ function ConfirmStxTransactionComponent({
     const fetchStxFees = async () => {
       try {
         setFeesLoading(true);
-        const [low, medium, high] = await estimateTransaction(
+        const [low, medium, high] = await estimateStacksTransaction(
           initialStxTransactions[0].payload,
-          undefined,
           selectedNetwork,
         );
 
