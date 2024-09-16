@@ -6,7 +6,10 @@ const STXTest = `STN2AMZQ54Y0NN4H5Z4S0DGMWP27CTXY5QEDCQAN`;
 
 const amountSTXSend = 10;
 test.describe('Transaction STX', () => {
-  test('Send STX Page Visual Check without funds Mainnet', async ({ page, extensionId }) => {
+  test('Send STX Page Visual Check with insufficient funds Mainnet', async ({
+    page,
+    extensionId,
+  }) => {
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
@@ -42,11 +45,12 @@ test.describe('Transaction STX', () => {
     // No funds on mainnet in this wallet -->Page opens and Next button is hidden and info message is shown
     await expect(wallet.buttonNext).toBeHidden();
     // Amount input is visible
-    await expect(wallet.inputField.first()).toBeVisible();
-    await expect(wallet.inputField.first()).toBeEnabled();
+    await expect(page.getByRole('textbox', { name: '0' })).toBeVisible();
+    await expect(page.getByRole('textbox', { name: '0' })).toBeEnabled();
     await expect(wallet.labelBalanceAmountSelector).toBeVisible();
     await expect(wallet.imageToken).toBeVisible();
-    await expect(wallet.noFundsBTCMessage).toBeVisible();
+    page.getByRole('textbox', { name: '0' }).fill('200000000');
+    await expect(page.getByRole('button', { name: /insufficient funds/i })).toBeVisible();
   });
 
   test('Send STX - Cancel transaction testnet', async ({ page, extensionId }) => {

@@ -3,7 +3,7 @@ import RequestsRoutes from '@common/utils/route-urls';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery';
-import { useGetSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
+import useGetSip10TokenInfo from '@hooks/queries/stx/useGetSip10TokenInfo';
 import useGetQuotes from '@hooks/queries/swaps/useGetQuotes';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useCoinRates from '@hooks/queries/useCoinRates';
@@ -48,6 +48,7 @@ import QuotesModal from './quotesModal';
 import type { OrderInfo, Side, StxOrderInfo } from './types';
 import useMasterCoinsList from './useMasterCoinsList';
 import {
+  getTrackingIdentifier,
   isStxTx,
   mapFTNativeSwapTokenToTokenBasic,
   mapFTProtocolToSwapProtocol,
@@ -138,7 +139,7 @@ export default function SwapScreen() {
   const { quotes, loading: quotesLoading, error: quotesError, fetchQuotes } = useGetQuotes();
   const { data: runeFloorPrice } = useRuneFloorPriceQuery(toToken?.name ?? '');
   const coinsMasterList = useMasterCoinsList();
-  const { data: sip10CoinsList } = useGetSip10FungibleTokens();
+  const { tokenInfo: toTokenInfo } = useGetSip10TokenInfo(toToken?.ticker);
 
   useEffect(() => {
     if (defaultFrom) {
@@ -177,12 +178,12 @@ export default function SwapScreen() {
     trackSwapMixPanel(AnalyticsEvents.FetchSwapQuote, {
       fromToken,
       toToken,
-      amount: fromToken?.principal === 'BTC' ? btcToSats(new BigNumber(amount)).toString() : amount,
+      amount: amountForQuote,
       quote,
       btcUsdRate,
       runeFloorPrice,
       stxBtcRate,
-      sip10CoinsList,
+      toTokenInfo,
     });
 
     fetchQuotes({
@@ -302,7 +303,7 @@ export default function SwapScreen() {
     }
 
     if (!fromToken?.tokenFiatRate || !fromToken.decimals) {
-      return '0.00';
+      return '--';
     }
 
     const rate = new BigNumber(fromToken.tokenFiatRate);
@@ -360,8 +361,8 @@ export default function SwapScreen() {
 
     trackMixPanel(AnalyticsEvents.SelectSwapQuote, {
       provider: provider.provider.name,
-      from: fromToken.name,
-      to: toToken.name ?? toToken.ticker,
+      from: getTrackingIdentifier(fromToken),
+      to: getTrackingIdentifier(toToken),
       fromPrincipal: isStxTx({ fromToken, toToken }) ? fromToken.principal : undefined,
       toPrincipal: isStxTx({ fromToken, toToken }) ? toToken.ticker : undefined,
     });
@@ -395,12 +396,12 @@ export default function SwapScreen() {
       provider,
       fromToken,
       toToken,
-      amount,
+      amount: amountForQuote,
       quote,
       btcUsdRate,
       runeFloorPrice,
       stxBtcRate,
-      sip10CoinsList,
+      toTokenInfo,
     });
   };
 

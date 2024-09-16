@@ -11,7 +11,7 @@ test.describe('Swap Flow ME', () => {
   const marketplace = 'Magic Eden';
   const token = 'THE•MONEY•BEES';
 
-  test('Cancel swap token via ME', async ({ page, extensionId }) => {
+  test('Cancel swap token via ME #localexecution', async ({ page, extensionId }) => {
     // Restore wallet
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
