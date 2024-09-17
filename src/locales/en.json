@@ -1383,7 +1383,7 @@
     "SELECT_BUNDLES": "Select bundles to proceed with the swap",
     "SWAP_FROM": "Swap from",
     "SWAP_TO": "Swap to",
-    "LIST_YOUR_RUNES": "List your Runes on Magic Eden",
+    "LIST_YOUR_RUNES": "List your Runes on a marketplace",
     "SLIPPAGE_WARNING": "Your transaction may be frontrun and result in an unfavorable trade",
     "BAD_QUOTE_WARNING_TITLE": "The quote you are receiving may result in significant value loss.",
     "BAD_QUOTE_WARNING_DESC": "The minimum amount you will receive will result in a loss of over {{percentage}}% of your trade’s value. This is due to low liquidity in the pool, causing discrepancies in pricing. Please review the details carefully before proceeding with the swap."
