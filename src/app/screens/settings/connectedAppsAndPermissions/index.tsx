@@ -1,4 +1,6 @@
+import { dispatchEventToOrigin } from '@common/utils/messages/extensionToContentScript/dispatchEvent';
 import { usePermissionsStore, usePermissionsUtils } from '@components/permissionsManager';
+import type { Client } from '@components/permissionsManager/schemas';
 import * as utils from '@components/permissionsManager/utils';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
@@ -27,6 +29,17 @@ function ConnectedAppsAndPermissionsScreen() {
     navigate('/settings');
   }, [navigate]);
 
+  const handleDisconnect = useCallback(
+    async (client: Client) => {
+      // TODO: Handle error state in UI when designs are finalized.
+      await removeClient(client.id);
+      dispatchEventToOrigin(client.origin, {
+        type: 'disconnect',
+      });
+    },
+    [removeClient],
+  );
+
   if (!store) {
     return null;
   }
@@ -44,7 +57,7 @@ function ConnectedAppsAndPermissionsScreen() {
               <Button
                 type="button"
                 onClick={() => {
-                  removeClient(client.id);
+                  handleDisconnect(client);
                 }}
               >
                 Disconnect

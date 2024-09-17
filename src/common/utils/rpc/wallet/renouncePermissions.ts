@@ -1,5 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { getTabIdFromPort } from '@common/utils';
+import { dispatchEventToOrigin } from '@common/utils/messages/extensionToContentScript/dispatchEvent';
 import { makeContext } from '@common/utils/popup';
 import * as utils from '@components/permissionsManager/utils';
 import {
@@ -37,6 +38,10 @@ export const handleRenouncePermissions = async (
   await utils.permissionsStoreMutex.runExclusive(async () => {
     utils.removeClient(store.clients, store.permissions, origin);
     utils.savePermissionsStore(store);
+  });
+
+  dispatchEventToOrigin(origin, {
+    type: 'disconnect',
   });
 
   sendRenouncePermissionsSuccessResponseMessage({
