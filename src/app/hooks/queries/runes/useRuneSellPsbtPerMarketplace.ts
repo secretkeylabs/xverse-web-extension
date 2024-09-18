@@ -2,12 +2,14 @@ import useXverseApi from '@hooks/apiClients/useXverseApi';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { BitcoinNetworkType } from '@sats-connect/core';
-import type {
-  CreateRuneListingRequest,
-  FungibleToken,
-  Marketplace,
+import {
+  AnalyticsEvents,
+  type CreateRuneListingRequest,
+  type FungibleToken,
+  type Marketplace,
 } from '@secretkeylabs/xverse-core';
 import { sanitizeRuneName } from '@utils/helper';
+import { trackMixPanel } from '@utils/mixpanel';
 import type { RuneItem } from '@utils/runes';
 import { useCallback, useState } from 'react';
 
@@ -66,6 +68,16 @@ const useRuneSellPsbtPerMarketplace = (
             batchAuctionId: order.batchAuctionId,
           })),
         };
+
+        trackMixPanel(AnalyticsEvents.ListRuneInitiated, {
+          marketplaces: selectedMarketplaces,
+          from: rune.name,
+          to: 'BTC',
+          runeTotalAmount: Object.values(listingUtxos)
+            .map((i) => i.amount)
+            .reduce((a, b) => a + b, 0),
+          priceInSatsPerRune: Object.values(listingUtxos)[0].priceSats,
+        });
 
         setSignPsbtPayload(payload);
       })
