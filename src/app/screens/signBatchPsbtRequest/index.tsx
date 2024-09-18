@@ -17,7 +17,9 @@ import InfoContainer from '@components/infoContainer';
 import LoadingTransactionStatus from '@components/loadingTransactionStatus';
 import type { ConfirmationStatus } from '@components/loadingTransactionStatus/circularSvgAnimation';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
+import useXverseApi from '@hooks/apiClients/useXverseApi';
 import useHasFeature from '@hooks/useHasFeature';
+import useSearchParamsState from '@hooks/useSearchParamsState';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useSignBatchPsbtTx from '@hooks/useSignBatchPsbtTx';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
@@ -25,6 +27,7 @@ import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowLeft, ArrowRight } from '@phosphor-icons/react';
 import type { SignMultiplePsbtPayload } from '@sats-connect/core';
+import { SigHash } from '@scure/btc-signer';
 import {
   AnalyticsEvents,
   FeatureId,
@@ -37,6 +40,7 @@ import Callout from '@ui-library/callout';
 import Spinner from '@ui-library/spinner';
 import { isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
+import objecthash from 'object-hash';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -57,17 +61,20 @@ import {
 interface TxResponse {
   txId: string;
   psbtBase64: string;
+  marketplaceName?: string;
+  batchAuctionId?: string;
 }
 
 type PsbtSummary = btcTransaction.PsbtSummary;
 type ParsedPsbt = { summary: PsbtSummary; runeSummary: RuneSummary | undefined };
-
 function SignBatchPsbtRequest() {
+  const [inApp] = useSearchParamsState('signBatchPsbtsInApp', false);
   const selectedAccount = useSelectedAccount();
   const { network } = useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const { payload, confirmSignPsbt, cancelSignPsbt, requestToken } = useSignBatchPsbtTx();
+  const { payload, confirmSignPsbt, cancelSignPsbt, requestToken, selectedRune, minPriceSats } =
+    useSignBatchPsbtTx();
   const [isSigning, setIsSigning] = useState(false);
   const [isSigningComplete, setIsSigningComplete] = useState(false);
   const [signingPsbtIndex, setSigningPsbtIndex] = useState(1);
@@ -84,6 +91,7 @@ function SignBatchPsbtRequest() {
   const hasRunesSupport = useHasFeature(FeatureId.RUNES_SUPPORT);
   useTrackMixPanelPageViewed();
   const [parsedPsbts, setParsedPsbts] = useState<ParsedPsbt[]>([]);
+  const xverseApi = useXverseApi();
 
   const individualParsedTxSummaryContext = useMemo(
     () => ({
@@ -190,7 +198,7 @@ function SignBatchPsbtRequest() {
       });
     }
 
-    payload.psbts.forEach((psbt) => psbt.inputsToSign.forEach(checkAddressMismatch));
+    payload.psbts?.forEach((psbt) => psbt.inputsToSign?.forEach(checkAddressMismatch));
   };
 
   useEffect(() => {
@@ -211,10 +219,30 @@ function SignBatchPsbtRequest() {
         // eslint-disable-next-line no-await-in-loop
         await delay(100);
         // eslint-disable-next-line no-await-in-loop
-        const signedPsbt = await confirmSignPsbt(psbt);
+        const enhancedPsbt = new btcTransaction.EnhancedPsbt(txnContext, psbt.psbtBase64);
+
+        let txId: string;
+        let psbtBase64: string;
+        if (inApp) {
+          txId = '';
+          psbtBase64 = await enhancedPsbt.getSignedPsbtBase64({
+            finalize: false,
+            ledgerTransport: undefined,
+            allowedSigHash:
+              psbt.marketplaceName === 'Magic Eden' ? [SigHash.SINGLE_ANYONECANPAY] : undefined,
+          });
+        } else {
+          const signedPsbt = await confirmSignPsbt(psbt);
+
+          txId = signedPsbt.txId;
+          psbtBase64 = signedPsbt.signingResponse;
+        }
+
         signedPsbts.push({
-          txId: signedPsbt.txId,
-          psbtBase64: signedPsbt.signingResponse,
+          txId,
+          psbtBase64,
+          marketplaceName: psbt.marketplaceName,
+          batchAuctionId: psbt.batchAuctionId,
         });
         if (payload.psbts.findIndex((item) => item === psbt) !== payload.psbts.length - 1) {
           setSigningPsbtIndex((prevIndex) => prevIndex + 1);
@@ -229,16 +257,58 @@ function SignBatchPsbtRequest() {
       setIsSigningComplete(true);
       setIsSigning(false);
 
-      const signingMessage = {
-        source: MESSAGE_SOURCE,
-        method: SatsConnectMethods.signBatchPsbtResponse,
-        payload: {
-          signBatchPsbtRequest: requestToken,
-          signBatchPsbtResponse: signedPsbts,
-        },
-      };
+      if (inApp) {
+        const expiresAt = new Date();
+        expiresAt.setDate(expiresAt.getDate() + 10); // 10 days from now
 
-      chrome.tabs.sendMessage(+tabId, signingMessage);
+        await xverseApi.listings
+          .submitRuneSellOrder(
+            signedPsbts.map((psbt) => ({
+              psbtBase64: psbt.psbtBase64,
+              marketplaceName: psbt.marketplaceName as string,
+              batchAuctionId: psbt.batchAuctionId,
+              ordinalsPublicKey: selectedAccount.ordinalsPublicKey,
+              ordinalsAddress: selectedAccount.ordinalsAddress,
+              btcAddress: selectedAccount.btcAddress,
+              rune: {
+                name: selectedRune?.assetName ?? '',
+                id: selectedRune?.principal ?? '',
+              },
+              expiresAt: expiresAt.toISOString(),
+            })),
+          )
+          .then((res) => {
+            if (res) {
+              navigate('/tx-status', {
+                state: {
+                  runeListed: selectedRune,
+                  orders: res,
+                  minPriceSats,
+                },
+              });
+            }
+          })
+          .catch((_) => {
+            navigate('/tx-status', {
+              state: {
+                txid: '',
+                error: '',
+                browserTx: true,
+              },
+            });
+          });
+      } else {
+        const signingMessage = {
+          source: MESSAGE_SOURCE,
+          method: SatsConnectMethods.signBatchPsbtResponse,
+          payload: {
+            signBatchPsbtRequest: requestToken,
+            signBatchPsbtResponse: signedPsbts,
+          },
+        };
+
+        chrome.tabs.sendMessage(+tabId, signingMessage);
+      }
     } catch (err) {
       setIsSigning(false);
       setIsSigningComplete(false);
@@ -273,10 +343,20 @@ function SignBatchPsbtRequest() {
 
   const signingStatus: ConfirmationStatus = isSigningComplete ? 'SUCCESS' : 'LOADING';
   const runeBurns = parsedPsbts.map((psbt) => psbt.runeSummary?.burns ?? []).flat();
+  const distinctRuneDelegations = new Set();
   const runeDelegations = parsedPsbts
     .filter((psbt) => !psbt.summary.isFinal)
     .map((psbt) => psbt.runeSummary?.receipts ?? [])
-    .flat();
+    .flat()
+    .filter((delegation) => {
+      const key = objecthash(delegation);
+      if (distinctRuneDelegations.has(key)) {
+        return false;
+      }
+
+      distinctRuneDelegations.add(key);
+      return true;
+    });
   const hasSomeRuneDelegation = runeDelegations.length > 0;
 
   if (isSigning || isSigningComplete) {

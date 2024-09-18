@@ -157,3 +157,14 @@ export async function sendMessageAuthorizedConnectedClients(
     message,
   );
 }
+
+export async function sendMessageToOrigin(origin: string, message: ContentScriptMessage) {
+  const url = clientOriginToUrlMatchPattern(origin);
+  const clientTabs = (await chrome.tabs.query({ url })).filter(
+    (tab): tab is chrome.tabs.Tab & { readonly id: number } => typeof tab.id === 'number',
+  );
+  sendMessageContentScriptTabs(
+    clientTabs.map((tab) => tab.id),
+    message,
+  );
+}
