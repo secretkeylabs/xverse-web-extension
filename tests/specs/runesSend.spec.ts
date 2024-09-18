@@ -41,7 +41,7 @@ test.describe('Send runes', () => {
     await expect(wallet.buttonInsufficientFunds).toBeDisabled();
   });
 
-  test('Cancel - send one rune testnet', async ({ page, extensionId }) => {
+  test('Cancel - send one rune testnet #localexecution', async ({ page, extensionId }) => {
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 

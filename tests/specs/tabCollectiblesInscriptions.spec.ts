@@ -4,7 +4,10 @@ import Wallet from '../pages/wallet';
 const TEST_ORDINALS_ADDRESS = 'tb1pprpcu07x8fd02keqx9wtfncz99fhg6hepvpw34w9l2lnazmmf7rspw96ql';
 
 test.describe('Collectibles Tab - Inscriptions', () => {
-  test('Cancel send Collection Inscriptions testnet', async ({ page, extensionId }) => {
+  test('Cancel send Collection Inscriptions testnet #localexecution', async ({
+    page,
+    extensionId,
+  }) => {
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
@@ -171,7 +174,7 @@ test.describe('Collectibles Tab - Inscriptions', () => {
     await expect(await wallet.containersCollectibleItem.count()).toBeGreaterThanOrEqual(1);
   });
 
-  test('Cancel send single Inscriptions testnet', async ({ page, extensionId }) => {
+  test('Cancel send single Inscriptions testnet #localexecution', async ({ page, extensionId }) => {
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
