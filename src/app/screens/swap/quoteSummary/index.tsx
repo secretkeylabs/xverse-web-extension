@@ -268,7 +268,6 @@ export default function QuoteSummary({
       runeFloorPrice,
       stxBtcRate,
       fromTokenInfo: sip10FromTokenInfoUSD,
-      toTokenInfo: sip10ToTokenInfoUSD,
     });
 
     if (selectedIdentifiers) {

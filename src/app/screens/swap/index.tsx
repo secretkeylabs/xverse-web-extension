@@ -139,10 +139,6 @@ export default function SwapScreen() {
   const { quotes, loading: quotesLoading, error: quotesError, fetchQuotes } = useGetQuotes();
   const { data: runeFloorPrice } = useRuneFloorPriceQuery(toToken?.name ?? '');
   const coinsMasterList = useMasterCoinsList();
-  const { tokenInfo: sip10ToTokenInfoUSD } = useGetSip10TokenInfo({
-    principal: toToken?.ticker,
-    fiatCurrency: 'USD',
-  });
   const { tokenInfo: sip10FromTokenInfoUSD } = useGetSip10TokenInfo({
     principal: toToken?.ticker,
     fiatCurrency: 'USD',
@@ -191,7 +187,6 @@ export default function SwapScreen() {
       runeFloorPrice,
       stxBtcRate,
       fromTokenInfo: sip10FromTokenInfoUSD,
-      toTokenInfo: sip10ToTokenInfoUSD,
     });
 
     fetchQuotes({
@@ -410,7 +405,6 @@ export default function SwapScreen() {
       runeFloorPrice,
       stxBtcRate,
       fromTokenInfo: sip10FromTokenInfoUSD,
-      toTokenInfo: sip10ToTokenInfoUSD,
     });
   };
 
