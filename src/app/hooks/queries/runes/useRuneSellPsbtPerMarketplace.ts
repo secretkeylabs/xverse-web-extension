@@ -2,13 +2,17 @@ import useXverseApi from '@hooks/apiClients/useXverseApi';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { BitcoinNetworkType } from '@sats-connect/core';
-import type { CreateRuneListingRequest, Marketplace } from '@secretkeylabs/xverse-core';
+import type {
+  CreateRuneListingRequest,
+  FungibleToken,
+  Marketplace,
+} from '@secretkeylabs/xverse-core';
 import { sanitizeRuneName } from '@utils/helper';
 import type { RuneItem } from '@utils/runes';
 import { useCallback, useState } from 'react';
 
 const useRuneSellPsbtPerMarketplace = (
-  runeName: string,
+  rune: FungibleToken,
   listingUtxos: Record<string, RuneItem>,
   selectedMarketplaces: Marketplace[],
 ) => {
@@ -21,21 +25,20 @@ const useRuneSellPsbtPerMarketplace = (
   const xverseApi = useXverseApi();
 
   const getRuneSellPsbt = useCallback(async () => {
-    const sanitizedRuneName = sanitizeRuneName(runeName);
     const utxosToList = Object.entries(listingUtxos)
       .filter((item) => item[1].selected)
       .map(([key, item]) => ({
-        location: key.split(':')[0],
+        txid: key.split(':')[0],
         index: Number(key.split(':')[1]),
-        priceSats: item.priceSats,
-        amount: item.amount,
+        priceSatsPerRune: item.priceSats,
+        runeAmount: item.amount,
       }));
 
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 10); // 10 days from now
 
     const args: CreateRuneListingRequest = {
-      rune: sanitizedRuneName,
+      rune: { name: sanitizeRuneName(rune.name), id: rune.ticker || '' },
       makerRunesPublicKey: ordinalsPublicKey,
       makerRunesAddress: ordinalsAddress,
       makerReceiveAddress: btcAddress,
@@ -69,7 +72,7 @@ const useRuneSellPsbtPerMarketplace = (
       .catch(() => setError('Failed to create listing'))
       .finally(() => setLoading(false));
   }, [
-    runeName,
+    rune,
     listingUtxos,
     btcAddress,
     network,

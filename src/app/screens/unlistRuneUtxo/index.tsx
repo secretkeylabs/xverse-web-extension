@@ -113,7 +113,7 @@ export default function UnlistRuneUtxoScreen() {
       });
       const data = response[0];
 
-      if (listing.marketplaceName === 'Magic Eden' && data.type === 'withMessage') {
+      if (['Magic Eden', 'OKX'].includes(listing.marketplaceName) && data.type === 'withMessage') {
         navigate(RequestsRoutes.SignMessageRequestInApp, {
           state: {
             requestPayload: {
@@ -123,6 +123,7 @@ export default function UnlistRuneUtxoScreen() {
                 address: selectedAccount?.ordinalsAddress,
                 selectedRuneId: selectedRune.principal,
                 orderIds: [listing.orderId],
+                marketplace: listing.marketplaceName,
               },
             },
           },
@@ -159,6 +160,7 @@ export default function UnlistRuneUtxoScreen() {
               {
                 marketplace: unisatCancellation.listing.marketplaceName,
                 orderId: unisatCancellation.listing.orderId,
+                type: 'withPsbt',
                 psbt: signedPsbt,
               },
             ],

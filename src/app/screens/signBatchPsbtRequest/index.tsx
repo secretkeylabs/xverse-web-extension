@@ -73,8 +73,15 @@ function SignBatchPsbtRequest() {
   const { network } = useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const { payload, confirmSignPsbt, cancelSignPsbt, requestToken, selectedRune, minPriceSats } =
-    useSignBatchPsbtTx();
+  const {
+    payload,
+    utxos,
+    confirmSignPsbt,
+    cancelSignPsbt,
+    requestToken,
+    selectedRune,
+    minPriceSats,
+  } = useSignBatchPsbtTx();
   const [isSigning, setIsSigning] = useState(false);
   const [isSigningComplete, setIsSigningComplete] = useState(false);
   const [signingPsbtIndex, setSigningPsbtIndex] = useState(1);
@@ -275,6 +282,12 @@ function SignBatchPsbtRequest() {
                 id: selectedRune?.principal ?? '',
               },
               expiresAt: expiresAt.toISOString(),
+              utxos: Object.entries(utxos).map(([location, utxo]) => ({
+                txid: location.split(':')[0],
+                index: Number(location.split(':')[1]),
+                priceSatsPerRune: utxo.priceSats,
+                runeAmount: utxo.amount,
+              })),
             })),
           )
           .then((res) => {
@@ -297,18 +310,17 @@ function SignBatchPsbtRequest() {
               },
             });
           });
-      } else {
-        const signingMessage = {
-          source: MESSAGE_SOURCE,
-          method: SatsConnectMethods.signBatchPsbtResponse,
-          payload: {
-            signBatchPsbtRequest: requestToken,
-            signBatchPsbtResponse: signedPsbts,
-          },
-        };
-
-        chrome.tabs.sendMessage(+tabId, signingMessage);
       }
+      const signingMessage = {
+        source: MESSAGE_SOURCE,
+        method: SatsConnectMethods.signBatchPsbtResponse,
+        payload: {
+          signBatchPsbtRequest: requestToken,
+          signBatchPsbtResponse: signedPsbts,
+        },
+      };
+
+      chrome.tabs.sendMessage(+tabId, signingMessage);
     } catch (err) {
       setIsSigning(false);
       setIsSigningComplete(false);
