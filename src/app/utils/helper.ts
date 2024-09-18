@@ -333,3 +333,5 @@ export const satsToBtcString = (num: BigNumber) =>
   satsToBtc(num)
     .toFixed(8)
     .replace(/\.?0+$/, '');
+
+export const sanitizeRuneName = (runeName) => runeName.replace(/[^A-Za-z]+/g, '').toUpperCase();

@@ -24,9 +24,17 @@ type Props = {
   orderInfo: OrderInfo;
   onClose: () => void;
   onConfirm: () => void;
+  customExecute?: (signedPsbt: string) => void;
+  customCallout?: { bodyText: string };
 };
 
-export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Props) {
+export default function PsbtConfirmation({
+  orderInfo,
+  onClose,
+  onConfirm,
+  customExecute,
+  customCallout,
+}: Props) {
   const [isLoading, setIsLoading] = useState(true);
   const [isSigning, setIsSigning] = useState(false);
   const [summary, setSummary] = useState<PSBTSummary | undefined>();
@@ -131,27 +139,31 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
         throw new Error(t('PSBT_CANT_SIGN_ERROR_TITLE'));
       }
 
-      const orderResponse = await handleExecuteOrder(signedPsbt);
+      if (customExecute) {
+        await customExecute(signedPsbt);
+      } else {
+        const orderResponse = await handleExecuteOrder(signedPsbt);
 
-      if (!orderResponse) {
-        return setIsSigning(false);
+        if (!orderResponse) {
+          return setIsSigning(false);
+        }
+
+        if (ledgerTransport) {
+          await ledgerTransport.close();
+        }
+
+        onConfirm();
+
+        setIsSigning(false);
+        navigate('/tx-status', {
+          state: {
+            txid: orderResponse.txid,
+            currency: 'BTC',
+            error: '',
+            browserTx: false,
+          },
+        });
       }
-
-      if (ledgerTransport) {
-        await ledgerTransport.close();
-      }
-
-      onConfirm();
-
-      setIsSigning(false);
-      navigate('/tx-status', {
-        state: {
-          txid: orderResponse.txid,
-          currency: 'BTC',
-          error: '',
-          browserTx: false,
-        },
-      });
     } catch (err) {
       setIsSigning(false);
       if (err instanceof Error) {
@@ -205,7 +217,7 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
       onBackClick={onClose}
       hideBottomBar
       showAccountHeader={false}
-      customCallout={quoteExpiryCallout}
+      customCallout={customCallout || quoteExpiryCallout}
     />
   );
 }

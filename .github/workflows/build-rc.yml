@@ -40,6 +40,8 @@ jobs:
           MOON_PAY_API_KEY: ${{ secrets.MOON_PAY_API_KEY }}
           MIX_PANEL_TOKEN: ${{ secrets.MIX_PANEL_TOKEN }}
           MIX_PANEL_EXPLORE_APP_TOKEN: ${{ secrets.MIX_PANEL_EXPLORE_APP_TOKEN }}
+          SKIP_ANIMATION_WALLET_STARTUP: 'false'
+
         run: npm run build
       - name: Upload Archive
         uses: actions/upload-artifact@v3

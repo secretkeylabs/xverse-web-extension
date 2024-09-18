@@ -78,8 +78,10 @@ import Stacking from '@screens/stacking';
 import SwapScreen from '@screens/swap';
 import TransactionRequest from '@screens/transactionRequest';
 import TransactionStatus from '@screens/transactionStatus';
+import MultipleMarketplaceListingResult from '@screens/transactionStatus/multipleMarketplaceListingResult';
 import TransferRunesRequest from '@screens/transferRunesRequest';
 import UnlistRuneScreen from '@screens/unlistRune';
+import UnlistRuneUtxoScreen from '@screens/unlistRuneUtxo';
 import WalletExists from '@screens/walletExists';
 import BtcSendRequest from 'app/screens/btcSendRequest';
 import ListRuneScreen from 'app/screens/listRune';
@@ -401,12 +403,20 @@ const router = createHashRouter([
         element: <TransactionStatus />,
       },
       {
+        path: 'multiple-marketplace-listing-result',
+        element: <MultipleMarketplaceListingResult />,
+      },
+      {
         path: 'buy/:currency',
         element: <Buy />,
       },
       {
         path: 'list-rune/:runeId',
         element: <ListRuneScreen />,
+      },
+      {
+        path: 'unlist-rune/:runeId/utxo',
+        element: <UnlistRuneUtxoScreen />,
       },
       {
         path: 'unlist-rune/:runeId',
