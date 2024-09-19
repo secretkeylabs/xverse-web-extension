@@ -6,6 +6,7 @@ import InfoContainer from '@components/infoContainer';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import TopRow from '@components/topRow';
 import useRunesApi from '@hooks/apiClients/useRunesApi';
+import useXverseApi from '@hooks/apiClients/useXverseApi';
 import useSeedVault from '@hooks/useSeedVault';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -43,6 +44,7 @@ function SignMessageRequestInApp() {
   const navigate = useNavigate();
   const { getSeed } = useSeedVault();
   const runesApi = useRunesApi();
+  const xverseApi = useXverseApi();
 
   const [addressType, setAddressType] = useState('');
   const [isSigning, setIsSigning] = useState(false);
@@ -110,7 +112,7 @@ function SignMessageRequestInApp() {
     setCurrentStepIndex(0);
   };
 
-  const handleGoBack = () => navigate(-1);
+  const handleGoBack = () => navigate(-2);
 
   const handleConnectAndConfirm = async () => {
     if (!selectedAccount) {
@@ -141,13 +143,27 @@ function SignMessageRequestInApp() {
         protocol: MessageSigningProtocols.BIP322,
       });
 
-      await runesApi.submitCancelRunesSellOrder({
-        orderIds: payload.orderIds,
-        makerPublicKey: selectedAccount?.ordinalsPublicKey!,
-        makerAddress: selectedAccount?.ordinalsAddress!,
-        token: payload.token,
-        signature: signedMessage.signature,
-      });
+      if (payload.marketplace === 'OKX') {
+        await xverseApi.listings.submitRuneCancelOrder({
+          cancellationsPerMarketplace: [
+            {
+              marketplace: payload.marketplace,
+              orderId: payload.orderIds[0],
+              type: 'withMessage',
+              token: payload.token,
+              signature: signedMessage.signature,
+            },
+          ],
+        });
+      } else {
+        await runesApi.submitCancelRunesSellOrder({
+          orderIds: payload.orderIds,
+          makerPublicKey: selectedAccount?.ordinalsPublicKey!,
+          makerAddress: selectedAccount?.ordinalsAddress!,
+          token: payload.token,
+          signature: signedMessage.signature,
+        });
+      }
 
       handleGoBack();
       toast(`${t('SIGNATURE_REQUEST.UNLISTED_SUCCESS')}`);
@@ -192,13 +208,27 @@ function SignMessageRequestInApp() {
       }
       const signedMessage = await confirmSignMessage();
 
-      await runesApi.submitCancelRunesSellOrder({
-        orderIds: payload.orderIds,
-        makerPublicKey: selectedAccount?.ordinalsPublicKey!,
-        makerAddress: selectedAccount?.ordinalsAddress!,
-        token: payload.token,
-        signature: signedMessage.signature,
-      });
+      if (payload.marketplace === 'OKX') {
+        await xverseApi.listings.submitRuneCancelOrder({
+          cancellationsPerMarketplace: [
+            {
+              marketplace: payload.marketplace,
+              orderId: payload.orderIds[0],
+              type: 'withMessage',
+              token: payload.token,
+              signature: signedMessage.signature,
+            },
+          ],
+        });
+      } else {
+        await runesApi.submitCancelRunesSellOrder({
+          orderIds: payload.orderIds,
+          makerPublicKey: selectedAccount?.ordinalsPublicKey!,
+          makerAddress: selectedAccount?.ordinalsAddress!,
+          token: payload.token,
+          signature: signedMessage.signature,
+        });
+      }
 
       handleGoBack();
       toast(`${t('SIGNATURE_REQUEST.UNLISTED_SUCCESS')}`);

@@ -1,7 +1,7 @@
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
-import useRuneUtxosQuery from '@hooks/queries/runes/useRuneUtxosQuery';
+import useRuneUtxosQueryPerMarketplace from '@hooks/queries/runes/useRuneUtxosQueryPerMarketplace';
 import useHasFeature from '@hooks/useHasFeature';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import { ArrowClockwise } from '@phosphor-icons/react';
@@ -12,17 +12,16 @@ import {
   TabButtonsContainer,
   TabContainer,
 } from '@screens/listRune/index.styled';
-import UnlistRuneItem from '@screens/unlistRune/unlistRuneItem';
-import { FeatureId } from '@secretkeylabs/xverse-core';
+import { FeatureId, type FungibleToken } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
-import { ftDecimals } from '@utils/helper';
-import { getFullTxId, getTxIdFromFullTxId, getVoutFromFullTxId } from '@utils/runes';
-import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import theme from 'theme';
 import { Container, Header, NoItemsContainer, UnlistRunesContainer } from './index.styled';
+import UnlistRuneItemPerMarketplace, {
+  type ListedUtxoWithProvider,
+} from './unlistRuneItemPerMarketplace';
 
 export default function UnlistRuneScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'LIST_RUNE_SCREEN' });
@@ -40,11 +39,13 @@ export default function UnlistRuneScreen() {
   useTrackMixPanelPageViewed();
 
   const {
-    data: listedItems,
+    data,
     isInitialLoading: isFetchingListedItems,
     isRefetching: isRefetchingListedItems,
     refetch,
-  } = useRuneUtxosQuery(selectedRune?.name ?? '', 'listed', false);
+  } = useRuneUtxosQueryPerMarketplace(selectedRune as FungibleToken, false);
+  const { listedItems } = data || {};
+
   const isLoading = isFetchingListedItems || isRefetchingListedItems;
   const showContent = !isLoading && !!listedItems?.length;
 
@@ -87,25 +88,13 @@ export default function UnlistRuneScreen() {
         )}
         {showContent && (
           <UnlistRunesContainer data-testid="listed">
-            {listedItems.map((item) => {
-              const key = getFullTxId(item);
-              const runeAmount = ftDecimals(
-                String(item.runes?.[0][1].amount),
-                selectedRune?.decimals ?? 0,
-              );
-              return (
-                <UnlistRuneItem
-                  key={key}
-                  txId={getTxIdFromFullTxId(key)}
-                  vout={getVoutFromFullTxId(key)}
-                  runeAmount={runeAmount}
-                  orderIds={item.listing.map((listing) => listing.orderId)}
-                  runeSymbol={item.runes?.[0][1].symbol ?? ''}
-                  listPrice={BigNumber(item.listing[0].totalPriceSats)}
-                  selectedRuneId={selectedRune?.principal ?? ''}
-                />
-              );
-            })}
+            {listedItems.map((item) => (
+              <UnlistRuneItemPerMarketplace
+                key={`${item.txid}:${item.vout}`}
+                item={item as ListedUtxoWithProvider}
+                selectedRune={selectedRune as FungibleToken}
+              />
+            ))}
           </UnlistRunesContainer>
         )}
         {!isLoading && !listedItems?.length && (
