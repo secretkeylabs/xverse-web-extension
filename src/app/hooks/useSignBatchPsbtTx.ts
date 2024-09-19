@@ -72,6 +72,7 @@ const useSignBatchPsbtTx = () => {
     selectedRune: locationState.selectedRune,
     minPriceSats: locationState.minPriceSats,
     utxos: locationState.utxos as Record<string, RuneItem>,
+    locationState,
   };
 };
 

@@ -40,6 +40,7 @@ import Callout from '@ui-library/callout';
 import Spinner from '@ui-library/spinner';
 import { isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
+import type { RuneItem } from '@utils/runes';
 import objecthash from 'object-hash';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -81,6 +82,7 @@ function SignBatchPsbtRequest() {
     requestToken,
     selectedRune,
     minPriceSats,
+    locationState,
   } = useSignBatchPsbtTx();
   const [isSigning, setIsSigning] = useState(false);
   const [isSigningComplete, setIsSigningComplete] = useState(false);
@@ -265,6 +267,16 @@ function SignBatchPsbtRequest() {
       setIsSigning(false);
 
       if (inApp) {
+        trackMixPanel(AnalyticsEvents.ListRuneSigned, {
+          from: locationState.selectedRune.name,
+          to: 'BTC',
+          priceInSatsPerRune: locationState.minPriceSats,
+          marketplaces: locationState.payload.psbts.map((p) => p.marketplaceName),
+          runeTotalAmount: Object.values(locationState.utxos as Record<string, RuneItem>)
+            .map((i) => i.amount)
+            .reduce((a, b) => a + b, 0),
+        });
+
         const expiresAt = new Date();
         expiresAt.setDate(expiresAt.getDate() + 10); // 10 days from now
 
