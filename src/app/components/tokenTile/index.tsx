@@ -4,13 +4,12 @@ import TokenImage from '@components/tokenImage';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { getFiatEquivalent, type FungibleToken } from '@secretkeylabs/xverse-core';
-import type { StoreState } from '@stores/index';
 import type { CurrencyTypes } from '@utils/constants';
 import { getBalanceAmount, getFtTicker } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { NumericFormat } from 'react-number-format';
-import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 const TileContainer = styled.button((props) => ({
@@ -119,7 +118,7 @@ function TokenTile({
   showProtocolIcon = true,
   hideBalance = false,
 }: Props) {
-  const { fiatCurrency } = useSelector((state: StoreState) => state.walletState);
+  const { fiatCurrency } = useWalletSelector();
   const { btcFiatRate, stxBtcRate } = useCoinRates();
   const { data: stxData } = useStxWalletData();
   const { data: btcBalance } = useBtcWalletData();

@@ -2,6 +2,7 @@ import { getDeviceAccountIndex } from '@common/utils/ledger';
 import { dispatchEventAuthorizedConnectedClients } from '@common/utils/messages/extensionToContentScript/dispatchEvent';
 import { makeAccountResourceId } from '@components/permissionsManager/resources';
 import useNetworkSelector from '@hooks/useNetwork';
+import useWalletSelector from '@hooks/useWalletSelector';
 import {
   AnalyticsEvents,
   StacksMainnet,
@@ -16,7 +17,6 @@ import {
   type NetworkType,
   type SettingsNetwork,
 } from '@secretkeylabs/xverse-core';
-import type { StoreState } from '@stores/index';
 import {
   ChangeNetworkAction,
   changeShowDataCollectionAlertAction,
@@ -38,7 +38,7 @@ import {
   trackMixPanel,
 } from '@utils/mixpanel';
 import { useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import useSeedVault from './useSeedVault';
 import useWalletSession from './useWalletSession';
 
@@ -83,29 +83,18 @@ const createSingleAccount = async (
 };
 
 const useWalletReducer = () => {
-  const network = useSelector((state: StoreState) => state.walletState.network);
-  const encryptedSeed = useSelector((state: StoreState) => state.walletState.encryptedSeed);
-
-  const selectedAccountIndex = useSelector(
-    (state: StoreState) => state.walletState.selectedAccountIndex,
-  );
-  const selectedAccountType = useSelector(
-    (state: StoreState) => state.walletState.selectedAccountType,
-  );
-  const accounts = useSelector((state: StoreState) => state.walletState.accountsList);
-  const savedNames = useSelector((state: StoreState) => state.walletState.savedNames);
-
-  const softwareAccountsList = useSelector((state: StoreState) => state.walletState.accountsList);
-  const ledgerAccountsList = useSelector(
-    (state: StoreState) => state.walletState.ledgerAccountsList,
-  );
-
-  const showDataCollectionAlert = useSelector(
-    (state: StoreState) => state.walletState.showDataCollectionAlert,
-  );
-
-  const hideStx = useSelector((state: StoreState) => state.walletState.hideStx);
-
+  const {
+    network,
+    encryptedSeed,
+    selectedAccountIndex,
+    selectedAccountType,
+    accountsList: accounts,
+    savedNames,
+    accountsList: softwareAccountsList,
+    ledgerAccountsList,
+    showDataCollectionAlert,
+    hideStx,
+  } = useWalletSelector();
   const seedVault = useSeedVault();
   const selectedNetwork = useNetworkSelector();
 
