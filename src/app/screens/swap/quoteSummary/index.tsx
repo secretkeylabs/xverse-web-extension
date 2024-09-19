@@ -176,6 +176,10 @@ export default function QuoteSummary({
     fiatCurrency: 'USD',
   });
 
+  const { tokenInfo: sip10ToTokenInfo } = useGetSip10TokenInfo({
+    principal: toToken?.ticker,
+  });
+
   const { tokenInfo: sip10FromTokenInfoUSD } = useGetSip10TokenInfo({
     principal: fromToken?.principal,
     fiatCurrency: 'USD',
@@ -372,10 +376,10 @@ export default function QuoteSummary({
         new BigNumber(btcFiatRate),
       ).toFixed(2);
     }
-    if (!sip10ToTokenInfoUSD?.tokenFiatRate) {
+    if (!sip10ToTokenInfo?.tokenFiatRate) {
       return '--';
     }
-    return new BigNumber(sip10ToTokenInfoUSD?.tokenFiatRate)
+    return new BigNumber(sip10ToTokenInfo?.tokenFiatRate)
       .multipliedBy(quote.receiveAmount)
       .toFixed(2);
   })();
