@@ -72,6 +72,7 @@ const TruncatedP = styled(StyledP)`
   overflow: hidden;
   text-overflow: ellipsis;
   width: 150px;
+  text-align: right;
 `;
 
 function QuoteTile({
