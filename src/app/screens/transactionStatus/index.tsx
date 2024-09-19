@@ -1,5 +1,6 @@
 import ArrowSquareOut from '@assets/img/arrow_square_out.svg';
 import Success from '@assets/img/send/check_circle.svg';
+import Warning from '@assets/img/send/info_circle.svg';
 import Failure from '@assets/img/send/x_circle.svg';
 import {
   sendAddressMismatchMessage,
@@ -10,9 +11,11 @@ import ActionButton from '@components/button';
 import CopyButton from '@components/copyButton';
 import InfoContainer from '@components/infoContainer';
 import useWalletSelector from '@hooks/useWalletSelector';
+import type { SubmitRuneListingResponse } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import { MAGIC_EDEN_RUNES_URL } from '@utils/constants';
 import { getBtcTxStatusUrl, getStxTxStatusUrl } from '@utils/helper';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -29,7 +32,6 @@ const Container = styled.div({
   flexDirection: 'column',
   justifyContent: 'center',
 });
-
 const OuterContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -167,15 +169,46 @@ function TransactionStatus() {
     isSwapTransaction,
     tabId,
     messageId,
-  } = location.state as { tabId?: chrome.tabs.Tab['id']; messageId?: string; [key: string]: any };
+    orders,
+    minPriceSats,
+  } = location.state as {
+    tabId?: chrome.tabs.Tab['id'];
+    messageId?: string;
+    [key: string]: any;
+    orders?: SubmitRuneListingResponse[];
+    minPriceSats?: number;
+  };
 
-  const renderTransactionSuccessStatus = (
+  const multipleOrders = useMemo(() => !!orders?.length, [orders]);
+  const failedMultipleOrders = useMemo(
+    () => orders?.filter((order) => !order.successful).length,
+    [orders],
+  );
+
+  /* eslint-disable no-inline-styles/no-inline-styles */
+  const renderTransactionSuccessStatus = multipleOrders ? (
+    <Container style={{ marginTop: '74px', marginBottom: '85px' }}>
+      <Image src={failedMultipleOrders ? Warning : Success} />
+      <HeadingText style={{ fontSize: '20px' }}>
+        {failedMultipleOrders ? t('BROADCASTED_MULTIPLE_PARTIALLY') : t('BROADCASTED_MULTIPLE')}
+      </HeadingText>
+      {failedMultipleOrders ? (
+        <BodyText style={{ fontSize: '16px' }}>
+          {t('BROADCASTED_MULTIPLE_PARTIALLY_SUBTITLE', {
+            failedTranscations: failedMultipleOrders,
+            totalTranscations: orders?.length,
+          })}
+        </BodyText>
+      ) : null}
+    </Container>
+  ) : (
     <Container>
       <Image src={Success} />
       <HeadingText>{sponsored ? t('SPONSORED_SUCCESS_MSG') : t('BROADCASTED')}</HeadingText>
       <BodyText>{sponsored ? t('SPONSORED_MSG') : t('SUCCESS_MSG')}</BodyText>
     </Container>
   );
+  /* eslint-enable no-inline-styles/no-inline-styles */
 
   const renderTransactionFailureStatus = (
     <Container>
@@ -207,8 +240,19 @@ function TransactionStatus() {
     } else if (isRareSat) navigate('/nft-dashboard?tab=rareSats');
     else if (isOrdinal) navigate('/nft-dashboard?tab=inscriptions');
     else if (isNft) navigate('/nft-dashboard?tab=nfts');
+    else if (multipleOrders) navigate('/');
     else if (runeListed) navigate(`/coinDashboard/FT?ftKey=${runeListed.principal}&protocol=runes`);
     else navigate('/');
+  };
+
+  const onSeeDetail = () => {
+    navigate('/multiple-marketplace-listing-result', {
+      state: {
+        orders,
+        minPriceSats,
+        rune: runeListed,
+      },
+    });
   };
 
   const handleClickTrySwapAgain = () => {
@@ -242,18 +286,27 @@ function TransactionStatus() {
       <TxStatusContainer data-testid="transaction-container">
         <OuterContainer>{renderTransactionSuccessStatus}</OuterContainer>
         <ButtonContainer>
-          <Button variant="primary" title={t('CLOSE')} onClick={onCloseClick} />
-          <Button
-            variant="secondary"
-            title={t('SEE_ON_MAGICEDEN', { runeSymbol: runeListed?.runeSymbol ?? '' })}
-            onClick={() => {
-              window.open(
-                `${MAGIC_EDEN_RUNES_URL}/${runeListed?.name}`,
-                '_blank',
-                'noopener,noreferrer',
-              );
-            }}
-          />
+          {multipleOrders ? (
+            <>
+              <Button variant="primary" title={t('SEE_DETAIL')} onClick={onSeeDetail} />
+              <Button variant="secondary" title={t('CLOSE')} onClick={onCloseClick} />
+            </>
+          ) : (
+            <>
+              <Button variant="primary" title={t('CLOSE')} onClick={onCloseClick} />
+              <Button
+                variant="secondary"
+                title={t('SEE_ON_MAGICEDEN', { runeSymbol: runeListed?.runeSymbol ?? '' })}
+                onClick={() => {
+                  window.open(
+                    `${MAGIC_EDEN_RUNES_URL}/${runeListed?.name}`,
+                    '_blank',
+                    'noopener,noreferrer',
+                  );
+                }}
+              />
+            </>
+          )}
         </ButtonContainer>
       </TxStatusContainer>
     );

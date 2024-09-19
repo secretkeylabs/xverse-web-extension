@@ -67,6 +67,13 @@ interface Props {
   unit?: string;
 }
 
+const TruncatedP = styled(StyledP)`
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 150px;
+`;
+
 function QuoteTile({
   provider,
   price,
@@ -101,9 +108,9 @@ function QuoteTile({
             displayType="text"
             thousandSeparator
             renderText={() => (
-              <StyledP data-testid="quote-label" typography="body_bold_m" color="white_0">
+              <TruncatedP data-testid="quote-label" typography="body_bold_m" color="white_0">
                 {formatNumber(price)} {unit}
-              </StyledP>
+              </TruncatedP>
             )}
           />
         </RowCenter>

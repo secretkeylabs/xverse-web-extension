@@ -201,7 +201,9 @@ const RestoreButton = styled(Button)((props) => ({
 function Landing() {
   const { t } = useTranslation('translation', { keyPrefix: 'LANDING_SCREEN' });
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
-  const [animationComplete, setAnimationComplete] = useState(false);
+  const [animationComplete, setAnimationComplete] = useState(
+    process.env.SKIP_ANIMATION_WALLET_STARTUP === 'true',
+  );
   const [slideTransitions, setSlideTransitions] = useState(false);
   const [transitionDirection, setTransitionDirection] = useState<'left' | 'right'>('right');
   const navigate = useNavigate();
