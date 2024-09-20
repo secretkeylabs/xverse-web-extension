@@ -1,13 +1,20 @@
 import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
-import RuneAmount from '@components/confirmBtcTransaction/itemRow/runeAmount';
 import { WarningOctagon } from '@phosphor-icons/react';
 import { animated, config, useSpring } from '@react-spring/web';
-import type { RuneSummary } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import Theme from 'theme';
+import Theme from '../../../../../theme';
+import { useTxSummaryContext } from '../../hooks/useTxSummaryContext';
+import RuneAmount from '../../itemRow/runeAmount';
+
+const Title = styled.p`
+  ${(props) => props.theme.typography.body_medium_m};
+  color: ${(props) => props.theme.colors.white_200};
+  margin-top: ${(props) => props.theme.space.s};
+  margin-bottom: ${(props) => props.theme.space.xs};
+`;
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -21,7 +28,6 @@ const Container = styled.div((props) => ({
 
 const RowContainer = styled.div((props) => ({
   padding: `0 ${props.theme.space.m}`,
-  marginTop: `${props.theme.space.m}`,
 }));
 
 const RowCenter = styled.div<{ spaceBetween?: boolean }>((props) => ({
@@ -29,10 +35,6 @@ const RowCenter = styled.div<{ spaceBetween?: boolean }>((props) => ({
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: props.spaceBetween ? 'space-between' : 'initial',
-}));
-
-const Header = styled(RowCenter)((props) => ({
-  padding: `0 ${props.theme.space.m}`,
 }));
 
 const WarningButton = styled.button`
@@ -50,16 +52,17 @@ const DelegationDescription = styled(StyledP)`
   padding-bottom: ${(props) => props.theme.space.xs};
 `;
 
-const Title = styled(StyledP)`
+const Warning = styled(StyledP)`
   margin-left: ${(props) => props.theme.space.xxs};
 `;
 
-type Props = {
-  delegations?: RuneSummary['receipts'];
-};
-
-function DelegateSection({ delegations }: Props) {
+function DelegateSection() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
+  const { extractedTxSummary } = useTxSummaryContext();
+
+  const delegations = !extractedTxSummary.isFinal
+    ? Object.values(extractedTxSummary.transfers).flatMap((addressItem) => addressItem.runes)
+    : [];
 
   const [showDelegationInfo, setShowDelegationInfo] = useState(false);
 
@@ -78,32 +81,33 @@ function DelegateSection({ delegations }: Props) {
   if (!delegations?.length) return null;
 
   return (
-    <Container>
-      <Header>
-        <StyledP typography="body_medium_m" color="white_200">
-          {t('YOU_WILL_DELEGATE')}
-        </StyledP>
-      </Header>
-      {delegations.map((delegation) => (
-        <RowContainer key={delegation.runeName}>
-          <RuneAmount rune={delegation} />
-        </RowContainer>
-      ))}
-      <WarningButton type="button" onClick={() => setShowDelegationInfo((prevState) => !prevState)}>
-        <RowCenter>
-          <WarningOctagon weight="fill" color={Theme.colors.caution} size={16} />
-          <Title typography="body_medium_s" color="caution">
-            {t('UNKNOWN_RUNE_RECIPIENTS')}
-          </Title>
-        </RowCenter>
-        <animated.img style={arrowRotation} src={DropDownIcon} alt="Drop Down" />
-      </WarningButton>
-      <animated.div style={slideInStyles}>
-        <DelegationDescription typography="body_medium_s" color="white_200">
-          {t('RUNE_DELEGATION_DESCRIPTION')}
-        </DelegationDescription>
-      </animated.div>
-    </Container>
+    <>
+      <Title>{t('YOU_WILL_DELEGATE')}</Title>
+      <Container>
+        {delegations.map((delegation) => (
+          <RowContainer key={delegation.runeName}>
+            <RuneAmount rune={delegation} />
+          </RowContainer>
+        ))}
+        <WarningButton
+          type="button"
+          onClick={() => setShowDelegationInfo((prevState) => !prevState)}
+        >
+          <RowCenter>
+            <WarningOctagon weight="fill" color={Theme.colors.caution} size={16} />
+            <Warning typography="body_medium_s" color="caution">
+              {t('UNKNOWN_RUNE_RECIPIENTS')}
+            </Warning>
+          </RowCenter>
+          <animated.img style={arrowRotation} src={DropDownIcon} alt="Drop Down" />
+        </WarningButton>
+        <animated.div style={slideInStyles}>
+          <DelegationDescription typography="body_medium_s" color="white_200">
+            {t('RUNE_DELEGATION_DESCRIPTION')}
+          </DelegationDescription>
+        </animated.div>
+      </Container>
+    </>
   );
 }
 

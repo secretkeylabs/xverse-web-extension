@@ -6,9 +6,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import type { OrderInfo } from '@screens/swap/types';
 import {
   btcTransaction,
-  parseSummaryForRunes,
   type ExecuteUtxoOrderRequest,
-  type RuneSummary,
   type Transport,
 } from '@secretkeylabs/xverse-core';
 import { useEffect, useMemo, useState } from 'react';
@@ -38,7 +36,6 @@ export default function PsbtConfirmation({
   const [isLoading, setIsLoading] = useState(true);
   const [isSigning, setIsSigning] = useState(false);
   const [summary, setSummary] = useState<PSBTSummary | undefined>();
-  const [runeSummary, setRuneSummary] = useState<RuneSummary | undefined>(undefined);
   const [validationError, setValidationError] = useState<{
     error: string;
     errorTitle: string;
@@ -82,11 +79,6 @@ export default function PsbtConfirmation({
       .getSummary()
       .then(async (txSummary) => {
         setSummary(txSummary);
-        setRuneSummary(
-          await parseSummaryForRunes(txnContext, txSummary, network.type, {
-            separateTransfersOnNoExternalInputs: true,
-          }),
-        );
         setIsLoading(false);
       })
       .catch((err) => {
@@ -206,7 +198,6 @@ export default function PsbtConfirmation({
   return (
     <ConfirmBtcTransaction
       summary={summary}
-      runeSummary={runeSummary}
       isLoading={isLoading}
       isSubmitting={isSigning}
       isBroadcast

@@ -1,11 +1,10 @@
 import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
-import { useParsedTxSummaryContext } from '@components/confirmBtcTransaction/hooks/useParsedTxSummaryContext';
 import { animated, config, useSpring } from '@react-spring/web';
 import { StyledP } from '@ui-library/common.styled';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { isScriptOutput } from '../utils';
+import { useTxSummaryContext } from '../hooks/useTxSummaryContext';
 import TransactionInput from './transactionInput';
 import TransactionOutput from './transactionOutput';
 
@@ -46,7 +45,7 @@ function TxInOutput() {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const { summary } = useParsedTxSummaryContext();
+  const { extractedTxSummary } = useTxSummaryContext();
 
   const slideInStyles = useSpring({
     config: { ...config.gentle, duration: 400 },
@@ -76,18 +75,18 @@ function TxInOutput() {
       </Button>
       {isExpanded && (
         <ExpandedContainer style={slideInStyles}>
-          {summary?.inputs.map((input) => (
+          {extractedTxSummary.inputs.map((input) => (
             <TransactionInput input={input} key={input.extendedUtxo.outpoint} />
           ))}
           <OutputTitleText typography="body_medium_m" color="white_400">
             {t('OUTPUT')}
           </OutputTitleText>
-          {summary?.outputs.map((output, index) => (
+          {extractedTxSummary.outputs.map((output, index) => (
             <TransactionOutput
               // eslint-disable-next-line react/no-array-index-key
               key={index}
               output={output}
-              scriptOutputCount={isScriptOutput(output) ? scriptOutputCount++ : undefined}
+              scriptOutputCount={output.type === 'script' ? scriptOutputCount++ : undefined}
             />
           ))}
         </ExpandedContainer>

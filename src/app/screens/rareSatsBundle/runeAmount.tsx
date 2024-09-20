@@ -1,4 +1,3 @@
-import { mapRuneBaseToFungibleToken } from '@components/confirmBtcTransaction/utils';
 import { RightAlignedStyledFiatAmountText } from '@components/fiatAmountText';
 import TokenImage from '@components/tokenImage';
 import useRuneFiatRateQuery from '@hooks/queries/runes/useRuneFiatRateQuery';
@@ -6,18 +5,19 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import type { RuneBase } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { ftDecimals } from '@utils/helper';
+import { mapRuneBaseToFungibleToken } from '@utils/mappers';
 import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 
-const Container = styled.div<{ topMargin?: boolean }>((props) => ({
+const Container = styled.div<{ $topMargin?: boolean }>((props) => ({
   width: '100%',
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   marginBottom: props.theme.space.s,
-  marginTop: props.topMargin ? props.theme.space.s : 0,
+  marginTop: props.$topMargin ? props.theme.space.s : 0,
   backgroundColor: props.theme.colors.elevation1,
   padding: props.theme.space.m,
   borderRadius: props.theme.space.xs,
@@ -60,7 +60,7 @@ export default function RuneAmount({
   const { fiatCurrency } = useWalletSelector();
   const { data: runeFiatRate } = useRuneFiatRateQuery(rune);
   return (
-    <Container topMargin={topMargin}>
+    <Container $topMargin={topMargin}>
       <AvatarContainer>
         <TokenImage
           currency="FT"

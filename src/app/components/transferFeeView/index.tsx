@@ -6,6 +6,7 @@ import {
   btcTransaction,
   getBtcFiatEquivalent,
   getFiatEquivalent,
+  type RareSatsType,
 } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import BigNumber from 'bignumber.js';
@@ -46,9 +47,16 @@ type Props = {
   feePerVByte?: BigNumber;
   fee: BigNumber;
   currency: string;
-  inscriptions?: btcTransaction.IOInscription[];
+  inscriptions?:
+    | btcTransaction.IOInscription[]
+    | (btcTransaction.IOInscription & { satributes: RareSatsType[] })[]
+    | (Omit<btcTransaction.IOInscription, 'offset'> & { satributes: RareSatsType[] })[];
   satributes?: btcTransaction.IOSatribute[];
-  onShowInscription?: (inscription: btcTransaction.IOInscription) => void;
+  onShowInscription?: (
+    inscription:
+      | (btcTransaction.IOInscription & { satributes: RareSatsType[] })
+      | (Omit<btcTransaction.IOInscription, 'offset'> & { satributes: RareSatsType[] }),
+  ) => void;
 };
 
 function TransferFeeView({

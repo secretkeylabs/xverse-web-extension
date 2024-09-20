@@ -1,4 +1,3 @@
-import { mapRuneBaseToFungibleToken } from '@components/confirmBtcTransaction/utils';
 import { RightAlignedStyledFiatAmountText } from '@components/fiatAmountText';
 import TokenImage from '@components/tokenImage';
 import useRuneFiatRateQuery from '@hooks/queries/runes/useRuneFiatRateQuery';
@@ -6,6 +5,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import type { RuneBase } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { ftDecimals } from '@utils/helper';
+import { mapRuneBaseToFungibleToken } from '@utils/mappers';
 import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
@@ -42,16 +42,21 @@ const Column = styled.div`
 type Props = {
   rune: RuneBase;
   hasSufficientBalance?: boolean;
+  topMargin?: boolean;
 };
 
-export default function RuneAmount({ rune, hasSufficientBalance = true }: Props) {
+export default function RuneAmount({
+  rune,
+  hasSufficientBalance = true,
+  topMargin = false,
+}: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { runeName, amount, divisibility, symbol } = rune;
   const amountWithDecimals = ftDecimals(String(amount), divisibility);
   const { fiatCurrency } = useWalletSelector();
   const { data: runeFiatRate } = useRuneFiatRateQuery(rune);
   return (
-    <Container>
+    <Container topMargin={topMargin}>
       <AvatarContainer>
         <TokenImage
           currency="FT"

@@ -16,7 +16,8 @@
     "CONFIRM": "Confirm",
     "APPLY": "Apply",
     "IN": "In",
-    "TO": "To"
+    "TO": "To",
+    "FROM": "From"
   },
   "UNITS": {
     "SATS_PER_VB": "sats/vB"
@@ -704,8 +705,8 @@
     "VIEW_ADDRESS": "View address",
     "ADD_STACKS_ADDRESS": "Add a Stacks address",
     "NFTS": "NFTs",
-    "RARE_SAT": "Rare sat",
-    "RARE_SATS": "Rare sats",
+    "RARE_SAT": "Rare Sat",
+    "RARE_SATS": "Rare Sats",
     "NEW_FEATURE": "New Feature, Rare Sats",
     "NEW_FEAT_RARE_SATS_DESCRIPTION": "Enable rare sats to display rare, interesting and unique sats in your wallet. You can change this setting at any time.",
     "NEW_FEAT_RARE_SATS_ORDINALS_ENABLE": "Enable rare sats to display rare, interesting and unique sats in your wallet. Note than enabling rare sats will also enable Ordinals. You can change this setting at any time.",

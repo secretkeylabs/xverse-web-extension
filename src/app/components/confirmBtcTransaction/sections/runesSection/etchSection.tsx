@@ -11,8 +11,8 @@ import { ftDecimals, getShortTruncatedAddress } from '@utils/helper';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
-import Theme from '../../../theme';
-import InscribeSection from './inscribeSection';
+import Theme from '../../../../../theme';
+import InscribeSection from '../inscribeSection';
 import {
   AddressLabel,
   Container,
@@ -23,7 +23,7 @@ import {
   RuneImage,
   RuneSymbol,
   RuneValue,
-} from './runes';
+} from './styles';
 
 type Props = {
   etch?: EtchActionDetails;

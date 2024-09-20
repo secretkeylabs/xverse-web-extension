@@ -3,8 +3,8 @@ import { ArrowDown } from '@phosphor-icons/react';
 import { StyledP } from '@ui-library/common.styled';
 import { getShortTruncatedAddress } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
-import ContentLabel from '../ContentLabel';
-import { Pill, StyledPillLabel } from '../runes';
+import ContentLabel from './ContentLabel';
+import { Pill, StyledPillLabel } from '../runesSection/styles';
 import {
   ButtonIcon,
   CardContainer,

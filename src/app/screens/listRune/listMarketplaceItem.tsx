@@ -1,4 +1,3 @@
-import { RowCenter } from '@components/confirmBtcTransaction/runes';
 import TokenImage from '@components/tokenImage';
 import type { FungibleToken, ListingProvider } from '@secretkeylabs/xverse-core';
 import Checkbox from '@ui-library/checkbox';
@@ -23,6 +22,13 @@ const Container = styled.div<{ $selected: boolean }>`
     props.$selected ? props.theme.colors.elevation2 : props.theme.colors.elevation1};
   transition: background-color 0.1s ease, border-color 0.1s ease;
 `;
+
+const RowCenter = styled.div({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+});
 
 const InfoContainer = styled.div`
   display: flex;

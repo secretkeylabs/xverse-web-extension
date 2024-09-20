@@ -1,8 +1,8 @@
-import RuneAmount from '@components/confirmBtcTransaction/itemRow/runeAmount';
-import type { RuneSummary } from '@secretkeylabs/xverse-core';
 import { InputFeedback } from '@ui-library/inputFeedback';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import { useTxSummaryContext } from '../../hooks/useTxSummaryContext';
+import RuneAmount from '../../itemRow/runeAmount';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -30,21 +30,19 @@ const Header = styled(RowCenter)((props) => ({
   padding: `0 ${props.theme.space.m}`,
 }));
 
-type Props = {
-  burns?: RuneSummary['burns'];
-};
-
-function BurnSection({ burns }: Props) {
+function BurnSection() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
 
-  if (!burns?.length) return null;
+  const { extractedTxSummary } = useTxSummaryContext();
+
+  if (!extractedTxSummary.runes.burns?.length) return null;
 
   return (
     <Container>
       <Header spaceBetween>
         <InputFeedback variant="danger" message={t('YOU_WILL_BURN')} />
       </Header>
-      {burns.map((burn) => (
+      {extractedTxSummary.runes.burns.map((burn) => (
         <RowContainer key={burn.runeName}>
           <RuneAmount rune={burn} />
         </RowContainer>

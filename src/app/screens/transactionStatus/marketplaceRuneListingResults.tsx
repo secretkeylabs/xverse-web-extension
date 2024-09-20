@@ -1,6 +1,5 @@
 import CheckCircle from '@assets/img/listings/CheckCircle.svg';
 import XCircle from '@assets/img/listings/XCircle.svg';
-import { RowCenter } from '@components/confirmBtcTransaction/runes';
 import TokenImage from '@components/tokenImage';
 import { ArrowUpRight } from '@phosphor-icons/react';
 import type { FungibleToken, ListingProvider, Marketplace } from '@secretkeylabs/xverse-core';
@@ -28,6 +27,13 @@ const Container = styled.div<{ $successful: boolean }>`
   gap: 10px;
   cursor: ${(props) => (props.$successful ? 'pointer' : 'auto')};
 `;
+
+const RowCenter = styled.div({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+});
 
 const InfoContainer = styled.div`
   display: flex;

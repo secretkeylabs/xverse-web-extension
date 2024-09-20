@@ -1,18 +1,10 @@
 import useAddressInscription from '@hooks/queries/ordinals/useAddressInscription';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
-import useHasFeature from '@hooks/useHasFeature';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import type { TransactionSummary } from '@screens/sendBtc/helpers';
-import {
-  AnalyticsEvents,
-  btcTransaction,
-  FeatureId,
-  parseSummaryForRunes,
-  type RuneSummary,
-  type Transport,
-} from '@secretkeylabs/xverse-core';
+import { AnalyticsEvents, btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import RoutePaths from 'app/routes/paths';
@@ -48,9 +40,7 @@ function SendOrdinalScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [transaction, setTransaction] = useState<btcTransaction.EnhancedTransaction | undefined>();
   const [summary, setSummary] = useState<TransactionSummary | undefined>();
-  const [runeSummary, setRuneSummary] = useState<RuneSummary | undefined>();
   const [insufficientFundsError, setInsufficientFundsError] = useState(false);
-  const hasRunesSupport = useHasFeature(FeatureId.RUNES_SUPPORT);
 
   useResetUserFlow(RoutePaths.SendOrdinal);
 
@@ -67,7 +57,6 @@ function SendOrdinalScreen() {
     if (!recipientAddress || !feeRate) {
       setTransaction(undefined);
       setSummary(undefined);
-      setRuneSummary(undefined);
       setInsufficientFundsError(false);
       return;
     }
@@ -92,16 +81,6 @@ function SendOrdinalScreen() {
         if (!transactionDetails) return;
         setTransaction(transactionDetails);
         setSummary(await transactionDetails.getSummary());
-        if (hasRunesSupport) {
-          setRuneSummary(
-            await parseSummaryForRunes(
-              context,
-              await transactionDetails.getSummary(),
-              context.network,
-              { separateTransfersOnNoExternalInputs: true },
-            ),
-          );
-        }
       } catch (e) {
         if (e instanceof Error) {
           // don't log the error if it's just an insufficient funds error
@@ -208,7 +187,6 @@ function SendOrdinalScreen() {
   return (
     <StepDisplay
       summary={summary}
-      runeSummary={runeSummary}
       ordinal={selectedOrdinal}
       currentStep={currentStep}
       setCurrentStep={setCurrentStep}

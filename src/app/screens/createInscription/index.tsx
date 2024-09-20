@@ -27,7 +27,7 @@ import ConfirmScreen from '@components/confirmScreen';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { isLedgerAccount } from '@utils/helper';
 
-import InscribeSection from '@components/confirmBtcTransaction/inscribeSection';
+import InscribeSection from 'app/components/confirmBtcTransaction/sections/inscribeSection';
 import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useConfirmedBtcBalance from '@hooks/queries/useConfirmedBtcBalance';
