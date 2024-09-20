@@ -67,12 +67,12 @@ interface Props {
   unit?: string;
 }
 
-const TruncatedP = styled(StyledP)`
+const TruncatedP = styled(StyledP)<{ $textAlign: string }>`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 150px;
-  text-align: right;
+  width: 120px;
+  text-align: ${({ $textAlign }) => $textAlign};
 `;
 
 function QuoteTile({
@@ -101,15 +101,25 @@ function QuoteTile({
       <TokenImage currency={image.currency} fungibleToken={image.ft} size={32} />
       <InfoContainer>
         <RowCenter>
-          <StyledP data-testid="place-name" typography="body_bold_m" color="white_0">
+          <TruncatedP
+            $textAlign="left"
+            data-testid="place-name"
+            typography="body_bold_m"
+            color="white_0"
+          >
             {provider}
-          </StyledP>
+          </TruncatedP>
           <NumericFormat
             value={price}
             displayType="text"
             thousandSeparator
             renderText={() => (
-              <TruncatedP data-testid="quote-label" typography="body_bold_m" color="white_0">
+              <TruncatedP
+                $textAlign="right"
+                data-testid="quote-label"
+                typography="body_bold_m"
+                color="white_0"
+              >
                 {formatNumber(price)} {unit}
               </TruncatedP>
             )}
