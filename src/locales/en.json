@@ -410,7 +410,7 @@
     "RUNES_CENOTAPH_WARNING": "This transaction will burn all input Runes. Make sure you trust the requesting app.",
     "YOU_WILL_SEND": "You will send",
     "TRANSACTION_DETAILS": "Transaction details",
-    "BTC_TRANSFER_WARNING": "This amount may include the tx fee & postage associated to transferred ordinals, runes & BRC-20.",
+    "BTC_TRANSFER_WARNING": "This amount may include the network fee.",
     "LEDGER": {
       "CONNECT": {
         "TITLE": "Connect your hardware wallet",
