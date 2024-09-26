@@ -66,13 +66,18 @@ test.describe('Send runes', () => {
     await wallet.buttonNext.click();
 
     await wallet.checkVisualsSendPage2('send-rune');
-    await wallet.inputSendAmount.fill(price.toString());
-    await expect(wallet.buttonNext).toBeEnabled();
+    await page.getByRole('textbox', { name: '0' }).fill(price.toString());
+    await page.getByRole('button', { name: 'Edit' }).click();
+    await page.getByRole('button', { name: /custom/i }).click();
+    await page.getByRole('dialog').getByPlaceholder('0').fill('3');
+    await page.getByRole('button', { name: 'Apply' }).click();
+    await page.getByRole('button', { name: 'Next' }).click();
 
     const displayBalance = await wallet.labelBalanceAmountSelector.innerText();
     const displayBalanceNumerical = parseFloat(displayBalance.replace(/[^0-9.]/g, ''));
     await expect(originalBalanceAmount).toEqual(displayBalanceNumerical);
-    await wallet.buttonNext.click();
+
+    await page.getByRole('button', { name: 'Next' }).click();
 
     await wallet.checkVisualsSendTransactionReview(
       'send-rune',
@@ -124,17 +129,22 @@ test.describe('Send runes', () => {
     await wallet.invalidAddressCheck(wallet.receiveAddress);
 
     await wallet.receiveAddress.fill(TEST_ORDINALS_ADDRESS);
-    await expect(wallet.buttonNext).toBeEnabled();
-    await wallet.buttonNext.click();
+    await page.getByRole('button', { name: 'Next' }).click();
 
     await wallet.checkVisualsSendPage2('send-rune');
-    await wallet.inputSendAmount.fill(price.toString());
-    await expect(wallet.buttonNext).toBeEnabled();
+    await page.getByRole('textbox', { name: '0' }).fill('3');
+
+    await page.getByRole('button', { name: 'Edit' }).click();
+    await page.getByRole('button', { name: /custom/i }).click();
+    await page.getByRole('dialog').getByPlaceholder('0').fill('3');
+    await page.getByRole('button', { name: 'Apply' }).click();
+    await expect(page.getByRole('button', { name: 'Next' })).toBeVisible();
+    await page.getByRole('button', { name: 'Next' }).click();
 
     const displayBalance = await wallet.labelBalanceAmountSelector.innerText();
     const displayBalanceNumerical = parseFloat(displayBalance.replace(/[^0-9.]/g, ''));
     await expect(originalBalanceAmount).toEqual(displayBalanceNumerical);
-    await wallet.buttonNext.click();
+    await page.getByRole('button', { name: 'Next' }).click();
 
     await wallet.checkVisualsSendTransactionReview(
       'send-rune',
