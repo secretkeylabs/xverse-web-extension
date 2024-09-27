@@ -5,7 +5,6 @@ import useSubmitRuneSellPsbt from '@hooks/queries/runes/useSubmitRuneSellPsbt';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import { RpcErrorCode } from '@sats-connect/core';
-import { SigHash } from '@scure/btc-signer';
 import { AnalyticsEvents, btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
 import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
@@ -70,7 +69,6 @@ function SignPsbtRequest() {
       const signedPsbt = await parsedPsbt?.getSignedPsbtBase64({
         finalize: payload.broadcast,
         ledgerTransport,
-        allowedSigHash: magicEdenPsbt && runeId ? [SigHash.SINGLE_ANYONECANPAY] : undefined,
       });
       const response = await confirmSignPsbt(signedPsbt);
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {

@@ -2,7 +2,6 @@ import BatchPsbtSigning from '@components/batchPsbtSigning';
 import useXverseApi from '@hooks/apiClients/useXverseApi';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import type { SignMultiplePsbtPayload } from '@sats-connect/core';
-import * as btc from '@scure/btc-signer';
 import { AnalyticsEvents } from '@secretkeylabs/xverse-core';
 import { trackMixPanel } from '@utils/mixpanel';
 import type { RuneItem } from '@utils/runes';
@@ -83,14 +82,7 @@ function RuneListingBatchSigning() {
     navigate('/');
   };
 
-  return (
-    <BatchPsbtSigning
-      psbts={psbts}
-      onSigned={onSigned}
-      onCancel={onCancel}
-      allowedSigHash={[btc.SigHash.SINGLE_ANYONECANPAY]}
-    />
-  );
+  return <BatchPsbtSigning psbts={psbts} onSigned={onSigned} onCancel={onCancel} />;
 }
 
 export default RuneListingBatchSigning;
