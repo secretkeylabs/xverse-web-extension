@@ -291,7 +291,7 @@ export default function ListRuneScreen() {
 
   useEffect(() => {
     if (signPsbtPayload) {
-      navigate(`${RequestsRoutes.SignBatchBtcTx}?signBatchPsbtsInApp=true`, {
+      navigate(RequestsRoutes.RuneListingBatchSigning, {
         state: {
           payload: signPsbtPayload,
           utxos: listItemsMap,

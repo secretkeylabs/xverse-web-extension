@@ -53,7 +53,7 @@
     "@tanstack/react-query-persist-client": "^4.29.3",
     "argon2-browser": "^1.18.0",
     "async-mutex": "^0.5.0",
-    "axios": "^1.7.7",
+    "axios": "1.7.7",
     "bignumber.js": "^9.1.0",
     "bip39": "^3.0.3",
     "classnames": "^2.3.2",

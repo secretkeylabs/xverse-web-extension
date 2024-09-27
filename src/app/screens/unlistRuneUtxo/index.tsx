@@ -114,7 +114,7 @@ export default function UnlistRuneUtxoScreen() {
       const data = response[0];
 
       if (['Magic Eden', 'OKX'].includes(listing.marketplaceName) && data.type === 'withMessage') {
-        navigate(RequestsRoutes.SignMessageRequestInApp, {
+        navigate(RequestsRoutes.SignRuneDelistingMessage, {
           state: {
             requestPayload: {
               payload: {
