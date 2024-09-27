@@ -15,6 +15,7 @@ const useTransactionContext = () => {
     () =>
       new UtxoCache({
         cacheStorageController: {
+          getAllKeys: async () => Object.keys(localStorage),
           get: async (key: string) => {
             const value = localStorage.getItem(key);
             return value;
