@@ -46,12 +46,10 @@ const useSignPsbtParams = (network: SettingsNetwork) => {
         requestToken: null,
       };
     }
-    const allowedSigHash = params.get('allowedSigHash') ?? '';
     const signInputs = JSON.parse(params.get('signInputs')!) as Record<string, number[]>;
     const inputsToSign: InputToSign[] = Object.keys(signInputs).map((address) => ({
       address,
       signingIndexes: signInputs[address],
-      sigHash: +allowedSigHash,
     }));
     const rpcPayload: SignTransactionPayload = {
       psbtBase64: params.get('psbt') ?? '',

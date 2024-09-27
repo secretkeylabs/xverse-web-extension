@@ -11,7 +11,6 @@ import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowLeft, ArrowRight } from '@phosphor-icons/react';
 import type { SignMultiplePsbtPayload } from '@sats-connect/core';
-import * as btc from '@scure/btc-signer';
 import {
   AnalyticsEvents,
   btcTransaction,
@@ -49,10 +48,9 @@ interface BatchPsbtSigningProps {
   psbts: SignMultiplePsbtPayload[];
   onSigned: (signedPsbts: string[]) => void | Promise<void>;
   onCancel: () => void;
-  allowedSigHash?: btc.SigHash[];
 }
 
-function BatchPsbtSigning({ onSigned, psbts, onCancel, allowedSigHash }: BatchPsbtSigningProps) {
+function BatchPsbtSigning({ onSigned, psbts, onCancel }: BatchPsbtSigningProps) {
   const selectedAccount = useSelectedAccount();
   const { network } = useWalletSelector();
   const navigate = useNavigate();
@@ -130,7 +128,6 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, allowedSigHash }: BatchPs
 
         const psbtBase64 = await enhancedPsbt.getSignedPsbtBase64({
           finalize: false,
-          allowedSigHash,
         });
         signedPsbts.push(psbtBase64);
 
