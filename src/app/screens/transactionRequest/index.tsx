@@ -167,9 +167,11 @@ function TransactionRequest() {
     } else if (payload.txType === 'smart_contract') {
       await handleContractDeployRequest(payload, requestAccount);
     } else {
+      console.log(payload);
       navigate(RoutePaths.ConfirmStacksTransaction, {
         state: {
           unsignedTx: payload.txHex,
+          fee: payload.fee,
           sponsored: payload.sponsored,
           isBrowserTx: true,
           tabId,

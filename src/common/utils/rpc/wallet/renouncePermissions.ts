@@ -36,7 +36,7 @@ export const handleRenouncePermissions = async (
   }
 
   await utils.permissionsStoreMutex.runExclusive(async () => {
-    utils.removeClient(store.clients, store.permissions, origin);
+    utils.removeClient(store, origin);
     utils.savePermissionsStore(store);
   });
 

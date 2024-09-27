@@ -1,97 +1,125 @@
 import { dispatchEventToOrigin } from '@common/utils/messages/extensionToContentScript/dispatchEvent';
 import { usePermissionsStore, usePermissionsUtils } from '@components/permissionsManager';
-import type { Client } from '@components/permissionsManager/schemas';
-import * as utils from '@components/permissionsManager/utils';
+import type { Client as ClientType } from '@components/permissionsManager/schemas';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import { useCallback } from 'react';
+import Button from '@ui-library/button';
+import { formatDate } from '@utils/date';
+import { useCallback, useMemo, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { SubTitle, Title } from '../index.styles';
+import ClientApp, { ClientPermissions } from './client';
 import {
-  Button,
-  ClientHeader,
-  ClientName,
+  ButtonContainer,
+  ClientProperty,
+  ClientPropertyContainer,
+  ClientPropertyValue,
   Container,
-  PermissionContainer,
-  PermissionDescription,
-  PermissionTitle,
   Row,
 } from './index.styles';
 
+export type ConnectedApp = ClientType & { lastUsed: number };
+
 function ConnectedAppsAndPermissionsScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONNECTED_APPS' });
+  const [selectedApp, setSelectedApp] = useState<ConnectedApp | null>(null);
   const navigate = useNavigate();
-  const { removeClient } = usePermissionsUtils();
+  const { removeClient, removeAllClients, getClientMetadata } = usePermissionsUtils();
   const { store } = usePermissionsStore();
 
-  const handleBackButtonClick = useCallback(() => {
-    navigate('/settings');
-  }, [navigate]);
+  const getClientsSortedByLastUsed = useCallback((): ConnectedApp[] | undefined => {
+    if (!store || !store.clients) {
+      return undefined;
+    }
 
-  const handleDisconnect = useCallback(
-    async (client: Client) => {
-      // TODO: Handle error state in UI when designs are finalized.
-      await removeClient(client.id);
-      dispatchEventToOrigin(client.origin, {
-        type: 'disconnect',
-      });
-    },
-    [removeClient],
+    const clientsArray = Array.from(store.clients);
+
+    return clientsArray
+      .map((client) => {
+        const lastUsed = getClientMetadata(client.id)?.lastUsed || 0;
+        return { ...client, lastUsed };
+      })
+      .sort((a, b) => b.lastUsed - a.lastUsed);
+  }, [store, getClientMetadata]);
+
+  const clientsSortedByLastUsed = useMemo(
+    () => getClientsSortedByLastUsed(),
+    [getClientsSortedByLastUsed],
   );
 
-  if (!store) {
-    return null;
-  }
+  const handleBackButtonClick = useCallback(() => {
+    if (selectedApp) {
+      setSelectedApp(null);
+      return;
+    }
+    navigate('/settings');
+  }, [navigate, selectedApp]);
+
+  const handleDisconnect = useCallback(async () => {
+    if (selectedApp) {
+      await removeClient(selectedApp.id);
+      dispatchEventToOrigin(selectedApp.origin, {
+        type: 'disconnect',
+      });
+      toast.success(t('DISCONNECT_SUCCESS'));
+      setSelectedApp(null);
+      return;
+    }
+    if (store) {
+      store.clients.forEach((client) => {
+        dispatchEventToOrigin(client.origin, {
+          type: 'disconnect',
+        });
+      });
+      await removeAllClients();
+    }
+    toast.success(t('DISCONNECT_ALL_SUCCESS'));
+  }, [selectedApp, removeClient, removeAllClients, t, store]);
 
   return (
     <>
       <TopRow onClick={handleBackButtonClick} />
       <Container>
-        <Title>{t('TITLE')}</Title>
-        <SubTitle> {store.clients.size === 0 ? t('EMPTY_MESSAGE') : t('SUBTITLE')}</SubTitle>
-        {[...store.clients].map((client) => (
-          <div key={client.id}>
-            <ClientHeader>
-              <ClientName>{client.name}</ClientName>
-              <Button
-                type="button"
-                onClick={() => {
-                  handleDisconnect(client);
-                }}
-              >
-                Disconnect
-              </Button>
-            </ClientHeader>
-            {utils
-              .getClientPermissions(store.permissions, client.id)
-              .sort((p1, p2) => p1.resourceId.localeCompare(p2.resourceId))
-              .map((p) => (
-                <div key={p.resourceId}>
-                  {(() => {
-                    const resource = utils.getResource(store.resources, p.resourceId);
-
-                    if (!resource) {
-                      return null;
-                    }
-
-                    return (
-                      <Row key={p.resourceId}>
-                        <PermissionContainer>
-                          <PermissionTitle>{resource.name}</PermissionTitle>
-                          <PermissionDescription>
-                            {[...p.actions].map((a) => (
-                              <div key={a}>{a}</div>
-                            ))}
-                          </PermissionDescription>
-                        </PermissionContainer>
-                      </Row>
-                    );
-                  })()}
-                </div>
-              ))}
-          </div>
-        ))}
+        {selectedApp ? (
+          <>
+            <Title>{selectedApp.name}</Title>
+            <ClientPropertyContainer>
+              <Row>
+                <ClientProperty>{t('URL')}</ClientProperty>
+                <ClientPropertyValue>{selectedApp.name}</ClientPropertyValue>
+              </Row>
+              <Row>
+                <ClientProperty>{t('LAST_USED')}</ClientProperty>
+                <ClientPropertyValue>
+                  {selectedApp.lastUsed ? formatDate(new Date(selectedApp.lastUsed)) : '-'}
+                </ClientPropertyValue>
+              </Row>
+              <Row>
+                <ClientProperty>{t('PERMISSIONS')}</ClientProperty>
+                <ClientPermissions clientId={selectedApp.id} />
+              </Row>
+            </ClientPropertyContainer>
+          </>
+        ) : (
+          <>
+            <Title>{t('TITLE')}</Title>
+            <SubTitle>{store?.clients.size === 0 ? t('EMPTY_MESSAGE') : t('SUBTITLE')}</SubTitle>
+            {clientsSortedByLastUsed?.map((client) => (
+              <ClientApp key={client.id} setSelectedApp={setSelectedApp} client={client} />
+            ))}
+          </>
+        )}
+        {(store?.clients?.size ?? 0) > 0 || selectedApp ? (
+          <ButtonContainer>
+            <Button
+              title={selectedApp ? t('DISCONNECT') : t('DISCONNECT_ALL')}
+              variant="secondary"
+              onClick={handleDisconnect}
+            />
+          </ButtonContainer>
+        ) : null}
       </Container>
       <BottomBar tab="settings" />
     </>

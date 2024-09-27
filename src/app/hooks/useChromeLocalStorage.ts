@@ -5,7 +5,7 @@ const useChromeLocalStorage = <T extends unknown>(key: string, defaultValue?: T)
   const queryClient = useQueryClient();
 
   const { data: value, isFetching } = useQuery({
-    queryKey: ['chromeLocalStorage', key],
+    queryKey: ['chromeLocalStorage', key, defaultValue],
     queryFn: async () => {
       const result = await chromeStorage.local.getItem<T>(key);
       return result === undefined ? defaultValue : result;

@@ -88,6 +88,12 @@ const handleGetRunesBalance = async (message: RpcRequestMessage, port: chrome.ru
     return;
   }
 
+  await utils.permissionsStoreMutex.runExclusive(async () => {
+    // Update the last used time for the client
+    utils.updateClientMetadata(store, origin, { lastUsed: new Date().getTime() });
+    await utils.savePermissionsStore(store);
+  });
+
   const runesApi = getRunesClient(network.type);
 
   try {

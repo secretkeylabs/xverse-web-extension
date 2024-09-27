@@ -892,7 +892,14 @@
   "CONNECTED_APPS": {
     "TITLE": "Connected Apps",
     "SUBTITLE": "You are connected to the following apps.",
-    "EMPTY_MESSAGE": "You're not currently connected to any app."
+    "EMPTY_MESSAGE": "You're not currently connected to any app.",
+    "DISCONNECT_SUCCESS": "App disconnected",
+    "DISCONNECT_ALL_SUCCESS": "All apps disconnected",
+    "DISCONNECT": "Disconnect",
+    "DISCONNECT_ALL": "Disconnect all",
+    "URL": "URL",
+    "LAST_USED": "Last used",
+    "PERMISSIONS": "Permissions"
   },
   "EXPLORE_SCREEN": {
     "TITLE": "Explore",
