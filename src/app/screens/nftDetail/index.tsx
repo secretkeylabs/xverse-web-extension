@@ -1,15 +1,36 @@
 import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
 import AccountHeaderComponent from '@components/accountHeader';
-import ActionButton from '@components/button';
 import CollectibleDetailTile from '@components/collectibleDetailTile';
 import SquareButton from '@components/squareButton';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import { ArrowLeft, ArrowUp, Share } from '@phosphor-icons/react';
+import useOptionsSheet from '@hooks/useOptionsSheet';
+import useSelectedAccount from '@hooks/useSelectedAccount';
+import useWalletSelector from '@hooks/useWalletSelector';
+import {
+  ArrowLeft,
+  ArrowUp,
+  DotsThreeVertical,
+  Share,
+  UserCircleCheck,
+  UserCircleMinus,
+} from '@phosphor-icons/react';
 import NftImage from '@screens/nftDashboard/nftImage';
+import { StyledButton } from '@screens/ordinalsCollection/index.styled';
 import type { Attribute } from '@secretkeylabs/xverse-core';
+import {
+  removeAccountAvatarAction,
+  setAccountAvatarAction,
+} from '@stores/wallet/actions/actionCreators';
+import ActionButton from '@ui-library/button';
+import Sheet from '@ui-library/sheet';
+import SnackBar from '@ui-library/snackBar';
 import { EMPTY_LABEL } from '@utils/constants';
+import { useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import Theme from '../../../theme';
 import {
   ActionButtonLoader,
   ActionButtonsLoader,
@@ -58,6 +79,10 @@ import NftAttribute from './nftAttribute';
 import useNftDetailScreen from './useNftDetail';
 
 function NftDetailScreen() {
+  const dispatch = useDispatch();
+  const optionsSheet = useOptionsSheet();
+  const { t: optionsDialogT } = useTranslation('translation', { keyPrefix: 'OPTIONS_DIALOG' });
+  const { t: commonT } = useTranslation('translation', { keyPrefix: 'COMMON' });
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
   const {
     nft,
@@ -74,6 +99,51 @@ function NftDetailScreen() {
     handleOnSendClick,
     galleryTitle,
   } = useNftDetailScreen();
+  const selectedAccount = useSelectedAccount();
+  const { avatarIds } = useWalletSelector();
+  const currentAvatar = avatarIds[selectedAccount.btcAddress];
+  const isNftSelectedAsAvatar =
+    currentAvatar?.type === 'stacks' && currentAvatar.nft.token_id === nftData?.token_id;
+
+  const handleSetAvatar = useCallback(() => {
+    const address = selectedAccount.btcAddress;
+
+    if (address && nftData?.token_id) {
+      dispatch(
+        setAccountAvatarAction({
+          address,
+          avatar: { type: 'stacks', nft: nftData },
+        }),
+      );
+
+      const toastId = toast.custom(
+        <SnackBar
+          text={optionsDialogT('NFT_AVATAR.SET_TOAST')}
+          type="neutral"
+          action={{
+            text: commonT('UNDO'),
+            onClick: () => {
+              if (currentAvatar?.type) {
+                dispatch(setAccountAvatarAction({ address, avatar: currentAvatar }));
+              } else {
+                dispatch(removeAccountAvatarAction({ address }));
+              }
+
+              toast.remove(toastId);
+            },
+          }}
+        />,
+      );
+    }
+
+    optionsSheet.close();
+  }, [dispatch, optionsDialogT, commonT, selectedAccount, nftData, optionsSheet, currentAvatar]);
+
+  const handleRemoveAvatar = useCallback(() => {
+    dispatch(removeAccountAvatarAction({ address: selectedAccount.btcAddress }));
+    toast.custom(<SnackBar text={optionsDialogT('NFT_AVATAR.REMOVE_TOAST')} type="neutral" />);
+    optionsSheet.close();
+  }, [dispatch, optionsDialogT, selectedAccount, optionsSheet]);
 
   const nftAttributes = nftData?.nft_token_attributes?.length !== 0 && (
     <>
@@ -258,18 +328,17 @@ function NftDetailScreen() {
               <GalleryReceiveButtonContainer>
                 <ActionButton
                   icon={<ArrowUp weight="bold" size="16" />}
-                  text={t('SEND')}
-                  onPress={handleOnSendClick}
+                  title={t('SEND')}
+                  onClick={handleOnSendClick}
                 />
               </GalleryReceiveButtonContainer>
-
               <ShareButtonContainer>
                 <ActionButton
+                  id={`copy-nft-url-${nftData?.asset_id}`}
                   icon={<Share weight="bold" color="white" size="16" />}
-                  text={t('SHARE')}
-                  onPress={onSharePress}
-                  hoverDialogId={`copy-nft-url-${nftData?.asset_id}`}
-                  transparent
+                  title={t('SHARE')}
+                  onClick={onSharePress}
+                  variant="secondary"
                 />
                 <StyledTooltip
                   anchorId={`copy-nft-url-${nftData?.asset_id}`}
@@ -279,6 +348,13 @@ function NftDetailScreen() {
                   place="top"
                 />
               </ShareButtonContainer>
+              <SquareButton
+                icon={<DotsThreeVertical size={20} color={Theme.colors.white_0} weight="bold" />}
+                onPress={optionsSheet.open}
+                isTransparent
+                size={44}
+                radiusSize={12}
+              />
             </GalleryRowContainer>
             {nftDetails}
             <Button isGallery={isGalleryOpen} onClick={onExplorerPress}>
@@ -300,13 +376,36 @@ function NftDetailScreen() {
       {isGalleryOpen ? (
         <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
       ) : (
-        <TopRow onClick={handleBackButtonClick} />
+        <TopRow onClick={handleBackButtonClick} onMenuClick={optionsSheet.open} />
       )}
       {isGalleryOpen ? galleryView : extensionView}
       {!isGalleryOpen && (
         <BottomBarContainer>
           <BottomTabBar tab="nft" />
         </BottomBarContainer>
+      )}
+      {optionsSheet.isVisible && (
+        <Sheet
+          title={commonT('OPTIONS')}
+          visible={optionsSheet.isVisible}
+          onClose={optionsSheet.close}
+        >
+          {isNftSelectedAsAvatar ? (
+            <StyledButton
+              variant="tertiary"
+              icon={<UserCircleMinus size={24} color={Theme.colors.white_200} />}
+              title={optionsDialogT('NFT_AVATAR.REMOVE_ACTION')}
+              onClick={handleRemoveAvatar}
+            />
+          ) : (
+            <StyledButton
+              variant="tertiary"
+              icon={<UserCircleCheck size={24} color={Theme.colors.white_200} />}
+              title={optionsDialogT('NFT_AVATAR.SET_ACTION')}
+              onClick={handleSetAvatar}
+            />
+          )}
+        </Sheet>
       )}
     </>
   );

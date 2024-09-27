@@ -27,7 +27,6 @@ import ConfirmScreen from '@components/confirmScreen';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { isLedgerAccount } from '@utils/helper';
 
-import InscribeSection from 'app/components/confirmBtcTransaction/sections/inscribeSection';
 import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useCoinRates from '@hooks/queries/useCoinRates';
 import useConfirmedBtcBalance from '@hooks/queries/useConfirmedBtcBalance';
@@ -38,6 +37,7 @@ import { StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
 import { trackMixPanel } from '@utils/mixpanel';
+import InscribeSection from 'app/components/confirmBtcTransaction/sections/inscribeSection';
 import CompleteScreen from './CompleteScreen';
 import EditFee from './EditFee';
 import ErrorModal from './ErrorModal';

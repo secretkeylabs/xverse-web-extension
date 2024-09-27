@@ -22,13 +22,12 @@ import { useTheme } from 'styled-components';
 export default function useOrdinalDetail() {
   const navigate = useNavigate();
   const selectedAccount = useSelectedAccount();
-  const { network, hasActivatedRareSatsKey } = useWalletSelector();
-  const { id } = useParams();
+  const { network, hasActivatedRareSatsKey, hiddenCollectibleIds } = useWalletSelector();
+  const { id, from } = useParams();
   const { data: ordinalData, isLoading } = useAddressInscription(id!);
   const { data: collectionMarketData } = useInscriptionCollectionMarketData(
     ordinalData?.collection_id,
   );
-
   const { isPending, pendingTxHash } = usePendingOrdinalTxs(ordinalData?.tx_id);
   const textContent = useTextOrdinalContent(ordinalData!);
   const { setSelectedSatBundleDetails } = useSatBundleDataReducer();
@@ -39,6 +38,11 @@ export default function useOrdinalDetail() {
   );
   const theme = useTheme();
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
+  const { t: tCollectibles } = useTranslation('translation', {
+    keyPrefix: 'COLLECTIBLE_COLLECTION_SCREEN',
+  });
+
+  const comesFromHidden = from === 'hidden';
 
   const [showSendOridnalsAlert, setshowSendOridnalsAlert] = useState(false);
 
@@ -53,10 +57,24 @@ export default function useOrdinalDetail() {
     [textContent, ordinalData?.content_type],
   );
 
+  const isInscriptionHidden = Object.keys(
+    hiddenCollectibleIds[selectedAccount.ordinalsAddress] ?? {},
+  ).some((ordinalId) => ordinalId === ordinalData?.id);
+
   const handleBackButtonClick = () => {
-    if (ordinalData?.collection_id)
-      navigate(`/nft-dashboard/ordinals-collection/${ordinalData?.collection_id}`);
-    else navigate('/nft-dashboard?tab=inscriptions');
+    if (isGalleryOpen) {
+      if (comesFromHidden || isInscriptionHidden) {
+        navigate('/nft-dashboard/hidden?tab=inscriptions');
+      } else if (ordinalData?.collection_id) {
+        navigate(`/nft-dashboard/ordinals-collection/${ordinalData?.collection_id}`);
+      } else {
+        navigate('/nft-dashboard?tab=inscriptions');
+      }
+
+      return;
+    }
+
+    navigate(-1);
   };
 
   const openInGalleryView = async () => {
@@ -114,6 +132,8 @@ export default function useOrdinalDetail() {
 
   const backButtonText = ordinalData?.collection_id
     ? t('BACK_TO_COLLECTION')
+    : comesFromHidden || isInscriptionHidden
+    ? tCollectibles('BACK_TO_HIDDEN_COLLECTIBLES')
     : t('MOVE_TO_ASSET_DETAIL');
 
   return {

@@ -5,10 +5,7 @@ import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useTransactionContext from '@hooks/useTransactionContext';
 import { RpcErrorCode, sendInscriptionsSchema } from '@sats-connect/core';
 import { type TransactionSummary } from '@screens/sendBtc/helpers';
-import {
-  btcTransaction,
-  type Transport,
-} from '@secretkeylabs/xverse-core';
+import { btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
 import { useEffect, useState } from 'react';
 import * as v from 'valibot';
 

@@ -1,22 +1,27 @@
 import LedgerBadge from '@assets/img/ledger/ledger_badge.svg';
 import BarLoader from '@components/barLoader';
 import OptionsDialog from '@components/optionsDialog/optionsDialog';
+import useOptionsDialog from '@hooks/useOptionsDialog';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CaretDown, DotsThreeVertical } from '@phosphor-icons/react';
 import { currencySymbolMap, type Account } from '@secretkeylabs/xverse-core';
+import { removeAccountAvatarAction } from '@stores/wallet/actions/actionCreators';
 import Button from '@ui-library/button';
 import Input from '@ui-library/input';
 import Sheet from '@ui-library/sheet';
+import SnackBar from '@ui-library/snackBar';
 import Spinner from '@ui-library/spinner';
-import { EMPTY_LABEL, LoaderSize, OPTIONS_DIALOG_WIDTH } from '@utils/constants';
-import { getAccountGradient } from '@utils/gradient';
+import { EMPTY_LABEL, LoaderSize } from '@utils/constants';
 import { isLedgerAccount, validateAccountName } from '@utils/helper';
 import { useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
+import { useDispatch } from 'react-redux';
 import 'react-tooltip/dist/react-tooltip.css';
 import Theme from 'theme';
+import AccountAvatar from './accountAvatar';
 import {
   AccountInfoContainer,
   AccountName,
@@ -26,7 +31,6 @@ import {
   Container,
   CurrentAccountContainer,
   CurrentAccountTextContainer,
-  GradientCircle,
   InputLabel,
   ModalButtonContainer,
   ModalContent,
@@ -50,24 +54,23 @@ function AccountRow({
   isAccountListView?: boolean;
   disabledAccountSelect?: boolean;
 }) {
+  const dispatch = useDispatch();
+  const menuDialog = useOptionsDialog();
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const { t: optionsDialogTranslation } = useTranslation('translation', {
     keyPrefix: 'OPTIONS_DIALOG',
   });
-  const { accountsList, ledgerAccountsList, fiatCurrency, accountBalances } = useWalletSelector();
+  const { accountsList, ledgerAccountsList, fiatCurrency, accountBalances, avatarIds } =
+    useWalletSelector();
+  const accountAvatar = avatarIds[account?.btcAddress ?? ''];
   const totalBalance = accountBalances[account?.btcAddress ?? ''];
-  const gradient = getAccountGradient(account?.stxAddress || account?.btcAddress!);
   const btcCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
   const stxCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
-  const [showOptionsDialog, setShowOptionsDialog] = useState(false);
   const [showRemoveAccountModal, setShowRemoveAccountModal] = useState(false);
   const [showRenameAccountModal, setShowRenameAccountModal] = useState(false);
   const [accountName, setAccountName] = useState('');
   const [accountNameError, setAccountNameError] = useState<string | null>(null);
   const [isAccountNameChangeLoading, setIsAccountNameChangeLoading] = useState(false);
-  const [optionsDialogIndents, setOptionsDialogIndents] = useState<
-    { top: string; left: string } | undefined
-  >();
   const { removeLedgerAccount, renameAccount, updateLedgerAccounts } = useWalletReducer();
 
   useEffect(
@@ -90,25 +93,10 @@ function AccountRow({
     } else {
       setAccountNameError(null);
     }
-  }, [accountName]);
+  }, [accountName, accountsList, ledgerAccountsList, optionsDialogTranslation]);
 
   const handleClick = () => {
     onAccountSelected(account!);
-  };
-
-  const openOptionsDialog = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setShowOptionsDialog(true);
-
-    setOptionsDialogIndents({
-      top: `${(event.target as HTMLElement).parentElement?.getBoundingClientRect().top}px`,
-      left: `calc(${
-        (event.target as HTMLElement).parentElement?.getBoundingClientRect().right
-      }px - ${OPTIONS_DIALOG_WIDTH}px)`,
-    });
-  };
-
-  const closeOptionsDialog = () => {
-    setShowOptionsDialog(false);
   };
 
   const handleRemoveAccountModalOpen = () => {
@@ -125,6 +113,13 @@ function AccountRow({
 
   const handleRenameAccountModalClose = () => {
     setShowRenameAccountModal(false);
+  };
+
+  const handleRemoveAvatar = () => {
+    dispatch(removeAccountAvatarAction({ address: account?.btcAddress ?? '' }));
+    toast.custom(
+      <SnackBar text={optionsDialogTranslation('NFT_AVATAR.REMOVE_TOAST')} type="neutral" />,
+    );
   };
 
   const handleRemoveLedgerAccount = async () => {
@@ -196,12 +191,11 @@ function AccountRow({
   return (
     <Container>
       <AccountInfoContainer $disableClick={disabledAccountSelect} onClick={handleClick}>
-        <GradientCircle
-          $firstGradient={gradient[0]}
-          $secondGradient={gradient[1]}
-          $thirdGradient={gradient[2]}
-          $isBig={isAccountListView}
-          $isSelected={isSelected}
+        <AccountAvatar
+          account={account}
+          avatar={accountAvatar}
+          isSelected={isSelected}
+          isAccountListView={isAccountListView}
         />
         <CurrentAccountContainer>
           {account && (
@@ -249,16 +243,21 @@ function AccountRow({
       </AccountInfoContainer>
 
       {isAccountListView && (
-        <OptionsButton aria-label="Open Account Options" onClick={openOptionsDialog}>
+        <OptionsButton aria-label="Open Account Options" onClick={menuDialog.open}>
           <DotsThreeVertical size={20} fill="white" />
         </OptionsButton>
       )}
 
-      {showOptionsDialog && (
-        <OptionsDialog closeDialog={closeOptionsDialog} optionsDialogIndents={optionsDialogIndents}>
+      {menuDialog.isVisible && (
+        <OptionsDialog closeDialog={menuDialog.close} optionsDialogIndents={menuDialog.indents}>
           <ButtonRow onClick={handleRenameAccountModalOpen}>
             {optionsDialogTranslation('RENAME_ACCOUNT')}
           </ButtonRow>
+          {accountAvatar?.type && (
+            <ButtonRow onClick={handleRemoveAvatar}>
+              {optionsDialogTranslation('NFT_AVATAR.REMOVE_ACTION')}
+            </ButtonRow>
+          )}
           {isLedgerAccount(account) && (
             <ButtonRow onClick={handleRemoveAccountModalOpen}>
               {optionsDialogTranslation('REMOVE_FROM_LIST')}

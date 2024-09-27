@@ -246,3 +246,72 @@ export const updateSavedNamesAction = (
   networkType,
   names,
 });
+
+export function addToStarCollectiblesAction(params: {
+  address: string;
+  id: string;
+  collectionId?: string;
+}): actions.AddToStarCollectibles {
+  return {
+    type: actions.AddToStarCollectiblesKey,
+    ...params,
+  };
+}
+
+export function removeFromStarCollectiblesAction(params: {
+  address: string;
+  id: string;
+}): actions.RemoveFromStarCollectibles {
+  return {
+    type: actions.RemoveFromStarCollectiblesKey,
+    ...params,
+  };
+}
+
+export function addToHideCollectiblesAction(params: {
+  address: string;
+  id: string;
+}): actions.AddToHideCollectibles {
+  return {
+    type: actions.AddToHideCollectiblesKey,
+    ...params,
+  };
+}
+
+export function removeFromHideCollectiblesAction(params: {
+  address: string;
+  id: string;
+}): actions.RemoveFromHideCollectibles {
+  return {
+    type: actions.RemoveFromHideCollectiblesKey,
+    ...params,
+  };
+}
+
+export function removeAllFromHideCollectiblesAction(params: {
+  address: string;
+}): actions.RemoveAllFromHideCollectibles {
+  return {
+    type: actions.RemoveAllFromHideCollectiblesKey,
+    ...params,
+  };
+}
+
+export function setAccountAvatarAction(params: {
+  address: string;
+  avatar: actions.AvatarInfo;
+}): actions.SetAccountAvatar {
+  return {
+    type: actions.SetAccountAvatarKey,
+    ...params,
+  };
+}
+
+export function removeAccountAvatarAction(params: {
+  address: string;
+}): actions.RemoveAccountAvatar {
+  return {
+    type: actions.RemoveAccountAvatarKey,
+    ...params,
+  };
+}

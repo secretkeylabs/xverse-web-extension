@@ -21,12 +21,14 @@ import {
   type StacksTransaction,
 } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
+import { removeAccountAvatarAction } from '@stores/wallet/actions/actionCreators';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -71,9 +73,12 @@ const ReviewTransactionText = styled.h1((props) => ({
 }));
 
 function ConfirmNftTransaction() {
+  const dispatch = useDispatch();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const selectedAccount = useSelectedAccount();
+  const { avatarIds } = useWalletSelector();
+  const currentAvatar = avatarIds[selectedAccount.btcAddress];
   const [fee, setFee] = useState<BigNumber>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -107,11 +112,24 @@ function ConfirmNftTransaction() {
           isNft: true,
         },
       });
+
       setTimeout(() => {
         refetch();
       }, 1000);
+
+      if (currentAvatar?.type === 'stacks' && currentAvatar.nft?.token_id === nft?.token_id) {
+        dispatch(removeAccountAvatarAction({ address: selectedAccount.btcAddress }));
+      }
     }
-  }, [stxTxBroadcastData]);
+  }, [
+    dispatch,
+    navigate,
+    refetch,
+    stxTxBroadcastData,
+    selectedAccount.btcAddress,
+    nft,
+    currentAvatar,
+  ]);
 
   useEffect(() => {
     if (txError) {

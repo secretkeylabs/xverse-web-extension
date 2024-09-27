@@ -3,17 +3,21 @@ import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
+import useWalletSelector from '@hooks/useWalletSelector';
 import type { TransactionSummary } from '@screens/sendBtc/helpers';
 import { AnalyticsEvents, btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
+import { removeAccountAvatarAction } from '@stores/wallet/actions/actionCreators';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import RoutePaths from 'app/routes/paths';
 import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import StepDisplay from './stepDisplay';
 import { getPreviousStep, Step } from './steps';
 
 function SendOrdinalScreen() {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const isInOption = isInOptions();
 
@@ -28,6 +32,8 @@ function SendOrdinalScreen() {
   const context = useTransactionContext();
   const { data: selectedOrdinal } = useAddressInscription(isRareSat ? undefined : id);
   const selectedAccount = useSelectedAccount();
+  const { avatarIds } = useWalletSelector();
+  const currentAvatar = avatarIds[selectedAccount.btcAddress];
   const { data: btcFeeRate, isLoading: feeRatesLoading } = useBtcFeeRate();
   const [currentStep, setCurrentStep] = useState<Step>(Step.SelectRecipient);
   const [feeRate, setFeeRate] = useState('');
@@ -167,6 +173,13 @@ function SendOrdinalScreen() {
           browserTx: isInOption,
         },
       });
+
+      if (
+        currentAvatar?.type === 'inscription' &&
+        currentAvatar.inscription?.id === selectedOrdinal?.id
+      ) {
+        dispatch(removeAccountAvatarAction({ address: selectedAccount.btcAddress }));
+      }
     } catch (e) {
       console.error(e);
       navigate('/tx-status', {

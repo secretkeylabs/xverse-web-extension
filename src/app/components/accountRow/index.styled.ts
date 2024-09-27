@@ -31,6 +31,17 @@ export const GradientCircle = styled.div<{
   opacity: props.$isSelected ? 1 : 0.5,
 }));
 
+export const AvatarContainer = styled.div<{
+  $isBig: boolean;
+  $isSelected: boolean;
+}>((props) => ({
+  width: props.$isBig ? 32 : 20,
+  height: props.$isBig ? 32 : 20,
+  borderRadius: props.$isBig ? 16 : 10,
+  opacity: props.$isSelected ? 1 : 0.5,
+  overflow: 'hidden',
+}));
+
 export const CurrentAccountContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',

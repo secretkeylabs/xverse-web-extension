@@ -3,11 +3,7 @@ import useDebounce from '@hooks/useDebounce';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
-import {
-  AnalyticsEvents,
-  btcTransaction,
-  type Transport,
-} from '@secretkeylabs/xverse-core';
+import { AnalyticsEvents, btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';

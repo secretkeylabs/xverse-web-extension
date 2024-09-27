@@ -3,13 +3,9 @@ import { useQuery } from '@tanstack/react-query';
 
 const useInscriptionDetails = (id: string) => {
   const OrdinalsApi = useOrdinalsApi();
-
   return useQuery({
-    queryKey: [`inscription-${id}`],
-    queryFn: async () => {
-      const response = await OrdinalsApi.getInscription(id);
-      return response;
-    },
+    queryKey: [`inscription-details-${id}`],
+    queryFn: () => OrdinalsApi.getInscription(id),
   });
 };
 

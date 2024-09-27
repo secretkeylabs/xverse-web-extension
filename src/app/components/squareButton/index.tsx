@@ -1,11 +1,15 @@
 import styled from 'styled-components';
 
-const Button = styled.button<{ $isTransparent?: boolean }>((props) => ({
+const Button = styled.button<{
+  $isTransparent?: boolean;
+  $hasText?: boolean;
+  $radiusSize?: number;
+}>((props) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  borderRadius: '16px',
-  rowGap: '8px',
+  borderRadius: props.$radiusSize ? props.$radiusSize : '16px',
+  rowGap: props.$hasText ? '8px' : '0px',
   backgroundColor: 'transparent',
   ':hover > div': {
     backgroundColor: props.$isTransparent
@@ -20,12 +24,10 @@ const Icon = styled.img`
   height: 20px;
 `;
 
-const Wrapper = styled.div<{
-  $isTransparent?: boolean;
-}>((props) => ({
+const Wrapper = styled.div<{ $isTransparent?: boolean; $size?: number }>((props) => ({
   display: 'flex',
-  width: 48,
-  height: 48,
+  width: props.$size ? props.$size : 48,
+  height: props.$size ? props.$size : 48,
   justifyContent: 'center',
   alignItems: 'center',
   transition: 'background-color 0.2s ease, opacity 0.2s ease',
@@ -49,18 +51,34 @@ const IconContainer = styled.div({
 });
 
 type Props = {
-  text: string;
+  text?: string;
   onPress: () => void;
   src?: string;
   icon?: JSX.Element;
   isTransparent?: boolean;
   hoverDialogId?: string;
+  size?: number;
+  radiusSize?: number;
 };
 
-function SquareButton({ src, text, icon, onPress, isTransparent, hoverDialogId }: Props) {
+function SquareButton({
+  src,
+  text,
+  icon,
+  onPress,
+  isTransparent,
+  hoverDialogId,
+  size,
+  radiusSize,
+}: Props) {
   return (
-    <Button onClick={onPress} $isTransparent={isTransparent}>
-      <Wrapper id={hoverDialogId} $isTransparent={isTransparent}>
+    <Button
+      onClick={onPress}
+      $isTransparent={isTransparent}
+      $hasText={!!text}
+      $radiusSize={radiusSize}
+    >
+      <Wrapper id={hoverDialogId} $isTransparent={isTransparent} $size={size}>
         {src && <Icon src={src} alt={text} />}
         {icon && <IconContainer>{icon}</IconContainer>}
       </Wrapper>

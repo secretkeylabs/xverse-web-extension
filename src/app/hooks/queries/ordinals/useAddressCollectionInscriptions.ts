@@ -7,41 +7,39 @@ import { handleRetries, InvalidParamsError } from '@utils/query';
 const PAGE_SIZE = 30;
 
 /**
- * Get collections belonging to an address
+ * Get a specific collection belonging to an address
  */
-const useAddressInscriptions = (showHiddenOnly?: boolean) => {
+const useAddressCollectionInscriptions = (collectionId?: string) => {
   const { ordinalsAddress } = useSelectedAccount();
   const { network } = useWalletSelector();
   const xverseApi = getXverseApiClient(network.type);
-  const { hiddenCollectibleIds, starredCollectibleIds } = useWalletSelector();
+  const { starredCollectibleIds } = useWalletSelector();
   const starredIds = starredCollectibleIds[ordinalsAddress]?.map(({ id }) => id);
 
-  const getCollectionsByAddress = async ({ pageParam = 0 }) => {
-    if (!ordinalsAddress) {
-      throw new InvalidParamsError('ordinalsAddress is required');
+  const getCollectionInscriptionsByAddress = async ({ pageParam = 0 }) => {
+    if (!ordinalsAddress || !collectionId) {
+      throw new InvalidParamsError('ordinalsAddress and collectionId are required');
     }
-    return xverseApi.getCollections(ordinalsAddress, pageParam, PAGE_SIZE, {
-      hiddenCollectibleIds: Object.keys(hiddenCollectibleIds[ordinalsAddress] ?? {}),
-      starredCollectibleIds: starredIds,
-      showHiddenOnly,
-    });
+    return xverseApi.getCollectionSpecificInscriptions(
+      ordinalsAddress,
+      collectionId,
+      pageParam,
+      PAGE_SIZE,
+      {
+        starredCollectibleIds: starredIds,
+      },
+    );
   };
 
   return useInfiniteQuery(
-    [
-      'address-inscriptions',
-      ordinalsAddress,
-      Object.keys(hiddenCollectibleIds[ordinalsAddress] ?? {}),
-      starredIds,
-      showHiddenOnly,
-    ],
-    getCollectionsByAddress,
+    ['address-collection-inscriptions', ordinalsAddress, collectionId, starredIds],
+    getCollectionInscriptionsByAddress,
     {
-      enabled: !!ordinalsAddress,
+      enabled: !!(collectionId && ordinalsAddress),
       retry: handleRetries,
       getNextPageParam: (lastpage, pages) => {
         const currentLength = pages
-          .map((page) => page.results)
+          .map((page) => page.data)
           .filter(Boolean)
           .flat().length;
         if (currentLength < lastpage.total) {
@@ -54,4 +52,4 @@ const useAddressInscriptions = (showHiddenOnly?: boolean) => {
   );
 };
 
-export default useAddressInscriptions;
+export default useAddressCollectionInscriptions;

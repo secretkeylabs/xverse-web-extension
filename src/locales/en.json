@@ -17,7 +17,9 @@
     "APPLY": "Apply",
     "IN": "In",
     "TO": "To",
-    "FROM": "From"
+    "FROM": "From",
+    "OPTIONS": "Options",
+    "UNDO": "Undo"
   },
   "UNITS": {
     "SATS_PER_VB": "sats/vB"
@@ -705,8 +707,8 @@
     "VIEW_ADDRESS": "View address",
     "ADD_STACKS_ADDRESS": "Add a Stacks address",
     "NFTS": "NFTs",
-    "RARE_SAT": "Rare Sat",
-    "RARE_SATS": "Rare Sats",
+    "RARE_SAT": "Rare sat",
+    "RARE_SATS": "Rare sats",
     "NEW_FEATURE": "New Feature, Rare Sats",
     "NEW_FEAT_RARE_SATS_DESCRIPTION": "Enable rare sats to display rare, interesting and unique sats in your wallet. You can change this setting at any time.",
     "NEW_FEAT_RARE_SATS_ORDINALS_ENABLE": "Enable rare sats to display rare, interesting and unique sats in your wallet. Note than enabling rare sats will also enable Ordinals. You can change this setting at any time.",
@@ -716,7 +718,9 @@
     "RARE_SATS_NOTICE_DETAIL": "Xverse supports most rare sats, but your sats may have other attributes.",
     "SEE_SUPPORTED": "See supported rarities",
     "FROM_RARE_SAT_BUNDLE": "This inscription belongs to the same bundle as other assets. Transferring it will involve transferring the full bundle.",
-    "HOLDS_RARE_SAT": "This inscription holds a rare sat."
+    "HOLDS_RARE_SAT": "This inscription holds a rare sat.",
+    "HIDDEN_COLLECTIBLES": "Hidden collectibles",
+    "UNHIDE_ALL": "Unhide all"
   },
   "RESTORE_FUND_SCREEN": {
     "TITLE": "Recover assets",
@@ -759,6 +763,12 @@
     "RARE_SATS": "Rare Sats",
     "NFT_DETAIL": "Item detail",
     "WEB_GALLERY": "Open gallery",
+    "STAR_INSCRIPTION": "Item starred",
+    "UNSTAR_INSCRIPTION": "Item un-starred",
+    "HIDE_INSCRIPTION": "Hide",
+    "UNHIDE_INSCRIPTION": "Unhide",
+    "INSCRIPTION_HIDDEN": "Item hidden",
+    "INSCRIPTION_UNHIDDEN": "Item un-hidden",
     "SEND": "Send",
     "SHARE": "Share",
     "OWNED_BY": "Owned by",
@@ -921,6 +931,12 @@
       "ALREADY_EXISTS_ERR": "You already have an account with this name",
       "NAME_RULES": "Your account's name can only include alphabetical and numerical characters.",
       "RESET_NAME": "Reset name"
+    },
+    "NFT_AVATAR": {
+      "SET_ACTION": "Set as avatar",
+      "SET_TOAST": "Item set as avatar",
+      "REMOVE_ACTION": "Remove avatar",
+      "REMOVE_TOAST": "Avatar removed"
     }
   },
   "BUY_SCREEN": {
@@ -1510,10 +1526,17 @@
   },
   "COLLECTIBLE_COLLECTION_SCREEN": {
     "BACK_TO_GALLERY": "Back to gallery",
+    "BACK_TO_HIDDEN_COLLECTIBLES": "Back to hidden collectibles",
     "COLLECTION_FLOOR_PRICE": "Collection floor price",
     "EST_PORTFOLIO_VALUE": "Est. portfolio value",
     "COLLECTION": "Collection",
     "LOAD_MORE": "Load more",
+    "STAR_COLLECTION": "Collection starred",
+    "UNSTAR_COLLECTION": "Collection un-starred",
+    "HIDE_COLLECTION": "Hide collection",
+    "UNHIDE_COLLECTION": "Unhide collection",
+    "COLLECTION_HIDDEN": "Collection hidden",
+    "COLLECTION_UNHIDDEN": "Collection un-hidden",
     "ERRORS": {
       "FAILED_TO_FETCH": "Failed to fetch data"
     }

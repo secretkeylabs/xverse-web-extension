@@ -31,7 +31,7 @@ const PageHeader = styled.div`
   width: 100%;
 `;
 
-const StyledCollectiblesTabs = styled(CollectiblesTabs)`
+const CollectiblesContainer = styled.div`
   padding: 0 ${(props) => props.theme.space.s};
   padding-bottom: ${(props) => props.theme.space.xl};
   max-width: 1224px;
@@ -90,7 +90,6 @@ function NftDashboard() {
     onActivateRareSatsAlertEnablePress,
     isGalleryOpen,
   } = nftDashboard;
-
   return (
     <>
       {isOrdinalReceiveAlertVisible && (
@@ -142,11 +141,13 @@ function NftDashboard() {
             )}
           </ButtonContainer>
         </PageHeader>
-        <StyledCollectiblesTabs
-          nftListView={<NftListView />}
-          inscriptionListView={<InscriptionListView />}
-          nftDashboard={nftDashboard}
-        />
+        <CollectiblesContainer>
+          <CollectiblesTabs
+            nftListView={<NftListView />}
+            inscriptionListView={<InscriptionListView />}
+            nftDashboard={nftDashboard}
+          />
+        </CollectiblesContainer>
       </Container>
       {!isGalleryOpen && <BottomTabBar tab="nft" />}
     </>

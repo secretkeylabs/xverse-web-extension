@@ -38,6 +38,7 @@ import ManageTokens from '@screens/manageTokens';
 import MintRune from '@screens/mintRune';
 import NftCollection from '@screens/nftCollection';
 import NftDashboard from '@screens/nftDashboard';
+import Index from '@screens/nftDashboard/hidden';
 import SupportedRarities from '@screens/nftDashboard/supportedRarities';
 import NftDetailScreen from '@screens/nftDetail';
 import OrdinalDetailScreen from '@screens/ordinalDetail';
@@ -552,6 +553,14 @@ const router = createHashRouter([
         ),
       },
       {
+        path: 'nft-dashboard/hidden',
+        element: (
+          <AuthGuard>
+            <Index />
+          </AuthGuard>
+        ),
+      },
+      {
         path: 'nft-dashboard/rare-sats-bundle',
         element: (
           <AuthGuard>
@@ -560,7 +569,7 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'nft-dashboard/ordinals-collection/:id',
+        path: 'nft-dashboard/ordinals-collection/:id/:from?',
         element: (
           <AuthGuard>
             <OrdinalsCollection />
@@ -572,7 +581,7 @@ const router = createHashRouter([
         element: <NftDetailScreen />,
       },
       {
-        path: 'nft-dashboard/ordinal-detail/:id',
+        path: 'nft-dashboard/ordinal-detail/:id/:from?',
         element: <OrdinalDetailScreen />,
       },
       {

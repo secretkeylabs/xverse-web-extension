@@ -1,13 +1,23 @@
+import useSelectedAccount from '@hooks/useSelectedAccount';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { Star } from '@phosphor-icons/react';
 import type { Inscription, NonFungibleToken } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import type { ReactNode } from 'react';
 import styled from 'styled-components';
 import type { Color } from 'theme';
+import Theme from 'theme';
 
 const InfoContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  width: 100%;
+`;
+
+const StyledItemIdContainer = styled.div`
+  display: flex;
+  gap: 4px;
   width: 100%;
 `;
 
@@ -17,6 +27,10 @@ const StyledItemId = styled(StyledP)`
   overflow: hidden;
   width: 100%;
   text-overflow: ellipsis;
+`;
+
+const StyledStar = styled(Star)`
+  margin-top: 2px;
 `;
 
 const StyledItemSub = styled(StyledP)`
@@ -57,6 +71,9 @@ type Props = {
   onClick?: (item: Inscription | NonFungibleToken) => void;
 };
 
+const isInscription = (item?: Inscription | NonFungibleToken): item is Inscription =>
+  item !== undefined && 'id' in item;
+
 function CollectibleCollectionGridItem({
   item,
   itemId,
@@ -72,13 +89,23 @@ function CollectibleCollectionGridItem({
         }
       : undefined;
 
+  const { ordinalsAddress } = useSelectedAccount();
+  const { starredCollectibleIds } = useWalletSelector();
+  const inscriptionStarred =
+    isInscription(item) && starredCollectibleIds[ordinalsAddress]?.some(({ id }) => id === item.id);
+
   return (
     <GridItemContainer data-testid="collection-item" onClick={handleOnClick}>
       <ImageContainer>{children}</ImageContainer>
       <InfoContainer>
-        <StyledItemId typography="body_bold_m" color="white_0">
-          {itemId}
-        </StyledItemId>
+        <StyledItemIdContainer>
+          {inscriptionStarred && (
+            <StyledStar size={14} color={Theme.colors.white_0} weight="fill" />
+          )}
+          <StyledItemId typography="body_bold_m" color="white_0">
+            {itemId}
+          </StyledItemId>
+        </StyledItemIdContainer>
         {itemSubText && (
           <StyledItemSub typography="body_medium_m" color={itemSubTextColor ?? 'white_400'}>
             {itemSubText}

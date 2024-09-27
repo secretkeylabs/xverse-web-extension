@@ -1,101 +1,33 @@
-import { StyledBarLoader, TilesSkeletonLoader } from '@components/tilesSkeletonLoader';
-import WrenchErrorMessage from '@components/wrenchErrorMessage';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
+import { TrayArrowDown } from '@phosphor-icons/react';
 import { mapRareSatsAPIResponseToBundle, type Bundle } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
-import { StyledP, StyledTabList } from '@ui-library/common.styled';
+import { StyledP } from '@ui-library/common.styled';
 import { TabItem } from '@ui-library/tabs';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TabPanel, Tabs } from 'react-tabs';
-import styled from 'styled-components';
-import Notice from './notice';
-import RareSatsTabGridItem from './rareSatsTabGridItem';
-import type { NftDashboardState } from './useNftDashboard';
+import Theme from 'theme';
+import Notice from '../notice';
+import RareSatsTabGridItem from '../rareSatsTabGridItem';
+import type { NftDashboardState } from '../useNftDashboard';
+
+import {
+  LoadMoreButtonContainer,
+  NoCollectiblesText,
+  NoticeContainer,
+  RareSatsTabContainer,
+  StickyStyledTabList,
+  StyledButton,
+  StyledTotalItems,
+  StyledWrenchErrorMessage,
+  TopBarContainer,
+} from './index.styled';
+import SkeletonLoader from './skeletonLoader';
 
 const MAX_SATS_ITEMS_EXTENSION = 5;
 const MAX_SATS_ITEMS_GALLERY = 20;
-
-export const GridContainer = styled.div<{
-  isGalleryOpen: boolean;
-}>((props) => ({
-  display: 'grid',
-  columnGap: props.isGalleryOpen ? props.theme.space.xl : props.theme.space.m,
-  rowGap: props.isGalleryOpen ? props.theme.space.xl : props.theme.space.l,
-  marginTop: props.theme.space.l,
-  gridTemplateColumns: props.isGalleryOpen
-    ? 'repeat(auto-fill,minmax(220px,1fr))'
-    : 'repeat(auto-fill,minmax(150px,1fr))',
-}));
-
-const RareSatsTabContainer = styled.div<{
-  isGalleryOpen: boolean;
-}>((props) => ({
-  marginTop: props.theme.space.l,
-}));
-
-const StickyStyledTabList = styled(StyledTabList)`
-  position: sticky;
-  background: ${(props) => props.theme.colors.elevation0};
-  top: -1px;
-  z-index: 1;
-  padding: ${(props) => props.theme.space.m} 0;
-`;
-
-const StyledTotalItems = styled(StyledP)`
-  margin-top: ${(props) => props.theme.space.s};
-`;
-
-const NoticeContainer = styled.div((props) => ({
-  marginTop: props.theme.space.m,
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-}));
-
-const StyledWrenchErrorMessage = styled(WrenchErrorMessage)`
-  margin-top: ${(props) => props.theme.space.xxl};
-`;
-
-const NoCollectiblesText = styled.div((props) => ({
-  ...props.theme.typography.body_bold_m,
-  color: props.theme.colors.white_200,
-  marginTop: props.theme.spacing(16),
-  textAlign: 'center',
-}));
-
-const LoadMoreButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  marginBottom: props.theme.spacing(30),
-  marginTop: props.theme.space.xl,
-  button: {
-    width: 156,
-  },
-}));
-
-const LoaderContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-});
-
-const CountLoaderContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(6),
-  marginBottom: props.theme.spacing(12),
-}));
-
-function SkeletonLoader({ isGalleryOpen }: { isGalleryOpen: boolean }) {
-  return (
-    <LoaderContainer>
-      <CountLoaderContainer>
-        <StyledBarLoader width={85} height={20} />
-      </CountLoaderContainer>
-      <TilesSkeletonLoader isGalleryOpen={isGalleryOpen} tileSize={isGalleryOpen ? 276 : 151} />
-    </LoaderContainer>
-  );
-}
 
 type TabButton = {
   key: string;
@@ -122,21 +54,24 @@ const tabKeyToIndex = (key?: string | null) => {
   return tabs.findIndex((tab) => tab.key === key);
 };
 
+type Props = {
+  className?: string;
+  nftListView: React.ReactNode;
+  inscriptionListView: React.ReactNode;
+  nftDashboard: NftDashboardState;
+};
+
 export default function CollectiblesTabs({
   className,
   nftListView,
   inscriptionListView,
   nftDashboard,
-}: {
-  className?: string;
-  nftListView: React.ReactNode;
-  inscriptionListView: React.ReactNode;
-  nftDashboard: NftDashboardState;
-}) {
+}: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [tabIndex, setTabIndex] = useState(tabKeyToIndex(searchParams?.get('tab')));
+
   const {
     isGalleryOpen,
     rareSatsQuery,
@@ -157,18 +92,15 @@ export default function CollectiblesTabs({
     [tabIndex],
   );
 
-  const handleSelectTab = (index: number) => {
-    setTabIndex(index);
-  };
+  const handleSelectTab = (index: number) => setTabIndex(index);
 
   useEffect(() => {
     setSearchParams({ tab: tabs[tabIndex]?.key });
-  }, [tabIndex, setSearchParams]);
+  }, [tabIndex]);
 
   const ordinalBundleCount = rareSatsQuery?.data?.pages?.[0]?.total || 0;
   const showNoBundlesNotice =
     ordinalBundleCount === 0 && !rareSatsQuery.isLoading && !rareSatsQuery.error;
-
   const visibleTabButtons = tabs.filter((tab: TabButton) => {
     if (tab.key === 'rareSats' && !hasActivatedRareSatsKey) {
       return false;
@@ -181,7 +113,7 @@ export default function CollectiblesTabs({
 
   return (
     <Tabs className={className} selectedIndex={tabIndex} onSelect={handleSelectTab}>
-      {/* TODO: replace with Tabs component from `src/app/components/tabs/index.tsx` */}
+      {/* TODO: replace with Tabs component from `src/app/ui-library/tabs.tsx` */}
       {visibleTabButtons.length > 1 && (
         <StickyStyledTabList data-testid="tab-list">
           {visibleTabButtons.map(({ key, label }) => (
@@ -197,24 +129,34 @@ export default function CollectiblesTabs({
       )}
       {hasActivatedOrdinalsKey && (
         <TabPanel>
-          {inscriptionsQuery.isInitialLoading ? (
-            <SkeletonLoader isGalleryOpen={isGalleryOpen} />
-          ) : (
-            <>
-              {totalInscriptions > 0 && (
-                <StyledTotalItems
-                  data-testid="total-items"
-                  typography="body_medium_m"
-                  color="white_200"
-                >
-                  {totalInscriptions === 1
-                    ? t('TOTAL_ITEMS_ONE')
-                    : t('TOTAL_ITEMS', { count: totalInscriptions })}
-                </StyledTotalItems>
-              )}
-              {inscriptionListView}
-            </>
-          )}
+          <div>
+            {inscriptionsQuery.isInitialLoading ? (
+              <SkeletonLoader isGalleryOpen={isGalleryOpen} />
+            ) : (
+              <>
+                <TopBarContainer>
+                  {totalInscriptions > 0 ? (
+                    <StyledP data-testid="total-items" typography="body_medium_m" color="white_200">
+                      {totalInscriptions === 1
+                        ? t('TOTAL_ITEMS_ONE')
+                        : t('TOTAL_ITEMS', { count: totalInscriptions })}
+                    </StyledP>
+                  ) : (
+                    <div />
+                  )}
+                  <StyledButton
+                    variant="tertiary"
+                    icon={<TrayArrowDown size={20} color={Theme.colors.white_200} />}
+                    title={t('HIDDEN_COLLECTIBLES')}
+                    onClick={() => {
+                      navigate(`/nft-dashboard/hidden?tab=${tabs[tabIndex]?.key}`);
+                    }}
+                  />
+                </TopBarContainer>
+                {inscriptionListView}
+              </>
+            )}
+          </div>
         </TabPanel>
       )}
       <TabPanel>
@@ -248,7 +190,6 @@ export default function CollectiblesTabs({
                 : t('TOTAL_ITEMS', { count: ordinalBundleCount })}
             </StyledTotalItems>
           )}
-
           {!rareSatsQuery.isLoading && showNoticeAlert && (
             <NoticeContainer>
               <Notice
@@ -269,7 +210,7 @@ export default function CollectiblesTabs({
           {rareSatsQuery.isInitialLoading ? (
             <SkeletonLoader isGalleryOpen={isGalleryOpen} />
           ) : (
-            <RareSatsTabContainer data-testid="rareSats-container" isGalleryOpen={isGalleryOpen}>
+            <RareSatsTabContainer data-testid="rareSats-container">
               {!rareSatsQuery.error &&
                 !rareSatsQuery.isLoading &&
                 rareSatsQuery.data?.pages

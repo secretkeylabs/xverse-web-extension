@@ -5,11 +5,7 @@ import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { RpcErrorCode, type TransferRunesRequest } from '@sats-connect/core';
 import { type TransactionSummary } from '@screens/sendBtc/helpers';
-import {
-  btcTransaction,
-  runesTransaction,
-  type Transport,
-} from '@secretkeylabs/xverse-core';
+import { btcTransaction, runesTransaction, type Transport } from '@secretkeylabs/xverse-core';
 import { useCallback, useEffect, useState } from 'react';
 
 type Args = {
@@ -54,9 +50,7 @@ const useTransferRunes = ({ tabId, messageId, recipients }: Args) => {
       try {
         if (!desiredFeeRate) return;
         setIsLoading(true);
-        const { tx, txSummary } = await generateTransferTxAndSummary(
-          desiredFeeRate,
-        );
+        const { tx, txSummary } = await generateTransferTxAndSummary(desiredFeeRate);
         setFeeRate(desiredFeeRate.toString());
         setTransaction(tx);
         setSummary(txSummary);
