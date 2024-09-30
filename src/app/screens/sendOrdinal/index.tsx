@@ -120,11 +120,7 @@ function SendOrdinalScreen() {
       window.close();
       return;
     }
-    navigate(
-      isRareSat
-        ? `/nft-dashboard/rare-sats-bundle${fromRune ? `?fromRune=${fromRune}` : ''}`
-        : `/nft-dashboard/ordinal-detail/${selectedOrdinal?.id}`,
-    );
+    navigate(-1);
   };
 
   const handleBackButtonClick = () => {
