@@ -6,7 +6,6 @@ import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 import { useTxSummaryContext } from '../hooks/useTxSummaryContext';
 import Amount from '../itemRow/amount';
-import AmountWithInscriptionSatribute from '../itemRow/amountWithInscriptionSatribute';
 import InscriptionSatributeRow from '../itemRow/inscriptionSatributeRow';
 import RuneAmount from '../itemRow/runeAmount';
 
@@ -72,16 +71,7 @@ function SendSection({
                   : transfer.destinationType}
               </StyledP>
             </SubHeader>
-            {transfer.btcSatsAmount > 0 && (
-              <>
-                <Amount amount={transfer.btcSatsAmount} />
-                <AmountWithInscriptionSatribute
-                  inscriptions={[]}
-                  satributes={[]}
-                  onShowInscription={onShowInscription}
-                />
-              </>
-            )}
+            {transfer.btcSatsAmount > 0 && <Amount amount={transfer.btcSatsAmount} />}
             {transfer.bundles.map((bundle) => (
               <>
                 <SubHeader>

@@ -106,7 +106,11 @@ export default function AmountWithInscriptionSatribute({
 
   const amountOfAssets = satributesArray.length + inscriptions.length;
 
-  return amountOfAssets > 0 ? (
+  if (amountOfAssets === 0) {
+    return null;
+  }
+
+  return (
     <WarningContainer>
       <WarningButton type="button" onClick={() => setShowBundleDetail((prevState) => !prevState)}>
         <Row>
@@ -165,5 +169,5 @@ export default function AmountWithInscriptionSatribute({
         </ItemsContainer>
       )}
     </WarningContainer>
-  ) : null;
+  );
 }
