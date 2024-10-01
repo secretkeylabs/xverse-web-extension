@@ -36,12 +36,11 @@ const useMasterCoinsList = () => {
   const isStacksSwapsEnabled = useHasFeature(FeatureId.STACKS_SWAPS);
 
   const coinsMasterList = useMemo(
-    () =>
-      [
-        ...(runesFtList || []),
-        btcFt,
-        ...(!hideStx && isStacksSwapsEnabled ? [stxFt, ...(sip10FtList ?? [])] : []),
-      ] ?? [],
+    () => [
+      ...(runesFtList || []),
+      btcFt,
+      ...(!hideStx && isStacksSwapsEnabled ? [stxFt, ...(sip10FtList ?? [])] : []),
+    ],
     [runesFtList, hideStx, isStacksSwapsEnabled, sip10FtList],
   );
 
