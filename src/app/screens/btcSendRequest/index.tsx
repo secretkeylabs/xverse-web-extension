@@ -224,6 +224,7 @@ function BtcSendRequest() {
       isSubmitting={isSubmitting}
       isBroadcast
       hideBottomBar
+      showAccountHeader
     />
   );
 }
