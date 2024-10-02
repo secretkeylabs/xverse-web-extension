@@ -2,12 +2,9 @@ import CheckCircle from '@assets/img/listings/CheckCircle.svg';
 import XCircle from '@assets/img/listings/XCircle.svg';
 import TokenImage from '@components/tokenImage';
 import { ArrowUpRight } from '@phosphor-icons/react';
-import {
-  marketplaceRuneDashboardUrl,
-  type FungibleToken,
-  type ListingProvider,
-} from '@secretkeylabs/xverse-core';
+import type { FungibleToken, ListingProvider, Marketplace } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
+import { MAGIC_EDEN_RUNES_URL, OKX_RUNES_URL, UNISAT_RUNES_URL } from '@utils/constants';
 import { formatNumber } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -59,13 +56,14 @@ function MarketplaceRuneListingResult({ minPriceSats, marketplace, rune, success
   const { t } = useTranslation('translation', { keyPrefix: 'LIST_RUNE_SCREEN' });
   const floorPrice = formatNumber(minPriceSats);
 
+  const marketplaceToUrl: { [key in Marketplace]: string } = {
+    'Magic Eden': `${MAGIC_EDEN_RUNES_URL}/${rune.name}`,
+    Unisat: `${UNISAT_RUNES_URL}/market?tick=${rune.name}`,
+    OKX: `${OKX_RUNES_URL}/token/${rune.name}/${rune.ticker}`,
+  };
+
   const handleClick = () =>
-    successful &&
-    window.open(
-      marketplaceRuneDashboardUrl(rune, marketplace.name),
-      '_blank',
-      'noopener,noreferrer',
-    );
+    successful && window.open(marketplaceToUrl[marketplace.name], '_blank', 'noopener,noreferrer');
 
   return (
     <Container
