@@ -14,13 +14,12 @@ const useVisibleMasterCoinsList = () => {
   const { hideStx } = useWalletSelector();
 
   const coinsMasterList = useMemo(
-    () =>
-      [
-        ...sip10FtList,
-        ...runesFtList,
-        btcFt,
-        ...(!hideStx && isStacksSwapsEnabled ? [stxFt] : []),
-      ] ?? [],
+    () => [
+      ...sip10FtList,
+      ...runesFtList,
+      btcFt,
+      ...(!hideStx && isStacksSwapsEnabled ? [stxFt] : []),
+    ],
     [sip10FtList, runesFtList, hideStx, isStacksSwapsEnabled],
   );
 
