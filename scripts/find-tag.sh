@@ -10,10 +10,10 @@ if [[ -z "$TAG" ]]; then
   exit 1
 fi
 
-if cat releases.json  | grep $TAG; then
+if cat releases.json  | jq -r '.[].tag_name' | grep $TAG; then
   echo found releases matching $TAG
 
-  for i in $(cat releases.json  | grep $TAG); do
+  for i in $(cat releases.json  | jq -r '.[].tag_name' | grep $TAG); do
     LATEST_RUNNING=$(echo $i | grep rc | sed 's/.*-rc.\(.*\)/\1/')
 
     if [[ -z "$LATEST_RC" || $LATEST_RUNNING -gt $LATEST_RC ]]; then
