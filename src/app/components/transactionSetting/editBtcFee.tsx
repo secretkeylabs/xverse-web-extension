@@ -1,6 +1,6 @@
 import FiatAmountText from '@components/fiatAmountText';
 import useBtcClient from '@hooks/apiClients/useBtcClient';
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useBtcFees from '@hooks/useBtcFees';
 import useDebounce from '@hooks/useDebounce';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
@@ -189,7 +189,7 @@ function EditBtcFee({
   const selectedAccount = useSelectedAccount();
   const { btcAddress, ordinalsAddress } = selectedAccount;
   const { network, fiatCurrency } = useWalletSelector();
-  const { btcFiatRate } = useCoinRates();
+  const { btcFiatRate } = useSupportedCoinRates();
   const [totalFee, setTotalFee] = useState(fee);
   const [feeRateInput, setFeeRateInput] = useState(feeRate?.toString() ?? '');
   const inputRef = useRef<HTMLInputElement>(null);

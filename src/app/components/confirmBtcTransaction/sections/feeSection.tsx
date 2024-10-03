@@ -1,5 +1,5 @@
 import TransferFeeView from '@components/transferFeeView';
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
@@ -55,7 +55,7 @@ function FeeSection({
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
   const { data: recommendedFees } = useBtcFeeRate();
-  const { btcFiatRate } = useCoinRates();
+  const { btcFiatRate } = useSupportedCoinRates();
 
   const { extractedTxSummary } = useTxSummaryContext();
 

@@ -28,8 +28,8 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { isLedgerAccount } from '@utils/helper';
 
 import useBtcClient from '@hooks/apiClients/useBtcClient';
-import useCoinRates from '@hooks/queries/useCoinRates';
 import useConfirmedBtcBalance from '@hooks/queries/useConfirmedBtcBalance';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import Button from '@ui-library/button';
@@ -108,7 +108,7 @@ function CreateInscription() {
   const selectedAccount = useSelectedAccount();
   const { ordinalsAddress, btcAddress } = selectedAccount;
   const { network, fiatCurrency } = useWalletSelector();
-  const { btcFiatRate } = useCoinRates();
+  const { btcFiatRate } = useSupportedCoinRates();
 
   const transactionContext = useTransactionContext();
 

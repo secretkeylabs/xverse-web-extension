@@ -54,7 +54,7 @@ function CurrencyRow({ currency, isSelected, onCurrencySelected, showDivider }: 
       $variant={isSelected ? theme.typography.body_bold_l : theme.typography.body_medium_l}
     >
       <CurrencyWrapper>
-        <StyledImg src={currency.flag} alt="flag" />
+        <StyledImg src={currency.isoFlag} alt="flag" />
         {currency.name}
       </CurrencyWrapper>
       {isSelected && <img src={TickIcon} alt="tick" />}

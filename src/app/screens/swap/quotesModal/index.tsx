@@ -1,5 +1,5 @@
 import useGetSip10TokenInfo from '@hooks/queries/stx/useGetSip10TokenInfo';
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import {
   getBtcFiatEquivalent,
   getStxFiatEquivalent,
@@ -65,7 +65,7 @@ function QuotesModal({
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
 
-  const { btcFiatRate, stxBtcRate } = useCoinRates();
+  const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const { tokenInfo: toTokenInfo } = useGetSip10TokenInfo({ principal: toToken?.ticker });
 
   const sortQuotesByReceiveAmount = <T extends StxQuote | Quote>(quotes: T[]): T[] =>

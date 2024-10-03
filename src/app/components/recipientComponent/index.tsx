@@ -3,7 +3,7 @@ import WalletIcon from '@assets/img/transactions/wallet.svg';
 import { StyledFiatAmountText } from '@components/fiatAmountText';
 import TokenImage from '@components/tokenImage';
 import TransferDetailView from '@components/transferDetailView';
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CubeTransparent } from '@phosphor-icons/react';
@@ -155,7 +155,7 @@ function RecipientComponent({
   const [fiatAmount, setFiatAmount] = useState<string | undefined>('0');
   const { ordinalsAddress } = useSelectedAccount();
   const { fiatCurrency } = useWalletSelector();
-  const { btcFiatRate, stxBtcRate } = useCoinRates();
+  const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
 
   useEffect(() => {
     setFiatAmount(

@@ -2,7 +2,7 @@ import InfoContainer from '@components/infoContainer';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import TransactionDetailComponent from '@components/transactionDetailComponent';
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useDebounce from '@hooks/useDebounce';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
@@ -53,7 +53,7 @@ function ConfirmBrc20Transaction() {
   const { network, fiatCurrency, feeMultipliers } = useWalletSelector();
   const selectedAccount = useSelectedAccount();
   const { btcAddress, ordinalsAddress } = selectedAccount;
-  const { btcFiatRate } = useCoinRates();
+  const { btcFiatRate } = useSupportedCoinRates();
   const navigate = useNavigate();
   const {
     recipientAddress,

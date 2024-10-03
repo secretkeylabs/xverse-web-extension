@@ -1,27 +1,22 @@
+import useXverseApi from '@hooks/apiClients/useXverseApi';
 import useWalletSelector from '@hooks/useWalletSelector';
-import {
-  fetchBtcToCurrencyRate,
-  fetchStxToBtcRate,
-  type NetworkType,
-  type SupportedCurrency,
-} from '@secretkeylabs/xverse-core';
+import { type SupportedCurrency } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 
-const useGetRates = (fiatCurrency: SupportedCurrency, networkType: NetworkType) => {
+const useGetSupportedRates = (fiatCurrency: SupportedCurrency) => {
+  const xverseApi = useXverseApi();
   const fetchCoinRates = async () => {
     try {
-      const btcFiatRate = await fetchBtcToCurrencyRate(networkType, {
+      const btcFiatRate = await xverseApi.fetchBtcToCurrencyRate({
         fiatCurrency,
       });
-
       const btcUsdRate =
         fiatCurrency === 'USD'
           ? btcFiatRate
-          : await fetchBtcToCurrencyRate(networkType, {
+          : await xverseApi.fetchBtcToCurrencyRate({
               fiatCurrency: 'USD' as SupportedCurrency,
             });
-
-      const stxBtcRate = await fetchStxToBtcRate(networkType);
+      const stxBtcRate = await xverseApi.fetchStxToBtcRate();
       return { stxBtcRate, btcFiatRate, btcUsdRate };
     } catch (e: any) {
       return Promise.reject(e);
@@ -29,17 +24,15 @@ const useGetRates = (fiatCurrency: SupportedCurrency, networkType: NetworkType) 
   };
 
   return useQuery({
-    queryKey: ['coin_rates', fiatCurrency, networkType],
+    queryKey: ['coin_rates', fiatCurrency],
     queryFn: fetchCoinRates,
     staleTime: 5 * 60 * 1000, // 5 min
   });
 };
 
-const useCoinRates = () => {
-  const { fiatCurrency, network } = useWalletSelector();
-
-  const { data } = useGetRates(fiatCurrency, network.type);
-
+const useSupportedCoinRates = () => {
+  const { fiatCurrency } = useWalletSelector();
+  const { data } = useGetSupportedRates(fiatCurrency);
   const stxBtcRate = data?.stxBtcRate.toString() || '0';
   const btcFiatRate = data?.btcFiatRate.toString() || '0';
   const btcUsdRate = data?.btcUsdRate?.toString() || '0';
@@ -47,4 +40,4 @@ const useCoinRates = () => {
   return { stxBtcRate, btcFiatRate, btcUsdRate };
 };
 
-export default useCoinRates;
+export default useSupportedCoinRates;

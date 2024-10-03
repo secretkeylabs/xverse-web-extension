@@ -1,6 +1,6 @@
 import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useRunesApi from '@hooks/apiClients/useRunesApi';
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
@@ -31,7 +31,7 @@ const useAccountBalance = () => {
     sip10ManageTokens,
     runesManageTokens,
   } = useWalletSelector();
-  const { btcFiatRate, stxBtcRate } = useCoinRates();
+  const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const runesApi = useRunesApi();
   const dispatch = useDispatch();
   const queue = useRef<Account[]>([]);

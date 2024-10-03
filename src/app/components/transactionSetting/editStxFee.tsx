@@ -1,5 +1,5 @@
 import FiatAmountText from '@components/fiatAmountText';
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getStxFiatEquivalent, stxToMicrostacks } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
@@ -129,7 +129,7 @@ function EditStxFee({
 }: Props) {
   const { t } = useTranslation('translation');
   const { fiatCurrency } = useWalletSelector();
-  const { btcFiatRate, stxBtcRate } = useCoinRates();
+  const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const [totalFee, setTotalFee] = useState(fee);
   const [feeRateInput, setFeeRateInput] = useState(feeRate?.toString() ?? '');
   const inputRef = useRef<HTMLInputElement>(null);
