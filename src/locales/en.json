@@ -441,7 +441,8 @@
       "CLOSE_BUTTON": "Close",
       "CANCEL_BUTTON": "Cancel",
       "SEE_TRANSACTION_BUTTON": "See transaction",
-      "RETRY_BUTTON": "Try again"
+      "RETRY_BUTTON": "Try again",
+      "BATCH_NOT_SUPPORTED": "External transaction requests are not yet supported on a Ledger account. Switch to a different account to sign transactions from the application."
     },
     "INSCRIBE": {
       "TITLE": "You will inscribe",
@@ -1124,8 +1125,8 @@
     "SIGNING_WARNING": "By signing this message, you prove that you are the owner of an account without broadcasting any on chain transactions. This signature cannot be used to send transactions on your behalf. You should only sign messages you trust.",
     "SIGNING_ADDRESS_TITLE": "Signing with address",
     "SIGNING_ADDRESS_STX": "Your Stacks address",
-    "SIGNING_ADDRESS_SEGWIT": "Your Bitcoin payment address",
-    "SIGNING_ADDRESS_TAPROOT": "Your Ordinals address",
+    "SIGNING_ADDRESS_PAYMENT": "Your Bitcoin payment address",
+    "SIGNING_ADDRESS_ORDINALS": "Your Ordinals address",
     "SIGN_BUTTON": "Sign",
     "CANCEL_BUTTON": "Cancel",
     "SIGNATURE_ERROR_TITLE": "Signature Error",

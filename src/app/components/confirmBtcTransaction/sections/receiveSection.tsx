@@ -9,7 +9,6 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { useTxSummaryContext } from '../hooks/useTxSummaryContext';
 import Amount from '../itemRow/amount';
-import AmountWithInscriptionSatribute from '../itemRow/amountWithInscriptionSatribute';
 import InscriptionSatributeRow from '../itemRow/inscriptionSatributeRow';
 import RuneAmount from '../itemRow/runeAmount';
 
@@ -87,11 +86,6 @@ function ReceiveSection({ onShowInscription }: Props) {
                 noMargin={!runes.length && !inscriptions.length && !satributes.length}
               >
                 <Amount amount={btcSatsAmount} />
-                <AmountWithInscriptionSatribute
-                  inscriptions={inscriptions}
-                  satributes={satributes}
-                  onShowInscription={onShowInscription}
-                />
               </RowContainer>
             )}
             {txIsFinal &&

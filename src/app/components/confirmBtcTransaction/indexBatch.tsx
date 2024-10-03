@@ -25,10 +25,9 @@ type Props = {
     extractedSummary: UserTransactionSummary | AggregatedSummary;
     summary: btcTransaction.PsbtSummary;
   }[];
-  isDuplicateTxs?: boolean;
 };
 
-function ConfirmBatchBtcTransactions({ summaries, isDuplicateTxs }: Props) {
+function ConfirmBatchBtcTransactions({ summaries }: Props) {
   const txnContext = useTransactionContext();
   const { network } = useWalletSelector();
 
@@ -36,31 +35,23 @@ function ConfirmBatchBtcTransactions({ summaries, isDuplicateTxs }: Props) {
     useState<TxSummaryContextProps>();
 
   useEffect(() => {
-    const summariesToAggregate = isDuplicateTxs && summaries.length ? [summaries[0]] : summaries;
     (async () => {
       const summary: btcTransaction.PsbtSummary = {
-        inputs: summariesToAggregate.map((psbt) => psbt.summary.inputs).flat(),
-        outputs: summariesToAggregate.map((psbt) => psbt.summary.outputs).flat(),
+        inputs: summaries.map((psbt) => psbt.summary.inputs).flat(),
+        outputs: summaries.map((psbt) => psbt.summary.outputs).flat(),
         feeOutput: undefined,
-        isFinal: summariesToAggregate.reduce(
-          (acc, curr) => acc && curr.extractedSummary.isFinal,
-          true,
-        ),
-        hasSigHashNone: summariesToAggregate.some((psbt) => psbt.extractedSummary.hasSigHashNone),
-        hasSigHashSingle: summariesToAggregate.some(
-          (psbt) => psbt.extractedSummary.hasSigHashSingle,
-        ),
+        isFinal: summaries.every((curr) => curr.extractedSummary.isFinal),
+        hasSigHashNone: summaries.some((psbt) => psbt.extractedSummary.hasSigHashNone),
+        hasSigHashSingle: summaries.some((psbt) => psbt.extractedSummary.hasSigHashSingle),
       };
       const runeSummary = await parseSummaryForRunes(txnContext, summary, network.type);
       const base: BaseSummary = {
         runes: {
           mint: undefined,
-          burns: summariesToAggregate.map((psbt) => psbt.extractedSummary.runes.burns).flat(),
-          hasCenotaph: summariesToAggregate.some((psbt) => psbt.extractedSummary.runes.hasCenotaph),
-          hasInvalidMint: summariesToAggregate.some(
-            (psbt) => psbt.extractedSummary.runes.hasInvalidMint,
-          ),
-          hasInsufficientBalance: summariesToAggregate.some(
+          burns: summaries.map((psbt) => psbt.extractedSummary.runes.burns).flat(),
+          hasCenotaph: summaries.some((psbt) => psbt.extractedSummary.runes.hasCenotaph),
+          hasInvalidMint: summaries.some((psbt) => psbt.extractedSummary.runes.hasInvalidMint),
+          hasInsufficientBalance: summaries.some(
             (psbt) => psbt.extractedSummary.runes.hasInsufficientBalance,
           ),
         },
@@ -70,13 +61,9 @@ function ConfirmBatchBtcTransactions({ summaries, isDuplicateTxs }: Props) {
         isFinal: summary.isFinal,
         hasSigHashNone: summary.hasSigHashNone,
         hasSigHashSingle: summary.hasSigHashSingle,
-        hasExternalInputs: summariesToAggregate.some(
-          (psbt) => psbt.extractedSummary.hasExternalInputs,
-        ),
-        hasOutputScript: summariesToAggregate.some((psbt) => psbt.extractedSummary.hasOutputScript),
-        hasUnconfirmedInputs: summariesToAggregate.some(
-          (psbt) => psbt.extractedSummary.hasUnconfirmedInputs,
-        ),
+        hasExternalInputs: summaries.some((psbt) => psbt.extractedSummary.hasExternalInputs),
+        hasOutputScript: summaries.some((psbt) => psbt.extractedSummary.hasOutputScript),
+        hasUnconfirmedInputs: summaries.some((psbt) => psbt.extractedSummary.hasUnconfirmedInputs),
       };
 
       setAggregatedParsedTxSummaryContext({
@@ -87,7 +74,7 @@ function ConfirmBatchBtcTransactions({ summaries, isDuplicateTxs }: Props) {
         batchMintDetails: summaries.map((psbt) => psbt.extractedSummary.runes.mint).flat(),
       });
     })();
-  }, [summaries, txnContext, network.type, isDuplicateTxs]);
+  }, [summaries, txnContext, network.type]);
 
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
 

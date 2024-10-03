@@ -132,12 +132,11 @@ function QuotesModal({
         <StyledP typography="body_m" color="white_200">
           {t('QUOTE_TITLE')}
         </StyledP>
-        {ammProviders.length > 0 ||
-          (stxProviders.length > 0 && (
-            <Heading typography="headline_s" color="white_0">
-              {t('EXCHANGE')}
-            </Heading>
-          ))}
+        {ammProviders.length > 0 && (
+          <Heading typography="headline_s" color="white_0">
+            {t('EXCHANGE')}
+          </Heading>
+        )}
         {sortedAmmQuotes.map((amm) => (
           <QuoteTile
             key={amm.provider.name}

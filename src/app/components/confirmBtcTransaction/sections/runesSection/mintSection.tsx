@@ -25,9 +25,9 @@ function MintSection() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { ordinalsAddress } = useSelectedAccount();
 
-  const { extractedTxSummary, runeMintDetails, batchMintDetails } = useTxSummaryContext();
+  const { extractedTxSummary, runeMintDetails, batchMintDetails = [] } = useTxSummaryContext();
 
-  if (!extractedTxSummary.runes.mint || !runeMintDetails || !batchMintDetails) return null;
+  if (!extractedTxSummary.runes.mint && !runeMintDetails && !batchMintDetails) return null;
 
   const isMintActionDetails = (
     obj: RuneMint | MintActionDetails | undefined,

@@ -4,24 +4,24 @@ import { delay } from '@common/utils/ledger';
 import ConfirmScreen from '@components/confirmScreen';
 import InfoContainer from '@components/infoContainer';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
-import TopRow from '@components/topRow';
-import useRunesApi from '@hooks/apiClients/useRunesApi';
-import useXverseApi from '@hooks/apiClients/useXverseApi';
 import useSeedVault from '@hooks/useSeedVault';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
-import CollapsableContainer from '@screens/signatureRequest/collapsableContainer';
+import CollapsibleContainer from '@screens/signatureRequest/collapsableContainer';
 import SignatureRequestMessage from '@screens/signatureRequest/signatureRequestMessage';
-import { bip0322Hash, MessageSigningProtocols, signMessage } from '@secretkeylabs/xverse-core';
+import {
+  bip0322Hash,
+  MessageSigningProtocols,
+  signMessage,
+  type SignedMessage,
+} from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import Sheet from '@ui-library/sheet';
 import { getTruncatedAddress, isHardwareAccount } from '@utils/helper';
 import { handleLedgerMessageSigning } from '@utils/ledger';
-import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
 import {
   ActionDisclaimer,
   MainContainer,
@@ -33,20 +33,32 @@ import {
   SigningAddressType,
   SigningAddressValue,
   SuccessActionsContainer,
-} from '../signMessageRequest/index.styled';
+} from './index.styled';
 
-function SignMessageRequestInApp() {
+interface MessageSigningProps {
+  address: string;
+  message: string;
+  protocol: MessageSigningProtocols;
+  onSigned: (signedMessage: SignedMessage) => Promise<void>;
+  onSignedError?: (error: unknown) => void;
+  onCancel: () => void;
+  header?: React.ReactNode;
+}
+
+function MessageSigning({
+  address,
+  message,
+  protocol,
+  onSigned,
+  onSignedError,
+  onCancel,
+  header,
+}: MessageSigningProps) {
   const { t } = useTranslation('translation');
   const { accountsList, network } = useWalletSelector();
   const selectedAccount = useSelectedAccount();
-  const location = useLocation();
-  const { payload } = location.state?.requestPayload || {};
-  const navigate = useNavigate();
   const { getSeed } = useSeedVault();
-  const runesApi = useRunesApi();
-  const xverseApi = useXverseApi();
 
-  const [addressType, setAddressType] = useState('');
   const [isSigning, setIsSigning] = useState(false);
 
   // Ledger state
@@ -57,24 +69,6 @@ function SignMessageRequestInApp() {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [isTxRejected, setIsTxRejected] = useState(false);
   const [isTxInvalid, setIsTxInvalid] = useState(false);
-
-  useEffect(() => {
-    const checkAddressAvailability = () => {
-      const account = accountsList.filter((acc) => {
-        if (acc.btcAddress === payload.address) {
-          setAddressType(t('SIGNATURE_REQUEST.SIGNING_ADDRESS_SEGWIT'));
-          return true;
-        }
-        if (acc.ordinalsAddress === payload?.address) {
-          setAddressType(t('SIGNATURE_REQUEST.SIGNING_ADDRESS_TAPROOT'));
-          return true;
-        }
-        return false;
-      });
-      return isHardwareAccount(selectedAccount) ? account[0] || selectedAccount : account[0];
-    };
-    checkAddressAvailability();
-  }, [accountsList, payload, selectedAccount, t]);
 
   const getConfirmationError = (type: 'title' | 'subtitle') => {
     if (type === 'title') {
@@ -100,10 +94,6 @@ function SignMessageRequestInApp() {
     return t('SIGNATURE_REQUEST.LEDGER.CONFIRM.ERROR_SUBTITLE');
   };
 
-  const handleCancelClick = () => {
-    navigate(`/coinDashboard/FT?ftKey=${payload.selectedRuneId}&protocol=runes`);
-  };
-
   const handleRetry = async () => {
     setIsTxRejected(false);
     setIsTxInvalid(false);
@@ -111,8 +101,6 @@ function SignMessageRequestInApp() {
     setIsConnectSuccess(false);
     setCurrentStepIndex(0);
   };
-
-  const handleGoBack = () => navigate(-2);
 
   const handleConnectAndConfirm = async () => {
     if (!selectedAccount) {
@@ -137,37 +125,14 @@ function SignMessageRequestInApp() {
       const signedMessage = await handleLedgerMessageSigning({
         transport,
         addressIndex: selectedAccount.deviceAccountIndex,
-        address: payload.address,
+        address,
         networkType: network.type,
-        message: payload.message,
-        protocol: MessageSigningProtocols.BIP322,
+        message,
+        protocol,
       });
-
-      if (payload.marketplace === 'OKX') {
-        await xverseApi.listings.submitRuneCancelOrder({
-          cancellationsPerMarketplace: [
-            {
-              marketplace: payload.marketplace,
-              orderId: payload.orderIds[0],
-              type: 'withMessage',
-              token: payload.token,
-              signature: signedMessage.signature,
-            },
-          ],
-        });
-      } else {
-        await runesApi.submitCancelRunesSellOrder({
-          orderIds: payload.orderIds,
-          makerPublicKey: selectedAccount?.ordinalsPublicKey!,
-          makerAddress: selectedAccount?.ordinalsAddress!,
-          token: payload.token,
-          signature: signedMessage.signature,
-        });
-      }
-
-      handleGoBack();
-      toast(`${t('SIGNATURE_REQUEST.UNLISTED_SUCCESS')}`);
+      await onSigned(signedMessage);
     } catch (e: any) {
+      onSignedError?.(e);
       if (e.name === 'LockedDeviceError') {
         setCurrentStepIndex(0);
         setIsConnectSuccess(false);
@@ -190,16 +155,15 @@ function SignMessageRequestInApp() {
     const seedPhrase = await getSeed();
     return signMessage({
       accounts: accountsList,
-      message: payload.message,
-      address: payload.address,
+      message,
+      address,
       seedPhrase,
       network: network.type,
-      protocol: MessageSigningProtocols.BIP322,
+      protocol,
     });
   };
 
   const confirmCallback = async () => {
-    if (!payload) return;
     try {
       setIsSigning(true);
       if (isHardwareAccount(selectedAccount)) {
@@ -207,57 +171,40 @@ function SignMessageRequestInApp() {
         return;
       }
       const signedMessage = await confirmSignMessage();
-
-      if (payload.marketplace === 'OKX') {
-        await xverseApi.listings.submitRuneCancelOrder({
-          cancellationsPerMarketplace: [
-            {
-              marketplace: payload.marketplace,
-              orderId: payload.orderIds[0],
-              type: 'withMessage',
-              token: payload.token,
-              signature: signedMessage.signature,
-            },
-          ],
-        });
-      } else {
-        await runesApi.submitCancelRunesSellOrder({
-          orderIds: payload.orderIds,
-          makerPublicKey: selectedAccount?.ordinalsPublicKey!,
-          makerAddress: selectedAccount?.ordinalsAddress!,
-          token: payload.token,
-          signature: signedMessage.signature,
-        });
-      }
-
-      handleGoBack();
-      toast(`${t('SIGNATURE_REQUEST.UNLISTED_SUCCESS')}`);
+      await onSigned(signedMessage);
     } catch (err) {
-      toast(`${t('SIGNATURE_REQUEST.UNLISTED_ERROR')}`);
+      onSignedError?.(err);
     } finally {
       setIsSigning(false);
     }
   };
 
+  const addressType =
+    address === selectedAccount.btcAddress
+      ? t('SIGNATURE_REQUEST.SIGNING_ADDRESS_PAYMENT')
+      : address === selectedAccount.ordinalsAddress
+      ? t('SIGNATURE_REQUEST.SIGNING_ADDRESS_ORDINALS')
+      : undefined;
+
   return (
     <>
       <ConfirmScreen
         onConfirm={confirmCallback}
-        onCancel={handleCancelClick}
+        onCancel={onCancel}
         cancelText={t('SIGNATURE_REQUEST.CANCEL_BUTTON')}
         confirmText={t('SIGNATURE_REQUEST.SIGN_BUTTON')}
         loading={isSigning}
       >
-        <TopRow onClick={handleGoBack} />
+        {header}
         <MainContainer>
           <RequestType>{t('SIGNATURE_REQUEST.TITLE')}</RequestType>
-          <SignatureRequestMessage message={payload.message} />
-          <CollapsableContainer
-            text={bip0322Hash(payload.message)}
+          <SignatureRequestMessage message={message} />
+          <CollapsibleContainer
+            text={bip0322Hash(message)}
             title={t('SIGNATURE_REQUEST.MESSAGE_HASH_HEADER')}
           >
-            <MessageHash>{bip0322Hash(payload.message)}</MessageHash>
-          </CollapsableContainer>
+            <MessageHash>{bip0322Hash(message)}</MessageHash>
+          </CollapsibleContainer>
           <SigningAddressContainer>
             <SigningAddressTitle>
               {t('SIGNATURE_REQUEST.SIGNING_ADDRESS_TITLE')}
@@ -265,7 +212,7 @@ function SignMessageRequestInApp() {
             <SigningAddress>
               {addressType && <SigningAddressType>{addressType}</SigningAddressType>}
               <SigningAddressValue data-testid="signing-address">
-                {getTruncatedAddress(payload.address, 6)}
+                {getTruncatedAddress(address, 6)}
               </SigningAddressValue>
             </SigningAddress>
           </SigningAddressContainer>
@@ -313,7 +260,7 @@ function SignMessageRequestInApp() {
             variant="primary"
           />
           <Button
-            onClick={handleCancelClick}
+            onClick={onCancel}
             title={t('SIGNATURE_REQUEST.LEDGER.CANCEL_BUTTON')}
             variant="secondary"
           />
@@ -323,4 +270,4 @@ function SignMessageRequestInApp() {
   );
 }
 
-export default SignMessageRequestInApp;
+export default MessageSigning;

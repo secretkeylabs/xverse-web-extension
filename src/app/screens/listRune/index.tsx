@@ -93,7 +93,7 @@ export default function ListRuneScreen() {
     isRefetching: listItemsRefetching,
     refetch,
   } = useRuneUtxosQueryPerMarketplace(selectedRune as FungibleToken, false);
-  const listItemsResponse = data?.unlistedItems || [];
+  const listItemsResponse = data?.unlistedItems?.filter((i) => i.runes.length === 1) || [];
 
   const supportedMarketplaces: Marketplace[] = ['Unisat', 'Magic Eden', 'OKX'];
   const {
@@ -291,7 +291,7 @@ export default function ListRuneScreen() {
 
   useEffect(() => {
     if (signPsbtPayload) {
-      navigate(`${RequestsRoutes.SignBatchBtcTx}?signBatchPsbtsInApp=true`, {
+      navigate(RequestsRoutes.RuneListingBatchSigning, {
         state: {
           payload: signPsbtPayload,
           utxos: listItemsMap,
