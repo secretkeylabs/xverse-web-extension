@@ -1,42 +1,32 @@
 import getSelectedAccount from '@common/utils/getSelectedAccount';
+import useWalletSelector from '@hooks/useWalletSelector';
 import type { Account } from '@secretkeylabs/xverse-core';
-import type { StoreState } from '@stores/index';
 import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
 import useWalletReducer from './useWalletReducer';
 
 const useSelectedAccount = (): Account => {
   const { switchAccount } = useWalletReducer();
+  const {
+    selectedAccountIndex,
+    selectedAccountType,
+    accountsList: softwareAccountsList,
+    ledgerAccountsList,
+  } = useWalletSelector();
 
-  const selectedAccountIndex = useSelector(
-    (state: StoreState) => state.walletState.selectedAccountIndex,
-  );
-  const selectedAccountType = useSelector(
-    (state: StoreState) => state.walletState.selectedAccountType,
-  );
-  const softwareAccountsList = useSelector((state: StoreState) => state.walletState.accountsList);
-  const ledgerAccountsList = useSelector(
-    (state: StoreState) => state.walletState.ledgerAccountsList,
-  );
-
-  const selectedAccount = useMemo(() => {
+  return useMemo(() => {
     const existingAccount = getSelectedAccount({
       selectedAccountIndex,
       selectedAccountType,
       softwareAccountsList,
       ledgerAccountsList,
     });
-
     if (existingAccount) {
       return existingAccount;
     }
-
     const fallbackAccount = softwareAccountsList[0];
-
     if (fallbackAccount) {
       switchAccount(fallbackAccount);
     }
-
     return fallbackAccount;
   }, [
     selectedAccountIndex,
@@ -45,8 +35,6 @@ const useSelectedAccount = (): Account => {
     ledgerAccountsList,
     switchAccount,
   ]);
-
-  return selectedAccount;
 };
 
 export default useSelectedAccount;

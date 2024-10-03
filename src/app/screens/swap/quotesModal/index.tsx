@@ -66,7 +66,7 @@ function QuotesModal({
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
 
   const { btcFiatRate, stxBtcRate } = useCoinRates();
-  const { tokenInfo: toTokenInfo } = useGetSip10TokenInfo(toToken?.ticker);
+  const { tokenInfo: toTokenInfo } = useGetSip10TokenInfo({ principal: toToken?.ticker });
 
   const sortQuotesByReceiveAmount = <T extends StxQuote | Quote>(quotes: T[]): T[] =>
     [...quotes].sort((a, b) => BigNumber(b.receiveAmount).comparedTo(a.receiveAmount));
@@ -132,12 +132,11 @@ function QuotesModal({
         <StyledP typography="body_m" color="white_200">
           {t('QUOTE_TITLE')}
         </StyledP>
-        {ammProviders.length > 0 ||
-          (stxProviders.length > 0 && (
-            <Heading typography="headline_s" color="white_0">
-              {t('EXCHANGE')}
-            </Heading>
-          ))}
+        {ammProviders.length > 0 && (
+          <Heading typography="headline_s" color="white_0">
+            {t('EXCHANGE')}
+          </Heading>
+        )}
         {sortedAmmQuotes.map((amm) => (
           <QuoteTile
             key={amm.provider.name}

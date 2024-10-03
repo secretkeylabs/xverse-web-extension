@@ -58,7 +58,7 @@ type Props = {
 
 export default function CoinHeader({ currency, fungibleToken }: Props) {
   const selectedAccount = useSelectedAccount();
-  const { fiatCurrency, network } = useWalletSelector();
+  const { fiatCurrency, network, selectedAccountType } = useWalletSelector();
   const { data: btcBalance } = useBtcWalletData();
   const { data: stxData } = useStxWalletData();
   const { btcFiatRate, stxBtcRate } = useCoinRates();
@@ -69,7 +69,10 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
 
   const showRunesListing =
     (useHasFeature(FeatureId.RUNES_LISTING) || process.env.NODE_ENV === 'development') &&
-    network.type === 'Mainnet';
+    network.type === 'Mainnet' &&
+    fungibleToken?.protocol === 'runes' &&
+    // TODO: remove this once we implement ledger batch PSBT signing flow
+    selectedAccountType !== 'ledger';
 
   const handleReceiveModalOpen = () => {
     setOpenReceiveModal(true);
@@ -252,7 +255,7 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
         {showSwaps && (
           <SmallActionButton src={ArrowSwap} text={t('SWAP')} onPress={navigateToSwaps} />
         )}
-        {showRunesListing && fungibleToken?.protocol === 'runes' && (
+        {showRunesListing && (
           <SmallActionButton
             src={List}
             text={t('LIST')}

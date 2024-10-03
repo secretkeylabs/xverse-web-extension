@@ -10,14 +10,14 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import { DotsThreeVertical } from '@phosphor-icons/react';
 import { OPTIONS_DIALOG_WIDTH } from '@utils/constants';
 
-const SelectedAccountContainer = styled.div<{ showBorderBottom?: boolean }>((props) => ({
+const SelectedAccountContainer = styled.div<{ $showBorderBottom?: boolean }>((props) => ({
   display: 'flex',
   flexDirection: 'row',
   position: 'relative',
   alignItems: 'center',
   justifyContent: 'space-between',
-  padding: `${props.theme.spacing(10)}px ${props.theme.space.m}`,
-  borderBottom: props.showBorderBottom ? `0.5px solid ${props.theme.colors.elevation3}` : 'none',
+  padding: `${props.theme.space.l} ${props.theme.space.m}`,
+  borderBottom: props.$showBorderBottom ? `0.5px solid ${props.theme.colors.elevation3}` : 'none',
 }));
 
 const OptionsButton = styled.button(() => ({
@@ -25,6 +25,14 @@ const OptionsButton = styled.button(() => ({
   alignItems: 'center',
   justifyContent: 'flex-end',
   background: 'transparent',
+  opacity: 0.7,
+  transition: 'opacity 0.1s ease',
+  '&:hover': {
+    opacity: 1,
+  },
+  '&:active': {
+    opacity: 0.6,
+  },
 }));
 
 const ButtonRow = styled.button`
@@ -94,7 +102,7 @@ function AccountHeaderComponent({
   };
 
   return (
-    <SelectedAccountContainer showBorderBottom={showBorderBottom}>
+    <SelectedAccountContainer $showBorderBottom={showBorderBottom}>
       <AccountRow
         account={selectedAccount!}
         isSelected
@@ -103,7 +111,7 @@ function AccountHeaderComponent({
       />
       {!disableMenuOption && (
         <OptionsButton aria-label="Open Header Options" onClick={openOptionsDialog}>
-          <DotsThreeVertical size={20} fill="white" />
+          <DotsThreeVertical size={20} fill="white" weight="bold" />
         </OptionsButton>
       )}
       {showOptionsDialog && (

@@ -80,13 +80,13 @@ function RareSatsBundle() {
   };
 
   const openInGalleryView = async () => {
-    await chrome.tabs.create({
-      url: chrome.runtime.getURL(
-        `options.html#/nft-dashboard/rare-sats-bundle?fromRune=${
-          searchParams.get('fromRune') || runeId
-        }`,
-      ),
-    });
+    let baseUrl = 'options.html#/nft-dashboard/rare-sats-bundle';
+    const fromRune = searchParams.get('fromRune') || runeId;
+
+    if (fromRune) {
+      baseUrl += `?fromRune=${fromRune}`;
+    }
+    await chrome.tabs.create({ url: chrome.runtime.getURL(baseUrl) });
   };
 
   const onCloseAlert = () => setShowSendOrdinalsAlert(false);

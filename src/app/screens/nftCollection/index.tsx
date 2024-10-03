@@ -8,7 +8,7 @@ import WebGalleryButton from '@components/webGalleryButton';
 import WrenchErrorMessage from '@components/wrenchErrorMessage';
 import useNftDetail from '@hooks/queries/useNftDetail';
 import { ArrowLeft } from '@phosphor-icons/react';
-import { GridContainer } from '@screens/nftDashboard/collectiblesTabs';
+import { GridContainer } from '@screens/nftDashboard/collectiblesTabs/index.styled';
 import Nft from '@screens/nftDashboard/nft';
 import NftImage from '@screens/nftDashboard/nftImage';
 import type { NonFungibleToken, StacksCollectionData } from '@secretkeylabs/xverse-core';
@@ -239,7 +239,7 @@ function NftCollection() {
         <>
           {isEmpty && <NoCollectiblesText>{t('NO_COLLECTIBLES')}</NoCollectiblesText>}
           {!!isError && <WrenchErrorMessage />}
-          <StyledGridContainer isGalleryOpen={isGalleryOpen}>
+          <StyledGridContainer $isGalleryOpen={isGalleryOpen}>
             {isLoading ? (
               <TilesSkeletonLoader
                 isGalleryOpen={isGalleryOpen}

@@ -81,7 +81,7 @@ test.describe('List runes', () => {
     const num1Currency = parseFloat(sendCurrencyAmount.replace(/[^0-9.]/g, ''));
 
     // click on continue
-    await wallet.buttonContinue.click();
+    await page.getByRole('button', { name: 'Continue' }).click();
 
     // Check Visuals Review transaction
     await expect(wallet.confirmTotalAmount).toBeVisible();

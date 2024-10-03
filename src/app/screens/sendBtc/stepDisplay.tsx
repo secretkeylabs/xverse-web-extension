@@ -1,6 +1,5 @@
 import RecipientSelector from '@components/recipientSelector';
 import TokenImage from '@components/tokenImage';
-import type { RuneSummary } from '@secretkeylabs/xverse-core';
 import ConfirmBtcTransaction from 'app/components/confirmBtcTransaction';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -30,7 +29,6 @@ const Container = styled.div`
 
 type Props = {
   summary: TransactionSummary | undefined;
-  runeSummary: RuneSummary | undefined;
   currentStep: Step;
   setCurrentStep: (step: Step) => void;
   recipientAddress: string;
@@ -51,7 +49,6 @@ type Props = {
 
 function StepDisplay({
   summary,
-  runeSummary,
   currentStep,
   setCurrentStep,
   recipientAddress,
@@ -121,7 +118,6 @@ function StepDisplay({
       return (
         <ConfirmBtcTransaction
           summary={summary}
-          runeSummary={runeSummary}
           isLoading={false}
           confirmText={t('COMMON.CONFIRM')}
           cancelText={t('COMMON.CANCEL')}

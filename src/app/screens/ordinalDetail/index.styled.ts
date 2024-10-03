@@ -148,7 +148,7 @@ export const DescriptionContainer = styled.div((props) => ({
 }));
 
 export const StyledWebGalleryButton = styled(WebGalleryButton)`
-  margintop: ${(props) => props.theme.space.s};
+  margin-top: ${(props) => props.theme.space.xs};
 `;
 
 export const ViewInExplorerButton = styled.button<DetailSectionProps>((props) => ({

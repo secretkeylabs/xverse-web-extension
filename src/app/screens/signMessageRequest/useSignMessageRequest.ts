@@ -1,4 +1,3 @@
-import useSeedVault from '@hooks/useSeedVault';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -8,7 +7,6 @@ import {
   type SignMessageOptions,
   type SignMessagePayload,
 } from '@sats-connect/core';
-import { signMessage } from '@secretkeylabs/xverse-core';
 import { isHardwareAccount } from '@utils/helper';
 import { decodeToken } from 'jsontokens';
 import { useEffect, useMemo, useState } from 'react';
@@ -16,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import SuperJSON from 'superjson';
 
-const useSignMessageRequestParams = () => {
+export const useSignMessageRequestParams = () => {
   const { search } = useLocation();
   const { network } = useWalletSelector();
   const params = useMemo(() => new URLSearchParams(search), [search]);
@@ -107,31 +105,4 @@ export const useSignMessageValidation = (requestPayload: SignMessagePayload | un
   }, [requestPayload]);
 
   return { validationError, validateSignMessage, setValidationError };
-};
-
-export const useSignMessageRequest = () => {
-  const { network, accountsList } = useWalletSelector();
-  const { getSeed } = useSeedVault();
-  const { payload, requestToken, tabId, requestId } = useSignMessageRequestParams();
-
-  const confirmSignMessage = async () => {
-    const { address, message } = payload;
-    const seedPhrase = await getSeed();
-    return signMessage({
-      accounts: accountsList,
-      message,
-      address,
-      protocol: payload.protocol,
-      seedPhrase,
-      network: network.type,
-    });
-  };
-
-  return {
-    payload,
-    requestToken,
-    tabId,
-    requestId,
-    confirmSignMessage,
-  };
 };

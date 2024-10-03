@@ -38,7 +38,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import AmountInput from './components/amountInput';
-import PsbtConfimation from './components/psbtConfirmation/psbtConfirmation';
+import PsbtConfirmation from './components/psbtConfirmation/psbtConfirmation';
 import RouteItem from './components/routeItem';
 import TokenFromBottomSheet from './components/tokenFromBottomSheet';
 import TokenToBottomSheet from './components/tokenToBottomSheet';
@@ -139,7 +139,10 @@ export default function SwapScreen() {
   const { quotes, loading: quotesLoading, error: quotesError, fetchQuotes } = useGetQuotes();
   const { data: runeFloorPrice } = useRuneFloorPriceQuery(toToken?.name ?? '');
   const coinsMasterList = useMasterCoinsList();
-  const { tokenInfo: toTokenInfo } = useGetSip10TokenInfo(toToken?.ticker);
+  const { tokenInfo: sip10FromTokenInfoUSD } = useGetSip10TokenInfo({
+    principal: toToken?.ticker,
+    fiatCurrency: 'USD',
+  });
 
   useEffect(() => {
     if (defaultFrom) {
@@ -183,7 +186,7 @@ export default function SwapScreen() {
       btcUsdRate,
       runeFloorPrice,
       stxBtcRate,
-      toTokenInfo,
+      fromTokenInfo: sip10FromTokenInfoUSD,
     });
 
     fetchQuotes({
@@ -401,7 +404,7 @@ export default function SwapScreen() {
       btcUsdRate,
       runeFloorPrice,
       stxBtcRate,
-      toTokenInfo,
+      fromTokenInfo: sip10FromTokenInfoUSD,
     });
   };
 
@@ -426,7 +429,7 @@ export default function SwapScreen() {
 
   if (orderInfo?.order.psbt) {
     return (
-      <PsbtConfimation
+      <PsbtConfirmation
         orderInfo={orderInfo}
         onConfirm={onConfirmExecute}
         onClose={() => setOrderInfo(undefined)}

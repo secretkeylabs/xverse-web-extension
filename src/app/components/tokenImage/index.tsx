@@ -7,7 +7,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import { XVERSE_ORDIVIEW_URL, type CurrencyTypes } from '@utils/constants';
 import { getTicker } from '@utils/helper';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 const DEFAULT_SIZE = 40;
@@ -71,6 +71,7 @@ interface TokenImageProps {
   size?: number;
   round?: boolean;
   showProtocolIcon?: boolean;
+  customProtocolIcon?: string;
 }
 
 export default function TokenImage({
@@ -80,6 +81,7 @@ export default function TokenImage({
   size,
   round,
   showProtocolIcon = true,
+  customProtocolIcon,
 }: TokenImageProps) {
   const { network } = useWalletSelector();
   const ftProtocol = fungibleToken?.protocol;
@@ -104,21 +106,23 @@ export default function TokenImage({
     </TickerIconContainer>
   );
 
-  const getProtocolIcon = () => {
-    if (!ftProtocol) {
+  const protocolIcon = useMemo(() => {
+    if (!ftProtocol && !customProtocolIcon) {
       return null;
     }
-    switch (ftProtocol) {
-      case 'stacks':
-        return <ProtocolImage src={IconStacks} alt="stacks" />;
-      case 'brc-20':
-        return <ProtocolImage src={OrdinalIcon} alt="brc20" />;
-      case 'runes':
-        return <ProtocolImage src={RunesIcon} alt="runes" />;
-      default:
-        return null;
-    }
-  };
+
+    const protocolToIcon = {
+      'brc-20': <ProtocolImage src={OrdinalIcon} alt="brc20" />,
+      stacks: <ProtocolImage src={IconStacks} alt="stacks" />,
+      runes: <ProtocolImage src={RunesIcon} alt="runes" />,
+    };
+
+    return ftProtocol ? (
+      protocolToIcon[ftProtocol]
+    ) : (
+      <ProtocolImage src={customProtocolIcon} alt="custom" />
+    );
+  }, [ftProtocol, customProtocolIcon]);
 
   const renderIcon = () => {
     if (!fungibleToken) {
@@ -178,8 +182,8 @@ export default function TokenImage({
   return (
     <TickerProtocolContainer>
       {imageError ? tickerComponent() : renderIcon()}
-      {ftProtocol && showProtocolIcon && (
-        <ProtocolIcon isSquare={ftProtocol === 'runes'}>{getProtocolIcon()}</ProtocolIcon>
+      {showProtocolIcon && protocolIcon && (
+        <ProtocolIcon isSquare={ftProtocol === 'runes'}>{protocolIcon}</ProtocolIcon>
       )}
     </TickerProtocolContainer>
   );

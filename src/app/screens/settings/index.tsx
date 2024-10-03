@@ -57,13 +57,11 @@ function Setting() {
           showDivider
         />
         <SettingComponent text={t('CATEGORIES.SECURITY')} onClick={openSecurity} showDivider />
-        {process.env.NODE_ENV !== 'production' && (
-          <SettingComponent
-            text={t('CATEGORIES.CONNECTED_APPS')}
-            onClick={openConnectedAppsAndPermissionsScreen}
-            showDivider
-          />
-        )}
+        <SettingComponent
+          text={t('CATEGORIES.CONNECTED_APPS')}
+          onClick={openConnectedAppsAndPermissionsScreen}
+          showDivider
+        />
         <SettingComponent
           text={t('CATEGORIES.ADVANCED')}
           onClick={openAdvancedSettings}

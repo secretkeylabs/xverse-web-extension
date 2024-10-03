@@ -5,14 +5,8 @@ import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { RpcErrorCode, type TransferRunesRequest } from '@sats-connect/core';
 import { type TransactionSummary } from '@screens/sendBtc/helpers';
-import {
-  btcTransaction,
-  parseSummaryForRunes,
-  runesTransaction,
-  type RuneSummary,
-  type Transport,
-} from '@secretkeylabs/xverse-core';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { btcTransaction, runesTransaction, type Transport } from '@secretkeylabs/xverse-core';
+import { useCallback, useEffect, useState } from 'react';
 
 type Args = {
   tabId: number;
@@ -27,7 +21,6 @@ const useTransferRunes = ({ tabId, messageId, recipients }: Args) => {
   const [feeRate, setFeeRate] = useState<string>('');
   const [transaction, setTransaction] = useState<btcTransaction.EnhancedTransaction | undefined>();
   const [summary, setSummary] = useState<TransactionSummary | undefined>();
-  const [runesSummary, setRunesSummary] = useState<RuneSummary | undefined>();
   const [isExecuting, setIsExecuting] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { data: btcFeeRates } = useBtcFeeRate();
@@ -47,10 +40,7 @@ const useTransferRunes = ({ tabId, messageId, recipients }: Args) => {
         Number(desiredFeeRate),
       );
       const txSummary = await tx.getSummary();
-      const parsedRunesSummary = await parseSummaryForRunes(txContext, txSummary, network.type, {
-        separateTransfersOnNoExternalInputs: true,
-      });
-      return { tx, txSummary, parsedRunesSummary };
+      return { tx, txSummary };
     },
     [network.type, recipients, txContext],
   );
@@ -60,13 +50,10 @@ const useTransferRunes = ({ tabId, messageId, recipients }: Args) => {
       try {
         if (!desiredFeeRate) return;
         setIsLoading(true);
-        const { tx, txSummary, parsedRunesSummary } = await generateTransferTxAndSummary(
-          desiredFeeRate,
-        );
+        const { tx, txSummary } = await generateTransferTxAndSummary(desiredFeeRate);
         setFeeRate(desiredFeeRate.toString());
         setTransaction(tx);
         setSummary(txSummary);
-        setRunesSummary(parsedRunesSummary);
       } catch (e) {
         setTransaction(undefined);
         setSummary(undefined);
@@ -139,7 +126,6 @@ const useTransferRunes = ({ tabId, messageId, recipients }: Args) => {
   return {
     transaction,
     summary,
-    runesSummary,
     txError,
     feeRate,
     isLoading,

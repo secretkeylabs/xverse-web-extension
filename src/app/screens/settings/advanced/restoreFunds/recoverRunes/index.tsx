@@ -86,10 +86,7 @@ function RecoverRunes() {
   const generateTransactionAndSummary = async (desiredFeeRate: number) => {
     const tx = await runesTransaction.recoverRunes(context, desiredFeeRate);
     const txSummary = await tx.getSummary();
-    const txRuneSummary = await parseSummaryForRunes(context, txSummary, context.network, {
-      separateTransfersOnNoExternalInputs: true,
-    });
-
+    const txRuneSummary = await parseSummaryForRunes(context, txSummary, context.network);
     return { transaction: tx, summary: txSummary, runeSummary: txRuneSummary };
   };
 
@@ -184,7 +181,6 @@ function RecoverRunes() {
     ) : (
       <ConfirmBtcTransaction
         summary={summary}
-        runeSummary={runeSummary}
         title={t('TITLE')}
         isLoading={isLoading}
         isSubmitting={isBroadcasting}

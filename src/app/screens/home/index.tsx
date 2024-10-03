@@ -19,6 +19,7 @@ import useCoinRates from '@hooks/queries/useCoinRates';
 import useFeeMultipliers from '@hooks/queries/useFeeMultipliers';
 import useSpamTokens from '@hooks/queries/useSpamTokens';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useAvatarCleanup from '@hooks/useAvatarCleanup';
 import useHasFeature from '@hooks/useHasFeature';
 import useNotificationBanners from '@hooks/useNotificationBanners';
 import useSelectedAccount from '@hooks/useSelectedAccount';
@@ -133,6 +134,7 @@ function Home() {
 
   useFeeMultipliers();
   useAppConfig();
+  useAvatarCleanup();
   useTrackMixPanelPageViewed();
   const { removeFromSpamTokens } = useSpamTokens();
 

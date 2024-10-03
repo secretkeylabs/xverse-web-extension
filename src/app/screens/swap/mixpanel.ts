@@ -23,7 +23,7 @@ function trackSwapMixPanel(
     btcUsdRate,
     runeFloorPrice,
     stxBtcRate,
-    toTokenInfo,
+    fromTokenInfo,
   }: {
     provider?: Provider;
     fromToken?: FungibleToken;
@@ -33,61 +33,45 @@ function trackSwapMixPanel(
     btcUsdRate: string;
     runeFloorPrice?: number;
     stxBtcRate?: string;
-    toTokenInfo?: Coin;
+    fromTokenInfo?: Coin;
   },
 ) {
-  let fromAmount;
-  let receiveAmount;
-  let toAmount;
+  let fromTokenAmount;
+  let toTokenAmount;
+  let fromTokenUsdValue;
   let fromPrincipal;
   let toPrincipal;
 
   const from = getTrackingIdentifier(fromToken);
   const to = getTrackingIdentifier(toToken);
 
+  const receiveAmount = quote?.receiveAmount ? new BigNumber(quote?.receiveAmount) : undefined;
+
+  if (receiveAmount) {
+    toTokenAmount = receiveAmount.toFixed(2);
+  }
+
   if (fromToken && toToken && isRunesTx({ fromToken, toToken })) {
-    fromAmount =
+    fromTokenUsdValue =
       fromToken?.principal === 'BTC'
         ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcUsdRate)).toFixed(2)
         : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2);
-
-    receiveAmount = quote?.receiveAmount ? new BigNumber(quote?.receiveAmount) : undefined;
-    toAmount = receiveAmount
-      ? getBtcFiatEquivalent(
-          toToken?.protocol === 'btc'
-            ? receiveAmount
-            : receiveAmount.multipliedBy(runeFloorPrice ?? 0),
-          new BigNumber(btcUsdRate),
-        ).toFixed(2)
-      : undefined;
+    fromTokenAmount = amount;
   } else if (stxBtcRate) {
     fromPrincipal = fromToken?.principal;
     toPrincipal = toToken?.ticker;
 
-    fromAmount =
+    fromTokenAmount = amount;
+    fromTokenUsdValue =
       fromToken?.principal === 'STX'
         ? getStxFiatEquivalent(
             stxToMicrostacks(new BigNumber(amount)),
             new BigNumber(stxBtcRate),
             new BigNumber(btcUsdRate),
           ).toFixed(2)
-        : fromToken?.tokenFiatRate
-        ? new BigNumber(fromToken?.tokenFiatRate).multipliedBy(amount).toFixed(2)
-        : '--';
-
-    receiveAmount = quote?.receiveAmount ? new BigNumber(quote?.receiveAmount) : undefined;
-    if (receiveAmount) {
-      toAmount =
-        toToken?.protocol === 'stx'
-          ? getStxFiatEquivalent(
-              stxToMicrostacks(receiveAmount),
-              new BigNumber(stxBtcRate),
-              new BigNumber(btcUsdRate),
-            ).toFixed(2)
-          : toTokenInfo?.tokenFiatRate
-          ? new BigNumber(toTokenInfo?.tokenFiatRate).multipliedBy(receiveAmount).toFixed(2)
-          : '--';
-    }
+        : fromTokenInfo?.tokenFiatRate
+        ? new BigNumber(fromTokenInfo?.tokenFiatRate).multipliedBy(amount).toFixed(2)
+        : 0;
   }
 
   trackMixPanel(eventName, {
@@ -96,8 +80,9 @@ function trackSwapMixPanel(
     ...(to ? { to } : {}),
     ...(fromPrincipal ? { fromPrincipal } : {}),
     ...(toPrincipal ? { toPrincipal } : {}),
-    fromAmount,
-    ...(toAmount ? { toAmount } : {}),
+    ...(fromTokenAmount ? { fromTokenAmount } : {}),
+    ...(fromTokenUsdValue ? { fromTokenUsdValue } : {}),
+    ...(toTokenAmount ? { toTokenAmount } : {}),
   });
 }
 

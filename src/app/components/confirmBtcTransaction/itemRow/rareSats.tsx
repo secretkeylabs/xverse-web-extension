@@ -1,31 +1,31 @@
 import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
 import { Butterfly } from '@phosphor-icons/react';
 import { animated, config, useSpring } from '@react-spring/web';
+import { btcTransaction, type RareSatsType } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import Divider from '@ui-library/divider';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 import Theme from 'theme';
 import Avatar from '../../../ui-library/avatar';
-import { mapTxSatributeInfoToBundleInfo, type SatRangeTx } from '../utils';
-import BundleItem from './bundleItem';
+import RareSatRow from './rareSatRow';
 
 const SatsBundleContainer = styled.div`
   display: flex;
   flex-direction: column;
   border-radius: ${(props) => props.theme.space.s};
+  margin-top: ${(props) => props.theme.space.s};
   margin-bottom: ${(props) => props.theme.space.s};
 `;
 
-const SatsBundleButton = styled.button`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  background-color: ${(props) => props.theme.colors.elevation1};
-`;
+const SatsBundleButton = styled.button<{ buttonColor?: string }>((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  backgroundColor: props.buttonColor ?? props.theme.colors.elevation1,
+}));
 
 const RangesContainer = styled(animated.div)((props) => ({
   borderRadius: props.theme.space.s,
@@ -44,7 +44,7 @@ const Row = styled.div`
   align-items: center;
 `;
 
-const BundleInfo = styled.div`
+const ButterflyHeader = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -52,11 +52,15 @@ const BundleInfo = styled.div`
 `;
 
 function RareSats({
-  satributesInfo,
+  satributes,
+  inscriptionSatributes,
   bundleSize,
+  buttonColor,
 }: {
-  satributesInfo: { satRanges: SatRangeTx[]; totalExoticSats: number };
+  satributes?: btcTransaction.IOSatribute[] | Omit<btcTransaction.IOSatribute, 'offset'>[];
+  inscriptionSatributes?: RareSatsType[];
   bundleSize?: number;
+  buttonColor?: string;
 }) {
   const [showBundleDetail, setShowBundleDetail] = useState(false);
 
@@ -76,51 +80,76 @@ function RareSats({
     config: { ...config.stiff },
   });
 
+  const totalExoticSats: number =
+    satributes?.reduce(
+      (accumulator, current) =>
+        accumulator + (!current.types.includes('COMMON') ? current.amount : 0),
+      0,
+    ) ?? 0;
+
+  if (!totalExoticSats && !inscriptionSatributes?.length) return null;
+
   return (
     <SatsBundleContainer>
       <SatsBundleButton
         type="button"
+        buttonColor={buttonColor}
         onClick={() => setShowBundleDetail((prevState) => !prevState)}
       >
         <Row>
           <Avatar icon={<Butterfly size={18} color={Theme.colors.elevation0} />} />
-          <BundleInfo>
-            <StyledP typography="body_medium_m" color="white_0">{`${
-              satributesInfo.totalExoticSats
-            } ${t(
-              satributesInfo.totalExoticSats > 1
-                ? 'NFT_DASHBOARD_SCREEN.RARE_SATS'
-                : 'NFT_DASHBOARD_SCREEN.RARE_SAT',
-            )}`}</StyledP>
-            {bundleSize && (
-              <NumericFormat
-                value={bundleSize}
-                displayType="text"
-                thousandSeparator
-                prefix={`${t('COMMON.SIZE')}: `}
-                suffix={` ${t('COMMON.SATS')}`}
-                renderText={(value: string) => (
-                  <StyledP typography="body_medium_s" color="white_400">
-                    {value}
-                  </StyledP>
-                )}
-              />
-            )}
-          </BundleInfo>
+          <ButterflyHeader>
+            <StyledP typography="body_medium_m" color="white_0">
+              {totalExoticSats > 0
+                ? `${totalExoticSats} ${t(
+                    totalExoticSats > 1
+                      ? 'NFT_DASHBOARD_SCREEN.RARE_SATS'
+                      : 'NFT_DASHBOARD_SCREEN.RARE_SAT',
+                  )}`
+                : `${t('NFT_DASHBOARD_SCREEN.RARE_SATS')}`}
+            </StyledP>
+          </ButterflyHeader>
         </Row>
         <animated.img style={arrowRotation} src={DropDownIcon} alt="Drop Down" />
       </SatsBundleButton>
-
       {showBundleDetail && (
         <RangesContainer style={slideInStyles}>
-          {satributesInfo.satRanges.map((item: SatRangeTx, index: number) => (
-            <div key={item.offset}>
+          {inscriptionSatributes && (
+            <Range>
+              <RareSatRow
+                item={{
+                  types: inscriptionSatributes,
+                  amount: 0,
+                  fromAddress: '',
+                  offset: -1,
+                }}
+              />
+            </Range>
+          )}
+          {totalExoticSats > 0 &&
+            satributes &&
+            satributes.map((item, i) => (
+              // eslint-disable-next-line react/jsx-key
               <Range>
-                <BundleItem item={mapTxSatributeInfoToBundleInfo(item)} />
+                <RareSatRow item={item} />
+                {i < satributes.length - 1 && <Divider verticalMargin="s" />}
               </Range>
-              {satributesInfo.satRanges.length > index + 1 && <Divider verticalMargin="s" />}
-            </div>
-          ))}
+            ))}
+          {bundleSize && totalExoticSats !== bundleSize && (
+            <>
+              <Divider verticalMargin="s" />
+              <Range>
+                <RareSatRow
+                  item={{
+                    types: ['COMMON'],
+                    amount: bundleSize - totalExoticSats,
+                    fromAddress: '',
+                    offset: -1,
+                  }}
+                />
+              </Range>
+            </>
+          )}
         </RangesContainer>
       )}
     </SatsBundleContainer>

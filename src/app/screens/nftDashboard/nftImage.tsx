@@ -94,6 +94,10 @@ function NftImage({ metadata, isInCollage = false }: Props) {
         playsInline
         controls
         preload="auto"
+        onClick={(event) => {
+          // Prevent playback when clicking anywhere other than the controls
+          event.preventDefault();
+        }}
       />
     );
   }

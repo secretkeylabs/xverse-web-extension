@@ -2,16 +2,16 @@ import DropDownIcon from '@assets/img/transactions/dropDownIcon.svg';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { WarningOctagon } from '@phosphor-icons/react';
 import { animated, config, useSpring } from '@react-spring/web';
-import { btcTransaction } from '@secretkeylabs/xverse-core';
+import { btcTransaction, type RareSatsType } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import Divider from '@ui-library/divider';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import Theme from 'theme';
-import { mapTxSatributeInfoToBundleInfo } from '../utils';
-import BundleItem from './bundleItem';
 import Inscription from './inscription';
+import RareSatRow from './rareSatRow';
+import RareSats from './rareSats';
 
 const WarningContainer = styled.div`
   display: flex;
@@ -54,10 +54,28 @@ export default function AmountWithInscriptionSatribute({
   inscriptions,
   onShowInscription,
 }: {
-  satributes: btcTransaction.IOSatribute[];
-  inscriptions: btcTransaction.IOInscription[];
-  onShowInscription: (inscription: btcTransaction.IOInscription) => void;
+  satributes: btcTransaction.IOSatribute[] | Omit<btcTransaction.IOSatribute, 'offset'>[];
+  inscriptions:
+    | btcTransaction.IOInscription[]
+    | (btcTransaction.IOInscription & { satributes: RareSatsType[] })[]
+    | (Omit<btcTransaction.IOInscription, 'offset'> & { satributes: RareSatsType[] })[];
+  onShowInscription: (
+    inscription:
+      | (btcTransaction.IOInscription & { satributes: RareSatsType[] })
+      | (Omit<btcTransaction.IOInscription, 'offset'> & { satributes: RareSatsType[] }),
+  ) => void;
 }) {
+  const inscriptionsHaveSatributes = (
+    inscriptionsArr: (
+      | btcTransaction.IOInscription
+      | (btcTransaction.IOInscription & { satributes: RareSatsType[] })
+      | (Omit<btcTransaction.IOInscription, 'offset'> & { satributes: RareSatsType[] })
+    )[],
+  ): inscriptionsArr is (
+    | (btcTransaction.IOInscription & { satributes: RareSatsType[] })
+    | (Omit<btcTransaction.IOInscription, 'offset'> & { satributes: RareSatsType[] })
+  )[] => inscriptions.some((inscription) => 'satributes' in inscription);
+
   const [showBundleDetail, setShowBundleDetail] = useState(false);
 
   const { t } = useTranslation('translation');
@@ -77,15 +95,26 @@ export default function AmountWithInscriptionSatribute({
     config: { ...config.stiff },
   });
 
+  const inscriptionSatributes =
+    hasActivatedRareSatsKey && inscriptionsHaveSatributes(inscriptions)
+      ? inscriptions
+          .map((inscription) => inscription.satributes)
+          .filter((rareSatsArr) => rareSatsArr.length > 0)
+      : [];
   // we only show the satributes if the user has activated the rare sats key
   const satributesArray = hasActivatedRareSatsKey ? satributes : [];
+
   const amountOfAssets = satributesArray.length + inscriptions.length;
 
-  return amountOfAssets > 0 ? (
+  if (amountOfAssets === 0) {
+    return null;
+  }
+
+  return (
     <WarningContainer>
       <WarningButton type="button" onClick={() => setShowBundleDetail((prevState) => !prevState)}>
         <Row>
-          <WarningOctagon weight="fill" color={Theme.colors.caution} />
+          <WarningOctagon weight="fill" color={Theme.colors.caution} size={16} />
           <Title typography="body_medium_s" color="caution">
             {t(
               `CONFIRM_TRANSACTION.${
@@ -96,11 +125,10 @@ export default function AmountWithInscriptionSatribute({
         </Row>
         <animated.img style={arrowRotation} src={DropDownIcon} alt="Drop Down" />
       </WarningButton>
-
       {showBundleDetail && (
         <ItemsContainer style={slideInStyles}>
-          {inscriptions.map((item: btcTransaction.IOInscription, index: number) => (
-            <div key={item.id}>
+          {inscriptions.map((item, index: number) => (
+            <>
               <Range>
                 <Inscription
                   inscription={item}
@@ -108,21 +136,38 @@ export default function AmountWithInscriptionSatribute({
                   onShowInscription={onShowInscription}
                 />
               </Range>
-              {(satributesArray.length || inscriptions.length > index + 1) && (
+              {(inscriptionSatributes.length > 0 || inscriptions.length > index + 1) && (
                 <Divider verticalMargin="s" />
               )}
-            </div>
+            </>
           ))}
-          {satributesArray.map((item: btcTransaction.IOSatribute, index: number) => (
-            <div key={item.offset}>
+          {inscriptionSatributes.length > 0 && (
+            <>
               <Range>
-                <BundleItem item={mapTxSatributeInfoToBundleInfo(item)} />
+                <RareSats
+                  buttonColor={Theme.colors.elevation2}
+                  satributes={[]}
+                  inscriptionSatributes={inscriptionSatributes}
+                />
               </Range>
-              {satributesArray.length > index + 1 && <Divider verticalMargin="s" />}
-            </div>
-          ))}
+              {satributesArray.length > 0 && <Divider verticalMargin="s" />}
+            </>
+          )}
+          {satributesArray.map(
+            (
+              item: btcTransaction.IOSatribute | Omit<btcTransaction.IOSatribute, 'offset'>,
+              index: number,
+            ) => (
+              <>
+                <Range>
+                  <RareSatRow item={item} />
+                </Range>
+                {satributesArray.length > index + 1 && <Divider verticalMargin="s" />}
+              </>
+            ),
+          )}
         </ItemsContainer>
       )}
     </WarningContainer>
-  ) : null;
+  );
 }

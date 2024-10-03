@@ -1,6 +1,6 @@
-import styled, { useTheme } from 'styled-components';
 import ActionButton from '@components/button';
 import { XCircle } from '@phosphor-icons/react';
+import styled, { useTheme } from 'styled-components';
 
 type DialogType = 'default' | 'feedback';
 
@@ -88,7 +88,9 @@ interface Props {
   title: string;
   description: string;
   leftButtonText?: string;
+  leftButtonDisabled?: boolean;
   rightButtonText?: string;
+  rightButtonDisabled?: boolean;
   type?: DialogType;
   icon?: JSX.Element;
   onLeftButtonClick?: () => void;
@@ -102,7 +104,9 @@ function Dialog({
   title,
   description,
   leftButtonText,
+  leftButtonDisabled,
   rightButtonText,
+  rightButtonDisabled,
   type = 'default',
   icon,
   onLeftButtonClick,
@@ -131,14 +135,27 @@ function Dialog({
         {onRightButtonClick && onLeftButtonClick && (
           <ButtonContainer>
             <TransparentButtonContainer>
-              <ActionButton text={leftButtonText ?? 'No'} transparent onPress={onLeftButtonClick} />
+              <ActionButton
+                text={leftButtonText ?? 'No'}
+                transparent
+                onPress={onLeftButtonClick}
+                disabled={leftButtonDisabled}
+              />
             </TransparentButtonContainer>
-            <ActionButton text={rightButtonText ?? 'Yes'} onPress={onRightButtonClick} />
+            <ActionButton
+              text={rightButtonText ?? 'Yes'}
+              onPress={onRightButtonClick}
+              disabled={rightButtonDisabled}
+            />
           </ButtonContainer>
         )}
         {!onRightButtonClick && onLeftButtonClick && (
           <ButtonContainer>
-            <ActionButton text={leftButtonText ?? 'Yes'} onPress={onLeftButtonClick} />
+            <ActionButton
+              text={leftButtonText ?? 'Yes'}
+              onPress={onLeftButtonClick}
+              disabled={leftButtonDisabled}
+            />
           </ButtonContainer>
         )}
       </Container>

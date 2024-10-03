@@ -37,7 +37,6 @@ function TransferRunesRequestInner({ data, context }: TransferRunesRequestInnerP
     isLoading,
     transaction,
     summary,
-    runesSummary,
     txError,
   } = useTransferRunes({
     tabId: context.tabId,
@@ -76,7 +75,6 @@ function TransferRunesRequestInner({ data, context }: TransferRunesRequestInnerP
         <ConfirmBtcTransaction
           showAccountHeader
           summary={summary}
-          runeSummary={runesSummary}
           isLoading={isLoading}
           confirmText={t('CONFIRM')}
           cancelText={t('CANCEL')}

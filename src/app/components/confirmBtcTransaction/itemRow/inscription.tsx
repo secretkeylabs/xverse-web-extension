@@ -1,21 +1,14 @@
 import OrdinalIcon from '@assets/img/rareSats/ic_ordinal_small_over_card.svg';
 import { Eye } from '@phosphor-icons/react';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
-import { btcTransaction } from '@secretkeylabs/xverse-core';
+import { btcTransaction, type RareSatsType } from '@secretkeylabs/xverse-core';
 import Avatar from '@ui-library/avatar';
 import { StyledP } from '@ui-library/common.styled';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 import Theme from 'theme';
-import { useParsedTxSummaryContext } from '../hooks/useParsedTxSummaryContext';
-
-type Props = {
-  inscription: btcTransaction.IOInscription;
-  bundleSize?: number;
-  hideTypeSizeInfo?: boolean;
-  onShowInscription: (inscription: btcTransaction.IOInscription) => void;
-};
+import { useTxSummaryContext } from '../hooks/useTxSummaryContext';
 
 const RowCenter = styled.div<{ spaceBetween?: boolean; gap?: boolean }>((props) => ({
   display: 'flex',
@@ -49,15 +42,25 @@ const Dot = styled(StyledP)`
   margin: 0 ${(props) => props.theme.space.xxs};
 `;
 
+type Props = {
+  inscription:
+    | (btcTransaction.IOInscription & { satributes: RareSatsType[] })
+    | (Omit<btcTransaction.IOInscription, 'offset'> & { satributes: RareSatsType[] });
+  hideTypeSizeInfo?: boolean;
+  onShowInscription: (
+    inscription:
+      | (btcTransaction.IOInscription & { satributes: RareSatsType[] })
+      | (Omit<btcTransaction.IOInscription, 'offset'> & { satributes: RareSatsType[] }),
+  ) => void;
+};
+
 export default function Inscription({
   inscription,
-  bundleSize,
   hideTypeSizeInfo = false,
   onShowInscription,
 }: Props) {
   const { t } = useTranslation('translation');
-  const { brc20Summary } = useParsedTxSummaryContext();
-
+  const { brc20Summary } = useTxSummaryContext();
   return (
     <RowCenter>
       <AvatarContainer>
@@ -78,25 +81,9 @@ export default function Inscription({
       <RowCenter spaceBetween gap>
         <div>
           {!hideTypeSizeInfo && (
-            <>
-              <StyledP typography="body_medium_m" color="white_0">
-                {t('COMMON.INSCRIPTION')}
-              </StyledP>
-              {bundleSize && (
-                <NumericFormat
-                  value={bundleSize}
-                  displayType="text"
-                  thousandSeparator
-                  prefix={`${t('COMMON.SIZE')}: `}
-                  suffix={` ${t('COMMON.SATS')}`}
-                  renderText={(value: string) => (
-                    <StyledP typography="body_medium_s" color="white_400">
-                      {value}
-                    </StyledP>
-                  )}
-                />
-              )}
-            </>
+            <StyledP typography="body_medium_m" color="white_0">
+              {t('COMMON.INSCRIPTION')}
+            </StyledP>
           )}
         </div>
         {brc20Summary ? (
@@ -132,9 +119,7 @@ export default function Inscription({
           <NumberTypeContainer>
             <InscriptionNumberContainer
               type="button"
-              onClick={() => {
-                onShowInscription(inscription);
-              }}
+              onClick={() => onShowInscription(inscription)}
             >
               <RowCenter>
                 <InscriptionNumber

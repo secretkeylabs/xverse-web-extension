@@ -7,6 +7,8 @@ import { permissionsPersistantStoreKeyName } from './constants';
 import {
   permissionsStoreSchema,
   type Client,
+  type ClientMetadata,
+  type ClientMetadataTable,
   type ClientsTable,
   type Permission,
   type PermissionsStore,
@@ -73,29 +75,70 @@ export async function getClient(permissionStore: PermissionsStore, clientId: Cli
   return [...permissionStore.clients].find((c) => c.id === clientId);
 }
 
+/**
+ * Get a client Metadata by its ID.
+ * @public
+ */
+export function getClientMetadata(
+  permissionStore: PermissionsStore,
+  clientId: Client['id'],
+): ClientMetadata {
+  const metadata = [...permissionStore.clientMetadata].find((c) => c.clientId === clientId);
+  // If the metadata doesn't exist, create it
+  if (!metadata) {
+    permissionStore.clientMetadata.add({ clientId });
+    return { clientId };
+  }
+  return metadata;
+}
+
 // Mutations
 
-export function addClient(clients: ClientsTable, client: Client) {
-  if (![...clients].some((c) => c.id === client.id)) {
-    clients.add(client);
+export function addClient(permissionStore: PermissionsStore, client: Client) {
+  if (![...permissionStore.clients].some((c) => c.id === client.id)) {
+    permissionStore.clients.add(client);
+    permissionStore.clientMetadata.add({ clientId: client.id, lastUsed: new Date().getTime() });
   }
 }
+
+export function updateClientMetadata(
+  permissionStore: PermissionsStore,
+  clientId: Client['id'],
+  updatedData: Partial<ClientMetadata>,
+) {
+  const updatedMetadata = Array.from(permissionStore.clientMetadata).map((item) =>
+    item.clientId === clientId ? { ...item, ...updatedData } : item,
+  );
+  permissionStore.clientMetadata = new Set(updatedMetadata);
+}
+
 export function removeAllClientPermissions(permissions: PermissionsTable, clientId: Client['id']) {
   const clientPermissions = [...permissions].filter((p) => p.clientId === clientId);
   clientPermissions.forEach((p) => permissions.delete(p));
 }
-export function removeClient(
-  clients: ClientsTable,
-  permissions: PermissionsTable,
-  clientId: Client['id'],
-) {
-  removeAllClientPermissions(permissions, clientId);
 
-  const client = [...clients].find((c) => c.id === clientId);
-  if (client) {
-    clients.delete(client);
+function removeClientMetadata(clientMetadata: ClientMetadataTable, clientId: Client['id']) {
+  const metadata = [...clientMetadata].find((p) => p.clientId === clientId);
+  if (metadata) {
+    clientMetadata.delete(metadata);
   }
 }
+
+export function removeClient(permissionStore: PermissionsStore, clientId: Client['id']) {
+  removeAllClientPermissions(permissionStore.permissions, clientId);
+  removeClientMetadata(permissionStore.clientMetadata, clientId);
+  const client = [...permissionStore.clients].find((c) => c.id === clientId);
+  if (client) {
+    permissionStore.clients.delete(client);
+  }
+}
+
+export function removeAllClients(permissionStore: PermissionsStore) {
+  permissionStore.clients.clear();
+  permissionStore.clientMetadata.clear();
+  permissionStore.permissions.clear();
+}
+
 export function addResource(resources: ResourcesTable, resource: Resource) {
   if (![...resources].some((r) => r.id === resource.id)) {
     resources.add(resource);
@@ -154,6 +197,9 @@ export function savePermissionsStore(permissionsStore: PermissionsStore) {
 function makeClientsTable() {
   return new Set<Client>();
 }
+function makeClientsMetadataTable() {
+  return new Set<ClientMetadata>();
+}
 function makeResourcesTable() {
   return new Set<Resource>();
 }
@@ -162,8 +208,9 @@ function makePermissionsTable() {
 }
 function makePermissionsStore(): PermissionsStore {
   return {
-    version: 2,
+    version: 3,
     clients: makeClientsTable(),
+    clientMetadata: makeClientsMetadataTable(),
     resources: makeResourcesTable(),
     permissions: makePermissionsTable(),
   };
