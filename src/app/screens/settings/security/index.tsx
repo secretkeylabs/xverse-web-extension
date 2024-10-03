@@ -109,6 +109,7 @@ function Security() {
           text={t('RESET_WALLET')}
           onClick={openResetWalletPrompt}
           showWarningTitle
+          showArrow={false}
         />
         <ResetWalletPrompt
           showResetWalletPrompt={showResetWalletPrompt}

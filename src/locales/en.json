@@ -1007,7 +1007,7 @@
     "SWAP": "Swap",
     "BUY": "Buy",
     "LIST": "List",
-    "TRANSACTION_HISTORY_TITLE": "Transaction history",
+    "TRANSACTION_HISTORY_TITLE": "Transactions",
     "TRANSACTIONS_LIST_EMPTY": "No transactions found.",
     "TRANSACTIONS_LIST_ERROR": "Error fetching transaction history for this token",
     "TRANSACTION_SENT": "Sent",

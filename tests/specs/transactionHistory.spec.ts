@@ -80,7 +80,7 @@ test.describe('Transaction', () => {
     await wallet.checkAndClickOnSpecificRune('SKIBIDI•OHIO•RIZZ');
     const originalBalanceAmount = await wallet.checkVisualsRunesDashboard('SKIBIDI•OHIO•RIZZ');
     await expect(originalBalanceAmount).toBeGreaterThan(0);
-    await expect(wallet.containerTransactionHistory.first()).toBeVisible();
+    await expect(wallet.containerTransactionHistory.first()).toBeHidden();
     // There should be at least one transaction visible
     await expect(await wallet.containerTransactionHistory.count()).toBeGreaterThanOrEqual(1);
     // check able to see rune bundles

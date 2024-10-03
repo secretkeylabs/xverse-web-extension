@@ -26,11 +26,11 @@ const TitleText = styled.h1((props) => ({
   paddingTop: props.theme.space.xl,
 }));
 
-const ComponentText = styled.h1<{
-  textColor: string;
+const ComponentText = styled.p<{
+  $textColor: string;
 }>((props) => ({
   ...props.theme.typography.body_medium_l,
-  color: props.textColor,
+  color: props.$textColor,
   flex: 1,
   textAlign: 'left',
 }));
@@ -79,6 +79,7 @@ type Props = {
   onClick?: () => void;
   showDivider?: boolean;
   showWarningTitle?: boolean;
+  showArrow?: boolean;
   toggle?: boolean;
   toggleValue?: boolean;
   description?: string;
@@ -95,6 +96,7 @@ function SettingComponent({
   link,
   showDivider,
   showWarningTitle,
+  showArrow = true,
   toggle,
   toggleValue,
   description,
@@ -103,6 +105,7 @@ function SettingComponent({
   isLoading,
 }: Props) {
   const theme = useTheme();
+
   return (
     <Wrapper>
       <ColumnContainer>
@@ -113,7 +116,7 @@ function SettingComponent({
         >
           <Column>
             <ComponentText
-              textColor={showWarningTitle ? theme.colors.feedback.error : theme.colors.white['200']}
+              $textColor={showWarningTitle ? theme.colors.feedback.error : theme.colors.white_200}
             >
               {text}
             </ComponentText>
@@ -121,7 +124,9 @@ function SettingComponent({
           </Column>
           {textDetail && <ComponentDescriptionText>{textDetail}</ComponentDescriptionText>}
           {!toggle && link && <ArrowUpRight color={theme.colors.white_0} size={16} weight="bold" />}
-          {!toggle && !link && <CaretRight color={theme.colors.white_0} size={16} weight="bold" />}
+          {!toggle && !link && showArrow && (
+            <CaretRight color={theme.colors.white_0} size={16} weight="bold" />
+          )}
           {isLoading && <Spinner color="white" size={16} />}
           {toggle && toggleFunction && !isLoading && (
             <Toggle onChange={toggleFunction} checked={toggleValue ?? false} disabled={disabled} />
