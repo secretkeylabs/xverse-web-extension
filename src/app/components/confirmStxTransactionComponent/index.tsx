@@ -397,7 +397,6 @@ function ConfirmStxTransactionComponent({
         <TransactionSettingAlert
           visible={openTransactionSettingModal}
           fee={microstacksToStx(getFee()).toString()}
-          type="STX"
           nonce={getTxNonce()}
           onApplyClick={applyTxSettings}
           onCrossClick={closeTransactionSettingAlert}

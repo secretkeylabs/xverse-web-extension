@@ -10,9 +10,8 @@ import {
   type SignTransactionPayload,
 } from '@sats-connect/core';
 import {
+  base64ToHex,
   btcTransaction,
-  psbtBase64ToHex,
-  signPsbt,
   type InputToSign,
   type SettingsNetwork,
 } from '@secretkeylabs/xverse-core';
@@ -20,7 +19,6 @@ import { decodeToken } from 'jsontokens';
 import { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import useBtcClient from '../../hooks/apiClients/useBtcClient';
-import useSeedVault from '../../hooks/useSeedVault';
 
 const useSignPsbtParams = (network: SettingsNetwork) => {
   const { search } = useLocation();
@@ -70,8 +68,7 @@ const useSignPsbtParams = (network: SettingsNetwork) => {
 };
 
 const useSignPsbt = () => {
-  const { accountsList, network } = useWalletSelector();
-  const { getSeed } = useSeedVault();
+  const { network } = useWalletSelector();
   const btcClient = useBtcClient();
   const { payload, tabId, requestToken, requestId } = useSignPsbtParams(network);
 
@@ -86,27 +83,17 @@ const useSignPsbt = () => {
     }
   }, [txnContext, payload]);
 
-  const confirmSignPsbt = async (signingResponseOverride?: string) => {
-    let signingResponse = signingResponseOverride;
-    if (!signingResponse && payload) {
-      const seedPhrase = await getSeed();
-      signingResponse = await signPsbt(
-        seedPhrase,
-        accountsList,
-        payload.inputsToSign,
-        payload.psbtBase64,
-        payload.broadcast,
-        network.type,
-      );
-    }
+  const confirmSignPsbt = async (signingResponse: string) => {
+    if (!signingResponse) return;
 
     let txId: string = '';
+
     if (payload.broadcast && signingResponse) {
-      const txHex = psbtBase64ToHex(signingResponse);
+      const txHex = base64ToHex(signingResponse);
       const response = await btcClient.sendRawTransaction(txHex);
       txId = response.tx.hash;
     }
-    if (!signingResponse) return;
+
     if (requestToken) {
       const signingMessage = {
         source: MESSAGE_SOURCE,
@@ -128,6 +115,7 @@ const useSignPsbt = () => {
       const response = makeRpcSuccessResponse(requestId as string, result);
       sendRpcResponse(+tabId, response);
     }
+
     return {
       txId,
       signingResponse,

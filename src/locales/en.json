@@ -198,7 +198,8 @@
     "SEND_ORDINAL": "Send ordinal",
     "CONFIRM_FEES": "Confirm fees",
     "RETRY_BUTTON": "Try again",
-    "FEES": "Fees"
+    "FEES": "Fees",
+    "AMOUNT": "Amount"
   },
   "DASHBOARD_SCREEN": {
     "TOTAL_BALANCE": "total balance",
