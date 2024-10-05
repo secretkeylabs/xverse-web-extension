@@ -25,9 +25,9 @@ import RoutePaths from 'app/routes/paths';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import useStxTransactionRequest from './useStxTransactionRequest';
+import useStxTransactionRequest, { type DataStxSignTransaction } from './useStxTransactionRequest';
 
 const LoaderContainer = styled.div((props) => ({
   display: 'flex',
@@ -40,7 +40,11 @@ const LoaderContainer = styled.div((props) => ({
 function TransactionRequest() {
   const selectedAccount = useSelectedAccount();
   const { network, feeMultipliers, accountsList } = useWalletSelector();
-  const txReq = useStxTransactionRequest();
+  const location = useLocation();
+  const { dataStxSignTransactionOverride } = (location.state || {}) as {
+    dataStxSignTransactionOverride?: DataStxSignTransaction;
+  };
+  const txReq = useStxTransactionRequest(dataStxSignTransactionOverride);
   const navigate = useNavigate();
   const selectedNetwork = useNetworkSelector();
   const { switchAccount } = useWalletReducer();
@@ -84,11 +88,12 @@ function TransactionRequest() {
       transaction?.auth,
     );
     setUnsignedTx(unsignedSendStxTx);
+
     navigate(RoutePaths.ConfirmStacksTransaction, {
       state: {
         unsignedTx: buf2hex(unsignedSendStxTx.serialize()),
         sponsored: tokenTransferPayload.sponsored,
-        isBrowserTx: true,
+        isBrowserTx: !dataStxSignTransactionOverride,
         tabId,
         messageId,
         requestToken,
@@ -162,9 +167,11 @@ function TransactionRequest() {
     } else if (payload.txType === 'smart_contract') {
       await handleContractDeployRequest(payload, requestAccount);
     } else {
+      console.log(payload);
       navigate(RoutePaths.ConfirmStacksTransaction, {
         state: {
           unsignedTx: payload.txHex,
+          fee: payload.fee,
           sponsored: payload.sponsored,
           isBrowserTx: true,
           tabId,

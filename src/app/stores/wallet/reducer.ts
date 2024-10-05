@@ -1,17 +1,24 @@
 import { defaultMainnet, initialNetworksList } from '@secretkeylabs/xverse-core';
 import { REHYDRATE } from 'redux-persist';
 import {
+  AddToHideCollectiblesKey,
+  AddToStarCollectiblesKey,
   ChangeFiatCurrencyKey,
   ChangeHasActivatedOrdinalsKey,
-  ChangeHasActivatedRBFKey,
   ChangeHasActivatedRareSatsKey,
+  ChangeHasActivatedRBFKey,
   ChangeNetworkKey,
   ChangeShowBtcReceiveAlertKey,
   ChangeShowDataCollectionAlertKey,
   ChangeShowOrdinalReceiveAlertKey,
   RareSatsNoticeDismissedKey,
+  RemoveAccountAvatarKey,
+  RemoveAllFromHideCollectiblesKey,
+  RemoveFromHideCollectiblesKey,
+  RemoveFromStarCollectiblesKey,
   ResetWalletKey,
   SelectAccountKey,
+  SetAccountAvatarKey,
   SetAccountBalanceKey,
   SetBrc20ManageTokensKey,
   SetFeeMultiplierKey,
@@ -28,8 +35,8 @@ import {
   UpdateLedgerAccountsKey,
   UpdateSavedNamesKey,
   UpdateSoftwareAccountsKey,
-  WalletSessionPeriods,
   type WalletActions,
+  WalletSessionPeriods,
   type WalletState,
 } from './actions/types';
 
@@ -85,6 +92,9 @@ export const initialWalletState: WalletState = {
   spamTokens: [],
   showSpamTokens: false,
   savedNames: {},
+  hiddenCollectibleIds: {},
+  starredCollectibleIds: {},
+  avatarIds: {},
 };
 
 /**
@@ -272,6 +282,87 @@ const walletReducer = (
           [action.networkType]: action.names,
         },
       };
+    case AddToStarCollectiblesKey:
+      return {
+        ...state,
+        starredCollectibleIds: {
+          ...state.starredCollectibleIds,
+          [action.address]: [
+            ...(state.starredCollectibleIds[action.address] ?? []),
+            { id: action.id, collectionId: action.collectionId ?? '' },
+          ],
+        },
+      };
+    case RemoveFromStarCollectiblesKey: {
+      const starredCollectibleIds = state.starredCollectibleIds[action.address] ?? [];
+      const updatedStarCollectibleIds = starredCollectibleIds.filter(
+        (collectible) => collectible.id !== action.id,
+      );
+      return {
+        ...state,
+        starredCollectibleIds: {
+          ...state.starredCollectibleIds,
+          [action.address]: updatedStarCollectibleIds,
+        },
+      };
+    }
+    case AddToHideCollectiblesKey: {
+      const starredCollectibleIds = state.starredCollectibleIds[action.address] ?? [];
+      const updatedStarCollectibleIds = starredCollectibleIds.filter(
+        (collectible) => collectible.id !== action.id && collectible.collectionId !== action.id,
+      );
+      return {
+        ...state,
+        hiddenCollectibleIds: {
+          ...state.hiddenCollectibleIds,
+          [action.address]: {
+            ...state.hiddenCollectibleIds[action.address],
+            [action.id]: action.id ?? '',
+          },
+        },
+        starredCollectibleIds: {
+          ...state.starredCollectibleIds,
+          [action.address]: updatedStarCollectibleIds,
+        },
+      };
+    }
+    case RemoveFromHideCollectiblesKey: {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      const { [action.id]: _, ...hiddenCollectibleIds } =
+        state.hiddenCollectibleIds[action.address];
+      return {
+        ...state,
+        hiddenCollectibleIds: {
+          ...state.hiddenCollectibleIds,
+          [action.address]: hiddenCollectibleIds,
+        },
+      };
+    }
+    case RemoveAllFromHideCollectiblesKey:
+      return {
+        ...state,
+        hiddenCollectibleIds: {
+          ...state.hiddenCollectibleIds,
+          [action.address]: {},
+        },
+      };
+    case SetAccountAvatarKey:
+      return {
+        ...state,
+        avatarIds: {
+          ...state.avatarIds,
+          [action.address]: action.avatar,
+        },
+      };
+    case RemoveAccountAvatarKey: {
+      return {
+        ...state,
+        avatarIds: {
+          ...state.avatarIds,
+          [action.address]: null,
+        },
+      };
+    }
     default:
       return state;
   }

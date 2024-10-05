@@ -91,7 +91,7 @@ const InputField = styled.input<{ $bgColor?: string; $hasLeftAccessory?: boolean
 
 const ComplicationsContainer = styled.div`
   position: absolute;
-  right: ${(props) => props.theme.spacing(8)}px;
+  right: ${(props) => props.theme.space.m};
   top: 0;
 
   height: 100%;
@@ -101,8 +101,15 @@ const ComplicationsContainer = styled.div`
   align-items: center;
 
   > *:first-child {
-    margin-left: ${(props) => props.theme.spacing(4)}px;
+    margin-left: ${(props) => props.theme.space.xs};
   }
+`;
+
+const ClearButtonContainer = styled.button`
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  border-radius: 50%;
 `;
 
 const ClearButton = styled.div<{ $hasSiblings?: boolean }>`
@@ -118,8 +125,8 @@ const ClearButton = styled.div<{ $hasSiblings?: boolean }>`
   height: 16px;
   background-color: ${(props) => props.theme.colors.white_200};
   color: ${(props) => props.theme.colors.elevation_n1};
-  border-radius: 50%;
-  margin-right: ${(props) => (props.$hasSiblings ? props.theme.spacing(4) : 0)}px;
+  border-radius: inherit;
+  margin-right: ${(props) => (props.$hasSiblings ? props.theme.space.xs : 0)}px;
   transition: opacity 0.1s ease;
 
   :before,
@@ -165,22 +172,23 @@ const LeftAccessoryContainer = styled.div`
 
 const SubText = styled.div`
   color: ${(props) => props.theme.colors.white_400};
-  margin-top: ${(props) => props.theme.spacing(4)}px;
+  margin-top: ${(props) => props.theme.space.xs};
   ${(props) => props.theme.typography.body_s}
 `;
 
 const Feedback = styled.div`
-  margin-top: 8px;
+  margin-top: ${(props) => props.theme.space.xs};
 `;
 
 type Props = {
+  id?: string;
   title?: string;
   placeholder?: string;
   value: string;
   dataTestID?: string;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (event: ChangeEvent<HTMLInputElement>) => void;
-  type?: 'text' | 'number';
+  type?: 'text' | 'number' | 'password';
   hideClear?: boolean;
   infoPanel?: React.ReactNode;
   complications?: React.ReactNode;
@@ -200,6 +208,7 @@ type Props = {
 };
 
 function Input({
+  id,
   title,
   placeholder,
   value,
@@ -266,6 +275,7 @@ function Input({
       <InputContainer>
         {leftAccessory && <LeftAccessoryContainer>{leftAccessory.icon}</LeftAccessoryContainer>}
         <InputField
+          id={id}
           className={displayVariant}
           ref={inputRef}
           type={type}
@@ -281,7 +291,9 @@ function Input({
         />
         <ComplicationsContainer ref={complicationsRef}>
           {!hideClear && value && (
-            <ClearButton onClick={handleClear} $hasSiblings={!!complications} />
+            <ClearButtonContainer onClick={handleClear}>
+              <ClearButton $hasSiblings={!!complications} />
+            </ClearButtonContainer>
           )}
           {complications}
         </ComplicationsContainer>

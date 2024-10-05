@@ -1,7 +1,6 @@
 import {
   API_TIMEOUT_MILLI,
   StacksNetwork,
-  getNetworkURL,
   type APIGetRunesActivityForAddressResponse,
   type AppInfo,
   type Brc20HistoryTransactionData,
@@ -15,6 +14,7 @@ import {
   type MempoolTransactionListResponse,
   type Transaction,
 } from '@stacks/stacks-blockchain-api-types';
+import { PayloadType } from '@stacks/transactions';
 import axios from 'axios';
 
 interface PaginatedResults<T> {
@@ -31,9 +31,7 @@ async function getTransferTransactions(reqParams: {
   offset: number;
 }): Promise<AddressTransactionWithTransfers[]> {
   const { stxAddress, limit, network, offset } = reqParams;
-  const apiUrl = `${getNetworkURL(
-    network,
-  )}/extended/v1/address/${stxAddress}/transactions_with_transfers`;
+  const apiUrl = `${network.coreApiUrl}/extended/v1/address/${stxAddress}/transactions_with_transfers`;
   const response = await axios.get<PaginatedResults<AddressTransactionWithTransfers>>(apiUrl, {
     params: {
       limit,
@@ -145,8 +143,13 @@ export const modifyRecommendedStxFees = (
     high: number;
   },
   appInfo: AppInfo | undefined | null,
+  txType: PayloadType,
 ): { low: number; medium: number; high: number } => {
-  const multiplier = appInfo?.stxSendTxMultiplier || 1;
+  const multiplier = appInfo
+    ? txType === PayloadType.ContractCall
+      ? appInfo.otherTxMultiplier
+      : appInfo.stxSendTxMultiplier
+    : 1;
   const highCap = appInfo?.thresholdHighStacksFee;
 
   let adjustedLow = Math.round(baseFees.low * multiplier);

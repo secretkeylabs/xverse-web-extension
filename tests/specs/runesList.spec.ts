@@ -59,7 +59,7 @@ test.describe('List runes', () => {
     // Select custom
     await wallet.buttonCustomPrice.click();
 
-    // Ste price modal appears
+    // Set price modal appears
     await expect(wallet.buttonApply).toBeVisible();
     await expect(wallet.buttonApply).toBeDisabled();
     await expect(wallet.inputListingPrice).toBeVisible();
@@ -81,7 +81,7 @@ test.describe('List runes', () => {
     const num1Currency = parseFloat(sendCurrencyAmount.replace(/[^0-9.]/g, ''));
 
     // click on continue
-    await wallet.buttonContinue.click();
+    await page.getByRole('button', { name: 'Continue' }).click();
 
     // Check Visuals Review transaction
     await expect(wallet.confirmTotalAmount).toBeVisible();
@@ -176,7 +176,7 @@ test.describe('List runes', () => {
     // click on the first UTXO
     await wallet.runeItemCheckbox.first().click();
 
-    // Click on set price
+    // Click on edit price
     await expect(wallet.buttonSetPrice).toBeEnabled();
     await wallet.buttonSetPrice.click();
 

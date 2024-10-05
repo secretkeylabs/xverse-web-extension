@@ -1,5 +1,5 @@
 import FiatAmountText from '@components/fiatAmountText';
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getStxFiatEquivalent, stxToMicrostacks } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
@@ -105,7 +105,6 @@ const ErrorText = styled.p((props) => ({
 
 // TODO tim: this component needs refactoring. separate business logic from presentation
 type Props = {
-  type?: string;
   fee: string;
   feeRate?: BigNumber | string;
   feeMode: string;
@@ -117,7 +116,6 @@ type Props = {
 };
 
 function EditStxFee({
-  type,
   fee,
   feeRate,
   feeMode,
@@ -129,11 +127,10 @@ function EditStxFee({
 }: Props) {
   const { t } = useTranslation('translation');
   const { fiatCurrency } = useWalletSelector();
-  const { btcFiatRate, stxBtcRate } = useCoinRates();
+  const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const [totalFee, setTotalFee] = useState(fee);
   const [feeRateInput, setFeeRateInput] = useState(feeRate?.toString() ?? '');
   const inputRef = useRef<HTMLInputElement>(null);
-  const isStx = type === 'STX';
 
   const modifyStxFees = (mode: string) => {
     const currentFee = new BigNumber(fee);
@@ -161,7 +158,7 @@ function EditStxFee({
   };
 
   useEffect(() => {
-    if (isStx && feeMode !== 'custom') {
+    if (feeMode !== 'custom') {
       modifyStxFees(feeMode);
     }
   }, [feeMode]);
@@ -215,11 +212,9 @@ function EditStxFee({
         {error && <ErrorText>{error}</ErrorText>}
       </FeeContainer>
       <ButtonContainer>
-        {isStx && (
-          <FeeButton isSelected={feeMode === 'low'} onClick={() => modifyStxFees('low')}>
-            {t('TRANSACTION_SETTING.LOW')}
-          </FeeButton>
-        )}
+        <FeeButton isSelected={feeMode === 'low'} onClick={() => modifyStxFees('low')}>
+          {t('TRANSACTION_SETTING.LOW')}
+        </FeeButton>
         <FeeButton isSelected={feeMode === 'medium'} onClick={() => modifyStxFees('medium')}>
           {t('TRANSACTION_SETTING.STANDARD')}
         </FeeButton>

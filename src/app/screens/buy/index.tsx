@@ -10,7 +10,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { FeatureId, getMoonPaySignedUrl } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
 import { MOON_PAY_API_KEY, MOON_PAY_URL, TRANSAC_API_KEY, TRANSAC_URL } from '@utils/constants';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';

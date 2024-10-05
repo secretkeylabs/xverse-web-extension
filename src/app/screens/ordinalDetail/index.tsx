@@ -1,30 +1,55 @@
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import AlertMessage from '@components/alertMessage';
-import ActionButton from '@components/button';
 import CollectibleDetailTile from '@components/collectibleDetailTile';
 import RareSatIcon from '@components/rareSatIcon/rareSatIcon';
 import SquareButton from '@components/squareButton';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import useOptionsSheet from '@hooks/useOptionsSheet';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
-import { ArrowUp, Share } from '@phosphor-icons/react';
+import useSelectedAccount from '@hooks/useSelectedAccount';
+import useWalletSelector from '@hooks/useWalletSelector';
+import {
+  ArrowUp,
+  DotsThreeVertical,
+  Share,
+  Star,
+  TrayArrowDown,
+  TrayArrowUp,
+  UserCircleCheck,
+  UserCircleMinus,
+} from '@phosphor-icons/react';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
+import { StyledButton } from '@screens/ordinalsCollection/index.styled';
+import {
+  addToHideCollectiblesAction,
+  addToStarCollectiblesAction,
+  removeAccountAvatarAction,
+  removeFromHideCollectiblesAction,
+  removeFromStarCollectiblesAction,
+  setAccountAvatarAction,
+} from '@stores/wallet/actions/actionCreators';
+import Button from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
+import Sheet from '@ui-library/sheet';
+import SnackBar from '@ui-library/snackBar';
 import { EMPTY_LABEL } from '@utils/constants';
 import { getRareSatsColorsByRareSatsType, getRareSatsLabelByType } from '@utils/rareSats';
+import { useCallback } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import Theme from '../../../theme';
 import {
   ActionButtonLoader,
   ActionButtonsLoader,
-  AssetDeatilButtonText,
   BackButtonContainer,
   Badge,
   BottomBarContainer,
-  Button,
   ButtonContainer,
   ButtonHiglightedText,
-  ButtonImage,
   ButtonText,
   CollectibleText,
   ColumnContainer,
@@ -65,8 +90,12 @@ import OrdinalAttributeComponent from './ordinalAttributeComponent';
 import useOrdinalDetail from './useOrdinalDetail';
 
 function OrdinalDetailScreen() {
+  const optionsSheet = useOptionsSheet();
+  const { t: optionsDialogT } = useTranslation('translation', { keyPrefix: 'OPTIONS_DIALOG' });
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
   const { t: commonT } = useTranslation('translation', { keyPrefix: 'COMMON' });
+  const navigate = useNavigate();
+
   const ordinalDetails = useOrdinalDetail();
   const {
     ordinal,
@@ -90,10 +119,132 @@ function OrdinalDetailScreen() {
     onCopyClick,
     backButtonText,
   } = ordinalDetails;
-
+  const selectedAccount = useSelectedAccount();
+  const { starredCollectibleIds, hiddenCollectibleIds, avatarIds } = useWalletSelector();
+  const currentAvatar = avatarIds[selectedAccount.btcAddress];
+  const isInscriptionSelectedAsAvatar =
+    currentAvatar?.type === 'inscription' && currentAvatar.inscription.id === ordinal?.id;
+  const inscriptionStarred = starredCollectibleIds[ordinalsAddress]?.some(
+    ({ id }) => id === ordinal?.id,
+  );
+  const isStandaloneInscription = !ordinal?.collection_id;
+  const isInscriptionHidden = Object.keys(hiddenCollectibleIds[ordinalsAddress] ?? {}).some(
+    (id) => id === ordinal?.id,
+  );
+  const isInscriptionCollectionHidden = Object.keys(
+    hiddenCollectibleIds[ordinalsAddress] ?? {},
+  ).some((id) => id === ordinal?.collection_id);
+  const isHidden = isInscriptionHidden || isInscriptionCollectionHidden;
   const isBrc20Ordinal = Boolean(brc20Details);
+  const dispatch = useDispatch();
 
   useResetUserFlow('/ordinal-detail');
+
+  const handleStarClick = () => {
+    if (inscriptionStarred) {
+      const toastId = toast.custom(
+        <SnackBar
+          text={t('UNSTAR_INSCRIPTION')}
+          type="neutral"
+          dismissToast={() => toast.remove(toastId)}
+        />,
+      );
+      dispatch(
+        removeFromStarCollectiblesAction({ address: ordinalsAddress, id: ordinal?.id ?? '' }),
+      );
+    } else {
+      const toastId = toast.custom(
+        <SnackBar
+          text={t('STAR_INSCRIPTION')}
+          type="neutral"
+          dismissToast={() => toast.remove(toastId)}
+        />,
+      );
+      dispatch(
+        addToStarCollectiblesAction({
+          address: ordinalsAddress,
+          id: ordinal?.id ?? '',
+          collectionId: ordinal?.collection_id ?? '',
+        }),
+      );
+    }
+  };
+
+  const handleClickUndoHiding = (toastId: string) => {
+    dispatch(removeFromHideCollectiblesAction({ address: ordinalsAddress, id: ordinal?.id ?? '' }));
+    toast.remove(toastId);
+    toast.custom(<SnackBar text={t('INSCRIPTION_UNHIDDEN')} type="neutral" />, { duration: 2000 });
+  };
+
+  const handleHideStandaloneInscription = () => {
+    dispatch(addToHideCollectiblesAction({ address: ordinalsAddress, id: ordinal?.id ?? '' }));
+
+    if (isInscriptionSelectedAsAvatar) {
+      dispatch(removeAccountAvatarAction({ address: selectedAccount.btcAddress }));
+    }
+
+    optionsSheet.close();
+    navigate('/nft-dashboard?tab=inscriptions');
+    const toastId = toast.custom(
+      <SnackBar
+        text={t('INSCRIPTION_HIDDEN')}
+        type="neutral"
+        action={{
+          text: commonT('UNDO'),
+          onClick: () => handleClickUndoHiding(toastId),
+        }}
+      />,
+      { duration: 4000 },
+    );
+  };
+
+  const handleUnHideStandaloneInscription = () => {
+    const isLastHiddenItem = Object.keys(hiddenCollectibleIds[ordinalsAddress] ?? {}).length === 1;
+    dispatch(removeFromHideCollectiblesAction({ address: ordinalsAddress, id: ordinal?.id ?? '' }));
+    optionsSheet.close();
+    toast.custom(<SnackBar text={t('INSCRIPTION_UNHIDDEN')} type="neutral" />);
+    navigate(`/nft-dashboard/${isLastHiddenItem ? '' : 'hidden'}?tab=inscriptions`);
+  };
+
+  const handleSetAvatar = useCallback(() => {
+    const address = selectedAccount.btcAddress;
+
+    if (address && ordinal?.id) {
+      dispatch(
+        setAccountAvatarAction({
+          address,
+          avatar: { type: 'inscription', inscription: ordinal },
+        }),
+      );
+
+      const toastId = toast.custom(
+        <SnackBar
+          text={optionsDialogT('NFT_AVATAR.SET_TOAST')}
+          type="neutral"
+          action={{
+            text: commonT('UNDO'),
+            onClick: () => {
+              if (currentAvatar?.type) {
+                dispatch(setAccountAvatarAction({ address, avatar: currentAvatar }));
+              } else {
+                dispatch(removeAccountAvatarAction({ address }));
+              }
+
+              toast.remove(toastId);
+            },
+          }}
+        />,
+      );
+    }
+
+    optionsSheet.close();
+  }, [dispatch, optionsDialogT, commonT, selectedAccount, ordinal, optionsSheet, currentAvatar]);
+
+  const handleRemoveAvatar = useCallback(() => {
+    dispatch(removeAccountAvatarAction({ address: selectedAccount.btcAddress }));
+    toast.custom(<SnackBar text={optionsDialogT('NFT_AVATAR.REMOVE_TOAST')} type="neutral" />);
+    optionsSheet.close();
+  }, [dispatch, selectedAccount.btcAddress, optionsDialogT, optionsSheet]);
 
   const ordinalDetailAttributes = (
     <OrdinalDetailsContainer isGallery={isGalleryOpen}>
@@ -372,12 +523,13 @@ function OrdinalDetailScreen() {
     <GalleryScrollContainer>
       <GalleryContainer>
         <BackButtonContainer>
-          <Button data-testid="back-to-gallery" onClick={handleBackButtonClick}>
-            <>
-              <ButtonImage src={ArrowLeft} />
-              <AssetDeatilButtonText>{backButtonText}</AssetDeatilButtonText>
-            </>
-          </Button>
+          <Button
+            variant="tertiary"
+            icon={<img src={ArrowLeft} alt="go back" />}
+            data-testid="back-to-gallery"
+            onClick={handleBackButtonClick}
+            title={backButtonText}
+          />
         </BackButtonContainer>
 
         <RowContainer withGap>
@@ -406,12 +558,13 @@ function OrdinalDetailScreen() {
     <GalleryScrollContainer>
       <GalleryContainer>
         <BackButtonContainer>
-          <Button data-testid="back-button" onClick={handleBackButtonClick}>
-            <>
-              <ButtonImage src={ArrowLeft} />
-              <AssetDeatilButtonText>{backButtonText}</AssetDeatilButtonText>
-            </>
-          </Button>
+          <Button
+            variant="tertiary"
+            icon={<img src={ArrowLeft} alt="go back" />}
+            data-testid="back-button"
+            onClick={handleBackButtonClick}
+            title={backButtonText}
+          />
         </BackButtonContainer>
 
         <RowContainer withGap>
@@ -441,19 +594,19 @@ function OrdinalDetailScreen() {
 
             <ButtonContainer>
               <GalleryButtonContainer>
-                <ActionButton
+                <Button
                   icon={<ArrowUp weight="bold" size="16" />}
-                  text={t('SEND')}
-                  onPress={handleSendOrdinal}
+                  title={t('SEND')}
+                  onClick={handleSendOrdinal}
                 />
               </GalleryButtonContainer>
               <GalleryButtonContainer>
-                <ActionButton
+                <Button
                   icon={<Share weight="bold" color="white" size="16" />}
-                  text={t('SHARE')}
-                  onPress={onCopyClick}
-                  hoverDialogId={`copy-url-${ordinal?.id}`}
-                  transparent
+                  title={t('SHARE')}
+                  onClick={onCopyClick}
+                  id={`copy-url-${ordinal?.id}`}
+                  variant="secondary"
                 />
                 <StyledTooltip
                   anchorId={`copy-url-${ordinal?.id}`}
@@ -463,6 +616,30 @@ function OrdinalDetailScreen() {
                   variant="light"
                 />
               </GalleryButtonContainer>
+              {!isHidden && (
+                <SquareButton
+                  icon={
+                    inscriptionStarred ? (
+                      <Star size={16} color={Theme.colors.tangerine} weight="fill" />
+                    ) : (
+                      <Star size={16} color={Theme.colors.white_0} weight="bold" />
+                    )
+                  }
+                  onPress={handleStarClick}
+                  isTransparent
+                  size={44}
+                  radiusSize={12}
+                />
+              )}
+              {(!isHidden || isStandaloneInscription) && (
+                <SquareButton
+                  icon={<DotsThreeVertical size={20} color={Theme.colors.white_0} weight="bold" />}
+                  onPress={optionsSheet.open}
+                  isTransparent
+                  size={44}
+                  radiusSize={12}
+                />
+              )}
             </ButtonContainer>
             <DescriptionText>{t('DATA')}</DescriptionText>
             {rareSats}
@@ -487,7 +664,12 @@ function OrdinalDetailScreen() {
       {isGalleryOpen ? (
         <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
       ) : (
-        <TopRow onClick={handleBackButtonClick} />
+        <TopRow
+          onClick={handleBackButtonClick}
+          onStarClick={isHidden ? undefined : handleStarClick}
+          isStarred={inscriptionStarred}
+          onMenuClick={!isHidden || isStandaloneInscription ? optionsSheet.open : undefined}
+        />
       )}
       {showSendOridnalsAlert && (
         <AlertMessage
@@ -503,6 +685,46 @@ function OrdinalDetailScreen() {
         <BottomBarContainer>
           <BottomTabBar tab="nft" />
         </BottomBarContainer>
+      )}
+      {optionsSheet.isVisible && (
+        <Sheet
+          title={commonT('OPTIONS')}
+          visible={optionsSheet.isVisible}
+          onClose={optionsSheet.close}
+        >
+          {!isHidden &&
+            (isInscriptionSelectedAsAvatar ? (
+              <StyledButton
+                variant="tertiary"
+                icon={<UserCircleMinus size={24} color={Theme.colors.white_200} />}
+                title={optionsDialogT('NFT_AVATAR.REMOVE_ACTION')}
+                onClick={handleRemoveAvatar}
+              />
+            ) : (
+              <StyledButton
+                variant="tertiary"
+                icon={<UserCircleCheck size={24} color={Theme.colors.white_200} />}
+                title={optionsDialogT('NFT_AVATAR.SET_ACTION')}
+                onClick={handleSetAvatar}
+              />
+            ))}
+          {isStandaloneInscription &&
+            (isInscriptionHidden ? (
+              <StyledButton
+                variant="tertiary"
+                icon={<TrayArrowUp size={24} color={Theme.colors.white_200} />}
+                title={t('UNHIDE_INSCRIPTION')}
+                onClick={handleUnHideStandaloneInscription}
+              />
+            ) : (
+              <StyledButton
+                variant="tertiary"
+                icon={<TrayArrowDown size={24} color={Theme.colors.white_200} />}
+                title={t('HIDE_INSCRIPTION')}
+                onClick={handleHideStandaloneInscription}
+              />
+            ))}
+        </Sheet>
       )}
     </>
   );

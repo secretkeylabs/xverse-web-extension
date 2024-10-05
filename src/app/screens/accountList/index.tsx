@@ -1,7 +1,6 @@
 import ConnectLedger from '@assets/img/dashboard/connect_ledger.svg';
 import { filterLedgerAccounts } from '@common/utils/ledger';
 import LazyAccountRow from '@components/accountRow/lazyAccountRow';
-import ActionButton from '@components/button';
 import Separator from '@components/separator';
 import TopRow from '@components/topRow';
 import useAccountBalance from '@hooks/queries/useAccountBalance';
@@ -11,6 +10,7 @@ import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Plus } from '@phosphor-icons/react';
 import type { Account } from '@secretkeylabs/xverse-core';
+import Button from '@ui-library/button';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -30,10 +30,9 @@ const Container = styled.div({
 const AccountContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  paddingLeft: props.theme.spacing(11),
-  paddingRight: props.theme.spacing(11),
-  paddingTop: props.theme.spacing(8),
-  gap: props.theme.spacing(8),
+  gap: props.theme.space.m,
+  padding: props.theme.space.m,
+  paddingBottom: 0,
 }));
 
 const ButtonsWrapper = styled.div(
@@ -72,21 +71,21 @@ function AccountList(): JSX.Element {
     return [...networkLedgerAccounts, ...accountsList];
   }, [accountsList, ledgerAccountsList, network]);
 
+  const handleBackButtonClick = () => {
+    navigate(-1);
+  };
+
   const handleAccountSelect = async (account: Account, goBack = true) => {
     await switchAccount(account);
     broadcastResetUserFlow();
     if (goBack) {
-      navigate(-1);
+      handleBackButtonClick();
     }
   };
 
   const isAccountSelected = (account: Account) =>
     account.btcAddress === selectedAccount?.btcAddress &&
     account.stxAddress === selectedAccount?.stxAddress;
-
-  const handleBackButtonClick = () => {
-    navigate(-1);
-  };
 
   const onCreateAccount = async () => {
     await createAccount();
@@ -121,17 +120,17 @@ function AccountList(): JSX.Element {
         </div>
         {!hideListActions ? (
           <ButtonsWrapper>
-            <ActionButton
+            <Button
               icon={<Plus size={16} fill="white" />}
-              onPress={onCreateAccount}
-              text={t('NEW_ACCOUNT')}
-              transparent
+              onClick={onCreateAccount}
+              title={t('NEW_ACCOUNT')}
+              variant="secondary"
             />
-            <ActionButton
+            <Button
               icon={<img src={ConnectLedger} width={16} height={16} alt="" />}
-              onPress={onImportLedgerAccount}
-              text={t('LEDGER_ACCOUNT')}
-              transparent
+              onClick={onImportLedgerAccount}
+              title={t('LEDGER_ACCOUNT')}
+              variant="secondary"
             />
           </ButtonsWrapper>
         ) : null}

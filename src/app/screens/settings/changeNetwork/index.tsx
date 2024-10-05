@@ -1,4 +1,3 @@
-import ActionButton from '@components/button';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useWalletReducer from '@hooks/useWalletReducer';
@@ -10,6 +9,7 @@ import {
   initialNetworksList,
   type SettingsNetwork,
 } from '@secretkeylabs/xverse-core';
+import Button from '@ui-library/button';
 import { isValidBtcApi, isValidStacksApi } from '@utils/helper';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -209,10 +209,10 @@ function ChangeNetworkScreen() {
         </NodeInputsContainer>
       </Container>
       <ButtonContainer>
-        <ActionButton
-          text={t('SAVE')}
-          onPress={onSubmit}
-          processing={isChangingNetwork}
+        <Button
+          title={t('SAVE')}
+          onClick={onSubmit}
+          loading={isChangingNetwork}
           disabled={isChangingNetwork}
         />
       </ButtonContainer>

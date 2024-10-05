@@ -9,11 +9,12 @@ import ActionButton from '@components/button';
 import SmallActionButton from '@components/smallActionButton';
 import TokenImage from '@components/tokenImage';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useCoinRates from '@hooks/queries/useCoinRates';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useHasFeature from '@hooks/useHasFeature';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { getTrackingIdentifier, isMotherToken } from '@screens/swap/utils';
 import {
   AnalyticsEvents,
   FeatureId,
@@ -57,10 +58,10 @@ type Props = {
 
 export default function CoinHeader({ currency, fungibleToken }: Props) {
   const selectedAccount = useSelectedAccount();
-  const { fiatCurrency, network } = useWalletSelector();
+  const { fiatCurrency, network, selectedAccountType } = useWalletSelector();
   const { data: btcBalance } = useBtcWalletData();
   const { data: stxData } = useStxWalletData();
-  const { btcFiatRate, stxBtcRate } = useCoinRates();
+  const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
@@ -68,7 +69,10 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
 
   const showRunesListing =
     (useHasFeature(FeatureId.RUNES_LISTING) || process.env.NODE_ENV === 'development') &&
-    network.type === 'Mainnet';
+    network.type === 'Mainnet' &&
+    fungibleToken?.protocol === 'runes' &&
+    // TODO: remove this once we implement ledger batch PSBT signing flow
+    selectedAccountType !== 'ledger';
 
   const handleReceiveModalOpen = () => {
     setOpenReceiveModal(true);
@@ -167,16 +171,23 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
   };
 
   const isCrossChainSwapsEnabled = useHasFeature(FeatureId.CROSS_CHAIN_SWAPS);
-  const showRunesSwap =
-    (currency === 'FT' && fungibleToken?.protocol === 'runes') || currency === 'BTC';
-  const showSwaps = isCrossChainSwapsEnabled && showRunesSwap;
+  const isStacksSwapsEnabled = useHasFeature(FeatureId.STACKS_SWAPS);
+
+  const isSwapEligibleCurrency =
+    (currency === 'FT' &&
+      (fungibleToken?.protocol === 'runes' ||
+        (isStacksSwapsEnabled && fungibleToken?.protocol === 'stacks'))) ||
+    currency === 'BTC' ||
+    (currency === 'STX' && isStacksSwapsEnabled);
+  const showSwaps = isCrossChainSwapsEnabled && isSwapEligibleCurrency;
 
   const navigateToSwaps = () => {
     if (!showSwaps) {
       return;
     }
     trackMixPanel(AnalyticsEvents.InitiateSwapFlow, {
-      selectedToken: fungibleToken ? fungibleToken.name ?? fungibleToken.principal : currency,
+      selectedToken: fungibleToken ? getTrackingIdentifier(fungibleToken) : currency,
+      principal: isMotherToken(fungibleToken) ? getTrackingIdentifier(fungibleToken) : undefined,
     });
     navigate(`/swap?from=${fungibleToken ? fungibleToken.principal : currency}`);
   };
@@ -244,7 +255,7 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
         {showSwaps && (
           <SmallActionButton src={ArrowSwap} text={t('SWAP')} onPress={navigateToSwaps} />
         )}
-        {showRunesListing && fungibleToken?.protocol === 'runes' && (
+        {showRunesListing && (
           <SmallActionButton
             src={List}
             text={t('LIST')}

@@ -1,10 +1,11 @@
+import RequestsRoutes from '@common/utils/route-urls';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery';
+import useRuneFloorPricePerMarketplaceQuery from '@hooks/queries/runes/useRuneFloorPricePerMarketplaceQuery';
 import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
-import useRuneSellPsbt from '@hooks/queries/runes/useRuneSellPsbt';
-import useRuneUtxosQuery from '@hooks/queries/runes/useRuneUtxosQuery';
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useRuneSellPsbtPerMarketplace from '@hooks/queries/runes/useRuneSellPsbtPerMarketplace';
+import useRuneUtxosQueryPerMarketplace from '@hooks/queries/runes/useRuneUtxosQueryPerMarketplace';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useHasFeature from '@hooks/useHasFeature';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
@@ -18,14 +19,17 @@ import {
   currencySymbolMap,
   getBtcFiatEquivalent,
   satsToBtc,
+  type FungibleToken,
+  type GetListedUtxosResponseUtxo,
+  type Marketplace,
 } from '@secretkeylabs/xverse-core';
 import Button, { LinkButton } from '@ui-library/button';
 import { StickyButtonContainer, StyledP } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
 import { formatToXDecimalPlaces, ftDecimals } from '@utils/helper';
-import { getFullTxId, getTxIdFromFullTxId, getVoutFromFullTxId } from '@utils/runes';
+import { getTxIdFromFullTxId, getVoutFromFullTxId } from '@utils/runes';
 import BigNumber from 'bignumber.js';
-import { useEffect, useReducer } from 'react';
+import { useEffect, useMemo, useReducer, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
@@ -52,8 +56,16 @@ import {
   TabButtonsContainer,
   TabContainer,
 } from './index.styled';
+import ListMarketplaceItem from './listMarketplaceItem';
 import WrapperComponent from './listRuneWrapper';
 import SetCustomPriceModal from './setCustomPriceModal';
+
+const joinedSelectedMarketplaces = (selectedMarketplaces: Marketplace[]) => {
+  const last = selectedMarketplaces.pop();
+  return [selectedMarketplaces.join(', '), last].filter((s) => s).join(' and ');
+};
+
+const getFullTxId = (item: GetListedUtxosResponseUtxo) => `${item.txid}:${item.vout.toString()}`;
 
 export default function ListRuneScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'LIST_RUNE_SCREEN' });
@@ -62,7 +74,7 @@ export default function ListRuneScreen() {
   const { visible: runesCoinsList } = useVisibleRuneFungibleTokens(false);
   const selectedRune = runesCoinsList.find((ft) => ft.principal === runeId);
   const { fiatCurrency } = useWalletSelector();
-  const { btcFiatRate } = useCoinRates();
+  const { btcFiatRate } = useSupportedCoinRates();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const locationFrom = params.get('from');
@@ -76,19 +88,38 @@ export default function ListRuneScreen() {
   useTrackMixPanelPageViewed();
 
   const {
-    data: listItemsResponse,
+    data,
     isInitialLoading: listItemsLoading,
     isRefetching: listItemsRefetching,
     refetch,
-  } = useRuneUtxosQuery(selectedRune?.name ?? '', 'unlisted', false);
+  } = useRuneUtxosQueryPerMarketplace(selectedRune as FungibleToken, false);
+  const listItemsResponse = data?.unlistedItems?.filter((i) => i.runes.length === 1) || [];
 
+  const supportedMarketplaces: Marketplace[] = ['Unisat', 'Magic Eden', 'OKX'];
   const {
-    data: runeFloorPrice,
+    data: floorPriceData,
     isInitialLoading: floorPriceLoading,
     isRefetching: floorPriceRefetching,
-  } = useRuneFloorPriceQuery(selectedRune?.name ?? '', false);
+  } = useRuneFloorPricePerMarketplaceQuery(
+    {
+      name: selectedRune?.assetName ?? '',
+      id: selectedRune?.principal ?? '',
+    },
+    supportedMarketplaces,
+    false,
+  );
 
-  const noFloorPrice = runeFloorPrice === 0;
+  const [selectedMarketplaces, setSelectedMarketplaces] = useState(new Set<Marketplace>());
+  const runeFloorPrice = useMemo(
+    () =>
+      Math.min(
+        ...(floorPriceData
+          ?.filter((d) => selectedMarketplaces.has(d.marketplace.name))
+          .map((d) => d.floorPrice) || [0]),
+      ),
+    [floorPriceData, selectedMarketplaces],
+  );
+  const noFloorPrice = useMemo(() => runeFloorPrice === 0, [runeFloorPrice]);
 
   const isLoading =
     listItemsLoading || listItemsRefetching || floorPriceLoading || floorPriceRefetching;
@@ -112,7 +143,9 @@ export default function ListRuneScreen() {
     signPsbtPayload,
     loading: psbtLoading,
     error: psbtError,
-  } = useRuneSellPsbt(selectedRune?.name ?? '', listItemsMap);
+  } = useRuneSellPsbtPerMarketplace(selectedRune as FungibleToken, listItemsMap, [
+    ...selectedMarketplaces,
+  ]);
 
   const selectedListItems = Object.values(listItemsMap).filter((item) => item.selected);
 
@@ -141,7 +174,7 @@ export default function ListRuneScreen() {
     const curAmount = currentItem.amount;
     return curAmount > maxAmount ? curAmount : maxAmount;
   }, 0);
-  const maxGlobalPriceSats = 1_000_000_000 / highestSelectedRuneAmount;
+  const maxGlobalPriceSats = 500_000_000 / highestSelectedRuneAmount; // Unisat's maximum
 
   const invalidListings: boolean = selectedListItems.some(
     (item) => item.amount * item.priceSats < 10000 || item.amount * item.priceSats > 1000000000,
@@ -157,8 +190,23 @@ export default function ListRuneScreen() {
 
     if (section === 'SELECT_RUNES') {
       navigate(`/coinDashboard/FT?ftKey=${selectedRune?.principal}&protocol=runes`);
-    } else {
+    } else if (section === 'SELECT_MARKETPLACES') {
       dispatch({ type: 'SET_SECTION', payload: 'SELECT_RUNES' });
+    } else {
+      dispatch({ type: 'SET_SECTION', payload: 'SELECT_MARKETPLACES' });
+    }
+  };
+
+  const getTitle = () => {
+    switch (section) {
+      case 'SELECT_RUNES':
+        return t('SELECT_RUNES');
+      case 'SELECT_MARKETPLACES':
+        return t('SELECT_MARKETPLACES');
+      case 'SET_PRICES':
+        return t('LIST_RUNES');
+      default:
+        return '';
     }
   };
 
@@ -166,6 +214,8 @@ export default function ListRuneScreen() {
     switch (section) {
       case 'SELECT_RUNES':
         return t('SELECT_RUNES_SECTION');
+      case 'SELECT_MARKETPLACES':
+        return t('SELECT_MARKETPLACES_SECTION');
       case 'SET_PRICES':
         return t('SET_PRICES_SECTION');
       default:
@@ -241,11 +291,12 @@ export default function ListRuneScreen() {
 
   useEffect(() => {
     if (signPsbtPayload) {
-      navigate(`/psbt-signing-request?magicEdenPsbt=true&runeId=${runeId}`, {
+      navigate(RequestsRoutes.RuneListingBatchSigning, {
         state: {
           payload: signPsbtPayload,
+          utxos: listItemsMap,
+          minPriceSats: Math.min(...Object.values(listItemsMap).map((item) => item.priceSats)),
           selectedRune,
-          listRunesState,
         },
       });
     }
@@ -293,7 +344,7 @@ export default function ListRuneScreen() {
         <TopRow onClick={handleGoBack} />
         <Container>
           <PaddingContainer>
-            <Header>{t('LIST_RUNES')}</Header>
+            <Header>{getTitle()}</Header>
             <StyledP color="white_200" typography="body_m">
               {getDesc()}
             </StyledP>
@@ -361,10 +412,55 @@ export default function ListRuneScreen() {
                 <PaddingContainer>
                   <StickyButtonContainer>
                     <Button
-                      title={t('SET_PRICES')}
-                      onClick={() => dispatch({ type: 'SET_SECTION', payload: 'SET_PRICES' })}
+                      title={t('NEXT')}
+                      onClick={() =>
+                        dispatch({ type: 'SET_SECTION', payload: 'SELECT_MARKETPLACES' })
+                      }
                       variant="primary"
                       disabled={!Object.values(listItemsMap).some((item) => item.selected)}
+                    />
+                  </StickyButtonContainer>
+                </PaddingContainer>
+              </>
+            )}
+            {section === 'SELECT_MARKETPLACES' && (
+              <>
+                <ScrollContainer style={{ marginTop: theme.space.xl }}>
+                  <PaddingContainer>
+                    <ListRunesContainer>
+                      {floorPriceData?.map((runeMarketInfo) => {
+                        const { name } = runeMarketInfo.marketplace;
+                        const selected = selectedMarketplaces.has(name);
+
+                        return (
+                          <ListMarketplaceItem
+                            key={name}
+                            runeMarketInfo={runeMarketInfo}
+                            rune={selectedRune as FungibleToken}
+                            selected={selected}
+                            onToggle={() =>
+                              setSelectedMarketplaces((prev) => {
+                                if (selected) {
+                                  prev.delete(name);
+                                } else {
+                                  prev.add(name);
+                                }
+                                return new Set([...prev]);
+                              })
+                            }
+                          />
+                        );
+                      })}
+                    </ListRunesContainer>
+                  </PaddingContainer>
+                </ScrollContainer>
+                <PaddingContainer>
+                  <StickyButtonContainer>
+                    <Button
+                      title={t('NEXT')}
+                      onClick={() => dispatch({ type: 'SET_SECTION', payload: 'SET_PRICES' })}
+                      variant="primary"
+                      disabled={!selectedMarketplaces.size}
                     />
                   </StickyButtonContainer>
                 </PaddingContainer>
@@ -418,7 +514,13 @@ export default function ListRuneScreen() {
                       <StyledButton
                         title="Custom"
                         onClick={() =>
-                          dispatch({ type: 'SET_TOGGLE_CUSTOM_PRICE_MODAL', payload: true })
+                          dispatch({
+                            type: 'SET_TOGGLE_CUSTOM_PRICE_MODAL',
+                            payload: {
+                              title: t('SET_PRICES'),
+                              visible: true,
+                            },
+                          })
                         }
                         variant={
                           runePriceOption === 'custom' && !individualCustomPriceUsed
@@ -430,9 +532,10 @@ export default function ListRuneScreen() {
                     <StyledP typography="body_medium_s" color="white_200">
                       {noFloorPrice
                         ? t('NO_FLOOR_PRICE', { symbol: selectedRune?.runeSymbol })
-                        : t('MAGIC_EDEN_FLOOR_PRICE', {
+                        : t('MARKETPLACE_FLOOR_PRICE', {
                             sats: formatToXDecimalPlaces(runeFloorPrice, 5),
                             symbol: selectedRune?.runeSymbol,
+                            marketplaces: joinedSelectedMarketplaces([...selectedMarketplaces]),
                           })}
                     </StyledP>
                   </SetRunePricesContainer>
@@ -458,7 +561,13 @@ export default function ListRuneScreen() {
                             }
                             handleShowCustomPriceModal={() => {
                               dispatch({ type: 'SET_INDIVIDUAL_CUSTOM_ITEM', payload: fullTxId });
-                              dispatch({ type: 'SET_TOGGLE_CUSTOM_PRICE_MODAL', payload: true });
+                              dispatch({
+                                type: 'SET_TOGGLE_CUSTOM_PRICE_MODAL',
+                                payload: {
+                                  title: t('EDIT_PRICE'),
+                                  visible: true,
+                                },
+                              });
                             }}
                           />
                         ))}
@@ -539,8 +648,8 @@ export default function ListRuneScreen() {
                 </PaddingContainer>
                 <SetCustomPriceModal
                   runeSymbol={selectedRune?.runeSymbol ?? ''}
-                  visible={toggleCustomPriceModal}
-                  title={t('SET_PRICES')}
+                  visible={toggleCustomPriceModal.visible}
+                  title={toggleCustomPriceModal.title}
                   floorPriceSats={runeFloorPrice}
                   minPriceSats={
                     individualCustomItem
@@ -554,7 +663,13 @@ export default function ListRuneScreen() {
                   }
                   onClose={() => {
                     dispatch({ type: 'SET_INDIVIDUAL_CUSTOM_ITEM', payload: null });
-                    dispatch({ type: 'SET_TOGGLE_CUSTOM_PRICE_MODAL', payload: false });
+                    dispatch({
+                      type: 'SET_TOGGLE_CUSTOM_PRICE_MODAL',
+                      payload: {
+                        ...toggleCustomPriceModal,
+                        visible: false,
+                      },
+                    });
                   }}
                   onApplyPrice={(priceSats: number) => {
                     if (individualCustomItem) {
@@ -565,7 +680,13 @@ export default function ListRuneScreen() {
                       dispatch({ type: 'SET_RUNE_PRICE_OPTION', payload: 'custom' });
                     }
                     dispatch({ type: 'SET_INDIVIDUAL_CUSTOM_ITEM', payload: null });
-                    dispatch({ type: 'SET_TOGGLE_CUSTOM_PRICE_MODAL', payload: false });
+                    dispatch({
+                      type: 'SET_TOGGLE_CUSTOM_PRICE_MODAL',
+                      payload: {
+                        ...toggleCustomPriceModal,
+                        visible: false,
+                      },
+                    });
                   }}
                 />
               </>

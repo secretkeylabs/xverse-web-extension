@@ -4,7 +4,7 @@ import { StyledP } from '@ui-library/common.styled';
 import Input from '@ui-library/input';
 import Sheet from '@ui-library/sheet';
 import { formatToXDecimalPlaces } from '@utils/helper';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -61,6 +61,17 @@ function SetCustomPriceModal({
   const lowError: boolean = priceSats.length !== 0 && Number(priceSats) < minPriceSats;
   const highError: boolean = priceSats.length !== 0 && Number(priceSats) > maxPriceSats;
 
+  const inputFeedback = useMemo(() => {
+    if (lowError || highError) {
+      return [
+        {
+          variant: 'danger' as const,
+          message: '',
+        },
+      ];
+    }
+  }, [highError, lowError]);
+
   return (
     <Sheet
       visible={visible}
@@ -92,6 +103,7 @@ function SetCustomPriceModal({
                 sats/{runeSymbol}
               </StyledP>
             }
+            feedback={inputFeedback}
             hideClear
             autoFocus
           />

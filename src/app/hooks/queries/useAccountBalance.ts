@@ -1,11 +1,10 @@
 import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useRunesApi from '@hooks/apiClients/useRunesApi';
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   API_TIMEOUT_MILLI,
-  getNetworkURL,
   type Account,
   type BtcAddressData,
   type FungibleToken,
@@ -32,7 +31,7 @@ const useAccountBalance = () => {
     sip10ManageTokens,
     runesManageTokens,
   } = useWalletSelector();
-  const { btcFiatRate, stxBtcRate } = useCoinRates();
+  const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const runesApi = useRunesApi();
   const dispatch = useDispatch();
   const queue = useRef<Account[]>([]);
@@ -73,9 +72,7 @@ const useAccountBalance = () => {
         });
       }
       if (account.stxAddress) {
-        const apiUrl = `${getNetworkURL(stacksNetwork)}/extended/v1/address/${
-          account.stxAddress
-        }/balances`;
+        const apiUrl = `${stacksNetwork.coreApiUrl}/extended/v1/address/${account.stxAddress}/balances`;
 
         const response = await axios.get<TokensResponse>(apiUrl, {
           timeout: API_TIMEOUT_MILLI,

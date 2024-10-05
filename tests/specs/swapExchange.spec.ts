@@ -30,7 +30,7 @@ test.describe('Swap Flow Exchange', () => {
 
     // Had problems with loading of all tokens so I check that 'Bitcoin' is loaded
     await expect(wallet.labelTokenSubtitle.getByText('Bitcoin').first()).toBeVisible();
-    await expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
+    expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
     await wallet.divTokenRow.first().click();
     await expect(wallet.nameToken.first()).not.toContainText('Select asset');
     await expect(wallet.imageToken.first()).toBeVisible();
@@ -40,7 +40,7 @@ test.describe('Swap Flow Exchange', () => {
     await wallet.buttonDownArrow.nth(1).click();
     // Had problems with loading of all tokens so I check that a 'DOG' is loaded
     await expect(wallet.labelTokenSubtitle.getByText('DOG').first()).toBeVisible();
-    await expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
+    expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
     await wallet.divTokenRow.first().click();
     await expect(wallet.nameToken.last()).not.toContainText('Select asset');
     await expect(wallet.imageToken.last()).toBeVisible();
@@ -62,7 +62,7 @@ test.describe('Swap Flow Exchange', () => {
 
     const quoteAmount = await wallet.quoteAmount.first().innerText();
     const numericQuoteValue = parseFloat(quoteAmount.replace(/[^0-9.]/g, ''));
-    await expect(numericQuoteValue).toBeGreaterThan(0);
+    expect(numericQuoteValue).toBeGreaterThan(0);
 
     // Click on DotSwap
     await wallet.buttonSwapPlace.filter({ hasText: marketplace }).click();
@@ -77,14 +77,14 @@ test.describe('Swap Flow Exchange', () => {
     await wallet.buttonSwap.click();
     await wallet.checkVisualsSendTransactionReview('swap', false, selfBTC);
 
-    await expect(await wallet.confirmAmount.count()).toBeGreaterThan(3);
+    expect(await wallet.confirmAmount.count()).toBeGreaterThan(3);
 
     // Confirm Amount is the same as swapAmount
     const swapSendAmount = await wallet.confirmAmount
       .filter({ hasText: swapAmount.toString() })
       .innerText();
     const numericValueSwap = parseFloat(swapSendAmount.replace(/[^0-9.]/g, ''));
-    await expect(numericValueSwap).toEqual(swapAmount);
+    expect(numericValueSwap).toEqual(swapAmount);
 
     // Check Rune token name
     await expect(wallet.nameRune).toContainText(tokenName1);
@@ -98,7 +98,7 @@ test.describe('Swap Flow Exchange', () => {
 
     // Check BTC Balance after cancel the transaction
     const balanceAfterCancel = await wallet.getTokenBalance('Bitcoin');
-    await expect(initialBTCBalance).toEqual(balanceAfterCancel);
+    expect(initialBTCBalance).toEqual(balanceAfterCancel);
   });
 
   test('Exchange token via DotSwap with standard fee testnet #localexecution', async ({
@@ -122,7 +122,7 @@ test.describe('Swap Flow Exchange', () => {
 
     // Had problems with loading of all tokens so I check that 'Bitcoin' is loaded
     await expect(wallet.labelTokenSubtitle.getByText('Bitcoin').first()).toBeVisible();
-    await expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
+    expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
     await wallet.divTokenRow.first().click();
     await expect(wallet.nameToken.first()).not.toContainText('Select asset');
     await expect(wallet.imageToken.first()).toBeVisible();
@@ -132,14 +132,14 @@ test.describe('Swap Flow Exchange', () => {
     await wallet.buttonDownArrow.nth(1).click();
     // Had problems with loading of all tokens so I check that a 'DOG' is loaded
     await expect(wallet.labelTokenSubtitle.getByText('DOG').first()).toBeVisible();
-    await expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
+    expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
     await wallet.divTokenRow.filter({ hasText: 'COOK•RUNES•ON•TESTNET' }).click();
     await expect(wallet.nameToken.last()).not.toContainText('Select asset');
     await expect(wallet.imageToken.last()).toBeVisible();
     await expect(wallet.buttonGetQuotes).toBeDisabled();
 
     // tried a calculated value but had multiple problems with that, for now we stick to a specific value
-    const swapAmount = 0.00002646;
+    const swapAmount = 0.00010646;
 
     const numericUSDValue = await wallet.fillSwapAmount(swapAmount);
 
@@ -154,7 +154,7 @@ test.describe('Swap Flow Exchange', () => {
 
     const quoteAmount = await wallet.quoteAmount.first().innerText();
     const numericQuoteValue = parseFloat(quoteAmount.replace(/[^0-9.]/g, ''));
-    await expect(numericQuoteValue).toBeGreaterThan(0);
+    expect(numericQuoteValue).toBeGreaterThan(0);
 
     // Click on DotSwap
     await wallet.buttonSwapPlace.filter({ hasText: marketplace }).click();
@@ -167,7 +167,7 @@ test.describe('Swap Flow Exchange', () => {
     // Save the current fee amount for comparison
     const originalFee = await wallet.feeAmount.innerText();
     const numericOriginalFee = parseFloat(originalFee.replace(/[^0-9.]/g, ''));
-    await expect(numericOriginalFee).toBeGreaterThan(0);
+    expect(numericOriginalFee).toBeGreaterThan(0);
 
     await wallet.buttonSwap.click();
     await wallet.checkVisualsSendTransactionReview('swap', false, selfBTC);
@@ -177,7 +177,7 @@ test.describe('Swap Flow Exchange', () => {
       .filter({ hasText: swapAmount.toString() })
       .innerText();
     const numericValueSwap = parseFloat(swapSendAmount.replace(/[^0-9.]/g, ''));
-    await expect(numericValueSwap).toEqual(swapAmount);
+    expect(numericValueSwap).toEqual(swapAmount);
 
     // Check Rune token name
     await expect(wallet.nameRune).toContainText(tokenName1);

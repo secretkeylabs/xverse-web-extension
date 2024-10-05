@@ -68,7 +68,7 @@ const handleEtchRune = async (message: WebBtcMessage<'runes_etch'>, port: chrome
     id,
     response: makeRPCError(message.id, {
       code: RpcErrorCode.USER_REJECTION,
-      message: 'User rejected request to send transfer',
+      message: 'User rejected request to etch a rune',
     }),
   });
   listenForOriginTabClose({ tabId });

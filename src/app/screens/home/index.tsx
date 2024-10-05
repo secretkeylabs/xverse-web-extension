@@ -15,16 +15,18 @@ import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungib
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useAppConfig from '@hooks/queries/useAppConfig';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useCoinRates from '@hooks/queries/useCoinRates';
 import useFeeMultipliers from '@hooks/queries/useFeeMultipliers';
 import useSpamTokens from '@hooks/queries/useSpamTokens';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
+import useAvatarCleanup from '@hooks/useAvatarCleanup';
 import useHasFeature from '@hooks/useHasFeature';
 import useNotificationBanners from '@hooks/useNotificationBanners';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowUp, Plus } from '@phosphor-icons/react';
+import { animated, useTransition } from '@react-spring/web';
 import CoinSelectModal from '@screens/home/coinSelectModal';
 import { AnalyticsEvents, FeatureId, type FungibleToken } from '@secretkeylabs/xverse-core';
 import {
@@ -50,7 +52,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from 'styled-components';
 import SquareButton from '../../components/squareButton';
 import BalanceCard from './balanceCard';
-import Banner from './banner';
+import BannerCarousel from './bannerCarousel';
 import {
   ButtonImage,
   ButtonText,
@@ -70,6 +72,7 @@ import {
   RowButtonContainer,
   StacksIcon,
   StyledDivider,
+  StyledDividerSingle,
   StyledTokenTile,
   TokenListButton,
   TokenListButtonContainer,
@@ -87,7 +90,6 @@ function Home() {
     showBtcReceiveAlert,
     showOrdinalReceiveAlert,
     showDataCollectionAlert,
-    network,
     hideStx,
     spamToken,
     notificationBanners,
@@ -108,8 +110,9 @@ function Home() {
     useBtcWalletData();
   const { isInitialLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } =
     useStxWalletData();
-  const { btcFiatRate, stxBtcRate } = useCoinRates();
-  const { data: notificationBannersArr } = useNotificationBanners();
+  const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
+  const { data: notificationBannersArr, isFetching: isFetchingNotificationBannersArr } =
+    useNotificationBanners();
   const {
     unfilteredData: fullSip10CoinsList,
     visible: sip10CoinsList,
@@ -131,6 +134,7 @@ function Home() {
 
   useFeeMultipliers();
   useAppConfig();
+  useAvatarCleanup();
   useTrackMixPanelPageViewed();
   const { removeFromSpamTokens } = useSpamTokens();
 
@@ -182,10 +186,11 @@ function Home() {
     .concat(runesCoinsList)
     .sort((a, b) => sortFtByFiatBalance(a, b, stxBtcRate, btcFiatRate));
 
-  const showNotificationBanner =
-    notificationBannersArr?.length &&
-    notificationBannersArr.length > 0 &&
-    !notificationBanners[notificationBannersArr[0].id];
+  const filteredNotificationBannersArr = notificationBannersArr
+    ? notificationBannersArr.filter((banner) => !notificationBanners[banner.id])
+    : [];
+  const showBannerCarousel =
+    !isFetchingNotificationBannersArr && !!filteredNotificationBannersArr?.length;
 
   const onReceiveModalOpen = () => {
     setOpenReceiveModal(true);
@@ -413,6 +418,21 @@ function Home() {
   const isCrossChainSwapsEnabled = useHasFeature(FeatureId.CROSS_CHAIN_SWAPS);
   const showSwaps = isCrossChainSwapsEnabled;
 
+  const transitions = useTransition(showBannerCarousel, {
+    from: { maxHeight: '1000px', opacity: 0.5 },
+    enter: { maxHeight: '1000px', opacity: 1 },
+    leave: { maxHeight: '0px', opacity: 0 },
+    config: (item, index, phase) =>
+      phase === 'leave'
+        ? {
+            duration: 300,
+            easing: (progress) => 1 - (1 - progress) ** 4,
+          }
+        : {
+            duration: 200,
+          },
+  });
+
   return (
     <>
       <AccountHeaderComponent />
@@ -452,13 +472,23 @@ function Home() {
           />
         </RowButtonContainer>
 
-        {showNotificationBanner && (
-          <>
-            <br />
-            <StyledDivider color="white_850" verticalMargin="m" />
-            <Banner {...notificationBannersArr[0]} />
-            <StyledDivider color="white_850" verticalMargin="xxs" />
-          </>
+        {transitions((style, item) =>
+          item ? (
+            <animated.div style={style}>
+              <br />
+              <StyledDivider color="white_850" verticalMargin="m" />
+              <BannerCarousel items={filteredNotificationBannersArr} />
+              <StyledDivider
+                color="white_850"
+                verticalMargin="m"
+                $noMarginBottom={filteredNotificationBannersArr.length === 1}
+              />
+            </animated.div>
+          ) : (
+            <animated.div style={style}>
+              <StyledDividerSingle color="elevation3" verticalMargin="xl" />
+            </animated.div>
+          ),
         )}
 
         <ColumnContainer>

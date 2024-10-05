@@ -4,8 +4,8 @@ import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungib
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useAccountBalance from '@hooks/queries/useAccountBalance';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useCoinRates from '@hooks/queries/useCoinRates';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core';
@@ -76,7 +76,7 @@ function BalanceCard(props: BalanceCardProps) {
   const { fiatCurrency, hideStx, accountBalances } = useWalletSelector();
   const { data: btcBalance } = useBtcWalletData();
   const { data: stxData } = useStxWalletData();
-  const { btcFiatRate, stxBtcRate } = useCoinRates();
+  const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const { setAccountBalance } = useAccountBalance();
   const { isLoading, isRefetching } = props;
   const oldTotalBalance = accountBalances[selectedAccount.btcAddress];

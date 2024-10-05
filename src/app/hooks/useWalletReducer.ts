@@ -2,6 +2,7 @@ import { getDeviceAccountIndex } from '@common/utils/ledger';
 import { dispatchEventAuthorizedConnectedClients } from '@common/utils/messages/extensionToContentScript/dispatchEvent';
 import { makeAccountResourceId } from '@components/permissionsManager/resources';
 import useNetworkSelector from '@hooks/useNetwork';
+import useWalletSelector from '@hooks/useWalletSelector';
 import {
   AnalyticsEvents,
   StacksMainnet,
@@ -16,7 +17,6 @@ import {
   type NetworkType,
   type SettingsNetwork,
 } from '@secretkeylabs/xverse-core';
-import type { StoreState } from '@stores/index';
 import {
   ChangeNetworkAction,
   changeShowDataCollectionAlertAction,
@@ -38,7 +38,7 @@ import {
   trackMixPanel,
 } from '@utils/mixpanel';
 import { useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import useSeedVault from './useSeedVault';
 import useWalletSession from './useWalletSession';
 
@@ -83,29 +83,17 @@ const createSingleAccount = async (
 };
 
 const useWalletReducer = () => {
-  const network = useSelector((state: StoreState) => state.walletState.network);
-  const encryptedSeed = useSelector((state: StoreState) => state.walletState.encryptedSeed);
-
-  const selectedAccountIndex = useSelector(
-    (state: StoreState) => state.walletState.selectedAccountIndex,
-  );
-  const selectedAccountType = useSelector(
-    (state: StoreState) => state.walletState.selectedAccountType,
-  );
-  const accounts = useSelector((state: StoreState) => state.walletState.accountsList);
-  const savedNames = useSelector((state: StoreState) => state.walletState.savedNames);
-
-  const softwareAccountsList = useSelector((state: StoreState) => state.walletState.accountsList);
-  const ledgerAccountsList = useSelector(
-    (state: StoreState) => state.walletState.ledgerAccountsList,
-  );
-
-  const showDataCollectionAlert = useSelector(
-    (state: StoreState) => state.walletState.showDataCollectionAlert,
-  );
-
-  const hideStx = useSelector((state: StoreState) => state.walletState.hideStx);
-
+  const {
+    network,
+    encryptedSeed,
+    selectedAccountIndex,
+    selectedAccountType,
+    accountsList: accounts,
+    savedNames,
+    ledgerAccountsList,
+    showDataCollectionAlert,
+    hideStx,
+  } = useWalletSelector();
   const seedVault = useSeedVault();
   const selectedNetwork = useNetworkSelector();
 
@@ -133,7 +121,7 @@ const useWalletReducer = () => {
         savedNames[network.type],
       );
 
-      const selectedAccount = softwareAccountsList.find((account) => account.id === selectedIndex);
+      const selectedAccount = accounts.find((account) => account.id === selectedIndex);
 
       if (!selectedAccount) {
         // if the selected account index does not exist, we cannot update it
@@ -146,7 +134,7 @@ const useWalletReducer = () => {
       );
 
       if (!accountsMatch) {
-        const newAccountsList = softwareAccountsList.map((account) =>
+        const newAccountsList = accounts.map((account) =>
           account.id === selectedIndex ? recreatedAccount : account,
         );
 
@@ -160,7 +148,7 @@ const useWalletReducer = () => {
       selectedAccountIndex,
       selectedAccountType,
       selectedNetwork,
-      softwareAccountsList,
+      accounts,
       savedNames,
     ],
   );
@@ -181,12 +169,14 @@ const useWalletReducer = () => {
 
     // Load custom account names for the new network
     const savedCustomAccountNames = savedNames[currentNetwork.type];
-    walletAccounts.forEach((account) => {
-      const savedAccount = savedCustomAccountNames?.find((acc) => acc.id === account.id);
-      if (savedAccount) {
-        account.accountName = savedAccount.name;
-      }
-    });
+    if (savedCustomAccountNames?.length) {
+      walletAccounts.forEach((account) => {
+        const savedAccount = savedCustomAccountNames.find((acc) => acc.id === account.id);
+        if (savedAccount) {
+          account.accountName = savedAccount.name;
+        }
+      });
+    }
 
     // ledger accounts initially didn't have a deviceAccountIndex
     // this is a migration to add the deviceAccountIndex to the ledger accounts without them
@@ -221,9 +211,19 @@ const useWalletReducer = () => {
     });
   };
 
+  const loadAccountNames = () => {
+    const updatedSavedNames = accounts.reduce<{ id: number; name: string }[]>((acc, account) => {
+      if (account.accountName) {
+        acc.push({ id: account.id, name: account.accountName });
+      }
+      return acc;
+    }, []);
+    dispatch(updateSavedNamesAction(network.type, updatedSavedNames));
+  };
+
   const loadWallet = async () => {
     const seedPhrase = await seedVault.getSeed();
-    const currentAccounts = softwareAccountsList || [];
+    const currentAccounts = accounts || [];
 
     if (currentAccounts.length === 0) {
       // This will happen on first load after the wallet is created. We create the accounts here to ensure
@@ -243,6 +243,13 @@ const useWalletReducer = () => {
     }
 
     await ensureSelectedAccountValid();
+
+    if (!savedNames[network.type]?.length && accounts.some((account) => !!account.accountName)) {
+      // there was no savedNames store object initially
+      // this is a migration to add the savedNames if there are custom account names that are not saved
+      // it should only fire once if ever
+      loadAccountNames();
+    }
 
     dispatch(setWalletUnlockedAction(true));
     setSessionStartTimeAndMigrate();
@@ -341,12 +348,7 @@ const useWalletReducer = () => {
 
   const createAccount = async () => {
     const seedPhrase = await seedVault.getSeed();
-    const newAccounts = await createWalletAccount(
-      seedPhrase,
-      network,
-      selectedNetwork,
-      softwareAccountsList,
-    );
+    const newAccounts = await createWalletAccount(seedPhrase, network, selectedNetwork, accounts);
     dispatch(updateSoftwareAccountsAction(newAccounts));
   };
 
@@ -385,7 +387,7 @@ const useWalletReducer = () => {
   const changeNetwork = async (changedNetwork: SettingsNetwork) => {
     // Save current custom account names
     const currentNetworkType = network.type;
-    const customAccountNames = softwareAccountsList.map((account) => ({
+    const customAccountNames = accounts.map((account) => ({
       id: account.id,
       name: account.accountName,
     }));
@@ -418,7 +420,7 @@ const useWalletReducer = () => {
     const nextAccounts: Account[] = [];
 
     // we recreate the same number of accounts on the new network
-    for (let i = 0; i < softwareAccountsList.length; i++) {
+    for (let i = 0; i < accounts.length; i++) {
       const account = await createSingleAccount(
         seedPhrase,
         i,
@@ -461,7 +463,7 @@ const useWalletReducer = () => {
     if (updatedAccount.accountType !== 'software') {
       throw new Error('Expected software account. Renaming cancelled.');
     }
-    const newAccountsList = softwareAccountsList.map((account) =>
+    const newAccountsList = accounts.map((account) =>
       account.id === updatedAccount.id ? updatedAccount : account,
     );
 

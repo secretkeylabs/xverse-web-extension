@@ -4,14 +4,16 @@ import type { Account } from '@secretkeylabs/xverse-core';
 import { useEffect, useRef, useState } from 'react';
 import AccountRow from '.';
 
-function LazyAccountRow(props: {
+type Props = {
   account: Account | null;
   isSelected: boolean;
   onAccountSelected: (account: Account, goBack?: boolean) => void;
   isAccountListView?: boolean;
   disabledAccountSelect?: boolean;
   fetchBalance?: (account: Account | null) => void;
-}) {
+};
+
+function LazyAccountRow(props: Props) {
   const { fetchBalance, account } = props;
   const { accountBalances } = useWalletSelector();
   const totalBalance = accountBalances[account?.btcAddress ?? ''];

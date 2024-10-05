@@ -1,5 +1,3 @@
-import { nanoid } from 'nanoid';
-import { useMemo } from 'react';
 import styled from 'styled-components';
 
 const Container = styled.div({
@@ -32,7 +30,7 @@ type Props = {
   handleClickDot?: (index: number) => void;
 };
 
-export default function Steps({
+export default function Dots({
   numDots,
   activeIndex,
   dotStrategy,

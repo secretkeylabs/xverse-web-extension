@@ -1,10 +1,10 @@
 import FeatureIcon from '@assets/img/nftDashboard/rareSats/NewFeature.svg';
 import AccountHeaderComponent from '@components/accountHeader';
-import ActionButton from '@components/button';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import BottomTabBar from '@components/tabBar';
 import WebGalleryButton from '@components/webGalleryButton';
 import { ArrowDown } from '@phosphor-icons/react';
+import Button from '@ui-library/button';
 import { StyledHeading } from '@ui-library/common.styled';
 import Dialog from '@ui-library/dialog';
 import { useTranslation } from 'react-i18next';
@@ -31,7 +31,7 @@ const PageHeader = styled.div`
   width: 100%;
 `;
 
-const StyledCollectiblesTabs = styled(CollectiblesTabs)`
+const CollectiblesContainer = styled.div`
   padding: 0 ${(props) => props.theme.space.s};
   padding-bottom: ${(props) => props.theme.space.xl};
   max-width: 1224px;
@@ -54,7 +54,7 @@ const ReceiveNftContainer = styled.div((props) => ({
 }));
 
 const CollectibleContainer = styled.div((props) => ({
-  marginBottom: props.theme.spacing(12),
+  marginBottom: props.theme.space.l,
 }));
 
 const ButtonContainer = styled.div({
@@ -90,7 +90,6 @@ function NftDashboard() {
     onActivateRareSatsAlertEnablePress,
     isGalleryOpen,
   } = nftDashboard;
-
   return (
     <>
       {isOrdinalReceiveAlertVisible && (
@@ -124,10 +123,10 @@ function NftDashboard() {
           </CollectibleContainer>
           <ButtonContainer data-testid="receive-button">
             <ReceiveButtonContainer>
-              <ActionButton
+              <Button
                 icon={<ArrowDown weight="bold" size={16} />}
-                text={t('RECEIVE')}
-                onPress={onReceiveModalOpen}
+                title={t('RECEIVE')}
+                onClick={onReceiveModalOpen}
               />
             </ReceiveButtonContainer>
             {openReceiveModal && (
@@ -142,11 +141,13 @@ function NftDashboard() {
             )}
           </ButtonContainer>
         </PageHeader>
-        <StyledCollectiblesTabs
-          nftListView={<NftListView />}
-          inscriptionListView={<InscriptionListView />}
-          nftDashboard={nftDashboard}
-        />
+        <CollectiblesContainer>
+          <CollectiblesTabs
+            nftListView={<NftListView />}
+            inscriptionListView={<InscriptionListView />}
+            nftDashboard={nftDashboard}
+          />
+        </CollectiblesContainer>
       </Container>
       {!isGalleryOpen && <BottomTabBar tab="nft" />}
     </>

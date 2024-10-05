@@ -46,4 +46,8 @@ export const StyledFiatAmountText = styled(FiatAmountText)`
   color: ${(props) => props.theme.colors.white_400};
 `;
 
+export const RightAlignedStyledFiatAmountText = styled(StyledFiatAmountText)`
+  text-align: right;
+`;
+
 export default FiatAmountText;

@@ -1,26 +1,17 @@
 import { ArrowUpRight, CaretRight } from '@phosphor-icons/react';
 import Spinner from '@ui-library/spinner';
-import Switch from 'react-switch';
+import Toggle from '@ui-library/toggle';
 import styled, { useTheme } from 'styled-components';
 
-const CustomSwitch = styled(Switch)`
-  .react-switch-handle {
-    background-color: ${({ checked }) =>
-      checked ? '#FFFFFF' : 'rgba(255, 255, 255, 0.2)'} !important;
-    border: ${({ checked }) => (checked ? '' : '4px solid rgba(255, 255, 255, 0.2)')} !important;
-  }
-`;
-
 const Button = styled.button<{
-  border: string;
+  $border: string;
 }>((props) => ({
   display: 'flex',
   alignItems: 'center',
   background: 'transparent',
   justifyContent: 'flex-start',
-  paddingTop: props.theme.space.m,
-  paddingBottom: props.theme.space.l,
-  borderBottom: props.border,
+  padding: `20px 0 ${props.theme.space.l}`,
+  borderBottom: props.$border,
 }));
 
 const ColumnContainer = styled.div({
@@ -35,11 +26,11 @@ const TitleText = styled.h1((props) => ({
   paddingTop: props.theme.space.xl,
 }));
 
-const ComponentText = styled.h1<{
-  textColor: string;
+const ComponentText = styled.p<{
+  $textColor: string;
 }>((props) => ({
   ...props.theme.typography.body_medium_l,
-  color: props.textColor,
+  color: props.$textColor,
   flex: 1,
   textAlign: 'left',
 }));
@@ -88,6 +79,7 @@ type Props = {
   onClick?: () => void;
   showDivider?: boolean;
   showWarningTitle?: boolean;
+  showArrow?: boolean;
   toggle?: boolean;
   toggleValue?: boolean;
   description?: string;
@@ -104,6 +96,7 @@ function SettingComponent({
   link,
   showDivider,
   showWarningTitle,
+  showArrow = true,
   toggle,
   toggleValue,
   description,
@@ -112,17 +105,18 @@ function SettingComponent({
   isLoading,
 }: Props) {
   const theme = useTheme();
+
   return (
     <Wrapper>
       <ColumnContainer>
         {title && <TitleText>{title}</TitleText>}
         <Button
           onClick={onClick}
-          border={showDivider ? `1px solid ${theme.colors.elevation2}` : 'transparent'}
+          $border={showDivider ? `1px solid ${theme.colors.elevation2}` : 'transparent'}
         >
           <Column>
             <ComponentText
-              textColor={showWarningTitle ? theme.colors.feedback.error : theme.colors.white['200']}
+              $textColor={showWarningTitle ? theme.colors.feedback.error : theme.colors.white_200}
             >
               {text}
             </ComponentText>
@@ -130,17 +124,12 @@ function SettingComponent({
           </Column>
           {textDetail && <ComponentDescriptionText>{textDetail}</ComponentDescriptionText>}
           {!toggle && link && <ArrowUpRight color={theme.colors.white_0} size={16} weight="bold" />}
-          {!toggle && !link && <CaretRight color={theme.colors.white_0} size={16} weight="bold" />}
+          {!toggle && !link && showArrow && (
+            <CaretRight color={theme.colors.white_0} size={16} weight="bold" />
+          )}
           {isLoading && <Spinner color="white" size={16} />}
-          {toggle && toggleFunction && toggleValue !== undefined && !isLoading && (
-            <CustomSwitch
-              onColor={theme.colors.tangerine}
-              offColor={theme.colors.elevation3}
-              onChange={toggleFunction}
-              checked={toggleValue}
-              uncheckedIcon={false}
-              checkedIcon={false}
-            />
+          {toggle && toggleFunction && !isLoading && (
+            <Toggle onChange={toggleFunction} checked={toggleValue ?? false} disabled={disabled} />
           )}
         </Button>
       </ColumnContainer>

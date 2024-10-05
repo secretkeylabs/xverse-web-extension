@@ -89,8 +89,8 @@ export default class Onboarding {
     this.buttonSeedWords = page.locator('button[value]:not([value=""])');
     this.header = page.locator('#app h3');
     this.inputPassword = page.locator('input[type="password"]');
-    this.errorMessage = page.getByRole('heading', { name: 'Your password should be at' });
-    this.errorMessage2 = page.getByRole('heading', { name: 'Please make sure your' });
+    this.errorMessage = page.locator('p').filter({ hasText: 'Your password should be at' });
+    this.errorMessage2 = page.locator('p').filter({ hasText: 'Please make sure your' });
     this.errorMessageSeedPhrase = page.locator('p').filter({ hasText: 'Invalid seed phrase' });
     this.labelSecurityLevelWeak = page.locator('p').filter({ hasText: 'Weak' });
     this.labelSecurityLevelMedium = page.locator('p').filter({ hasText: 'Medium' });
@@ -129,7 +129,7 @@ export default class Onboarding {
     for (let i = 0; i < (await linkList.count()); i++) {
       expect(await linkList.nth(i).getAttribute('href')).not.toBeNull();
     }
-    await expect(this.page.locator('input[type="checkbox"]')).toBeVisible();
+    await expect(this.page.locator('label[role="checkbox"]')).toBeVisible();
     await expect(this.buttonAccept).toBeVisible();
 
     // check links

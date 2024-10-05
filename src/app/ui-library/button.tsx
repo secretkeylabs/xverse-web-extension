@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import type React from 'react';
 import styled from 'styled-components';
 import Spinner from './spinner';
 
@@ -32,7 +33,6 @@ const StyledButton = styled.button`
     border: 1px solid;
     color: ${(props) => props.theme.colors.elevation0};
 
-    :focus-visible,
     :hover:enabled {
       background-color: ${(props) => props.theme.colors.white_200};
     }
@@ -49,7 +49,6 @@ const StyledButton = styled.button`
     border: 1px solid ${(props) => props.theme.colors.white_800};
     color: ${(props) => props.theme.colors.white_0};
 
-    :focus-visible,
     :hover:enabled {
       background-color: ${(props) => props.theme.colors.elevation6_800};
       border: 1px solid ${(props) => props.theme.colors.white_850};
@@ -71,7 +70,6 @@ const StyledButton = styled.button`
     border: none;
     color: ${(props) => props.theme.colors.white_0};
 
-    :focus-visible,
     :hover:enabled {
       color: ${(props) => props.theme.colors.white_200};
     }
@@ -88,7 +86,6 @@ const StyledButton = styled.button`
     border: none;
     color: ${(props) => props.theme.colors.white_0};
 
-    :focus-visible,
     :hover:enabled {
       background-color: ${(props) => props.theme.colors.danger_dark_100};
       color: ${(props) => props.theme.colors.white_0};
@@ -109,36 +106,32 @@ const CenterDiv = styled.div`
   align-content: center;
 `;
 
-type Props = {
+type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   title: string;
-  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
   icon?: React.ReactNode;
   iconPosition?: 'left' | 'right';
-  disabled?: boolean;
   loading?: boolean;
+  disabled?: boolean;
   className?: string;
   variant?: ButtonVariant;
-  type?: 'button' | 'submit' | 'reset';
 };
 
 function Button({
   title,
-  onClick,
   icon,
   iconPosition = 'left',
   className,
   loading = false,
   disabled = false,
   variant = 'primary',
-  type,
+  ...props
 }: Props) {
   return (
     <StyledButton
+      {...props}
       className={classNames(className, variant)}
-      onClick={onClick}
       tabIndex={0}
       disabled={disabled || loading}
-      type={type}
     >
       {loading ? (
         <Spinner />

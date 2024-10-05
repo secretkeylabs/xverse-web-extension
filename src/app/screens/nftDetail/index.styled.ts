@@ -15,7 +15,7 @@ export const ExtensionContainer = styled.div((props) => ({
 }));
 
 export const GalleryReceiveButtonContainer = styled.div((props) => ({
-  marginRight: props.theme.spacing(3),
+  marginRight: props.theme.spacing(6),
   width: '100%',
 }));
 
@@ -116,7 +116,7 @@ export const GridContainer = styled.div((props) => ({
 }));
 
 export const ShareButtonContainer = styled.div((props) => ({
-  marginLeft: props.theme.spacing(3),
+  marginRight: props.theme.spacing(6),
   width: '100%',
 }));
 

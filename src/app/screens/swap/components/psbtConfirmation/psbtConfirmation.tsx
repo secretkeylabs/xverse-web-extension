@@ -6,9 +6,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import type { OrderInfo } from '@screens/swap/types';
 import {
   btcTransaction,
-  parseSummaryForRunes,
   type ExecuteUtxoOrderRequest,
-  type RuneSummary,
   type Transport,
 } from '@secretkeylabs/xverse-core';
 import { useEffect, useMemo, useState } from 'react';
@@ -24,13 +22,20 @@ type Props = {
   orderInfo: OrderInfo;
   onClose: () => void;
   onConfirm: () => void;
+  customExecute?: (signedPsbt: string) => void;
+  customCallout?: { bodyText: string };
 };
 
-export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Props) {
+export default function PsbtConfirmation({
+  orderInfo,
+  onClose,
+  onConfirm,
+  customExecute,
+  customCallout,
+}: Props) {
   const [isLoading, setIsLoading] = useState(true);
   const [isSigning, setIsSigning] = useState(false);
   const [summary, setSummary] = useState<PSBTSummary | undefined>();
-  const [runeSummary, setRuneSummary] = useState<RuneSummary | undefined>(undefined);
   const [validationError, setValidationError] = useState<{
     error: string;
     errorTitle: string;
@@ -74,11 +79,6 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
       .getSummary()
       .then(async (txSummary) => {
         setSummary(txSummary);
-        setRuneSummary(
-          await parseSummaryForRunes(txnContext, txSummary, network.type, {
-            separateTransfersOnNoExternalInputs: true,
-          }),
-        );
         setIsLoading(false);
       })
       .catch((err) => {
@@ -131,27 +131,31 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
         throw new Error(t('PSBT_CANT_SIGN_ERROR_TITLE'));
       }
 
-      const orderResponse = await handleExecuteOrder(signedPsbt);
+      if (customExecute) {
+        await customExecute(signedPsbt);
+      } else {
+        const orderResponse = await handleExecuteOrder(signedPsbt);
 
-      if (!orderResponse) {
-        return setIsSigning(false);
+        if (!orderResponse) {
+          return setIsSigning(false);
+        }
+
+        if (ledgerTransport) {
+          await ledgerTransport.close();
+        }
+
+        onConfirm();
+
+        setIsSigning(false);
+        navigate('/tx-status', {
+          state: {
+            txid: orderResponse.txid,
+            currency: 'BTC',
+            error: '',
+            browserTx: false,
+          },
+        });
       }
-
-      if (ledgerTransport) {
-        await ledgerTransport.close();
-      }
-
-      onConfirm();
-
-      setIsSigning(false);
-      navigate('/tx-status', {
-        state: {
-          txid: orderResponse.txid,
-          currency: 'BTC',
-          error: '',
-          browserTx: false,
-        },
-      });
     } catch (err) {
       setIsSigning(false);
       if (err instanceof Error) {
@@ -194,7 +198,6 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
   return (
     <ConfirmBtcTransaction
       summary={summary}
-      runeSummary={runeSummary}
       isLoading={isLoading}
       isSubmitting={isSigning}
       isBroadcast
@@ -205,7 +208,7 @@ export default function PsbtConfirmation({ orderInfo, onClose, onConfirm }: Prop
       onBackClick={onClose}
       hideBottomBar
       showAccountHeader={false}
-      customCallout={quoteExpiryCallout}
+      customCallout={customCallout || quoteExpiryCallout}
     />
   );
 }

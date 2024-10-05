@@ -3,7 +3,9 @@ import type {
   AccountType,
   AppInfo,
   FungibleToken,
+  Inscription,
   NetworkType,
+  NftData,
   SettingsNetwork,
   SupportedCurrency,
 } from '@secretkeylabs/xverse-core';
@@ -35,6 +37,13 @@ export const SetSpamTokenKey = 'SetSpamTokenKey';
 export const SetSpamTokensKey = 'SetSpamTokensKey';
 export const SetShowSpamTokensKey = 'SetShowSpamTokensKey';
 export const UpdateSavedNamesKey = 'UpdateSavedNamesKey';
+export const AddToStarCollectiblesKey = 'AddToStarCollectiblesKey';
+export const RemoveFromStarCollectiblesKey = 'RemoveFromStarCollectiblesKey';
+export const AddToHideCollectiblesKey = 'AddToHideCollectiblesKey';
+export const RemoveFromHideCollectiblesKey = 'RemoveFromHideCollectiblesKey';
+export const RemoveAllFromHideCollectiblesKey = 'RemoveAllFromHideCollectiblesKey';
+export const SetAccountAvatarKey = 'SetAccountAvatarKey';
+export const RemoveAccountAvatarKey = 'RemoveAccountAvatarKey';
 
 export enum WalletSessionPeriods {
   LOW = 15,
@@ -76,6 +85,9 @@ export interface WalletState {
   savedNames: {
     [key in NetworkType]?: { id: number; name?: string }[];
   };
+  hiddenCollectibleIds: Record<string, Record<string, string>>;
+  starredCollectibleIds: Record<string, Array<{ id: string; collectionId: string }>>;
+  avatarIds: Record<string, AvatarInfo | null>;
 }
 
 export interface StoreEncryptedSeed {
@@ -215,6 +227,58 @@ export interface UpdateSavedNames {
   names: { id: number; name?: string }[];
 }
 
+export interface AddToStarCollectibles {
+  type: typeof AddToStarCollectiblesKey;
+  address: string;
+  id: string;
+  collectionId?: string;
+}
+
+export interface RemoveFromStarCollectibles {
+  type: typeof RemoveFromStarCollectiblesKey;
+  address: string;
+  id: string;
+}
+
+export interface AddToHideCollectibles {
+  type: typeof AddToHideCollectiblesKey;
+  address: string;
+  id: string;
+  collectionId?: string;
+}
+
+export interface RemoveFromHideCollectibles {
+  type: typeof RemoveFromHideCollectiblesKey;
+  address: string;
+  id: string;
+}
+
+export interface RemoveAllFromHideCollectibles {
+  type: typeof RemoveAllFromHideCollectiblesKey;
+  address: string;
+}
+
+export interface SetAccountAvatar {
+  type: typeof SetAccountAvatarKey;
+  address: string;
+  avatar: AvatarInfo;
+}
+
+export interface RemoveAccountAvatar {
+  type: typeof RemoveAccountAvatarKey;
+  address: string;
+}
+
+export type AvatarInfo =
+  | {
+      type: 'inscription';
+      inscription: Inscription;
+    }
+  | {
+      type: 'stacks';
+      nft: NftData;
+    };
+
 export type WalletActions =
   | ResetWallet
   | UpdateSoftwareAccounts
@@ -242,4 +306,11 @@ export type WalletActions =
   | SetSpamToken
   | SetSpamTokens
   | SetShowSpamTokens
-  | UpdateSavedNames;
+  | UpdateSavedNames
+  | AddToStarCollectibles
+  | RemoveFromStarCollectibles
+  | AddToHideCollectibles
+  | RemoveFromHideCollectibles
+  | RemoveAllFromHideCollectibles
+  | SetAccountAvatar
+  | RemoveAccountAvatar;

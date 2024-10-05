@@ -34,18 +34,18 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-const ListItemsContainer = styled.div({
+const ListItemsContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
-});
+  marginTop: props.theme.space.l,
+}));
 
 const ListHeader = styled.h1((props) => ({
-  marginTop: props.theme.spacing(20),
-  marginBottom: props.theme.spacing(12),
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-  ...props.theme.headline_s,
+  ...props.theme.typography.headline_xs,
+  margin: props.theme.space.m,
+  marginTop: 0,
+  marginBottom: props.theme.space.l,
 }));
 
 const LoadingContainer = styled.div({
@@ -65,7 +65,7 @@ const NoTransactionsContainer = styled.div((props) => ({
 }));
 
 const GroupContainer = styled(animated.div)((props) => ({
-  marginBottom: props.theme.spacing(8),
+  marginBottom: props.theme.space.m,
 }));
 
 const SectionHeader = styled.div((props) => ({
@@ -73,8 +73,8 @@ const SectionHeader = styled.div((props) => ({
   flexDirection: 'row',
   alignItems: 'center',
   marginBottom: props.theme.spacing(7),
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
+  paddingLeft: props.theme.space.m,
+  paddingRight: props.theme.space.m,
 }));
 
 const SectionSeparator = styled.div((props) => ({
@@ -86,16 +86,8 @@ const SectionSeparator = styled.div((props) => ({
 const SectionTitle = styled.p((props) => ({
   ...props.theme.body_xs,
   color: props.theme.colors.white_200,
-  marginRight: props.theme.spacing(4),
+  marginRight: props.theme.space.xs,
 }));
-
-interface TransactionsHistoryListProps {
-  coin: CurrencyTypes;
-  stxTxFilter: string | null;
-  brc20Token: string | null;
-  runeToken: string | null;
-  runeSymbol: string | null;
-}
 
 const sortTransactionsByBlockHeight = (transactions: BtcTransactionData[]) =>
   transactions.sort((txA, txB) => {
@@ -189,8 +181,24 @@ const filterStxTxs = (
     );
   });
 
-export default function TransactionsHistoryList(props: TransactionsHistoryListProps) {
-  const { coin, stxTxFilter, brc20Token, runeToken, runeSymbol } = props;
+type Props = {
+  coin: CurrencyTypes;
+  stxTxFilter: string | null;
+  brc20Token: string | null;
+  runeToken: string | null;
+  runeSymbol: string | null;
+  withTitle?: boolean;
+};
+
+function TransactionsHistoryList({
+  coin,
+  stxTxFilter,
+  brc20Token,
+  runeToken,
+  runeSymbol,
+  withTitle = true,
+}: Props) {
+  const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
   const selectedAccount = useSelectedAccount();
   const { network, selectedAccountType } = useWalletSelector();
   const btcClient = useBtcClient();
@@ -209,7 +217,6 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
     },
   });
 
-  const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
   const wallet = selectedAccount
     ? {
         ...selectedAccount,
@@ -249,7 +256,7 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
 
   return (
     <ListItemsContainer>
-      <ListHeader>{t('TRANSACTION_HISTORY_TITLE')}</ListHeader>
+      {withTitle && <ListHeader>{t('TRANSACTION_HISTORY_TITLE')}</ListHeader>}
       {groupedTxs &&
         !isLoading &&
         Object.keys(groupedTxs).map((group) => (
@@ -317,3 +324,5 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
     </ListItemsContainer>
   );
 }
+
+export default TransactionsHistoryList;

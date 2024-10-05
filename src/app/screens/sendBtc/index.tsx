@@ -1,17 +1,9 @@
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useDebounce from '@hooks/useDebounce';
-import useHasFeature from '@hooks/useHasFeature';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
-import {
-  AnalyticsEvents,
-  btcTransaction,
-  FeatureId,
-  parseSummaryForRunes,
-  type RuneSummary,
-  type Transport,
-} from '@secretkeylabs/xverse-core';
+import { AnalyticsEvents, btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
@@ -47,8 +39,6 @@ function SendBtcScreen() {
 
   const [transaction, setTransaction] = useState<btcTransaction.EnhancedTransaction | undefined>();
   const [summary, setSummary] = useState<TransactionSummary | undefined>();
-  const [runeSummary, setRuneSummary] = useState<RuneSummary | undefined>();
-  const hasRunesSupport = useHasFeature(FeatureId.RUNES_SUPPORT);
 
   useEffect(() => {
     if (!feeRate && btcFeeRate && !feeRatesLoading) {
@@ -76,7 +66,6 @@ function SendBtcScreen() {
     if (!debouncedRecipient || !feeRate) {
       setTransaction(undefined);
       setSummary(undefined);
-      setRuneSummary(undefined);
       return;
     }
 
@@ -93,16 +82,6 @@ function SendBtcScreen() {
           setSummary(transactionDetails.summary);
           if (sendMax) {
             setAmountSats(transactionDetails.summary.outputs[0].amount.toString());
-          }
-          if (hasRunesSupport) {
-            setRuneSummary(
-              await parseSummaryForRunes(
-                transactionContext,
-                transactionDetails.summary,
-                transactionContext.network,
-                { separateTransfersOnNoExternalInputs: true },
-              ),
-            );
           }
         } else {
           setTransaction(undefined);
@@ -202,7 +181,6 @@ function SendBtcScreen() {
   return (
     <StepDisplay
       summary={summary}
-      runeSummary={runeSummary}
       currentStep={currentStep}
       setCurrentStep={setCurrentStep}
       recipientAddress={recipientAddress}

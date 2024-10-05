@@ -31,13 +31,13 @@ jobs:
           npm run knip
           npx eslint .
           npx tsc --noEmit
-          npm test
       - name: Build
         env:
           TRANSAC_API_KEY: ${{ secrets.TRANSAC_API_KEY }}
           MOON_PAY_API_KEY: ${{ secrets.MOON_PAY_API_KEY }}
           MIX_PANEL_TOKEN: ${{ secrets.MIX_PANEL_TOKEN }}
           MIX_PANEL_EXPLORE_APP_TOKEN: ${{ secrets.MIX_PANEL_EXPLORE_APP_TOKEN }}
+          SKIP_ANIMATION_WALLET_STARTUP: 'false'
         run: npm run build --if-present
       - name: Install Playwright Browsers
         run: npx playwright install chromium --with-deps

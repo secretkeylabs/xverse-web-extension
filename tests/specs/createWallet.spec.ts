@@ -90,16 +90,21 @@ test.describe('Create and Restore Wallet Flow', () => {
       // Write the file
       fs.writeFileSync(filePathAddresses, dataAddress, 'utf8');
     });
-    await test.step('reset Wallet via Menu', async () => {
-      await expect(wallet.buttonMenu).toBeVisible();
-      await wallet.buttonMenu.click();
-      await expect(wallet.buttonResetWallet).toBeVisible();
-      await wallet.buttonResetWallet.click();
-      await wallet.buttonResetWallet.click();
-      await expect(onboardingPage.inputPassword).toBeVisible();
+
+    await test.step('Reset Wallet via Settings', async () => {
+      // Go to Settings -> Security
+      await wallet.navigationSettings.click();
+      await wallet.buttonSecurity.click();
+
+      // Confirm reset
+      await page.getByRole('button', { name: 'Reset Wallet' }).first().click();
+      await page.getByRole('dialog').getByRole('button', { name: 'Reset Wallet' }).click();
+
+      // Enter password to confirm reset
       await onboardingPage.inputPassword.fill(strongPW);
       await onboardingPage.buttonContinue.click();
     });
+
     await test.step('Restore wallet with 12 word seed phrase', async () => {
       const landingPage = new Landing(page);
       await expect(landingPage.buttonRestoreWallet).toBeVisible();
@@ -137,7 +142,7 @@ test.describe('Create and Restore Wallet Flow', () => {
       await newWallet.checkVisualsStartpage();
 
       const balanceText = newWallet.balance;
-      await await expect(balanceText).toHaveText('$0.00');
+      await expect(balanceText).toHaveText('$0.00');
 
       // Get the Addresses
       const addressBitcoinCheck = await newWallet.getAddress('Bitcoin');

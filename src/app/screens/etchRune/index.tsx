@@ -67,18 +67,7 @@ function EtchRune() {
       {orderTx && orderTx.summary && !etchError && (
         <ConfirmBtcTransaction
           summary={orderTx.summary}
-          runeSummary={{
-            etch: etchRequest,
-            burns: [],
-            receipts: [],
-            transfers: [],
-            inputsHadRunes: false,
-            txnHasExternalInputs: orderTx.summary?.inputs.some(
-              (input) =>
-                input.extendedUtxo.address !== btcAddress &&
-                input.extendedUtxo.address !== ordinalsAddress,
-            ),
-          }}
+          runeEtchDetails={etchRequest}
           feeRate={+feeRate}
           confirmText={t('CONFIRM')}
           cancelText={t('CANCEL')}

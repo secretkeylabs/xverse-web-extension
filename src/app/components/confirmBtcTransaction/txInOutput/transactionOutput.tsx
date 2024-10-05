@@ -8,7 +8,6 @@ import { getTruncatedAddress } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import { isAddressOutput, isPubKeyOutput, isScriptOutput } from '../utils';
 
 const TransferDetailContainer = styled.div((props) => ({
   paddingBottom: props.theme.space.m,
@@ -37,8 +36,9 @@ type Props = {
 function TransactionOutput({ output, scriptOutputCount }: Props) {
   const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey } = useSelectedAccount();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const isOutputWithScript = isScriptOutput(output);
-  const isOutputWithPubKey = isPubKeyOutput(output);
+  const isOutputWithScript = output.type === 'script';
+  const isOutputWithAddress = output.type === 'address';
+  const isOutputWithPubKey = !isOutputWithScript && !isOutputWithAddress;
 
   const detailViewIcon = isOutputWithScript ? ScriptIcon : OutputIcon;
   const detailViewHideCopyButton =
@@ -93,7 +93,7 @@ function TransactionOutput({ output, scriptOutputCount }: Props) {
         hideCopyButton={detailViewHideCopyButton}
         dataTestID="confirm-amount"
         amount={`${satsToBtc(
-          new BigNumber(isAddressOutput(output) ? output.amount.toString() : '0'),
+          new BigNumber(isOutputWithAddress ? output.amount.toString() : '0'),
         ).toFixed()} BTC`}
         address={isOutputWithScript || isOutputWithPubKey ? '' : output.address}
         outputScript={isOutputWithScript ? output.script : undefined}

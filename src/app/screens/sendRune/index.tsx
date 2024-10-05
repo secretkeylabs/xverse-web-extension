@@ -9,8 +9,6 @@ import {
   AnalyticsEvents,
   FeatureId,
   btcTransaction,
-  parseSummaryForRunes,
-  type RuneSummary,
   type Transport,
 } from '@secretkeylabs/xverse-core';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
@@ -34,7 +32,6 @@ function SendRuneScreen() {
   const { t } = useTranslation('translation');
   const { data: btcFeeRate, isLoading: feeRatesLoading } = useBtcFeeRate();
   const selectedAccount = useSelectedAccount();
-  const { network } = useWalletSelector();
   const { data: runesCoinsList } = useRuneFungibleTokensQuery();
   // TODO: can we remove location.state here?
   const [recipientAddress, setRecipientAddress] = useState<string>(
@@ -42,6 +39,7 @@ function SendRuneScreen() {
   );
   const [amountError, setAmountError] = useState('');
   const [amountToSend, setAmountToSend] = useState<string>(location.state?.amount || '');
+  const [useTokenValue, setUseTokenValue] = useState(true);
   const [feeRate, setFeeRate] = useState('');
   const [sendMax, setSendMax] = useState(false);
   const [currentStep, setCurrentStep] = useState<Step>(Step.SelectRecipient);
@@ -50,7 +48,6 @@ function SendRuneScreen() {
   const transactionContext = useTransactionContext();
   const [transaction, setTransaction] = useState<btcTransaction.EnhancedTransaction | undefined>();
   const [summary, setSummary] = useState<TransactionSummary | undefined>();
-  const [runeSummary, setRuneSummary] = useState<RuneSummary | undefined>();
   const [searchParams] = useSearchParams();
   const hasRunesSupport = useHasFeature(FeatureId.RUNES_SUPPORT);
 
@@ -97,7 +94,6 @@ function SendRuneScreen() {
     if (!recipientAddress || !feeRate || bigAmount.isNaN() || bigAmount.isLessThanOrEqualTo(0)) {
       setTransaction(undefined);
       setSummary(undefined);
-      setRuneSummary(undefined);
       return;
     }
 
@@ -118,14 +114,6 @@ function SendRuneScreen() {
         setTransaction(transactionDetails.transaction);
         if (transactionDetails.summary) {
           setSummary(transactionDetails.summary);
-          setRuneSummary(
-            await parseSummaryForRunes(
-              transactionContext,
-              transactionDetails.summary,
-              network.type,
-              { separateTransfersOnNoExternalInputs: true },
-            ),
-          );
         }
       } catch (e) {
         if (!(e instanceof Error) || !e.message.includes('Insufficient funds')) {
@@ -181,7 +169,6 @@ function SendRuneScreen() {
     try {
       setIsSubmitting(true);
       const txnId = await transaction?.broadcast({ ledgerTransport, rbfEnabled: true });
-
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
         protocol: 'runes',
         action: 'transfer',
@@ -232,10 +219,11 @@ function SendRuneScreen() {
   return (
     <StepDisplay
       summary={summary}
-      runeSummary={runeSummary}
       token={fungibleToken}
       amountToSend={amountToSend}
       setAmountToSend={setAmount}
+      useTokenValue={useTokenValue}
+      setUseTokenValue={setUseTokenValue}
       amountError={amountError}
       currentStep={currentStep}
       setCurrentStep={setCurrentStep}

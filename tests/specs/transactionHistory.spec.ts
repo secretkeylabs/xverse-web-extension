@@ -17,8 +17,8 @@ test.describe('Transaction', () => {
     await expect(wallet.textCoinTitle).toContainText(tokenName);
 
     // Check contract details are displayed
-    await wallet.buttonCoinContract.click();
-    await expect(wallet.buttonCoinContract).toBeVisible();
+    await wallet.coinSecondaryButton.click();
+    await expect(wallet.coinSecondaryButton).toBeVisible();
     await expect(wallet.coinContractAddress).toBeVisible();
     await expect(wallet.coinContractAddress).not.toBeEmpty();
   });
@@ -76,15 +76,19 @@ test.describe('Transaction', () => {
   test('Visual Check Runes Transaction history', async ({ page, extensionId }) => {
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
-
     // Check if Rune is enabled and if not enable the rune and click on it
     await wallet.checkAndClickOnSpecificRune('SKIBIDI•OHIO•RIZZ');
-
     const originalBalanceAmount = await wallet.checkVisualsRunesDashboard('SKIBIDI•OHIO•RIZZ');
     await expect(originalBalanceAmount).toBeGreaterThan(0);
-    await expect(wallet.containerTransactionHistory.first()).toBeVisible();
+    await expect(wallet.containerTransactionHistory.first()).toBeHidden();
     // There should be at least one transaction visible
     await expect(await wallet.containerTransactionHistory.count()).toBeGreaterThanOrEqual(1);
+    // check able to see rune bundles
+    await wallet.coinSecondaryButton.click();
+    await expect(wallet.coinSecondaryButton).toBeVisible();
+    // can navigate to rare-sats-bundle page
+    await wallet.runeItem.last().click();
+    await expect(page.url()).toContain('rare-sats-bundle');
   });
 
   // TODO: add test for sending NFT - https://linear.app/xverseapp/issue/ENG-4321/transaction-send-nft

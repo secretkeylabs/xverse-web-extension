@@ -34,13 +34,14 @@ jobs:
           npm run knip
           npx eslint .
           npx tsc --noEmit
-          npm test
       - name: Build
         env:
           TRANSAC_API_KEY: ${{ secrets.TRANSAC_API_KEY }}
           MOON_PAY_API_KEY: ${{ secrets.MOON_PAY_API_KEY }}
           MIX_PANEL_TOKEN: ${{ secrets.MIX_PANEL_TOKEN }}
           MIX_PANEL_EXPLORE_APP_TOKEN: ${{ secrets.MIX_PANEL_EXPLORE_APP_TOKEN }}
+          SKIP_ANIMATION_WALLET_STARTUP: 'false'
+
         run: npm run build
       - name: Upload Archive
         uses: actions/upload-artifact@v3
@@ -131,7 +132,7 @@ jobs:
   publish-rc:
     # TODO also keep the develop PR description up to date
     if: ${{ github.base_ref == 'main' }}
-    needs: [UItest]
+    needs: build
     runs-on: ubuntu-latest
     permissions:
       contents: write

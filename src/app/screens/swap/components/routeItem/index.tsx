@@ -1,6 +1,6 @@
 import TokenImage from '@components/tokenImage';
 import { CaretDown } from '@phosphor-icons/react';
-import { mapSwapTokenToFT } from '@screens/swap/utils';
+import { mapFtToCurrencyType, mapSwapTokenToFT, mapTokenToCurrencyType } from '@screens/swap/utils';
 import type { FungibleToken, Token } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { useTranslation } from 'react-i18next';
@@ -19,7 +19,6 @@ const RouteItemButtonContainer = styled.button((props) => ({
   marginTop: props.theme.space.xs,
   width: 135,
   height: 56,
-  overflow: 'hidden',
   ':hover': {
     opacity: 0.8,
   },
@@ -35,16 +34,17 @@ const TokenName = styled(StyledP)`
   text-align: left;
 `;
 
-type RouteItemProps = {
+type Props = {
   label: string;
-  token?: FungibleToken | Token | 'BTC';
+  token?: FungibleToken | Token;
   onClick: () => void;
 };
 
-export default function RouteItem({ label, token, onClick }: RouteItemProps) {
+export default function RouteItem({ label, token, onClick }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
 
-  const isBtcToken = token === 'BTC' || token?.protocol === 'btc';
+  const currency =
+    token && 'principal' in token ? mapFtToCurrencyType(token) : mapTokenToCurrencyType(token);
 
   return (
     <div>
@@ -54,16 +54,20 @@ export default function RouteItem({ label, token, onClick }: RouteItemProps) {
       <RouteItemButtonContainer onClick={onClick}>
         {token && (
           <TokenImage
-            currency={isBtcToken ? 'BTC' : 'FT'}
+            currency={currency}
             fungibleToken={
-              isBtcToken ? undefined : 'principal' in token ? token : mapSwapTokenToFT(token)
+              currency === 'FT'
+                ? 'principal' in token
+                  ? token
+                  : mapSwapTokenToFT(token)
+                : undefined
             }
             showProtocolIcon={false}
             size={20}
           />
         )}
         <TokenName data-testid="token-name" typography="body_medium_m" color="white_0">
-          {isBtcToken ? 'BTC' : token?.name ?? t('SELECT_COIN')}
+          {currency !== 'FT' ? currency : token?.name ?? t('SELECT_COIN')}
         </TokenName>
         <CaretDown
           data-testid="down-arrow-button"

@@ -10,8 +10,8 @@ import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
   flex: 1,
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
+  paddingLeft: props.theme.space.m,
+  paddingRight: props.theme.space.m,
   display: 'flex',
   flexDirection: 'column',
 }));
@@ -27,7 +27,7 @@ const ContentContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
-  marginBottom: props.theme.spacing(32),
+  marginBottom: props.theme.space.xxxl,
 }));
 
 const Title = styled.h1((props) => ({
@@ -46,7 +46,7 @@ const BackupActionsContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'space-between',
-  marginTop: props.theme.spacing(20),
+  marginTop: props.theme.space.xxl,
   width: '100%',
   columnGap: props.theme.space.xs,
 }));
@@ -55,7 +55,7 @@ const LoadingContainer = styled.div((props) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
-  marginTop: props.theme.spacing(20),
+  marginTop: props.theme.space.xxl,
   width: '100%',
 }));
 

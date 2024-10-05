@@ -1,7 +1,7 @@
 import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RecipientSelector from '@components/recipientSelector';
 import TokenImage from '@components/tokenImage';
-import type { FungibleToken, RuneSummary } from '@secretkeylabs/xverse-core';
+import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import SendLayout from '../../layouts/sendLayout';
@@ -31,9 +31,10 @@ const Container = styled.div`
 type Props = {
   token: FungibleToken;
   summary: TransactionSummary | undefined;
-  runeSummary: RuneSummary | undefined;
   amountToSend: string;
   setAmountToSend: (amount: string) => void;
+  useTokenValue: boolean;
+  setUseTokenValue: (toggle: boolean) => void;
   amountError: string;
   currentStep: Step;
   setCurrentStep: (step: Step) => void;
@@ -54,9 +55,10 @@ type Props = {
 function StepDisplay({
   token,
   summary,
-  runeSummary,
   amountToSend,
   setAmountToSend,
+  useTokenValue,
+  setUseTokenValue,
   amountError,
   currentStep,
   setCurrentStep,
@@ -106,6 +108,8 @@ function StepDisplay({
               header={header}
               amountToSend={amountToSend}
               setAmountToSend={setAmountToSend}
+              useTokenValue={useTokenValue}
+              setUseTokenValue={setUseTokenValue}
               amountError={amountError}
               feeRate={feeRate}
               setFeeRate={setFeeRate}
@@ -129,7 +133,6 @@ function StepDisplay({
       return (
         <ConfirmBtcTransaction
           summary={summary}
-          runeSummary={runeSummary}
           isLoading={false}
           confirmText={t('COMMON.CONFIRM')}
           cancelText={t('COMMON.CANCEL')}

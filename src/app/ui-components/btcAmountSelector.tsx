@@ -1,5 +1,5 @@
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowsDownUp } from '@phosphor-icons/react';
 import {
@@ -26,6 +26,13 @@ const BalanceDiv = styled.div`
   text-align: end;
 `;
 
+const ConvertedAmountWrapper = styled.div`
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
 const inputValidator = /^[0-9.]*$/;
 const btcInputExtractor = /[0-9]+[.]?[0-9]{0,8}/;
 const btcInputValidator = /^[0-9]+[.]?[0-9]{0,8}$/;
@@ -50,7 +57,7 @@ function AmountSelector({
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { fiatCurrency } = useWalletSelector();
   const { data: btcBalanceSats } = useBtcWalletData();
-  const { btcFiatRate } = useCoinRates();
+  const { btcFiatRate } = useSupportedCoinRates();
 
   const [amountDisplay, setAmountDisplay] = useState(
     amountSats && satsToBtcString(new BigNumber(amountSats)),
@@ -182,9 +189,9 @@ function AmountSelector({
               thousandSeparator
               prefix={useBtcValue ? `~${currencySymbolMap[fiatCurrency]}` : ''}
               renderText={(value: string) => (
-                <div>
+                <ConvertedAmountWrapper>
                   {value} {useBtcValue ? fiatCurrency : 'BTC'}
-                </div>
+                </ConvertedAmountWrapper>
               )}
             />
             <ArrowsDownUp size={16} weight="fill" />

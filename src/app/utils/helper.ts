@@ -170,12 +170,16 @@ export const isValidBtcApi = async (url: string, network: NetworkType) => {
   });
 
   try {
-    const [customHash, defaultHash] = await Promise.all([
-      btcClient.getBlockHash(1),
-      defaultBtcClient.getBlockHash(1),
-    ]);
-    // this ensures the URL is for correct network
-    return customHash === defaultHash;
+    if (network === 'Mainnet') {
+      const [customHash, defaultHash] = await Promise.all([
+        btcClient.getBlockHash(1),
+        defaultBtcClient.getBlockHash(1),
+      ]);
+      // this ensures the URL is for correct network
+      return customHash === defaultHash;
+    }
+    const blockHash = await btcClient.getBlockHash(1);
+    return !!blockHash;
   } catch (e) {
     return false;
   }
@@ -325,16 +329,9 @@ export const getLockCountdownLabel = (
   return t('LOCK_COUNTDOWN_HS', { count: hours });
 };
 
-export const isFungibleToken = (token: any): token is FungibleToken =>
-  token &&
-  typeof token === 'object' &&
-  'balance' in token &&
-  'total_sent' in token &&
-  'total_received' in token &&
-  'principal' in token &&
-  'assetName' in token;
-
 export const satsToBtcString = (num: BigNumber) =>
   satsToBtc(num)
     .toFixed(8)
     .replace(/\.?0+$/, '');
+
+export const sanitizeRuneName = (runeName) => runeName.replace(/[^A-Za-z]+/g, '').toUpperCase();

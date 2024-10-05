@@ -37,7 +37,6 @@ const Container = styled.div`
 
 type Props = {
   summary: TransactionSummary | undefined;
-  runeSummary: RuneSummary | undefined;
   ordinal?: Inscription;
   currentStep: Step;
   setCurrentStep: (step: Step) => void;
@@ -56,7 +55,6 @@ type Props = {
 
 function StepDisplay({
   summary,
-  runeSummary,
   ordinal,
   currentStep,
   setCurrentStep,
@@ -130,7 +128,6 @@ function StepDisplay({
       return (
         <ConfirmBtcTransaction
           summary={summary}
-          runeSummary={runeSummary}
           brc20Summary={brc20Summary}
           isLoading={false}
           confirmText={t('COMMON.CONFIRM')}

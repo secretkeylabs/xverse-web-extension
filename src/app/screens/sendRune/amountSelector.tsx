@@ -1,4 +1,4 @@
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useWalletSelector from '@hooks/useWalletSelector';
 import RuneAmountSelector from '@screens/sendRune/runeAmountSelector';
@@ -31,6 +31,8 @@ type Props = {
   token: FungibleToken;
   amountToSend: string;
   setAmountToSend: (amount: string) => void;
+  useTokenValue: boolean;
+  setUseTokenValue: (toggle: boolean) => void;
   amountError: string;
   feeRate: string;
   setFeeRate: (feeRate: string) => void;
@@ -49,6 +51,8 @@ function AmountSelector({
   token,
   amountToSend,
   setAmountToSend,
+  useTokenValue,
+  setUseTokenValue,
   amountError,
   feeRate,
   setFeeRate,
@@ -65,7 +69,7 @@ function AmountSelector({
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
   const { fiatCurrency } = useWalletSelector();
-  const { btcFiatRate } = useCoinRates();
+  const { btcFiatRate } = useSupportedCoinRates();
   const { data: recommendedFees } = useBtcFeeRate();
 
   const balance = getFtBalance(token);
@@ -86,6 +90,8 @@ function AmountSelector({
           token={token}
           amountToSend={amountToSend}
           setAmountToSend={setAmountToSend}
+          useTokenValue={useTokenValue}
+          setUseTokenValue={setUseTokenValue}
           amountError={amountError}
           sendMax={sendMax}
           setSendMax={setSendMax}

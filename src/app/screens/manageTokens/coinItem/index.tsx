@@ -1,9 +1,8 @@
 import TokenImage from '@components/tokenImage';
 import type { FungibleToken } from '@secretkeylabs/xverse-core';
+import Toggle from '@ui-library/toggle';
 import { useState } from 'react';
-import Switch from 'react-switch';
 import styled from 'styled-components';
-import Theme from 'theme';
 
 const RowContainer = styled.div`
   display: flex;
@@ -18,14 +17,6 @@ const CoinContainer = styled.div({
   flexDirection: 'row',
   alignItems: 'center',
 });
-
-const CustomSwitch = styled(Switch)`
-  .react-switch-handle {
-    background-color: ${({ checked }) =>
-      checked ? '#FFFFFF' : 'rgba(255, 255, 255, 0.2)'} !important;
-    border: ${({ checked }) => (checked ? '' : '4px solid rgba(255, 255, 255, 0.2)')} !important;
-  }
-`;
 
 const CoinTitleText = styled.p<{ isEnabled?: boolean }>((props) => ({
   ...props.theme.typography[props.isEnabled ? 'body_bold_m' : 'body_m'],
@@ -91,15 +82,7 @@ function CoinItem({
           {name}
         </CoinTitleText>
       </CoinContainer>
-      <CustomSwitch
-        onColor={Theme.colors.tangerine}
-        offColor={Theme.colors.elevation3}
-        onChange={toggleSwitch}
-        checked={isEnabled!}
-        uncheckedIcon={false}
-        checkedIcon={false}
-        disabled={disabled}
-      />
+      <Toggle onChange={toggleSwitch} checked={isEnabled!} disabled={disabled} />
     </RowContainer>
   );
 }

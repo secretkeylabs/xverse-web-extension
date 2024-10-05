@@ -3,13 +3,6 @@ import styled from 'styled-components';
 
 type ToastType = 'success' | 'error' | 'neutral';
 
-interface ToastProps {
-  text: string;
-  type: ToastType;
-  dismissToast?: () => void;
-  action?: { text: string; onClick: () => void };
-}
-
 const getBackgroundColor = (type: ToastType, theme: any): string => {
   const colors = {
     success: theme.colors.feedback.success,
@@ -35,7 +28,7 @@ const ToastContainer = styled.div<{ type: ToastType }>`
   border-radius: 12px;
   box-shadow: 0px 7px 16px -4px rgba(25, 25, 48, 0.25);
   min-height: 44px;
-  padding: 12px 20px;
+  padding: ${(props) => props.theme.space.s} ${(props) => props.theme.space.m};
   width: auto;
   max-width: 328px;
   align-items: center;
@@ -43,21 +36,33 @@ const ToastContainer = styled.div<{ type: ToastType }>`
   margin-bottom: 80px;
 `;
 
-const ToastMessage = styled.h1<{ type: ToastType }>`
+const ToastMessage = styled.p<{ type: ToastType; addMarginRight: boolean }>`
   ${({ theme }) => theme.typography.body_medium_m};
   color: ${(props) => getTextColor(props.type, props.theme)};
-  margin-left: ${(props) => props.theme.space.s};
-  margin-right: ${(props) => props.theme.space.l};
 `;
 
-const ToastDismissButton = styled.h1<{ type: ToastType }>`
+const ToastDismissButton = styled.div<{ type: ToastType }>`
+  display: flex;
   ${({ theme }) => theme.typography.body_medium_m};
   color: ${(props) => getTextColor(props.type, props.theme)};
   background: transparent;
   cursor: pointer;
+  margin-right: ${(props) => props.theme.space.s};
 `;
 
-function SnackBar({ text, type, dismissToast, action }: ToastProps) {
+const ToastActionButton = styled(ToastDismissButton)`
+  margin-left: ${(props) => props.theme.space.l};
+  margin-right: 0;
+`;
+
+type Props = {
+  text: string;
+  type: ToastType;
+  dismissToast?: () => void;
+  action?: { text: string; onClick: () => void };
+};
+
+function SnackBar({ text, type, dismissToast, action }: Props) {
   return (
     <ToastContainer type={type}>
       {type !== 'neutral' && dismissToast && (
@@ -67,12 +72,14 @@ function SnackBar({ text, type, dismissToast, action }: ToastProps) {
         </ToastDismissButton>
       )}
 
-      <ToastMessage type={type}>{text}</ToastMessage>
+      <ToastMessage type={type} addMarginRight={Boolean(action)}>
+        {text}
+      </ToastMessage>
 
       {action?.text && (
-        <ToastDismissButton onClick={action?.onClick} type={type}>
+        <ToastActionButton onClick={action?.onClick} type={type}>
           {action?.text}
-        </ToastDismissButton>
+        </ToastActionButton>
       )}
     </ToastContainer>
   );
