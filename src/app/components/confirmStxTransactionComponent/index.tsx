@@ -19,7 +19,6 @@ import {
   getNonce,
   getStxFiatEquivalent,
   microstacksToStx,
-  nextBestNonce,
   signLedgerStxTransaction,
   signMultiStxTransactions,
   signTransaction,
