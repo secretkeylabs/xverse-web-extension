@@ -220,7 +220,7 @@ function MessageSigning({
           <InfoContainer bodyText={t('SIGNATURE_REQUEST.SIGNING_WARNING')} type="Info" />
         </MainContainer>
       </ConfirmScreen>
-      <Sheet title="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
+      <Sheet visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
         {currentStepIndex === 0 && (
           <LedgerConnectionView
             title={t('SIGNATURE_REQUEST.LEDGER.CONNECT.TITLE')}
