@@ -231,15 +231,13 @@ export default function ListRuneScreen() {
     dispatch({ type: 'UPDATE_ONE_LIST_ITEM', key, payload: updatedSelectedListItem });
     if (
       Object.values(listItemsMap).filter((listItem) => listItem.selected).length ===
-        listItemsResponse?.length ??
-      0
+      listItemsResponse?.length
     ) {
       dispatch({ type: 'SET_SELECT_ALL_TOGGLE', payload: true });
     }
     if (
       Object.values(listItemsMap).filter((listItem) => !listItem.selected).length ===
-        listItemsResponse?.length ??
-      0
+      listItemsResponse?.length
     ) {
       dispatch({ type: 'SET_SELECT_ALL_TOGGLE', payload: false });
     }
