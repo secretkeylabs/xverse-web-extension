@@ -59,7 +59,8 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel }: BatchPsbtSigningProps) 
   const [isSigningComplete, setIsSigningComplete] = useState(false);
   const [signingPsbtIndex, setSigningPsbtIndex] = useState(1);
   const [currentPsbtIndex, setCurrentPsbtIndex] = useState(0);
-  const [reviewTransaction, setReviewTransaction] = useState(false);
+  const singlePsbt = psbts.length === 1;
+  const [reviewTransaction, setReviewTransaction] = useState(singlePsbt);
   const [isLoading, setIsLoading] = useState(true);
   const txnContext = useTransactionContext();
   useTrackMixPanelPageViewed();
@@ -256,13 +257,36 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel }: BatchPsbtSigningProps) 
     );
   };
 
-  const reviewDoneText = hasDuplicateInputs ? t('CONFIRM_ALL') : t('DONE');
-  const onReviewDone = hasDuplicateInputs
-    ? onSignPsbtConfirmed
-    : () => {
-        setReviewTransaction(false);
-        setCurrentPsbtIndex(0);
-      };
+  const modalOnClose =
+    singlePsbt || hasDuplicateInputs
+      ? onCancel
+      : () => {
+          setReviewTransaction(false);
+          setCurrentPsbtIndex(0);
+        };
+
+  const reviewTitle = singlePsbt
+    ? t('SIGN_TRANSACTION')
+    : `${t('TRANSACTION')} ${currentPsbtIndex + 1}/${parsedPsbts.length}`;
+  const reviewBackText = singlePsbt ? t('CANCEL') : t('PREVIOUS');
+  const reviewBackIcon = singlePsbt ? null : <ArrowLeft color="white" size={16} weight="bold" />;
+  const reviewBackDisabled = singlePsbt ? false : currentPsbtIndex === 0;
+  const onReviewBackClick = singlePsbt
+    ? onCancel
+    : () => setCurrentPsbtIndex((prevIndex) => prevIndex - 1);
+
+  const reviewDoneText = hasDuplicateInputs
+    ? t('CONFIRM_ALL')
+    : singlePsbt
+    ? t('CONFIRM')
+    : t('DONE');
+  const onReviewDone =
+    hasDuplicateInputs || singlePsbt
+      ? onSignPsbtConfirmed
+      : () => {
+          setReviewTransaction(false);
+          setCurrentPsbtIndex(0);
+        };
 
   return (
     <>
@@ -271,16 +295,11 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel }: BatchPsbtSigningProps) 
       <StyledSheet
         header=""
         visible={reviewTransaction || hasDuplicateInputs}
-        onClose={() => {
-          setReviewTransaction(false);
-          setCurrentPsbtIndex(0);
-        }}
+        onClose={modalOnClose}
       >
         <OuterContainer>
           <ModalContainer>
-            <ReviewTransactionText>
-              {t('TRANSACTION')} {currentPsbtIndex + 1}/{parsedPsbts.length}
-            </ReviewTransactionText>
+            <ReviewTransactionText>{reviewTitle}</ReviewTransactionText>
             {!!parsedPsbts[currentPsbtIndex] && (
               <TxSummaryContext.Provider value={individualTxSummaryContext}>
                 <TransactionSummary />
@@ -290,13 +309,11 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel }: BatchPsbtSigningProps) 
         </OuterContainer>
         <TxReviewModalControls>
           <Button
-            title={t('PREVIOUS')}
+            title={reviewBackText}
             variant="secondary"
-            onClick={() => {
-              setCurrentPsbtIndex((prevIndex) => prevIndex - 1);
-            }}
-            icon={<ArrowLeft color="white" size={16} weight="bold" />}
-            disabled={currentPsbtIndex === 0}
+            onClick={onReviewBackClick}
+            icon={reviewBackIcon}
+            disabled={reviewBackDisabled}
           />
           {currentPsbtIndex < parsedPsbts.length - 1 && (
             <Button

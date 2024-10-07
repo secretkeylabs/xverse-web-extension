@@ -349,6 +349,7 @@
     "BUNDLE_PLUS_FEES": "Bundle size + fees",
     "REVIEW_TRANSACTION": "Review transaction",
     "SIGN_TRANSACTIONS": "Sign {{count}} transactions",
+    "SIGN_TRANSACTION": "Sign transaction",
     "AMOUNT": "Amount",
     "INSUFFICIENT_BALANCE": "Insufficient balance",
     "YOUR_ADDRESS": "My address",
