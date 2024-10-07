@@ -1,5 +1,5 @@
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
@@ -66,7 +66,7 @@ function AmountSelector({
 
   const { fiatCurrency } = useWalletSelector();
   const { data: btcBalance, isLoading: btcBalanceLoading } = useBtcWalletData();
-  const { btcFiatRate } = useCoinRates();
+  const { btcFiatRate } = useSupportedCoinRates();
 
   const { data: recommendedFees } = useBtcFeeRate();
 

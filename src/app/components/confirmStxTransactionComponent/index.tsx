@@ -5,8 +5,8 @@ import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import TransactionSettingAlert from '@components/transactionSetting';
-import useCoinRates from '@hooks/queries/useCoinRates';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useNetworkSelector from '@hooks/useNetwork';
 import useSeedVault from '@hooks/useSeedVault';
 import useSelectedAccount from '@hooks/useSelectedAccount';
@@ -96,7 +96,7 @@ function ConfirmStxTransactionComponent({
     keyPrefix: 'TRANSACTION_SETTING',
   });
   const selectedNetwork = useNetworkSelector();
-  const { stxBtcRate, btcFiatRate } = useCoinRates();
+  const { stxBtcRate, btcFiatRate } = useSupportedCoinRates();
   const { data: stxData } = useStxWalletData();
   const { getSeed } = useSeedVault();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
@@ -397,7 +397,6 @@ function ConfirmStxTransactionComponent({
         <TransactionSettingAlert
           visible={openTransactionSettingModal}
           fee={microstacksToStx(getFee()).toString()}
-          type="STX"
           nonce={getTxNonce()}
           onApplyClick={applyTxSettings}
           onCrossClick={closeTransactionSettingAlert}

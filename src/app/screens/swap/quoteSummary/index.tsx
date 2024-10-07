@@ -2,7 +2,7 @@ import SlippageEditIcon from '@assets/img/swap/slippageEdit.svg';
 import TopRow from '@components/topRow';
 import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery';
 import useGetSip10TokenInfo from '@hooks/queries/stx/useGetSip10TokenInfo';
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useSearchParamsState from '@hooks/useSearchParamsState';
 import useSelectedAccount from '@hooks/useSelectedAccount';
@@ -186,7 +186,7 @@ export default function QuoteSummary({
   });
 
   const theme = useTheme();
-  const { btcFiatRate, btcUsdRate, stxBtcRate } = useCoinRates();
+  const { btcFiatRate, btcUsdRate, stxBtcRate } = useSupportedCoinRates();
   const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey, stxAddress, stxPublicKey } =
     useSelectedAccount();
 

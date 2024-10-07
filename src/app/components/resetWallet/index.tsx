@@ -31,6 +31,7 @@ function ResetWalletPrompt({
   openResetWalletScreen,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
+
   return (
     <Sheet
       visible={showResetWalletPrompt}

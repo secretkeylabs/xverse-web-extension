@@ -29,7 +29,7 @@ import ForgotPassword from '@screens/forgotPassword';
 import Home from '@screens/home';
 import Landing from '@screens/landing';
 import LedgerAddStxAddress from '@screens/ledger/addStxAddress';
-import ConfirmLedgerTransaction from '@screens/ledger/confirmLedgerTransaction';
+import ConfirmLedgerStxTransaction from '@screens/ledger/confirmLedgerStxTransaction';
 import ImportLedger from '@screens/ledger/importLedgerAccount';
 import VerifyLedger from '@screens/ledger/verifyLedgerAccountAddress';
 import Legal from '@screens/legal';
@@ -181,8 +181,8 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'confirm-ledger-tx',
-        element: <ConfirmLedgerTransaction />,
+        path: 'confirm-ledger-stx-tx',
+        element: <ConfirmLedgerStxTransaction />,
       },
       {
         path: 'backup',

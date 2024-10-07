@@ -64,9 +64,11 @@ function SignPsbtRequest() {
   }, [parsedPsbt]);
 
   const onConfirm = async (ledgerTransport?: Transport) => {
+    if (!parsedPsbt) return;
+
     setIsSigning(true);
     try {
-      const signedPsbt = await parsedPsbt?.getSignedPsbtBase64({
+      const signedPsbt = await parsedPsbt.getSignedPsbtBase64({
         finalize: payload.broadcast,
         ledgerTransport,
       });

@@ -90,7 +90,6 @@ const useWalletReducer = () => {
     selectedAccountType,
     accountsList: accounts,
     savedNames,
-    accountsList: softwareAccountsList,
     ledgerAccountsList,
     showDataCollectionAlert,
     hideStx,
@@ -122,7 +121,7 @@ const useWalletReducer = () => {
         savedNames[network.type],
       );
 
-      const selectedAccount = softwareAccountsList.find((account) => account.id === selectedIndex);
+      const selectedAccount = accounts.find((account) => account.id === selectedIndex);
 
       if (!selectedAccount) {
         // if the selected account index does not exist, we cannot update it
@@ -135,7 +134,7 @@ const useWalletReducer = () => {
       );
 
       if (!accountsMatch) {
-        const newAccountsList = softwareAccountsList.map((account) =>
+        const newAccountsList = accounts.map((account) =>
           account.id === selectedIndex ? recreatedAccount : account,
         );
 
@@ -149,7 +148,7 @@ const useWalletReducer = () => {
       selectedAccountIndex,
       selectedAccountType,
       selectedNetwork,
-      softwareAccountsList,
+      accounts,
       savedNames,
     ],
   );
@@ -213,21 +212,18 @@ const useWalletReducer = () => {
   };
 
   const loadAccountNames = () => {
-    const updatedSavedNames = softwareAccountsList.reduce<{ id: number; name: string }[]>(
-      (acc, account) => {
-        if (account.accountName) {
-          acc.push({ id: account.id, name: account.accountName });
-        }
-        return acc;
-      },
-      [],
-    );
+    const updatedSavedNames = accounts.reduce<{ id: number; name: string }[]>((acc, account) => {
+      if (account.accountName) {
+        acc.push({ id: account.id, name: account.accountName });
+      }
+      return acc;
+    }, []);
     dispatch(updateSavedNamesAction(network.type, updatedSavedNames));
   };
 
   const loadWallet = async () => {
     const seedPhrase = await seedVault.getSeed();
-    const currentAccounts = softwareAccountsList || [];
+    const currentAccounts = accounts || [];
 
     if (currentAccounts.length === 0) {
       // This will happen on first load after the wallet is created. We create the accounts here to ensure
@@ -248,10 +244,7 @@ const useWalletReducer = () => {
 
     await ensureSelectedAccountValid();
 
-    if (
-      !savedNames[network.type]?.length &&
-      softwareAccountsList.some((account) => !!account.accountName)
-    ) {
+    if (!savedNames[network.type]?.length && accounts.some((account) => !!account.accountName)) {
       // there was no savedNames store object initially
       // this is a migration to add the savedNames if there are custom account names that are not saved
       // it should only fire once if ever
@@ -355,12 +348,7 @@ const useWalletReducer = () => {
 
   const createAccount = async () => {
     const seedPhrase = await seedVault.getSeed();
-    const newAccounts = await createWalletAccount(
-      seedPhrase,
-      network,
-      selectedNetwork,
-      softwareAccountsList,
-    );
+    const newAccounts = await createWalletAccount(seedPhrase, network, selectedNetwork, accounts);
     dispatch(updateSoftwareAccountsAction(newAccounts));
   };
 
@@ -399,7 +387,7 @@ const useWalletReducer = () => {
   const changeNetwork = async (changedNetwork: SettingsNetwork) => {
     // Save current custom account names
     const currentNetworkType = network.type;
-    const customAccountNames = softwareAccountsList.map((account) => ({
+    const customAccountNames = accounts.map((account) => ({
       id: account.id,
       name: account.accountName,
     }));
@@ -432,7 +420,7 @@ const useWalletReducer = () => {
     const nextAccounts: Account[] = [];
 
     // we recreate the same number of accounts on the new network
-    for (let i = 0; i < softwareAccountsList.length; i++) {
+    for (let i = 0; i < accounts.length; i++) {
       const account = await createSingleAccount(
         seedPhrase,
         i,
@@ -475,7 +463,7 @@ const useWalletReducer = () => {
     if (updatedAccount.accountType !== 'software') {
       throw new Error('Expected software account. Renaming cancelled.');
     }
-    const newAccountsList = softwareAccountsList.map((account) =>
+    const newAccountsList = accounts.map((account) =>
       account.id === updatedAccount.id ? updatedAccount : account,
     );
 

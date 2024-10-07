@@ -1,6 +1,6 @@
 import AmountWithInscriptionSatribute from '@components/confirmBtcTransaction/itemRow/amountWithInscriptionSatribute';
 import FiatAmountText from '@components/fiatAmountText';
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   btcTransaction,
@@ -71,7 +71,7 @@ function TransferFeeView({
   const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
 
   const { fiatCurrency } = useWalletSelector();
-  const { btcFiatRate, stxBtcRate } = useCoinRates();
+  const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
 
   return (
     <Container>

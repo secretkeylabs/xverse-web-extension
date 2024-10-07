@@ -1,4 +1,4 @@
-import type { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
+import type { ConfirmStxTransactionState } from '@common/types/ledger';
 import ConfirmStxTransactionComponent from '@components/confirmStxTransactionComponent';
 import TransferMemoView from '@components/confirmStxTransactionComponent/transferMemoView';
 import RecipientComponent from '@components/recipientComponent';
@@ -82,15 +82,13 @@ function ConfirmFtTransaction() {
 
   const handleOnConfirmClick = (txs: StacksTransaction[]) => {
     if (isLedgerAccount(selectedAccount)) {
-      const type: LedgerTransactionType = 'STX';
       const state: ConfirmStxTransactionState = {
         unsignedTx: Buffer.from(unsignedTx.serialize()),
-        type,
         recipients: [{ address: recipientAddress, amountMicrostacks: new BigNumber(amount) }],
         fee: new BigNumber(unsignedTx.auth.spendingCondition.fee.toString()),
       };
 
-      navigate('/confirm-ledger-tx', { state });
+      navigate('/confirm-ledger-stx-tx', { state });
       return;
     }
 

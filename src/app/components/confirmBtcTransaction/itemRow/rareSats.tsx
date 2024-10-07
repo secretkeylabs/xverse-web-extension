@@ -121,7 +121,6 @@ function RareSats({
                   types: inscriptionSatributes,
                   amount: 0,
                   fromAddress: '',
-                  offset: -1,
                 }}
               />
             </Range>
@@ -144,7 +143,6 @@ function RareSats({
                     types: ['COMMON'],
                     amount: bundleSize - totalExoticSats,
                     fromAddress: '',
-                    offset: -1,
                   }}
                 />
               </Range>

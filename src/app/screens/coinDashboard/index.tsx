@@ -50,7 +50,7 @@ const SecondaryContainer = styled.div((props) => ({
   flexDirection: 'column',
   paddingLeft: props.theme.space.m,
   paddingRight: props.theme.space.m,
-  marginTop: props.theme.space.xl,
+  marginTop: props.theme.space.l,
   marginBottom: props.theme.space.xl,
   h1: {
     ...props.theme.typography.body_medium_m,
@@ -295,6 +295,7 @@ export default function CoinDashboard() {
             brc20Token={protocol === 'brc-20' ? selectedFt?.principal || null : null}
             runeToken={protocol === 'runes' ? selectedFt?.name || null : null}
             runeSymbol={protocol === 'runes' ? selectedFt?.runeSymbol || null : null}
+            withTitle={!displayTabs}
           />
         )}
         {showStxContract && (
