@@ -1,8 +1,7 @@
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  compileAggregatedSummary,
-  compileUserTransactionSummary,
+  compileViewSummary,
   parseSummaryForRunes,
   type AggregatedSummary,
   type BaseSummary,
@@ -67,10 +66,7 @@ function ConfirmBatchBtcTransactions({ summaries }: Props) {
       };
 
       setAggregatedParsedTxSummaryContext({
-        extractedTxSummary:
-          base.isFinal && !base.hasExternalInputs
-            ? compileUserTransactionSummary(txnContext, summary, runeSummary, base)
-            : compileAggregatedSummary(txnContext, summary, runeSummary, base),
+        extractedTxSummary: compileViewSummary(txnContext, summary, runeSummary, base),
         batchMintDetails: summaries.map((psbt) => psbt.extractedSummary.runes.mint).flat(),
       });
     })();

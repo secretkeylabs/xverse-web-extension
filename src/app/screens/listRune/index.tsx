@@ -287,7 +287,7 @@ export default function ListRuneScreen() {
         ),
       });
     }
-  }, [listItemsResponse, runeFloorPrice, location.state, selectedRune]);
+  }, [listItemsResponse.length, runeFloorPrice, location.state, selectedRune?.decimals]);
 
   useEffect(() => {
     if (signPsbtPayload) {
