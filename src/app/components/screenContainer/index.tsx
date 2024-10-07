@@ -13,7 +13,7 @@ const RouteContainer = styled.div`
   width: 360px;
   margin: auto;
   background-color: ${(props) => props.theme.colors.elevation0};
-  border: 1px solid rgba(126, 137, 171, 0.2);
+  border: 1px solid ${(props) => props.theme.colors.elevation2};
   box-shadow: 0px 8px 28px rgba(0, 0, 0, 0.35);
 
   // set some basic responsive properties here for when we load routes
@@ -23,6 +23,7 @@ const RouteContainer = styled.div`
     min-height: 600px;
     max-height: unset;
     height: auto;
+    border-radius: ${(props) => props.theme.radius(2)}px;
   }
 `;
 

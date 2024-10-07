@@ -106,10 +106,10 @@
     "LEARN_MORE": "Learn More",
     "LEDGER_BEFORE_GETTING_STARTED": {
       "TITLE": "Before getting started",
-      "DESCRIPTION": "Do you use Ledger Live with the hardware wallet device you wish to connect?",
+      "DESCRIPTION": "Please select one of the following options to continue.",
       "OPTIONS": {
-        "USE_LEDGER_LIVE": "I use Ledger Live with the device.",
-        "DONT_USE_LEDGER_LIVE": "I do not use Ledger Live with the device."
+        "USE_LEDGER_LIVE": "I am using Ledger Live with this device.",
+        "DONT_USE_LEDGER_LIVE": "I am not using Ledger Live with this device."
       },
       "IMPORTANT_WARNING": {
         "TITLE": "Important - Please read",
