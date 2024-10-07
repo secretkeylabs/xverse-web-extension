@@ -169,7 +169,7 @@ function ConfirmBtcTransaction({
             </StickyHorizontalSplitButtonContainer>
           )}
         </SendLayout>
-        <Sheet title="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
+        <Sheet visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
           {isModalVisible && <LedgerSteps onConfirm={onConfirm} onCancel={onCancel} />}
         </Sheet>
       </TxSummaryContext.Provider>

@@ -25,7 +25,7 @@ type Props = {
   txnSignIndex?: number;
 };
 
-function ConfirmBtcTransaction({ onConfirm, onCancel, txnToSignCount, txnSignIndex }: Props) {
+function LedgerSteps({ onConfirm, onCancel, txnToSignCount, txnSignIndex }: Props) {
   const [currentStep, setCurrentStep] = useState(Steps.ConnectLedger);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isConnectSuccess, setIsConnectSuccess] = useState(false);
@@ -118,4 +118,4 @@ function ConfirmBtcTransaction({ onConfirm, onCancel, txnToSignCount, txnSignInd
   );
 }
 
-export default ConfirmBtcTransaction;
+export default LedgerSteps;

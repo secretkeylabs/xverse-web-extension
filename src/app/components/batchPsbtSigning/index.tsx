@@ -292,7 +292,7 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: BatchPs
   };
 
   const renderSigning = () => {
-    if (!renderSign) return null;
+    if (!renderSign || (!isSigningComplete && isLedgerModalVisible)) return null;
 
     const signingStatus: ConfirmationStatus = isSigningComplete ? 'SUCCESS' : 'LOADING';
     return (
@@ -326,7 +326,7 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: BatchPs
     <>
       {renderPreSign()}
       {renderSigning()}
-      <Sheet title="" visible={isLedgerModalVisible} onClose={() => setIsLedgerModalVisible(false)}>
+      <Sheet visible={isLedgerModalVisible} onClose={() => setIsLedgerModalVisible(false)}>
         {isLedgerModalVisible && (
           <LedgerSteps
             onConfirm={onSignPsbtConfirmed}

@@ -44,7 +44,7 @@ const BodyContainer = styled.div`
 `;
 
 type Props = {
-  title: string;
+  title?: string;
   visible: boolean;
   children: React.ReactNode;
   onClose?: () => void;

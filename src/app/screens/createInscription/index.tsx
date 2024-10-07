@@ -481,7 +481,6 @@ function CreateInscription() {
             />
           )}
           <Sheet
-            title=""
             visible={isLedgerConnectVisible}
             onClose={isConnectSuccess ? undefined : handleLedgerConnectCancel}
           >
