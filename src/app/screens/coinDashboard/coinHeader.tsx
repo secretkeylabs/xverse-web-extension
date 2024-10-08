@@ -58,7 +58,7 @@ type Props = {
 
 export default function CoinHeader({ currency, fungibleToken }: Props) {
   const selectedAccount = useSelectedAccount();
-  const { fiatCurrency, network, selectedAccountType } = useWalletSelector();
+  const { fiatCurrency, network } = useWalletSelector();
   const { data: btcBalance } = useBtcWalletData();
   const { data: stxData } = useStxWalletData();
   const { btcFiatRate, stxBtcRate } = useCoinRates();
@@ -70,9 +70,7 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
   const showRunesListing =
     (useHasFeature(FeatureId.RUNES_LISTING) || process.env.NODE_ENV === 'development') &&
     network.type === 'Mainnet' &&
-    fungibleToken?.protocol === 'runes' &&
-    // TODO: remove this once we implement ledger batch PSBT signing flow
-    selectedAccountType !== 'ledger';
+    fungibleToken?.protocol === 'runes';
 
   const handleReceiveModalOpen = () => {
     setOpenReceiveModal(true);
