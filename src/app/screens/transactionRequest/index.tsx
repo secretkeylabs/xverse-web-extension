@@ -7,7 +7,6 @@ import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  buf2hex,
   createDeployContractRequest,
   extractFromPayload,
   fetchStxPendingTxData,
@@ -91,7 +90,7 @@ function TransactionRequest() {
 
     navigate(RoutePaths.ConfirmStacksTransaction, {
       state: {
-        unsignedTx: buf2hex(unsignedSendStxTx.serialize()),
+        unsignedTx: Buffer.from(unsignedSendStxTx.serialize()).toString('hex'),
         sponsored: tokenTransferPayload.sponsored,
         isBrowserTx: !dataStxSignTransactionOverride,
         tabId,
@@ -167,7 +166,6 @@ function TransactionRequest() {
     } else if (payload.txType === 'smart_contract') {
       await handleContractDeployRequest(payload, requestAccount);
     } else {
-      console.log(payload);
       navigate(RoutePaths.ConfirmStacksTransaction, {
         state: {
           unsignedTx: payload.txHex,

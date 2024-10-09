@@ -82,7 +82,18 @@ function RuneListingBatchSigning() {
     navigate('/');
   };
 
-  return <BatchPsbtSigning psbts={psbts} onSigned={onSigned} onCancel={onCancel} />;
+  const onDone = () => {
+    navigate('/');
+  };
+
+  return (
+    <BatchPsbtSigning
+      psbts={psbts}
+      onSigned={onSigned}
+      onCancel={onCancel}
+      onPostSignDone={onDone}
+    />
+  );
 }
 
 export default RuneListingBatchSigning;

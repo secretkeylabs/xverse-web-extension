@@ -43,6 +43,10 @@ function SignBatchPsbtRequest() {
     window.close();
   };
 
+  const onDone = () => {
+    window.close();
+  };
+
   useEffect(() => {
     if (payload.network.type !== network.type) {
       navigate('/tx-status', {
@@ -78,7 +82,14 @@ function SignBatchPsbtRequest() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Only run this once on load
   }, []);
 
-  return <BatchPsbtSigning psbts={payload.psbts} onSigned={onSigned} onCancel={onCancel} />;
+  return (
+    <BatchPsbtSigning
+      psbts={payload.psbts}
+      onSigned={onSigned}
+      onCancel={onCancel}
+      onPostSignDone={onDone}
+    />
+  );
 }
 
 export default SignBatchPsbtRequest;
