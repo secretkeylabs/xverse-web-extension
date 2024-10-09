@@ -443,8 +443,7 @@
       "CLOSE_BUTTON": "Close",
       "CANCEL_BUTTON": "Cancel",
       "SEE_TRANSACTION_BUTTON": "See transaction",
-      "RETRY_BUTTON": "Try again",
-      "BATCH_NOT_SUPPORTED": "External transaction requests are not yet supported on a Ledger account. Switch to a different account to sign transactions from the application."
+      "RETRY_BUTTON": "Try again"
     },
     "INSCRIBE": {
       "TITLE": "You will inscribe",
@@ -1145,7 +1144,8 @@
         "ERROR_SUBTITLE_DEVICE_LOCKED": "Your Ledger device is locked. Please unlock it to continue."
       },
       "CONFIRM": {
-        "TITLE": "Confirm the signature",
+        "TITLE": "Confirm the transaction",
+        "TITLE_WITH_COUNT": "Confirm the transaction ({{current}} of {{total}})",
         "SUBTITLE": "Authorise the signature on your device to continue.",
         "ERROR_TITLE": "Error requesting signature",
         "ERROR_SUBTITLE": "The signature request encountered an error. Please check that your Ledger Bitcoin app is version 2.1.3 or newer.",

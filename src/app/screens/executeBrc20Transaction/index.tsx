@@ -165,7 +165,7 @@ function ExecuteBrc20Transaction() {
           loadingPercentage={loadingPercentageAwareOfStatus}
         />
       )}
-      <Sheet title="" visible={isLedgerModalVisible} onClose={handleClickClose}>
+      <Sheet visible={isLedgerModalVisible} onClose={handleClickClose}>
         <LedgerStepView
           currentStep={progress}
           isConnectSuccess={isConnectSuccess}

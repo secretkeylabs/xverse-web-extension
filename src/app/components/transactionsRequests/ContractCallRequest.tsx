@@ -19,7 +19,6 @@ import useExecuteOrder from '@screens/swap/components/psbtConfirmation/useExecut
 import {
   addressToString,
   broadcastSignedTransaction,
-  buf2hex,
   extractFromPayload,
   isMultiSig,
   microstacksToStx,
@@ -111,7 +110,9 @@ export default function ContractCallRequest({
   const selectedNetwork = useNetworkSelector();
   const [hasTabClosed, setHasTabClosed] = useState(false);
   const { t } = useTranslation('translation');
-  const [fee, setFee] = useState<BigNumber | undefined>(undefined);
+  const [fee, setFee] = useState<BigNumber | undefined>(
+    new BigNumber(unsignedTx.auth.spendingCondition.fee.toString()),
+  );
   const { executeStxOrder } = useExecuteOrder();
   const [isLoading, setIsLoading] = useState(false);
   const isStxSwap = messageId === 'velar' || messageId === 'alex';
@@ -213,7 +214,7 @@ export default function ContractCallRequest({
             sendSignTransactionSuccessResponseMessage({
               tabId,
               messageId,
-              result: { transaction: buf2hex(tx[0].serialize()) },
+              result: { transaction: Buffer.from(tx[0].serialize()).toString('hex') },
             });
             break;
           }
@@ -222,7 +223,7 @@ export default function ContractCallRequest({
               tabId,
               messageId,
               result: {
-                transaction: buf2hex(tx[0].serialize()),
+                transaction: Buffer.from(tx[0].serialize()).toString('hex'),
                 txid: txId,
               },
             });
@@ -237,7 +238,7 @@ export default function ContractCallRequest({
         finalizeTxSignature({
           requestPayload: requestToken,
           tabId,
-          data: { txId, txRaw: buf2hex(tx[0].serialize()) },
+          data: { txId, txRaw: Buffer.from(tx[0].serialize()).toString('hex') },
         });
       }
       navigate('/tx-status', {
@@ -271,7 +272,7 @@ export default function ContractCallRequest({
     if (isStxSwap) {
       const order: ExecuteStxOrderRequest = {
         providerCode: messageId,
-        signedTransaction: buf2hex(transactions[0].serialize()),
+        signedTransaction: Buffer.from(transactions[0].serialize()).toString('hex'),
       };
       setIsLoading(true);
       const response = await executeStxOrder(order);
@@ -300,7 +301,7 @@ export default function ContractCallRequest({
             sendSignTransactionSuccessResponseMessage({
               tabId,
               messageId,
-              result: { transaction: buf2hex(unsignedTx.serialize()) },
+              result: { transaction: Buffer.from(unsignedTx.serialize()).toString('hex') },
             });
             break;
           }
@@ -322,7 +323,7 @@ export default function ContractCallRequest({
             sendSignTransactionSuccessResponseMessage({
               tabId,
               messageId,
-              result: { transaction: buf2hex(unsignedTx.serialize()) },
+              result: { transaction: Buffer.from(unsignedTx.serialize()).toString('hex') },
             });
             break;
           }
@@ -334,7 +335,7 @@ export default function ContractCallRequest({
         finalizeTxSignature({
           requestPayload: requestToken,
           tabId,
-          data: { txId: '', txRaw: buf2hex(unsignedTx.serialize()) },
+          data: { txId: '', txRaw: Buffer.from(unsignedTx.serialize()).toString('hex') },
         });
       }
       window.close();

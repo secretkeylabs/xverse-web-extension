@@ -25,6 +25,8 @@ type Props = {
   isTxRejected: boolean;
   t: TFunction<'translation', 'CONFIRM_TRANSACTION'>;
   signatureRequestTranslate: TFunction<'translation', 'SIGNATURE_REQUEST'>;
+  txnToSignCount?: number;
+  txnSignIndex?: number;
 };
 
 function LedgerStepView({
@@ -34,6 +36,8 @@ function LedgerStepView({
   isTxRejected,
   t,
   signatureRequestTranslate,
+  txnToSignCount,
+  txnSignIndex,
 }: Props) {
   switch (currentStep) {
     case Steps.ConnectLedger:
@@ -67,10 +71,17 @@ function LedgerStepView({
           </ConnectLedgerContainer>
         </div>
       );
-    case Steps.ConfirmTransaction:
+    case Steps.ConfirmTransaction: {
+      let title = signatureRequestTranslate('LEDGER.CONFIRM.TITLE');
+      if (txnToSignCount && txnSignIndex && txnToSignCount > 1) {
+        title = signatureRequestTranslate('LEDGER.CONFIRM.TITLE_WITH_COUNT', {
+          current: txnSignIndex,
+          total: txnToSignCount,
+        });
+      }
       return (
         <LedgerConnectionView
-          title={signatureRequestTranslate('LEDGER.CONFIRM.TITLE')}
+          title={title}
           text={signatureRequestTranslate('LEDGER.CONFIRM.SUBTITLE')}
           titleFailed={signatureRequestTranslate('LEDGER.CONFIRM.ERROR_TITLE')}
           textFailed={signatureRequestTranslate('LEDGER.CONFIRM.ERROR_SUBTITLE')}
@@ -79,6 +90,7 @@ function LedgerStepView({
           isConnectFailed={isTxRejected}
         />
       );
+    }
     default:
       return null;
   }
