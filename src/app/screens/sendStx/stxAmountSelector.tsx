@@ -1,7 +1,7 @@
 import FiatAmountText from '@components/fiatAmountText';
 import { microStxToStx } from '@components/postCondition/postConditionView/helper';
-import useCoinRates from '@hooks/queries/useCoinRates';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowsDownUp } from '@phosphor-icons/react';
 import {
@@ -70,7 +70,7 @@ function StxAmountSelector({ amount, setAmount, sendMax, setSendMax, disabled = 
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { fiatCurrency } = useWalletSelector();
   const { data: stxData } = useStxWalletData();
-  const { btcFiatRate, stxBtcRate } = useCoinRates();
+  const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const stxBalanceStr = stxData?.availableBalance.toString() ?? '0';
 
   const [amountDisplay, setAmountDisplay] = useState(

@@ -19,6 +19,7 @@ import useRbfTransactionData, {
 } from '@hooks/useRbfTransactionData';
 import useSeedVault from '@hooks/useSeedVault';
 import useSelectedAccount from '@hooks/useSelectedAccount';
+import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { CarProfile, Lightning, RocketLaunch, ShootingStar } from '@phosphor-icons/react';
@@ -77,6 +78,7 @@ function SpeedUpTransactionScreen() {
   const selectedStacksNetwork = useNetworkSelector();
   const isBtc = isBtcTransaction(stxTransaction || btcTransaction);
   const [isBroadcasting, setIsBroadcasting] = useState(false);
+  const transactionContext = useTransactionContext();
 
   const handleClickFeeButton = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (e.currentTarget.value === 'custom') {
@@ -218,7 +220,7 @@ function SpeedUpTransactionScreen() {
       const signedTx = await rbfTransaction.getReplacementTransaction({
         feeRate: Number(feeRateInput),
         ledgerTransport: transport,
-        getSeedPhrase: getSeed,
+        context: transactionContext,
       });
 
       await btcClient.sendRawTransaction(signedTx.hex);

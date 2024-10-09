@@ -5,7 +5,7 @@ import useRuneFloorPricePerMarketplaceQuery from '@hooks/queries/runes/useRuneFl
 import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
 import useRuneSellPsbtPerMarketplace from '@hooks/queries/runes/useRuneSellPsbtPerMarketplace';
 import useRuneUtxosQueryPerMarketplace from '@hooks/queries/runes/useRuneUtxosQueryPerMarketplace';
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useHasFeature from '@hooks/useHasFeature';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
@@ -74,7 +74,7 @@ export default function ListRuneScreen() {
   const { visible: runesCoinsList } = useVisibleRuneFungibleTokens(false);
   const selectedRune = runesCoinsList.find((ft) => ft.principal === runeId);
   const { fiatCurrency } = useWalletSelector();
-  const { btcFiatRate } = useCoinRates();
+  const { btcFiatRate } = useSupportedCoinRates();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const locationFrom = params.get('from');
@@ -231,15 +231,13 @@ export default function ListRuneScreen() {
     dispatch({ type: 'UPDATE_ONE_LIST_ITEM', key, payload: updatedSelectedListItem });
     if (
       Object.values(listItemsMap).filter((listItem) => listItem.selected).length ===
-        listItemsResponse?.length ??
-      0
+      listItemsResponse?.length
     ) {
       dispatch({ type: 'SET_SELECT_ALL_TOGGLE', payload: true });
     }
     if (
       Object.values(listItemsMap).filter((listItem) => !listItem.selected).length ===
-        listItemsResponse?.length ??
-      0
+      listItemsResponse?.length
     ) {
       dispatch({ type: 'SET_SELECT_ALL_TOGGLE', payload: false });
     }

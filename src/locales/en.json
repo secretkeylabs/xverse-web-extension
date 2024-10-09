@@ -106,10 +106,10 @@
     "LEARN_MORE": "Learn More",
     "LEDGER_BEFORE_GETTING_STARTED": {
       "TITLE": "Before getting started",
-      "DESCRIPTION": "Do you use Ledger Live with the hardware wallet device you wish to connect?",
+      "DESCRIPTION": "Please select one of the following options to continue.",
       "OPTIONS": {
-        "USE_LEDGER_LIVE": "I use Ledger Live with the device.",
-        "DONT_USE_LEDGER_LIVE": "I do not use Ledger Live with the device."
+        "USE_LEDGER_LIVE": "I am using Ledger Live with this device.",
+        "DONT_USE_LEDGER_LIVE": "I am not using Ledger Live with this device."
       },
       "IMPORTANT_WARNING": {
         "TITLE": "Important - Please read",
@@ -198,7 +198,8 @@
     "SEND_ORDINAL": "Send ordinal",
     "CONFIRM_FEES": "Confirm fees",
     "RETRY_BUTTON": "Try again",
-    "FEES": "Fees"
+    "FEES": "Fees",
+    "AMOUNT": "Amount"
   },
   "DASHBOARD_SCREEN": {
     "TOTAL_BALANCE": "total balance",
@@ -348,6 +349,7 @@
     "BUNDLE_PLUS_FEES": "Bundle size + fees",
     "REVIEW_TRANSACTION": "Review transaction",
     "SIGN_TRANSACTIONS": "Sign {{count}} transactions",
+    "SIGN_TRANSACTION": "Sign transaction",
     "AMOUNT": "Amount",
     "INSUFFICIENT_BALANCE": "Insufficient balance",
     "YOUR_ADDRESS": "My address",
@@ -1006,7 +1008,7 @@
     "SWAP": "Swap",
     "BUY": "Buy",
     "LIST": "List",
-    "TRANSACTION_HISTORY_TITLE": "Transaction history",
+    "TRANSACTION_HISTORY_TITLE": "Transactions",
     "TRANSACTIONS_LIST_EMPTY": "No transactions found.",
     "TRANSACTIONS_LIST_ERROR": "Error fetching transaction history for this token",
     "TRANSACTION_SENT": "Sent",

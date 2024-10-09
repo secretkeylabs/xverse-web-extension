@@ -1,5 +1,5 @@
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowsDownUp } from '@phosphor-icons/react';
 import {
@@ -57,7 +57,7 @@ function AmountSelector({
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { fiatCurrency } = useWalletSelector();
   const { data: btcBalanceSats } = useBtcWalletData();
-  const { btcFiatRate } = useCoinRates();
+  const { btcFiatRate } = useSupportedCoinRates();
 
   const [amountDisplay, setAmountDisplay] = useState(
     amountSats && satsToBtcString(new BigNumber(amountSats)),

@@ -65,7 +65,8 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: BatchPs
   const [isSigningComplete, setIsSigningComplete] = useState(false);
   const [signingPsbtIndex, setSigningPsbtIndex] = useState(1);
   const [currentPsbtIndex, setCurrentPsbtIndex] = useState(0);
-  const [reviewTransaction, setReviewTransaction] = useState(false);
+  const singlePsbt = psbts.length === 1;
+  const [reviewTransaction, setReviewTransaction] = useState(singlePsbt);
   const [isLoading, setIsLoading] = useState(true);
   const [parsedPsbts, setParsedPsbts] = useState<ParsedPsbt[]>([]);
   const [isLedgerModalVisible, setIsLedgerModalVisible] = useState(false);

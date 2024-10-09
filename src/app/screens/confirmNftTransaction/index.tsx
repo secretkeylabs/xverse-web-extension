@@ -1,5 +1,5 @@
 import AssetIcon from '@assets/img/transactions/Assets.svg';
-import type { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
+import type { ConfirmStxTransactionState } from '@common/types/ledger';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmStxTransactionComponent from '@components/confirmStxTransactionComponent';
 import RecipientComponent from '@components/recipientComponent';
@@ -146,10 +146,8 @@ function ConfirmNftTransaction() {
 
   const handleOnConfirmClick = (txs: StacksTransaction[]) => {
     if (isLedgerAccount(selectedAccount)) {
-      const type: LedgerTransactionType = 'STX';
       const state: ConfirmStxTransactionState = {
         unsignedTx: Buffer.from(unsignedTx.serialize()),
-        type,
         recipients: [
           {
             address: recipientAddress,
@@ -166,7 +164,7 @@ function ConfirmNftTransaction() {
         ),
       };
 
-      navigate('/confirm-ledger-tx', { state });
+      navigate('/confirm-ledger-stx-tx', { state });
       return;
     }
 

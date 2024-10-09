@@ -6,8 +6,8 @@ import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery'
 import useGetSip10TokenInfo from '@hooks/queries/stx/useGetSip10TokenInfo';
 import useGetQuotes from '@hooks/queries/swaps/useGetQuotes';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useCoinRates from '@hooks/queries/useCoinRates';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import type { DataStxSignTransaction } from '@screens/transactionRequest/useStxTransactionRequest';
@@ -130,7 +130,7 @@ export default function SwapScreen() {
   const { data: btcBalance } = useBtcWalletData();
   const { data: stxData } = useStxWalletData();
 
-  const { btcFiatRate, btcUsdRate, stxBtcRate } = useCoinRates();
+  const { btcFiatRate, btcUsdRate, stxBtcRate } = useSupportedCoinRates();
   const navigate = useNavigate();
   const { t } = useTranslation('translation');
   const location = useLocation();

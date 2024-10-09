@@ -3,7 +3,7 @@ import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useSeedVault from '@hooks/useSeedVault';
 import SeedCheck from '@screens/backupWalletSteps/seedCheck';
-import { Container, Title } from '@screens/settings/index.styles';
+import { Container } from '@screens/settings/index.styles';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -12,16 +12,10 @@ import styled from 'styled-components';
 const EnterPasswordContainer = styled.div((props) => ({
   width: '100%',
   height: '100%',
-  top: 0,
-  left: 0,
-  bottom: 0,
-  right: 0,
-  position: 'fixed',
   zIndex: 10,
   background: props.theme.colors.elevation0,
   backdropFilter: 'blur(16px)',
-  padding: 16,
-  paddingTop: props.theme.spacing(40),
+  paddingTop: props.theme.space.l,
 }));
 
 const SeedphraseContainer = styled.div((props) => ({
@@ -30,10 +24,10 @@ const SeedphraseContainer = styled.div((props) => ({
 
 function BackupWalletScreen() {
   const { t } = useTranslation('translation');
-  const [password, setPassword] = useState<string>('');
-  const [error, setError] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(false);
-  const [showSeed, setShowSeed] = useState<boolean>(false);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [showSeed, setShowSeed] = useState(false);
   const [seed, setSeed] = useState('');
   const navigate = useNavigate();
   const { getSeed, unlockVault } = useSeedVault();
@@ -49,7 +43,7 @@ function BackupWalletScreen() {
     };
   }, []);
 
-  const goBack = () => {
+  const handleBackButtonClick = () => {
     navigate(-1);
   };
 
@@ -69,9 +63,8 @@ function BackupWalletScreen() {
 
   return (
     <>
-      <TopRow onClick={goBack} />
+      <TopRow onClick={handleBackButtonClick} />
       <Container>
-        <Title>{t('SETTING_SCREEN.BACKUP_WALLET')}</Title>
         {!showSeed && (
           <EnterPasswordContainer>
             <PasswordInput
@@ -80,15 +73,16 @@ function BackupWalletScreen() {
               enteredPassword={password}
               setEnteredPassword={setPassword}
               handleContinue={handlePasswordNextClick}
-              handleBack={goBack}
+              handleBack={handleBackButtonClick}
               passwordError={error}
               stackButtonAlignment
               loading={loading}
+              autoFocus
             />
           </EnterPasswordContainer>
         )}
         <SeedphraseContainer>
-          {showSeed && <SeedCheck seedPhrase={seed} onContinue={goBack} />}
+          {showSeed && <SeedCheck seedPhrase={seed} onContinue={handleBackButtonClick} />}
         </SeedphraseContainer>
       </Container>
       <BottomBar tab="settings" />

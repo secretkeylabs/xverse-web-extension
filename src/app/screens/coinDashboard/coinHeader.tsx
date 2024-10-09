@@ -9,8 +9,8 @@ import ActionButton from '@components/button';
 import SmallActionButton from '@components/smallActionButton';
 import TokenImage from '@components/tokenImage';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useCoinRates from '@hooks/queries/useCoinRates';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useHasFeature from '@hooks/useHasFeature';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -61,7 +61,7 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
   const { fiatCurrency, network } = useWalletSelector();
   const { data: btcBalance } = useBtcWalletData();
   const { data: stxData } = useStxWalletData();
-  const { btcFiatRate, stxBtcRate } = useCoinRates();
+  const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
   const [openReceiveModal, setOpenReceiveModal] = useState(false);

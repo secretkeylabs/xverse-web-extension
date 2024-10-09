@@ -2,15 +2,18 @@ import CheckCircle from '@assets/img/listings/CheckCircle.svg';
 import XCircle from '@assets/img/listings/XCircle.svg';
 import TokenImage from '@components/tokenImage';
 import { ArrowUpRight } from '@phosphor-icons/react';
-import type { FungibleToken, ListingProvider, Marketplace } from '@secretkeylabs/xverse-core';
+import {
+  marketplaceRuneDashboardUrl,
+  type FungibleToken,
+  type ListingProvider,
+} from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
-import { MAGIC_EDEN_RUNES_URL, OKX_RUNES_URL, UNISAT_RUNES_URL } from '@utils/constants';
 import { formatNumber } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import theme from 'theme';
 
-const Container = styled.div<{ $successful: boolean }>`
+const Container = styled.div<{ $successful: boolean; $enabled: boolean }>`
   display: flex;
   align-items: center;
   flex-direction: row;
@@ -25,7 +28,7 @@ const Container = styled.div<{ $successful: boolean }>`
   transition: background-color 0.1s ease, border-color 0.1s ease;
   width: 100%;
   gap: 10px;
-  cursor: ${(props) => (props.$successful ? 'pointer' : 'auto')};
+  cursor: ${(props) => (props.$enabled ? 'pointer' : 'auto')};
 `;
 
 const RowCenter = styled.div({
@@ -56,19 +59,16 @@ function MarketplaceRuneListingResult({ minPriceSats, marketplace, rune, success
   const { t } = useTranslation('translation', { keyPrefix: 'LIST_RUNE_SCREEN' });
   const floorPrice = formatNumber(minPriceSats);
 
-  const marketplaceToUrl: { [key in Marketplace]: string } = {
-    'Magic Eden': `${MAGIC_EDEN_RUNES_URL}/${rune.name}`,
-    Unisat: `${UNISAT_RUNES_URL}/market?tick=${rune.name}`,
-    OKX: `${OKX_RUNES_URL}/token/${rune.name}/${rune.ticker}`,
-  };
+  const marketplaceUrl = marketplaceRuneDashboardUrl(rune, marketplace.name);
+  const enabled = successful && !!marketplaceUrl;
 
-  const handleClick = () =>
-    successful && window.open(marketplaceToUrl[marketplace.name], '_blank', 'noopener,noreferrer');
+  const handleClick = () => enabled && window.open(marketplaceUrl, '_blank', 'noopener,noreferrer');
 
   return (
     <Container
       data-testid="marketplace-listing-result"
       $successful={successful}
+      $enabled={enabled}
       onClick={handleClick}
     >
       <div style={{ marginRight: theme.space.s }}>
@@ -102,7 +102,7 @@ function MarketplaceRuneListingResult({ minPriceSats, marketplace, rune, success
           </SubtitleContainer>
         </RowCenter>
       </InfoContainer>
-      {successful && <ArrowUpRight size="16" color={theme.colors.white_0} />}
+      {enabled && <ArrowUpRight size="16" color={theme.colors.white_0} />}
     </Container>
   );
 }

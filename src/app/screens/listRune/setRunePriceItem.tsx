@@ -1,4 +1,4 @@
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { PencilSimple } from '@phosphor-icons/react';
 import FloorComparisonLabel from '@screens/listRune/floorComparisonLabel';
@@ -84,7 +84,7 @@ function SetRunePriceItem({
   handleShowCustomPriceModal,
 }: Props) {
   const { t } = useTranslation('translation');
-  const { btcFiatRate } = useCoinRates();
+  const { btcFiatRate } = useSupportedCoinRates();
   const { fiatCurrency } = useWalletSelector();
 
   return (

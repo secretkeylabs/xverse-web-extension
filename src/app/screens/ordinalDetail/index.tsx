@@ -526,7 +526,7 @@ function OrdinalDetailScreen() {
           <Button
             variant="tertiary"
             icon={<img src={ArrowLeft} alt="go back" />}
-            dataTestId="back-to-gallery"
+            data-testid="back-to-gallery"
             onClick={handleBackButtonClick}
             title={backButtonText}
           />
@@ -561,7 +561,7 @@ function OrdinalDetailScreen() {
           <Button
             variant="tertiary"
             icon={<img src={ArrowLeft} alt="go back" />}
-            dataTestId="back-button"
+            data-testid="back-button"
             onClick={handleBackButtonClick}
             title={backButtonText}
           />

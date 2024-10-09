@@ -12,11 +12,10 @@ const CardContainer = styled.button((props) => ({
   transition: 'background 0.1s ease, border 0.1s ease',
   textAlign: 'left',
   color: props.theme.colors.white_0,
-  background:
-    props.className === 'checked' ? props.theme.colors.background.selectBackground : 'transparent',
+  background: props.theme.colors.elevation1,
   borderRadius: props.theme.radius(2),
   border: `1px solid ${
-    props.className === 'checked' ? props.theme.colors.border.select : props.theme.colors.white_900
+    props.className === 'checked' ? '#7383ff4d' : props.theme.colors.elevation1
   }`,
   userSelect: 'none',
 }));

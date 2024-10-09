@@ -2,8 +2,8 @@ import { BetterBarLoader } from '@components/barLoader';
 import { StyledFiatAmountText } from '@components/fiatAmountText';
 import TokenImage from '@components/tokenImage';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useCoinRates from '@hooks/queries/useCoinRates';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getFiatEquivalent, type FungibleToken } from '@secretkeylabs/xverse-core';
 import type { CurrencyTypes } from '@utils/constants';
@@ -119,7 +119,7 @@ function TokenTile({
   hideBalance = false,
 }: Props) {
   const { fiatCurrency } = useWalletSelector();
-  const { btcFiatRate, stxBtcRate } = useCoinRates();
+  const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const { data: stxData } = useStxWalletData();
   const { data: btcBalance } = useBtcWalletData();
 

@@ -1,6 +1,6 @@
-import useCoinRates from '@hooks/queries/useCoinRates';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useNetworkSelector from '@hooks/useNetwork';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -91,7 +91,7 @@ function Step2SelectAmount({
   const { stxAddress, stxPublicKey } = useSelectedAccount();
   const { fiatCurrency, feeMultipliers } = useWalletSelector();
   const { data: stxData } = useStxWalletData();
-  const { btcFiatRate, stxBtcRate } = useCoinRates();
+  const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const stxBalance = stxData?.availableBalance.toString() ?? '0';
   const ftBalance = fungibleToken ? getFtBalance(fungibleToken) : '0';
 

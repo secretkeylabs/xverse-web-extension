@@ -17,8 +17,8 @@ const Container = styled.div`
 
 const Title = styled.h1((props) => ({
   ...props.theme.typography.headline_l,
-  paddingTop: props.theme.space.xxl,
-  paddingBottom: props.theme.space.m,
+  marginTop: props.theme.space.xxl,
+  marginBottom: props.theme.space.s,
 }));
 
 function Setting() {

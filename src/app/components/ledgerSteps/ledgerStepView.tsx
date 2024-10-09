@@ -9,7 +9,7 @@ import LedgerFailView from '@components/ledger/failLedgerView';
 import {
   ConnectLedgerTitle,
   InfoImage,
-} from '@screens/ledger/confirmLedgerTransaction/index.styled';
+} from '@screens/ledger/confirmLedgerStxTransaction/index.styled';
 import type { TFunction } from 'react-i18next';
 
 export enum Steps {
