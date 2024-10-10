@@ -16,7 +16,6 @@
   "icons": {
     "128": "xverse_icon.png"
   },
-  "devtools_page": "devtools.html",
   "web_accessible_resources": [{ "resources": ["inpage.js"], "matches": ["*://*/*"] }],
   "host_permissions": ["*://*/*"],
   "permissions": ["storage", "tabs"],
@@ -27,8 +26,7 @@
     {
       "run_at": "document_start",
       "js": ["browser-polyfill.js", "content-script.js"],
-      "matches": ["*://*/*"],
-      "all_frames": true
+      "matches": ["*://*/*"]
     }
   ]
 }
