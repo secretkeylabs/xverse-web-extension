@@ -15,11 +15,10 @@ const useGetSip10TokenInfo = ({
 
   const fetchTokensInfo = async () => {
     if (principal) {
-      const coinsInfo = await xverseApiClient.getCoinsInfo(
+      const coinsInfo = await xverseApiClient.getSip10Tokens(
         [principal],
         fiatCurrency ?? defaultFiatCurrency,
       );
-
       const tokenInfo = coinsInfo.find((coin) => coin.contract === principal);
       return tokenInfo;
     }

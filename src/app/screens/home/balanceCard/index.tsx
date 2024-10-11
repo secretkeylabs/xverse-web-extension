@@ -80,9 +80,9 @@ function BalanceCard(props: BalanceCardProps) {
   const { setAccountBalance } = useAccountBalance();
   const { isLoading, isRefetching } = props;
   const oldTotalBalance = accountBalances[selectedAccount.btcAddress];
-  const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
-  const { visible: brc20CoinsList } = useVisibleBrc20FungibleTokens();
-  const { visible: runesCoinList } = useVisibleRuneFungibleTokens();
+  const { data: sip10CoinsList } = useVisibleSip10FungibleTokens();
+  const { data: brc20CoinsList } = useVisibleBrc20FungibleTokens();
+  const { data: runesCoinList } = useVisibleRuneFungibleTokens();
 
   const balance = calculateTotalBalance({
     stxBalance: stxData?.balance.toString() ?? '0',

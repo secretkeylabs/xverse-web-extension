@@ -60,7 +60,7 @@ function SendStxScreen() {
   // Will be used in the future when the summary screen is refactored
   const [, setRecipientDomain] = useState('');
   const [memo, setMemo] = useState(stxMemo ?? '');
-  const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
+  const { data: sip10CoinsList } = useVisibleSip10FungibleTokens();
   const [searchParams] = useSearchParams();
   const principal = searchParams.get('principal');
   const fungibleToken = sip10CoinsList?.find((coin) => coin.principal === principal);

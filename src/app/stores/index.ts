@@ -29,8 +29,8 @@ const migrations = {
   },
   3: (
     state: WalletState & {
-      brcCoinsList: FungibleToken[] | null; // removed in v3
-      coinsList: FungibleToken[] | null; // removed in v3
+      brcCoinsList: (FungibleToken & { visible?: boolean })[] | null; // removed in v3
+      coinsList: (FungibleToken & { visible?: boolean })[] | null; // removed in v3
       coins: Coin[]; // removed in v3
     },
   ) => ({

@@ -1,21 +1,18 @@
 import stacksIcon from '@assets/img/dashboard/stx_icon.svg';
-import runesComingSoon from '@assets/img/manageTokens/runes_coming_soon.svg';
 import OptionsDialog from '@components/optionsDialog/optionsDialog';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import { useGetBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
 import { useRuneFungibleTokensQuery } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
 import { useGetSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
-import useHasFeature from '@hooks/useHasFeature';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Eye, EyeSlash } from '@phosphor-icons/react';
 import CoinItem from '@screens/manageTokens/coinItem';
 import {
-  FeatureId,
-  type FungibleToken,
   type FungibleTokenProtocol,
+  type FungibleTokenWithStates,
 } from '@secretkeylabs/xverse-core';
 import {
   setBrc20ManageTokensAction,
@@ -25,7 +22,6 @@ import {
 } from '@stores/wallet/actions/actionCreators';
 import { StyledP } from '@ui-library/common.styled';
 import { SPAM_OPTIONS_WIDTH } from '@utils/constants';
-import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -97,14 +93,6 @@ const Description = styled.h1((props) => ({
   marginBottom: props.theme.spacing(16),
 }));
 
-const RunesContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(24),
-  marginRight: props.theme.spacing(5),
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-}));
-
 const ErrorsText = styled.p((props) => ({
   ...props.theme.typography.body_bold_m,
   color: props.theme.colors.white_200,
@@ -112,10 +100,6 @@ const ErrorsText = styled.p((props) => ({
   marginBottom: 'auto',
   textAlign: 'center',
 }));
-
-const RunesComingSoon = styled.img({
-  width: '70%',
-});
 
 const ButtonRow = styled.button`
   display: flex;
@@ -161,16 +145,20 @@ function ManageTokens() {
   const { t } = useTranslation('translation', { keyPrefix: 'TOKEN_SCREEN' });
 
   const selectedAccount = useSelectedAccount();
-  const { sip10ManageTokens, brc20ManageTokens, runesManageTokens, showSpamTokens } =
-    useWalletSelector();
-  const { data: runesList, isError: runeError } = useRuneFungibleTokensQuery();
-  const { data: sip10List, isError: sip10Error } = useGetSip10FungibleTokens();
-  const { data: brc20List, isError: brc20Error } = useGetBrc20FungibleTokens();
+  const { showSpamTokens } = useWalletSelector();
+  const { data: runesList, isError: runeError } = useRuneFungibleTokensQuery((data) =>
+    data.filter((ft) => ft.showToggle),
+  );
+  const { data: sip10List, isError: sip10Error } = useGetSip10FungibleTokens((data) =>
+    data.filter((ft) => ft.showToggle),
+  );
+  const { data: brc20List, isError: brc20Error } = useGetBrc20FungibleTokens((data) =>
+    data.filter((ft) => ft.showToggle),
+  );
 
   const [selectedProtocol, setSelectedProtocol] = useState<FungibleTokenProtocol>(
     selectedAccount?.stxAddress ? 'stacks' : 'brc-20',
   );
-  const showRunes = useHasFeature(FeatureId.RUNES_SUPPORT);
   const [showOptionsDialog, setShowOptionsDialog] = useState(false);
 
   const [optionsDialogIndents, setOptionsDialogIndents] = useState<
@@ -193,9 +181,9 @@ function ManageTokens() {
   };
 
   const toggled = (isEnabled: boolean, _coinName: string, coinKey: string) => {
-    const runeFt = runesList?.find((ft) => ft.principal === coinKey);
-    const sip10Ft = sip10List?.find((ft) => ft.principal === coinKey);
-    const brc20Ft = brc20List?.find((ft) => ft.principal === coinKey);
+    const runeFt = runesList?.find((ft: FungibleTokenWithStates) => ft.principal === coinKey);
+    const sip10Ft = sip10List?.find((ft: FungibleTokenWithStates) => ft.principal === coinKey);
+    const brc20Ft = brc20List?.find((ft: FungibleTokenWithStates) => ft.principal === coinKey);
 
     const payload = { principal: coinKey, isEnabled };
 
@@ -211,29 +199,19 @@ function ManageTokens() {
   const handleBackButtonClick = () => navigate('/');
 
   const getCoinsList = () => {
-    let coins: FungibleToken[];
+    let coins: FungibleTokenWithStates[];
     let error: boolean;
     switch (selectedProtocol) {
       case 'stacks':
-        coins = (sip10List ?? []).map((ft) => ({
-          ...ft,
-          visible:
-            sip10ManageTokens[ft.principal] ?? (ft.supported && new BigNumber(ft.balance).gt(0)),
-        }));
+        coins = sip10List ?? [];
         error = sip10Error;
         break;
       case 'brc-20':
-        coins = (brc20List ?? []).map((ft) => ({
-          ...ft,
-          visible: brc20ManageTokens[ft.principal] ?? new BigNumber(ft.balance).gt(0),
-        }));
+        coins = brc20List ?? [];
         error = brc20Error;
         break;
       case 'runes':
-        coins = (runesList ?? []).map((ft) => ({
-          ...ft,
-          visible: runesManageTokens[ft.principal] ?? new BigNumber(ft.balance).gt(0),
-        }));
+        coins = runesList ?? [];
         error = runeError;
         break;
       default:
@@ -246,7 +224,7 @@ function ManageTokens() {
     return (
       <>
         {selectedProtocol === 'stacks' && <Stacks />}
-        {coins.map((coin: FungibleToken) => (
+        {coins.map((coin) => (
           <CoinItem
             id={coin.principal}
             key={coin.principal}
@@ -257,7 +235,7 @@ function ManageTokens() {
             runeSymbol={coin.runeSymbol}
             disabled={false}
             toggled={toggled}
-            enabled={coin.visible}
+            enabled={coin.isEnabled}
           />
         ))}
         {!coins.length && <ErrorsText>{t('NO_COINS')}</ErrorsText>}
@@ -316,15 +294,7 @@ function ManageTokens() {
               RUNES
             </Button>
           </FtInfoContainer>
-          <TokenContainer>
-            {selectedProtocol === 'runes' && !showRunes ? (
-              <RunesContainer>
-                <RunesComingSoon src={runesComingSoon} />
-              </RunesContainer>
-            ) : (
-              getCoinsList()
-            )}
-          </TokenContainer>
+          <TokenContainer>{getCoinsList()}</TokenContainer>
         </ScrollableContainer>
       </Container>
       <BottomBar tab="dashboard" />

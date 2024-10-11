@@ -4,7 +4,7 @@ import {
   microstacksToStx,
   satsToBtc,
   type Account,
-  type FungibleToken,
+  type FungibleTokenWithStates,
   type NetworkType,
   type NftData,
   type SettingsNetwork,
@@ -252,9 +252,9 @@ export const calculateTotalBalance = ({
 }: {
   stxBalance?: string;
   btcBalance?: string;
-  sipCoinsList: FungibleToken[];
-  brcCoinsList: FungibleToken[];
-  runesCoinList: FungibleToken[];
+  sipCoinsList: FungibleTokenWithStates[];
+  brcCoinsList: FungibleTokenWithStates[];
+  runesCoinList: FungibleTokenWithStates[];
   stxBtcRate: string;
   btcFiatRate: string;
   hideStx: boolean;
@@ -277,7 +277,7 @@ export const calculateTotalBalance = ({
 
   if (sipCoinsList) {
     totalBalance = sipCoinsList.reduce((acc, coin) => {
-      if (coin.visible && coin.tokenFiatRate && coin.decimals) {
+      if (coin.isEnabled && coin.tokenFiatRate && coin.decimals) {
         const tokenUnits = new BigNumber(10).exponentiatedBy(new BigNumber(coin.decimals));
         const coinFiatValue = new BigNumber(coin.balance)
           .dividedBy(tokenUnits)
@@ -291,7 +291,7 @@ export const calculateTotalBalance = ({
 
   if (brcCoinsList) {
     totalBalance = brcCoinsList.reduce((acc, coin) => {
-      if (coin.visible && coin.tokenFiatRate) {
+      if (coin.isEnabled && coin.tokenFiatRate) {
         const coinFiatValue = new BigNumber(coin.balance).multipliedBy(
           new BigNumber(coin.tokenFiatRate),
         );
@@ -304,7 +304,7 @@ export const calculateTotalBalance = ({
 
   if (runesCoinList) {
     totalBalance = runesCoinList.reduce((acc, coin) => {
-      if (coin.visible && coin.tokenFiatRate) {
+      if (coin.isEnabled && coin.tokenFiatRate) {
         const coinFiatValue = new BigNumber(getFtBalance(coin)).multipliedBy(
           new BigNumber(coin.tokenFiatRate),
         );

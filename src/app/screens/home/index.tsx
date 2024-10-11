@@ -10,9 +10,18 @@ import ReceiveCardComponent from '@components/receiveCardComponent';
 import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import BottomBar from '@components/tabBar';
-import { useVisibleBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
-import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
-import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
+import {
+  useGetBrc20FungibleTokens,
+  useVisibleBrc20FungibleTokens,
+} from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
+import {
+  useRuneFungibleTokensQuery,
+  useVisibleRuneFungibleTokens,
+} from '@hooks/queries/runes/useRuneFungibleTokensQuery';
+import {
+  useGetSip10FungibleTokens,
+  useVisibleSip10FungibleTokens,
+} from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useAppConfig from '@hooks/queries/useAppConfig';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useFeeMultipliers from '@hooks/queries/useFeeMultipliers';
@@ -28,7 +37,12 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowDown, ArrowUp, Plus } from '@phosphor-icons/react';
 import { animated, useTransition } from '@react-spring/web';
 import CoinSelectModal from '@screens/home/coinSelectModal';
-import { AnalyticsEvents, FeatureId, type FungibleToken } from '@secretkeylabs/xverse-core';
+import {
+  AnalyticsEvents,
+  FeatureId,
+  type FungibleToken,
+  type FungibleTokenWithStates,
+} from '@secretkeylabs/xverse-core';
 import {
   changeShowDataCollectionAlertAction,
   setBrc20ManageTokensAction,
@@ -43,7 +57,6 @@ import type { CurrencyTypes } from '@utils/constants';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { optInMixPanel, optOutMixPanel, trackMixPanel } from '@utils/mixpanel';
 import { sortFtByFiatBalance } from '@utils/tokens';
-import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -113,21 +126,22 @@ function Home() {
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const { data: notificationBannersArr, isFetching: isFetchingNotificationBannersArr } =
     useNotificationBanners();
+
+  const { data: fullSip10CoinsList } = useGetSip10FungibleTokens();
+  const { data: fullBrc20CoinsList } = useGetBrc20FungibleTokens();
+  const { data: fullRunesCoinsList } = useRuneFungibleTokensQuery();
   const {
-    unfilteredData: fullSip10CoinsList,
-    visible: sip10CoinsList,
+    data: sip10CoinsList,
     isInitialLoading: loadingStxCoinData,
     isRefetching: refetchingStxCoinData,
   } = useVisibleSip10FungibleTokens();
   const {
-    unfilteredData: fullBrc20CoinsList,
-    visible: brc20CoinsList,
+    data: brc20CoinsList,
     isInitialLoading: loadingBrcCoinData,
     isRefetching: refetchingBrcCoinData,
   } = useVisibleBrc20FungibleTokens();
   const {
-    unfilteredData: fullRunesCoinsList,
-    visible: runesCoinsList,
+    data: runesCoinsList,
     isInitialLoading: loadingRunesData,
     isRefetching: refetchingRunesData,
   } = useVisibleRuneFungibleTokens();
@@ -163,11 +177,23 @@ function Home() {
                 isEnabled: true,
               };
 
-              if (fullRunesCoinsList?.find((ft) => ft.principal === spamToken.principal)) {
+              if (
+                fullRunesCoinsList?.find(
+                  (ft: FungibleTokenWithStates) => ft.principal === spamToken.principal,
+                )
+              ) {
                 dispatch(setRunesManageTokensAction(payload));
-              } else if (fullSip10CoinsList?.find((ft) => ft.principal === spamToken.principal)) {
+              } else if (
+                fullSip10CoinsList?.find(
+                  (ft: FungibleTokenWithStates) => ft.principal === spamToken.principal,
+                )
+              ) {
                 dispatch(setSip10ManageTokensAction(payload));
-              } else if (fullBrc20CoinsList?.find((ft) => ft.principal === spamToken.principal)) {
+              } else if (
+                fullBrc20CoinsList?.find(
+                  (ft: FungibleTokenWithStates) => ft.principal === spamToken.principal,
+                )
+              ) {
                 dispatch(setBrc20ManageTokensAction(payload));
               }
 
@@ -181,10 +207,12 @@ function Home() {
     }
   }, [spamToken]);
 
-  const combinedFtList = sip10CoinsList
-    .concat(brc20CoinsList)
-    .concat(runesCoinsList)
-    .sort((a, b) => sortFtByFiatBalance(a, b, stxBtcRate, btcFiatRate));
+  const combinedFtList = (sip10CoinsList ?? [])
+    .concat(brc20CoinsList ?? [])
+    .concat(runesCoinsList ?? [])
+    .sort((a: FungibleTokenWithStates, b: FungibleTokenWithStates) =>
+      sortFtByFiatBalance(a, b, stxBtcRate, btcFiatRate),
+    );
 
   const filteredNotificationBannersArr = notificationBannersArr
     ? notificationBannersArr.filter((banner) => !notificationBanners[banner.id])
@@ -508,7 +536,7 @@ function Home() {
               onPress={handleTokenPressed}
             />
           )}
-          {combinedFtList.map((coin) => {
+          {combinedFtList.map((coin: FungibleTokenWithStates) => {
             const isLoading = loadingStxCoinData || loadingBrcCoinData || loadingRunesData;
             return (
               <StyledTokenTile
@@ -539,7 +567,7 @@ function Home() {
           onClose={onSendModalClose}
           onSelectCoin={onSendFtSelect}
           visible={openSendModal}
-          coins={combinedFtList.filter((ft) => new BigNumber(ft.balance).gt(0))}
+          coins={combinedFtList}
           title={t('SEND')}
           loadingWalletData={loadingStxWalletData || loadingBtcWalletData}
         />

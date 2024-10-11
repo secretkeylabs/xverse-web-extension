@@ -71,7 +71,7 @@ export default function ListRuneScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'LIST_RUNE_SCREEN' });
   const navigate = useNavigate();
   const { runeId } = useParams();
-  const { visible: runesCoinsList } = useVisibleRuneFungibleTokens(false);
+  const { data: runesCoinsList } = useVisibleRuneFungibleTokens(false);
   const selectedRune = runesCoinsList.find((ft) => ft.principal === runeId);
   const { fiatCurrency } = useWalletSelector();
   const { btcFiatRate } = useSupportedCoinRates();

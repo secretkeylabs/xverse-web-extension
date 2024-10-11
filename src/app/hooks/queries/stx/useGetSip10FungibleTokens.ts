@@ -3,14 +3,14 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   StacksNetwork,
-  // getCoinMetaData,
-  getCoinsInfo,
   getFtData,
+  getFungibleTokenStates,
+  getXverseApiClient,
   type FungibleToken,
+  type FungibleTokenWithStates,
   type SettingsNetwork,
 } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
-import BigNumber from 'bignumber.js';
 
 export const fetchSip10FungibleTokens =
   (
@@ -18,47 +18,32 @@ export const fetchSip10FungibleTokens =
     fiatCurrency: string,
     network: SettingsNetwork,
     currentNetworkInstance: StacksNetwork,
-  ) =>
+  ): (() => Promise<FungibleToken[]>) =>
   async () => {
-    // get sip10 metadata and balances for the stxAddress
     const sip10Balances = await getFtData(stxAddress, currentNetworkInstance);
+    const sip10ContractInfos =
+      (await getXverseApiClient(network.type).getSip10Tokens(
+        sip10Balances.map((ft) => ft.principal),
+        fiatCurrency,
+      )) || [];
 
-    // getting contract ids of all fts
-    const contractids: string[] = sip10Balances.map((ft) => ft.principal);
-    const sip10ContractInfos = (await getCoinsInfo(network.type, contractids, fiatCurrency)) || [];
-
-    // combine
-    return sip10Balances
-      .map((ft) => {
-        const found = (sip10ContractInfos || []).find((coin) => coin.contract === ft.principal);
-        if (!found) {
-          return ft;
-        }
-        return {
-          ...ft,
-          ...found,
-          visible: true,
-          name: found.name || ft.principal.split('.')[1],
-        };
-      })
-      .concat(
-        sip10ContractInfos
-          .filter((coin) => !sip10Balances.some((ft) => ft.principal === coin.contract))
-          .map((coin) => ({
-            ...coin,
-            principal: coin.contract,
-            assetName: coin.name || coin.contract.split('.')[1],
-            protocol: 'stacks',
-            balance: '0',
-            total_sent: '',
-            total_received: '',
-          })),
-      );
+    return sip10Balances.map((ft) => {
+      const found = sip10ContractInfos.find((coin) => coin.contract === ft.principal);
+      if (!found) {
+        return ft;
+      }
+      return {
+        ...ft,
+        ...found,
+        name: found.name || ft.principal.split('.')[1],
+      };
+    });
   };
 
-export const useGetSip10FungibleTokens = () => {
+export const useGetSip10FungibleTokens = (select?: (data: FungibleTokenWithStates[]) => any) => {
   const { stxAddress } = useSelectedAccount();
-  const { fiatCurrency, network, spamTokens, showSpamTokens } = useWalletSelector();
+  const { sip10ManageTokens, fiatCurrency, network, spamTokens, showSpamTokens } =
+    useWalletSelector();
   const currentNetworkInstance = useNetworkSelector();
 
   const queryFn = fetchSip10FungibleTokens(
@@ -67,46 +52,32 @@ export const useGetSip10FungibleTokens = () => {
     network,
     currentNetworkInstance,
   );
+  const selectWithDerivedState = (data: FungibleToken[]) => {
+    const withDerivedState = data.map(
+      (ft: FungibleToken) =>
+        ({
+          ...ft,
+          ...getFungibleTokenStates({
+            fungibleToken: ft,
+            manageTokens: sip10ManageTokens,
+            spamTokens,
+            showSpamTokens,
+          }),
+        } as FungibleTokenWithStates),
+    );
+    return select ? select(withDerivedState) : withDerivedState;
+  };
 
-  const query = useQuery({
+  return useQuery({
     queryKey: ['sip10-fungible-tokens', network.type, stxAddress, fiatCurrency],
     queryFn,
     enabled: Boolean(network && stxAddress),
+    select: selectWithDerivedState,
   });
-
-  return {
-    ...query,
-    unfilteredData: query.data,
-    data: query.data?.filter((ft) => {
-      let passedSpamCheck = true;
-      if (spamTokens?.length) {
-        passedSpamCheck = showSpamTokens || !spamTokens.includes(ft.principal);
-      }
-      return passedSpamCheck;
-    }),
-  };
 };
 
-export const useVisibleSip10FungibleTokens = (): ReturnType<typeof useGetSip10FungibleTokens> & {
-  visible: FungibleToken[];
-} => {
-  const { sip10ManageTokens } = useWalletSelector();
-  const sip10Query = useGetSip10FungibleTokens();
-  // set visible false for unsupported tokens
-  const sip10FTList = sip10Query.data || [];
-  sip10FTList.forEach((ft) => {
-    ft.visible = !!ft.supported;
-  });
-
-  return {
-    ...sip10Query,
-    visible: sip10FTList.filter((ft) => {
-      const userSetting = sip10ManageTokens[ft.principal];
-
-      return (
-        userSetting === true ||
-        (userSetting === undefined && ft.supported && new BigNumber(ft.balance).gt(0))
-      );
-    }),
-  };
+// convenience hook to get only enabled sip10 fungible tokens
+export const useVisibleSip10FungibleTokens = () => {
+  const selectEnabled = (data: FungibleTokenWithStates[]) => data.filter((ft) => ft.isEnabled);
+  return useGetSip10FungibleTokens(selectEnabled);
 };

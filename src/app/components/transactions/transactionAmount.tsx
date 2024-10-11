@@ -33,7 +33,7 @@ const TransactionValue = styled.p((props) => ({
 
 export default function TransactionAmount(props: TransactionAmountProps): JSX.Element | null {
   const { transaction, currency, protocol, tokenSymbol } = props;
-  const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
+  const { data: sip10CoinsList } = useVisibleSip10FungibleTokens();
   if (currency === 'STX' || (currency === 'FT' && protocol === 'stacks')) {
     const stxTransaction = transaction as StxTransactionData;
     if (stxTransaction.txType === 'token_transfer') {

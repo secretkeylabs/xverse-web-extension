@@ -46,7 +46,7 @@ import trackSwapMixPanel from './mixpanel';
 import QuoteSummary from './quoteSummary';
 import QuotesModal from './quotesModal';
 import type { OrderInfo, Side, StxOrderInfo } from './types';
-import useMasterCoinsList from './useMasterCoinsList';
+import useVisibleMasterCoinsList from './useVisibleMasterCoinsList';
 import {
   getTrackingIdentifier,
   isStxTx,
@@ -138,7 +138,7 @@ export default function SwapScreen() {
   const defaultFrom = params.get('from');
   const { quotes, loading: quotesLoading, error: quotesError, fetchQuotes } = useGetQuotes();
   const { data: runeFloorPrice } = useRuneFloorPriceQuery(toToken?.name ?? '');
-  const coinsMasterList = useMasterCoinsList();
+  const coinsMasterList = useVisibleMasterCoinsList();
   const { tokenInfo: sip10FromTokenInfoUSD } = useGetSip10TokenInfo({
     principal: toToken?.ticker,
     fiatCurrency: 'USD',
@@ -149,7 +149,7 @@ export default function SwapScreen() {
       const token = coinsMasterList.find((coin) => coin.principal === defaultFrom);
       setFromToken(token);
     }
-  }, [defaultFrom, coinsMasterList.length]);
+  }, [defaultFrom, coinsMasterList]);
 
   const handleGoBack = () => {
     navigate('/');

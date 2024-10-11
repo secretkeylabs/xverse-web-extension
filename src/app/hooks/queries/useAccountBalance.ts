@@ -5,9 +5,11 @@ import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   API_TIMEOUT_MILLI,
+  getFungibleTokenStates,
   type Account,
   type BtcAddressData,
   type FungibleToken,
+  type FungibleTokenWithStates,
   type TokensResponse,
 } from '@secretkeylabs/xverse-core';
 import { setAccountBalanceAction } from '@stores/wallet/actions/actionCreators';
@@ -30,6 +32,8 @@ const useAccountBalance = () => {
     brc20ManageTokens,
     sip10ManageTokens,
     runesManageTokens,
+    spamTokens,
+    showSpamTokens,
   } = useWalletSelector();
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const runesApi = useRunesApi();
@@ -38,6 +42,17 @@ const useAccountBalance = () => {
   const [isProcessingQueue, setIsProcessingQueue] = useState(false);
   const [queueLength, setQueueLength] = useState(0);
 
+  const withDerivedState = (ft: FungibleToken) =>
+    ({
+      ...ft,
+      ...getFungibleTokenStates({
+        fungibleToken: ft,
+        manageTokens: sip10ManageTokens,
+        spamTokens,
+        showSpamTokens,
+      }),
+    } as FungibleTokenWithStates);
+
   const fetchBalances = async (account: Account | null) => {
     if (!account) {
       return;
@@ -45,9 +60,9 @@ const useAccountBalance = () => {
 
     let btcBalance = '0';
     let stxBalance = '0';
-    let finalSipCoinsList: FungibleToken[] = [];
-    let finalBrcCoinsList: FungibleToken[] = [];
-    let finalRunesCoinsList: FungibleToken[] = [];
+    let finalSipCoinsList: FungibleTokenWithStates[] = [];
+    let finalBrcCoinsList: FungibleTokenWithStates[] = [];
+    let finalRunesCoinsList: FungibleTokenWithStates[] = [];
 
     try {
       if (account.btcAddress) {
@@ -61,15 +76,13 @@ const useAccountBalance = () => {
           fiatCurrency,
           network,
         );
-        finalBrcCoinsList = (await fetchBrc20Balances()).filter((ft) => {
-          const setting = brc20ManageTokens[ft.principal];
-          return setting === true || (setting === undefined && new BigNumber(ft.balance).gt(0));
-        });
+        finalBrcCoinsList = (await fetchBrc20Balances())
+          .map(withDerivedState)
+          .filter((ft) => ft.isEnabled);
         const runeBalances = fetchRuneBalances(runesApi, account.ordinalsAddress, fiatCurrency);
-        finalRunesCoinsList = (await runeBalances()).filter((ft) => {
-          const setting = runesManageTokens[ft.principal];
-          return setting === true || (setting === undefined && new BigNumber(ft.balance).gt(0));
-        });
+        finalRunesCoinsList = (await runeBalances())
+          .map(withDerivedState)
+          .filter((ft) => ft.isEnabled);
       }
       if (account.stxAddress) {
         const apiUrl = `${stacksNetwork.coreApiUrl}/extended/v1/address/${account.stxAddress}/balances`;
@@ -88,10 +101,9 @@ const useAccountBalance = () => {
           network,
           stacksNetwork,
         );
-        finalSipCoinsList = (await fetchSip10Balances()).filter((ft) => {
-          const setting = sip10ManageTokens[ft.principal];
-          return setting === true || (setting === undefined && new BigNumber(ft.balance).gt(0));
-        });
+        finalSipCoinsList = (await fetchSip10Balances())
+          .map(withDerivedState)
+          .filter((ft) => ft.isEnabled);
       }
     } catch (error) {
       console.error('Failed to fetch balances:', error);

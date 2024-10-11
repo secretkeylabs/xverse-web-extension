@@ -166,9 +166,9 @@ export default function CoinDashboard() {
   const { addToSpamTokens } = useSpamTokens();
   const dispatch = useDispatch();
   const { currency } = useParams();
-  const { visible: runesCoinsList } = useVisibleRuneFungibleTokens();
-  const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
-  const { visible: brc20CoinsList } = useVisibleBrc20FungibleTokens();
+  const { data: runesCoinsList } = useVisibleRuneFungibleTokens();
+  const { data: sip10CoinsList } = useVisibleSip10FungibleTokens();
+  const { data: brc20CoinsList } = useVisibleBrc20FungibleTokens();
 
   let selectedFt: FungibleToken | undefined;
 
