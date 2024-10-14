@@ -80,6 +80,7 @@ const handleGetBalance = async (message: RpcRequestMessage, port: chrome.runtime
     selectedAccountType,
     accountsList: softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
     network,
   } = rootStore.store.getState().walletState;
 
@@ -88,6 +89,7 @@ const handleGetBalance = async (message: RpcRequestMessage, port: chrome.runtime
     selectedAccountType,
     softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
   });
 
   if (!account) {

@@ -1,5 +1,6 @@
 import RecipientSelector from '@components/recipientSelector';
 import TokenImage from '@components/tokenImage';
+import type { btcTransaction } from '@secretkeylabs/xverse-core';
 import ConfirmBtcTransaction from 'app/components/confirmBtcTransaction';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -28,6 +29,7 @@ const Container = styled.div`
 `;
 
 type Props = {
+  transaction?: btcTransaction.EnhancedTransaction;
   summary: TransactionSummary | undefined;
   currentStep: Step;
   setCurrentStep: (step: Step) => void;
@@ -48,6 +50,7 @@ type Props = {
 };
 
 function StepDisplay({
+  transaction,
   summary,
   currentStep,
   setCurrentStep,
@@ -117,6 +120,7 @@ function StepDisplay({
       }
       return (
         <ConfirmBtcTransaction
+          transaction={transaction}
           summary={summary}
           isLoading={false}
           confirmText={t('COMMON.CONFIRM')}

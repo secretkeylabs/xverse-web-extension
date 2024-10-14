@@ -26,10 +26,12 @@ function SendBtcScreen() {
   const { data: btcFeeRate, isLoading: feeRatesLoading } = useBtcFeeRate();
   const selectedAccount = useSelectedAccount();
   const transactionContext = useTransactionContext();
-  const [recipientAddress, setRecipientAddress] = useState<string>('');
+  const [recipientAddress, setRecipientAddress] = useState<string>(
+    'bc1qqzvqv7y7tmmc57ze5hmyn5k5wjy8804k0fl2u6',
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [amountSats, setAmountSats] = useState<string>('');
+  const [amountSats, setAmountSats] = useState<string>('1000');
   const [feeRate, setFeeRate] = useState('');
   const [sendMax, setSendMax] = useState(false);
 
@@ -42,24 +44,26 @@ function SendBtcScreen() {
 
   useEffect(() => {
     if (!feeRate && btcFeeRate && !feeRatesLoading) {
-      setFeeRate(btcFeeRate.regular.toString());
+      setFeeRate(feeRate || btcFeeRate.regular.toString());
     }
   }, [btcFeeRate, feeRatesLoading]);
 
   const generateTransactionAndSummary = async (feeRateOverride?: number) => {
     const amountBigInt = Number.isNaN(Number(amountSats)) ? 0n : BigInt(amountSats);
-    return sendMax && currentStep !== Step.Confirm
-      ? generateSendMaxTransaction(
-          transactionContext,
-          debouncedRecipient,
-          feeRateOverride ?? +feeRate,
-        )
-      : generateTransaction(
-          transactionContext,
-          debouncedRecipient,
-          amountBigInt,
-          feeRateOverride ?? +feeRate,
-        );
+    const result =
+      sendMax && currentStep !== Step.Confirm
+        ? await generateSendMaxTransaction(
+            transactionContext,
+            debouncedRecipient,
+            feeRateOverride ?? +feeRate,
+          )
+        : await generateTransaction(
+            transactionContext,
+            debouncedRecipient,
+            amountBigInt,
+            feeRateOverride ?? +feeRate,
+          );
+    return result;
   };
 
   useEffect(() => {
@@ -134,7 +138,10 @@ function SendBtcScreen() {
   const handleSubmit = async (ledgerTransport?: Transport) => {
     try {
       setIsSubmitting(true);
-      const txnId = await transaction?.broadcast({ ledgerTransport, rbfEnabled: true });
+      const txnId = await transaction?.broadcast({
+        ledgerTransport,
+        rbfEnabled: true,
+      });
 
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
         protocol: 'bitcoin',
@@ -180,6 +187,7 @@ function SendBtcScreen() {
 
   return (
     <StepDisplay
+      transaction={transaction}
       summary={summary}
       currentStep={currentStep}
       setCurrentStep={setCurrentStep}

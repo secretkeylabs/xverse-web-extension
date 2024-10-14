@@ -11,6 +11,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { Plus } from '@phosphor-icons/react';
 import type { Account } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
+import { filterKeystoneAccounts } from '@utils/account';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -60,7 +61,7 @@ function AccountList(): JSX.Element {
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const selectedAccount = useSelectedAccount();
-  const { network, accountsList, ledgerAccountsList } = useWalletSelector();
+  const { network, accountsList, ledgerAccountsList, keystoneAccountsList } = useWalletSelector();
   const { createAccount, switchAccount } = useWalletReducer();
   const { enqueueFetchBalances } = useAccountBalance();
 
@@ -68,14 +69,18 @@ function AccountList(): JSX.Element {
 
   const displayedAccountsList = useMemo(() => {
     const networkLedgerAccounts = filterLedgerAccounts(ledgerAccountsList, network.type);
-    return [...networkLedgerAccounts, ...accountsList];
-  }, [accountsList, ledgerAccountsList, network]);
+    const networkKeystoneAccounts = filterKeystoneAccounts(keystoneAccountsList, network.type);
+    return [...networkLedgerAccounts, ...networkKeystoneAccounts, ...accountsList];
+  }, [accountsList, ledgerAccountsList, keystoneAccountsList, network]);
+
+  console.warn('DEBUGPRINT[11]: index.tsx:70: displayedAccountsList=', displayedAccountsList);
 
   const handleBackButtonClick = () => {
     navigate(-1);
   };
 
   const handleAccountSelect = async (account: Account, goBack = true) => {
+    console.warn('DEBUGPRINT[4]: index.tsx:81: account=', account);
     await switchAccount(account);
     broadcastResetUserFlow();
     if (goBack) {

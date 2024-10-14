@@ -1,4 +1,4 @@
-import { btcTransaction } from '@secretkeylabs/xverse-core';
+import { btcTransaction, type Account, type Transport } from '@secretkeylabs/xverse-core';
 
 export type TransactionSummary = btcTransaction.TransactionSummary & {
   dustFiltered?: boolean;
@@ -27,7 +27,9 @@ export const generateTransaction = async (
   );
 
   try {
+    console.warn('DEBUGPRINT[23]: helpers.ts:30: transaction=', transaction);
     const summary = await transaction.getSummary();
+    console.warn('DEBUGPRINT[22]: helpers.ts:30: summary=', summary);
     return { transaction, summary };
   } catch (e) {
     if (e instanceof Error && e.message.includes('Insufficient funds')) {

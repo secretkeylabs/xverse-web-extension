@@ -25,6 +25,7 @@ export const ChangeShowBtcReceiveAlertKey = 'ChangeShowBtcReceiveAlertKey';
 export const ChangeShowOrdinalReceiveAlertKey = 'ChangeShowOrdinalReceiveAlertKey';
 export const ChangeShowDataCollectionAlertKey = 'ChangeShowDataCollectionAlertKey';
 export const UpdateLedgerAccountsKey = 'UpdateLedgerAccountsKey';
+export const UpdateKeystoneAccountsKey = 'UpdateKeystoneAccountsKey';
 export const SetSip10ManageTokensKey = 'SetSip10ManageTokensKey';
 export const SetBrc20ManageTokensKey = 'SetBrc20ManageTokensKey';
 export const SetRunesManageTokensKey = 'SetRunesManageTokens';
@@ -55,6 +56,7 @@ export enum WalletSessionPeriods {
 export interface WalletState {
   accountsList: Account[];
   ledgerAccountsList: Account[];
+  keystoneAccountsList: Account[];
   selectedAccountIndex: number;
   selectedAccountType: AccountType;
   network: SettingsNetwork; // currently selected network urls and type
@@ -115,6 +117,10 @@ export interface SelectAccount {
   type: typeof SelectAccountKey;
   selectedAccountIndex: number;
   selectedAccountType: AccountType;
+}
+export interface UpdateKeystoneAccounts {
+  type: typeof UpdateKeystoneAccountsKey;
+  keystoneAccountsList: Account[];
 }
 
 export interface ChangeFiatCurrency {
@@ -283,6 +289,7 @@ export type WalletActions =
   | ResetWallet
   | UpdateSoftwareAccounts
   | UpdateLedgerAccounts
+  | UpdateKeystoneAccounts
   | SelectAccount
   | StoreEncryptedSeed
   | SetFeeMultiplier

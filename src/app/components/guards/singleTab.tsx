@@ -1,6 +1,11 @@
 import { useEffect } from 'react';
 
-type GuardType = 'onboarding' | 'importLedger' | 'closeWallet' | 'verifyLedger';
+type GuardType =
+  | 'onboarding'
+  | 'importLedger'
+  | 'closeWallet'
+  | 'verifyLedger'
+  | 'hardwareWalletImport';
 
 const getChannelAndPingNames = (guardName: GuardType) => {
   const channelName = `${guardName}Channel`;

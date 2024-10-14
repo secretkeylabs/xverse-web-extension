@@ -194,6 +194,9 @@ export const isHardwareAccount = (account: Account | null): boolean =>
 export const isLedgerAccount = (account: Account | null): boolean =>
   account?.accountType === 'ledger';
 
+export const isKeystoneAccount = (account: Account | null): boolean =>
+  account?.accountType === 'keystone';
+
 export const isInOptions = (): boolean => !!window.location?.pathname?.match(/options.html$/);
 
 export const formatNumber = (value?: string | number) =>

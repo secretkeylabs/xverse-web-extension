@@ -25,6 +25,7 @@ import {
   setWalletHideStxAction,
   setWalletUnlockedAction,
   storeEncryptedSeedAction,
+  updateKeystoneAccountsAction,
   updateLedgerAccountsAction,
   updateSavedNamesAction,
   updateSoftwareAccountsAction,
@@ -91,6 +92,7 @@ const useWalletReducer = () => {
     accountsList: accounts,
     savedNames,
     ledgerAccountsList,
+    keystoneAccountsList,
     showDataCollectionAlert,
     hideStx,
   } = useWalletSelector();
@@ -107,8 +109,8 @@ const useWalletReducer = () => {
       selectedType = selectedAccountType,
       selectedIndex = selectedAccountIndex,
     ): Promise<void> => {
-      if (selectedType === 'ledger') {
-        // these accounts are created by Ledger, so we cannot regenerate them
+      if (['ledger', 'keystone'].includes(selectedType)) {
+        // these accounts are created by ledger or keystone, so we cannot regenerate them
         return;
       }
 
@@ -360,6 +362,7 @@ const useWalletReducer = () => {
 
       await ensureSelectedAccountValid(nextAccount.accountType, nextAccount.id);
 
+      console.warn('DEBUGPRINT[1]: useWalletReducer.ts:363: nextAccount=', nextAccount);
       dispatch(selectAccount(nextAccount));
 
       dispatchEventAuthorizedConnectedClients(
@@ -458,6 +461,31 @@ const useWalletReducer = () => {
     dispatch(updateLedgerAccountsAction(newLedgerAccountsList));
   };
 
+  const addKeystoneAccount = async (keystoneAccount: Account) => {
+    console.warn('DEBUGPRINT[4]: useWalletReducer.ts:463: keystoneAccount=', keystoneAccount);
+    dispatch(updateKeystoneAccountsAction([...keystoneAccountsList, keystoneAccount]));
+  };
+
+  const removeKeystoneAccount = async (keystoneAccount: Account) => {
+    dispatch(
+      updateKeystoneAccountsAction(
+        keystoneAccountsList.filter((account) => account.id !== keystoneAccount.id),
+      ),
+    );
+  };
+
+  const updateKeystoneAccounts = async (updatedKeystoneAccount: Account) => {
+    if (updatedKeystoneAccount.accountType !== 'keystone') {
+      throw new Error('Expected keystone account. Update cancelled.');
+    }
+
+    const newKeystoneAccountsList = keystoneAccountsList.map((account) =>
+      account.id === updatedKeystoneAccount.id ? updatedKeystoneAccount : account,
+    );
+
+    dispatch(updateKeystoneAccountsAction(newKeystoneAccountsList));
+  };
+
   // TODO: refactor this to be more specific to renaming software accounts
   const renameAccount = async (updatedAccount: Account) => {
     if (updatedAccount.accountType !== 'software') {
@@ -494,6 +522,9 @@ const useWalletReducer = () => {
     addLedgerAccount,
     removeLedgerAccount,
     updateLedgerAccounts,
+    addKeystoneAccount,
+    removeKeystoneAccount,
+    updateKeystoneAccounts,
     renameAccount,
     toggleStxVisibility,
     changeShowDataCollectionAlert,

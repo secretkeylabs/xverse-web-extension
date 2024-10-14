@@ -11,6 +11,7 @@ const useSelectedAccount = (): Account => {
     selectedAccountType,
     accountsList: softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
   } = useWalletSelector();
 
   return useMemo(() => {
@@ -19,6 +20,7 @@ const useSelectedAccount = (): Account => {
       selectedAccountType,
       softwareAccountsList,
       ledgerAccountsList,
+      keystoneAccountsList,
     });
     if (existingAccount) {
       return existingAccount;
@@ -33,6 +35,7 @@ const useSelectedAccount = (): Account => {
     selectedAccountType,
     softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
     switchAccount,
   ]);
 };
