@@ -1,6 +1,7 @@
 import useGetSip10TokenInfo from '@hooks/queries/stx/useGetSip10TokenInfo';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import {
+  btcToSats,
   getBtcFiatEquivalent,
   getStxFiatEquivalent,
   stxToMicrostacks,
@@ -23,6 +24,7 @@ interface Props {
   ammProviders: Quote[];
   utxoProviders: UtxoQuote[];
   stxProviders: StxQuote[];
+  amount: string;
   toToken?: Token;
   ammProviderClicked?: (amm: Quote) => void;
   utxoProviderClicked?: (utxoProvider: UtxoQuote) => void;
@@ -59,6 +61,7 @@ function QuotesModal({
   ammProviders,
   utxoProviders,
   stxProviders,
+  amount,
   toToken,
   ammProviderClicked,
   utxoProviderClicked,
@@ -141,11 +144,16 @@ function QuotesModal({
           <QuoteTile
             key={amm.provider.name}
             provider={amm.provider.name}
-            price={amm.receiveAmount}
+            price={
+              amm.to.protocol === 'btc'
+                ? amm.receiveAmount
+                : btcToSats(BigNumber(amount).dividedBy(BigNumber(amm.receiveAmount))).toFixed(2)
+            }
+            floorText={t('EXCHANGE_RATE')}
             image={{ ft: { image: amm.provider.logo } as FungibleToken }}
             onClick={() => ammProviderClicked && ammProviderClicked(amm)}
             subtitle={getReceiveAmountSubtitle(amm, ammProviders)}
-            unit={amm.to.protocol === 'btc' ? 'Sats' : toToken?.symbol || ''}
+            unit={amm.to.protocol === 'btc' ? 'Sats' : `Sats / ${toToken?.symbol}`}
             fiatValue={
               amm.to.protocol === 'btc'
                 ? getBtcFiatEquivalent(

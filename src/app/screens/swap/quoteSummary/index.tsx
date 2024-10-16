@@ -171,10 +171,6 @@ export default function QuoteSummary({
   selectedIdentifiers,
 }: QuoteSummaryProps) {
   const { t } = useTranslation('translation');
-  const { tokenInfo: sip10ToTokenInfoUSD } = useGetSip10TokenInfo({
-    principal: toToken?.ticker,
-    fiatCurrency: 'USD',
-  });
 
   const { tokenInfo: sip10ToTokenInfo } = useGetSip10TokenInfo({
     principal: toToken?.ticker,
