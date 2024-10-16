@@ -121,7 +121,7 @@ function SendBtcScreen() {
       window.close();
       return;
     }
-    navigate('/');
+    navigate(`/coinDashboard/BTC`);
   };
 
   const calculateFeeForFeeRate = async (desiredFeeRate: number): Promise<number | undefined> => {
