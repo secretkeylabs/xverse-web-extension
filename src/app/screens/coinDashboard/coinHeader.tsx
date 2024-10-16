@@ -71,6 +71,7 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
+  const { t: commonT } = useTranslation('translation', { keyPrefix: 'COMMON' });
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const isReceivingAddressesVisible = !isLedgerAccount(selectedAccount);
   const dispatch = useDispatch();
@@ -170,20 +171,18 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
 
   const getDashboardTitle = () => {
     if (fungibleToken?.name) {
-      return `${fungibleToken.name} ${t('BALANCE')}`;
+      return fungibleToken.name;
     }
-
     if (!currency) {
       return '';
     }
-
     if (currency === 'STX') {
-      return `Stacks ${t('BALANCE')}`;
+      return commonT('STACKS');
     }
     if (currency === 'BTC') {
-      return `Bitcoin ${t('BALANCE')}`;
+      return commonT('BITCOIN');
     }
-    return `${currency} ${t('BALANCE')}`;
+    return `${currency}`;
   };
 
   const isCrossChainSwapsEnabled = useHasFeature(FeatureId.CROSS_CHAIN_SWAPS);
