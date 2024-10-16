@@ -26,8 +26,6 @@ export default class Onboarding {
 
   readonly inputPassword: Locator;
 
-  readonly errorMessage: Locator;
-
   readonly errorMessage2: Locator;
 
   readonly errorMessageSeedPhrase: Locator;
@@ -89,7 +87,6 @@ export default class Onboarding {
     this.buttonSeedWords = page.locator('button[value]:not([value=""])');
     this.header = page.locator('#app h3');
     this.inputPassword = page.locator('input[type="password"]');
-    this.errorMessage = page.locator('p').filter({ hasText: 'Your password should be at' });
     this.errorMessage2 = page.locator('p').filter({ hasText: 'Please make sure your' });
     this.errorMessageSeedPhrase = page.locator('p').filter({ hasText: 'Invalid seed phrase' });
     this.labelSecurityLevelWeak = page.locator('p').filter({ hasText: 'Weak' });
@@ -186,7 +183,6 @@ export default class Onboarding {
     await expect(this.inputPassword).toBeVisible();
     await expect(this.buttonContinue).toBeVisible();
     await expect(this.buttonContinue).toBeDisabled();
-    await expect(this.errorMessage).toBeHidden();
     await expect(this.labelSecurityLevelWeak).toBeHidden();
     await expect(this.labelSecurityLevelMedium).toBeHidden();
     await expect(this.labelSecurityLevelStrong).toBeHidden();
@@ -262,15 +258,6 @@ export default class Onboarding {
   async testPasswordInput({ password, expectations }) {
     // Fill in the password input field with the specified password.
     await this.inputPassword.fill(password);
-
-    // Check if an error message is expected to be visible.
-    if (expectations.errorMessageVisible) {
-      // If yes, verify that the error message element is visible.
-      await expect(this.errorMessage).toBeVisible();
-    } else {
-      // If not, verify that the error message element is hidden.
-      await expect(this.errorMessage).toBeHidden();
-    }
 
     // Define a mapping of security levels to their corresponding label elements.
     const visibilityChecks = {

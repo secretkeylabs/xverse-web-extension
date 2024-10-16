@@ -129,7 +129,6 @@ function RestoreWallet(): JSX.Element {
         handleContinue={onNewPasswordContinue}
         handleBack={onNewPasswordBack}
         checkPasswordStrength
-        createPasswordFlow
         autoFocus
       />
     </PasswordContainer>,
