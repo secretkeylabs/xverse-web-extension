@@ -22,6 +22,7 @@ import {
   SelectAccountKey,
   SetAccountAvatarKey,
   SetAccountBalanceKey,
+  SetBalanceHiddenToggleKey,
   SetBrc20ManageTokensKey,
   SetFeeMultiplierKey,
   SetHiddenCollectiblesKey,
@@ -100,6 +101,7 @@ export const initialWalletState: WalletState = {
   hiddenCollectibleIds: {},
   starredCollectibleIds: {},
   avatarIds: {},
+  balanceHidden: false,
 };
 
 /**
@@ -383,6 +385,12 @@ const walletReducer = (
       return {
         ...state,
         avatarIds: clonedAvatarIds,
+      };
+    }
+    case SetBalanceHiddenToggleKey: {
+      return {
+        ...state,
+        balanceHidden: action.toggle,
       };
     }
     default:

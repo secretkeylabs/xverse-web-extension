@@ -1,4 +1,5 @@
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
+import useWalletSelector from '@hooks/useWalletSelector';
 import {
   microstacksToStx,
   satsToBtc,
@@ -10,6 +11,7 @@ import {
   type StxTransactionData,
 } from '@secretkeylabs/xverse-core';
 import type { CurrencyTypes } from '@utils/constants';
+import { HIDDEN_BALANCE_LABEL } from '@utils/constants';
 import { getFtBalance, getFtTicker } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { NumericFormat } from 'react-number-format';
@@ -34,6 +36,10 @@ const TransactionValue = styled.p((props) => ({
 export default function TransactionAmount(props: TransactionAmountProps): JSX.Element | null {
   const { transaction, currency, protocol, tokenSymbol } = props;
   const { data: sip10CoinsList } = useVisibleSip10FungibleTokens();
+  const { balanceHidden } = useWalletSelector();
+  if (balanceHidden) {
+    return <TransactionValue>{HIDDEN_BALANCE_LABEL}</TransactionValue>;
+  }
   if (currency === 'STX' || (currency === 'FT' && protocol === 'stacks')) {
     const stxTransaction = transaction as StxTransactionData;
     if (stxTransaction.txType === 'token_transfer') {

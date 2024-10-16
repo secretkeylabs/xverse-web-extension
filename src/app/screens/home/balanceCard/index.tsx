@@ -9,12 +9,14 @@ import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core';
+import { setBalanceHiddenToggleAction } from '@stores/wallet/actions/actionCreators';
 import Spinner from '@ui-library/spinner';
-import { LoaderSize } from '@utils/constants';
+import { HIDDEN_BALANCE_LABEL, LoaderSize } from '@utils/constants';
 import { calculateTotalBalance, getAccountBalanceKey } from '@utils/helper';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 const RowContainer = styled.div((props) => ({
@@ -61,8 +63,10 @@ const BalanceContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'flex-start',
+  width: 'fit-content',
   alignItems: 'center',
   gap: props.theme.spacing(5),
+  cursor: 'pointer',
 }));
 
 interface BalanceCardProps {
@@ -73,10 +77,10 @@ interface BalanceCardProps {
 function BalanceCard(props: BalanceCardProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const selectedAccount = useSelectedAccount();
-  const { fiatCurrency, hideStx, accountBalances } = useWalletSelector();
+  const dispatch = useDispatch();
+  const { fiatCurrency, hideStx, accountBalances, balanceHidden } = useWalletSelector();
   const { confirmedBalance: btcBalance, isLoading: btcBalanceLoading } =
-    useSelectedAccountBtcBalance();
-  const { data: stxData } = useStxWalletData();
+    useSelectedAccountBtcBalance();  const { data: stxData } = useStxWalletData();
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const { setAccountBalance } = useAccountBalance();
   const { isLoading, isRefetching } = props;
@@ -127,6 +131,12 @@ function BalanceCard(props: BalanceCardProps) {
     })();
   });
 
+  const onClickBalance = () => dispatch(setBalanceHiddenToggleAction({ toggle: !balanceHidden }));
+
+  const onKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') onClickBalance();
+  };
+
   return (
     <>
       <RowContainer>
@@ -140,20 +150,29 @@ function BalanceCard(props: BalanceCardProps) {
           <BarLoader loaderSize={LoaderSize.LARGE} />
         </BarLoaderContainer>
       ) : (
-        <BalanceContainer>
-          <NumericFormat
-            value={balance}
-            displayType="text"
-            prefix={`${currencySymbolMap[fiatCurrency]}`}
-            thousandSeparator
-            renderText={(value: string) => (
-              <BalanceAmountText data-testid="total-balance-value">{value}</BalanceAmountText>
-            )}
-          />
-          {isRefetching && (
-            <div>
-              <Spinner color="white" size={16} />
-            </div>
+        <BalanceContainer onClick={onClickBalance} role="button" tabIndex={0} onKeyDown={onKeyDown}>
+          {balanceHidden && (
+            <BalanceAmountText data-testid="total-balance-value">
+              {HIDDEN_BALANCE_LABEL}
+            </BalanceAmountText>
+          )}
+          {!balanceHidden && (
+            <>
+              <NumericFormat
+                value={balance}
+                displayType="text"
+                prefix={`${currencySymbolMap[fiatCurrency]}`}
+                thousandSeparator
+                renderText={(value: string) => (
+                  <BalanceAmountText data-testid="total-balance-value">{value}</BalanceAmountText>
+                )}
+              />
+              {isRefetching && (
+                <div>
+                  <Spinner color="white" size={16} />
+                </div>
+              )}
+            </>
           )}
         </BalanceContainer>
       )}

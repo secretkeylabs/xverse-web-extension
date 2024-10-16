@@ -159,4 +159,5 @@ export type WalletStateV5 = Omit<
   hiddenCollectibleIds: Record<string, Record<string, string>>;
   starredCollectibleIds: Record<string, Array<{ id: string; collectionId: string }>>;
   avatarIds: Record<string, AvatarInfo>;
+  balanceHidden: boolean;
 };

@@ -4,13 +4,14 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowsDownUp } from '@phosphor-icons/react';
 import {
+  type BtcPaymentType,
   btcToSats,
   currencySymbolMap,
   getBtcFiatEquivalent,
   getFiatBtcEquivalent,
-  type BtcPaymentType,
 } from '@secretkeylabs/xverse-core';
 import Input, { ConvertComplication, MaxButton, VertRule } from '@ui-library/input';
+import { HIDDEN_BALANCE_LABEL } from '@utils/constants';
 import { satsToBtcString } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
@@ -59,7 +60,7 @@ function AmountSelector({
   disabled = false,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
-  const { fiatCurrency } = useWalletSelector();
+  const { fiatCurrency, balanceHidden } = useWalletSelector();
   const { btcFiatRate } = useSupportedCoinRates();
   const selectedAccount = useSelectedAccount(overridePaymentType);
   const { data: addressBtcBalance } = useBtcAddressBalance(selectedAccount.btcAddress);
@@ -179,8 +180,9 @@ function AmountSelector({
           prefix={useBtcValue ? '' : `~${currencySymbolMap[fiatCurrency]}`}
           renderText={(value: string) => (
             <BalanceDiv data-testid="balance-label">
-              <BalanceText>{t('BALANCE')} </BalanceText> {value}{' '}
-              {useBtcValue ? 'BTC' : fiatCurrency}
+              <BalanceText>{t('BALANCE')}</BalanceText>
+              {balanceHidden && ` ${HIDDEN_BALANCE_LABEL}`}
+              {!balanceHidden && ` ${value} ${useBtcValue ? 'BTC' : fiatCurrency}`}
             </BalanceDiv>
           )}
         />

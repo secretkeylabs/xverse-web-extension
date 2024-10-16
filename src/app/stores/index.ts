@@ -144,6 +144,7 @@ const migrations = {
       hiddenCollectibleIds: (state as unknown as WalletStateV5).hiddenCollectibleIds || {},
       starredCollectibleIds: (state as unknown as WalletStateV5).starredCollectibleIds || {},
       avatarIds: migrateAvatarIds((state as unknown as WalletStateV5).avatarIds),
+      balanceHidden: false,
     };
   },
   /* *

@@ -340,3 +340,12 @@ export function removeAccountAvatarAction(params: {
     ...params,
   };
 }
+
+export function setBalanceHiddenToggleAction(params: {
+  toggle: boolean;
+}): actions.SetBalanceHiddenToggle {
+  return {
+    type: actions.SetBalanceHiddenToggleKey,
+    ...params,
+  };
+}

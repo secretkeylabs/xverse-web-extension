@@ -6,6 +6,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { Star } from '@phosphor-icons/react';
 import { getBtcFiatEquivalent, satsToBtc, type BtcAddressType } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
+import { HIDDEN_BALANCE_LABEL } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import styled from 'styled-components';
 
@@ -70,7 +71,7 @@ export default function AddressBalance({
   addressType,
   totalBalance,
 }: AddressBalanceProps) {
-  const { fiatCurrency, btcPaymentAddressType } = useWalletSelector();
+  const { fiatCurrency, btcPaymentAddressType, balanceHidden } = useWalletSelector();
   const { btcFiatRate } = useSupportedCoinRates();
 
   if (balance === undefined) {
@@ -104,12 +105,18 @@ export default function AddressBalance({
         <StyledP typography="body_m" color="white_200">{`${balancePercentage}%`}</StyledP>
       </TitleContainer>
       <BalanceContainer>
-        <StyledP typography="body_bold_m">{satsToBtc(BigNumber(balance)).toString()}</StyledP>
+        <StyledP typography="body_bold_m">
+          {balanceHidden ? HIDDEN_BALANCE_LABEL : satsToBtc(BigNumber(balance)).toString()}
+        </StyledP>
         <StyledP typography="body_m" color="white_200">
-          <FiatAmountText
-            fiatAmount={getBtcFiatEquivalent(BigNumber(balance), BigNumber(btcFiatRate))}
-            fiatCurrency={fiatCurrency}
-          />
+          {balanceHidden ? (
+            HIDDEN_BALANCE_LABEL
+          ) : (
+            <FiatAmountText
+              fiatAmount={getBtcFiatEquivalent(BigNumber(balance), BigNumber(btcFiatRate))}
+              fiatCurrency={fiatCurrency}
+            />
+          )}
         </StyledP>
       </BalanceContainer>
     </Container>
