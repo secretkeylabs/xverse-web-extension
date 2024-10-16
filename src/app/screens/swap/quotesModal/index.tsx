@@ -149,7 +149,7 @@ function QuotesModal({
                 ? amm.receiveAmount
                 : btcToSats(BigNumber(amount).dividedBy(BigNumber(amm.receiveAmount))).toFixed(2)
             }
-            floorText={t('EXCHANGE_RATE')}
+            floorText={amm.to.protocol === 'runes' ? t('EXCHANGE_RATE') : undefined}
             image={{ ft: { image: amm.provider.logo } as FungibleToken }}
             onClick={() => ammProviderClicked && ammProviderClicked(amm)}
             subtitle={getReceiveAmountSubtitle(amm, ammProviders)}
