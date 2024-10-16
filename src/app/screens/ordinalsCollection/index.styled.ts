@@ -7,7 +7,7 @@ import Button from '@ui-library/button';
 import styled from 'styled-components';
 
 interface DetailSectionProps {
-  isGalleryOpen?: boolean;
+  $isGalleryOpen?: boolean;
 }
 
 /* layout */
@@ -23,7 +23,7 @@ export const PageHeader = styled.div<DetailSectionProps>`
   padding: ${(props) => props.theme.space.xs};
   padding-top: 0;
   max-width: 1224px;
-  margin-top: ${(props) => (props.isGalleryOpen ? props.theme.space.xxl : props.theme.space.l)};
+  margin-top: ${(props) => (props.$isGalleryOpen ? props.theme.space.xxl : props.theme.space.l)};
   margin-left: auto;
   margin-right: auto;
   width: 100%;
@@ -32,15 +32,15 @@ export const PageHeader = styled.div<DetailSectionProps>`
 // TODO tim: use media queries for this once we get responsive layouts with breakpoints
 export const PageHeaderContent = styled.div<DetailSectionProps>`
   display: flex;
-  flex-direction: ${(props) => (props.isGalleryOpen ? 'row' : 'column')};
-  justify-content: ${(props) => (props.isGalleryOpen ? 'space-between' : 'initial')};
+  flex-direction: ${(props) => (props.$isGalleryOpen ? 'row' : 'column')};
+  justify-content: ${(props) => (props.$isGalleryOpen ? 'space-between' : 'initial')};
   row-gap: ${(props) => props.theme.space.xl};
 `;
 
 export const AttributesContainer = styled.div<DetailSectionProps>`
   display: flex;
-  flex-direction: ${(props) => (props.isGalleryOpen ? 'column' : 'row')};
-  justify-content: ${(props) => (props.isGalleryOpen ? 'space-between' : 'initial')};
+  flex-direction: ${(props) => (props.$isGalleryOpen ? 'column' : 'row')};
+  justify-content: ${(props) => (props.$isGalleryOpen ? 'space-between' : 'initial')};
   column-gap: ${(props) => props.theme.space.m};
 `;
 
@@ -74,7 +74,6 @@ export const StyledWrenchErrorMessage = styled(WrenchErrorMessage)`
 
 export const BackButtonContainer = styled.div`
   display: flex;
-  flex-direction: row;
   margin-bottom: ${(props) => props.theme.space.xxl};
 `;
 

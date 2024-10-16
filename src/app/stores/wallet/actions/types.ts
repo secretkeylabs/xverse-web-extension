@@ -43,6 +43,7 @@ export const UpdateSavedNamesKey = 'UpdateSavedNamesKey';
 export const AddToStarCollectiblesKey = 'AddToStarCollectiblesKey';
 export const RemoveFromStarCollectiblesKey = 'RemoveFromStarCollectiblesKey';
 export const AddToHideCollectiblesKey = 'AddToHideCollectiblesKey';
+export const SetHiddenCollectiblesKey = 'SetHiddenCollectiblesKey';
 export const RemoveFromHideCollectiblesKey = 'RemoveFromHideCollectiblesKey';
 export const RemoveAllFromHideCollectiblesKey = 'RemoveAllFromHideCollectiblesKey';
 export const SetAccountAvatarKey = 'SetAccountAvatarKey';
@@ -272,6 +273,11 @@ export interface RemoveAllFromHideCollectibles {
   address: string;
 }
 
+export interface SetHiddenCollectibles {
+  type: typeof SetHiddenCollectiblesKey;
+  collectibleIds: Record<string, Record<string, string>>;
+}
+
 export interface SetAccountAvatar {
   type: typeof SetAccountAvatarKey;
   address: string;
@@ -328,5 +334,6 @@ export type WalletActions =
   | AddToHideCollectibles
   | RemoveFromHideCollectibles
   | RemoveAllFromHideCollectibles
+  | SetHiddenCollectibles
   | SetAccountAvatar
   | RemoveAccountAvatar;

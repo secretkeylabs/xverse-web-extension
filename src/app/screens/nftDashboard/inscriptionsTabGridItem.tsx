@@ -34,12 +34,12 @@ const InfoContainer = styled.div`
 
 const StyledItemIdContainer = styled.div`
   display: flex;
-  gap: 4px;
+  gap: ${(props) => props.theme.space.xxs};
   width: 100%;
 `;
 
 const StyledStar = styled(Star)`
-  margin-top: 2px;
+  margin-top: ${(props) => props.theme.space.xxxs};
 `;
 
 const StyledItemId = styled(StyledP)`
@@ -76,12 +76,12 @@ function InscriptionsTabGridItem({ item: collection }: { item: InscriptionCollec
     (id) => id === getCollectionKey(collection),
   );
 
-  const handleClickCollectionId = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClickCollection = (e: React.MouseEvent<HTMLButtonElement>) => {
     const collectionId = e.currentTarget.value;
     navigate(`/nft-dashboard/ordinals-collection/${collectionId}/${isItemHidden ? 'hidden' : ''}`);
   };
 
-  const handleClickInscriptionId = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleClickInscription = (e: React.MouseEvent<HTMLButtonElement>) => {
     const inscriptionId = e.currentTarget.value;
     navigate(`/nft-dashboard/ordinal-detail/${inscriptionId}/${isItemHidden ? 'hidden' : ''}`);
   };
@@ -95,7 +95,7 @@ function InscriptionsTabGridItem({ item: collection }: { item: InscriptionCollec
         data-testid="inscription-container"
         type="button"
         value={getCollectionKey(collection)}
-        onClick={isCollection(collection) ? handleClickCollectionId : handleClickInscriptionId}
+        onClick={isCollection(collection) ? handleClickCollection : handleClickInscription}
       >
         {!collection.thumbnail_inscriptions ? ( // eslint-disable-line no-nested-ternary
           <OrdinalImage ordinal={{ id: '', content_type: 'unknown', number: 0 }} />

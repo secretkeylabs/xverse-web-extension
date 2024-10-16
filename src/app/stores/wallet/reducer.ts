@@ -24,6 +24,7 @@ import {
   SetAccountBalanceKey,
   SetBrc20ManageTokensKey,
   SetFeeMultiplierKey,
+  SetHiddenCollectiblesKey,
   SetNotificationBannersKey,
   SetRunesManageTokensKey,
   SetShowSpamTokensKey,
@@ -358,6 +359,14 @@ const walletReducer = (
         hiddenCollectibleIds: {
           ...state.hiddenCollectibleIds,
           [action.address]: {},
+        },
+      };
+    case SetHiddenCollectiblesKey:
+      return {
+        ...state,
+        hiddenCollectibleIds: {
+          ...state.hiddenCollectibleIds,
+          ...action.collectibleIds,
         },
       };
     case SetAccountAvatarKey:

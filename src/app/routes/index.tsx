@@ -38,7 +38,7 @@ import ManageTokens from '@screens/manageTokens';
 import MintRune from '@screens/mintRune';
 import NftCollection from '@screens/nftCollection';
 import NftDashboard from '@screens/nftDashboard';
-import Index from '@screens/nftDashboard/hidden';
+import NftDashboardHidden from '@screens/nftDashboard/hidden';
 import SupportedRarities from '@screens/nftDashboard/supportedRarities';
 import NftDetailScreen from '@screens/nftDetail';
 import OrdinalDetailScreen from '@screens/ordinalDetail';
@@ -574,7 +574,7 @@ const router = createHashRouter([
         path: 'nft-dashboard/hidden',
         element: (
           <AuthGuard>
-            <Index />
+            <NftDashboardHidden />
           </AuthGuard>
         ),
       },
@@ -611,7 +611,7 @@ const router = createHashRouter([
         element: <SendNft />,
       },
       {
-        path: 'nft-dashboard/nft-collection/:id',
+        path: 'nft-dashboard/nft-collection/:id/:from?',
         element: (
           <AuthGuard>
             <NftCollection />

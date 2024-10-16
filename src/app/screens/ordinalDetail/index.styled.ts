@@ -227,54 +227,12 @@ export const DetailSection = styled.div<DetailSectionProps>((props) => ({
   width: '100%',
 }));
 
-export const ExtensionLoaderContainer = styled.div({
-  height: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'space-around',
-  alignItems: 'center',
-});
-
-export const GalleryLoaderContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-});
-
 export const StyledBarLoader = styled(BetterBarLoader)<{
   withMarginBottom?: boolean;
 }>((props) => ({
   padding: 0,
   borderRadius: props.theme.radius(1),
-  marginBottom: props.withMarginBottom ? props.theme.spacing(6) : 0,
-}));
-
-export const StyledSeparator = styled(Separator)`
-  width: 100%;
-`;
-
-export const TitleLoader = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-export const ActionButtonsLoader = styled.div((props) => ({
-  display: 'flex',
-  justifyContent: 'center',
-  columnGap: props.theme.spacing(11),
-}));
-
-export const ActionButtonLoader = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  rowGap: props.theme.space.xs,
-}));
-
-export const InfoContainer = styled.div((props) => ({
-  width: '100%',
-  display: 'flex',
-  justifyContent: 'space-between',
-  padding: `0 ${props.theme.space.m}`,
+  marginBottom: props.withMarginBottom ? props.theme.space.s : 0,
 }));
 
 export const RareSatsBundleCallout = styled(Callout)<DetailSectionProps>((props) => ({

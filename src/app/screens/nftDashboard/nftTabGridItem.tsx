@@ -1,9 +1,13 @@
 import CollectibleCollage from '@components/collectibleCollage/collectibleCollage';
+import useSelectedAccount from '@hooks/useSelectedAccount';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { Star } from '@phosphor-icons/react';
 import type { StacksCollectionData } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { getNftsTabGridItemSubText } from '@utils/nfts';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import Theme from 'theme';
 import Nft from './nft';
 import NftImage from './nftImage';
 
@@ -24,6 +28,12 @@ const InfoContainer = styled.div`
   width: 100%;
 `;
 
+const TitleContainer = styled.div`
+  display: flex;
+  gap: 4px;
+  width: 100%;
+`;
+
 const StyledItemId = styled(StyledP)`
   text-align: left;
   text-wrap: nowrap;
@@ -40,17 +50,32 @@ const StyledItemSub = styled(StyledP)`
   width: 100%;
 `;
 
-function NftTabGridItem({
-  item: collection,
-  isLoading = false,
-}: {
+const StyledStar = styled(Star)`
+  margin-top: ${(props) => props.theme.space.xxxs};
+`;
+
+type Props = {
   item: StacksCollectionData;
   isLoading?: boolean;
-}) {
+};
+
+function NftTabGridItem({ item: collection, isLoading = false }: Props) {
   const navigate = useNavigate();
+  const { stxAddress } = useSelectedAccount();
+  const { hiddenCollectibleIds, starredCollectibleIds } = useWalletSelector();
+
+  const isItemHidden = Object.keys(hiddenCollectibleIds[stxAddress] ?? {}).some(
+    (id) => id === collection.collection_id,
+  );
+
+  const collectionStarred = starredCollectibleIds[stxAddress]?.some(
+    ({ id }) => id === collection.collection_id,
+  );
 
   const handleClickCollection = () => {
-    navigate(`nft-collection/${collection.collection_id}`);
+    navigate(
+      `/nft-dashboard/nft-collection/${collection.collection_id}/${isItemHidden ? 'hidden' : ''}`,
+    );
   };
 
   const itemId = collection.collection_name;
@@ -68,9 +93,12 @@ function NftTabGridItem({
         )}
       </ThumbnailContainer>
       <InfoContainer>
-        <StyledItemId typography="body_bold_m" color="white_0">
-          {itemId}
-        </StyledItemId>
+        <TitleContainer>
+          {collectionStarred && <StyledStar size={14} color={Theme.colors.white_0} weight="fill" />}
+          <StyledItemId typography="body_bold_m" color="white_0">
+            {itemId}
+          </StyledItemId>
+        </TitleContainer>
         <StyledItemSub typography="body_medium_m" color="white_400">
           {itemSubText}
         </StyledItemSub>

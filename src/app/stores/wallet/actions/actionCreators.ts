@@ -313,6 +313,15 @@ export function removeAllFromHideCollectiblesAction(params: {
   };
 }
 
+export function setHiddenCollectiblesAction(params: {
+  collectibleIds: Record<string, Record<string, string>>;
+}): actions.SetHiddenCollectibles {
+  return {
+    type: actions.SetHiddenCollectiblesKey,
+    ...params,
+  };
+}
+
 export function setAccountAvatarAction(params: {
   address: string;
   avatar: actions.AvatarInfo;

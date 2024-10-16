@@ -757,7 +757,9 @@
     "FROM_RARE_SAT_BUNDLE": "This inscription belongs to the same bundle as other assets. Transferring it will involve transferring the full bundle.",
     "HOLDS_RARE_SAT": "This inscription holds a rare sat.",
     "HIDDEN_COLLECTIBLES": "Hidden collectibles",
-    "UNHIDE_ALL": "Unhide all"
+    "UNHIDE_ALL": "Unhide all",
+    "HIDDEN_ITEMS_RESTORED": "Hidden items restored",
+    "ITEMS_RETURNED_TO_HIDDEN": "Items returned to hidden"
   },
   "RESTORE_FUND_SCREEN": {
     "TITLE": "Recover assets",

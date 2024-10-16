@@ -70,6 +70,7 @@ export const MAX_ACC_NAME_LENGTH = 20;
 export const EMPTY_LABEL = '--';
 export const OPTIONS_DIALOG_WIDTH = 179;
 export const SPAM_OPTIONS_WIDTH = 244;
+export const LONG_TOAST_DURATION = 4000;
 
 export const XverseProviderInfo: Provider = {
   id: 'XverseProviders.BitcoinProvider',

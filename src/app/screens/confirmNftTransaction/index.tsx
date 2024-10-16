@@ -77,7 +77,7 @@ function ConfirmNftTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const selectedAccount = useSelectedAccount();
-  const { avatarIds } = useWalletSelector();
+  const { avatarIds, network } = useWalletSelector();
   const selectedAvatar = avatarIds[selectedAccount.ordinalsAddress];
   const [fee, setFee] = useState<BigNumber>();
   const navigate = useNavigate();
@@ -89,7 +89,6 @@ function ConfirmNftTransaction() {
 
   const { unsignedTx: unsignedTxHex, recipientAddress } = location.state;
   const unsignedTx = useMemo(() => deserializeTransaction(unsignedTxHex), [unsignedTxHex]);
-  const { network } = useWalletSelector();
   const { refetch } = useStxWalletData();
   const selectedNetwork = useNetworkSelector();
   const {
