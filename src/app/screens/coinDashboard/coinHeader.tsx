@@ -177,6 +177,9 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
       return '';
     }
     if (currency === 'STX') {
+      if (new BigNumber(stxData?.locked ?? 0).gt(0)) {
+        return `Available ${commonT('STACKS')} Balance`;
+      }
       return commonT('STACKS');
     }
     if (currency === 'BTC') {
