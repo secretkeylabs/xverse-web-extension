@@ -34,7 +34,7 @@ function FiatAmountText({ className, fiatAmount, fiatCurrency, dataTestId }: Pro
       value={fiatAmount.toFixed(2).toString()}
       displayType="text"
       thousandSeparator
-      prefix={`~ ${currencySymbolMap[fiatCurrency]}`}
+      prefix={` ${currencySymbolMap[fiatCurrency]}`}
       suffix={` ${fiatCurrency}`}
       data-testid={dataTestId}
     />

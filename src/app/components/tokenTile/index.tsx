@@ -1,5 +1,6 @@
 import { BetterBarLoader } from '@components/barLoader';
 import { StyledFiatAmountText } from '@components/fiatAmountText';
+import PercentageChange from '@components/percentageChange';
 import TokenImage from '@components/tokenImage';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
@@ -85,6 +86,11 @@ const StyledBarLoader = styled(BetterBarLoader)<{
   borderRadius: props.theme.radius(1),
   marginBottom: props.withMarginBottom ? props.theme.space.xxs : 0,
 }));
+
+const FiatCurrencyRow = styled.div({
+  display: 'flex',
+  alignItems: 'center',
+});
 
 function TokenLoader() {
   return (
@@ -174,7 +180,10 @@ function TokenTile({
               thousandSeparator
               renderText={(value: string) => <CoinBalanceText>{value}</CoinBalanceText>}
             />
-            <StyledFiatAmountText fiatAmount={getFiatAmount()} fiatCurrency={fiatCurrency} />
+            <FiatCurrencyRow>
+              {fungibleToken && <PercentageChange ftCurrencyPairs={[[fungibleToken, currency]]} />}
+              <StyledFiatAmountText fiatAmount={getFiatAmount()} fiatCurrency={fiatCurrency} />
+            </FiatCurrencyRow>
           </AmountContainer>
         )
       )}
