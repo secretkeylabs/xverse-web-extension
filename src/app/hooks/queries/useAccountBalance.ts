@@ -13,7 +13,7 @@ import {
   type TokensResponse,
 } from '@secretkeylabs/xverse-core';
 import { setAccountBalanceAction } from '@stores/wallet/actions/actionCreators';
-import { calculateTotalBalance } from '@utils/helper';
+import { calculateTotalBalance, getAccountBalanceKey } from '@utils/helper';
 import axios from 'axios';
 import BigNumber from 'bignumber.js';
 import { useEffect, useRef, useState } from 'react';
@@ -65,21 +65,35 @@ const useAccountBalance = () => {
     let finalRunesCoinsList: FungibleTokenWithStates[] = [];
 
     try {
-      if (account.btcAddress) {
-        const btcData: BtcAddressData = await btcClient.getBalance(account.btcAddress);
-        btcBalance = btcData.finalBalance.toString();
-      }
+      const getBtcBalance = async (address?: string) => {
+        if (!address) {
+          return '0';
+        }
+        const btcData: BtcAddressData = await btcClient.getBalance(address);
+        return btcData.finalBalance.toString();
+      };
 
-      if (account.ordinalsAddress) {
+      const [nativeBalance, nestedBalance, taprootBalance] = await Promise.all([
+        getBtcBalance(account.btcAddresses.native?.address),
+        getBtcBalance(account.btcAddresses.nested?.address),
+        getBtcBalance(account.btcAddresses.taproot.address),
+      ]);
+      btcBalance = BigNumber(nativeBalance).plus(nestedBalance).plus(taprootBalance).toString();
+
+      if (account.btcAddresses.taproot.address) {
         const fetchBrc20Balances = fetchBrc20FungibleTokens(
-          account.ordinalsAddress,
+          account.btcAddresses.taproot.address,
           fiatCurrency,
           network,
         );
         finalBrcCoinsList = (await fetchBrc20Balances())
           .map(withDerivedState)
           .filter((ft) => ft.isEnabled);
-        const runeBalances = fetchRuneBalances(runesApi, account.ordinalsAddress, fiatCurrency);
+        const runeBalances = fetchRuneBalances(
+          runesApi,
+          account.btcAddresses.taproot.address,
+          fiatCurrency,
+        );
         finalRunesCoinsList = (await runeBalances())
           .map(withDerivedState)
           .filter((ft) => ft.isEnabled);
@@ -119,7 +133,7 @@ const useAccountBalance = () => {
       btcFiatRate,
       hideStx,
     });
-    dispatch(setAccountBalanceAction(account.btcAddress, totalBalance));
+    dispatch(setAccountBalanceAction(getAccountBalanceKey(account), totalBalance));
     return totalBalance;
   };
 
@@ -158,7 +172,7 @@ const useAccountBalance = () => {
 
   const setAccountBalance = (account: Account | null, balance: string) => {
     if (account) {
-      dispatch(setAccountBalanceAction(account.btcAddress, balance));
+      dispatch(setAccountBalanceAction(getAccountBalanceKey(account), balance));
     }
   };
 

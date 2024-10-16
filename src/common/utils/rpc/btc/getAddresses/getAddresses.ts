@@ -1,6 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { getTabIdFromPort } from '@common/utils';
-import getSelectedAccount from '@common/utils/getSelectedAccount';
+import getSelectedAccount, { embellishAccountWithDetails } from '@common/utils/getSelectedAccount';
 import { makeContext, openPopup } from '@common/utils/popup';
 import * as utils from '@components/permissionsManager/utils';
 import { getAddressesRequestMessageSchema, type RpcRequestMessage } from '@sats-connect/core';
@@ -50,6 +50,7 @@ export const handleGetAddresses = async (message: RpcRequestMessage, port: chrom
     selectedAccountType,
     accountsList: softwareAccountsList,
     ledgerAccountsList,
+    btcPaymentAddressType,
   } = rootStore.store.getState().walletState;
 
   const account = getSelectedAccount({
@@ -64,7 +65,8 @@ export const handleGetAddresses = async (message: RpcRequestMessage, port: chrom
     return;
   }
 
-  const addresses = accountPurposeAddresses(account, parseResult.output.params.purposes);
+  const embellishedAccount = embellishAccountWithDetails(account, btcPaymentAddressType);
+  const addresses = accountPurposeAddresses(embellishedAccount, parseResult.output.params.purposes);
   sendGetAddressesSuccessResponseMessage({
     tabId,
     messageId: message.id,

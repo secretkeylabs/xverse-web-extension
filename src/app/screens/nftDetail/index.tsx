@@ -99,19 +99,17 @@ function NftDetailScreen() {
     handleOnSendClick,
     galleryTitle,
   } = useNftDetailScreen();
-  const selectedAccount = useSelectedAccount();
+  const { ordinalsAddress } = useSelectedAccount();
   const { avatarIds } = useWalletSelector();
-  const currentAvatar = avatarIds[selectedAccount.btcAddress];
+  const selectedAvatar = avatarIds[ordinalsAddress];
   const isNftSelectedAsAvatar =
-    currentAvatar?.type === 'stacks' && currentAvatar.nft.token_id === nftData?.token_id;
+    selectedAvatar?.type === 'stacks' && selectedAvatar.nft.token_id === nftData?.token_id;
 
   const handleSetAvatar = useCallback(() => {
-    const address = selectedAccount.btcAddress;
-
-    if (address && nftData?.token_id) {
+    if (ordinalsAddress && nftData?.token_id) {
       dispatch(
         setAccountAvatarAction({
-          address,
+          address: ordinalsAddress,
           avatar: { type: 'stacks', nft: nftData },
         }),
       );
@@ -123,13 +121,16 @@ function NftDetailScreen() {
           action={{
             text: commonT('UNDO'),
             onClick: () => {
-              if (currentAvatar?.type) {
-                dispatch(setAccountAvatarAction({ address, avatar: currentAvatar }));
+              if (selectedAvatar?.type) {
+                dispatch(
+                  setAccountAvatarAction({ address: ordinalsAddress, avatar: selectedAvatar }),
+                );
               } else {
-                dispatch(removeAccountAvatarAction({ address }));
+                dispatch(removeAccountAvatarAction({ address: ordinalsAddress }));
               }
 
               toast.remove(toastId);
+              toast.custom(<SnackBar text={optionsDialogT('NFT_AVATAR.UNDO')} type="neutral" />);
             },
           }}
         />,
@@ -137,13 +138,13 @@ function NftDetailScreen() {
     }
 
     optionsSheet.close();
-  }, [dispatch, optionsDialogT, commonT, selectedAccount, nftData, optionsSheet, currentAvatar]);
+  }, [dispatch, optionsDialogT, commonT, ordinalsAddress, nftData, optionsSheet, selectedAvatar]);
 
   const handleRemoveAvatar = useCallback(() => {
-    dispatch(removeAccountAvatarAction({ address: selectedAccount.btcAddress }));
+    dispatch(removeAccountAvatarAction({ address: ordinalsAddress }));
     toast.custom(<SnackBar text={optionsDialogT('NFT_AVATAR.REMOVE_TOAST')} type="neutral" />);
     optionsSheet.close();
-  }, [dispatch, optionsDialogT, selectedAccount, optionsSheet]);
+  }, [dispatch, optionsDialogT, ordinalsAddress, optionsSheet]);
 
   const nftAttributes = nftData?.nft_token_attributes?.length !== 0 && (
     <>

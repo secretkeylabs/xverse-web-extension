@@ -1,5 +1,6 @@
-import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
+import useBtcAddressBalance from '@hooks/useBtcAddressBalance';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowsDownUp } from '@phosphor-icons/react';
 import {
@@ -7,6 +8,7 @@ import {
   currencySymbolMap,
   getBtcFiatEquivalent,
   getFiatBtcEquivalent,
+  type BtcPaymentType,
 } from '@secretkeylabs/xverse-core';
 import Input, { ConvertComplication, MaxButton, VertRule } from '@ui-library/input';
 import { satsToBtcString } from '@utils/helper';
@@ -45,6 +47,7 @@ type Props = {
   sendMax: boolean;
   setSendMax: (sendMax: boolean) => void;
   disabled?: boolean;
+  overridePaymentType?: BtcPaymentType;
 };
 
 function AmountSelector({
@@ -52,12 +55,14 @@ function AmountSelector({
   setAmountSats,
   sendMax,
   setSendMax,
+  overridePaymentType,
   disabled = false,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { fiatCurrency } = useWalletSelector();
-  const { data: btcBalanceSats } = useBtcWalletData();
   const { btcFiatRate } = useSupportedCoinRates();
+  const selectedAccount = useSelectedAccount(overridePaymentType);
+  const { data: addressBtcBalance } = useBtcAddressBalance(selectedAccount.btcAddress);
 
   const [amountDisplay, setAmountDisplay] = useState(
     amountSats && satsToBtcString(new BigNumber(amountSats)),
@@ -79,7 +84,7 @@ function AmountSelector({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- We specifically only want to run this on these 2 deps
   }, [sendMax, amountSats]);
 
-  const btcBalance = new BigNumber(btcBalanceSats ?? 0);
+  const btcBalance = new BigNumber(addressBtcBalance?.confirmedBalance ?? 0);
   const balance = useBtcValue
     ? satsToBtcString(btcBalance)
     : getBtcFiatEquivalent(btcBalance, new BigNumber(btcFiatRate)).toFixed(2);

@@ -27,13 +27,13 @@ function SendOrdinalScreen() {
   const isRareSatParam = params.get('isRareSat');
   const vout = params.get('vout');
   const isRareSat = isRareSatParam === 'true';
-  const fromRune = params.get('fromRune');
 
   const context = useTransactionContext();
   const { data: selectedOrdinal } = useAddressInscription(isRareSat ? undefined : id);
   const selectedAccount = useSelectedAccount();
   const { avatarIds } = useWalletSelector();
-  const currentAvatar = avatarIds[selectedAccount.btcAddress];
+
+  const selectedAvatar = avatarIds[selectedAccount.ordinalsAddress];
   const { data: btcFeeRate, isLoading: feeRatesLoading } = useBtcFeeRate();
   const [currentStep, setCurrentStep] = useState<Step>(Step.SelectRecipient);
   const [feeRate, setFeeRate] = useState('');
@@ -171,10 +171,10 @@ function SendOrdinalScreen() {
       });
 
       if (
-        currentAvatar?.type === 'inscription' &&
-        currentAvatar.inscription?.id === selectedOrdinal?.id
+        selectedAvatar?.type === 'inscription' &&
+        selectedAvatar.inscription?.id === selectedOrdinal?.id
       ) {
-        dispatch(removeAccountAvatarAction({ address: selectedAccount.btcAddress }));
+        dispatch(removeAccountAvatarAction({ address: selectedAccount.ordinalsAddress }));
       }
     } catch (e) {
       console.error(e);

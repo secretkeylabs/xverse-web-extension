@@ -1,14 +1,8 @@
 import dashboardIcon from '@assets/img/dashboard-icon.svg';
-import BitcoinToken from '@assets/img/dashboard/bitcoin_token.svg';
 import ListDashes from '@assets/img/dashboard/list_dashes.svg';
-import ordinalsIcon from '@assets/img/dashboard/ordinalBRC20.svg';
-import stacksIcon from '@assets/img/dashboard/stx_icon.svg';
 import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
-import ReceiveCardComponent from '@components/receiveCardComponent';
-import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
-import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import BottomBar from '@components/tabBar';
 import {
   useGetBrc20FungibleTokens,
@@ -51,7 +45,6 @@ import {
   setSpamTokenAction,
 } from '@stores/wallet/actions/actionCreators';
 import Button from '@ui-library/button';
-import Sheet from '@ui-library/sheet';
 import SnackBar from '@ui-library/snackBar';
 import type { CurrencyTypes } from '@utils/constants';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
@@ -64,6 +57,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from 'styled-components';
 import SquareButton from '../../components/squareButton';
+import AnnouncementModal from './announcementModal';
 import BalanceCard from './balanceCard';
 import BannerCarousel from './bannerCarousel';
 import {
@@ -71,54 +65,34 @@ import {
   ButtonText,
   ColumnContainer,
   Container,
-  Icon,
-  IconBackground,
-  MergedIcon,
-  MergedOrdinalsIcon,
   ModalButtonContainer,
   ModalContent,
   ModalControlsContainer,
   ModalDescription,
   ModalIcon,
   ModalTitle,
-  ReceiveContainer,
   RowButtonContainer,
-  StacksIcon,
   StyledDivider,
   StyledDividerSingle,
   StyledTokenTile,
   TokenListButton,
   TokenListButtonContainer,
-  VerifyButtonContainer,
-  VerifyOrViewContainer,
 } from './index.styled';
+import ReceiveSheet from './receiveSheet';
 
 function Home() {
   const { t } = useTranslation('translation', {
     keyPrefix: 'DASHBOARD_SCREEN',
   });
   const selectedAccount = useSelectedAccount();
-  const { stxAddress, btcAddress, ordinalsAddress } = selectedAccount;
-  const {
-    showBtcReceiveAlert,
-    showOrdinalReceiveAlert,
-    showDataCollectionAlert,
-    hideStx,
-    spamToken,
-    notificationBanners,
-  } = useWalletSelector();
+  const { stxAddress, btcAddress } = selectedAccount;
+  const { showDataCollectionAlert, hideStx, spamToken, notificationBanners } = useWalletSelector();
   const theme = useTheme();
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openBuyModal, setOpenBuyModal] = useState(false);
-  const [isBtcReceiveAlertVisible, setIsBtcReceiveAlertVisible] = useState(false);
-  const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible] = useState(false);
-  const [areReceivingAddressesVisible, setAreReceivingAddressesVisible] = useState(
-    !isLedgerAccount(selectedAccount),
-  );
-  const [choseToVerifyAddresses, setChoseToVerifyAddresses] = useState(false);
   const { isInitialLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } =
     useBtcWalletData();
   const { isInitialLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } =
@@ -224,15 +198,6 @@ function Home() {
     setOpenReceiveModal(true);
   };
 
-  const onReceiveModalClose = () => {
-    setOpenReceiveModal(false);
-
-    if (isLedgerAccount(selectedAccount)) {
-      setAreReceivingAddressesVisible(false);
-      setChoseToVerifyAddresses(false);
-    }
-  };
-
   const onSendModalOpen = () => {
     setOpenSendModal(true);
   };
@@ -273,14 +238,6 @@ function Home() {
     navigate('/send-btc');
   };
 
-  const onBTCReceiveSelect = () => {
-    navigate('/receive/BTC');
-  };
-
-  const onSTXReceiveSelect = () => {
-    navigate('/receive/STX');
-  };
-
   const onSendFtSelect = async (fungibleToken: FungibleToken) => {
     let route = '';
     switch (fungibleToken?.protocol) {
@@ -314,22 +271,6 @@ function Home() {
     navigate('/buy/BTC');
   };
 
-  const onOrdinalReceiveAlertOpen = () => {
-    if (showOrdinalReceiveAlert) setIsOrdinalReceiveAlertVisible(true);
-  };
-
-  const onOrdinalReceiveAlertClose = () => {
-    setIsOrdinalReceiveAlertVisible(false);
-  };
-
-  const onReceiveAlertClose = () => {
-    setIsBtcReceiveAlertVisible(false);
-  };
-
-  const onReceiveAlertOpen = () => {
-    if (showBtcReceiveAlert) setIsBtcReceiveAlertVisible(true);
-  };
-
   const handleTokenPressed = (currency: CurrencyTypes, fungibleToken?: FungibleToken) => {
     if (fungibleToken) {
       navigate(
@@ -340,98 +281,10 @@ function Home() {
     }
   };
 
-  const onOrdinalsReceivePress = () => {
-    navigate('/receive/ORD');
-  };
-
   const onSwapPressed = () => {
     trackMixPanel(AnalyticsEvents.InitiateSwapFlow, {});
     navigate('/swap');
   };
-
-  const receiveContent = (
-    <ReceiveContainer>
-      <ReceiveCardComponent
-        title={t('BITCOIN')}
-        address={btcAddress}
-        onQrAddressClick={onBTCReceiveSelect}
-        onCopyAddressClick={onReceiveAlertOpen}
-        showVerifyButton={choseToVerifyAddresses}
-        currency="BTC"
-      >
-        <Icon src={BitcoinToken} />
-      </ReceiveCardComponent>
-
-      <ReceiveCardComponent
-        title={t('ORDINALS_AND_BRC20')}
-        address={ordinalsAddress}
-        onQrAddressClick={onOrdinalsReceivePress}
-        onCopyAddressClick={onOrdinalReceiveAlertOpen}
-        showVerifyButton={choseToVerifyAddresses}
-        currency="ORD"
-      >
-        <MergedOrdinalsIcon src={ordinalsIcon} />
-      </ReceiveCardComponent>
-
-      {stxAddress && (
-        <ReceiveCardComponent
-          title={t('STACKS_AND_TOKEN')}
-          address={stxAddress}
-          onQrAddressClick={onSTXReceiveSelect}
-          showVerifyButton={choseToVerifyAddresses}
-          currency="STX"
-        >
-          <MergedIcon>
-            <StacksIcon src={stacksIcon} />
-            <IconBackground>
-              <Plus weight="bold" size={12} />
-            </IconBackground>
-          </MergedIcon>
-        </ReceiveCardComponent>
-      )}
-
-      {isLedgerAccount(selectedAccount) && !stxAddress && (
-        <Button
-          variant="secondary"
-          icon={<Plus color="white" size={16} />}
-          title={t('ADD_STACKS_ADDRESS')}
-          onClick={async () => {
-            if (!isInOptions()) {
-              await chrome.tabs.create({
-                url: chrome.runtime.getURL(`options.html#/add-stx-address-ledger`),
-              });
-            } else {
-              navigate('/add-stx-address-ledger');
-            }
-          }}
-        />
-      )}
-    </ReceiveContainer>
-  );
-
-  const verifyOrViewAddresses = (
-    <VerifyOrViewContainer>
-      <VerifyButtonContainer>
-        <Button
-          title={t('VERIFY_ADDRESSES_ON_LEDGER')}
-          onClick={() => {
-            setChoseToVerifyAddresses(true);
-            setAreReceivingAddressesVisible(true);
-          }}
-        />
-      </VerifyButtonContainer>
-      <Button
-        variant="secondary"
-        title={t('VIEW_ADDRESSES')}
-        onClick={() => {
-          if (choseToVerifyAddresses) {
-            setChoseToVerifyAddresses(false);
-          }
-          setAreReceivingAddressesVisible(true);
-        }}
-      />
-    </VerifyOrViewContainer>
-  );
 
   const handleDataCollectionDeny = () => {
     optOutMixPanel();
@@ -464,12 +317,6 @@ function Home() {
   return (
     <>
       <AccountHeaderComponent />
-      {isBtcReceiveAlertVisible && (
-        <ShowBtcReceiveAlert onReceiveAlertClose={onReceiveAlertClose} />
-      )}
-      {isOrdinalReceiveAlertVisible && (
-        <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose} />
-      )}
       <Container>
         <BalanceCard
           isLoading={loadingStxWalletData || loadingBtcWalletData}
@@ -558,9 +405,9 @@ function Home() {
             </>
           </TokenListButton>
         </TokenListButtonContainer>
-        <Sheet visible={openReceiveModal} title={t('RECEIVE')} onClose={onReceiveModalClose}>
-          {areReceivingAddressesVisible ? receiveContent : verifyOrViewAddresses}
-        </Sheet>
+
+        <ReceiveSheet visible={openReceiveModal} onClose={() => setOpenReceiveModal(false)} />
+
         <CoinSelectModal
           onSelectBitcoin={onBtcSendClick}
           onSelectStacks={onStxSendClick}
@@ -581,6 +428,7 @@ function Home() {
           title={t('BUY')}
           loadingWalletData={loadingStxWalletData || loadingBtcWalletData}
         />
+        <AnnouncementModal />
       </Container>
       <BottomBar tab="dashboard" />
 

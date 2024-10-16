@@ -10,7 +10,7 @@ type Props = {
   account: Account | null;
   isSelected: boolean;
   isAccountListView?: boolean;
-  avatar?: AvatarInfo | null;
+  avatar?: AvatarInfo;
 };
 
 function AccountAvatar({ account, avatar, isSelected, isAccountListView = false }: Props) {
@@ -30,7 +30,7 @@ function AccountAvatar({ account, avatar, isSelected, isAccountListView = false 
     );
   }
 
-  const gradient = getAccountGradient(account?.stxAddress || account?.btcAddress!);
+  const gradient = getAccountGradient(account);
 
   return (
     <GradientCircle

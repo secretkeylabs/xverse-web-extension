@@ -1,4 +1,4 @@
-import { getXverseApiClient, walletFromSeedPhrase } from '@secretkeylabs/xverse-core';
+import { getAccountFromSeedPhrase, getXverseApiClient } from '@secretkeylabs/xverse-core';
 import { useCallback } from 'react';
 import useSeedVault from './useSeedVault';
 import useWalletSelector from './useWalletSelector';
@@ -13,12 +13,14 @@ const useSanityCheck = () => {
     async (origin: string) => {
       const mnemonic = await getSeed();
 
-      const wallet = await walletFromSeedPhrase({ mnemonic, index: 0n, network: network.type });
+      const wallet = await getAccountFromSeedPhrase({ mnemonic, index: 0n, network: network.type });
       if (wallet.masterPubKey !== accountsList[0].masterPubKey) {
         await getXverseApiClient(network.type).getAppFeatures(
           {
-            ordinalsAddress: accountsList[0].ordinalsAddress,
-            paymentAddress: accountsList[0].btcAddress,
+            ordinalsAddress: accountsList[0].btcAddresses.taproot.address,
+            paymentAddress:
+              accountsList[0].btcAddresses.native?.address ||
+              accountsList[0].btcAddresses.nested?.address,
           },
           {
             [origin]: VERSION,

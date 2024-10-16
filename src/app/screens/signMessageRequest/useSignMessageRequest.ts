@@ -57,19 +57,15 @@ export const useSignMessageValidation = (requestPayload: SignMessagePayload | un
   const { t } = useTranslation('translation', { keyPrefix: 'REQUEST_ERRORS' });
   const selectedAccount = useSelectedAccount();
   const { accountsList, network } = useWalletSelector();
-  const { btcAddress } = useSelectedAccount();
   const { switchAccount } = useWalletReducer();
 
   const checkAddressAvailability = () => {
-    const account = accountsList.filter((acc) => {
-      if (acc.btcAddress === requestPayload?.address) {
-        return true;
-      }
-      if (acc.ordinalsAddress === requestPayload?.address) {
-        return true;
-      }
-      return false;
-    });
+    const account = accountsList.filter(
+      (acc) =>
+        selectedAccount.btcAddress === acc.btcAddresses.native?.address ||
+        selectedAccount.btcAddress === acc.btcAddresses.nested?.address ||
+        selectedAccount.btcAddress === acc.btcAddresses.taproot.address,
+    );
     return isHardwareAccount(selectedAccount) ? account[0] || selectedAccount : account[0];
   };
 
@@ -90,7 +86,11 @@ export const useSignMessageValidation = (requestPayload: SignMessagePayload | un
       return;
     }
 
-    if (btcAddress === account.btcAddress) return;
+    if (
+      selectedAccount.btcAddress === account.btcAddresses.native?.address ||
+      selectedAccount.btcAddress === account.btcAddresses.nested?.address
+    )
+      return;
 
     switchAccount(account);
   };

@@ -119,11 +119,10 @@ function OrdinalDetailScreen() {
     onCopyClick,
     backButtonText,
   } = ordinalDetails;
-  const selectedAccount = useSelectedAccount();
   const { starredCollectibleIds, hiddenCollectibleIds, avatarIds } = useWalletSelector();
-  const currentAvatar = avatarIds[selectedAccount.btcAddress];
+  const selectedAvatar = avatarIds[ordinalsAddress];
   const isInscriptionSelectedAsAvatar =
-    currentAvatar?.type === 'inscription' && currentAvatar.inscription.id === ordinal?.id;
+    selectedAvatar?.type === 'inscription' && selectedAvatar.inscription.id === ordinal?.id;
   const inscriptionStarred = starredCollectibleIds[ordinalsAddress]?.some(
     ({ id }) => id === ordinal?.id,
   );
@@ -180,7 +179,7 @@ function OrdinalDetailScreen() {
     dispatch(addToHideCollectiblesAction({ address: ordinalsAddress, id: ordinal?.id ?? '' }));
 
     if (isInscriptionSelectedAsAvatar) {
-      dispatch(removeAccountAvatarAction({ address: selectedAccount.btcAddress }));
+      dispatch(removeAccountAvatarAction({ address: ordinalsAddress }));
     }
 
     optionsSheet.close();
@@ -207,12 +206,10 @@ function OrdinalDetailScreen() {
   };
 
   const handleSetAvatar = useCallback(() => {
-    const address = selectedAccount.btcAddress;
-
-    if (address && ordinal?.id) {
+    if (ordinalsAddress && ordinal?.id) {
       dispatch(
         setAccountAvatarAction({
-          address,
+          address: ordinalsAddress,
           avatar: { type: 'inscription', inscription: ordinal },
         }),
       );
@@ -224,13 +221,16 @@ function OrdinalDetailScreen() {
           action={{
             text: commonT('UNDO'),
             onClick: () => {
-              if (currentAvatar?.type) {
-                dispatch(setAccountAvatarAction({ address, avatar: currentAvatar }));
+              if (selectedAvatar?.type) {
+                dispatch(
+                  setAccountAvatarAction({ address: ordinalsAddress, avatar: selectedAvatar }),
+                );
               } else {
-                dispatch(removeAccountAvatarAction({ address }));
+                dispatch(removeAccountAvatarAction({ address: ordinalsAddress }));
               }
 
               toast.remove(toastId);
+              toast.custom(<SnackBar text={optionsDialogT('NFT_AVATAR.UNDO')} type="neutral" />);
             },
           }}
         />,
@@ -238,13 +238,13 @@ function OrdinalDetailScreen() {
     }
 
     optionsSheet.close();
-  }, [dispatch, optionsDialogT, commonT, selectedAccount, ordinal, optionsSheet, currentAvatar]);
+  }, [dispatch, optionsDialogT, commonT, ordinalsAddress, ordinal, optionsSheet, selectedAvatar]);
 
   const handleRemoveAvatar = useCallback(() => {
-    dispatch(removeAccountAvatarAction({ address: selectedAccount.btcAddress }));
+    dispatch(removeAccountAvatarAction({ address: ordinalsAddress }));
     toast.custom(<SnackBar text={optionsDialogT('NFT_AVATAR.REMOVE_TOAST')} type="neutral" />);
     optionsSheet.close();
-  }, [dispatch, selectedAccount.btcAddress, optionsDialogT, optionsSheet]);
+  }, [dispatch, ordinalsAddress, optionsDialogT, optionsSheet]);
 
   const ordinalDetailAttributes = (
     <OrdinalDetailsContainer isGallery={isGalleryOpen}>

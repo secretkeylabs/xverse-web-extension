@@ -3,6 +3,7 @@ import { REHYDRATE } from 'redux-persist';
 import {
   AddToHideCollectiblesKey,
   AddToStarCollectiblesKey,
+  ChangeBtcPaymentAddressTypeKey,
   ChangeFiatCurrencyKey,
   ChangeHasActivatedOrdinalsKey,
   ChangeHasActivatedRareSatsKey,
@@ -11,6 +12,7 @@ import {
   ChangeShowBtcReceiveAlertKey,
   ChangeShowDataCollectionAlertKey,
   ChangeShowOrdinalReceiveAlertKey,
+  EnableNestedSegWitAddressKey,
   RareSatsNoticeDismissedKey,
   RemoveAccountAvatarKey,
   RemoveAllFromHideCollectiblesKey,
@@ -70,6 +72,8 @@ export const initialWalletState: WalletState = {
   ledgerAccountsList: [],
   selectedAccountIndex: 0,
   selectedAccountType: 'software',
+  btcPaymentAddressType: 'native',
+  allowNestedSegWitAddress: false,
   encryptedSeed: '',
   fiatCurrency: 'USD',
   sip10ManageTokens: {},
@@ -169,6 +173,16 @@ const walletReducer = (
         accountsList: [],
         accountBalances: {},
       };
+    case EnableNestedSegWitAddressKey:
+      return {
+        ...state,
+        allowNestedSegWitAddress: true,
+      };
+    case ChangeBtcPaymentAddressTypeKey:
+      return {
+        ...state,
+        btcPaymentAddressType: action.btcPaymentType,
+      };
     case ChangeHasActivatedOrdinalsKey:
       return {
         ...state,
@@ -251,7 +265,7 @@ const walletReducer = (
         ...state,
         accountBalances: {
           ...state.accountBalances,
-          [action.btcAddress]: action.totalBalance,
+          [action.accountKey]: action.totalBalance,
         },
       };
     case SetWalletHideStxKey:
@@ -355,12 +369,11 @@ const walletReducer = (
         },
       };
     case RemoveAccountAvatarKey: {
+      const clonedAvatarIds = { ...state.avatarIds };
+      delete clonedAvatarIds[action.address];
       return {
         ...state,
-        avatarIds: {
-          ...state.avatarIds,
-          [action.address]: null,
-        },
+        avatarIds: clonedAvatarIds,
       };
     }
     default:

@@ -58,6 +58,7 @@ import SendStxScreen from '@screens/sendStx';
 import Setting from '@screens/settings';
 import About from '@screens/settings/about';
 import AdvancedSettings from '@screens/settings/advanced';
+import PaymentAddressTypeSelector from '@screens/settings/advanced/paymentAddressTypeSelector';
 import RestoreFunds from '@screens/settings/advanced/restoreFunds';
 import RecoverRunes from '@screens/settings/advanced/restoreFunds/recoverRunes';
 import RestoreOrdinals from '@screens/settings/advanced/restoreFunds/restoreOrdinals';
@@ -369,6 +370,14 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <AdvancedSettings />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: RoutePaths.PreferredAddress,
+        element: (
+          <AuthGuard>
+            <PaymentAddressTypeSelector />
           </AuthGuard>
         ),
       },

@@ -56,7 +56,7 @@ function AddStxAddress(): JSX.Element {
   const [isAddressRejected, setIsAddressRejected] = useState(false);
   const [stacksCredentials, setStacksCredentials] = useState<Credential | undefined>(undefined);
   const selectedAccount = useSelectedAccount();
-  const { network } = useWalletSelector();
+  const { network, ledgerAccountsList } = useWalletSelector();
   const { updateLedgerAccounts } = useWalletReducer();
   const { search } = useLocation();
   const params = new URLSearchParams(search);
@@ -74,8 +74,14 @@ function AddStxAddress(): JSX.Element {
       return;
     }
 
+    const existingAccount = ledgerAccountsList.find((account) => account.id === selectedAccount.id);
+
+    if (!existingAccount) {
+      return;
+    }
+
     const ledgerAccount: Account = {
-      ...selectedAccount,
+      ...existingAccount,
       stxAddress: stacksCreds?.address || '',
       stxPublicKey: stacksCreds?.publicKey || '',
     };

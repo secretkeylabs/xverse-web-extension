@@ -2,6 +2,7 @@ import type {
   Account,
   AccountType,
   AppInfo,
+  BtcPaymentType,
   FungibleToken,
   Inscription,
   NetworkType,
@@ -17,6 +18,8 @@ export const UpdateSoftwareAccountsKey = 'UpdateSoftwareAccountsKey';
 export const SetFeeMultiplierKey = 'SetFeeMultiplierKey';
 export const ChangeFiatCurrencyKey = 'ChangeFiatCurrency';
 export const ChangeNetworkKey = 'ChangeNetwork';
+export const ChangeBtcPaymentAddressTypeKey = 'ChangeBtcPaymentAddressTypeKey';
+export const EnableNestedSegWitAddressKey = 'EnableNestedSegWitAddressKey';
 export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
 export const RareSatsNoticeDismissedKey = 'RareSatsNoticeDismissedKey';
 export const ChangeHasActivatedRareSatsKey = 'ChangeHasActivatedRareSatsKey';
@@ -57,6 +60,8 @@ export interface WalletState {
   ledgerAccountsList: Account[];
   selectedAccountIndex: number;
   selectedAccountType: AccountType;
+  btcPaymentAddressType: BtcPaymentType;
+  allowNestedSegWitAddress: boolean;
   network: SettingsNetwork; // currently selected network urls and type
   savedNetworks: SettingsNetwork[]; // previously set network urls for type
   encryptedSeed: string;
@@ -87,7 +92,7 @@ export interface WalletState {
   };
   hiddenCollectibleIds: Record<string, Record<string, string>>;
   starredCollectibleIds: Record<string, Array<{ id: string; collectionId: string }>>;
-  avatarIds: Record<string, AvatarInfo | null>;
+  avatarIds: Record<string, AvatarInfo>;
 }
 
 export interface StoreEncryptedSeed {
@@ -124,6 +129,15 @@ export interface ChangeFiatCurrency {
 export interface ChangeNetwork {
   type: typeof ChangeNetworkKey;
   network: SettingsNetwork;
+}
+
+export interface EnableNestedSegWitAddress {
+  type: typeof EnableNestedSegWitAddressKey;
+}
+
+export interface ChangeBtcPaymentAddressType {
+  type: typeof ChangeBtcPaymentAddressTypeKey;
+  btcPaymentType: BtcPaymentType;
 }
 
 export interface ChangeActivateOrdinals {
@@ -197,7 +211,7 @@ export interface SetWalletUnlocked {
 
 export interface SetAccountBalance {
   type: typeof SetAccountBalanceKey;
-  btcAddress: string;
+  accountKey: string;
   totalBalance: string;
 }
 
@@ -288,6 +302,8 @@ export type WalletActions =
   | SetFeeMultiplier
   | ChangeFiatCurrency
   | ChangeNetwork
+  | EnableNestedSegWitAddress
+  | ChangeBtcPaymentAddressType
   | ChangeActivateOrdinals
   | ChangeActivateRareSats
   | ChangeActivateRBF

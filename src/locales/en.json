@@ -229,7 +229,23 @@
       "ALLOW": "Allow"
     },
     "TOKEN_HIDDEN": "Token hidden and reported",
-    "UNDO": "Undo"
+    "UNDO": "Undo",
+    "ANNOUNCEMENTS": {
+      "NATIVE_SEGWIT": {
+        "TITLE": "Native SegWit is here!",
+        "DESCRIPTION_1": "Xverse now supports Native SegWit for lower fees and better performance!",
+        "DESCRIPTION_2": "You can select your preferred Bitcoin payment address (native or nested) used for sending, receiving, and connecting with apps.",
+        "DESCRIPTION_3": "Your Bitcoin balance includes funds from both addresses, and you can switch back anytime.",
+        "SELECT": "Select my Preferred Bitcoin Address",
+        "LATER": "Maybe later"
+      }
+    },
+    "CALLOUTS": {
+      "NATIVE_SEGWIT": {
+        "TITLE": "Now using Native SegWit!",
+        "DESCRIPTION": "Your new Native SegWit address is set as preferred. Switch back to legacy (Nested SegWit) in Settings."
+      }
+    }
   },
   "TOKEN_SCREEN": {
     "ADD_COINS": "Manage tokens",
@@ -254,7 +270,17 @@
     "ORDINAL_ADDRESS": "Ordinal, Runes & BRC-20 address",
     "ORDINALS_RECEIVE_MESSAGE": "Only use this address to receive Ordinals, Runes, and BRC-20 tokens.",
     "STX_RECEIVE_MESSAGE": "Only use this address to receive SIP-10 tokens.",
-    "BTC_RECEIVE_MESSAGE": "Only use this address to receive Bitcoin."
+    "BTC_RECEIVE_MESSAGE": "Only use this address to receive Bitcoin.",
+    "CALLOUTS": {
+      "NATIVE_SEGWIT": {
+        "TITLE": "Now using Native SegWit!",
+        "DESCRIPTION": "Your new Native SegWit address is set as preferred address."
+      },
+      "ADDRESS_CHANGE_TOOLTIP": {
+        "TITLE": "Switch Preferred Bitcoin Address",
+        "DESCRIPTION": "You can switch between Native SegWit and legacy (Nested SegWit)"
+      }
+    }
   },
   "SEND": {
     "BTC": {
@@ -263,7 +289,9 @@
       "MAX_IGNORING_DUST_UTXO_MSG": "Small amounts may remain in your wallet, as sending them costs more in fees than their value.",
       "NO_FUNDS_TITLE": "Your balance is empty",
       "NO_FUNDS": "You don't have any funds to send. You can purchase crypto quickly and deposit directly into your Xverse wallet.",
-      "BUY_BTC": "Buy Bitcoin"
+      "BUY_BTC": "Buy Bitcoin",
+      "SELECT_ADDRESS_TYPE": "Select address type",
+      "SELECT_ADDRESS_TYPE_DESCRIPTION": "Select your preferred address to send BTC. Using Native SegWit is recommended for reduced fees and better performance."
     },
     "STX": {
       "BUY_STX": "Buy Stacks"
@@ -644,17 +672,23 @@
   },
   "FORGOT_PASSWORD_SCREEN": {
     "TITLE": "Forgot Password",
-    "PARAGRAPH1": "Xverse does not keep a copy of your password. If you're unable to access your account, you will need to reset your wallet and input the seedphrase you used when you generated your wallet.",
+    "PARAGRAPH1": "Xverse does not keep a copy of your password. If you're unable to access your account, you will need to reset your wallet and input the seed phrase you used when you generated your wallet.",
     "PARAGRAPH2": "This will reset your wallet from this browser. Make sure you have your seed phrase backed up.",
-    "BACKUP_CHECKBOX_LABEL": "I backed up my seedphrase",
+    "BACKUP_CHECKBOX_LABEL": "I backed up my seed phrase",
     "CANCEL": "Cancel",
     "RESET": "Reset"
   },
   "RESTORE_WALLET_SCREEN": {
-    "ENTER_SEED_HEADER": "Enter your seedphrase to restore your wallet.",
+    "ENTER_SEED_HEADER": "Enter your seed phrase to restore your wallet.",
     "SEED_INPUT_ERROR": "Invalid seed phrase, please try again",
     "CONTINUE_BUTTON": "Continue",
-    "HAVE_A_24_WORDS_SEEDPHRASE?": "Have a {{number}} words seedphrase?"
+    "HAVE_A_COUNT_WORDS_SEED_PHRASE": "Have a {{number}} words seed phrase?",
+    "SELECT_ADDRESS_TYPE": {
+      "TITLE": "Default address type selection",
+      "DESCRIPTION": "Select the address type to set as your default; Native SegWit (more efficient) or Nested SegWit (legacy). You can switch back any time from settings.",
+      "ACCOUNT_COUNT": "Accounts: {{accounts}}",
+      "ACCOUNT_SUMMARY_DESCRIPTION": "The balances shown above are cumulated BTC holdings for each type of address across the detected accounts."
+    }
   },
   "STACKING_SCREEN": {
     "STACK_AND_EARN": "Stack STX, earn BTC",
@@ -705,6 +739,7 @@
     "MINT": "Mint",
     "TRANSFER": "Transfer",
     "DEPLOY": "Deploy",
+    "VERIFY": "Verify",
     "VERIFY_ADDRESS_ON_LEDGER": "Verify address on Ledger",
     "VIEW_ADDRESS": "View address",
     "ADD_STACKS_ADDRESS": "Add a Stacks address",
@@ -897,6 +932,13 @@
     "ENABLE_RARE_SATS_DETAIL": "Automatically scan your ordinal address for rare sats and display them in your collectibles and transaction review screens",
     "ENABLE_SPEED_UP_TRANSACTIONS": "Enable speed up transactions",
     "ENABLE_SPEED_UP_TRANSACTIONS_DETAIL": "Allows you to speed up unconfirmed transactions by paying a higher fee.",
+    "PREFERRED_BTC_ADDRESS": {
+      "TITLE": "Preferred Bitcoin Address",
+      "DESCRIPTION": "You can switch between Native SegWit (more efficient) and  Nested SegWit (legacy) for your transactions. The selected address will be used for sending, receiving, and connecting with dapps. Your total balance includes funds from both addresses, and you can switch back anytime.",
+      "NESTED_SEGWIT": "Nested SegWit",
+      "NATIVE_SEGWIT": "Native SegWit",
+      "SUCCESS": "Preferred Bitcoin address changed"
+    },
     "ADVANCED": "Advanced",
     "XVERSE_DEFAULT": "Use Xverse as default wallet",
     "XVERSE_DEFAULT_DESCRIPTION": "Allow apps to prioritize Xverse when looking for a wallet with which to connect."
@@ -938,7 +980,8 @@
       "SET_ACTION": "Set as avatar",
       "SET_TOAST": "Item set as avatar",
       "REMOVE_ACTION": "Remove avatar",
-      "REMOVE_TOAST": "Avatar removed"
+      "REMOVE_TOAST": "Avatar removed",
+      "UNDO": "Avatar reverted"
     }
   },
   "BUY_SCREEN": {
@@ -1043,6 +1086,7 @@
     "TRANSACTIONS": "TRANSACTIONS",
     "CONTRACT": "CONTRACT",
     "BUNDLES": "BUNDLES",
+    "BREAKDOWN": "BREAKDOWN",
     "COMING_SOON": "Coming soon",
     "VERIFY_ADDRESS_ON_LEDGER": "Verify address on Ledger",
     "VIEW_ADDRESS": "View address",

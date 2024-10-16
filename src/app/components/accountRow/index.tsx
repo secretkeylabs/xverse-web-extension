@@ -13,7 +13,7 @@ import Sheet from '@ui-library/sheet';
 import SnackBar from '@ui-library/snackBar';
 import Spinner from '@ui-library/spinner';
 import { EMPTY_LABEL, LoaderSize } from '@utils/constants';
-import { isLedgerAccount, validateAccountName } from '@utils/helper';
+import { getAccountBalanceKey, isLedgerAccount, validateAccountName } from '@utils/helper';
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -62,8 +62,10 @@ function AccountRow({
   });
   const { accountsList, ledgerAccountsList, fiatCurrency, accountBalances, avatarIds } =
     useWalletSelector();
-  const accountAvatar = avatarIds[account?.btcAddress ?? ''];
-  const totalBalance = accountBalances[account?.btcAddress ?? ''];
+  const selectedAvatar = avatarIds[account?.btcAddresses.taproot.address ?? ''];
+  // TODO: refactor this into a hook
+  const totalBalance = accountBalances[getAccountBalanceKey(account)];
+
   const btcCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
   const stxCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
   const [showRemoveAccountModal, setShowRemoveAccountModal] = useState(false);
@@ -71,7 +73,8 @@ function AccountRow({
   const [accountName, setAccountName] = useState('');
   const [accountNameError, setAccountNameError] = useState<string | null>(null);
   const [isAccountNameChangeLoading, setIsAccountNameChangeLoading] = useState(false);
-  const { removeLedgerAccount, renameAccount, updateLedgerAccounts } = useWalletReducer();
+
+  const { removeLedgerAccount, renameSoftwareAccount, updateLedgerAccounts } = useWalletReducer();
 
   useEffect(
     () => () => {
@@ -116,7 +119,9 @@ function AccountRow({
   };
 
   const handleRemoveAvatar = () => {
-    dispatch(removeAccountAvatarAction({ address: account?.btcAddress ?? '' }));
+    if (!account) return;
+
+    dispatch(removeAccountAvatarAction({ address: account?.btcAddresses.taproot.address }));
     toast.custom(
       <SnackBar text={optionsDialogTranslation('NFT_AVATAR.REMOVE_TOAST')} type="neutral" />,
     );
@@ -157,7 +162,7 @@ function AccountRow({
       if (isLedgerAccount(account)) {
         await updateLedgerAccounts({ ...account, accountName });
       } else {
-        await renameAccount({ ...account, accountName });
+        await renameSoftwareAccount({ ...account, accountName });
       }
       handleRenameAccountModalClose();
     } catch (err) {
@@ -177,7 +182,7 @@ function AccountRow({
       if (isLedgerAccount(account)) {
         updateLedgerAccounts({ ...account, accountName: undefined });
       } else {
-        renameAccount({ ...account, accountName: undefined });
+        renameSoftwareAccount({ ...account, accountName: undefined });
       }
       setAccountName('');
       handleRenameAccountModalClose();
@@ -193,7 +198,7 @@ function AccountRow({
       <AccountInfoContainer $disableClick={disabledAccountSelect} onClick={handleClick}>
         <AccountAvatar
           account={account}
-          avatar={accountAvatar}
+          avatar={selectedAvatar}
           isSelected={isSelected}
           isAccountListView={isAccountListView}
         />
@@ -253,7 +258,7 @@ function AccountRow({
           <ButtonRow onClick={handleRenameAccountModalOpen}>
             {optionsDialogTranslation('RENAME_ACCOUNT')}
           </ButtonRow>
-          {accountAvatar?.type && (
+          {selectedAvatar?.type && (
             <ButtonRow onClick={handleRemoveAvatar}>
               {optionsDialogTranslation('NFT_AVATAR.REMOVE_ACTION')}
             </ButtonRow>

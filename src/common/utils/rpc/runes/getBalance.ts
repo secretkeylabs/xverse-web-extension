@@ -97,7 +97,9 @@ const handleGetRunesBalance = async (message: RpcRequestMessage, port: chrome.ru
   const runesApi = getRunesClient(network.type);
 
   try {
-    const runesBalances = await runesApi.getRuneBalances(existingAccount.ordinalsAddress);
+    const runesBalances = await runesApi.getRuneBalances(
+      existingAccount.btcAddresses.taproot.address,
+    );
     sendRpcResponse(
       tabId,
       makeRpcSuccessResponse<'runes_getBalance'>(message.id, {

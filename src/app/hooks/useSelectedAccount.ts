@@ -1,39 +1,65 @@
-import getSelectedAccount from '@common/utils/getSelectedAccount';
+import getSelectedAccount, {
+  embellishAccountWithDetails,
+  type AccountWithDetails,
+} from '@common/utils/getSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import type { Account } from '@secretkeylabs/xverse-core';
+import type { BtcPaymentType } from '@secretkeylabs/xverse-core';
 import { useMemo } from 'react';
 import useWalletReducer from './useWalletReducer';
 
-const useSelectedAccount = (): Account => {
+const useSelectedAccount = (overridePayAddressType?: BtcPaymentType): AccountWithDetails => {
   const { switchAccount } = useWalletReducer();
   const {
     selectedAccountIndex,
     selectedAccountType,
     accountsList: softwareAccountsList,
     ledgerAccountsList,
+    btcPaymentAddressType,
   } = useWalletSelector();
 
   return useMemo(() => {
-    const existingAccount = getSelectedAccount({
+    let account = getSelectedAccount({
       selectedAccountIndex,
       selectedAccountType,
       softwareAccountsList,
       ledgerAccountsList,
     });
-    if (existingAccount) {
-      return existingAccount;
+
+    if (!account) {
+      [account] = softwareAccountsList;
+      if (account) {
+        switchAccount(account);
+      }
     }
-    const fallbackAccount = softwareAccountsList[0];
-    if (fallbackAccount) {
-      switchAccount(fallbackAccount);
+
+    let accountType = btcPaymentAddressType;
+
+    if (overridePayAddressType) {
+      switch (overridePayAddressType) {
+        case 'nested':
+          if (account.btcAddresses.nested) {
+            accountType = overridePayAddressType;
+          }
+          break;
+        case 'native':
+          if (account.btcAddresses.native) {
+            accountType = overridePayAddressType;
+          }
+          break;
+        default:
+          break;
+      }
     }
-    return fallbackAccount;
+
+    return embellishAccountWithDetails(account, accountType);
   }, [
     selectedAccountIndex,
     selectedAccountType,
     softwareAccountsList,
     ledgerAccountsList,
     switchAccount,
+    btcPaymentAddressType,
+    overridePayAddressType,
   ]);
 };
 

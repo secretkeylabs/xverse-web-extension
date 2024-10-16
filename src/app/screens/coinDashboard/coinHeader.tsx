@@ -8,7 +8,7 @@ import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import SmallActionButton from '@components/smallActionButton';
 import TokenImage from '@components/tokenImage';
-import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useSelectedAccountBtcBalance from '@hooks/queries/useSelectedAccountBtcBalance';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useHasFeature from '@hooks/useHasFeature';
@@ -59,7 +59,11 @@ type Props = {
 export default function CoinHeader({ currency, fungibleToken }: Props) {
   const selectedAccount = useSelectedAccount();
   const { fiatCurrency, network } = useWalletSelector();
-  const { data: btcBalance } = useBtcWalletData();
+
+  // TODO: this should be a dumb component, move the logic to the parent
+  // TODO: currently, we get btc and stx balances here for all currencies and FTs, but we should get them in
+  // TODO: the relevant parent and pass them as props
+  const { confirmedBalance: btcBalance } = useSelectedAccountBtcBalance();
   const { data: stxData } = useStxWalletData();
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const navigate = useNavigate();

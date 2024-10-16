@@ -3,6 +3,7 @@ import type {
   Account,
   AccountType,
   AppInfo,
+  BtcPaymentType,
   FungibleToken,
   NetworkType,
   SettingsNetwork,
@@ -87,6 +88,21 @@ export function ChangeNetworkAction(network: SettingsNetwork): actions.ChangeNet
   return {
     type: actions.ChangeNetworkKey,
     network,
+  };
+}
+
+export function EnableNestedSegWitAddress(): actions.EnableNestedSegWitAddress {
+  return {
+    type: actions.EnableNestedSegWitAddressKey,
+  };
+}
+
+export function ChangeBtcPaymentAddressType(
+  newType: BtcPaymentType,
+): actions.ChangeBtcPaymentAddressType {
+  return {
+    type: actions.ChangeBtcPaymentAddressTypeKey,
+    btcPaymentType: newType,
   };
 }
 
@@ -200,12 +216,12 @@ export function setWalletUnlockedAction(isUnlocked: boolean): actions.SetWalletU
 }
 
 export function setAccountBalanceAction(
-  btcAddress: string,
+  accountKey: string,
   totalBalance: string,
 ): actions.SetAccountBalance {
   return {
     type: actions.SetAccountBalanceKey,
-    btcAddress,
+    accountKey,
     totalBalance,
   };
 }

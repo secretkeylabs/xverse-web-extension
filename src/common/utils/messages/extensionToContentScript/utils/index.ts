@@ -108,7 +108,7 @@ export async function sendMessageConnectedClients(message: ContentScriptMessage)
  * @public
  */
 export async function sendMessageAuthorizedConnectedClients(
-  permission: Omit<Permission, 'clientId'>,
+  permissions: Omit<Permission, 'clientId'>[],
   message: ContentScriptMessage,
 ) {
   const [error, store] = await getPermissionsStore();
@@ -125,10 +125,12 @@ export async function sendMessageAuthorizedConnectedClients(
   }
 
   const authorizedClientIds = [...store.permissions]
-    .filter(
-      (p) =>
-        p.resourceId === permission.resourceId &&
-        [...permission.actions].every((action) => p.actions.has(action)),
+    .filter((p) =>
+      permissions.some(
+        (permission) =>
+          p.resourceId === permission.resourceId &&
+          [...permission.actions].every((action) => p.actions.has(action)),
+      ),
     )
     .map((p) => p.clientId);
 

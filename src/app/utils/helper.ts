@@ -82,9 +82,12 @@ export const getTruncatedAddress = (address: string, lengthToShow = 4) =>
     address.length,
   )}`;
 
-export const getShortTruncatedAddress = (address: string) => {
+export const getShortTruncatedAddress = (address: string, charCount = 8) => {
   if (address) {
-    return `${address.substring(0, 8)}...${address.substring(address.length - 8, address.length)}`;
+    return `${address.substring(0, charCount)}...${address.substring(
+      address.length - charCount,
+      address.length,
+    )}`;
   }
 };
 
@@ -238,6 +241,11 @@ export const validateAccountName = (
   }
 
   return null;
+};
+
+export const getAccountBalanceKey = (account: Account | null) => {
+  if (!account) return '';
+  return `${account.accountType}-${account.deviceAccountIndex || account.id}`;
 };
 
 export const calculateTotalBalance = ({

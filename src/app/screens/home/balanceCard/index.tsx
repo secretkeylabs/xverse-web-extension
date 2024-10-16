@@ -3,7 +3,7 @@ import { useVisibleBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc
 import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useAccountBalance from '@hooks/queries/useAccountBalance';
-import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useSelectedAccountBtcBalance from '@hooks/queries/useSelectedAccountBtcBalance';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useSelectedAccount from '@hooks/useSelectedAccount';
@@ -11,7 +11,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
 import { LoaderSize } from '@utils/constants';
-import { calculateTotalBalance } from '@utils/helper';
+import { calculateTotalBalance, getAccountBalanceKey } from '@utils/helper';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
@@ -74,19 +74,21 @@ function BalanceCard(props: BalanceCardProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const selectedAccount = useSelectedAccount();
   const { fiatCurrency, hideStx, accountBalances } = useWalletSelector();
-  const { data: btcBalance } = useBtcWalletData();
+  const { confirmedBalance: btcBalance, isLoading: btcBalanceLoading } =
+    useSelectedAccountBtcBalance();
   const { data: stxData } = useStxWalletData();
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const { setAccountBalance } = useAccountBalance();
   const { isLoading, isRefetching } = props;
-  const oldTotalBalance = accountBalances[selectedAccount.btcAddress];
+  // TODO: refactor this into a hook
+  const oldTotalBalance = accountBalances[getAccountBalanceKey(selectedAccount)];
   const { data: sip10CoinsList } = useVisibleSip10FungibleTokens();
   const { data: brc20CoinsList } = useVisibleBrc20FungibleTokens();
   const { data: runesCoinList } = useVisibleRuneFungibleTokens();
 
   const balance = calculateTotalBalance({
     stxBalance: stxData?.balance.toString() ?? '0',
-    btcBalance: btcBalance?.toString() ?? '0',
+    btcBalance: (btcBalance ?? 0).toString(),
     sipCoinsList: sip10CoinsList,
     brcCoinsList: brc20CoinsList,
     runesCoinList,
@@ -96,14 +98,14 @@ function BalanceCard(props: BalanceCardProps) {
   });
 
   useEffect(() => {
-    if (!balance || !selectedAccount || isLoading || isRefetching) {
+    if (!balance || !selectedAccount || isLoading || btcBalanceLoading || isRefetching) {
       return;
     }
 
     if (oldTotalBalance !== balance) {
       setAccountBalance(selectedAccount, balance);
     }
-  }, [balance, oldTotalBalance, selectedAccount, isLoading, isRefetching]);
+  }, [balance, oldTotalBalance, selectedAccount, isLoading, isRefetching, btcBalanceLoading]);
 
   useEffect(() => {
     (() => {

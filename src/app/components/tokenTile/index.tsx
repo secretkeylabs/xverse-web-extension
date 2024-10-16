@@ -1,7 +1,7 @@
 import { BetterBarLoader } from '@components/barLoader';
 import { StyledFiatAmountText } from '@components/fiatAmountText';
 import TokenImage from '@components/tokenImage';
-import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useSelectedAccountBtcBalance from '@hooks/queries/useSelectedAccountBtcBalance';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -121,7 +121,7 @@ function TokenTile({
   const { fiatCurrency } = useWalletSelector();
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const { data: stxData } = useStxWalletData();
-  const { data: btcBalance } = useBtcWalletData();
+  const { confirmedBalance: btcBalance } = useSelectedAccountBtcBalance();
 
   const getTickerTitle = () => {
     if (currency === 'STX' || currency === 'BTC') return `${currency}`;

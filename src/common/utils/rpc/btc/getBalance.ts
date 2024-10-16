@@ -1,5 +1,5 @@
 import { getTabIdFromPort } from '@common/utils';
-import getSelectedAccount from '@common/utils/getSelectedAccount';
+import getSelectedAccount, { embellishAccountWithDetails } from '@common/utils/getSelectedAccount';
 import { makeContext } from '@common/utils/popup';
 import { safePromise, type Result } from '@common/utils/safe';
 import * as utils from '@components/permissionsManager/utils';
@@ -81,6 +81,7 @@ const handleGetBalance = async (message: RpcRequestMessage, port: chrome.runtime
     accountsList: softwareAccountsList,
     ledgerAccountsList,
     network,
+    btcPaymentAddressType,
   } = rootStore.store.getState().walletState;
 
   const account = getSelectedAccount({
@@ -95,7 +96,9 @@ const handleGetBalance = async (message: RpcRequestMessage, port: chrome.runtime
     return;
   }
 
-  const address = account.btcAddress;
+  const detailedAccount = embellishAccountWithDetails(account, btcPaymentAddressType);
+
+  const address = detailedAccount.btcAddress;
   const [getBalanceError, balances] = await getBalance(address, network.type);
   if (getBalanceError) {
     sendInternalErrorMessage({

@@ -36,7 +36,7 @@ import {
   getInscriptionsCollectionGridItemSubText,
   getInscriptionsCollectionGridItemSubTextColor,
 } from '@utils/inscriptions';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -65,10 +65,10 @@ function OrdinalsCollection() {
   const { t } = useTranslation('translation', { keyPrefix: 'COLLECTIBLE_COLLECTION_SCREEN' });
   const { t: tCommon } = useTranslation('translation', { keyPrefix: 'COMMON' });
   const navigate = useNavigate();
-  const { btcAddress, ordinalsAddress } = useSelectedAccount();
+  const { ordinalsAddress } = useSelectedAccount();
   const { id: collectionId, from } = useParams();
   const { starredCollectibleIds, hiddenCollectibleIds, avatarIds } = useWalletSelector();
-  const currentAvatar = avatarIds[btcAddress];
+  const selectedAvatar = avatarIds[ordinalsAddress];
   const optionsSheet = useOptionsSheet();
   const { data, error, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useAddressCollectionInscriptions(collectionId);
@@ -110,14 +110,14 @@ function OrdinalsCollection() {
   const handleHideCollection = () => {
     dispatch(addToHideCollectiblesAction({ address: ordinalsAddress, id: collectionId ?? '' }));
 
-    if (currentAvatar?.type === 'inscription') {
+    if (selectedAvatar?.type === 'inscription') {
       const shouldHideAvatar = data?.pages
         ?.map((page) => page?.data)
         .flat()
-        .some((inscription) => inscription.id === currentAvatar.inscription.id);
+        .some((inscription) => inscription.id === selectedAvatar.inscription.id);
 
       if (shouldHideAvatar) {
-        dispatch(removeAccountAvatarAction({ address: btcAddress }));
+        dispatch(removeAccountAvatarAction({ address: ordinalsAddress }));
       }
     }
 
