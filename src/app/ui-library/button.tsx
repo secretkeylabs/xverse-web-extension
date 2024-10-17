@@ -147,7 +147,7 @@ function Button({
       ) : (
         <>
           {icon && iconPosition === 'left' && <CenterDiv>{icon}</CenterDiv>}
-          <div>{title}</div>
+          {title && <div>{title}</div>}
           {icon && iconPosition === 'right' && <CenterDiv>{icon}</CenterDiv>}
         </>
       )}
