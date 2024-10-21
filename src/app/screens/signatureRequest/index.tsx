@@ -89,7 +89,7 @@ function SignatureRequest(): JSX.Element {
           txid: '',
           currency: 'STX',
           errorTitle: t('SIGNATURE_REQUEST.SIGNATURE_ERROR_TITLE'),
-          error: t('CONFIRM_TRANSACTION.NETWORK_MISMATCH'),
+          error: t('REQUEST_ERRORS.NETWORK_MISMATCH'),
           browserTx: true,
         },
       });
@@ -104,7 +104,7 @@ function SignatureRequest(): JSX.Element {
           txid: '',
           currency: 'STX',
           errorTitle: t('SIGNATURE_REQUEST.SIGNATURE_ERROR_TITLE'),
-          error: t('CONFIRM_TRANSACTION.ADDRESS_MISMATCH'),
+          error: t('REQUEST_ERRORS.ADDRESS_MISMATCH_STX'),
           browserTx: true,
         },
       });

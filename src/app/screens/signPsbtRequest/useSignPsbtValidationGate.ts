@@ -13,6 +13,7 @@ type Props = {
 type ValidationError = {
   error: string;
   errorTitle?: string;
+  alignment?: 'center' | 'left';
 };
 
 const useSignPsbtValidationGate = ({ payload, parsedPsbt }: Props) => {
@@ -41,6 +42,7 @@ const useSignPsbtValidationGate = ({ payload, parsedPsbt }: Props) => {
         if (input.address !== btcAddress && input.address !== ordinalsAddress) {
           setValidationError({
             error: t('ADDRESS_MISMATCH'),
+            alignment: 'left',
           });
         }
       });

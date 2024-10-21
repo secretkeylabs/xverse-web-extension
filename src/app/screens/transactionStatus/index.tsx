@@ -27,18 +27,19 @@ const TxStatusContainer = styled.div((props) => ({
   height: '100%',
 }));
 
+const OuterContainer = styled.div((_props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  flex: 1,
+  whiteSpace: 'pre-line',
+}));
+
 const Container = styled.div({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
 });
-const OuterContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  marginTop: props.theme.spacing(46),
-  flex: 1,
-}));
 
 const TransactionIDContainer = styled.div((props) => ({
   display: 'flex',
@@ -46,20 +47,19 @@ const TransactionIDContainer = styled.div((props) => ({
   justifyContent: 'flex-start',
   alignItems: 'flex-start',
   marginTop: props.theme.spacing(15),
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
+  marginLeft: props.theme.space.m,
+  marginRight: props.theme.space.m,
 }));
 
 const ButtonContainer = styled.div((props) => ({
-  flex: 1,
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'flex-end',
-  gap: props.theme.spacing(6),
-  marginTop: props.theme.spacing(15),
-  marginBottom: props.theme.spacing(32),
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
+  gap: props.theme.space.s,
+  marginTop: props.theme.space.xl,
+  marginBottom: props.theme.space.xl,
+  marginLeft: props.theme.space.m,
+  marginRight: props.theme.space.m,
 }));
 
 const RowContainer = styled.div((props) => ({
@@ -95,25 +95,25 @@ const HeadingText = styled.h1((props) => ({
   ...props.theme.typography.headline_s,
   color: props.theme.colors.white_0,
   textAlign: 'center',
-  marginTop: props.theme.spacing(8),
+  marginTop: props.theme.space.m,
 }));
 
-const BodyText = styled.h1((props) => ({
+const BodyText = styled.h1<{ $textAlignment: 'center' | 'left' }>((props) => ({
   ...props.theme.typography.body_m,
   color: props.theme.colors.white_400,
-  marginTop: props.theme.spacing(8),
-  textAlign: 'center',
+  marginTop: props.theme.space.m,
+  textAlign: props.$textAlignment,
   overflowWrap: 'break-word',
   wordWrap: 'break-word',
   wordBreak: 'break-word',
-  marginLeft: props.theme.spacing(5),
-  marginRight: props.theme.spacing(5),
+  marginLeft: props.theme.space.m,
+  marginRight: props.theme.space.m,
 }));
 
 const TxIDText = styled.h1((props) => ({
   ...props.theme.headline_category_s,
   color: props.theme.colors.white_400,
-  marginTop: props.theme.spacing(8),
+  marginTop: props.theme.space.m,
   textTransform: 'uppercase',
 }));
 
@@ -171,6 +171,7 @@ function TransactionStatus() {
     messageId,
     orders,
     minPriceSats,
+    textAlignment = 'center',
   } = location.state as {
     tabId?: chrome.tabs.Tab['id'];
     messageId?: string;
@@ -193,7 +194,7 @@ function TransactionStatus() {
         {failedMultipleOrders ? t('BROADCASTED_MULTIPLE_PARTIALLY') : t('BROADCASTED_MULTIPLE')}
       </HeadingText>
       {failedMultipleOrders ? (
-        <BodyText style={{ fontSize: '16px' }}>
+        <BodyText style={{ fontSize: '16px' }} $textAlignment={textAlignment}>
           {t('BROADCASTED_MULTIPLE_PARTIALLY_SUBTITLE', {
             failedTranscations: failedMultipleOrders,
             totalTranscations: orders?.length,
@@ -205,7 +206,9 @@ function TransactionStatus() {
     <Container>
       <Image src={Success} />
       <HeadingText>{sponsored ? t('SPONSORED_SUCCESS_MSG') : t('BROADCASTED')}</HeadingText>
-      <BodyText>{sponsored ? t('SPONSORED_MSG') : t('SUCCESS_MSG')}</BodyText>
+      <BodyText $textAlignment={textAlignment}>
+        {sponsored ? t('SPONSORED_MSG') : t('SUCCESS_MSG')}
+      </BodyText>
     </Container>
   );
   /* eslint-enable no-inline-styles/no-inline-styles */
@@ -214,7 +217,7 @@ function TransactionStatus() {
     <Container>
       <Image src={Failure} />
       <HeadingText>{errorTitle || t('FAILED')}</HeadingText>
-      <BodyText>{error}</BodyText>
+      <BodyText $textAlignment={textAlignment}>{error}</BodyText>
     </Container>
   );
 
@@ -230,9 +233,15 @@ function TransactionStatus() {
 
   const onCloseClick = () => {
     if (browserTx) {
+      // TODO: refactor this to not use the error label. Needs to be something more explicit.
       if (error === tReqErrors('NETWORK_MISMATCH') && tabId && messageId)
         sendNetworkMismatchMessage({ tabId, messageId });
-      if (error === tReqErrors('ADDRESS_MISMATCH') && tabId && messageId)
+      if (
+        (error === tReqErrors('ADDRESS_MISMATCH') ||
+          error === tReqErrors('ADDRESS_MISMATCH_STX')) &&
+        tabId &&
+        messageId
+      )
         sendAddressMismatchMessage({ tabId, messageId });
       if (error === tReqErrors('MISSING_ARGUMENTS') && tabId && messageId)
         sendMissingFunctionArgumentsMessage({ tabId, messageId });

@@ -109,9 +109,10 @@ function BtcSendRequest() {
         navigate('/tx-status', {
           state: {
             txid: '',
-            currency: 'STX',
-            error: t('CONFIRM_TRANSACTION.ADDRESS_MISMATCH'),
+            currency: 'BTC',
+            error: t('REQUEST_ERRORS.ADDRESS_MISMATCH'),
             browserTx: true,
+            textAlignment: 'left',
           },
         });
       }
@@ -120,7 +121,7 @@ function BtcSendRequest() {
           state: {
             txid: '',
             currency: 'BTC',
-            error: t('CONFIRM_TRANSACTION.NETWORK_MISMATCH'),
+            error: t('REQUEST_ERRORS.NETWORK_MISMATCH'),
             browserTx: true,
           },
         });
