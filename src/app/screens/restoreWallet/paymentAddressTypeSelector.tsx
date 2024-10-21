@@ -5,6 +5,8 @@ import type { BtcPaymentType } from '@secretkeylabs/xverse-core';
 import { getPaymentAccountSummaryForSeedPhrase } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import Button from '@ui-library/button';
+import { StyledP } from '@ui-library/common.styled';
+import { InputFeedback } from '@ui-library/inputFeedback';
 import Spinner from '@ui-library/spinner';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -23,7 +25,7 @@ const Container = styled.div({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
-  maxWidth: 320,
+  maxWidth: 330,
   minHeight: 550,
 });
 
@@ -54,19 +56,13 @@ const TypesContainer = styled.div({
   margin: '4px 0',
 });
 
-const Text = styled.p((props) => ({
-  ...props.theme.typography.body_m,
-  color: props.theme.colors.white_200,
-}));
-
-const BoldText = styled.p((props) => ({
-  ...props.theme.typography.body_bold_m,
-  color: props.theme.colors.white_200,
-}));
-
 const ButtonContainer = styled.div((props) => ({
   width: '100%',
   marginBottom: props.theme.spacing(15),
+}));
+
+const LearnMoreLink = styled.a((props) => ({
+  marginTop: props.theme.space.xs,
 }));
 
 type Props = {
@@ -116,28 +112,39 @@ export default function PaymentAddressTypeSelector({
     <Container>
       <Title>{t('TITLE')}</Title>
       <BodyContainer>
-        <Text>{t('DESCRIPTION')}</Text>
+        <StyledP typography="body_m" color="white_200">
+          {t('DESCRIPTION')}
+        </StyledP>
+        <LearnMoreLink
+          href="https://www.xverse.app/blog/segwit-vs-native-segwit-addresses"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <InputFeedback message={t('LEARN_MORE')} />
+        </LearnMoreLink>
         <SummaryContainer>
-          <BoldText>
+          <StyledP typography="body_bold_m" color="white_200">
             {t('ACCOUNT_COUNT', {
               accounts: `${data.accountCount}${data.hasMoreAccounts ? '+' : ''}`,
             })}
-          </BoldText>
+          </StyledP>
           <TypesContainer>
             <PreferredBtcAddressItem
               title="Native SegWit"
-              balance={data.nativeTotalSats?.toString()}
+              balanceSats={data.nativeTotalSats}
               isSelected={selectedType === 'native'}
               onClick={onClickType('native')}
             />
             <PreferredBtcAddressItem
               title="Nested SegWit"
-              balance={data.nestedTotalSats?.toString()}
+              balanceSats={data.nestedTotalSats}
               isSelected={selectedType === 'nested'}
               onClick={onClickType('nested')}
             />
           </TypesContainer>
-          <Text>{t('ACCOUNT_SUMMARY_DESCRIPTION')}</Text>
+          <StyledP typography="body_m" color="white_200">
+            {t('ACCOUNT_SUMMARY_DESCRIPTION')}
+          </StyledP>
         </SummaryContainer>
       </BodyContainer>
       <ButtonContainer>

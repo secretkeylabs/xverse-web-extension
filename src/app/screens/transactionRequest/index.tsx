@@ -231,7 +231,7 @@ function TransactionRequest() {
           state: {
             txid: '',
             currency: 'STX',
-            error: t('ADDRESS_MISMATCH'),
+            error: t('ADDRESS_MISMATCH_STX'),
             browserTx: true,
             tabId,
             messageId,

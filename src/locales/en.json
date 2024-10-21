@@ -40,7 +40,7 @@
     "LEDGER_IMPORT_1_BUTTON": "Get started",
     "LEDGER_IMPORT_2_TITLE": "Select assets",
     "LEDGER_IMPORT_2_SUBTITLE": "Choose the assets you want to manage with this wallet.",
-    "LEDGER_IMPORT_2_FOOTNOTE": "If you don’t want to set a Stacks address now, you have the possibility to set it up later.",
+    "LEDGER_IMPORT_2_FOOTNOTE": "If you don't want to set a Stacks address now, you have the possibility to set it up later.",
     "LEDGER_IMPORT_2_SELECT": {
       "BTC_TITLE": "Bitcoin, Runes & Ordinals (default)",
       "BTC_SUBTITLE": "Native SegWit and Taproot addresses",
@@ -123,7 +123,7 @@
         "UNDERSTAND_SHOULD_NOT_USE_LEDGER_LIVE": "I understand I should not use Ledger Live or other Bitcoin wallets with the same hardware device"
       }
     },
-    "ADDRESS_MISMATCH": "There’s a mismatch between your signing address and the address you’re logged with.",
+    "ADDRESS_MISMATCH": "There's a mismatch between your signing address and the address you're logged in with.",
     "CLOSE_BUTTON": "Close",
     "TITLE_FAILED": "Connection failed"
   },
@@ -151,7 +151,7 @@
     "ORDINALS_TITLE_VERIFIED": "Ordinals address verified successfully",
     "STACKS_TITLE_VERIFIED": "Stacks address verified successfully",
     "WRONG_DEVICE_ERROR_SUBTITLE": "The public key of the connected device did not match the wallet public key. Make sure you have the correct device connected.",
-    "ADDRESS_MISMATCH": "There’s a mismatch between the address you’re verifying and the address you’re logged with.",
+    "ADDRESS_MISMATCH": "There's a mismatch between the address you're verifying and the address you're logged with.",
     "LEDGER_CONNECT": {
       "BTC_TITLE": "Connect Your Ledger",
       "BTC_SUBTITLE": "To continue, connect your Ledger device, make sure it's unlocked, and open the Bitcoin app.",
@@ -235,7 +235,7 @@
     "ANNOUNCEMENTS": {
       "NATIVE_SEGWIT": {
         "TITLE": "Native SegWit is here!",
-        "DESCRIPTION_1": "Xverse now supports Native SegWit for lower fees and better performance!",
+        "DESCRIPTION_1": "Xverse now supports Native SegWit addresses for lower fees and better performance!",
         "DESCRIPTION_2": "You can select your preferred Bitcoin payment address (native or nested) used for sending, receiving, and connecting with apps.",
         "DESCRIPTION_3": "Your Bitcoin balance includes funds from both addresses, and you can switch back anytime.",
         "SELECT": "Select my Preferred Bitcoin Address",
@@ -408,8 +408,6 @@
     "TRANSACTIONS_FAILED_TO_BROADCAST": "{{failed}}/{{total}} transactions failed to broadcast",
     "CHECK_THE_APP_YOU_USE": "Please check the app you are using.",
     "TRANSACTIONS_SIGNED": "Transactions signed",
-    "NETWORK_MISMATCH": "There’s a mismatch between your active network and the network you’re logged with.",
-    "ADDRESS_MISMATCH": "There’s a mismatch between your signing address and the address you’re logged with.",
     "PSBT_NO_BROADCAST_DISCLAIMER": "This transaction will not be broadcasted from your wallet. It may be broadcasted later by a third party.",
     "PSBTS_NO_BROADCAST_DISCLAIMER": "These transactions will not be broadcasted from your wallet. They may be broadcasted later by a third party.",
     "PSBT_SIG_HASH_NONE_DISCLAIMER_TITLE": "Transaction uses SIGHASH_NONE",
@@ -685,10 +683,11 @@
     "CONTINUE_BUTTON": "Continue",
     "HAVE_A_COUNT_WORDS_SEED_PHRASE": "Have a {{number}} words seed phrase?",
     "SELECT_ADDRESS_TYPE": {
-      "TITLE": "Default address type selection",
-      "DESCRIPTION": "Select the address type to set as your default; Native SegWit (more efficient) or Nested SegWit (legacy). You can switch back any time from settings.",
+      "TITLE": "Preferred Address Type",
+      "DESCRIPTION": "Select the default address type you would like to use for all accounts. You can switch at any time from settings.",
+      "LEARN_MORE": "Learn more about address types.",
       "ACCOUNT_COUNT": "Accounts: {{accounts}}",
-      "ACCOUNT_SUMMARY_DESCRIPTION": "The balances shown above are cumulated BTC holdings for each type of address across the detected accounts."
+      "ACCOUNT_SUMMARY_DESCRIPTION": "The balances shown are cumulative across all accounts for each address type."
     }
   },
   "STACKING_SCREEN": {
@@ -1594,8 +1593,9 @@
   "REQUEST_ERRORS": {
     "INVALID_REQUEST": "Invalid request",
     "MISSING_ARGUMENTS": "Contract function call missing arguments",
-    "ADDRESS_MISMATCH": "There’s a mismatch between your signing address and the address you’re logged with.",
-    "NETWORK_MISMATCH": "There’s a mismatch between your active network and the network you’re logged with.",
+    "ADDRESS_MISMATCH": "The app is requesting a signature from an address that doesn't match the one currently active in your Xverse wallet.\n\nTo fix this:\n - Ensure that the account you're using in Xverse matches the account you're logged in with on the app.\n- Confirm that the address type in Xverse matches the one required by the app (Native SegWit or Nested SegWit).",
+    "ADDRESS_MISMATCH_STX": "The app is requesting a signature from an address that doesn't match the one currently active in your Xverse wallet.",
+    "NETWORK_MISMATCH": "There's a mismatch between your active network and the network you're logged in with on the app.",
     "PSBT_CANT_PARSE_ERROR_TITLE": "Transaction Error",
     "PSBT_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction is invalid and cannot be processed. Please contact the developer of the requesting app for support."
   }

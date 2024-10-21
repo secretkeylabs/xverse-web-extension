@@ -151,6 +151,7 @@ function SignPsbtRequest() {
         error={validationError.error}
         errorTitle={validationError.errorTitle}
         onClose={onCloseClick}
+        textAlignment={validationError.alignment}
       />
     );
   }

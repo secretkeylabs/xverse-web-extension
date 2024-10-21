@@ -1,7 +1,9 @@
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
 import { CheckCircle } from '@phosphor-icons/react';
+import { satsToBtc } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { getShortTruncatedAddress } from '@utils/helper';
+import BigNumber from 'bignumber.js';
 import styled from 'styled-components';
 
 const Button = styled.button<{ $isSelected: boolean }>((props) => ({
@@ -49,7 +51,7 @@ const SelectedContainer = styled.div((props) => ({
 
 type Props = {
   title: string;
-  balance: string;
+  balanceSats?: number | bigint;
   address?: string;
   onClick: () => void;
   isSelected: boolean;
@@ -59,9 +61,11 @@ export default function preferredBtcAddressItem({
   title,
   onClick,
   address,
-  balance,
+  balanceSats,
   isSelected,
 }: Props) {
+  const balance =
+    balanceSats !== undefined ? `${satsToBtc(BigNumber(balanceSats.toString()))} BTC` : '';
   return (
     <Button type="button" onClick={onClick} $isSelected={isSelected}>
       <BtcIcon src={IconBitcoin} />

@@ -11,9 +11,8 @@ const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   height: '100%',
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-  paddingTop: props.theme.spacing(60),
+  paddingLeft: props.theme.space.m,
+  paddingRight: props.theme.space.m,
 }));
 
 const Image = styled.img({
@@ -26,31 +25,48 @@ const HeadingText = styled.h1((props) => ({
   ...props.theme.typography.headline_xs,
   color: props.theme.colors.white_0,
   textAlign: 'center',
-  marginTop: props.theme.spacing(8),
+  marginTop: props.theme.space.m,
 }));
 
-const BodyText = styled.h1((props) => ({
+const BodyText = styled.h1<{ $textAlignment: 'center' | 'left' }>((props) => ({
   ...props.theme.typography.body_l,
   color: props.theme.colors.white_200,
-  marginTop: props.theme.spacing(8),
-  textAlign: 'center',
+  marginTop: props.theme.space.m,
+  textAlign: props.$textAlignment,
   overflowWrap: 'break-word',
   wordWrap: 'break-word',
   wordBreak: 'break-word',
-  marginBottom: props.theme.spacing(42),
+  whiteSpace: 'pre-line',
 }));
 
-const CloseButton = styled(Button)((props) => ({
-  marginBottom: props.theme.spacing(42),
+const OuterContainer = styled.div((_props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+  flex: 1,
+}));
+
+const BodyContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+});
+
+const ButtonContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  marginTop: props.theme.space.xl,
+  marginBottom: props.theme.space.xl,
 }));
 
 interface RequestErrorProps {
   errorTitle?: string;
   error: string;
+  textAlignment?: 'center' | 'left';
   onClose?: () => void;
 }
 
-function RequestError({ error, errorTitle, onClose }: RequestErrorProps) {
+function RequestError({ error, errorTitle, onClose, textAlignment = 'center' }: RequestErrorProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'REQUEST_ERRORS' });
 
   const handleClose = () => {
@@ -60,12 +76,19 @@ function RequestError({ error, errorTitle, onClose }: RequestErrorProps) {
       window.close();
     }
   };
+
   return (
     <Container>
-      <Image src={Failure} />
-      <HeadingText>{errorTitle || t('INVALID_REQUEST')}</HeadingText>
-      <BodyText>{error}</BodyText>
-      <CloseButton onClick={handleClose} title="Close" variant="primary" />
+      <OuterContainer>
+        <BodyContainer>
+          <Image src={Failure} />
+          <HeadingText>{errorTitle || t('INVALID_REQUEST')}</HeadingText>
+          <BodyText $textAlignment={textAlignment}>{error}</BodyText>
+        </BodyContainer>
+      </OuterContainer>
+      <ButtonContainer>
+        <Button onClick={handleClose} title="Close" variant="primary" />
+      </ButtonContainer>
     </Container>
   );
 }

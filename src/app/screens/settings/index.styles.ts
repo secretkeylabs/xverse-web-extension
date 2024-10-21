@@ -4,7 +4,7 @@ export const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
-  padding: `0 ${props.theme.space.s}`,
+  padding: `0 ${props.theme.space.xs}`,
   ...props.theme.scrollbar,
 }));
 

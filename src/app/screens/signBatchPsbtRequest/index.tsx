@@ -11,7 +11,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 function SignBatchPsbtRequest() {
   const navigate = useNavigate();
   const selectedAccount = useSelectedAccount();
-  const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
+  const { t } = useTranslation('translation', { keyPrefix: 'REQUEST_ERRORS' });
   const { network } = useWalletSelector();
   const { search } = useLocation();
   const params = new URLSearchParams(search);
@@ -71,6 +71,7 @@ function SignBatchPsbtRequest() {
             currency: 'BTC',
             error: t('ADDRESS_MISMATCH'),
             browserTx: true,
+            textAlignment: 'left',
           },
         });
         return true;

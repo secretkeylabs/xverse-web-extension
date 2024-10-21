@@ -23,6 +23,11 @@ const CustomisedModal = styled(Modal)`
   max-height: 100%;
   display: flex;
   flex-direction: column;
+
+  &:focus-visible::after {
+    border: none;
+    outline: none;
+  }
 `;
 
 const BodyContainer = styled.div`
