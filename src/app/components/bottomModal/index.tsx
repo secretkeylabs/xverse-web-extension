@@ -32,7 +32,7 @@ type Props = {
   header: string;
   visible: boolean;
   children: React.ReactNode;
-  onClose: () => void;
+  onClose?: () => void;
   overlayStylesOverriding?: {};
   contentStylesOverriding?: {};
   className?: string;
@@ -86,9 +86,11 @@ function BottomModal({
     >
       <RowContainer>
         <BottomModalHeaderText>{header}</BottomModalHeaderText>
-        <ButtonImage onClick={onClose}>
-          <XCircle color={theme.colors.white_200} weight="fill" size="28" />
-        </ButtonImage>
+        {onClose && (
+          <ButtonImage onClick={onClose}>
+            <XCircle color={theme.colors.white_200} weight="fill" size="28" />
+          </ButtonImage>
+        )}
       </RowContainer>
       {children}
     </CustomisedModal>

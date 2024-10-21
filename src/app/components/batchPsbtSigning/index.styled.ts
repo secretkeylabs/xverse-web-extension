@@ -1,5 +1,5 @@
 import BottomModal from '@components/bottomModal';
-import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
+import Button from '@ui-library/button';
 import styled from 'styled-components';
 
 export const OuterContainer = styled.div`
@@ -25,6 +25,14 @@ export const ModalContainer = styled(Container)({
   marginTop: 0,
 });
 
+export const HeaderContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  marginBottom: props.theme.space.l,
+  alignItems: 'center',
+}));
+
 export const LoaderContainer = styled.div((props) => ({
   display: 'flex',
   flex: 1,
@@ -33,15 +41,9 @@ export const LoaderContainer = styled.div((props) => ({
   marginTop: props.theme.space.l,
 }));
 
-export const TransparentButtonContainer = styled.div((props) => ({
-  marginRight: props.theme.space.s,
-  width: '100%',
-}));
-
 export const ReviewTransactionText = styled.h1((props) => ({
   ...props.theme.headline_s,
   color: props.theme.colors.white_0,
-  marginBottom: props.theme.space.l,
   textAlign: 'left',
 }));
 
@@ -70,13 +72,18 @@ export const StyledSheet = styled(BottomModal)`
   background-color: #181818 !important;
 `;
 
-export const TxReviewModalControls = styled.div((props) => ({
+export const ButtonsContainer = styled.div((props) => ({
   display: 'flex',
   columnGap: props.theme.space.s,
   padding: `${props.theme.space.l} ${props.theme.space.m}`,
 }));
 
-export const ButtonsContainer = styled(StickyHorizontalSplitButtonContainer)`
-  padding-left: ${(props) => props.theme.space.m};
-  padding-right: ${(props) => props.theme.space.m};
-`;
+export const InlineButtonsContainer = styled(ButtonsContainer)((props) => ({
+  columnGap: props.theme.space.xs,
+  padding: 'inherit',
+}));
+
+export const SmallButton = styled(Button)(() => ({
+  minWidth: 44,
+  padding: 'initial',
+}));

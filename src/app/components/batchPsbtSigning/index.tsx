@@ -32,13 +32,14 @@ import {
   BundleLinkText,
   ButtonsContainer,
   Container,
+  HeaderContainer,
+  InlineButtonsContainer,
   LoaderContainer,
   ModalContainer,
   OuterContainer,
   ReviewTransactionText,
+  SmallButton,
   StyledSheet,
-  TransparentButtonContainer,
-  TxReviewModalControls,
 } from './index.styled';
 
 type ParsedPsbt = {
@@ -223,9 +224,7 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: BatchPs
             </Container>
           </OuterContainer>
           <ButtonsContainer>
-            <TransparentButtonContainer>
-              <Button title={t('CANCEL')} variant="secondary" onClick={onCancel} />
-            </TransparentButtonContainer>
+            <Button title={t('CANCEL')} variant="secondary" onClick={onCancel} />
             <Button
               title={t('CONFIRM_ALL')}
               onClick={() => onSignPsbtConfirmed()}
@@ -236,24 +235,50 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: BatchPs
       );
     };
 
-    const reviewDoneText = hasDuplicateInputs ? t('CONFIRM_ALL') : t('DONE');
-    const onReviewDone = hasDuplicateInputs
-      ? () => onSignPsbtConfirmed()
-      : () => {
-          setReviewTransaction(false);
-          setCurrentPsbtIndex(0);
-        };
+    const onReviewDone = () => {
+      setReviewTransaction(false);
+      setCurrentPsbtIndex(0);
+    };
 
     return (
       <>
         <AccountHeaderComponent disableMenuOption disableAccountSwitch />
         {renderBody()}
-        <StyledSheet header="" visible={reviewTransaction || hasDuplicateInputs} onClose={onCancel}>
+        <StyledSheet
+          header=""
+          visible={reviewTransaction || hasDuplicateInputs}
+          onClose={hasDuplicateInputs ? undefined : onReviewDone}
+        >
           <OuterContainer>
             <ModalContainer>
-              <ReviewTransactionText>
-                {t('TRANSACTION')} {currentPsbtIndex + 1}/{parsedPsbts.length}
-              </ReviewTransactionText>
+              <HeaderContainer>
+                <ReviewTransactionText>
+                  {t('TRANSACTION')} {currentPsbtIndex + 1}/{parsedPsbts.length}
+                </ReviewTransactionText>
+                {hasDuplicateInputs && (
+                  <InlineButtonsContainer>
+                    <SmallButton
+                      title=""
+                      variant="secondary"
+                      onClick={() => {
+                        setCurrentPsbtIndex((prevIndex) => prevIndex - 1);
+                      }}
+                      icon={<ArrowLeft size={16} weight="bold" />}
+                      disabled={currentPsbtIndex === 0}
+                    />
+                    <SmallButton
+                      title=""
+                      variant="secondary"
+                      onClick={() => {
+                        setCurrentPsbtIndex((prevIndex) => prevIndex + 1);
+                      }}
+                      icon={<ArrowRight size={16} weight="bold" />}
+                      iconPosition="right"
+                      disabled={currentPsbtIndex === parsedPsbts.length - 1}
+                    />
+                  </InlineButtonsContainer>
+                )}
+              </HeaderContainer>
               {!!parsedPsbts[currentPsbtIndex] && (
                 <TxSummaryContext.Provider value={individualTxSummaryContext}>
                   <TransactionSummary />
@@ -261,31 +286,41 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: BatchPs
               )}
             </ModalContainer>
           </OuterContainer>
-          <TxReviewModalControls>
-            <Button
-              title={t('PREVIOUS')}
-              variant="secondary"
-              onClick={() => {
-                setCurrentPsbtIndex((prevIndex) => prevIndex - 1);
-              }}
-              icon={<ArrowLeft color="white" size={16} weight="bold" />}
-              disabled={currentPsbtIndex === 0}
-            />
-            {currentPsbtIndex < parsedPsbts.length - 1 && (
-              <Button
-                title={t('NEXT')}
-                variant="secondary"
-                onClick={() => {
-                  setCurrentPsbtIndex((prevIndex) => prevIndex + 1);
-                }}
-                icon={<ArrowRight color="white" size={16} weight="bold" />}
-                iconPosition="right"
-              />
+          <ButtonsContainer>
+            {hasDuplicateInputs && (
+              <>
+                <Button title={t('CANCEL')} variant="secondary" onClick={onCancel} />
+                <Button
+                  title={t('CONFIRM_ALL')}
+                  onClick={() => onSignPsbtConfirmed()}
+                  loading={isSigning}
+                />
+              </>
             )}
-            {currentPsbtIndex === parsedPsbts.length - 1 && (
-              <Button title={reviewDoneText} onClick={onReviewDone} />
+            {!hasDuplicateInputs && (
+              <>
+                <Button
+                  title={t('PREVIOUS')}
+                  variant="secondary"
+                  onClick={() => {
+                    setCurrentPsbtIndex((prevIndex) => prevIndex - 1);
+                  }}
+                  icon={<ArrowLeft size={16} weight="bold" />}
+                  disabled={currentPsbtIndex === 0}
+                />
+                <Button
+                  title={t('NEXT')}
+                  variant="secondary"
+                  onClick={() => {
+                    setCurrentPsbtIndex((prevIndex) => prevIndex + 1);
+                  }}
+                  icon={<ArrowRight size={16} weight="bold" />}
+                  iconPosition="right"
+                  disabled={currentPsbtIndex === parsedPsbts.length - 1}
+                />
+              </>
             )}
-          </TxReviewModalControls>
+          </ButtonsContainer>
         </StyledSheet>
       </>
     );
