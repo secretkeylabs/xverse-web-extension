@@ -235,7 +235,7 @@
     "ANNOUNCEMENTS": {
       "NATIVE_SEGWIT": {
         "TITLE": "Native SegWit is here!",
-        "DESCRIPTION_1": "Xverse now supports Native SegWit for lower fees and better performance!",
+        "DESCRIPTION_1": "Xverse now supports Native SegWit addresses for lower fees and better performance!",
         "DESCRIPTION_2": "You can select your preferred Bitcoin payment address (native or nested) used for sending, receiving, and connecting with apps.",
         "DESCRIPTION_3": "Your Bitcoin balance includes funds from both addresses, and you can switch back anytime.",
         "SELECT": "Select my Preferred Bitcoin Address",
@@ -685,10 +685,10 @@
     "CONTINUE_BUTTON": "Continue",
     "HAVE_A_COUNT_WORDS_SEED_PHRASE": "Have a {{number}} words seed phrase?",
     "SELECT_ADDRESS_TYPE": {
-      "TITLE": "Default address type selection",
-      "DESCRIPTION": "Select the address type to set as your default; Native SegWit (more efficient) or Nested SegWit (legacy). You can switch back any time from settings.",
+      "TITLE": "Preferred Address Type",
+      "DESCRIPTION": "Select the default address type you would like to use for all accounts. You can switch at any time from settings.",
       "ACCOUNT_COUNT": "Accounts: {{accounts}}",
-      "ACCOUNT_SUMMARY_DESCRIPTION": "The balances shown above are cumulated BTC holdings for each type of address across the detected accounts."
+      "ACCOUNT_SUMMARY_DESCRIPTION": "The balances shown are cumulative across all accounts for each address type."
     }
   },
   "STACKING_SCREEN": {

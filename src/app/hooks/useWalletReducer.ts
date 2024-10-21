@@ -10,6 +10,7 @@ import {
   createWalletAccount,
   decryptSeedPhraseCBC,
   getAccountFromSeedPhrase,
+  getBnsName,
   restoreWalletWithAccounts,
   StacksMainnet,
   StacksNetwork,
@@ -50,6 +51,7 @@ const createSingleAccount = async (
   seedPhrase: string,
   accountIndex: number,
   btcNetwork: NetworkType,
+  stacksNetwork: StacksNetwork,
   savedNames: { id: number; name?: string }[] = [],
 ) => {
   const account = await getAccountFromSeedPhrase({
@@ -58,6 +60,7 @@ const createSingleAccount = async (
     network: btcNetwork,
   });
   account.accountName = savedNames.find((name) => name.id === accountIndex)?.name;
+  account.bnsName = await getBnsName(account.stxAddress, stacksNetwork);
 
   return account;
 };
@@ -75,7 +78,7 @@ const useWalletReducer = () => {
     hideStx,
   } = useWalletSelector();
   const seedVault = useSeedVault();
-  const selectedNetwork = useNetworkSelector();
+  const stacksNetwork = useNetworkSelector();
   const currentlySelectedAccount = getSelectedAccount({
     selectedAccountIndex,
     selectedAccountType,
@@ -105,6 +108,7 @@ const useWalletReducer = () => {
         seedPhrase,
         selectedIndex,
         network.type,
+        stacksNetwork,
         savedNames[network.type],
       );
 
@@ -131,6 +135,7 @@ const useWalletReducer = () => {
     [
       dispatch,
       network.type,
+      stacksNetwork,
       seedVault,
       selectedAccountIndex,
       selectedAccountType,
@@ -246,6 +251,7 @@ const useWalletReducer = () => {
         seedPhrase,
         0,
         network.type,
+        stacksNetwork,
         savedNames[network.type],
       );
 
@@ -266,6 +272,7 @@ const useWalletReducer = () => {
               seedPhrase,
               account.id,
               network.type,
+              stacksNetwork,
               savedNames[network.type],
             );
 
@@ -297,7 +304,7 @@ const useWalletReducer = () => {
       initialised = true;
     };
 
-    await loadActiveAccounts(seedPhrase, network, selectedNetwork, currentAccounts, {
+    await loadActiveAccounts(seedPhrase, network, stacksNetwork, currentAccounts, {
       checkForNewAccounts: network.type === 'Mainnet',
       accountLoadCallback: async (loadedAccounts) => {
         if (loadedAccounts.length === currentAccounts.length) {
@@ -354,7 +361,7 @@ const useWalletReducer = () => {
     // We create an account to ensure that the seed phrase is valid, but we don't store it
     // The actual account creation is done on startup of the wallet
     // If the seed phrase is invalid, then this will throw an error
-    await createSingleAccount(seedPhrase, 0, network.type, savedNames[network.type]);
+    await createSingleAccount(seedPhrase, 0, network.type, stacksNetwork, savedNames[network.type]);
 
     await chrome.storage.local.clear();
     await chrome.storage.session.clear();
@@ -400,7 +407,7 @@ const useWalletReducer = () => {
     const newAccounts = await createWalletAccount(
       seedPhrase,
       network,
-      selectedNetwork,
+      stacksNetwork,
       softwareAccountsList,
     );
     dispatch(updateSoftwareAccountsAction(newAccounts));
@@ -495,6 +502,7 @@ const useWalletReducer = () => {
         seedPhrase,
         i,
         changedNetwork.type,
+        changedStacksNetwork,
         savedNames[changedNetwork.type],
       );
       nextAccounts.push(account);

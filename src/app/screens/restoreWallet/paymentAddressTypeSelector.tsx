@@ -23,7 +23,7 @@ const Container = styled.div({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
-  maxWidth: 320,
+  maxWidth: 330,
   minHeight: 550,
 });
 
@@ -126,13 +126,13 @@ export default function PaymentAddressTypeSelector({
           <TypesContainer>
             <PreferredBtcAddressItem
               title="Native SegWit"
-              balance={data.nativeTotalSats?.toString()}
+              balanceSats={data.nativeTotalSats}
               isSelected={selectedType === 'native'}
               onClick={onClickType('native')}
             />
             <PreferredBtcAddressItem
               title="Nested SegWit"
-              balance={data.nestedTotalSats?.toString()}
+              balanceSats={data.nestedTotalSats}
               isSelected={selectedType === 'nested'}
               onClick={onClickType('nested')}
             />
