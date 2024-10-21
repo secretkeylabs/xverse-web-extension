@@ -1,7 +1,6 @@
 import Eye from '@assets/img/createPassword/Eye.svg';
 import EyeSlash from '@assets/img/createPassword/EyeSlash.svg';
 import logo from '@assets/img/xverse_logo.svg';
-import useSanityCheck from '@hooks/useSanityCheck';
 import useSeedVault from '@hooks/useSeedVault';
 import useSeedVaultMigration from '@hooks/useSeedVaultMigration';
 import useWalletReducer from '@hooks/useWalletReducer';
@@ -122,7 +121,6 @@ function Login(): JSX.Element {
   const navigate = useNavigate();
   const { unlockWallet } = useWalletReducer();
   const { hasSeed } = useSeedVault();
-  const { getSanityCheck } = useSanityCheck();
   const { migrateCachedStorage, isVaultUpdated } = useSeedVaultMigration();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [password, setPassword] = useState('');
@@ -173,8 +171,7 @@ function Login(): JSX.Element {
     // Check for SeedVault Migrations
     try {
       const hasMigrated = await isVaultUpdated();
-      const sanityCheck = await getSanityCheck('X-Current-Version');
-      if (!hasMigrated && sanityCheck) {
+      if (!hasMigrated) {
         setShowMigration(true);
       } else {
         setIsVerifying(false);
