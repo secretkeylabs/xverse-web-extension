@@ -103,9 +103,7 @@ const groupBtcTxsByDate = (
       if (!processedTransactions[txDateKey]) {
         processedTransactions[txDateKey] = [];
       }
-      if (processedTransactions[txDateKey].every((tx) => tx.txid !== transaction.txid)) {
-        processedTransactions[txDateKey].push(transaction);
-      }
+      processedTransactions[txDateKey].push(transaction);
     }
   });
 
@@ -149,9 +147,7 @@ const groupRuneTxsByDate = (
     if (!processedTransactions[txDateKey]) {
       processedTransactions[txDateKey] = [];
     }
-    if (processedTransactions[txDateKey].every((tx) => tx.txid !== transaction.txid)) {
-      processedTransactions[txDateKey].push(transaction);
-    }
+    processedTransactions[txDateKey].push(transaction);
   });
 
   const result: [Date, string, GetRunesActivityForAddressEvent[]][] = [];
@@ -217,9 +213,7 @@ const groupedTxsByDateMap = (
     if (!processedTransactions[txDateKey]) {
       processedTransactions[txDateKey] = [];
     }
-    if (processedTransactions[txDateKey].every((tx) => getTxid(tx) !== getTxid(transaction))) {
-      processedTransactions[txDateKey].push(transaction);
-    }
+    processedTransactions[txDateKey].push(transaction);
   });
 
   const result: [Date, string, (AddressTransactionWithTransfers | Tx)[]][] = [];
