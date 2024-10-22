@@ -245,7 +245,7 @@
     "CALLOUTS": {
       "NATIVE_SEGWIT": {
         "TITLE": "Now using Native SegWit!",
-        "DESCRIPTION": "Your new Native SegWit address is set as preferred. Switch back to legacy (Nested SegWit) in Settings."
+        "DESCRIPTION": "Your new Native SegWit address is set as preferred. Switch back to Nested SegWit in Settings."
       }
     }
   },
@@ -280,7 +280,7 @@
       },
       "ADDRESS_CHANGE_TOOLTIP": {
         "TITLE": "Switch Preferred Bitcoin Address",
-        "DESCRIPTION": "You can switch between Native SegWit and legacy (Nested SegWit)"
+        "DESCRIPTION": "You can switch between Native SegWit and Nested SegWit."
       }
     }
   },
@@ -936,7 +936,7 @@
     "ENABLE_SPEED_UP_TRANSACTIONS_DETAIL": "Allows you to speed up unconfirmed transactions by paying a higher fee.",
     "PREFERRED_BTC_ADDRESS": {
       "TITLE": "Preferred Bitcoin Address",
-      "DESCRIPTION": "You can switch between Native SegWit (more efficient) and  Nested SegWit (legacy) for your transactions. The selected address will be used for sending, receiving, and connecting with dapps. Your total balance includes funds from both addresses, and you can switch back anytime.",
+      "DESCRIPTION": "You can switch between Native SegWit (more efficient) and  Nested SegWit for your transactions. The selected address will be used for sending, receiving, and connecting with dapps. Your total balance includes funds from both addresses, and you can switch back anytime.",
       "NESTED_SEGWIT": "Nested SegWit",
       "NATIVE_SEGWIT": "Native SegWit",
       "SUCCESS": "Preferred Bitcoin address changed"

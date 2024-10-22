@@ -3,6 +3,7 @@ import plusIcon from '@assets/img/dashboard/plus.svg';
 import stacksIcon from '@assets/img/dashboard/stx_icon.svg';
 import ordinalsIcon from '@assets/img/nftDashboard/ordinals_icon.svg';
 import ActionButton from '@components/button';
+import ReceiveCardComponent from '@components/receiveCardComponent';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Plus } from '@phosphor-icons/react';
@@ -12,7 +13,6 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import ReceiveCardComponent from '../../../components/receiveCardComponent';
 
 const GalleryModalContainer = styled.div((props) => ({
   padding: `0 ${props.theme.space.m}`,
@@ -142,14 +142,15 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAle
           onQrAddressClick={onOrdinalsReceivePress}
           showVerifyButton={choseToVerifyAddresses}
           currency="ORD"
-        >
-          <IconContainer>
-            <Icon src={ordinalsIcon} />
-            <IconBackground>
-              <Plus weight="bold" size={12} />
-            </IconBackground>
-          </IconContainer>
-        </ReceiveCardComponent>
+          icon={
+            <IconContainer>
+              <Icon src={ordinalsIcon} />
+              <IconBackground>
+                <Plus weight="bold" size={12} />
+              </IconBackground>
+            </IconContainer>
+          }
+        />
       )}
 
       {stxAddress && (
@@ -159,14 +160,15 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAle
           onQrAddressClick={onReceivePress}
           showVerifyButton={choseToVerifyAddresses}
           currency="STX"
-        >
-          <IconContainer>
-            <Icon src={stacksIcon} />
-            <IconBackground>
-              <Plus weight="bold" size={12} />
-            </IconBackground>
-          </IconContainer>
-        </ReceiveCardComponent>
+          icon={
+            <IconContainer>
+              <Icon src={stacksIcon} />
+              <IconBackground>
+                <Plus weight="bold" size={12} />
+              </IconBackground>
+            </IconContainer>
+          }
+        />
       )}
 
       {isLedgerAccount(selectedAccount) && !stxAddress && (

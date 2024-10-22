@@ -1,4 +1,4 @@
-import { format, isYesterday, isToday } from 'date-fns';
+import { format, isToday, isYesterday } from 'date-fns';
 
 // eslint-disable-next-line import/prefer-default-export
 export const formatDate = (date: Date) => {
@@ -10,3 +10,5 @@ export const formatDate = (date: Date) => {
   }
   return format(date, 'MMMM dd, yyyy');
 };
+
+export const formatDateKey = (date: Date) => format(date, 'yyyy-MM-dd');
