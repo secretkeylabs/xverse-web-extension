@@ -108,6 +108,8 @@ export default function PaymentAddressTypeSelector({
 
   const onClickType = (type: BtcPaymentType) => () => onSelectedTypeChange(type);
 
+  const totalFunds = data.nativeTotalSats + data.nestedTotalSats;
+
   return (
     <Container>
       <Title>{t('TITLE')}</Title>
@@ -143,7 +145,8 @@ export default function PaymentAddressTypeSelector({
             />
           </TypesContainer>
           <StyledP typography="body_m" color="white_200">
-            {t('ACCOUNT_SUMMARY_DESCRIPTION')}
+            {totalFunds !== 0n && t('ACCOUNT_SUMMARY_DESCRIPTION')}
+            {totalFunds === 0n && t('ACCOUNT_SUMMARY_DESCRIPTION_NO_FUNDS')}
           </StyledP>
         </SummaryContainer>
       </BodyContainer>
