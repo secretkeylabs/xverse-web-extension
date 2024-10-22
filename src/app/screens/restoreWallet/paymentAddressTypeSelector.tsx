@@ -94,7 +94,7 @@ export default function PaymentAddressTypeSelector({
 
   useEffect(() => {
     if (isLoading || !data) return;
-    const preferredType = data.nativeTotalSats > data.nestedTotalSats ? 'native' : 'nested';
+    const preferredType = data.nestedTotalSats > data.nativeTotalSats ? 'nested' : 'native';
     onSelectedTypeChange(preferredType);
   }, [data, isLoading]);
 
