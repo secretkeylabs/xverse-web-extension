@@ -1,5 +1,7 @@
 import * as btc from '@scure/btc-signer';
 import type { BtcAddressType, NetworkType } from '@secretkeylabs/xverse-core';
+import { useTranslation } from 'react-i18next';
+import { Tooltip } from 'react-tooltip';
 import styled from 'styled-components';
 
 const LabelContainer = styled.div((props) => ({
@@ -11,14 +13,35 @@ const LabelContainer = styled.div((props) => ({
 const labelMap: Record<BtcAddressType, string> = {
   native: 'Native SegWit',
   nested: 'Nested SegWit',
-  taproot: 'Taproot',
+  taproot: 'Ordinals',
 };
+
+// TODO: centralize this tooltip with the styles
+const StyledTooltip = styled(Tooltip)`
+  ${(props) => props.theme.typography.body_bold_m}
+  max-width: 200px;
+  background-color: ${(props) => props.theme.colors.white_0};
+  color: #12151e;
+  border-radius: ${(props) => props.theme.space.s};
+  padding: 10px 12px;
+`;
 
 type BtcAddressTypeLabelProps = {
   addressType: BtcAddressType;
 };
 
 export function BtcAddressTypeLabel({ addressType }: BtcAddressTypeLabelProps) {
+  const { t } = useTranslation('translation', { keyPrefix: 'INFORMATION' });
+  if (addressType === 'taproot') {
+    return (
+      <>
+        <LabelContainer id="ordinals_address_anchor">{labelMap[addressType]}</LabelContainer>
+        <StyledTooltip anchorId="ordinals_address_anchor" variant="light">
+          {t('ORDINALS_ADDRESS_TOOLTIP')}
+        </StyledTooltip>
+      </>
+    );
+  }
   return <LabelContainer>{labelMap[addressType]}</LabelContainer>;
 }
 
