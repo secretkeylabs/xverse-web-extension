@@ -24,7 +24,7 @@ const TxStatusContainer = styled.div((props) => ({
   background: props.theme.colors.elevation0,
   display: 'flex',
   flexDirection: 'column',
-  height: '100%',
+  minHeight: 600,
 }));
 
 const OuterContainer = styled.div((_props) => ({
