@@ -16,6 +16,7 @@ const HeaderContainer = styled.div((props) => ({
   justifyContent: 'space-between',
   margin: props.theme.space.m,
   gap: props.theme.space.m,
+  minHeight: props.theme.space.m,
 }));
 
 const CustomisedModal = styled(Modal)`
