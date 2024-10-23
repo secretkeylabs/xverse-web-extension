@@ -18,11 +18,12 @@ const labelMap: Record<BtcAddressType, string> = {
 
 // TODO: centralize this tooltip with the styles
 const StyledTooltip = styled(Tooltip)`
+  ${(props) => props.theme.typography.body_bold_m}
   max-width: 200px;
   background-color: ${(props) => props.theme.colors.white_0};
   color: #12151e;
-  border-radius: 8px;
-  padding: 7px;
+  border-radius: ${(props) => props.theme.space.s};
+  padding: 10px 12px;
 `;
 
 type BtcAddressTypeLabelProps = {
