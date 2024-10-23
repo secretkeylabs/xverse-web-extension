@@ -12,17 +12,20 @@ import styled from 'styled-components';
 import AddressTypeSelector from './addressTypeSelector';
 
 const AddressTypeContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: props.theme.space.xxs,
-  marginTop: props.theme.space.s,
-  marginBottom: props.theme.space.s,
+  marginTop: props.theme.space.l,
+  marginBottom: props.theme.space.l,
 }));
 
 type AddressTypeSelectorProps = {
   selectedType: BtcPaymentType;
   setSelectedType: (type: BtcPaymentType) => void;
 };
+
+const AddressTypeSelectorsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${(props) => props.theme.space.s};
+`;
 
 export function AddressTypeSelectors({ selectedType, setSelectedType }: AddressTypeSelectorProps) {
   const { t } = useTranslation('translation', {
@@ -31,7 +34,7 @@ export function AddressTypeSelectors({ selectedType, setSelectedType }: AddressT
   const { btcAddresses } = useSelectedAccount();
 
   return (
-    <>
+    <AddressTypeSelectorsContainer>
       <AddressTypeSelector
         title={t('NATIVE_SEGWIT')}
         address={btcAddresses.native?.address}
@@ -44,7 +47,7 @@ export function AddressTypeSelectors({ selectedType, setSelectedType }: AddressT
         onClick={() => setSelectedType('nested')}
         isSelected={selectedType === 'nested'}
       />
-    </>
+    </AddressTypeSelectorsContainer>
   );
 }
 
@@ -75,7 +78,9 @@ function PreferredBtcAddressSheet({
 
   return (
     <Sheet title={t('TITLE')} visible={visible} onClose={onCancel}>
-      <StyledP typography="body_m">{t('DESCRIPTION')}</StyledP>
+      <StyledP typography="body_m" color="white_200">
+        {t('DESCRIPTION')}
+      </StyledP>
       <AddressTypeContainer>
         <AddressTypeSelectors selectedType={selectedType} setSelectedType={setSelectedType} />
       </AddressTypeContainer>

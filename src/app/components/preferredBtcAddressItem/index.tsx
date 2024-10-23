@@ -12,7 +12,6 @@ const Button = styled.button<{ $isSelected: boolean }>((props) => ({
     ? props.theme.colors.white_900
     : props.theme.colors.transparent,
   padding: props.theme.space.m,
-  margin: `${props.theme.space.xxs} 0`,
   borderRadius: props.theme.space.s,
   border: `solid 1px ${props.theme.colors.white_800}`,
   display: 'flex',
