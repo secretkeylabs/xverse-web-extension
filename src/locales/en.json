@@ -238,7 +238,9 @@
     "ANNOUNCEMENTS": {
       "NATIVE_SEGWIT": {
         "TITLE": "Native SegWit is here!",
-        "DESCRIPTION_1": "Xverse now supports Native SegWit addresses for lower fees and better performance!",
+        "DESCRIPTION_1a": "Xverse now supports ",
+        "DESCRIPTION_1b": "Native SegWit",
+        "DESCRIPTION_1c": " addresses for lower fees and better performance!",
         "DESCRIPTION_2": "You can select your preferred Bitcoin payment address (native or nested) used for sending, receiving, and connecting with apps.",
         "DESCRIPTION_3": "Your Bitcoin balance includes funds from both addresses, and you can switch back anytime.",
         "SELECT": "Select my Preferred Bitcoin Address",

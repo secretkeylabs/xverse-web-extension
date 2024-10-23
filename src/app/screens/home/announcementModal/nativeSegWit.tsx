@@ -16,8 +16,14 @@ const LogoImg = styled.img(() => ({
 
 const DescriptionItem = styled.div<{ $bottomSpacer?: boolean }>((props) => ({
   ...props.theme.typography.body_m,
+  color: props.theme.colors.white_200,
   marginBottom: props.$bottomSpacer ? props.theme.space.m : 0,
 }));
+
+const HighlightSpan = styled.span`
+  ${(props) => props.theme.typography.body_medium_m};
+  color: ${(props) => props.theme.colors.white_0};
+`;
 
 const ButtonContainer = styled.div((props) => ({
   display: 'flex',
@@ -54,7 +60,11 @@ export default function NativeSegWit({ isVisible, onClose }: Props) {
       onClose={onClose}
       visible={isVisible}
     >
-      <DescriptionItem $bottomSpacer>{t('DESCRIPTION_1')}</DescriptionItem>
+      <DescriptionItem $bottomSpacer>
+        {t('DESCRIPTION_1a')}
+        <HighlightSpan>{t('DESCRIPTION_1b')}</HighlightSpan>
+        {t('DESCRIPTION_1c')}
+      </DescriptionItem>
       <DescriptionItem $bottomSpacer>{t('DESCRIPTION_2')}</DescriptionItem>
       <DescriptionItem>{t('DESCRIPTION_3')}</DescriptionItem>
       <ButtonContainer>
