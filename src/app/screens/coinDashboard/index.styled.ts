@@ -17,7 +17,7 @@ export const SecondaryContainer = styled.div((props) => ({
   flexDirection: 'column',
   paddingLeft: props.theme.space.m,
   paddingRight: props.theme.space.m,
-  marginTop: props.theme.space.l,
+  marginTop: props.theme.space.m,
   marginBottom: props.theme.space.xl,
   h1: {
     ...props.theme.typography.body_medium_m,

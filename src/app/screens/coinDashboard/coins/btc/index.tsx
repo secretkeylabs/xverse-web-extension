@@ -4,11 +4,12 @@ import TopRow from '@components/topRow';
 import useCanUserSwitchPaymentType from '@hooks/useCanUserSwitchPaymentType';
 import { broadcastResetUserFlow, useResetUserFlow } from '@hooks/useResetUserFlow';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
+import { Tabs, type TabProp } from '@ui-library/tabs';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import CoinHeader from '../../coinHeader';
-import { Button, Container, FtInfoContainer } from '../../index.styled';
+import { Container, FtInfoContainer } from '../../index.styled';
 import TransactionsHistoryList from '../../transactionsHistoryList';
 import BalanceBreakdown from './balanceBreakdown';
 
@@ -33,31 +34,32 @@ export default function CoinDashboard() {
 
   const onCancelAddressType = () => setShowPreferredBtcAddressSheet(false);
 
+  const tabs: TabProp<'primary' | 'secondary'>[] = [
+    {
+      label: t('TRANSACTIONS'),
+      value: 'primary',
+    },
+    {
+      label: t('BREAKDOWN'),
+      value: 'secondary',
+    },
+  ];
+
   return (
     <>
       <TopRow onClick={handleGoBack} onSettingsClick={handleChangeAddressTypeClick} />
       <Container>
         <CoinHeader currency="BTC" />
-        {/* TODO: import { Tabs } from ui-library/tabs.tsx */}
         <FtInfoContainer>
-          <Button
-            disabled={currentTab === 'primary'}
-            isSelected={currentTab === 'primary'}
-            onClick={() => setCurrentTab('primary')}
-          >
-            {t('TRANSACTIONS')}
-          </Button>
-          <Button
-            data-testid="coin-secondary-button"
-            disabled={currentTab === 'secondary'}
-            isSelected={currentTab === 'secondary'}
-            onClick={() => setCurrentTab('secondary')}
-          >
-            {t('BREAKDOWN')}
-          </Button>
+          <Tabs
+            tabs={tabs}
+            activeTab={currentTab}
+            onTabClick={(tabClicked: 'primary' | 'secondary') => setCurrentTab(tabClicked)}
+          />
         </FtInfoContainer>
         {currentTab === 'primary' && (
           <TransactionsHistoryList
+            withTitle={false}
             coin="BTC"
             stxTxFilter={null}
             brc20Token={null}
