@@ -50,11 +50,12 @@ const SummaryContainer = styled.div({
   margin: '18px 0',
 });
 
-const TypesContainer = styled.div({
+const TypesContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   margin: '4px 0',
-});
+  gap: props.theme.space.s,
+}));
 
 const ButtonContainer = styled.div((props) => ({
   width: '100%',
