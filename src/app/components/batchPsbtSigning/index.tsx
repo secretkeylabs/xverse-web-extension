@@ -66,8 +66,7 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: BatchPs
   const [isSigningComplete, setIsSigningComplete] = useState(false);
   const [signingPsbtIndex, setSigningPsbtIndex] = useState(1);
   const [currentPsbtIndex, setCurrentPsbtIndex] = useState(0);
-  const singlePsbt = psbts.length === 1;
-  const [reviewTransaction, setReviewTransaction] = useState(singlePsbt);
+  const [reviewTransaction, setReviewTransaction] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [parsedPsbts, setParsedPsbts] = useState<ParsedPsbt[]>([]);
   const [isLedgerModalVisible, setIsLedgerModalVisible] = useState(false);
@@ -196,18 +195,18 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: BatchPs
     });
 
     const renderBody = () => {
-      if (hasDuplicateInputs) {
-        // if there are duplicate inputs on the individual transactions, we won't show a summary
-        // and will have to ask the user to review each txn individually
-        return null;
-      }
-
       if (isLoading) {
         return (
           <LoaderContainer>
             <Spinner color="white" size={50} />
           </LoaderContainer>
         );
+      }
+
+      if (hasDuplicateInputs) {
+        // if there are duplicate inputs on the individual transactions, we won't show a summary
+        // and will have to ask the user to review each txn individually
+        return null;
       }
 
       return (
@@ -247,7 +246,7 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: BatchPs
         {renderBody()}
         <StyledSheet
           header=""
-          visible={reviewTransaction || hasDuplicateInputs}
+          visible={(reviewTransaction || hasDuplicateInputs) && !isLoading}
           onClose={hasDuplicateInputs ? undefined : onReviewDone}
         >
           <OuterContainer>

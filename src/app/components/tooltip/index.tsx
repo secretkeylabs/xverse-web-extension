@@ -37,7 +37,7 @@ const StyledCallout = styled(Callout)(() => ({
 }));
 
 type Props = CalloutProps & {
-  target: MutableRefObject<HTMLButtonElement | null>;
+  target: MutableRefObject<HTMLElement | null>;
   positionVertical?: 'top' | 'bottom';
   positionHorizontal?: 'left' | 'right';
 };
