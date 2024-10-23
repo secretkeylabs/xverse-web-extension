@@ -687,7 +687,8 @@
       "DESCRIPTION": "Select the default address type you would like to use for all accounts. You can switch at any time from settings.",
       "LEARN_MORE": "Learn more about address types.",
       "ACCOUNT_COUNT": "Accounts: {{accounts}}",
-      "ACCOUNT_SUMMARY_DESCRIPTION": "The balances shown are cumulative across all accounts for each address type."
+      "ACCOUNT_SUMMARY_DESCRIPTION": "The balances shown are cumulative across all accounts for each address type.",
+      "ACCOUNT_SUMMARY_DESCRIPTION_NO_FUNDS": "No balances found for this seed phrase."
     }
   },
   "STACKING_SCREEN": {
