@@ -32,7 +32,7 @@ export const TabItem = styled.button<{ $active?: boolean }>`
 
 export type TabProp<T> = { label: string; value: T };
 
-export type TabsProps<T> = {
+type TabsProps<T> = {
   tabs: TabProp<T>[];
   activeTab: T;
   onTabClick: (value: T) => void;
@@ -54,5 +54,3 @@ export function Tabs<T extends unknown>({ tabs, activeTab, onTabClick, className
     </TabContainer>
   );
 }
-
-export default Tabs;
