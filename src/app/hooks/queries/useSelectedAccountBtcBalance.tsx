@@ -4,18 +4,24 @@ import BigNumber from 'bignumber.js';
 
 export default function useSelectedAccountBtcBalance() {
   const selectedAccount = useSelectedAccount();
-  const { data: nativeBalance, isLoading: nativeLoading } = useBtcAddressBalance(
-    selectedAccount.btcAddresses.native?.address ?? '',
-  );
-  const { data: nestedBalance, isLoading: nestedLoading } = useBtcAddressBalance(
-    selectedAccount.btcAddresses.nested?.address ?? '',
-  );
-  const { data: taprootBalance, isLoading: taprootLoading } = useBtcAddressBalance(
-    selectedAccount.btcAddresses.taproot.address ?? '',
-  );
+  const {
+    data: nativeBalance,
+    isLoading: nativeLoading,
+    isRefetching: nativeRefetching,
+  } = useBtcAddressBalance(selectedAccount.btcAddresses.native?.address ?? '');
+  const {
+    data: nestedBalance,
+    isLoading: nestedLoading,
+    isRefetching: nestedRefetching,
+  } = useBtcAddressBalance(selectedAccount.btcAddresses.nested?.address ?? '');
+  const {
+    data: taprootBalance,
+    isLoading: taprootLoading,
+    isRefetching: taprootRefetching,
+  } = useBtcAddressBalance(selectedAccount.btcAddresses.taproot.address ?? '');
 
   if (nativeLoading || nestedLoading || taprootLoading) {
-    return { isLoading: true };
+    return { isLoading: true, isRefetching: false };
   }
 
   const confirmedBalance = BigNumber(nativeBalance?.confirmedBalance ?? 0)
@@ -35,5 +41,6 @@ export default function useSelectedAccountBtcBalance() {
     nestedBalance,
     taprootBalance,
     isLoading: false,
+    isRefetching: nativeRefetching || nestedRefetching || taprootRefetching,
   };
 }
