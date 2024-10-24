@@ -19,8 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-const TxStatusContainer = styled.div((props) => ({
-  background: props.theme.colors.elevation0,
+const TxStatusContainer = styled.div((_props) => ({
   display: 'flex',
   flexDirection: 'column',
   minHeight: 570,

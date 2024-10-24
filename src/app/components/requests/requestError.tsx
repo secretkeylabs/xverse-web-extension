@@ -7,7 +7,6 @@ import styled from 'styled-components';
  */
 
 const Container = styled.div((props) => ({
-  background: props.theme.colors.elevation0,
   display: 'flex',
   flexDirection: 'column',
   height: '100%',
