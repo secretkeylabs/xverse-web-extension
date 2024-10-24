@@ -24,7 +24,8 @@ const TxStatusContainer = styled.div((props) => ({
   background: props.theme.colors.elevation0,
   display: 'flex',
   flexDirection: 'column',
-  minHeight: 600,
+  minHeight: 570,
+  height: '100%',
 }));
 
 const OuterContainer = styled.div((_props) => ({
@@ -238,6 +239,7 @@ function TransactionStatus() {
         sendNetworkMismatchMessage({ tabId, messageId });
       if (
         (error === tReqErrors('ADDRESS_MISMATCH') ||
+          error === tReqErrors('ADDRESS_TYPE_MISMATCH') ||
           error === tReqErrors('ADDRESS_MISMATCH_STX')) &&
         tabId &&
         messageId
