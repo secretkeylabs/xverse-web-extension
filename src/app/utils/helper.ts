@@ -245,7 +245,7 @@ export const validateAccountName = (
 
 export const getAccountBalanceKey = (account: Account | null) => {
   if (!account) return '';
-  return `${account.accountType}-${account.deviceAccountIndex || account.id}`;
+  return `${account.accountType}-${account.id}`;
 };
 
 export const calculateTotalBalance = ({
