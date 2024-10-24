@@ -69,7 +69,7 @@ export const StyledSheet = styled(BottomModal)`
   flex-direction: column;
   height: 100%;
   max-height: 100% !important;
-  background-color: #181818 !important;
+  background-color: ${(props) => props.theme.colors.elevation0} !important;
 `;
 
 export const ButtonsContainer = styled.div((props) => ({
