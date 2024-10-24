@@ -50,27 +50,29 @@ type Props = {
   ftCurrencyPairs: [FungibleToken, CurrencyTypes][];
   decimals?: number;
   displayTimeInterval?: boolean;
+  displayBalanceChange?: boolean;
   displayAmountChange?: boolean;
 };
 
 function PercentageChange({
   ftCurrencyPairs,
   decimals = 2,
-  displayAmountChange = false,
   displayTimeInterval = false,
+  displayBalanceChange = false,
+  displayAmountChange = false,
 }: Props) {
   const { fiatCurrency } = useWalletSelector();
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const { data: stxData } = useStxWalletData();
   const { data: btcBalance } = useBtcWalletData();
 
-  const [currentAmount, oldAmount] = ftCurrencyPairs
+  const [currentBalance, oldBalance] = ftCurrencyPairs
     .map(([fungibleToken, currency]) => {
       if (!fungibleToken.priceChangePercentage24h || !fungibleToken.tokenFiatRate || !currency) {
         return [BigNumber(0), BigNumber(0)];
       }
 
-      const fiatAmount =
+      const fiatBalance =
         currency &&
         getFiatEquivalent(
           Number(getBalanceAmount(currency, fungibleToken, stxData, btcBalance)),
@@ -79,14 +81,15 @@ function PercentageChange({
           BigNumber(btcFiatRate),
           fungibleToken,
         );
-      if (!fiatAmount) {
+
+      if (!fiatBalance) {
         return [BigNumber(0), BigNumber(0)];
       }
 
       const priceChangePercentage24h = 100.0 + parseFloat(fungibleToken.priceChangePercentage24h);
       return [
-        BigNumber(fiatAmount),
-        BigNumber(fiatAmount).dividedBy(priceChangePercentage24h).multipliedBy(100),
+        BigNumber(fiatBalance),
+        BigNumber(fiatBalance).dividedBy(priceChangePercentage24h).multipliedBy(100),
       ];
     })
     .reduce(
@@ -94,31 +97,48 @@ function PercentageChange({
       [BigNumber(0), BigNumber(0)],
     );
 
-  if (currentAmount.eq(0) || oldAmount.eq(0)) {
+  if (currentBalance.eq(0) || oldBalance.eq(0)) {
     return <NoDataText />;
   }
 
-  const priceChangePercentage24h = currentAmount.dividedBy(oldAmount).minus(1).multipliedBy(100);
-  const formattedPercentageChange = priceChangePercentage24h.absoluteValue().toFixed(decimals);
+  const priceChangePercentage24h = currentBalance.dividedBy(oldBalance).minus(1);
+  const formattedPercentageChange = priceChangePercentage24h
+    .multipliedBy(100)
+    .absoluteValue()
+    .toFixed(decimals);
 
   const increase = priceChangePercentage24h.gte(0);
   const themeColor = increase ? Theme.colors.success_light : Theme.colors.danger_light;
   const CaretIcon = increase ? CaretUp : CaretDown;
 
-  const formattedAmountChange = [
+  const formattedBalanceChange = [
     '(',
     currencySymbolMap[fiatCurrency],
     increase ? '+' : '-',
-    currentAmount.minus(oldAmount).absoluteValue().toFixed(2),
+    currentBalance.minus(oldBalance).absoluteValue().toFixed(2),
     ')',
   ].join('');
+
+  // chm todo: multiple by selected currency
+  const amountChangeInUsd =
+    displayAmountChange && ftCurrencyPairs.length === 1 && ftCurrencyPairs[0][0].currentPrice
+      ? BigNumber(ftCurrencyPairs[0][0].currentPrice)
+          .multipliedBy(priceChangePercentage24h)
+          .absoluteValue()
+          .toFixed(2)
+      : null;
+
+  const formattedAmountChange = amountChangeInUsd
+    ? ['(', currencySymbolMap[fiatCurrency], increase ? '+' : '-', amountChangeInUsd, ')'].join('')
+    : null;
 
   return (
     <RowContainer>
       <CaretIcon size={12} color={themeColor} weight="fill" />
       <PercentageChangeText themeColor={themeColor}>
         {formattedPercentageChange}%
-        {displayAmountChange && formattedAmountChange ? ` ${formattedAmountChange}` : ''}
+        {displayBalanceChange && formattedBalanceChange ? ` ${formattedBalanceChange}` : ''}
+        {formattedAmountChange ? ` ${formattedAmountChange}` : ''}
       </PercentageChangeText>
       {displayTimeInterval && <IntervalText>24h</IntervalText>}
     </RowContainer>
