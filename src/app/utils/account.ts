@@ -1,11 +1,16 @@
 import type { Account, NetworkType } from '@secretkeylabs/xverse-core';
 
-export const getNewAccountId = (ledgerAccountsList: Account[]) => {
-  if (ledgerAccountsList.length === 0) {
+export const delay = (ms: number) =>
+  new Promise((res) => {
+    setTimeout(res, ms);
+  });
+
+export const getNewAccountId = (keystoneAccountsList: Account[]) => {
+  if (keystoneAccountsList.length === 0) {
     return 0;
   }
 
-  return ledgerAccountsList[ledgerAccountsList.length - 1].id + 1;
+  return keystoneAccountsList[keystoneAccountsList.length - 1].id + 1;
 };
 
 export const filterKeystoneAccounts = (accounts: Account[], network: NetworkType) =>
@@ -13,7 +18,7 @@ export const filterKeystoneAccounts = (accounts: Account[], network: NetworkType
     account.ordinalsAddress?.startsWith(network === 'Mainnet' ? 'bc1' : 'tb1'),
   );
 
-export const getDeviceNewAccountIndex = (
+export const getKeystoneDeviceNewAccountIndex = (
   keystoneAccountsList: Account[],
   network: NetworkType,
   masterKey?: string,
@@ -23,7 +28,6 @@ export const getDeviceNewAccountIndex = (
   const keystoneAccountsIndexList = networkKeystoneAccounts
     .filter((account) => masterKey === account.masterPubKey)
     .map((account, key) =>
-      // ledger accounts initially didn't have deviceAccountIndex, so we map to their list index as as the initial behaviour
       account.deviceAccountIndex !== undefined ? account.deviceAccountIndex : key,
     )
     .sort((a, b) => a - b);
@@ -34,6 +38,5 @@ export const getDeviceNewAccountIndex = (
     }
   }
 
-  // If no missing number is found, return the length of the array
   return keystoneAccountsIndexList.length;
 };

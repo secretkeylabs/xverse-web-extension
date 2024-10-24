@@ -3,10 +3,17 @@ import useDebounce from '@hooks/useDebounce';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
-import { AnalyticsEvents, btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
+import { TransportWebUSB } from '@keystonehq/hw-transport-webusb';
+import {
+  AnalyticsEvents,
+  btcTransaction,
+  type AccountType,
+  type Transport,
+} from '@secretkeylabs/xverse-core';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import {
   generateSendMaxTransaction,
@@ -18,6 +25,7 @@ import { getPreviousStep, Step } from './steps';
 
 function SendBtcScreen() {
   const navigate = useNavigate();
+  const { t } = useTranslation('translation');
 
   const isInOption = isInOptions();
 
@@ -26,12 +34,10 @@ function SendBtcScreen() {
   const { data: btcFeeRate, isLoading: feeRatesLoading } = useBtcFeeRate();
   const selectedAccount = useSelectedAccount();
   const transactionContext = useTransactionContext();
-  const [recipientAddress, setRecipientAddress] = useState<string>(
-    'bc1qqzvqv7y7tmmc57ze5hmyn5k5wjy8804k0fl2u6',
-  );
+  const [recipientAddress, setRecipientAddress] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [amountSats, setAmountSats] = useState<string>('1000');
+  const [amountSats, setAmountSats] = useState<string>('');
   const [feeRate, setFeeRate] = useState('');
   const [sendMax, setSendMax] = useState(false);
 
@@ -135,11 +141,16 @@ function SendBtcScreen() {
     return undefined;
   };
 
-  const handleSubmit = async (ledgerTransport?: Transport) => {
+  const handleSubmit = async (type?: AccountType, transport?: Transport | TransportWebUSB) => {
     try {
       setIsSubmitting(true);
       const txnId = await transaction?.broadcast({
-        ledgerTransport,
+        ...(type === 'ledger' && {
+          ledgerTransport: transport as Transport,
+        }),
+        ...(type === 'keystone' && {
+          keystoneTransport: transport as TransportWebUSB,
+        }),
         rbfEnabled: true,
       });
 
@@ -158,12 +169,20 @@ function SendBtcScreen() {
         },
       });
     } catch (e) {
-      console.error(e);
+      let msg = e;
+      if (e instanceof Error) {
+        if (e.message.includes('Export address is just allowed on specific pages')) {
+          msg = t('SIGNATURE_REQUEST.KEYSTONE.CONFIRM.ERROR_SUBTITLE');
+        }
+        if (e.message.includes('UR parsing rejected')) {
+          msg = t('SIGNATURE_REQUEST.KEYSTONE.CONFIRM.DENIED.ERROR_SUBTITLE');
+        }
+      }
       navigate('/tx-status', {
         state: {
           txid: '',
           currency: 'BTC',
-          error: `${e}`,
+          error: `${msg}`,
           browserTx: isInOption,
         },
       });
@@ -187,7 +206,6 @@ function SendBtcScreen() {
 
   return (
     <StepDisplay
-      transaction={transaction}
       summary={summary}
       currentStep={currentStep}
       setCurrentStep={setCurrentStep}

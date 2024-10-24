@@ -73,14 +73,11 @@ function AccountList(): JSX.Element {
     return [...networkLedgerAccounts, ...networkKeystoneAccounts, ...accountsList];
   }, [accountsList, ledgerAccountsList, keystoneAccountsList, network]);
 
-  console.warn('DEBUGPRINT[11]: index.tsx:70: displayedAccountsList=', displayedAccountsList);
-
   const handleBackButtonClick = () => {
     navigate(-1);
   };
 
   const handleAccountSelect = async (account: Account, goBack = true) => {
-    console.warn('DEBUGPRINT[4]: index.tsx:81: account=', account);
     await switchAccount(account);
     broadcastResetUserFlow();
     if (goBack) {
@@ -99,6 +96,12 @@ function AccountList(): JSX.Element {
   const onImportLedgerAccount = async () => {
     await chrome.tabs.create({
       url: chrome.runtime.getURL('options.html#/import-ledger'),
+    });
+  };
+
+  const onImportKeystoneAccount = async () => {
+    await chrome.tabs.create({
+      url: chrome.runtime.getURL('options.html#/import-keystone'),
     });
   };
 
@@ -135,6 +138,12 @@ function AccountList(): JSX.Element {
               icon={<img src={ConnectLedger} width={16} height={16} alt="" />}
               onClick={onImportLedgerAccount}
               title={t('LEDGER_ACCOUNT')}
+              variant="secondary"
+            />
+            <Button
+              icon={<img src={ConnectLedger} width={16} height={16} alt="" />}
+              onClick={onImportKeystoneAccount}
+              title={t('KEYSTONE_ACCOUNT')}
               variant="secondary"
             />
           </ButtonsWrapper>

@@ -1,68 +1,49 @@
-import InfoIcon from '@assets/img/info.svg';
-import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
-import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
-import KeystoneScanSignature from '@components/keystone/ScanSignature';
-import KeystoneViewTxQRCode from '@components/keystone/viewTxQRCode';
-import LedgerConnectionView, {
-  ConnectLedgerContainer,
-  ConnectLedgerText,
-} from '@components/ledger/connectLedgerView';
-import LedgerFailView from '@components/ledger/failLedgerView';
-import {
-  ConnectLedgerTitle,
-  InfoImage,
-} from '@screens/ledger/confirmLedgerStxTransaction/index.styled';
-import type {
-  AggregatedSummary,
-  btcTransaction,
-  UserTransactionSummary,
-} from '@secretkeylabs/xverse-core';
+import keystoneConnectDefaultIcon from '@assets/img/keystone/keystone_connect_default.svg';
+import keystoneConnectBtcIcon from '@assets/img/keystone/keystone_import_connect_btc.svg';
+import KeystoneConnectionView from '@components/keystone/connectKeystoneView';
 import type { TFunction } from 'react-i18next';
 
 export enum KeystoneSteps {
-  ViewTxQRCode = 0,
-  ScanSignature = 1,
-  ConfirmTransaction = 2,
+  ConnectKeystone = 0,
+  ConfirmTransaction = 1,
 }
 
 type Props = {
-  transaction?: btcTransaction.EnhancedTransaction;
   currentStep: KeystoneSteps;
   isConnectSuccess: boolean;
   isConnectFailed: boolean;
   isTxRejected: boolean;
-  t: TFunction<'translation', 'CONFIRM_TRANSACTION'>;
   signatureRequestTranslate: TFunction<'translation', 'SIGNATURE_REQUEST'>;
 };
 
 function KeystoneStepView({
-  transaction,
   currentStep,
   isConnectSuccess,
   isConnectFailed,
   isTxRejected,
-  t,
   signatureRequestTranslate,
 }: Props) {
   switch (currentStep) {
-    case KeystoneSteps.ViewTxQRCode:
-      return <KeystoneViewTxQRCode transaction={transaction} />;
-    case KeystoneSteps.ScanSignature:
-      if (isTxRejected || isConnectFailed) {
-        return (
-          <LedgerFailView title={t('CONFIRM.ERROR_TITLE')} text={t('CONFIRM.ERROR_SUBTITLE')} />
-        );
-      }
-
-      return <KeystoneScanSignature transaction={transaction} />;
+    case KeystoneSteps.ConnectKeystone:
+      return (
+        <KeystoneConnectionView
+          title={signatureRequestTranslate('KEYSTONE.CONNECT.TITLE')}
+          text={signatureRequestTranslate('KEYSTONE.CONNECT.SUBTITLE')}
+          titleFailed={signatureRequestTranslate('KEYSTONE.CONNECT.ERROR_TITLE')}
+          textFailed={signatureRequestTranslate('KEYSTONE.CONNECT.ERROR_SUBTITLE')}
+          imageDefault={keystoneConnectBtcIcon}
+          isConnectSuccess={isConnectSuccess}
+          isConnectFailed={isConnectFailed}
+        />
+      );
     case KeystoneSteps.ConfirmTransaction:
       return (
-        <LedgerConnectionView
-          title={signatureRequestTranslate('LEDGER.CONFIRM.TITLE')}
-          text={signatureRequestTranslate('LEDGER.CONFIRM.SUBTITLE')}
-          titleFailed={signatureRequestTranslate('LEDGER.CONFIRM.ERROR_TITLE')}
-          textFailed={signatureRequestTranslate('LEDGER.CONFIRM.ERROR_SUBTITLE')}
-          imageDefault={ledgerConnectDefaultIcon}
+        <KeystoneConnectionView
+          title={signatureRequestTranslate('KEYSTONE.CONFIRM.TITLE')}
+          text={signatureRequestTranslate('KEYSTONE.CONFIRM.SUBTITLE')}
+          titleFailed={signatureRequestTranslate('KEYSTONE.CONFIRM.ERROR_TITLE')}
+          textFailed={signatureRequestTranslate('KEYSTONE.CONFIRM.ERROR_SUBTITLE')}
+          imageDefault={keystoneConnectDefaultIcon}
           isConnectSuccess={false}
           isConnectFailed={isTxRejected}
         />

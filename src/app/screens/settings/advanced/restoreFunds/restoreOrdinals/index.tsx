@@ -6,8 +6,10 @@ import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useOrdinalsByAddress from '@hooks/useOrdinalsByAddress';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
+import { TransportWebUSB } from '@keystonehq/hw-transport-webusb';
 import type { TransactionSummary } from '@screens/sendBtc/helpers';
 import {
+  type AccountType,
   AnalyticsEvents,
   type BtcOrdinal,
   btcTransaction,
@@ -138,10 +140,18 @@ function RestoreOrdinals() {
     setSummary(undefined);
   };
 
-  const handleSubmit = async (ledgerTransport?: Transport) => {
+  const handleSubmit = async (type?: AccountType, transport?: Transport | TransportWebUSB) => {
     try {
       setIsSubmitting(true);
-      const txnId = await transaction?.broadcast({ ledgerTransport, rbfEnabled: true });
+      const txnId = await transaction?.broadcast({
+        ...(type === 'ledger' && {
+          ledgerTransport: transport as Transport,
+        }),
+        ...(type === 'keystone' && {
+          keystoneTransport: transport as TransportWebUSB,
+        }),
+        rbfEnabled: true,
+      });
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
         protocol: 'ordinals',
         action: 'transfer',

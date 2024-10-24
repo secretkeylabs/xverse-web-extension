@@ -29,7 +29,6 @@ const Container = styled.div`
 `;
 
 type Props = {
-  transaction?: btcTransaction.EnhancedTransaction;
   summary: TransactionSummary | undefined;
   currentStep: Step;
   setCurrentStep: (step: Step) => void;
@@ -50,7 +49,6 @@ type Props = {
 };
 
 function StepDisplay({
-  transaction,
   summary,
   currentStep,
   setCurrentStep,
@@ -120,7 +118,6 @@ function StepDisplay({
       }
       return (
         <ConfirmBtcTransaction
-          transaction={transaction}
           summary={summary}
           isLoading={false}
           confirmText={t('COMMON.CONFIRM')}

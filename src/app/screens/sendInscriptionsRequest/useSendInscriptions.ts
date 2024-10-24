@@ -3,9 +3,10 @@ import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/u
 import { sendUserRejectionMessage } from '@common/utils/rpc/responseMessages/errors';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useTransactionContext from '@hooks/useTransactionContext';
+import { TransportWebUSB } from '@keystonehq/hw-transport-webusb';
 import { RpcErrorCode, sendInscriptionsSchema } from '@sats-connect/core';
 import { type TransactionSummary } from '@screens/sendBtc/helpers';
-import { btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
+import { btcTransaction, type AccountType, type Transport } from '@secretkeylabs/xverse-core';
 import { useEffect, useState } from 'react';
 import * as v from 'valibot';
 
@@ -93,11 +94,19 @@ const useSendInscriptions = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [feeRate, btcFeeRates?.priority]);
 
-  const confirmOrdinalsTransferRequest = async (ledgerTransport?: Transport) => {
+  const confirmOrdinalsTransferRequest = async (
+    type?: AccountType,
+    transport?: Transport | TransportWebUSB,
+  ) => {
     try {
       setIsExecuting(true);
       const txid = await transaction?.broadcast({
-        ledgerTransport,
+        ...(type === 'ledger' && {
+          ledgerTransport: transport as Transport,
+        }),
+        ...(type === 'keystone' && {
+          keystoneTransport: transport as TransportWebUSB,
+        }),
         rbfEnabled: false,
       });
       if (!txid) {

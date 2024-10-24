@@ -2,8 +2,10 @@ import { delay } from '@common/utils/ledger';
 import type { Tab } from '@components/tabBar';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { createKeystoneTransport, TransportWebUSB } from '@keystonehq/hw-transport-webusb';
 import TransportFactory from '@ledgerhq/hw-transport-webusb';
 import {
+  type AccountType,
   type Brc20Definition,
   type btcTransaction,
   type EtchActionDetails,
@@ -16,7 +18,7 @@ import { StickyHorizontalSplitButtonContainer, StyledP } from '@ui-library/commo
 import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
 import { isKeystoneAccount, isLedgerAccount } from '@utils/helper';
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import type { Color } from '../../../theme';
@@ -55,7 +57,6 @@ const SuccessActionsContainer = styled.div((props) => ({
 }));
 
 type Props = {
-  transaction?: btcTransaction.EnhancedTransaction;
   summary?: btcTransaction.TransactionSummary | btcTransaction.PsbtSummary;
   runeMintDetails?: MintActionDetails;
   runeEtchDetails?: EtchActionDetails;
@@ -68,7 +69,7 @@ type Props = {
   hideBottomBar?: boolean;
   cancelText: string;
   confirmText: string;
-  onConfirm: (ledgerTransport?: Transport) => void;
+  onConfirm: (type?: AccountType, transport?: Transport | TransportWebUSB) => void;
   onCancel: () => void;
   onBackClick?: () => void;
   confirmDisabled?: boolean;
@@ -84,7 +85,6 @@ type Props = {
 };
 
 function ConfirmBtcTransaction({
-  transaction,
   summary,
   runeMintDetails,
   runeEtchDetails,
@@ -128,7 +128,7 @@ function ConfirmBtcTransaction({
   const [isTxRejected, setIsTxRejected] = useState(false);
 
   const [isKeystoneModalVisible, setIsKeystoneModalVisible] = useState(false);
-  const [keystoneCurrentStep, setKeystoneCurrentStep] = useState(KeystoneSteps.ViewTxQRCode);
+  const [keystoneCurrentStep, setKeystoneCurrentStep] = useState(KeystoneSteps.ConnectKeystone);
 
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const { t: signatureRequestTranslate } = useTranslation('translation', {
@@ -140,6 +140,7 @@ function ConfirmBtcTransaction({
       // show ledger connection screens
       setIsLedgerModalVisible(true);
     } else if (isKeystoneAccount(selectedAccount)) {
+      // show keystone connection screens
       setIsKeystoneModalVisible(true);
     } else {
       return onConfirm();
@@ -178,27 +179,52 @@ function ConfirmBtcTransaction({
     }
 
     try {
-      onConfirm(transport);
+      onConfirm('ledger', transport);
     } catch (err) {
       console.error(err);
       setIsTxRejected(true);
     }
   };
 
-  const handleKeystoneScanCompleted = async () => {
+  const handleKeystoneConnectAndConfirm = useCallback(async () => {
     if (!selectedAccount) {
       console.error('No account selected');
       return;
     }
     setIsButtonDisabled(true);
 
-    setKeystoneCurrentStep(KeystoneSteps.ScanSignature);
-  };
+    const transport = await createKeystoneTransport();
+
+    if (!transport) {
+      setIsConnectSuccess(false);
+      setIsConnectFailed(true);
+      setIsButtonDisabled(false);
+      return;
+    }
+    setKeystoneCurrentStep(KeystoneSteps.ConnectKeystone);
+
+    await delay(1500);
+
+    setKeystoneCurrentStep(KeystoneSteps.ConfirmTransaction);
+
+    try {
+      onConfirm('keystone', transport);
+    } catch (err) {
+      console.error(err);
+      setIsTxRejected(true);
+    }
+  }, [onConfirm, selectedAccount]);
 
   const goToConfirmationStep = () => {
-    setLedgerCurrentStep(LedgerSteps.ConfirmTransaction);
+    if (isLedgerModalVisible) {
+      setLedgerCurrentStep(LedgerSteps.ConfirmTransaction);
 
-    handleLedgerConnectAndConfirm();
+      handleLedgerConnectAndConfirm();
+    } else if (isKeystoneModalVisible) {
+      setKeystoneCurrentStep(KeystoneSteps.ConfirmTransaction);
+
+      handleKeystoneConnectAndConfirm();
+    }
   };
 
   const handleRetry = async () => {
@@ -207,9 +233,23 @@ function ConfirmBtcTransaction({
     if (isLedgerModalVisible) {
       setLedgerCurrentStep(LedgerSteps.ConnectLedger);
     } else if (isKeystoneModalVisible) {
-      setKeystoneCurrentStep(KeystoneSteps.ScanSignature);
+      setKeystoneCurrentStep(KeystoneSteps.ConnectKeystone);
     }
   };
+
+  // auto confirm keystone connect and confirm
+  useEffect(() => {
+    if (!extractedTxSummary || isButtonDisabled) return;
+
+    if (isKeystoneModalVisible) {
+      handleKeystoneConnectAndConfirm();
+    }
+  }, [
+    extractedTxSummary,
+    handleKeystoneConnectAndConfirm,
+    isButtonDisabled,
+    isKeystoneModalVisible,
+  ]);
 
   if (isLoading || extractTxSummaryLoading) {
     return (
@@ -311,38 +351,30 @@ function ConfirmBtcTransaction({
           onClose={() => setIsKeystoneModalVisible(false)}
         >
           <KeystoneStepView
-            transaction={transaction}
             currentStep={keystoneCurrentStep}
             isConnectSuccess={isConnectSuccess}
             isConnectFailed={isConnectFailed}
             isTxRejected={isTxRejected}
-            t={t}
             signatureRequestTranslate={signatureRequestTranslate}
           />
           <SuccessActionsContainer>
-            {keystoneCurrentStep === KeystoneSteps.ScanSignature && !isTxRejected ? (
-              <Button onClick={onCancel} title={t('LEDGER.CANCEL_BUTTON')} />
-            ) : (
-              <>
-                <Button
-                  onClick={
-                    isTxRejected || isConnectFailed ? handleRetry : handleKeystoneScanCompleted
-                  }
-                  title={signatureRequestTranslate(
-                    isTxRejected || isConnectFailed
-                      ? 'LEDGER.RETRY_BUTTON'
-                      : 'LEDGER.CONNECT_BUTTON',
-                  )}
-                  disabled={isButtonDisabled}
-                  loading={isButtonDisabled}
-                />
-                <Button
-                  onClick={onCancel}
-                  title={signatureRequestTranslate('LEDGER.CANCEL_BUTTON')}
-                  variant="secondary"
-                />
-              </>
-            )}
+            <Button
+              onClick={
+                isTxRejected || isConnectFailed ? handleRetry : handleKeystoneConnectAndConfirm
+              }
+              title={signatureRequestTranslate(
+                isTxRejected || isConnectFailed
+                  ? 'KEYSTONE.RETRY_BUTTON'
+                  : 'KEYSTONE.CONNECT_BUTTON',
+              )}
+              disabled={isButtonDisabled}
+              loading={isButtonDisabled}
+            />
+            <Button
+              onClick={onCancel}
+              title={signatureRequestTranslate('KEYSTONE.CANCEL_BUTTON')}
+              variant="secondary"
+            />
           </SuccessActionsContainer>
         </Sheet>
       </TxSummaryContext.Provider>

@@ -1,3 +1,4 @@
+import KeystoneBadge from '@assets/img/keystone/keystone_badge.svg';
 import LedgerBadge from '@assets/img/ledger/ledger_badge.svg';
 import BarLoader from '@components/barLoader';
 import OptionsDialog from '@components/optionsDialog/optionsDialog';
@@ -71,8 +72,13 @@ function AccountRow({
   const [accountName, setAccountName] = useState('');
   const [accountNameError, setAccountNameError] = useState<string | null>(null);
   const [isAccountNameChangeLoading, setIsAccountNameChangeLoading] = useState(false);
-  const { removeLedgerAccount, removeKeystoneAccount, renameAccount, updateLedgerAccounts } =
-    useWalletReducer();
+  const {
+    removeLedgerAccount,
+    removeKeystoneAccount,
+    renameAccount,
+    updateKeystoneAccounts,
+    updateLedgerAccounts,
+  } = useWalletReducer();
 
   useEffect(
     () => () => {
@@ -161,6 +167,8 @@ function AccountRow({
       setIsAccountNameChangeLoading(true);
       if (isLedgerAccount(account)) {
         await updateLedgerAccounts({ ...account, accountName });
+      } else if (isKeystoneAccount(account)) {
+        await updateKeystoneAccounts({ ...account, accountName });
       } else {
         await renameAccount({ ...account, accountName });
       }
@@ -181,6 +189,8 @@ function AccountRow({
       setIsAccountNameChangeLoading(true);
       if (isLedgerAccount(account)) {
         updateLedgerAccounts({ ...account, accountName: undefined });
+      } else if (isKeystoneAccount(account)) {
+        updateKeystoneAccounts({ ...account, accountName: undefined });
       } else {
         renameAccount({ ...account, accountName: undefined });
       }
@@ -212,6 +222,7 @@ function AccountRow({
                     `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`}
                 </AccountName>
                 {isLedgerAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
+                {isKeystoneAccount(account) && <img src={KeystoneBadge} alt="Keystone icon" />}
                 {isSelected && !disabledAccountSelect && !isAccountListView && (
                   <CaretDown color={Theme.colors.white_0} weight="bold" size={16} />
                 )}
@@ -263,7 +274,7 @@ function AccountRow({
               {optionsDialogTranslation('NFT_AVATAR.REMOVE_ACTION')}
             </ButtonRow>
           )}
-          {isKeystoneAccount(account) && (
+          {(isLedgerAccount(account) || isKeystoneAccount(account)) && (
             <ButtonRow onClick={handleRemoveAccountModalOpen}>
               {optionsDialogTranslation('REMOVE_FROM_LIST')}
             </ButtonRow>

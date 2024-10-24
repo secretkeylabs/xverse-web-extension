@@ -3,9 +3,15 @@ import { sendUserRejectionMessage } from '@common/utils/rpc/responseMessages/err
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { TransportWebUSB } from '@keystonehq/hw-transport-webusb';
 import { RpcErrorCode, type TransferRunesRequest } from '@sats-connect/core';
 import { type TransactionSummary } from '@screens/sendBtc/helpers';
-import { btcTransaction, runesTransaction, type Transport } from '@secretkeylabs/xverse-core';
+import {
+  btcTransaction,
+  runesTransaction,
+  type AccountType,
+  type Transport,
+} from '@secretkeylabs/xverse-core';
 import { useCallback, useEffect, useState } from 'react';
 
 type Args = {
@@ -85,11 +91,16 @@ const useTransferRunes = ({ tabId, messageId, recipients }: Args) => {
   }, [feeRate, btcFeeRates?.priority, buildTx]);
 
   const confirmRunesTransferRequest = useCallback(
-    async (ledgerTransport?: Transport) => {
+    async (type?: AccountType, transport?: Transport | TransportWebUSB) => {
       try {
         setIsExecuting(true);
         const txid = await transaction?.broadcast({
-          ledgerTransport,
+          ...(type === 'ledger' && {
+            ledgerTransport: transport as Transport,
+          }),
+          ...(type === 'keystone' && {
+            keystoneTransport: transport as TransportWebUSB,
+          }),
           rbfEnabled: false,
         });
         if (!txid) {
