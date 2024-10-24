@@ -129,6 +129,11 @@ test.describe('Create and Restore Wallet Flow', () => {
       }
       await expect(onboardingPage2.buttonContinue).toBeEnabled();
       await onboardingPage2.buttonContinue.click();
+
+      // address type screen (native/nested), we'll just continue with the default
+      await expect(onboardingPage2.buttonContinue).toBeEnabled();
+      await onboardingPage2.buttonContinue.click();
+
       await onboardingPage2.inputPassword.fill(strongPW);
       await onboardingPage2.buttonContinue.click();
       await onboardingPage2.inputPassword.fill(strongPW);
