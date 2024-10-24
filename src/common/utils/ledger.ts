@@ -1,10 +1,5 @@
 import type { Account, NetworkType } from '@secretkeylabs/xverse-core';
 
-export const delay = (ms: number) =>
-  new Promise((res) => {
-    setTimeout(res, ms);
-  });
-
 export const filterLedgerAccountsByNetwork = (accounts: Account[], network: NetworkType) =>
   accounts.filter((account) =>
     account.btcAddresses.taproot.address.startsWith(network === 'Mainnet' ? 'bc1' : 'tb1'),

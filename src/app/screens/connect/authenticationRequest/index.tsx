@@ -3,7 +3,7 @@ import stxIcon from '@assets/img/dashboard/stx_icon.svg';
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import { MESSAGE_SOURCE } from '@common/types/message-types';
-import { delay } from '@common/utils/ledger';
+import { delay } from '@common/utils/promises';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';

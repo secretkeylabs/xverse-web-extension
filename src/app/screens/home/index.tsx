@@ -17,8 +17,8 @@ import {
   useVisibleSip10FungibleTokens,
 } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useAppConfig from '@hooks/queries/useAppConfig';
-import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useFeeMultipliers from '@hooks/queries/useFeeMultipliers';
+import useSelectedAccountBtcBalance from '@hooks/queries/useSelectedAccountBtcBalance';
 import useSpamTokens from '@hooks/queries/useSpamTokens';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
@@ -93,8 +93,8 @@ function Home() {
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openBuyModal, setOpenBuyModal] = useState(false);
-  const { isInitialLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } =
-    useBtcWalletData();
+  const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } =
+    useSelectedAccountBtcBalance();
   const { isInitialLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } =
     useStxWalletData();
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
