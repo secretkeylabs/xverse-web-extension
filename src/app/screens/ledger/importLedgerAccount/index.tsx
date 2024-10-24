@@ -1,4 +1,5 @@
-import { delay, getDeviceNewAccountIndex, getNewAccountId } from '@common/utils/ledger';
+import { getDeviceNewAccountIndex, getNewAccountId } from '@common/utils/ledger';
+import { delay } from '@common/utils/promises';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';

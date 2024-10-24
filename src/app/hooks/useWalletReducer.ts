@@ -1,6 +1,7 @@
 import getSelectedAccount from '@common/utils/getSelectedAccount';
 import { getDeviceAccountIndex } from '@common/utils/ledger';
 import { dispatchEventAuthorizedConnectedClients } from '@common/utils/messages/extensionToContentScript/dispatchEvent';
+import { delay } from '@common/utils/promises';
 import { makeAccountResourceId } from '@components/permissionsManager/resources';
 import type { Permission } from '@components/permissionsManager/schemas';
 import useNetworkSelector from '@hooks/useNetwork';
@@ -41,7 +42,6 @@ import {
   resetMixPanel,
   trackMixPanel,
 } from '@utils/mixpanel';
-import { sleep } from '@utils/promises';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import useBtcClient from './apiClients/useBtcClient';
@@ -193,7 +193,7 @@ const useWalletReducer = () => {
 
         // since we've already loaded the existing accounts, we can now check for new accounts, but with a small delay
         // to not overload the backends
-        await sleep(100);
+        await delay(100);
       }
 
       newAccountResponse = await walletAccountsGenerator.next();
