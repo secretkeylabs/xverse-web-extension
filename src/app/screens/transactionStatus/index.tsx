@@ -7,7 +7,6 @@ import {
   sendMissingFunctionArgumentsMessage,
   sendNetworkMismatchMessage,
 } from '@common/utils/rpc/responseMessages/errors';
-import ActionButton from '@components/button';
 import CopyButton from '@components/copyButton';
 import InfoContainer from '@components/infoContainer';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -112,7 +111,7 @@ const BodyText = styled.h1<{ $textAlignment: 'center' | 'left' }>((props) => ({
 }));
 
 const TxIDText = styled.h1((props) => ({
-  ...props.theme.headline_category_s,
+  ...props.theme.typography.body_medium_s,
   color: props.theme.colors.white_400,
   marginTop: props.theme.space.m,
   textTransform: 'uppercase',
@@ -343,12 +342,12 @@ function TransactionStatus() {
       </OuterContainer>
       {isSwapTransaction && isSponsorServiceError ? (
         <ButtonContainer>
-          <ActionButton text={t('RETRY')} onPress={handleClickTrySwapAgain} />
-          <ActionButton text={t('CLOSE')} onPress={onCloseClick} transparent />
+          <Button title={t('RETRY')} onClick={handleClickTrySwapAgain} />
+          <Button title={t('CLOSE')} onClick={onCloseClick} variant="secondary" />
         </ButtonContainer>
       ) : (
         <ButtonContainer>
-          <ActionButton text={t('CLOSE')} onPress={onCloseClick} />
+          <Button title={t('CLOSE')} onClick={onCloseClick} />
         </ButtonContainer>
       )}
     </TxStatusContainer>
