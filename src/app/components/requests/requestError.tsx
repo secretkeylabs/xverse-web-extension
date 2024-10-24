@@ -11,8 +11,8 @@ const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   height: '100%',
-  paddingLeft: props.theme.space.m,
-  paddingRight: props.theme.space.m,
+  marginLeft: props.theme.space.m,
+  marginRight: props.theme.space.m,
 }));
 
 const Image = styled.img({
