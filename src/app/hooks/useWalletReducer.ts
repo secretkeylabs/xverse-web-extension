@@ -193,7 +193,7 @@ const useWalletReducer = () => {
 
         // since we've already loaded the existing accounts, we can now check for new accounts, but with a small delay
         // to not overload the backends
-        await sleep(200);
+        await sleep(100);
       }
 
       newAccountResponse = await walletAccountsGenerator.next();
