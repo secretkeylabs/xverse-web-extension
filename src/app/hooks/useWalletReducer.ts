@@ -41,6 +41,7 @@ import {
   resetMixPanel,
   trackMixPanel,
 } from '@utils/mixpanel';
+import { sleep } from '@utils/promises';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import useBtcClient from './apiClients/useBtcClient';
@@ -183,11 +184,16 @@ const useWalletReducer = () => {
       newSoftwareAccountList.push(newAccount);
 
       if (newSoftwareAccountList.length >= currentAccounts.length) {
+        // we've regenerated the existing accounts, so we can update the store before continuing
         dispatch(updateSoftwareAccountsAction([...newSoftwareAccountList]));
 
         if (options?.accountLoadCallback) {
           await options.accountLoadCallback([...newSoftwareAccountList]);
         }
+
+        // since we've already loaded the existing accounts, we can now check for new accounts, but with a small delay
+        // to not overload the backends
+        await sleep(200);
       }
 
       newAccountResponse = await walletAccountsGenerator.next();
