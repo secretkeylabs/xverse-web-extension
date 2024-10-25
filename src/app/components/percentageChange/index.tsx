@@ -1,4 +1,5 @@
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useGetCoinsMarketData from '@hooks/queries/useGetCoinsMarketData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -47,7 +48,7 @@ const IntervalText = styled.p((props) => ({
 }));
 
 type Props = {
-  ftCurrencyPairs: [FungibleToken, CurrencyTypes][];
+  ftCurrencyPairs: [FungibleToken | undefined, CurrencyTypes][];
   decimals?: number;
   displayTimeInterval?: boolean;
   displayBalanceChange?: boolean;
@@ -63,15 +64,16 @@ function PercentageChange({
 }: Props) {
   const { fiatCurrency } = useWalletSelector();
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
+
   const { data: stxData } = useStxWalletData();
   const { data: btcBalance } = useBtcWalletData();
 
+  const btcMarketData = useGetCoinsMarketData('bitcoin');
+  const stxMarketData = useGetCoinsMarketData('blockstack');
+
+  let currentPrice = 0;
   const [currentBalance, oldBalance] = ftCurrencyPairs
     .map(([fungibleToken, currency]) => {
-      if (!fungibleToken.priceChangePercentage24h || !fungibleToken.tokenFiatRate || !currency) {
-        return [BigNumber(0), BigNumber(0)];
-      }
-
       const fiatBalance =
         currency &&
         getFiatEquivalent(
@@ -86,11 +88,33 @@ function PercentageChange({
         return [BigNumber(0), BigNumber(0)];
       }
 
-      const priceChangePercentage24h = 100.0 + parseFloat(fungibleToken.priceChangePercentage24h);
-      return [
-        BigNumber(fiatBalance),
-        BigNumber(fiatBalance).dividedBy(priceChangePercentage24h).multipliedBy(100),
-      ];
+      let priceChangePercentage24h = 0.0;
+
+      if (fungibleToken) {
+        if (!fungibleToken.priceChangePercentage24h || !fungibleToken.tokenFiatRate || !currency) {
+          return [BigNumber(0), BigNumber(0)];
+        }
+
+        currentPrice = Number(fungibleToken.currentPrice || '0');
+        priceChangePercentage24h = 100.0 + parseFloat(fungibleToken.priceChangePercentage24h);
+      } else if (currency === 'BTC') {
+        currentPrice = btcMarketData?.current_price || 0;
+        priceChangePercentage24h = btcMarketData?.price_change_percentage_24h
+          ? 100.0 + parseFloat(btcMarketData?.price_change_percentage_24h.toString())
+          : 0;
+      } else if (currency === 'STX') {
+        currentPrice = stxMarketData?.current_price || 0;
+        priceChangePercentage24h = stxMarketData?.price_change_percentage_24h
+          ? 100.0 + parseFloat(stxMarketData?.price_change_percentage_24h.toString())
+          : 0;
+      }
+
+      return priceChangePercentage24h
+        ? [
+            BigNumber(fiatBalance),
+            BigNumber(fiatBalance).dividedBy(priceChangePercentage24h).multipliedBy(100),
+          ]
+        : [BigNumber(0), BigNumber(0)];
     })
     .reduce(
       (total, current) => [total[0].plus(current[0]), total[1].plus(current[1])],
@@ -121,11 +145,8 @@ function PercentageChange({
 
   // chm todo: multiple by selected currency
   const amountChangeInUsd =
-    displayAmountChange && ftCurrencyPairs.length === 1 && ftCurrencyPairs[0][0].currentPrice
-      ? BigNumber(ftCurrencyPairs[0][0].currentPrice)
-          .multipliedBy(priceChangePercentage24h)
-          .absoluteValue()
-          .toFixed(2)
+    displayAmountChange && ftCurrencyPairs.length === 1
+      ? BigNumber(currentPrice).multipliedBy(priceChangePercentage24h).absoluteValue().toFixed(2)
       : null;
 
   const formattedAmountChange = amountChangeInUsd

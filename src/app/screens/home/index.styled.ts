@@ -1,5 +1,4 @@
 import TokenTile from '@components/tokenTile';
-import { animated } from '@react-spring/web';
 import Divider from '@ui-library/divider';
 import styled from 'styled-components';
 

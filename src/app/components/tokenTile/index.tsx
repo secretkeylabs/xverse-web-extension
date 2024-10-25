@@ -181,7 +181,7 @@ function TokenTile({
               renderText={(value: string) => <CoinBalanceText>{value}</CoinBalanceText>}
             />
             <FiatCurrencyRow>
-              {fungibleToken && <PercentageChange ftCurrencyPairs={[[fungibleToken, currency]]} />}
+              <PercentageChange ftCurrencyPairs={[[fungibleToken, currency]]} />
               <StyledFiatAmountText fiatAmount={getFiatAmount()} fiatCurrency={fiatCurrency} />
             </FiatCurrencyRow>
           </AmountContainer>

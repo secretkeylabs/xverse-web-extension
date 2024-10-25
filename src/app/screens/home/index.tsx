@@ -6,6 +6,7 @@ import stacksIcon from '@assets/img/dashboard/stx_icon.svg';
 import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
+import PercentageChange from '@components/percentageChange';
 import ReceiveCardComponent from '@components/receiveCardComponent';
 import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
@@ -49,7 +50,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useTheme } from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import SquareButton from '../../components/squareButton';
 import BalanceCard from './balanceCard';
 import BannerCarousel from './bannerCarousel';
@@ -79,6 +80,11 @@ import {
   VerifyButtonContainer,
   VerifyOrViewContainer,
 } from './index.styled';
+
+const PercentageChangeContainer = styled.div((props) => ({
+  marginTop: props.theme.space.s,
+  marginBottom: props.theme.space.xxxs,
+}));
 
 function Home() {
   const { t } = useTranslation('translation', {
@@ -453,6 +459,18 @@ function Home() {
             refetchingRunesData
           }
         />
+        <PercentageChangeContainer>
+          <PercentageChange
+            displayTimeInterval
+            ftCurrencyPairs={[
+              [undefined, 'BTC'],
+              [undefined, 'STX'],
+              ...combinedFtList.map(
+                (ft) => [ft, 'FT'] as [FungibleToken | undefined, CurrencyTypes],
+              ),
+            ]}
+          />
+        </PercentageChangeContainer>
         <RowButtonContainer data-testid="transaction-buttons-row">
           <SquareButton
             icon={<ArrowUp weight="regular" size="20" />}
