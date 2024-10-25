@@ -66,20 +66,9 @@ export function selectAccount(
   let selectedAccountType = accountType ?? 'software';
 
   if (typeof selectedAccountIndex === 'object') {
-    console.warn(
-      'DEBUGPRINT[10]: actionCreators.ts:71: selectedAccountIndex=',
-      selectedAccountIndex,
-    );
-    console.warn(
-      'DEBUGPRINT[9]: actionCreators.ts:69: selectedAccountIndex.accountType=',
-      selectedAccountIndex.accountType,
-    );
     selectedAccountType = selectedAccountIndex.accountType ?? 'software';
     selectedAccountIndex = selectedAccountIndex.id;
   }
-
-  console.warn('DEBUGPRINT[7]: actionCreators.ts:72: selectedAccountType=', selectedAccountType);
-  console.warn('DEBUGPRINT[8]: actionCreators.ts:70: selectedAccountIndex=', selectedAccountIndex);
 
   return {
     type: actions.SelectAccountKey,

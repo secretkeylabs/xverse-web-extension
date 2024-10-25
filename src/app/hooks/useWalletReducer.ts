@@ -362,14 +362,13 @@ const useWalletReducer = () => {
 
       await ensureSelectedAccountValid(nextAccount.accountType, nextAccount.id);
 
-      console.warn('DEBUGPRINT[1]: useWalletReducer.ts:363: nextAccount=', nextAccount);
       dispatch(selectAccount(nextAccount));
 
       dispatchEventAuthorizedConnectedClients(
         {
           resourceId: makeAccountResourceId({
-            accountId: accounts[selectedAccountIndex].id,
-            masterPubKey: accounts[selectedAccountIndex].masterPubKey,
+            accountId: accounts[selectedAccountIndex]?.id,
+            masterPubKey: accounts[selectedAccountIndex]?.masterPubKey,
             networkType: network.type,
           }),
           actions: new Set(['read']),
@@ -462,7 +461,6 @@ const useWalletReducer = () => {
   };
 
   const addKeystoneAccount = async (keystoneAccount: Account) => {
-    console.warn('DEBUGPRINT[4]: useWalletReducer.ts:463: keystoneAccount=', keystoneAccount);
     dispatch(updateKeystoneAccountsAction([...keystoneAccountsList, keystoneAccount]));
   };
 

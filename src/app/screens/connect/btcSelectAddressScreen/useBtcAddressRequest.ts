@@ -175,6 +175,7 @@ export default function useRequestHelper(): UseRequestHelperReturn {
       };
       chrome.tabs.sendMessage(tabId, addressMessage);
     };
+
     return {
       legacyRequestNetworkType,
       message,

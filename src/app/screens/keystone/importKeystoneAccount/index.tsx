@@ -21,15 +21,13 @@ import { delay, getKeystoneDeviceNewAccountIndex, getNewAccountId } from '@utils
 import { Container, OnBoardingActionsContainer, OnBoardingContentContainer } from './index.styled';
 
 export interface Credential {
+  xpub: string;
   publicKey: string;
   address: string;
 }
 
 function ImportKeystone(): JSX.Element {
   const [currentStep, setCurrentStep] = useState(ImportKeystoneSteps.START);
-  const [bitcoinCredentials, setBitcoinCredentials] = useState<Credential | undefined>(undefined);
-  const [ordinalsCredentials, setOrdinalsCredentials] = useState<Credential | undefined>(undefined);
-  const [stacksCredentials, setStacksCredentials] = useState<Credential | undefined>(undefined);
   const [masterPubKey, setMasterPubKey] = useState('');
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isConnectSuccess, setIsConnectSuccess] = useState(false);
@@ -37,10 +35,7 @@ function ImportKeystone(): JSX.Element {
   const [accountId, setAccountId] = useState(0);
   const [accountName, setAccountName] = useState('');
   const [accountNameError, setAccountNameError] = useState<string | undefined>();
-  const [isBtcAddressConfirmed, setIsBtcAddressConfirmed] = useState(false);
-  const [isOrdinalsAddressConfirmed, setIsOrdinalsAddressConfirmed] = useState(false);
   const [connectFailedText, setConnectFailedText] = useState('');
-  const [isOrdinalsAddressRejected, setIsOrdinalsAddressRejected] = useState(false);
   const { t } = useTranslation('translation', {
     keyPrefix: 'OPTIONS_DIALOG',
   });
@@ -49,7 +44,6 @@ function ImportKeystone(): JSX.Element {
   });
 
   const { addKeystoneAccount, updateKeystoneAccounts } = useWalletReducer();
-  const [isTogglerChecked, setIsTogglerChecked] = useState(false);
   const { accountsList, keystoneAccountsList, network } = useWalletSelector();
   const transition = useTransition(currentStep, DEFAULT_TRANSITION_OPTIONS);
 
@@ -74,16 +68,10 @@ function ImportKeystone(): JSX.Element {
     };
 
     try {
-      const bitcoinAccount = await importNativeSegwitAccountFromKeystone({
+      btcCreds = await importNativeSegwitAccountFromKeystone({
         transport,
         addressIndex: deviceNewAccountIndex,
       });
-      btcCreds = {
-        address: bitcoinAccount.address,
-        publicKey: bitcoinAccount.pubkey,
-      };
-      setBitcoinCredentials(btcCreds);
-      setIsBtcAddressConfirmed(true);
     } catch (err: any) {
       if ([4, 6].includes(err.transportErrorCode)) {
         setConnectFailedText(keystoneImportErrorMessages[err.transportErrorCode]);
@@ -98,16 +86,10 @@ function ImportKeystone(): JSX.Element {
       await transport.close();
     }
     try {
-      const ordinalsAccount = await importTaprootAccountFromKeystone({
+      ordinalsCreds = await importTaprootAccountFromKeystone({
         transport,
         addressIndex: deviceNewAccountIndex,
       });
-      ordinalsCreds = {
-        address: ordinalsAccount.address,
-        publicKey: ordinalsAccount.pubkey,
-      };
-      setOrdinalsCredentials(ordinalsCreds);
-      setIsOrdinalsAddressConfirmed(true);
     } catch (err: any) {
       if ([4, 6].includes(err.transportErrorCode)) {
         setConnectFailedText(keystoneImportErrorMessages[err.transportErrorCode]);
@@ -162,6 +144,8 @@ function ImportKeystone(): JSX.Element {
           stxPublicKey: stacksCreds?.publicKey || '',
           btcPublicKey: btcCreds?.publicKey || '',
           ordinalsPublicKey: ordinalsCreds?.publicKey || '',
+          btcXpub: btcCreds?.xpub || '',
+          ordinalsXpub: ordinalsCreds?.xpub || '',
           accountType: 'keystone',
           accountName: `Keystone Account ${newAccountId + 1}`,
           deviceAccountIndex: getKeystoneDeviceNewAccountIndex(
@@ -184,6 +168,8 @@ function ImportKeystone(): JSX.Element {
           btcPublicKey: btcCreds?.publicKey || '',
           ordinalsAddress: ordinalsCreds?.address || '',
           ordinalsPublicKey: ordinalsCreds?.publicKey || '',
+          btcXpub: btcCreds?.xpub || '',
+          ordinalsXpub: ordinalsCreds?.xpub || '',
         };
         await updateKeystoneAccounts(keystoneAccount);
         await delay(1000);
@@ -287,9 +273,6 @@ function ImportKeystone(): JSX.Element {
   };
 
   const backToAssetSelection = () => {
-    setBitcoinCredentials(undefined);
-    setOrdinalsCredentials(undefined);
-    setStacksCredentials(undefined);
     setIsButtonDisabled(false);
     setIsConnectSuccess(false);
     setIsConnectFailed(false);
