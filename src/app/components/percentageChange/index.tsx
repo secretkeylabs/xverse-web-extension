@@ -1,5 +1,6 @@
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useGetCoinsMarketData from '@hooks/queries/useGetCoinsMarketData';
+import useGetExchangeRate from '@hooks/queries/useGetExchangeRate';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -63,8 +64,10 @@ function PercentageChange({
   displayAmountChange = false,
 }: Props) {
   const { fiatCurrency } = useWalletSelector();
-  const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
+  const { data: exchangeRates } = useGetExchangeRate('USD');
+  const exchangeRate = exchangeRates ? Number(exchangeRates[fiatCurrency]) : 1;
 
+  const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const { data: stxData } = useStxWalletData();
   const { data: btcBalance } = useBtcWalletData();
 
@@ -143,10 +146,13 @@ function PercentageChange({
     ')',
   ].join('');
 
-  // chm todo: multiple by selected currency
   const amountChangeInUsd =
     displayAmountChange && ftCurrencyPairs.length === 1
-      ? BigNumber(currentPrice).multipliedBy(priceChangePercentage24h).absoluteValue().toFixed(2)
+      ? BigNumber(currentPrice)
+          .multipliedBy(priceChangePercentage24h)
+          .multipliedBy(exchangeRate)
+          .absoluteValue()
+          .toFixed(2)
       : null;
 
   const formattedAmountChange = amountChangeInUsd
