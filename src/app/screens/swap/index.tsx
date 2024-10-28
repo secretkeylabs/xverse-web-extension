@@ -417,6 +417,7 @@ export default function SwapScreen() {
       ammProviders={quotes?.amm || []}
       utxoProviders={quotes?.utxo || []}
       stxProviders={quotes?.stx || []}
+      amount={amount}
       toToken={toToken}
       ammProviderClicked={(provider: Quote) => {
         setProvider(true, provider);
