@@ -17,7 +17,7 @@ type ValidationError = {
 };
 
 const useSignPsbtValidationGate = ({ payload, parsedPsbt }: Props) => {
-  const { btcAddress, ordinalsAddress } = useSelectedAccount();
+  const { btcAddress, btcAddresses, ordinalsAddress } = useSelectedAccount();
   const { network } = useWalletSelector();
   const { t } = useTranslation('translation', { keyPrefix: 'REQUEST_ERRORS' });
   const [validationError, setValidationError] = useState<ValidationError | null>(null);
@@ -40,10 +40,22 @@ const useSignPsbtValidationGate = ({ payload, parsedPsbt }: Props) => {
     if (payload.inputsToSign) {
       payload.inputsToSign.forEach((input) => {
         if (input.address !== btcAddress && input.address !== ordinalsAddress) {
-          setValidationError({
-            error: t('ADDRESS_MISMATCH'),
-            alignment: 'left',
-          });
+          if (
+            input.address === btcAddresses.native?.address ||
+            input.address === btcAddresses.nested?.address
+          ) {
+            setValidationError({
+              errorTitle: t('ADDRESS_TYPE_MISMATCH_TITLE'),
+              error: t('ADDRESS_TYPE_MISMATCH'),
+              alignment: 'left',
+            });
+          } else {
+            setValidationError({
+              error: t('ADDRESS_MISMATCH'),
+              errorTitle: t('ADDRESS_MISMATCH_TITLE'),
+              alignment: 'left',
+            });
+          }
         }
       });
       return;

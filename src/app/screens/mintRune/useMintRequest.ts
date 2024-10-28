@@ -1,4 +1,5 @@
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
+import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useOrdinalsServiceApi from '@hooks/apiClients/useOrdinalsServiceApi';
 import useRunesApi from '@hooks/apiClients/useRunesApi';
 import useTransactionContext from '@hooks/useTransactionContext';
@@ -40,6 +41,7 @@ const useMintRequest = (): {
   const txContext = useTransactionContext();
   const ordinalsServiceApi = useOrdinalsServiceApi();
   const runesApi = useRunesApi();
+  const btcClient = useBtcClient();
 
   const [mintError, setMintError] = useState<{
     code: number | undefined;
@@ -139,11 +141,8 @@ const useMintRequest = (): {
   const payAndConfirmMintRequest = async (ledgerTransport?: Transport) => {
     try {
       setIsExecuting(true);
-      const txid = await orderTx?.transaction.broadcast({
-        ledgerTransport,
-        rbfEnabled: false,
-      });
-      if (!txid) {
+
+      if (!orderTx) {
         const response = makeRPCError(requestId, {
           code: RpcErrorCode.INTERNAL_ERROR,
           message: 'Failed to broadcast transaction',
@@ -151,6 +150,21 @@ const useMintRequest = (): {
         sendRpcResponse(+tabId, response);
         return;
       }
+
+      // TODO: make enhancedTransaction class use a passed in btcClient and use:
+      /*
+      orderTx.transaction.broadcast({
+        ledgerTransport,
+        rbfEnabled: false,
+      });
+      */
+
+      const { hex: transactionHex, id: txid } = await orderTx.transaction.getTransactionHexAndId({
+        ledgerTransport,
+        rbfEnabled: false,
+      });
+      await btcClient.sendRawTransaction(transactionHex);
+
       await ordinalsServiceApi.executeMint(orderId, txid);
       const mintRequestResponse = makeRpcSuccessResponse<'runes_mint'>(requestId, {
         fundingAddress: txContext.paymentAddress.address,

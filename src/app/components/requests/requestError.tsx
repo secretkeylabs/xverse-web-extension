@@ -7,12 +7,11 @@ import styled from 'styled-components';
  */
 
 const Container = styled.div((props) => ({
-  background: props.theme.colors.elevation0,
   display: 'flex',
   flexDirection: 'column',
   height: '100%',
-  paddingLeft: props.theme.space.m,
-  paddingRight: props.theme.space.m,
+  marginLeft: props.theme.space.m,
+  marginRight: props.theme.space.m,
 }));
 
 const Image = styled.img({
@@ -22,14 +21,14 @@ const Image = styled.img({
 });
 
 const HeadingText = styled.h1((props) => ({
-  ...props.theme.typography.headline_xs,
+  ...props.theme.typography.headline_s,
   color: props.theme.colors.white_0,
   textAlign: 'center',
   marginTop: props.theme.space.m,
 }));
 
 const BodyText = styled.h1<{ $textAlignment: 'center' | 'left' }>((props) => ({
-  ...props.theme.typography.body_l,
+  ...props.theme.typography.body_m,
   color: props.theme.colors.white_200,
   marginTop: props.theme.space.m,
   textAlign: props.$textAlignment,

@@ -4,7 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { Tooltip } from 'react-tooltip';
 import styled from 'styled-components';
 
-const LabelContainer = styled.div((props) => ({
+const LabelContainer = styled.p((props) => ({
+  ...props.theme.typography.body_medium_s,
+  color: 'white_0',
   backgroundColor: props.theme.colors.white_900,
   borderRadius: '6px',
   padding: '3px 8px',

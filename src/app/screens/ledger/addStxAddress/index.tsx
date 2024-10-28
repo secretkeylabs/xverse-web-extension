@@ -1,7 +1,7 @@
 import stxIcon from '@assets/img/dashboard/stx_icon.svg';
 import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
-import { delay } from '@common/utils/ledger';
+import { delay } from '@common/utils/promises';
 import ActionButton from '@components/button';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import LedgerFailView from '@components/ledger/failLedgerView';

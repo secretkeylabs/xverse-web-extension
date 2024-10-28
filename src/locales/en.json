@@ -238,7 +238,9 @@
     "ANNOUNCEMENTS": {
       "NATIVE_SEGWIT": {
         "TITLE": "Native SegWit is here!",
-        "DESCRIPTION_1": "Xverse now supports Native SegWit addresses for lower fees and better performance!",
+        "DESCRIPTION_1a": "Xverse now supports ",
+        "DESCRIPTION_1b": "Native SegWit",
+        "DESCRIPTION_1c": " addresses for lower fees and better performance!",
         "DESCRIPTION_2": "You can select your preferred Bitcoin payment address (native or nested) used for sending, receiving, and connecting with apps.",
         "DESCRIPTION_3": "Your Bitcoin balance includes funds from both addresses, and you can switch back anytime.",
         "SELECT": "Select my Preferred Bitcoin Address",
@@ -687,10 +689,10 @@
     "HAVE_A_COUNT_WORDS_SEED_PHRASE": "Have a {{number}} words seed phrase?",
     "SELECT_ADDRESS_TYPE": {
       "TITLE": "Preferred Address Type",
-      "DESCRIPTION": "Select the default address type you would like to use for all accounts. You can switch at any time from settings.",
+      "DESCRIPTION": "Select the default Bitcoin payment address type you would like to use for all accounts. You can switch at any time from settings.",
       "LEARN_MORE": "Learn more about address types.",
       "ACCOUNT_COUNT": "Accounts: {{accounts}}",
-      "ACCOUNT_SUMMARY_DESCRIPTION": "The balances shown are cumulative across all accounts for each address type.",
+      "ACCOUNT_SUMMARY_DESCRIPTION": "The balances shown are cumulative across all found accounts for each address type.",
       "ACCOUNT_SUMMARY_DESCRIPTION_NO_FUNDS": "No balances found for this seed phrase."
     }
   },
@@ -1598,7 +1600,10 @@
   "REQUEST_ERRORS": {
     "INVALID_REQUEST": "Invalid request",
     "MISSING_ARGUMENTS": "Contract function call missing arguments",
-    "ADDRESS_MISMATCH": "The app is requesting a signature from an address that doesn't match the one currently active in your Xverse wallet.\n\nTo fix this:\n - Ensure that the account you're using in Xverse matches the account you're logged in with on the app.\n- Confirm that the address type in Xverse matches the one required by the app (Native SegWit or Nested SegWit).",
+    "ADDRESS_MISMATCH_TITLE": "Address Mismatch",
+    "ADDRESS_MISMATCH": "The app is requesting a signature from an address that doesn't match the account currently active in your wallet.\n\nTo fix this:\n- Make sure the account in Xverse matches the one connected to the app\n- Try reconnecting to the app",
+    "ADDRESS_TYPE_MISMATCH_TITLE": "Address Type Mismatch",
+    "ADDRESS_TYPE_MISMATCH": "The app is requesting a signature from a Bitcoin payment address type that doesn't match the one currently active in your wallet.\n\nTo fix this:\n- Make sure the Bitcoin payment address type (Native SegWit or Nested SegWit) selected in Xverse matches the app\n- Try reconnecting to the app",
     "ADDRESS_MISMATCH_STX": "The app is requesting a signature from an address that doesn't match the one currently active in your Xverse wallet.",
     "NETWORK_MISMATCH": "There's a mismatch between your active network and the network you're logged in with on the app.",
     "PSBT_CANT_PARSE_ERROR_TITLE": "Transaction Error",

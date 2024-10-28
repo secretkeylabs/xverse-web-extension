@@ -56,15 +56,15 @@ export const useSignMessageValidation = (requestPayload: SignMessagePayload | un
   const [validationError, setValidationError] = useState<ValidationError | null>(null);
   const { t } = useTranslation('translation', { keyPrefix: 'REQUEST_ERRORS' });
   const selectedAccount = useSelectedAccount();
-  const { accountsList, network } = useWalletSelector();
+  const { accountsList, network, btcPaymentAddressType } = useWalletSelector();
   const { switchAccount } = useWalletReducer();
 
   const checkAddressAvailability = () => {
     const account = accountsList.filter(
       (acc) =>
-        selectedAccount.btcAddress === acc.btcAddresses.native?.address ||
-        selectedAccount.btcAddress === acc.btcAddresses.nested?.address ||
-        selectedAccount.btcAddress === acc.btcAddresses.taproot.address,
+        requestPayload?.address === acc.btcAddresses.native?.address ||
+        requestPayload?.address === acc.btcAddresses.nested?.address ||
+        requestPayload?.address === acc.btcAddresses.taproot.address,
     );
     return isHardwareAccount(selectedAccount) ? account[0] || selectedAccount : account[0];
   };
@@ -86,13 +86,25 @@ export const useSignMessageValidation = (requestPayload: SignMessagePayload | un
       return;
     }
 
-    if (
-      selectedAccount.btcAddress === account.btcAddresses.native?.address ||
-      selectedAccount.btcAddress === account.btcAddresses.nested?.address
-    )
-      return;
+    if (selectedAccount.ordinalsAddress !== account.btcAddresses.taproot.address) {
+      switchAccount(account);
+    }
 
-    switchAccount(account);
+    if (requestPayload?.address === account.btcAddresses.taproot.address) {
+      return;
+    }
+
+    // ensure we have the correct address type signing on payment address
+    if (
+      (btcPaymentAddressType === 'native' &&
+        requestPayload?.address !== account.btcAddresses.native?.address) ||
+      (btcPaymentAddressType === 'nested' &&
+        requestPayload?.address !== account.btcAddresses.nested?.address)
+    ) {
+      setValidationError({
+        error: t('ADDRESS_TYPE_MISMATCH'),
+      });
+    }
   };
 
   useEffect(() => {

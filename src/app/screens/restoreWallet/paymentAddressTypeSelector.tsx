@@ -50,11 +50,12 @@ const SummaryContainer = styled.div({
   margin: '18px 0',
 });
 
-const TypesContainer = styled.div({
+const TypesContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   margin: '4px 0',
-});
+  gap: props.theme.space.s,
+}));
 
 const ButtonContainer = styled.div((props) => ({
   width: '100%',
@@ -89,7 +90,7 @@ export default function PaymentAddressTypeSelector({
   const { data, isLoading } = useQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: ['onboardingBtcAddressBalance', sha256(seedPhrase.substring(0, 20)).toString()],
-    queryFn: () => getPaymentAccountSummaryForSeedPhrase(btcClient, seedPhrase, 'Mainnet', 20),
+    queryFn: () => getPaymentAccountSummaryForSeedPhrase(btcClient, seedPhrase, 'Mainnet', 10),
   });
 
   useEffect(() => {

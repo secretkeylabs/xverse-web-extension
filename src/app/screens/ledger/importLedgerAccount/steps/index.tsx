@@ -52,7 +52,7 @@ import {
 } from './index.styled';
 
 const LINK_TO_LEDGER_ACCOUNT_ISSUE_GUIDE =
-  'https://support.xverse.app/hc/en-us/articles/17901278165773';
+  'https://support.xverse.app/hc/en-us/articles/17898446492557';
 const LINK_TO_LEDGER_PASSPHRASE_GUIDE =
   'https://support.xverse.app/hc/en-us/articles/17901278165773';
 

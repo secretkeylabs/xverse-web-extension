@@ -327,7 +327,9 @@ export default function ListRuneScreen() {
         selectedRuneId={selectedRune?.principal ?? ''}
         getDesc={getDesc}
       >
-        <NoItemsContainer>{t('NO_UNLISTED_ITEMS')}</NoItemsContainer>
+        <NoItemsContainer typography="body_medium_s" color="white_200">
+          {t('NO_UNLISTED_ITEMS')}
+        </NoItemsContainer>
       </WrapperComponent>
     );
   }

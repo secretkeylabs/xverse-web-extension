@@ -80,7 +80,8 @@ function BalanceCard(props: BalanceCardProps) {
   const dispatch = useDispatch();
   const { fiatCurrency, hideStx, accountBalances, balanceHidden } = useWalletSelector();
   const { confirmedBalance: btcBalance, isLoading: btcBalanceLoading } =
-    useSelectedAccountBtcBalance();  const { data: stxData } = useStxWalletData();
+    useSelectedAccountBtcBalance();
+  const { data: stxData } = useStxWalletData();
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const { setAccountBalance } = useAccountBalance();
   const { isLoading, isRefetching } = props;

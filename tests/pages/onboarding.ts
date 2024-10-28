@@ -220,6 +220,10 @@ export default class Onboarding {
     }
     await expect(this.buttonContinue).toBeEnabled();
     await this.buttonContinue.click();
+    // choose the default address type between native and nested segwit
+    // will be the one with the most funds
+    await expect(this.buttonContinue).toBeEnabled();
+    await this.buttonContinue.click();
     await this.inputPassword.fill(password);
     await this.buttonContinue.click();
     await this.inputPassword.fill(password);

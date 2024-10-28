@@ -1,6 +1,7 @@
 import getSelectedAccount from '@common/utils/getSelectedAccount';
 import { getDeviceAccountIndex } from '@common/utils/ledger';
 import { dispatchEventAuthorizedConnectedClients } from '@common/utils/messages/extensionToContentScript/dispatchEvent';
+import { delay } from '@common/utils/promises';
 import { makeAccountResourceId } from '@components/permissionsManager/resources';
 import type { Permission } from '@components/permissionsManager/schemas';
 import useNetworkSelector from '@hooks/useNetwork';
@@ -183,11 +184,16 @@ const useWalletReducer = () => {
       newSoftwareAccountList.push(newAccount);
 
       if (newSoftwareAccountList.length >= currentAccounts.length) {
+        // we've regenerated the existing accounts, so we can update the store before continuing
         dispatch(updateSoftwareAccountsAction([...newSoftwareAccountList]));
 
         if (options?.accountLoadCallback) {
           await options.accountLoadCallback([...newSoftwareAccountList]);
         }
+
+        // since we've already loaded the existing accounts, we can now check for new accounts, but with a small delay
+        // to not overload the backends
+        await delay(100);
       }
 
       newAccountResponse = await walletAccountsGenerator.next();

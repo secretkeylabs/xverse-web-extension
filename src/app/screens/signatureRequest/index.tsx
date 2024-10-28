@@ -1,6 +1,6 @@
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
-import { delay } from '@common/utils/ledger';
+import { delay } from '@common/utils/promises';
 import { makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';

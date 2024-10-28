@@ -126,16 +126,18 @@ const migrations = {
       return migratedIds;
     };
 
-    markAlertsForShow(
-      'native_segwit_intro',
-      'co:panel:address_changed_to_native',
-      'co:receive:address_change_button',
-      'co:receive:address_changed_to_native',
-    );
+    if ((state as unknown as WalletStateV5).btcPaymentAddressType === undefined) {
+      markAlertsForShow(
+        'native_segwit_intro',
+        'co:panel:address_changed_to_native',
+        'co:receive:address_change_button',
+        'co:receive:address_changed_to_native',
+      );
+    }
 
     return {
       ...state,
-      btcPaymentAddressType: 'nested',
+      btcPaymentAddressType: (state as unknown as WalletStateV5).btcPaymentAddressType || 'nested',
       accountsList: state.accountsList.map(migrateAccount('software')),
       ledgerAccountsList: state.ledgerAccountsList.map(migrateAccount('ledger')),
       allowNestedSegWitAddress: true,
