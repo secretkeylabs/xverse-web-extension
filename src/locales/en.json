@@ -1457,6 +1457,7 @@
     "EXCHANGE": "EXCHANGE",
     "MARKETPLACE": "MARKETPLACE",
     "FLOOR_PRICE": "Floor price",
+    "EXCHANGE_RATE": "Exchange rate",
     "RECOMMENDED": "Recommended",
     "BEST": "Best",
     "SELECT_BUNDLES": "Select bundles to proceed with the swap",
