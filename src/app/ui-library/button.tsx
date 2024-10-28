@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import type React from 'react';
 import styled from 'styled-components';
 import Spinner from './spinner';
 
@@ -105,42 +106,32 @@ const CenterDiv = styled.div`
   align-content: center;
 `;
 
-type Props = {
+type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   title: string;
-  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
   icon?: React.ReactNode;
   iconPosition?: 'left' | 'right';
-  disabled?: boolean;
   loading?: boolean;
+  disabled?: boolean;
   className?: string;
   variant?: ButtonVariant;
-  type?: 'button' | 'submit' | 'reset';
-  id?: string;
-  dataTestId?: string;
 };
 
 function Button({
   title,
-  onClick,
   icon,
   iconPosition = 'left',
   className,
   loading = false,
   disabled = false,
   variant = 'primary',
-  type,
-  id,
-  dataTestId,
+  ...props
 }: Props) {
   return (
     <StyledButton
+      {...props}
       className={classNames(className, variant)}
-      onClick={onClick}
       tabIndex={0}
       disabled={disabled || loading}
-      type={type}
-      id={id}
-      data-testid={dataTestId}
     >
       {loading ? (
         <Spinner />

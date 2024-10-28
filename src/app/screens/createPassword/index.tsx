@@ -101,7 +101,6 @@ function CreatePassword(): JSX.Element {
             handleContinue={handleContinuePasswordCreation}
             handleBack={handleNewPasswordBack}
             checkPasswordStrength
-            createPasswordFlow
             autoFocus
           />
         ) : (

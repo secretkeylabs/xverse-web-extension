@@ -11,12 +11,11 @@ import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  ArchiveTray,
   ArrowUp,
   DotsThreeVertical,
   Share,
   Star,
-  TrayArrowDown,
-  TrayArrowUp,
   UserCircleCheck,
   UserCircleMinus,
 } from '@phosphor-icons/react';
@@ -34,7 +33,7 @@ import Button from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import SnackBar from '@ui-library/snackBar';
-import { EMPTY_LABEL } from '@utils/constants';
+import { EMPTY_LABEL, LONG_TOAST_DURATION } from '@utils/constants';
 import { getRareSatsColorsByRareSatsType, getRareSatsLabelByType } from '@utils/rareSats';
 import { useCallback } from 'react';
 import toast from 'react-hot-toast';
@@ -43,8 +42,6 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Theme from '../../../theme';
 import {
-  ActionButtonLoader,
-  ActionButtonsLoader,
   BackButtonContainer,
   Badge,
   BottomBarContainer,
@@ -59,14 +56,11 @@ import {
   DetailSection,
   Divider,
   ExtensionContainer,
-  ExtensionLoaderContainer,
   ExtensionOrdinalsContainer,
   GalleryButtonContainer,
   GalleryCollectibleText,
   GalleryContainer,
-  GalleryLoaderContainer,
   GalleryScrollContainer,
-  InfoContainer,
   OrdinalDetailsContainer,
   OrdinalGalleryTitleText,
   OrdinalsContainer,
@@ -80,12 +74,11 @@ import {
   SatributesBadges,
   SatributesIconsContainer,
   StyledBarLoader,
-  StyledSeparator,
   StyledTooltip,
   StyledWebGalleryButton,
-  TitleLoader,
   ViewInExplorerButton,
 } from './index.styled';
+import { ExtensionLoader, GalleryLoader } from './loaders';
 import OrdinalAttributeComponent from './ordinalAttributeComponent';
 import useOrdinalDetail from './useOrdinalDetail';
 
@@ -119,11 +112,10 @@ function OrdinalDetailScreen() {
     onCopyClick,
     backButtonText,
   } = ordinalDetails;
-  const selectedAccount = useSelectedAccount();
   const { starredCollectibleIds, hiddenCollectibleIds, avatarIds } = useWalletSelector();
-  const currentAvatar = avatarIds[selectedAccount.btcAddress];
+  const selectedAvatar = avatarIds[ordinalsAddress];
   const isInscriptionSelectedAsAvatar =
-    currentAvatar?.type === 'inscription' && currentAvatar.inscription.id === ordinal?.id;
+    selectedAvatar?.type === 'inscription' && selectedAvatar.inscription.id === ordinal?.id;
   const inscriptionStarred = starredCollectibleIds[ordinalsAddress]?.some(
     ({ id }) => id === ordinal?.id,
   );
@@ -140,25 +132,29 @@ function OrdinalDetailScreen() {
 
   useResetUserFlow('/ordinal-detail');
 
+  const handleUnstarClick = (toastId: string) => {
+    dispatch(removeFromStarCollectiblesAction({ address: ordinalsAddress, id: ordinal?.id ?? '' }));
+    toast.remove(toastId);
+    toast.custom(<SnackBar text={t('UNSTAR_INSCRIPTION')} type="neutral" />);
+  };
+
   const handleStarClick = () => {
     if (inscriptionStarred) {
-      const toastId = toast.custom(
-        <SnackBar
-          text={t('UNSTAR_INSCRIPTION')}
-          type="neutral"
-          dismissToast={() => toast.remove(toastId)}
-        />,
-      );
       dispatch(
         removeFromStarCollectiblesAction({ address: ordinalsAddress, id: ordinal?.id ?? '' }),
       );
+      toast.custom(<SnackBar text={t('UNSTAR_INSCRIPTION')} type="neutral" />);
     } else {
       const toastId = toast.custom(
         <SnackBar
           text={t('STAR_INSCRIPTION')}
           type="neutral"
-          dismissToast={() => toast.remove(toastId)}
+          action={{
+            text: commonT('UNDO'),
+            onClick: () => handleUnstarClick(toastId),
+          }}
         />,
+        { duration: LONG_TOAST_DURATION },
       );
       dispatch(
         addToStarCollectiblesAction({
@@ -180,7 +176,7 @@ function OrdinalDetailScreen() {
     dispatch(addToHideCollectiblesAction({ address: ordinalsAddress, id: ordinal?.id ?? '' }));
 
     if (isInscriptionSelectedAsAvatar) {
-      dispatch(removeAccountAvatarAction({ address: selectedAccount.btcAddress }));
+      dispatch(removeAccountAvatarAction({ address: ordinalsAddress }));
     }
 
     optionsSheet.close();
@@ -194,7 +190,7 @@ function OrdinalDetailScreen() {
           onClick: () => handleClickUndoHiding(toastId),
         }}
       />,
-      { duration: 4000 },
+      { duration: LONG_TOAST_DURATION },
     );
   };
 
@@ -207,12 +203,10 @@ function OrdinalDetailScreen() {
   };
 
   const handleSetAvatar = useCallback(() => {
-    const address = selectedAccount.btcAddress;
-
-    if (address && ordinal?.id) {
+    if (ordinalsAddress && ordinal?.id) {
       dispatch(
         setAccountAvatarAction({
-          address,
+          address: ordinalsAddress,
           avatar: { type: 'inscription', inscription: ordinal },
         }),
       );
@@ -224,13 +218,16 @@ function OrdinalDetailScreen() {
           action={{
             text: commonT('UNDO'),
             onClick: () => {
-              if (currentAvatar?.type) {
-                dispatch(setAccountAvatarAction({ address, avatar: currentAvatar }));
+              if (selectedAvatar?.type) {
+                dispatch(
+                  setAccountAvatarAction({ address: ordinalsAddress, avatar: selectedAvatar }),
+                );
               } else {
-                dispatch(removeAccountAvatarAction({ address }));
+                dispatch(removeAccountAvatarAction({ address: ordinalsAddress }));
               }
 
               toast.remove(toastId);
+              toast.custom(<SnackBar text={optionsDialogT('NFT_AVATAR.UNDO')} type="neutral" />);
             },
           }}
         />,
@@ -238,13 +235,13 @@ function OrdinalDetailScreen() {
     }
 
     optionsSheet.close();
-  }, [dispatch, optionsDialogT, commonT, selectedAccount, ordinal, optionsSheet, currentAvatar]);
+  }, [dispatch, optionsDialogT, commonT, ordinalsAddress, ordinal, optionsSheet, selectedAvatar]);
 
   const handleRemoveAvatar = useCallback(() => {
-    dispatch(removeAccountAvatarAction({ address: selectedAccount.btcAddress }));
+    dispatch(removeAccountAvatarAction({ address: ordinalsAddress }));
     toast.custom(<SnackBar text={optionsDialogT('NFT_AVATAR.REMOVE_TOAST')} type="neutral" />);
     optionsSheet.close();
-  }, [dispatch, selectedAccount.btcAddress, optionsDialogT, optionsSheet]);
+  }, [dispatch, ordinalsAddress, optionsDialogT, optionsSheet]);
 
   const ordinalDetailAttributes = (
     <OrdinalDetailsContainer isGallery={isGalleryOpen}>
@@ -447,35 +444,7 @@ function OrdinalDetailScreen() {
   );
 
   const extensionView = isLoading ? (
-    <ExtensionLoaderContainer>
-      <TitleLoader>
-        <StyledBarLoader width={100} height={18.5} withMarginBottom />
-        <StyledBarLoader width={100} height={30} />
-      </TitleLoader>
-      <StyledBarLoader width={100} height={18.5} />
-      <StyledBarLoader width={136} height={136} />
-      <ActionButtonsLoader>
-        <ActionButtonLoader>
-          <StyledBarLoader width={48} height={48} />
-          <StyledBarLoader width={30} height={15.5} />
-        </ActionButtonLoader>
-        <ActionButtonLoader>
-          <StyledBarLoader width={48} height={48} />
-          <StyledBarLoader width={30} height={15.5} />
-        </ActionButtonLoader>
-      </ActionButtonsLoader>
-      <StyledSeparator />
-      <InfoContainer>
-        <div>
-          <StyledBarLoader width={100} height={18.5} />
-          <StyledBarLoader width={80} height={18.5} />
-        </div>
-        <div>
-          <StyledBarLoader width={100} height={18.5} />
-          <StyledBarLoader width={80} height={18.5} />
-        </div>
-      </InfoContainer>
-    </ExtensionLoaderContainer>
+    <ExtensionLoader />
   ) : (
     <ExtensionContainer>
       <CollectibleText>
@@ -526,7 +495,7 @@ function OrdinalDetailScreen() {
           <Button
             variant="tertiary"
             icon={<img src={ArrowLeft} alt="go back" />}
-            dataTestId="back-to-gallery"
+            data-testid="back-to-gallery"
             onClick={handleBackButtonClick}
             title={backButtonText}
           />
@@ -534,23 +503,7 @@ function OrdinalDetailScreen() {
 
         <RowContainer withGap>
           <StyledBarLoader width={376.5} height={376.5} />
-          <GalleryLoaderContainer>
-            <StyledBarLoader width={120} height={21} withMarginBottom />
-            <StyledBarLoader width={180} height={40} withMarginBottom />
-            <StyledBarLoader width={100} height={18.5} withMarginBottom />
-            <ButtonContainer>
-              <StyledBarLoader width={190} height={44} />
-              <StyledBarLoader width={190} height={44} />
-            </ButtonContainer>
-            <StyledBarLoader width={100} height={31} withMarginBottom />
-            <StyledBarLoader width={400} height={18.5} withMarginBottom />
-            <StyledBarLoader width={400} height={18.5} withMarginBottom />
-            <StyledBarLoader width={400} height={18.5} withMarginBottom />
-            <StyledBarLoader width={400} height={18.5} withMarginBottom />
-            <StyledBarLoader width={400} height={18.5} withMarginBottom />
-            <StyledBarLoader width={400} height={18.5} withMarginBottom />
-            <StyledBarLoader width={392} height={44} />
-          </GalleryLoaderContainer>
+          <GalleryLoader />
         </RowContainer>
       </GalleryContainer>
     </GalleryScrollContainer>
@@ -561,7 +514,7 @@ function OrdinalDetailScreen() {
           <Button
             variant="tertiary"
             icon={<img src={ArrowLeft} alt="go back" />}
-            dataTestId="back-button"
+            data-testid="back-button"
             onClick={handleBackButtonClick}
             title={backButtonText}
           />
@@ -712,14 +665,14 @@ function OrdinalDetailScreen() {
             (isInscriptionHidden ? (
               <StyledButton
                 variant="tertiary"
-                icon={<TrayArrowUp size={24} color={Theme.colors.white_200} />}
+                icon={<ArchiveTray size={24} color={Theme.colors.white_200} />}
                 title={t('UNHIDE_INSCRIPTION')}
                 onClick={handleUnHideStandaloneInscription}
               />
             ) : (
               <StyledButton
                 variant="tertiary"
-                icon={<TrayArrowDown size={24} color={Theme.colors.white_200} />}
+                icon={<ArchiveTray size={24} color={Theme.colors.white_200} />}
                 title={t('HIDE_INSCRIPTION')}
                 onClick={handleHideStandaloneInscription}
               />

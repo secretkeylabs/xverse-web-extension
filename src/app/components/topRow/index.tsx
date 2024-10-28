@@ -1,4 +1,5 @@
-import { ArrowLeft, DotsThreeVertical, Star } from '@phosphor-icons/react';
+import { ArrowLeft, DotsThreeVertical, FadersHorizontal, Star } from '@phosphor-icons/react';
+import type { MutableRefObject } from 'react';
 import styled from 'styled-components';
 import Theme from 'theme';
 
@@ -56,6 +57,8 @@ type Props = {
   showBackButton?: boolean;
   className?: string;
   onMenuClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onSettingsClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  settingsRef?: MutableRefObject<HTMLButtonElement | null>;
   onStarClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   isStarred?: boolean;
 };
@@ -66,6 +69,8 @@ function TopRow({
   showBackButton = true,
   className,
   onMenuClick,
+  onSettingsClick,
+  settingsRef,
   onStarClick,
   isStarred,
 }: Props) {
@@ -86,6 +91,11 @@ function TopRow({
       {onMenuClick && (
         <MenuButton onClick={onMenuClick}>
           <DotsThreeVertical size={20} color={Theme.colors.white_0} weight="bold" />
+        </MenuButton>
+      )}
+      {onSettingsClick && (
+        <MenuButton onClick={onSettingsClick} ref={settingsRef}>
+          <FadersHorizontal size={20} color={Theme.colors.white_200} />
         </MenuButton>
       )}
     </TopSectionContainer>

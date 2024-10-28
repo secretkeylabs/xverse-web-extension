@@ -1,4 +1,4 @@
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useWalletSelector from '@hooks/useWalletSelector';
 import RuneAmountSelector from '@screens/sendRune/runeAmountSelector';
@@ -69,7 +69,7 @@ function AmountSelector({
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
   const { fiatCurrency } = useWalletSelector();
-  const { btcFiatRate } = useCoinRates();
+  const { btcFiatRate } = useSupportedCoinRates();
   const { data: recommendedFees } = useBtcFeeRate();
 
   const balance = getFtBalance(token);

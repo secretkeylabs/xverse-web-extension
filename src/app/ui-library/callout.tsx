@@ -9,6 +9,7 @@ import {
 import styled from 'styled-components';
 import Theme from 'theme';
 import { StyledHeading, StyledP } from './common.styled';
+import CrossButton from './crossButton';
 
 type CalloutVariant = 'info' | 'warning' | 'danger' | 'success';
 
@@ -33,6 +34,7 @@ const icons = {
 };
 
 const Container = styled.div<{ variant: CalloutVariant }>`
+  position: relative;
   display: flex;
   flex-direction: row;
   border-radius: ${(props) => props.theme.radius(2)}px;
@@ -82,7 +84,9 @@ export type CalloutProps = {
   variant?: CalloutVariant;
   redirectText?: string;
   onClickRedirect?: () => void;
+  onClose?: () => void;
   anchorRedirect?: string;
+  hideIcon?: boolean;
 };
 
 function Callout({
@@ -93,12 +97,14 @@ function Callout({
   variant = 'info',
   redirectText,
   onClickRedirect,
+  onClose,
   anchorRedirect,
+  hideIcon = false,
 }: CalloutProps) {
   const StyledIcon = icons[variant];
   return (
     <Container className={className} variant={variant}>
-      <StyledIcon size={24} weight="fill" color="currentColor" />
+      {!hideIcon && <StyledIcon size={24} weight="fill" color="currentColor" />}
       <TextContainer data-testid={dataTestID}>
         {titleText && (
           <StyledHeading typography="body_bold_m" color="white_0">
@@ -127,6 +133,7 @@ function Callout({
           </>
         )}
       </TextContainer>
+      {onClose && <CrossButton onClick={onClose} />}
     </Container>
   );
 }

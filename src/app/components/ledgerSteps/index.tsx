@@ -1,4 +1,4 @@
-import { delay } from '@common/utils/ledger';
+import { delay } from '@common/utils/promises';
 import TransportFactory from '@ledgerhq/hw-transport-webusb';
 import { type Transport } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';

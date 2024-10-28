@@ -8,6 +8,7 @@ enum RoutePaths {
   Preferences = '/preferences',
   Security = '/security',
   AdvancedSettings = '/advanced-settings',
+  PreferredAddress = '/preferred-address',
   TransferRunesRequest = '/transfer-runes-request',
   AccountList = '/account-list',
 }

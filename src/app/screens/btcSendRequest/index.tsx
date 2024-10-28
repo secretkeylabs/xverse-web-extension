@@ -105,23 +105,35 @@ function BtcSendRequest() {
 
   useEffect(() => {
     const checkIfMismatch = () => {
+      let errorTitle = '';
+      let error = '';
+      let textAlignment = 'center';
+
       if (payload.senderAddress !== selectedAccount.btcAddress) {
-        navigate('/tx-status', {
-          state: {
-            txid: '',
-            currency: 'STX',
-            error: t('CONFIRM_TRANSACTION.ADDRESS_MISMATCH'),
-            browserTx: true,
-          },
-        });
+        if (
+          selectedAccount.btcAddresses.native?.address === payload.senderAddress ||
+          selectedAccount.btcAddresses.nested?.address === payload.senderAddress
+        ) {
+          errorTitle = t('REQUEST_ERRORS.ADDRESS_TYPE_MISMATCH_TITLE');
+          error = t('REQUEST_ERRORS.ADDRESS_TYPE_MISMATCH');
+        } else {
+          errorTitle = t('REQUEST_ERRORS.ADDRESS_MISMATCH_TITLE');
+          error = t('REQUEST_ERRORS.ADDRESS_MISMATCH');
+        }
+        textAlignment = 'left';
+      } else if (payload.network.type !== network.type) {
+        error = t('REQUEST_ERRORS.NETWORK_MISMATCH');
       }
-      if (payload.network.type !== network.type) {
+
+      if (error) {
         navigate('/tx-status', {
           state: {
             txid: '',
             currency: 'BTC',
-            error: t('CONFIRM_TRANSACTION.NETWORK_MISMATCH'),
+            errorTitle,
+            error,
             browserTx: true,
+            textAlignment,
           },
         });
       }

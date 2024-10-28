@@ -83,6 +83,18 @@ export const StyledButton = styled(Button)`
   }
 `;
 
+export const StyledSheetButton = styled(Button)`
+  &.tertiary {
+    justify-content: flex-start;
+    color: ${(props) => props.theme.colors.white_200};
+    padding-left: 0;
+
+    &:hover:enabled {
+      opacity: 0.8;
+    }
+  }
+`;
+
 export const TopBarContainer = styled.div((props) => ({
   display: 'flex',
   justifyContent: 'space-between',

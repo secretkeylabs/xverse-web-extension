@@ -93,7 +93,6 @@ function ChangePasswordScreen() {
             handleBack={handleBackButtonClick}
             checkPasswordStrength
             stackButtonAlignment
-            createPasswordFlow
             autoFocus
           />
         )}

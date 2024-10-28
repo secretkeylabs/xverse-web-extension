@@ -6,8 +6,8 @@ import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery'
 import useGetSip10TokenInfo from '@hooks/queries/stx/useGetSip10TokenInfo';
 import useGetQuotes from '@hooks/queries/swaps/useGetQuotes';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useCoinRates from '@hooks/queries/useCoinRates';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import type { DataStxSignTransaction } from '@screens/transactionRequest/useStxTransactionRequest';
@@ -46,7 +46,7 @@ import trackSwapMixPanel from './mixpanel';
 import QuoteSummary from './quoteSummary';
 import QuotesModal from './quotesModal';
 import type { OrderInfo, Side, StxOrderInfo } from './types';
-import useMasterCoinsList from './useMasterCoinsList';
+import useVisibleMasterCoinsList from './useVisibleMasterCoinsList';
 import {
   getTrackingIdentifier,
   isStxTx,
@@ -130,7 +130,7 @@ export default function SwapScreen() {
   const { data: btcBalance } = useBtcWalletData();
   const { data: stxData } = useStxWalletData();
 
-  const { btcFiatRate, btcUsdRate, stxBtcRate } = useCoinRates();
+  const { btcFiatRate, btcUsdRate, stxBtcRate } = useSupportedCoinRates();
   const navigate = useNavigate();
   const { t } = useTranslation('translation');
   const location = useLocation();
@@ -138,7 +138,7 @@ export default function SwapScreen() {
   const defaultFrom = params.get('from');
   const { quotes, loading: quotesLoading, error: quotesError, fetchQuotes } = useGetQuotes();
   const { data: runeFloorPrice } = useRuneFloorPriceQuery(toToken?.name ?? '');
-  const coinsMasterList = useMasterCoinsList();
+  const coinsMasterList = useVisibleMasterCoinsList();
   const { tokenInfo: sip10FromTokenInfoUSD } = useGetSip10TokenInfo({
     principal: toToken?.ticker,
     fiatCurrency: 'USD',
@@ -149,7 +149,7 @@ export default function SwapScreen() {
       const token = coinsMasterList.find((coin) => coin.principal === defaultFrom);
       setFromToken(token);
     }
-  }, [defaultFrom, coinsMasterList.length]);
+  }, [defaultFrom, coinsMasterList]);
 
   const handleGoBack = () => {
     navigate('/');

@@ -182,7 +182,7 @@ export default function TokenToBottomSheet({
                     });
                     handleClose();
                   }}
-                  hideBalance
+                  hideSwapBalance
                 />
               );
             }
@@ -200,7 +200,7 @@ export default function TokenToBottomSheet({
                     });
                     handleClose();
                   }}
-                  hideBalance
+                  hideSwapBalance
                 />
               );
             }
@@ -219,7 +219,7 @@ export default function TokenToBottomSheet({
                     handleClose();
                   }}
                   fungibleToken={mapSwapTokenToFT(token)}
-                  hideBalance
+                  hideSwapBalance
                 />
               );
             }

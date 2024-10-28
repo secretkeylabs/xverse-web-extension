@@ -12,6 +12,7 @@ import {
   ArrowUp,
   DotsThreeVertical,
   Share,
+  Star,
   UserCircleCheck,
   UserCircleMinus,
 } from '@phosphor-icons/react';
@@ -19,21 +20,25 @@ import NftImage from '@screens/nftDashboard/nftImage';
 import { StyledButton } from '@screens/ordinalsCollection/index.styled';
 import type { Attribute } from '@secretkeylabs/xverse-core';
 import {
+  addToStarCollectiblesAction,
   removeAccountAvatarAction,
+  removeFromStarCollectiblesAction,
   setAccountAvatarAction,
 } from '@stores/wallet/actions/actionCreators';
 import ActionButton from '@ui-library/button';
 import Sheet from '@ui-library/sheet';
 import SnackBar from '@ui-library/snackBar';
-import { EMPTY_LABEL } from '@utils/constants';
+import { EMPTY_LABEL, LONG_TOAST_DURATION } from '@utils/constants';
 import { useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import Theme from '../../../theme';
+import { ExtensionLoader, GalleryLoader } from './loaders';
+import NftAttribute from './nftAttribute';
+import useNftDetailScreen from './useNftDetail';
+
 import {
-  ActionButtonLoader,
-  ActionButtonsLoader,
   AssetDeatilButtonText,
   AttributeText,
   BackButton,
@@ -49,16 +54,12 @@ import {
   DescriptionContainer,
   DetailSection,
   ExtensionContainer,
-  ExtensionLoaderContainer,
   ExtensionNftContainer,
   GalleryCollectibleText,
   GalleryContainer,
-  GalleryLoaderContainer,
-  GalleryReceiveButtonContainer,
   GalleryRowContainer,
   GalleryScrollContainer,
   GridContainer,
-  InfoContainer,
   NftContainer,
   NftDetailsContainer,
   NftGalleryTitleText,
@@ -67,16 +68,10 @@ import {
   OwnerAddressText,
   RowContainer,
   SeeDetailsButtonContainer,
-  ShareButtonContainer,
-  StyledBarLoader,
-  StyledSeparator,
   StyledTooltip,
-  TitleLoader,
   WebGalleryButton,
   WebGalleryButtonText,
 } from './index.styled';
-import NftAttribute from './nftAttribute';
-import useNftDetailScreen from './useNftDetail';
 
 function NftDetailScreen() {
   const dispatch = useDispatch();
@@ -99,19 +94,17 @@ function NftDetailScreen() {
     handleOnSendClick,
     galleryTitle,
   } = useNftDetailScreen();
-  const selectedAccount = useSelectedAccount();
-  const { avatarIds } = useWalletSelector();
-  const currentAvatar = avatarIds[selectedAccount.btcAddress];
+  const { ordinalsAddress } = useSelectedAccount();
+  const { avatarIds, hiddenCollectibleIds, starredCollectibleIds } = useWalletSelector();
+  const selectedAvatar = avatarIds[ordinalsAddress];
   const isNftSelectedAsAvatar =
-    currentAvatar?.type === 'stacks' && currentAvatar.nft.token_id === nftData?.token_id;
+    selectedAvatar?.type === 'stacks' && selectedAvatar.nft.token_id === nftData?.token_id;
 
   const handleSetAvatar = useCallback(() => {
-    const address = selectedAccount.btcAddress;
-
-    if (address && nftData?.token_id) {
+    if (ordinalsAddress && nftData?.token_id) {
       dispatch(
         setAccountAvatarAction({
-          address,
+          address: ordinalsAddress,
           avatar: { type: 'stacks', nft: nftData },
         }),
       );
@@ -123,13 +116,16 @@ function NftDetailScreen() {
           action={{
             text: commonT('UNDO'),
             onClick: () => {
-              if (currentAvatar?.type) {
-                dispatch(setAccountAvatarAction({ address, avatar: currentAvatar }));
+              if (selectedAvatar?.type) {
+                dispatch(
+                  setAccountAvatarAction({ address: ordinalsAddress, avatar: selectedAvatar }),
+                );
               } else {
-                dispatch(removeAccountAvatarAction({ address }));
+                dispatch(removeAccountAvatarAction({ address: ordinalsAddress }));
               }
 
               toast.remove(toastId);
+              toast.custom(<SnackBar text={optionsDialogT('NFT_AVATAR.UNDO')} type="neutral" />);
             },
           }}
         />,
@@ -137,13 +133,60 @@ function NftDetailScreen() {
     }
 
     optionsSheet.close();
-  }, [dispatch, optionsDialogT, commonT, selectedAccount, nftData, optionsSheet, currentAvatar]);
+  }, [dispatch, optionsDialogT, commonT, ordinalsAddress, nftData, optionsSheet, selectedAvatar]);
 
   const handleRemoveAvatar = useCallback(() => {
-    dispatch(removeAccountAvatarAction({ address: selectedAccount.btcAddress }));
+    dispatch(removeAccountAvatarAction({ address: ordinalsAddress }));
     toast.custom(<SnackBar text={optionsDialogT('NFT_AVATAR.REMOVE_TOAST')} type="neutral" />);
     optionsSheet.close();
-  }, [dispatch, optionsDialogT, selectedAccount, optionsSheet]);
+  }, [dispatch, optionsDialogT, ordinalsAddress, optionsSheet]);
+
+  const isNftCollectionHidden = Object.keys(hiddenCollectibleIds[stxAddress] ?? {}).some(
+    (id) => id === collection?.collection_id,
+  );
+  const nftId = nftData?.fully_qualified_token_id ?? '';
+  const nftStarred = starredCollectibleIds[stxAddress]?.some(({ id }) => id === nftId);
+
+  const handleClickUndoStarring = (toastId: string) => {
+    dispatch(
+      removeFromStarCollectiblesAction({
+        address: stxAddress,
+        id: nftId,
+      }),
+    );
+    toast.remove(toastId);
+    toast.custom(<SnackBar text={t('UNSTAR_INSCRIPTION')} type="neutral" />);
+  };
+
+  const handleStarClick = () => {
+    if (nftStarred) {
+      dispatch(
+        removeFromStarCollectiblesAction({
+          address: stxAddress,
+          id: nftId,
+        }),
+      );
+      toast.custom(<SnackBar text={t('UNSTAR_INSCRIPTION')} type="neutral" />);
+    } else {
+      dispatch(
+        addToStarCollectiblesAction({
+          address: stxAddress,
+          id: nftId,
+        }),
+      );
+      const toastId = toast.custom(
+        <SnackBar
+          text={t('STAR_INSCRIPTION')}
+          type="neutral"
+          action={{
+            text: commonT('UNDO'),
+            onClick: () => handleClickUndoStarring(toastId),
+          }}
+        />,
+        { duration: LONG_TOAST_DURATION },
+      );
+    }
+  };
 
   const nftAttributes = nftData?.nft_token_attributes?.length !== 0 && (
     <>
@@ -160,9 +203,9 @@ function NftDetailScreen() {
     </>
   );
   const nftDetails = (
-    <NftDetailsContainer isGallery={isGalleryOpen}>
+    <NftDetailsContainer $isGallery={isGalleryOpen}>
       {collection?.collection_name && (
-        <DetailSection isGallery={isGalleryOpen}>
+        <DetailSection $isGallery={isGalleryOpen}>
           <CollectibleDetailTile title={t('COLLECTION')} value={collection?.collection_name} />
           <CollectibleDetailTile
             title={t('COLLECTION_FLOOR_PRICE')}
@@ -173,7 +216,7 @@ function NftDetailScreen() {
         </DetailSection>
       )}
       {!isGalleryOpen && nftAttributes}
-      <DetailSection isGallery={isGalleryOpen}>
+      <DetailSection $isGallery={isGalleryOpen}>
         <CollectibleDetailTile title={t('NAME')} value={nftData?.token_metadata?.name!} />
         {nftData?.rarity_score && (
           <CollectibleDetailTile title={t('RARITY')} value={nftData?.rarity_score} />
@@ -187,35 +230,7 @@ function NftDetailScreen() {
   );
 
   const extensionView = isLoading ? (
-    <ExtensionLoaderContainer>
-      <TitleLoader>
-        <StyledBarLoader width={100} height={18.5} withMarginBottom />
-        <StyledBarLoader width={100} height={30} />
-      </TitleLoader>
-      <StyledBarLoader width={100} height={18.5} />
-      <StyledBarLoader width={136} height={136} />
-      <ActionButtonsLoader>
-        <ActionButtonLoader>
-          <StyledBarLoader width={48} height={48} />
-          <StyledBarLoader width={30} height={15.5} />
-        </ActionButtonLoader>
-        <ActionButtonLoader>
-          <StyledBarLoader width={48} height={48} />
-          <StyledBarLoader width={30} height={15.5} />
-        </ActionButtonLoader>
-      </ActionButtonsLoader>
-      <StyledSeparator />
-      <InfoContainer>
-        <div>
-          <StyledBarLoader width={100} height={18.5} />
-          <StyledBarLoader width={80} height={18.5} />
-        </div>
-        <div>
-          <StyledBarLoader width={100} height={18.5} />
-          <StyledBarLoader width={80} height={18.5} />
-        </div>
-      </InfoContainer>
-    </ExtensionLoaderContainer>
+    <ExtensionLoader />
   ) : (
     <ExtensionContainer>
       <CollectibleText>{t('COLLECTIBLE')}</CollectibleText>
@@ -252,11 +267,11 @@ function NftDetailScreen() {
       </ButtonContainer>
       {nftDetails}
       <SeeDetailsButtonContainer>
-        <Button isGallery={isGalleryOpen} onClick={onExplorerPress}>
+        <Button $isGallery={isGalleryOpen} onClick={onExplorerPress}>
           <ButtonText>{t('VIEW_CONTRACT')}</ButtonText>
           <ButtonHiglightedText>{t('STACKS_EXPLORER')}</ButtonHiglightedText>
         </Button>
-        <Button isGallery={isGalleryOpen} onClick={onGammaPress}>
+        <Button $isGallery={isGalleryOpen} onClick={onGammaPress}>
           <ButtonText>{t('DETAILS')}</ButtonText>
           <ButtonHiglightedText>{t('GAMMA')}</ButtonHiglightedText>
         </Button>
@@ -271,31 +286,12 @@ function NftDetailScreen() {
           <BackButton data-testid="back-button" onClick={handleBackButtonClick}>
             <>
               <ArrowLeft weight="regular" size="20" color="white" />
-              <AssetDeatilButtonText>{t('MOVE_TO_ASSET_DETAIL')}</AssetDeatilButtonText>
+              <AssetDeatilButtonText>{t('BACK_TO_COLLECTION')}</AssetDeatilButtonText>
             </>
           </BackButton>
         </BackButtonContainer>
 
-        <GalleryRowContainer withGap>
-          <StyledBarLoader width={376.5} height={376.5} />
-          <GalleryLoaderContainer>
-            <StyledBarLoader width={120} height={21} withMarginBottom />
-            <StyledBarLoader width={180} height={40} withMarginBottom />
-            <StyledBarLoader width={100} height={18.5} withMarginBottom />
-            <ButtonContainer>
-              <StyledBarLoader width={190} height={44} />
-              <StyledBarLoader width={190} height={44} />
-            </ButtonContainer>
-            <StyledBarLoader width={100} height={31} withMarginBottom />
-            <StyledBarLoader width={400} height={18.5} withMarginBottom />
-            <StyledBarLoader width={400} height={18.5} withMarginBottom />
-            <StyledBarLoader width={400} height={18.5} withMarginBottom />
-            <StyledBarLoader width={400} height={18.5} withMarginBottom />
-            <StyledBarLoader width={400} height={18.5} withMarginBottom />
-            <StyledBarLoader width={400} height={18.5} withMarginBottom />
-            <StyledBarLoader width={392} height={44} />
-          </GalleryLoaderContainer>
-        </GalleryRowContainer>
+        <GalleryLoader />
       </GalleryContainer>
     </GalleryScrollContainer>
   ) : (
@@ -304,7 +300,7 @@ function NftDetailScreen() {
         <BackButtonContainer>
           <BackButton data-testid="back-button" onClick={handleBackButtonClick}>
             <ArrowLeft weight="regular" size="20" color="white" />
-            <AssetDeatilButtonText>{t('MOVE_TO_ASSET_DETAIL')}</AssetDeatilButtonText>
+            <AssetDeatilButtonText>{t('BACK_TO_COLLECTION')}</AssetDeatilButtonText>
           </BackButton>
         </BackButtonContainer>
         <GalleryRowContainer>
@@ -324,44 +320,59 @@ function NftDetailScreen() {
                 )}`}
               </OwnerAddressText>
             </RowContainer>
-            <GalleryRowContainer>
-              <GalleryReceiveButtonContainer>
-                <ActionButton
-                  icon={<ArrowUp weight="bold" size="16" />}
-                  title={t('SEND')}
-                  onClick={handleOnSendClick}
-                />
-              </GalleryReceiveButtonContainer>
-              <ShareButtonContainer>
-                <ActionButton
-                  id={`copy-nft-url-${nftData?.asset_id}`}
-                  icon={<Share weight="bold" color="white" size="16" />}
-                  title={t('SHARE')}
-                  onClick={onSharePress}
-                  variant="secondary"
-                />
-                <StyledTooltip
-                  anchorId={`copy-nft-url-${nftData?.asset_id}`}
-                  variant="light"
-                  content={t('COPIED')}
-                  events={['click']}
-                  place="top"
-                />
-              </ShareButtonContainer>
-              <SquareButton
-                icon={<DotsThreeVertical size={20} color={Theme.colors.white_0} weight="bold" />}
-                onPress={optionsSheet.open}
-                isTransparent
-                size={44}
-                radiusSize={12}
+            <GalleryRowContainer $withGap>
+              <ActionButton
+                icon={<ArrowUp weight="bold" size="16" />}
+                title={t('SEND')}
+                onClick={handleOnSendClick}
               />
+              <ActionButton
+                id={`copy-nft-url-${nftData?.asset_id}`}
+                icon={<Share weight="bold" color="white" size="16" />}
+                title={t('SHARE')}
+                onClick={onSharePress}
+                variant="secondary"
+              />
+              <StyledTooltip
+                anchorId={`copy-nft-url-${nftData?.asset_id}`}
+                variant="light"
+                content={t('COPIED')}
+                events={['click']}
+                place="top"
+              />
+              {isNftCollectionHidden ? null : (
+                <>
+                  <SquareButton
+                    icon={
+                      nftStarred ? (
+                        <Star size={16} color={Theme.colors.tangerine} weight="fill" />
+                      ) : (
+                        <Star size={16} color={Theme.colors.white_0} weight="bold" />
+                      )
+                    }
+                    onPress={handleStarClick}
+                    isTransparent
+                    size={44}
+                    radiusSize={12}
+                  />
+                  <SquareButton
+                    icon={
+                      <DotsThreeVertical size={20} color={Theme.colors.white_0} weight="bold" />
+                    }
+                    onPress={optionsSheet.open}
+                    isTransparent
+                    size={44}
+                    radiusSize={12}
+                  />
+                </>
+              )}
             </GalleryRowContainer>
             {nftDetails}
-            <Button isGallery={isGalleryOpen} onClick={onExplorerPress}>
+            <Button $isGallery={isGalleryOpen} onClick={onExplorerPress}>
               <ButtonText>{t('VIEW_CONTRACT')}</ButtonText>
               <ButtonHiglightedText>{t('STACKS_EXPLORER')}</ButtonHiglightedText>
             </Button>
-            <Button isGallery={isGalleryOpen} onClick={onGammaPress}>
+            <Button $isGallery={isGalleryOpen} onClick={onGammaPress}>
               <ButtonText>{t('DETAILS')}</ButtonText>
               <ButtonHiglightedText>{t('GAMMA')}</ButtonHiglightedText>
             </Button>
@@ -376,7 +387,12 @@ function NftDetailScreen() {
       {isGalleryOpen ? (
         <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
       ) : (
-        <TopRow onClick={handleBackButtonClick} onMenuClick={optionsSheet.open} />
+        <TopRow
+          onClick={handleBackButtonClick}
+          onStarClick={isNftCollectionHidden ? undefined : handleStarClick}
+          isStarred={nftStarred}
+          onMenuClick={isNftCollectionHidden ? undefined : optionsSheet.open}
+        />
       )}
       {isGalleryOpen ? galleryView : extensionView}
       {!isGalleryOpen && (

@@ -1,6 +1,6 @@
 import FiatAmountText from '@components/fiatAmountText';
 import TokenImage from '@components/tokenImage';
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getBtcFiatEquivalent, satsToBtc } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
@@ -50,7 +50,7 @@ type Props = {
 
 export default function Amount({ amount }: Props) {
   const { fiatCurrency } = useWalletSelector();
-  const { btcFiatRate } = useCoinRates();
+  const { btcFiatRate } = useSupportedCoinRates();
   const { t } = useTranslation('translation');
 
   if (!amount) return null;

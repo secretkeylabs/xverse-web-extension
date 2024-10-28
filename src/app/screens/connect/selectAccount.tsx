@@ -74,7 +74,7 @@ type Props = {
 };
 
 function SelectAccount({ account, handlePressAccount }: Props) {
-  const gradient = getAccountGradient(account?.stxAddress || account?.btcAddress!);
+  const gradient = getAccountGradient(account);
   const { t } = useTranslation('translation', { keyPrefix: 'SELECT_BTC_ADDRESS_SCREEN' });
   const theme = useTheme();
 

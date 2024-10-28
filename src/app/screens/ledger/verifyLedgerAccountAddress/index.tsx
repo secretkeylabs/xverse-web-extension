@@ -1,4 +1,4 @@
-import { delay } from '@common/utils/ledger';
+import { delay } from '@common/utils/promises';
 import ActionButton from '@components/button';
 import InfoContainer from '@components/infoContainer';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';

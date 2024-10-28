@@ -2,7 +2,7 @@ import TokenImage from '@components/tokenImage';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core';
-import { isInOptions } from '@utils/helper';
+import { isInOptions, isLedgerAccount } from '@utils/helper';
 import SendLayout from 'app/layouts/sendLayout';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
@@ -60,7 +60,7 @@ function SendStxScreen() {
   // Will be used in the future when the summary screen is refactored
   const [, setRecipientDomain] = useState('');
   const [memo, setMemo] = useState(stxMemo ?? '');
-  const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
+  const { data: sip10CoinsList } = useVisibleSip10FungibleTokens();
   const [searchParams] = useSearchParams();
   const principal = searchParams.get('principal');
   const fungibleToken = sip10CoinsList?.find((coin) => coin.principal === principal);
@@ -78,11 +78,13 @@ function SendStxScreen() {
   const [unsignedSendStxTx, setUnsignedSendStxTx] = useState('');
 
   const handleCancel = () => {
-    if (isInOption) {
-      window.close();
-      return;
+    if (fungibleToken) {
+      navigate(
+        `/coinDashboard/FT?ftKey=${fungibleToken.principal}&protocol=${fungibleToken.protocol}`,
+      );
+    } else {
+      navigate(`/coinDashboard/STX`);
     }
-    navigate('/');
   };
 
   const handleBackButtonClick = () => {

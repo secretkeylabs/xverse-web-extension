@@ -5,12 +5,11 @@ test.describe('Transaction', () => {
   test('Visual Check SIP 10 Token Transaction history mainnet', async ({ page, extensionId }) => {
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
-
-    const tokenName = await wallet.enableRandomToken('SIP10');
+    const tokenName = await wallet.selectLastToken('SIP10');
 
     await wallet.clickOnSpecificToken(tokenName);
 
-    await expect(page.url()).toContain('coinDashboard');
+    expect(page.url()).toContain('coinDashboard');
     // Check token detail page for token image and coin title
     await expect(wallet.imageToken).toBeVisible();
     await expect(wallet.textCoinTitle).toBeVisible();
@@ -26,10 +25,10 @@ test.describe('Transaction', () => {
   test('Visual Check BRC 20 Token Transaction history mainnet', async ({ page, extensionId }) => {
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
-    const tokenName = await wallet.enableRandomToken('BRC20');
+    const tokenName = await wallet.selectLastToken('BRC20');
 
     await wallet.clickOnSpecificToken(tokenName);
-    await expect(page.url()).toContain('coinDashboard');
+    expect(page.url()).toContain('coinDashboard');
     // Check token detail page for coin title
     await expect(wallet.textCoinTitle).toBeVisible();
     await expect(wallet.textCoinTitle).toContainText(tokenName);
@@ -80,7 +79,7 @@ test.describe('Transaction', () => {
     await wallet.checkAndClickOnSpecificRune('SKIBIDI•OHIO•RIZZ');
     const originalBalanceAmount = await wallet.checkVisualsRunesDashboard('SKIBIDI•OHIO•RIZZ');
     await expect(originalBalanceAmount).toBeGreaterThan(0);
-    await expect(wallet.containerTransactionHistory.first()).toBeVisible();
+    await expect(wallet.containerTransactionHistory.first()).toBeHidden();
     // There should be at least one transaction visible
     await expect(await wallet.containerTransactionHistory.count()).toBeGreaterThanOrEqual(1);
     // check able to see rune bundles

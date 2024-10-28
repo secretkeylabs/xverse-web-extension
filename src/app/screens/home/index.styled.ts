@@ -1,5 +1,5 @@
 import TokenTile from '@components/tokenTile';
-import { animated } from '@react-spring/web';
+import Callout from '@ui-library/callout';
 import Divider from '@ui-library/divider';
 import styled from 'styled-components';
 
@@ -23,8 +23,6 @@ export const ColumnContainer = styled.div((props) => ({
 export const ReceiveContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  marginTop: props.theme.space.l,
-  marginBottom: props.theme.space.xl,
   gap: props.theme.space.m,
 }));
 
@@ -173,3 +171,7 @@ export const StyledDivider = styled(Divider)<{ $noMarginBottom?: boolean }>`
 export const StyledDividerSingle = styled(StyledDivider)`
   margin-bottom: 0;
 `;
+
+export const SpacedCallout = styled(Callout)((props) => ({
+  marginTop: props.theme.space.s,
+}));

@@ -61,22 +61,6 @@ export const ConnectLedgerTitle = styled.h1<{ textAlign?: 'left' | 'center' }>((
   marginBottom: props.theme.spacing(6),
 }));
 
-export const ConnectLedgerTextAdvanced = styled.p<{
-  isCompleted?: boolean;
-}>((props) => ({
-  ...props.theme.body_m,
-  display: 'flex',
-  alignItems: 'flex-start',
-  color: props.isCompleted ? props.theme.colors.white_400 : props.theme.colors.white_200,
-  textAlign: 'center',
-  marginBottom: props.theme.spacing(16),
-}));
-
-export const InfoContainerWrapper = styled.div((props) => ({
-  textAlign: 'left',
-  marginTop: props.theme.spacing(8),
-}));
-
 export const TxDetails = styled.div((props) => ({
   marginTop: props.theme.spacing(36),
   width: '100%',
@@ -98,9 +82,3 @@ export const RecipientsWrapper = styled.div({
   display: 'flex',
   flexDirection: 'column',
 });
-
-export const ConfirmTxIconBig = styled.img((props) => ({
-  width: 32,
-  height: 32,
-  marginBottom: props.theme.spacing(8),
-}));

@@ -89,17 +89,22 @@ function CollectibleCollectionGridItem({
         }
       : undefined;
 
-  const { ordinalsAddress } = useSelectedAccount();
+  const { ordinalsAddress, stxAddress } = useSelectedAccount();
   const { starredCollectibleIds } = useWalletSelector();
   const inscriptionStarred =
     isInscription(item) && starredCollectibleIds[ordinalsAddress]?.some(({ id }) => id === item.id);
+  const nftStarred =
+    !isInscription(item) &&
+    starredCollectibleIds[stxAddress]?.some(
+      ({ id }) => id === `${item?.asset_identifier}:${item?.identifier.tokenId}`,
+    );
 
   return (
     <GridItemContainer data-testid="collection-item" onClick={handleOnClick}>
       <ImageContainer>{children}</ImageContainer>
       <InfoContainer>
         <StyledItemIdContainer>
-          {inscriptionStarred && (
+          {(inscriptionStarred || nftStarred) && (
             <StyledStar size={14} color={Theme.colors.white_0} weight="fill" />
           )}
           <StyledItemId typography="body_bold_m" color="white_0">

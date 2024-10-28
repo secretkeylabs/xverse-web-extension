@@ -4,7 +4,6 @@ import useHasFeature from '@hooks/useHasFeature';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
-import useWalletSelector from '@hooks/useWalletSelector';
 import {
   AnalyticsEvents,
   FeatureId,
@@ -144,7 +143,9 @@ function SendRuneScreen() {
       window.close();
       return;
     }
-    navigate('/');
+    navigate(
+      `/coinDashboard/FT?ftKey=${fungibleToken.principal}&protocol=${fungibleToken.protocol}`,
+    );
   };
 
   const handleBackButtonClick = () => {

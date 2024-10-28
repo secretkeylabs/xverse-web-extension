@@ -195,18 +195,18 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: BatchPs
     });
 
     const renderBody = () => {
-      if (hasDuplicateInputs) {
-        // if there are duplicate inputs on the individual transactions, we won't show a summary
-        // and will have to ask the user to review each txn individually
-        return null;
-      }
-
       if (isLoading) {
         return (
           <LoaderContainer>
             <Spinner color="white" size={50} />
           </LoaderContainer>
         );
+      }
+
+      if (hasDuplicateInputs) {
+        // if there are duplicate inputs on the individual transactions, we won't show a summary
+        // and will have to ask the user to review each txn individually
+        return null;
       }
 
       return (
@@ -246,7 +246,7 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: BatchPs
         {renderBody()}
         <StyledSheet
           header=""
-          visible={reviewTransaction || hasDuplicateInputs}
+          visible={(reviewTransaction || hasDuplicateInputs) && !isLoading}
           onClose={hasDuplicateInputs ? undefined : onReviewDone}
         >
           <OuterContainer>

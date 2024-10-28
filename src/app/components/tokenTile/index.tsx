@@ -1,12 +1,13 @@
 import { BetterBarLoader } from '@components/barLoader';
 import { StyledFiatAmountText } from '@components/fiatAmountText';
 import TokenImage from '@components/tokenImage';
-import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSelectedAccountBtcBalance from '@hooks/queries/useSelectedAccountBtcBalance';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getFiatEquivalent, type FungibleToken } from '@secretkeylabs/xverse-core';
 import type { CurrencyTypes } from '@utils/constants';
+import { HIDDEN_BALANCE_LABEL } from '@utils/constants';
 import { getBalanceAmount, getFtTicker } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { NumericFormat } from 'react-number-format';
@@ -86,6 +87,16 @@ const StyledBarLoader = styled(BetterBarLoader)<{
   marginBottom: props.withMarginBottom ? props.theme.space.xxs : 0,
 }));
 
+const CoinBalanceContainer = styled.div`
+  ${(props) => props.theme.typography.body_medium_m}
+  color: ${(props) => props.theme.colors.white_0};
+`;
+
+const FiatAmountContainer = styled.div`
+  ${(props) => props.theme.typography.body_medium_s}
+  color: ${(props) => props.theme.colors.white_400};
+`;
+
 function TokenLoader() {
   return (
     <LoaderMainContainer>
@@ -104,7 +115,7 @@ type Props = {
   enlargeTicker?: boolean;
   className?: string;
   showProtocolIcon?: boolean;
-  hideBalance?: boolean;
+  hideSwapBalance?: boolean;
 };
 
 function TokenTile({
@@ -116,12 +127,12 @@ function TokenTile({
   enlargeTicker = false,
   className,
   showProtocolIcon = true,
-  hideBalance = false,
+  hideSwapBalance = false,
 }: Props) {
-  const { fiatCurrency } = useWalletSelector();
-  const { btcFiatRate, stxBtcRate } = useCoinRates();
+  const { fiatCurrency, balanceHidden } = useWalletSelector();
+  const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const { data: stxData } = useStxWalletData();
-  const { data: btcBalance } = useBtcWalletData();
+  const { confirmedBalance: btcBalance } = useSelectedAccountBtcBalance();
 
   const getTickerTitle = () => {
     if (currency === 'STX' || currency === 'BTC') return `${currency}`;
@@ -157,26 +168,33 @@ function TokenTile({
         <TextContainer>
           <CoinTickerText>{getTickerTitle()}</CoinTickerText>
           <TokenTitleContainer>
-            <SubText aria-label="Token SubTitle" fullWidth={hideBalance}>
+            <SubText aria-label="Token SubTitle" fullWidth={hideSwapBalance}>
               {title}
             </SubText>
           </TokenTitleContainer>
         </TextContainer>
       </RowContainer>
-      {loading ? (
-        <TokenLoader />
-      ) : (
-        !hideBalance && (
-          <AmountContainer aria-label="CoinBalance Container">
-            <NumericFormat
-              value={getBalanceAmount(currency, fungibleToken, stxData, btcBalance)}
-              displayType="text"
-              thousandSeparator
-              renderText={(value: string) => <CoinBalanceText>{value}</CoinBalanceText>}
-            />
-            <StyledFiatAmountText fiatAmount={getFiatAmount()} fiatCurrency={fiatCurrency} />
-          </AmountContainer>
-        )
+      {loading && <TokenLoader />}
+      {!loading && !hideSwapBalance && (
+        <AmountContainer aria-label="CoinBalance Container">
+          <CoinBalanceContainer>
+            {balanceHidden && HIDDEN_BALANCE_LABEL}
+            {!balanceHidden && (
+              <NumericFormat
+                value={getBalanceAmount(currency, fungibleToken, stxData, btcBalance)}
+                displayType="text"
+                thousandSeparator
+                renderText={(value: string) => <CoinBalanceText>{value}</CoinBalanceText>}
+              />
+            )}
+          </CoinBalanceContainer>
+          <FiatAmountContainer>
+            {balanceHidden && HIDDEN_BALANCE_LABEL}
+            {!balanceHidden && (
+              <StyledFiatAmountText fiatAmount={getFiatAmount()} fiatCurrency={fiatCurrency} />
+            )}
+          </FiatAmountContainer>
+        </AmountContainer>
       )}
     </TileContainer>
   );

@@ -3,6 +3,7 @@ import { REHYDRATE } from 'redux-persist';
 import {
   AddToHideCollectiblesKey,
   AddToStarCollectiblesKey,
+  ChangeBtcPaymentAddressTypeKey,
   ChangeFiatCurrencyKey,
   ChangeHasActivatedOrdinalsKey,
   ChangeHasActivatedRareSatsKey,
@@ -11,6 +12,7 @@ import {
   ChangeShowBtcReceiveAlertKey,
   ChangeShowDataCollectionAlertKey,
   ChangeShowOrdinalReceiveAlertKey,
+  EnableNestedSegWitAddressKey,
   RareSatsNoticeDismissedKey,
   RemoveAccountAvatarKey,
   RemoveAllFromHideCollectiblesKey,
@@ -20,8 +22,10 @@ import {
   SelectAccountKey,
   SetAccountAvatarKey,
   SetAccountBalanceKey,
+  SetBalanceHiddenToggleKey,
   SetBrc20ManageTokensKey,
   SetFeeMultiplierKey,
+  SetHiddenCollectiblesKey,
   SetNotificationBannersKey,
   SetRunesManageTokensKey,
   SetShowSpamTokensKey,
@@ -70,6 +74,8 @@ export const initialWalletState: WalletState = {
   ledgerAccountsList: [],
   selectedAccountIndex: 0,
   selectedAccountType: 'software',
+  btcPaymentAddressType: 'native',
+  allowNestedSegWitAddress: false,
   encryptedSeed: '',
   fiatCurrency: 'USD',
   sip10ManageTokens: {},
@@ -95,6 +101,7 @@ export const initialWalletState: WalletState = {
   hiddenCollectibleIds: {},
   starredCollectibleIds: {},
   avatarIds: {},
+  balanceHidden: false,
 };
 
 /**
@@ -168,6 +175,16 @@ const walletReducer = (
         ],
         accountsList: [],
         accountBalances: {},
+      };
+    case EnableNestedSegWitAddressKey:
+      return {
+        ...state,
+        allowNestedSegWitAddress: true,
+      };
+    case ChangeBtcPaymentAddressTypeKey:
+      return {
+        ...state,
+        btcPaymentAddressType: action.btcPaymentType,
       };
     case ChangeHasActivatedOrdinalsKey:
       return {
@@ -251,7 +268,7 @@ const walletReducer = (
         ...state,
         accountBalances: {
           ...state.accountBalances,
-          [action.btcAddress]: action.totalBalance,
+          [action.accountKey]: action.totalBalance,
         },
       };
     case SetWalletHideStxKey:
@@ -346,6 +363,14 @@ const walletReducer = (
           [action.address]: {},
         },
       };
+    case SetHiddenCollectiblesKey:
+      return {
+        ...state,
+        hiddenCollectibleIds: {
+          ...state.hiddenCollectibleIds,
+          ...action.collectibleIds,
+        },
+      };
     case SetAccountAvatarKey:
       return {
         ...state,
@@ -355,12 +380,17 @@ const walletReducer = (
         },
       };
     case RemoveAccountAvatarKey: {
+      const clonedAvatarIds = { ...state.avatarIds };
+      delete clonedAvatarIds[action.address];
       return {
         ...state,
-        avatarIds: {
-          ...state.avatarIds,
-          [action.address]: null,
-        },
+        avatarIds: clonedAvatarIds,
+      };
+    }
+    case SetBalanceHiddenToggleKey: {
+      return {
+        ...state,
+        balanceHidden: action.toggle,
       };
     }
     default:

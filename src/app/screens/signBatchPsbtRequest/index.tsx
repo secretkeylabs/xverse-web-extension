@@ -11,7 +11,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 function SignBatchPsbtRequest() {
   const navigate = useNavigate();
   const selectedAccount = useSelectedAccount();
-  const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
+  const { t } = useTranslation('translation', { keyPrefix: 'REQUEST_ERRORS' });
   const { network } = useWalletSelector();
   const { search } = useLocation();
   const params = new URLSearchParams(search);
@@ -65,14 +65,30 @@ function SignBatchPsbtRequest() {
         input.address !== selectedAccount.btcAddress &&
         input.address !== selectedAccount.ordinalsAddress
       ) {
+        let errorTitle = '';
+        let error = '';
+        if (
+          selectedAccount.btcAddresses.native?.address === input.address ||
+          selectedAccount.btcAddresses.nested?.address === input.address
+        ) {
+          errorTitle = t('ADDRESS_TYPE_MISMATCH_TITLE');
+          error = t('ADDRESS_TYPE_MISMATCH');
+        } else {
+          errorTitle = t('ADDRESS_MISMATCH_TITLE');
+          error = t('ADDRESS_MISMATCH');
+        }
+
         navigate('/tx-status', {
           state: {
             txid: '',
             currency: 'BTC',
-            error: t('ADDRESS_MISMATCH'),
+            errorTitle,
+            error,
             browserTx: true,
+            textAlignment: 'left',
           },
         });
+
         return true;
       }
       return false;

@@ -26,7 +26,7 @@ function ShowBtcReceiveAlert({ onReceiveAlertClose }: Props) {
       onButtonClick={onReceiveAlertClose}
       tickMarkButtonText={t('DO_NOT_SHOW_MESSAGE')}
       tickMarkButtonClick={onToggleReceiveBtcAlert}
-      tickMarkButtonChecked={!showBtcReceiveAlert ?? false}
+      tickMarkButtonChecked={!showBtcReceiveAlert}
     />
   );
 }

@@ -56,20 +56,16 @@ export const useSignMessageValidation = (requestPayload: SignMessagePayload | un
   const [validationError, setValidationError] = useState<ValidationError | null>(null);
   const { t } = useTranslation('translation', { keyPrefix: 'REQUEST_ERRORS' });
   const selectedAccount = useSelectedAccount();
-  const { accountsList, network } = useWalletSelector();
-  const { btcAddress } = useSelectedAccount();
+  const { accountsList, network, btcPaymentAddressType } = useWalletSelector();
   const { switchAccount } = useWalletReducer();
 
   const checkAddressAvailability = () => {
-    const account = accountsList.filter((acc) => {
-      if (acc.btcAddress === requestPayload?.address) {
-        return true;
-      }
-      if (acc.ordinalsAddress === requestPayload?.address) {
-        return true;
-      }
-      return false;
-    });
+    const account = accountsList.filter(
+      (acc) =>
+        requestPayload?.address === acc.btcAddresses.native?.address ||
+        requestPayload?.address === acc.btcAddresses.nested?.address ||
+        requestPayload?.address === acc.btcAddresses.taproot.address,
+    );
     return isHardwareAccount(selectedAccount) ? account[0] || selectedAccount : account[0];
   };
 
@@ -90,9 +86,25 @@ export const useSignMessageValidation = (requestPayload: SignMessagePayload | un
       return;
     }
 
-    if (btcAddress === account.btcAddress) return;
+    if (selectedAccount.ordinalsAddress !== account.btcAddresses.taproot.address) {
+      switchAccount(account);
+    }
 
-    switchAccount(account);
+    if (requestPayload?.address === account.btcAddresses.taproot.address) {
+      return;
+    }
+
+    // ensure we have the correct address type signing on payment address
+    if (
+      (btcPaymentAddressType === 'native' &&
+        requestPayload?.address !== account.btcAddresses.native?.address) ||
+      (btcPaymentAddressType === 'nested' &&
+        requestPayload?.address !== account.btcAddresses.nested?.address)
+    ) {
+      setValidationError({
+        error: t('ADDRESS_TYPE_MISMATCH'),
+      });
+    }
   };
 
   useEffect(() => {

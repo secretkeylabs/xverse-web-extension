@@ -1,7 +1,7 @@
 import stxIcon from '@assets/img/dashboard/stx_icon.svg';
 import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
-import { delay } from '@common/utils/ledger';
+import { delay } from '@common/utils/promises';
 import ActionButton from '@components/button';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import LedgerFailView from '@components/ledger/failLedgerView';
@@ -56,7 +56,7 @@ function AddStxAddress(): JSX.Element {
   const [isAddressRejected, setIsAddressRejected] = useState(false);
   const [stacksCredentials, setStacksCredentials] = useState<Credential | undefined>(undefined);
   const selectedAccount = useSelectedAccount();
-  const { network } = useWalletSelector();
+  const { network, ledgerAccountsList } = useWalletSelector();
   const { updateLedgerAccounts } = useWalletReducer();
   const { search } = useLocation();
   const params = new URLSearchParams(search);
@@ -74,8 +74,14 @@ function AddStxAddress(): JSX.Element {
       return;
     }
 
+    const existingAccount = ledgerAccountsList.find((account) => account.id === selectedAccount.id);
+
+    if (!existingAccount) {
+      return;
+    }
+
     const ledgerAccount: Account = {
-      ...selectedAccount,
+      ...existingAccount,
       stxAddress: stacksCreds?.address || '',
       stxPublicKey: stacksCreds?.publicKey || '',
     };

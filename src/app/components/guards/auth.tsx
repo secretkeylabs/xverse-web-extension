@@ -66,7 +66,9 @@ function AuthGuard({ children }: PropsWithChildren) {
       navigate('/login');
     }
 
-    await loadWallet();
+    await loadWallet(() => {
+      isInitialised.current = true;
+    });
   };
 
   useEffect(() => {

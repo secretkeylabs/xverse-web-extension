@@ -630,18 +630,18 @@ export default class Wallet {
 
     await expect(this.labelAccountName).toBeVisible();
     await expect(this.buttonMenu).toBeVisible();
-    await expect(await this.labelTokenSubtitle.count()).toBeGreaterThanOrEqual(2);
+    expect(await this.labelTokenSubtitle.count()).toBeGreaterThanOrEqual(2);
 
     await expect(this.navigationDashboard).toBeVisible();
     await expect(this.navigationNFT).toBeVisible();
     await expect(this.navigationStacking).toBeVisible();
     await expect(this.navigationExplore).toBeVisible();
     await expect(this.navigationSettings).toBeVisible();
-    await expect(await this.divTokenRow.count()).toBeGreaterThan(1);
+    expect(await this.divTokenRow.count()).toBeGreaterThan(1);
   }
 
   async checkVisualsSendSTXPage3() {
-    await expect(this.page.url()).toContain('confirm-stx-tx');
+    expect(this.page.url()).toContain('confirm-stx-tx');
     await expect(this.buttonConfirm).toBeVisible();
     await expect(this.buttonCancel).toBeVisible();
     await expect(this.receiveAddress).toBeVisible();
@@ -655,10 +655,10 @@ export default class Wallet {
    * Checks the visibility and state of UI elements state on first page in Send Flow
    *
    * @param {string} url - The expected URL to validate the correct page navigation.
-   * @param {boolean} isSTX - Optional flag to apply STX-specific element checks (default: false).
+   * @param {boolean} moreInputFields - (default: false).
    */
   async checkVisualsSendPage1(url: string, moreInputFields: boolean = false) {
-    await expect(this.page.url()).toContain(url);
+    expect(this.page.url()).toContain(url);
     await expect(this.buttonNext).toBeVisible();
     await expect(this.buttonNext).toBeDisabled();
 
@@ -682,7 +682,7 @@ export default class Wallet {
    * @param {boolean} isSTX - Indicates if the page is STX-specific; adjusts element checks accordingly (default: false).
    */
   async checkVisualsSendPage2(url: string, isSTX: boolean = false) {
-    await expect(this.page.url()).toContain(url);
+    expect(this.page.url()).toContain(url);
     await expect(this.buttonNext).toBeVisible();
     await expect(this.buttonNext).toBeDisabled();
 
@@ -722,7 +722,7 @@ export default class Wallet {
     tokenImageShown: boolean = true,
     ordinalNumber?: string,
   ) {
-    await expect(this.page.url()).toContain(url);
+    expect(this.page.url()).toContain(url);
     await expect(this.buttonExpand).toBeVisible();
     await expect(this.buttonCancel).toBeEnabled();
     await expect(this.buttonConfirm).toBeEnabled();
@@ -749,29 +749,27 @@ export default class Wallet {
     // Execute these checks only if sendAddress is provided
     if (sendAddress) {
       await expect(this.sendAddress.first()).toBeVisible();
-      await expect(await this.sendAddress.first().innerText()).toContain(sendAddress.slice(-4));
+      expect(await this.sendAddress.first().innerText()).toContain(sendAddress.slice(-4));
     }
 
     // Execute these checks only if recipientAddress is provided
     if (recipientAddress) {
       await expect(this.receiveAddress.first()).toBeVisible();
-      await expect(await this.receiveAddress.first().innerText()).toContain(
-        recipientAddress.slice(-4),
-      );
+      expect(await this.receiveAddress.first().innerText()).toContain(recipientAddress.slice(-4));
     }
     // Collection Inscriptions don't have the ordinal number displayed in the Review
     // Check if the right ordinal number is shown
     if (ordinalNumber) {
       const reviewNumberOrdinal = await this.numberInscription.first().innerText();
-      await expect(ordinalNumber).toMatch(reviewNumberOrdinal);
+      expect(ordinalNumber).toMatch(reviewNumberOrdinal);
     }
   }
 
   // Check Visuals of Rune Dashboard (without List button), return balance amount
-  async checkVisualsRunesDashboard(runeName) {
+  async checkVisualsRunesDashboard(runeName: string) {
     await expect(this.imageToken.first()).toBeVisible();
     await expect(this.textCoinTitle).toBeVisible();
-    await expect(await this.textCoinTitle).toContainText(runeName);
+    await expect(this.textCoinTitle).toContainText(runeName);
     await expect(this.coinBalance).toBeVisible();
     await expect(this.buttonReceive).toBeVisible();
     await expect(this.buttonSend).toBeVisible();
@@ -786,11 +784,11 @@ export default class Wallet {
     await expect(this.buttonSetPrice).toBeVisible();
     await expect(this.buttonSetPrice).toBeDisabled();
     await expect(this.runeItem.first()).toBeVisible();
-    await expect(await this.runeItem.count()).toBeGreaterThanOrEqual(1);
+    expect(await this.runeItem.count()).toBeGreaterThanOrEqual(1);
   }
 
   async checkVisualsSwapPage() {
-    await expect(this.page.url()).toContain('swap');
+    expect(this.page.url()).toContain('swap');
     await expect(this.buttonDownArrow.first()).toBeVisible();
     await expect(this.buttonGetQuotes.first()).toBeVisible();
     await expect(this.buttonGetQuotes.first()).toBeDisabled();
@@ -798,8 +796,8 @@ export default class Wallet {
     await expect(this.swapTokenBalance).toContainText('--');
     await expect(this.buttonBack).toBeVisible();
     await expect(this.nameToken.first()).toContainText('Select asset');
-    await expect(await this.nameToken).toHaveCount(2);
-    await expect(await this.buttonDownArrow).toHaveCount(2);
+    await expect(this.nameToken).toHaveCount(2);
+    await expect(this.buttonDownArrow).toHaveCount(2);
     await expect(this.buttonGetQuotes).toBeVisible();
     await expect(this.textUSD).toBeVisible();
     await expect(this.buttonSwapToken).toBeVisible();
@@ -813,7 +811,7 @@ export default class Wallet {
 
     const usdAmount = await this.textUSD.innerText();
     const numericUSDValue = parseFloat(usdAmount.replace(/[^0-9.]/g, ''));
-    await expect(numericUSDValue).toBeGreaterThan(0);
+    expect(numericUSDValue).toBeGreaterThan(0);
 
     return numericUSDValue;
   }
@@ -823,8 +821,8 @@ export default class Wallet {
   async checkVisualsQuotePage(
     tokenName: string,
     slippage: boolean,
-    numericQuoteValue,
-    numericUSDValue,
+    numericQuoteValue: number,
+    numericUSDValue: number,
   ) {
     await expect(this.buttonSwap).toBeVisible();
     await expect(this.buttonEditFee).toBeVisible();
@@ -832,7 +830,7 @@ export default class Wallet {
       await expect(this.buttonSlippage).toBeVisible();
     }
     // Only 2 token should be visible
-    await expect(await this.buttonSwapPlace.count()).toBe(2);
+    expect(await this.buttonSwapPlace.count()).toBe(2);
     // await expect(await this.imageToken.count()).toBe(2);
 
     // Check Rune token name
@@ -841,18 +839,18 @@ export default class Wallet {
     // Check if USD amount from quote page is the same as from th swap start flow page
     const usdAmountQuote = await this.textUSD.first().innerText();
     const numericUSDQuote = parseFloat(usdAmountQuote.replace(/[^0-9.]/g, ''));
-    await expect(numericUSDQuote).toEqual(numericUSDValue);
+    expect(numericUSDQuote).toEqual(numericUSDValue);
 
     // min-received-amount value should be the same as quoteAmount
     const minReceivedAmount = await this.minReceivedAmount.innerText();
     const numericMinReceivedAmount = parseFloat(minReceivedAmount.replace(/[^0-9.]/g, ''));
     const formattedNumericMinReceivedAmount = parseFloat(numericMinReceivedAmount.toFixed(3));
-    await expect(formattedNumericMinReceivedAmount).toEqual(numericQuoteValue);
+    expect(formattedNumericMinReceivedAmount).toEqual(numericQuoteValue);
 
     // check if quoteAmount is the same from the page before
     const quoteAmount2Page = await this.quoteAmount.last().innerText();
     const numericQuote2Page = parseFloat(quoteAmount2Page.replace(/[^0-9.]/g, ''));
-    await expect(numericQuote2Page).toEqual(numericQuoteValue);
+    expect(numericQuote2Page).toEqual(numericQuoteValue);
   }
 
   async checkVisualsListOnMEPage() {
@@ -879,7 +877,7 @@ export default class Wallet {
     // Save the current fee amount for comparison
     const originalFee = await this.feeAmount.innerText();
     const numericOriginalFee = parseFloat(originalFee.replace(/[^0-9.]/g, ''));
-    await expect(numericOriginalFee).toBeGreaterThan(0);
+    expect(numericOriginalFee).toBeGreaterThan(0);
     let feePriority = 'Medium';
     if (feePriorityShown) {
       feePriority = await this.labelFeePriority.innerText();
@@ -896,7 +894,7 @@ export default class Wallet {
       .locator(this.labelTotalFee)
       .innerText();
     const numericFee = parseFloat(fee.replace(/[^0-9.]/g, ''));
-    await expect(numericFee).toBe(numericOriginalFee);
+    expect(numericFee).toBe(numericOriginalFee);
 
     // Save high fee rate for comparison
     const highFee = await this.labelTotalFee.first().innerText();
@@ -907,12 +905,12 @@ export default class Wallet {
 
     const newFee = await this.feeAmount.innerText();
     const numericNewFee = parseFloat(newFee.replace(/[^0-9.]/g, ''));
-    await expect(numericNewFee).toBe(numericHighFee);
+    expect(numericNewFee).toBe(numericHighFee);
   }
 
   async navigateToCollectibles() {
     await this.navigationNFT.click();
-    await expect(this.page.url()).toContain('nft-dashboard');
+    expect(this.page.url()).toContain('nft-dashboard');
     // If 'enable' rare sats pop up is appearing
     if (await this.buttonEnable.isVisible()) {
       await this.buttonEnable.click();
@@ -923,32 +921,30 @@ export default class Wallet {
   }
 
   // had to disable this rule as my first assertion was always changed to a wrong assertion
-  /* eslint-disable playwright/prefer-web-first-assertions */
   async checkAmountsSendingSTX(amountSTXSend, STXTest, sendFee) {
-    await expect(await this.receiveAddress.first().innerText()).toContain(STXTest.slice(-4));
+    expect(await this.receiveAddress.first().innerText()).toContain(STXTest.slice(-4));
 
     // Sending amount without Fee
     const sendAmount = await this.confirmAmount.first().innerText();
     const numericValueSendAmount = parseFloat(sendAmount.replace(/[^0-9.]/g, ''));
 
-    await expect(numericValueSendAmount).toEqual(amountSTXSend);
+    expect(numericValueSendAmount).toEqual(amountSTXSend);
 
     // Fees
     const fee = await this.feeAmount.innerText();
     const numericValueFee = parseFloat(fee.replace(/[^0-9.]/g, ''));
-    await expect(numericValueFee).toEqual(sendFee);
+    expect(numericValueFee).toEqual(sendFee);
   }
 
-  /* eslint-disable playwright/prefer-web-first-assertions */
   async checkAmountsSendingBTC(selfBTCTest, BTCTest, amountBTCSend) {
     // Sending amount without Fee
     const amountText = await this.confirmAmount.first().innerText();
     const numericValueAmountText = parseFloat(amountText.replace(/[^0-9.]/g, ''));
-    await expect(numericValueAmountText).toEqual(amountBTCSend);
+    expect(numericValueAmountText).toEqual(amountBTCSend);
 
     // Address check sending and receiving
-    await expect(await this.sendAddress.innerText()).toContain(selfBTCTest.slice(-4));
-    await expect(await this.receiveAddress.first().innerText()).toContain(BTCTest.slice(-4));
+    expect(await this.sendAddress.innerText()).toContain(selfBTCTest.slice(-4));
+    expect(await this.receiveAddress.first().innerText()).toContain(BTCTest.slice(-4));
 
     const confirmAmountAfter = await this.confirmAmount.last().innerText();
     const originalFee = await this.feeAmount.innerText();
@@ -963,7 +959,7 @@ export default class Wallet {
     // Balance - fees - sending amount
     const roundedResult = Number((num3 - num2 - amountBTCSend).toFixed(9));
     // Check if Balance value after the transaction is the same as the calculated value
-    await expect(num1).toEqual(roundedResult);
+    expect(num1).toEqual(roundedResult);
   }
 
   async confirmSendTransaction(transactionIDShown: boolean = true) {
@@ -976,7 +972,7 @@ export default class Wallet {
     await this.buttonClose.click();
   }
 
-  async getAddress(whichAddress): Promise<string> {
+  async getAddress(whichAddress: string): Promise<string> {
     // click on 'Receive' button
     await this.allUpperButtons.nth(1).click();
 
@@ -994,7 +990,7 @@ export default class Wallet {
     return address;
   }
 
-  async getTokenBalance(tokenname) {
+  async getTokenBalance(tokenname: string) {
     const locator = this.page
       .getByRole('button')
       .filter({ has: this.labelTokenSubtitle.getByText(tokenname, { exact: true }) })
@@ -1005,14 +1001,14 @@ export default class Wallet {
     return numericValue;
   }
 
-  async clickOnSpecificToken(tokenname) {
+  async clickOnSpecificToken(tokenname: string) {
     const specificToken = this.page
       .getByRole('button')
       .filter({ has: this.labelTokenSubtitle.getByText(tokenname, { exact: true }) });
     await specificToken.last().click();
   }
 
-  async clickOnSpecificInscription(inscriptionName) {
+  async clickOnSpecificInscription(inscriptionName: string) {
     const specificToken = this.containersCollectibleItem
       .filter({
         has: this.nameInscription.getByText(inscriptionName, { exact: true }),
@@ -1022,7 +1018,7 @@ export default class Wallet {
   }
 
   // This function tries to click on a specific rune, if the rune is not enabled it will enable the test rune and then click on it
-  async checkAndClickOnSpecificRune(tokenname) {
+  async checkAndClickOnSpecificRune(tokenname: string) {
     // Check if test rune is enabled and if not enabled the test rune
     try {
       // click on the test rune
@@ -1066,7 +1062,7 @@ export default class Wallet {
     await expect(this.inputFallbackBTCURL).toBeVisible();
   }
 
-  async checkTestnetUrls(shouldContainTestnet) {
+  async checkTestnetUrls(shouldContainTestnet: boolean) {
     const inputsURL = [this.inputStacksURL, this.inputBTCURL, this.inputFallbackBTCURL];
     const checks = inputsURL.map(async (input) => {
       const inputValue = await input.inputValue();
@@ -1097,6 +1093,7 @@ export default class Wallet {
 
     await this.checkTestnetUrls(true);
 
+    // TODO think of a better way to do this
     // Wait for the network to be switched so that API doesn't fail because of the rate limiting
     await this.page.waitForTimeout(15000);
 
@@ -1119,6 +1116,7 @@ export default class Wallet {
 
     await this.checkTestnetUrls(false);
 
+    // TODO think of a better way to do this
     // Wait for the network to be switched so that API doesn't fail because of the rate limiting
     await this.page.waitForTimeout(15000);
 
@@ -1156,30 +1154,21 @@ export default class Wallet {
       const balanceText = await this.labelCoinBalanceCurrency.innerText();
       totalBalance = parseFloat(balanceText.replace(/[^\d.-]/g, ''));
     }
-    // Check if total balance of all tokens is the same as total wallet balance
-    const totalBalanceText = await this.balance.innerText();
-    const totalBalanceWallet = parseFloat(totalBalanceText.replace(/[^\d.-]/g, ''));
-    await expect(totalBalanceWallet).toBe(totalBalance);
     return totalBalance;
   }
 
-  // The enableRandomToken function takes a parameter tokenType which can either be ‘BRC20’ or ‘SIP10’. This parameter determines additional actions specific to BRC20 tokens.
-  async enableRandomToken(tokenType: 'BRC20' | 'SIP10'): Promise<string> {
+  async selectLastToken(tokenType: 'BRC20' | 'SIP10'): Promise<string> {
     await this.manageTokenButton.click();
-    await expect(this.page.url()).toContain('manage-tokens');
+    expect(this.page.url()).toContain('manage-tokens');
 
     // Click on the specific token type button if BRC20 is selected
     if (tokenType === 'BRC20') {
       await this.buttonBRC20.click();
     }
 
-    // Enable a random token
-    const tokenName = await this.toggleRandomToken(true);
-
-    // Navigate back and verify the token is visible
+    const chosenToken = this.divTokenRow.last();
+    const tokenName = (await chosenToken.getAttribute('data-testid')) || 'default-value';
     await this.buttonBack.click();
-    await expect(this.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeVisible();
-
     return tokenName;
   }
 

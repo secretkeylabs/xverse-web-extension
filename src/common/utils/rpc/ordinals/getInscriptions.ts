@@ -94,7 +94,7 @@ const handleGetInscriptions = async (message: RpcRequestMessage, port: chrome.ru
 
   try {
     const inscriptionsList = await ordinalsApi.getInscriptions(
-      existingAccount.ordinalsAddress,
+      existingAccount.btcAddresses.taproot.address,
       parseResult.output.params.offset,
       parseResult.output.params.limit,
     );

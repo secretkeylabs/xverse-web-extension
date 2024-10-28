@@ -34,7 +34,7 @@ export const ButtonsContainer = styled.div<{
   flexDirection: props.$stackButtonAlignment ? 'column-reverse' : 'row',
   alignItems: props.$stackButtonAlignment ? 'center' : 'flex-end',
   flex: 1,
-  marginTop: props.$ifError ? props.theme.spacing(30) : props.theme.spacing(40),
+  marginTop: props.$ifError ? props.theme.space.xxxl : props.theme.space.xxxxl,
   marginBottom: props.theme.space.m,
 }));
 
@@ -47,8 +47,9 @@ export const StyledButton = styled.button({
   },
 });
 
-export const PasswordStrengthContainer = styled.div((props) => ({
+export const PasswordStrengthContainer = styled.div<{ $visibility: boolean }>((props) => ({
   ...props.theme.typography.body_medium_m,
+  visibility: props.$visibility ? 'visible' : 'hidden',
   display: 'flex',
   alignItems: 'center',
   width: '100%',

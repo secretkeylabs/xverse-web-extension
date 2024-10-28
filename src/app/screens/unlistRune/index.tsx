@@ -27,7 +27,7 @@ export default function UnlistRuneScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'LIST_RUNE_SCREEN' });
   const navigate = useNavigate();
   const { runeId } = useParams();
-  const { visible: runesCoinsList } = useVisibleRuneFungibleTokens();
+  const { data: runesCoinsList } = useVisibleRuneFungibleTokens();
   const selectedRune = runesCoinsList.find((ft) => ft.principal === runeId);
   const showRunesListing =
     useHasFeature(FeatureId.RUNES_LISTING) || process.env.NODE_ENV === 'development';

@@ -29,7 +29,7 @@ import ForgotPassword from '@screens/forgotPassword';
 import Home from '@screens/home';
 import Landing from '@screens/landing';
 import LedgerAddStxAddress from '@screens/ledger/addStxAddress';
-import ConfirmLedgerTransaction from '@screens/ledger/confirmLedgerTransaction';
+import ConfirmLedgerStxTransaction from '@screens/ledger/confirmLedgerStxTransaction';
 import ImportLedger from '@screens/ledger/importLedgerAccount';
 import VerifyLedger from '@screens/ledger/verifyLedgerAccountAddress';
 import Legal from '@screens/legal';
@@ -38,7 +38,7 @@ import ManageTokens from '@screens/manageTokens';
 import MintRune from '@screens/mintRune';
 import NftCollection from '@screens/nftCollection';
 import NftDashboard from '@screens/nftDashboard';
-import Index from '@screens/nftDashboard/hidden';
+import NftDashboardHidden from '@screens/nftDashboard/hidden';
 import SupportedRarities from '@screens/nftDashboard/supportedRarities';
 import NftDetailScreen from '@screens/nftDetail';
 import OrdinalDetailScreen from '@screens/ordinalDetail';
@@ -58,6 +58,7 @@ import SendStxScreen from '@screens/sendStx';
 import Setting from '@screens/settings';
 import About from '@screens/settings/about';
 import AdvancedSettings from '@screens/settings/advanced';
+import PaymentAddressTypeSelector from '@screens/settings/advanced/paymentAddressTypeSelector';
 import RestoreFunds from '@screens/settings/advanced/restoreFunds';
 import RecoverRunes from '@screens/settings/advanced/restoreFunds/recoverRunes';
 import RestoreOrdinals from '@screens/settings/advanced/restoreFunds/restoreOrdinals';
@@ -181,8 +182,8 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'confirm-ledger-tx',
-        element: <ConfirmLedgerTransaction />,
+        path: 'confirm-ledger-stx-tx',
+        element: <ConfirmLedgerStxTransaction />,
       },
       {
         path: 'backup',
@@ -369,6 +370,14 @@ const router = createHashRouter([
         element: (
           <AuthGuard>
             <AdvancedSettings />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: RoutePaths.PreferredAddress,
+        element: (
+          <AuthGuard>
+            <PaymentAddressTypeSelector />
           </AuthGuard>
         ),
       },
@@ -565,7 +574,7 @@ const router = createHashRouter([
         path: 'nft-dashboard/hidden',
         element: (
           <AuthGuard>
-            <Index />
+            <NftDashboardHidden />
           </AuthGuard>
         ),
       },
@@ -602,7 +611,7 @@ const router = createHashRouter([
         element: <SendNft />,
       },
       {
-        path: 'nft-dashboard/nft-collection/:id',
+        path: 'nft-dashboard/nft-collection/:id/:from?',
         element: (
           <AuthGuard>
             <NftCollection />

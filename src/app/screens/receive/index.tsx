@@ -1,15 +1,21 @@
 import StxIcon from '@assets/img/dashboard/stx_icon.svg';
 import BtcIcon from '@assets/img/receive_btc_image.svg';
 import OrdinalIcon from '@assets/img/receive_ordinals_image.svg';
+import { BtcAddressTypeForAddressLabel } from '@components/btcAddressTypeLabel';
+import { GlobalPreferredBtcAddressSheet } from '@components/preferredBtcAddress';
 import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import BottomTabBar from '@components/tabBar';
+import TooltipCalloutRaw from '@components/tooltip';
 import TopRow from '@components/topRow';
+import useCanUserSwitchPaymentType from '@hooks/useCanUserSwitchPaymentType';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Check, Copy } from '@phosphor-icons/react';
 import QrCode from '@screens/receive/qrCode';
-import { useState } from 'react';
+import Callout from '@ui-library/callout';
+import { markAlertSeen, shouldShowAlert } from '@utils/alertTracker';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Tooltip } from 'react-tooltip';
@@ -32,6 +38,11 @@ const AddressContainer = styled.div({
   columnGap: 16,
 });
 
+const AddressTypeContainer = styled.div((props) => ({
+  display: 'flex',
+  marginBottom: props.theme.space.xs,
+}));
+
 const Button = styled.button((props) => ({
   display: 'flex',
   justifyContent: 'center',
@@ -47,7 +58,6 @@ const Button = styled.button((props) => ({
 const TopTitleText = styled.h1((props) => ({
   ...props.theme.typography.headline_s,
   textAlign: 'center',
-  marginTop: props.theme.spacing(12),
 }));
 
 const DescriptionText = styled.p((props) => ({
@@ -67,7 +77,7 @@ const BnsNameText = styled.h1((props) => ({
   marginBottom: 4,
 }));
 
-const QRCodeContainer = styled.div<{ marginBottom: number }>((props) => ({
+const QRCodeContainer = styled.div<{ $marginBottom: number }>((props) => ({
   display: 'flex',
   backgroundColor: props.theme.colors.white['0'],
   justifyContent: 'center',
@@ -77,7 +87,7 @@ const QRCodeContainer = styled.div<{ marginBottom: number }>((props) => ({
   height: 159,
   alignSelf: 'center',
   marginTop: props.theme.spacing(15),
-  marginBottom: props.marginBottom,
+  marginBottom: props.$marginBottom,
 }));
 
 const AddressText = styled.h1((props) => ({
@@ -91,18 +101,37 @@ const BottomBarContainer = styled.div({
   marginTop: 22,
 });
 
+const SpacedCallout = styled(Callout)((props) => ({
+  marginTop: props.theme.space.s,
+}));
+
+const TooltipCallout = styled(TooltipCalloutRaw)(() => ({
+  maxWidth: 300,
+}));
+
 type SupportedAddresses = 'BTC' | 'STX' | 'ORD';
 const validAddresses: SupportedAddresses[] = ['BTC', 'STX', 'ORD'];
 
 function Receive() {
+  const navigate = useNavigate();
+  const selectedAccount = useSelectedAccount();
+  const { stxAddress, btcAddress, ordinalsAddress } = selectedAccount;
+  const { showBtcReceiveAlert, showOrdinalReceiveAlert, network, btcPaymentAddressType } =
+    useWalletSelector();
+  const userCanSwitchPaymentType = useCanUserSwitchPaymentType();
+
   const { t } = useTranslation('translation', { keyPrefix: 'RECEIVE' });
   const [addressCopied, setAddressCopied] = useState(false);
   const [isBtcReceiveAlertVisible, setIsBtcReceiveAlertVisible] = useState(false);
   const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible] = useState(false);
-  const navigate = useNavigate();
-  const selectedAccount = useSelectedAccount();
-  const { stxAddress, btcAddress, ordinalsAddress } = selectedAccount;
-  const { showBtcReceiveAlert, showOrdinalReceiveAlert } = useWalletSelector();
+  const [showBtcAddressTypeSelectorSheet, setShowBtcAddressTypeSelectorSheet] = useState(false);
+  const [showNativeSegWitCallout, setShowNativeSegWitCallout] = useState(
+    shouldShowAlert('co:receive:address_changed_to_native'),
+  );
+  const [showAddressChangeTooltip, setShowAddressChangeTooltip] = useState(
+    shouldShowAlert('co:receive:address_change_button'),
+  );
+  const topBarSettingsRef = useRef<HTMLButtonElement | null>(null);
 
   const { currency } = useParams<{ currency: SupportedAddresses }>();
 
@@ -156,13 +185,38 @@ function Receive() {
     if (currency === 'ORD' && showOrdinalReceiveAlert) setIsOrdinalReceiveAlertVisible(true);
   };
 
+  const onNativeSegWitCalloutClose = () => {
+    setShowNativeSegWitCallout(false);
+    markAlertSeen('co:receive:address_changed_to_native');
+  };
+  const onAddressChangeTooltipClose = () => {
+    setShowAddressChangeTooltip(false);
+    markAlertSeen('co:receive:address_change_button');
+  };
+  const showBtcAddressTypeSelector = userCanSwitchPaymentType && currency === 'BTC';
+
   return (
     <>
-      <TopRow title={t('RECEIVE')} onClick={handleBackButtonClick} />
+      <TopRow
+        onClick={handleBackButtonClick}
+        onSettingsClick={
+          showBtcAddressTypeSelector ? () => setShowBtcAddressTypeSelectorSheet(true) : undefined
+        }
+        settingsRef={topBarSettingsRef}
+      />
+      {showBtcAddressTypeSelector && showAddressChangeTooltip && (
+        <TooltipCallout
+          titleText={t('CALLOUTS.ADDRESS_CHANGE_TOOLTIP.TITLE')}
+          bodyText={t('CALLOUTS.ADDRESS_CHANGE_TOOLTIP.DESCRIPTION')}
+          onClose={onAddressChangeTooltipClose}
+          target={topBarSettingsRef}
+          hideIcon
+        />
+      )}
       <OuterContainer>
         <TopTitleText>{renderData[currency].title}</TopTitleText>
         <DescriptionText>{renderData[currency].desc}</DescriptionText>
-        <QRCodeContainer data-testid="qr-container" marginBottom={showBnsName ? 24 : 50}>
+        <QRCodeContainer data-testid="qr-container" $marginBottom={showBnsName ? 24 : 30}>
           <QrCode
             image={renderData[currency].icon}
             data={renderData[currency].address}
@@ -170,6 +224,14 @@ function Receive() {
           />
         </QRCodeContainer>
         {showBnsName && <BnsNameText>{selectedAccount?.bnsName}</BnsNameText>}
+        {currency === 'BTC' && (
+          <AddressTypeContainer>
+            <BtcAddressTypeForAddressLabel
+              address={renderData[currency].address}
+              network={network.type}
+            />
+          </AddressTypeContainer>
+        )}
         <AddressContainer>
           <AddressText data-testid="address-label">{renderData[currency].address}</AddressText>
           <Button id={`copy-${renderData[currency].address}`} onClick={handleOnClick}>
@@ -183,6 +245,14 @@ function Receive() {
             place="top"
           />
         </AddressContainer>
+        {currency === 'BTC' && showNativeSegWitCallout && btcPaymentAddressType === 'native' && (
+          <SpacedCallout
+            titleText={t('CALLOUTS.NATIVE_SEGWIT.TITLE')}
+            bodyText={t('CALLOUTS.NATIVE_SEGWIT.DESCRIPTION')}
+            onClose={onNativeSegWitCalloutClose}
+            hideIcon
+          />
+        )}
       </OuterContainer>
       <BottomBarContainer>
         <BottomTabBar tab="dashboard" />
@@ -193,6 +263,12 @@ function Receive() {
       {isOrdinalReceiveAlertVisible && (
         <ShowOrdinalReceiveAlert
           onOrdinalReceiveAlertClose={() => setIsOrdinalReceiveAlertVisible(false)}
+        />
+      )}
+      {showBtcAddressTypeSelector && (
+        <GlobalPreferredBtcAddressSheet
+          visible={showBtcAddressTypeSelectorSheet}
+          onHide={() => setShowBtcAddressTypeSelectorSheet(false)}
         />
       )}
     </>

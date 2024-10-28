@@ -1,8 +1,9 @@
-import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
+import useBtcAddressBalance from '@hooks/useBtcAddressBalance';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
+import { getBtcFiatEquivalent, type BtcPaymentType } from '@secretkeylabs/xverse-core';
 import BtcAmountSelector from '@ui-components/btcAmountSelector';
 import SelectFeeRate from '@ui-components/selectFeeRate';
 import Button from '@ui-library/button';
@@ -11,6 +12,7 @@ import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import Title from './title';
 
 const Container = styled.div`
   flex: 1 1 100%;
@@ -31,6 +33,7 @@ const Buttons = styled.div`
 
 type Props = {
   amountSats: string;
+  overridePaymentType: BtcPaymentType;
   setAmountSats: (amount: string) => void;
   feeRate: string;
   setFeeRate: (feeRate: string) => void;
@@ -42,11 +45,11 @@ type Props = {
   dustFiltered: boolean;
   hasSufficientFunds: boolean;
   isLoading?: boolean;
-  header?: React.ReactNode;
 };
 
 function AmountSelector({
   amountSats,
+  overridePaymentType,
   setAmountSats,
   feeRate,
   setFeeRate,
@@ -58,15 +61,17 @@ function AmountSelector({
   isLoading,
   dustFiltered,
   hasSufficientFunds,
-  header,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
   const navigate = useNavigate();
 
   const { fiatCurrency } = useWalletSelector();
-  const { data: btcBalance, isLoading: btcBalanceLoading } = useBtcWalletData();
-  const { btcFiatRate } = useCoinRates();
+  const selectedAccount = useSelectedAccount(overridePaymentType);
+  const { data: btcBalance, isLoading: btcBalanceLoading } = useBtcAddressBalance(
+    selectedAccount.btcAddress,
+  );
+  const { btcFiatRate } = useSupportedCoinRates();
 
   const { data: recommendedFees } = useBtcFeeRate();
 
@@ -77,17 +82,18 @@ function AmountSelector({
     return null;
   }
 
-  const hasBtc = +btcBalance > 0;
+  const hasBtc = (btcBalance?.confirmedBalance ?? 0) > 0;
   return (
     <Container>
       <div>
-        {header}
+        <Title title={t('SEND')} showBtcIcon />
         <BtcAmountSelector
           data-testid="test-container"
           amountSats={amountSats}
           setAmountSats={setAmountSats}
           sendMax={sendMax}
           setSendMax={setSendMax}
+          overridePaymentType={overridePaymentType}
           disabled={!hasBtc}
         />
         {hasBtc && (

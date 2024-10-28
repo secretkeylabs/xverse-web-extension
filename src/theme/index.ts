@@ -95,6 +95,9 @@ const Theme = {
     lilac: '#5E41C5',
     lilac_dark: '#4F34BA',
 
+    // utility
+    transparent: 'rgba(0, 0, 0, 0)',
+
     action: {
       /**
        * @deprecated

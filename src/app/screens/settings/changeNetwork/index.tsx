@@ -180,18 +180,21 @@ function ChangeNetworkScreen() {
           network={savedMainnet || defaultMainnet}
           isSelected={formInputs.type === 'Mainnet'}
           onNetworkSelected={onNetworkSelected}
+          disabled={isChangingNetwork}
           showDivider
         />
         <NetworkRow
           network={savedTestnet || defaultTestnet}
           isSelected={formInputs.type === 'Testnet'}
           onNetworkSelected={onNetworkSelected}
+          disabled={isChangingNetwork}
           showDivider
         />
         <NetworkRow
           network={savedSignet || defaultSignet}
           isSelected={formInputs.type === 'Signet'}
           onNetworkSelected={onNetworkSelected}
+          disabled={isChangingNetwork}
           showDivider={false}
         />
         <NodeInputsContainer>
@@ -204,6 +207,7 @@ function ChangeNetworkScreen() {
               onClear={onClearCreator(key)}
               onReset={onResetCreator(key)}
               error={formErrors[key]}
+              disabled={isChangingNetwork}
             />
           ))}
         </NodeInputsContainer>

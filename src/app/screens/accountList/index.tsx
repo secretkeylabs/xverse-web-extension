@@ -1,5 +1,5 @@
 import ConnectLedger from '@assets/img/dashboard/connect_ledger.svg';
-import { filterLedgerAccounts } from '@common/utils/ledger';
+import { filterLedgerAccountsByNetwork } from '@common/utils/ledger';
 import LazyAccountRow from '@components/accountRow/lazyAccountRow';
 import Separator from '@components/separator';
 import TopRow from '@components/topRow';
@@ -67,7 +67,7 @@ function AccountList(): JSX.Element {
   const hideListActions = Boolean(params.get('hideListActions')) || false;
 
   const displayedAccountsList = useMemo(() => {
-    const networkLedgerAccounts = filterLedgerAccounts(ledgerAccountsList, network.type);
+    const networkLedgerAccounts = filterLedgerAccountsByNetwork(ledgerAccountsList, network.type);
     return [...networkLedgerAccounts, ...accountsList];
   }, [accountsList, ledgerAccountsList, network]);
 
@@ -84,8 +84,8 @@ function AccountList(): JSX.Element {
   };
 
   const isAccountSelected = (account: Account) =>
-    account.btcAddress === selectedAccount?.btcAddress &&
-    account.stxAddress === selectedAccount?.stxAddress;
+    account.btcAddresses.taproot.address === selectedAccount.ordinalsAddress &&
+    account.stxAddress === selectedAccount.stxAddress;
 
   const onCreateAccount = async () => {
     await createAccount();
@@ -105,7 +105,7 @@ function AccountList(): JSX.Element {
           <AccountContainer>
             <Title>{t('TITLE')}</Title>
             {displayedAccountsList.map((account) => (
-              <div key={account.btcAddress}>
+              <div key={account.btcAddresses.taproot.address}>
                 <LazyAccountRow
                   account={account}
                   isSelected={isAccountSelected(account)}

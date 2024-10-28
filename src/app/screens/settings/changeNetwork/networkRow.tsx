@@ -32,9 +32,10 @@ interface Props {
   isSelected: boolean;
   onNetworkSelected: (network: SettingsNetwork) => void;
   showDivider: boolean;
+  disabled?: boolean;
 }
 
-function NetworkRow({ network, isSelected, onNetworkSelected, showDivider }: Props) {
+function NetworkRow({ network, isSelected, onNetworkSelected, showDivider, disabled }: Props) {
   const theme = useTheme();
   const onClick = () => {
     onNetworkSelected(network);
@@ -44,6 +45,7 @@ function NetworkRow({ network, isSelected, onNetworkSelected, showDivider }: Pro
     <Button
       onClick={onClick}
       border={showDivider ? `1px solid ${theme.colors.white_900}` : 'transparent'}
+      disabled={disabled}
     >
       <Text
         isActive={isSelected}
