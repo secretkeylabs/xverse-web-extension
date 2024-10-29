@@ -27,9 +27,13 @@ const useSelectedAccount = (overridePayAddressType?: BtcPaymentType): AccountWit
 
     if (!account) {
       [account] = softwareAccountsList;
-      if (account) {
-        switchAccount(account);
+      if (!account) {
+        // this should never happen
+        // if it does, then this hook is being called before onboarding is complete, which is a bug
+        // and should be picked up during dev time
+        throw new Error('No account found');
       }
+      switchAccount(account);
     }
 
     let accountType = btcPaymentAddressType;
