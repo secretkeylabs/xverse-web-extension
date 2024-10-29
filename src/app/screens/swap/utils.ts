@@ -109,22 +109,22 @@ export const isRunesTx = ({
   toToken,
 }: {
   fromToken: FungibleToken;
-  toToken: Token;
+  toToken: FungibleToken;
 }): boolean =>
   (fromToken?.protocol === 'runes' || toToken?.protocol === 'runes') &&
-  (fromToken?.principal === 'BTC' || toToken?.ticker === 'BTC');
+  (fromToken?.principal === 'BTC' || toToken?.principal === 'BTC');
 
 export const isStxTx = ({
   fromToken,
   toToken,
 }: {
   fromToken?: FungibleToken;
-  toToken?: Token;
+  toToken?: FungibleToken;
 }): boolean =>
   fromToken?.protocol === 'stacks' ||
   fromToken?.principal === 'STX' ||
-  toToken?.protocol === 'sip10' ||
-  toToken?.ticker === 'STX';
+  toToken?.protocol === 'stacks' ||
+  toToken?.principal === 'STX';
 
 const getIdentifier = (token?: Token | FungibleToken) => {
   if (!token) return '';

@@ -55,10 +55,8 @@ const SubtitleContainer = styled.div`
 interface Props {
   provider: string;
   price: string;
-  image: {
-    currency?: CurrencyTypes;
-    ft?: FungibleToken;
-  };
+  image?: string;
+  token?: FungibleToken;
   subtitle?: string;
   subtitleColorOverride?: Color;
   fiatValue?: string;
@@ -79,6 +77,7 @@ function QuoteTile({
   provider,
   price,
   image,
+  token,
   subtitle,
   subtitleColorOverride,
   fiatValue,
@@ -98,7 +97,7 @@ function QuoteTile({
 
   return (
     <Container data-testid="swap-place-button" onClick={onClick} clickable={Boolean(onClick)}>
-      <TokenImage currency={image.currency} fungibleToken={image.ft} size={32} />
+      <TokenImage fungibleToken={token} imageUrl={image} size={32} />
       <InfoContainer>
         <RowCenter>
           <TruncatedP

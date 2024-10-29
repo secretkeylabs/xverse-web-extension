@@ -18,7 +18,6 @@ import {
   type MarketUtxo,
   type PlaceUtxoOrderRequest,
   type Quote,
-  type Token,
 } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
@@ -29,7 +28,7 @@ import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
-import trackSwapMixPanel from '../mixpanel';
+// import trackSwapMixPanel from '../mixpanel';
 import QuoteTile from '../quotesModal/quoteTile';
 import SlippageModalContent from '../slippageModal';
 import type { OrderInfo, StxOrderInfo } from '../types';
@@ -148,7 +147,7 @@ const FeeRate = styled.div`
 type QuoteSummaryProps = {
   amount: string;
   fromToken?: FungibleToken;
-  toToken?: Token;
+  toToken?: FungibleToken;
   quote: Quote;
   onClose: () => void;
   onChangeProvider: () => void;
@@ -231,11 +230,11 @@ export default function QuoteSummary({
   })();
 
   const toUnit = (() => {
-    if (toToken?.protocol === 'btc') {
+    if (toToken?.principal === 'BTC') {
       return 'Sats';
     }
-    if (toToken?.symbol) {
-      return toToken.symbol;
+    if (toToken?.runeSymbol) {
+      return toToken.runeSymbol;
     }
     if (toToken?.protocol === 'runes') {
       return RUNE_DISPLAY_DEFAULTS.symbol;
@@ -247,7 +246,7 @@ export default function QuoteSummary({
   })();
 
   const isRunesSwap = fromToken?.protocol === 'runes' || toToken?.protocol === 'runes';
-  const isSip10Swap = fromToken?.protocol === 'stacks' || toToken?.protocol === 'sip10';
+  const isSip10Swap = fromToken?.protocol === 'stacks' || toToken?.protocol === 'stacks';
 
   const [showSlippageModal, setShowSlippageModal] = useState(false);
   const DEFAULT_SLIPPAGE = quote.slippageThreshold ?? 0.05;
@@ -258,17 +257,17 @@ export default function QuoteSummary({
       return;
     }
 
-    trackSwapMixPanel(AnalyticsEvents.ConfirmSwap, {
-      provider: quote.provider,
-      fromToken,
-      toToken,
-      amount,
-      quote,
-      btcUsdRate,
-      runeFloorPrice,
-      stxBtcRate,
-      fromTokenInfo: sip10FromTokenInfoUSD,
-    });
+    // trackSwapMixPanel(AnalyticsEvents.ConfirmSwap, {
+    //   provider: quote.provider,
+    //   fromToken,
+    //   toToken,
+    //   amount,
+    //   quote,
+    //   btcUsdRate,
+    //   runeFloorPrice,
+    //   stxBtcRate,
+    //   fromTokenInfo: sip10FromTokenInfoUSD,
+    // });
 
     if (selectedIdentifiers) {
       const placeUtxoOrderRequest: PlaceUtxoOrderRequest = {
@@ -330,7 +329,7 @@ export default function QuoteSummary({
     }
   };
 
-  const feeUnits = toToken?.protocol === 'sip10' || toToken?.protocol === 'stx' ? 'STX' : 'Sats';
+  const feeUnits = toToken?.protocol === 'stacks' || toToken?.principal === 'STX' ? 'STX' : 'Sats';
 
   const showSlippageWarning = Boolean(
     quote.slippageSupported && quote.slippageThreshold && slippage > quote.slippageThreshold,
@@ -353,7 +352,7 @@ export default function QuoteSummary({
   })();
 
   const toTokenFiatValue = (() => {
-    if (toToken?.protocol === 'btc') {
+    if (toToken?.principal === 'BTC') {
       return getBtcFiatEquivalent(
         new BigNumber(quote.receiveAmount),
         new BigNumber(btcFiatRate),
@@ -365,7 +364,7 @@ export default function QuoteSummary({
         new BigNumber(btcFiatRate),
       ).toFixed(2);
     }
-    if (toToken?.protocol === 'stx') {
+    if (toToken?.principal === 'STX') {
       return getStxFiatEquivalent(
         stxToMicrostacks(new BigNumber(quote.receiveAmount)),
         new BigNumber(stxBtcRate),
@@ -392,7 +391,7 @@ export default function QuoteSummary({
     .toFixed(0);
 
   const getTokenRate = (): string => {
-    if (toToken?.protocol === 'btc') {
+    if (toToken?.principal === 'BTC') {
       return new BigNumber(quote.receiveAmount)
         .dividedBy(new BigNumber(amount))
         .decimalPlaces(2)
@@ -434,13 +433,7 @@ export default function QuoteSummary({
             <QuoteTile
               provider="Amount"
               price={amount}
-              image={{
-                currency: mapFtToCurrencyType(fromToken),
-                ft:
-                  fromToken?.principal === 'BTC' || fromToken?.principal === 'STX'
-                    ? undefined
-                    : fromToken,
-              }}
+              token={fromToken}
               subtitle={
                 fromToken?.principal === 'BTC'
                   ? 'Bitcoin'
@@ -460,21 +453,8 @@ export default function QuoteSummary({
             <QuoteTile
               provider="Amount"
               price={quote.receiveAmount}
-              image={{
-                currency: mapTokenToCurrencyType(toToken),
-                ft:
-                  toToken?.protocol === 'runes'
-                    ? ({
-                        runeSymbol: toToken?.symbol,
-                        runeInscriptionId: toToken?.logo,
-                        ticker: toToken?.name,
-                        protocol: 'runes',
-                      } as FungibleToken)
-                    : toToken?.protocol === 'sip10'
-                    ? mapSwapTokenToFT(toToken)
-                    : undefined,
-              }}
-              subtitle={toToken?.protocol === 'btc' ? 'Bitcoin' : toToken?.name}
+              token={toToken}
+              subtitle={toToken?.name}
               subtitleColorOverride="white_400"
               unit={toUnit}
               fiatValue={toTokenFiatValue}

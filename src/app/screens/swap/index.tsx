@@ -42,7 +42,7 @@ import PsbtConfirmation from './components/psbtConfirmation/psbtConfirmation';
 import RouteItem from './components/routeItem';
 import TokenFromBottomSheet from './components/tokenFromBottomSheet';
 import TokenToBottomSheet from './components/tokenToBottomSheet';
-import trackSwapMixPanel from './mixpanel';
+// import trackSwapMixPanel from './mixpanel';
 import QuoteSummary from './quoteSummary';
 import QuotesModal from './quotesModal';
 import type { OrderInfo, Side, StxOrderInfo } from './types';
@@ -114,7 +114,7 @@ export default function SwapScreen() {
   const [getQuotesModalVisible, setGetQuotesModalVisible] = useState(false);
   const [tokenSelectionBottomSheet, setTokenSelectionBottomSheet] = useState<Side | null>(null);
   const [fromToken, setFromToken] = useState<FungibleToken | undefined>();
-  const [toToken, setToToken] = useState<Token | undefined>();
+  const [toToken, setToToken] = useState<FungibleToken | undefined>();
   const [utxosRequest, setUtxosRequest] = useState<GetUtxosRequest | null>(null);
   const [inputError, setInputError] = useState('');
   const [hasQuoteError, setHasQuoteError] = useState(false);
@@ -178,16 +178,16 @@ export default function SwapScreen() {
       return;
     }
 
-    trackSwapMixPanel(AnalyticsEvents.FetchSwapQuote, {
-      fromToken,
-      toToken,
-      amount: amountForQuote,
-      quote,
-      btcUsdRate,
-      runeFloorPrice,
-      stxBtcRate,
-      fromTokenInfo: sip10FromTokenInfoUSD,
-    });
+    // trackSwapMixPanel(AnalyticsEvents.FetchSwapQuote, {
+    //   fromToken,
+    //   toToken,
+    //   amount: amountForQuote,
+    //   quote,
+    //   btcUsdRate,
+    //   runeFloorPrice,
+    //   stxBtcRate,
+    //   fromTokenInfo: sip10FromTokenInfoUSD,
+    // });
 
     fetchQuotes({
       from: mapFTNativeSwapTokenToTokenBasic(fromToken),
@@ -225,16 +225,13 @@ export default function SwapScreen() {
     setInputError('');
     setAmount('');
     setHasQuoteError(false);
-    const newFrom =
-      getUserFTFromTokenTicker(toToken.protocol, toToken.ticker) ?? mapSwapTokenToFT(toToken);
-    const newTo = mapFtToSwapToken(fromToken);
-    setFromToken(newFrom);
-    setToToken(newTo);
+    setFromToken(toToken);
+    setToToken(fromToken);
   };
 
   const onChangeToToken = (token: Token) => {
     setHasQuoteError(false);
-    setToToken(token);
+    setToToken(mapSwapTokenToFT(token));
   };
 
   const onChangeFromToken = (token: FungibleToken) => {
@@ -343,7 +340,7 @@ export default function SwapScreen() {
   const isRunesToBtcRoute =
     fromToken?.principal !== 'BTC' &&
     fromToken?.protocol === 'runes' &&
-    toToken?.protocol === 'btc';
+    toToken?.principal === 'BTC';
 
   useEffect(() => {
     if (errorMessage) {
@@ -362,13 +359,13 @@ export default function SwapScreen() {
       return;
     }
 
-    trackMixPanel(AnalyticsEvents.SelectSwapQuote, {
-      provider: provider.provider.name,
-      from: getTrackingIdentifier(fromToken),
-      to: getTrackingIdentifier(toToken),
-      fromPrincipal: isStxTx({ fromToken, toToken }) ? fromToken.principal : undefined,
-      toPrincipal: isStxTx({ fromToken, toToken }) ? toToken.ticker : undefined,
-    });
+    // trackMixPanel(AnalyticsEvents.SelectSwapQuote, {
+    //   provider: provider.provider.name,
+    //   from: getTrackingIdentifier(fromToken),
+    //   to: getTrackingIdentifier(toToken),
+    //   fromPrincipal: isStxTx({ fromToken, toToken }) ? fromToken.principal : undefined,
+    //   toPrincipal: isStxTx({ fromToken, toToken }) ? toToken.ticker : undefined,
+    // });
 
     if (isAmm) {
       setUtxosRequest(null);
@@ -391,21 +388,21 @@ export default function SwapScreen() {
   };
 
   const onConfirmExecute = () => {
-    const provider = quote?.provider ?? selectedUtxoProvider?.provider;
-    if (!fromToken || !toToken || !provider) {
-      return;
-    }
-    trackSwapMixPanel(AnalyticsEvents.SignSwap, {
-      provider,
-      fromToken,
-      toToken,
-      amount: amountForQuote,
-      quote,
-      btcUsdRate,
-      runeFloorPrice,
-      stxBtcRate,
-      fromTokenInfo: sip10FromTokenInfoUSD,
-    });
+    // const provider = quote?.provider ?? selectedUtxoProvider?.provider;
+    // if (!fromToken || !toToken || !provider) {
+    //   return;
+    // }
+    // trackSwapMixPanel(AnalyticsEvents.SignSwap, {
+    //   provider,
+    //   fromToken,
+    //   toToken,
+    //   amount: amountForQuote,
+    //   quote,
+    //   btcUsdRate,
+    //   runeFloorPrice,
+    //   stxBtcRate,
+    //   fromTokenInfo: sip10FromTokenInfoUSD,
+    // });
   };
 
   const QuoteModal = (

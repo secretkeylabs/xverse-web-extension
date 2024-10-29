@@ -1,10 +1,10 @@
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useVisibleMasterCoinsList from '@screens/swap/useVisibleMasterCoinsList';
 import { mapSwapProtocolToFTProtocol } from '@screens/swap/utils';
-import { type Token } from '@secretkeylabs/xverse-core';
+import { type FungibleToken } from '@secretkeylabs/xverse-core';
 import { sortFtByFiatBalance } from '@utils/tokens';
 
-const useFromTokens = (toToken?: Token) => {
+const useFromTokens = (toToken?: FungibleToken) => {
   const tokens = useVisibleMasterCoinsList();
   const { stxBtcRate, btcFiatRate } = useSupportedCoinRates();
 
@@ -19,9 +19,7 @@ const useFromTokens = (toToken?: Token) => {
 
   const filteredTokens = toToken
     ? sortedTokens.filter(
-        (token) =>
-          token.principal !== toToken.ticker &&
-          mapSwapProtocolToFTProtocol(toToken.protocol) === token.protocol,
+        (token) => token.principal !== toToken.ticker && toToken.protocol === token.protocol,
       )
     : sortedTokens;
 

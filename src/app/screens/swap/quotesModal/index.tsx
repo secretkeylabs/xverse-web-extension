@@ -8,7 +8,6 @@ import {
   type FungibleToken,
   type Quote,
   type StxQuote,
-  type Token,
   type UtxoQuote,
 } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
@@ -25,7 +24,7 @@ interface Props {
   utxoProviders: UtxoQuote[];
   stxProviders: StxQuote[];
   amount: string;
-  toToken?: Token;
+  toToken?: FungibleToken;
   ammProviderClicked?: (amm: Quote) => void;
   utxoProviderClicked?: (utxoProvider: UtxoQuote) => void;
 }
@@ -150,10 +149,10 @@ function QuotesModal({
                 : btcToSats(BigNumber(amount).dividedBy(BigNumber(amm.receiveAmount))).toFixed(2)
             }
             floorText={amm.to.protocol === 'runes' ? t('EXCHANGE_RATE') : undefined}
-            image={{ ft: { image: amm.provider.logo } as FungibleToken }}
+            image={amm.provider.logo}
             onClick={() => ammProviderClicked && ammProviderClicked(amm)}
             subtitle={getReceiveAmountSubtitle(amm, ammProviders)}
-            unit={amm.to.protocol === 'btc' ? 'Sats' : `Sats / ${toToken?.symbol}`}
+            unit={amm.to.protocol === 'btc' ? 'Sats' : `Sats / ${toToken?.runeSymbol}`}
             fiatValue={
               amm.to.protocol === 'btc'
                 ? getBtcFiatEquivalent(
@@ -174,7 +173,7 @@ function QuotesModal({
             key={stx.provider.name}
             provider={stx.provider.name}
             price={stx.receiveAmount}
-            image={{ ft: { image: stx.provider.logo } as FungibleToken }}
+            image={stx.provider.logo}
             onClick={() => ammProviderClicked && ammProviderClicked(stx)}
             subtitle={getReceiveAmountSubtitle(stx, stxProviders)}
             unit={stx.to.protocol === 'stx' ? 'STX' : toToken?.name || ''}
@@ -198,11 +197,11 @@ function QuotesModal({
             key={utxoProvider.provider.name}
             provider={utxoProvider.provider.name}
             price={utxoProvider.floorRate}
-            image={{ ft: { image: utxoProvider.provider.logo } as FungibleToken }}
+            image={utxoProvider.provider.logo}
             floorText={t('FLOOR_PRICE')}
             onClick={() => utxoProviderClicked && utxoProviderClicked(utxoProvider)}
             subtitle={getFloorPriceSubtitle(utxoProvider, utxoProviders)}
-            unit={toToken?.symbol ? `Sats / ${toToken.symbol}` : ''}
+            unit={toToken?.runeSymbol ? `Sats / ${toToken.runeSymbol}` : ''}
           />
         ))}
       </Container>

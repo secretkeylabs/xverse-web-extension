@@ -4,9 +4,9 @@ import {
   currencySymbolMap,
   getBtcFiatEquivalent,
   satsToBtc,
+  type FungibleToken,
   type GetUtxosRequest,
   type MarketUtxo,
-  type Token,
   type UtxoQuote,
 } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
@@ -118,7 +118,7 @@ const LoaderContainer = styled.div`
 type Props = {
   utxosRequest: GetUtxosRequest;
   selectedUtxoProvider?: UtxoQuote;
-  toToken?: Token;
+  toToken?: FungibleToken;
   onClose: () => void;
   onChangeProvider: () => void;
   onNext: (amount: string, btcAmount: string, selectedUtxos: Omit<MarketUtxo, 'token'>[]) => void;
@@ -227,7 +227,7 @@ export default function UtxoSelection({
         </Heading>
         <QuoteSummaryTile
           fromUnit="BTC"
-          toUnit={toToken?.symbol}
+          toUnit={toToken?.runeSymbol ?? undefined}
           rate={totalRunesPerBtc.toString()}
           provider={selectedUtxoProvider?.provider.name || ''}
           image={selectedUtxoProvider?.provider.logo || ''}
@@ -303,7 +303,7 @@ export default function UtxoSelection({
                 <NumericFormat
                   value={totalRuneAmount.toString()}
                   displayType="text"
-                  suffix={` ${toToken?.symbol}`}
+                  suffix={` ${toToken?.runeSymbol}`}
                   thousandSeparator
                   renderText={(value: string) => (
                     <StyledP data-testid="quote-label" typography="body_medium_m" color="white_0">

@@ -2,10 +2,8 @@ import TokenTile from '@components/tokenTile';
 import useDebounce from '@hooks/useDebounce';
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import {
-  isStxTx,
   mapFTMotherProtocolToSwapProtocol,
   mapFTProtocolToSwapProtocol,
-  mapSwapProtocolToFTProtocol,
   mapSwapTokenToFT,
 } from '@screens/swap/utils';
 import {
@@ -177,9 +175,9 @@ export default function TokenToBottomSheet({
                   currency="BTC"
                   onPress={() => {
                     onSelectCoin(token);
-                    trackMixPanel(AnalyticsEvents.SelectTokenToSwapTo, {
-                      selectedToken: 'BTC',
-                    });
+                    // trackMixPanel(AnalyticsEvents.SelectTokenToSwapTo, {
+                    //   selectedToken: 'BTC',
+                    // });
                     handleClose();
                   }}
                   hideSwapBalance
@@ -212,10 +210,10 @@ export default function TokenToBottomSheet({
                   currency="FT"
                   onPress={() => {
                     onSelectCoin(token);
-                    trackMixPanel(AnalyticsEvents.SelectTokenToSwapTo, {
-                      selectedToken: token.name ?? token.ticker,
-                      principal: isStxTx({ toToken: token }) ? token.ticker : undefined,
-                    });
+                    // trackMixPanel(AnalyticsEvents.SelectTokenToSwapTo, {
+                    //   selectedToken: token.name ?? token.ticker,
+                    //   principal: isStxTx({ toToken: token }) ? token.ticker : undefined,
+                    // });
                     handleClose();
                   }}
                   fungibleToken={mapSwapTokenToFT(token)}
