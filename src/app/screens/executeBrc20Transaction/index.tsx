@@ -3,6 +3,7 @@ import type { ConfirmationStatus } from '@components/loadingTransactionStatus/ci
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { createKeystoneTransport } from '@keystonehq/hw-transport-webusb';
 import TransportFactory from '@ledgerhq/hw-transport-webusb';
 import {
   BRC20ErrorCode,
@@ -12,11 +13,12 @@ import {
 import Button from '@ui-library/button';
 import Sheet from '@ui-library/sheet';
 import type { ExecuteBrc20TransferState } from '@utils/brc20';
-import { getBtcTxStatusUrl, isInOptions, isLedgerAccount } from '@utils/helper';
-import { useEffect, useState } from 'react';
+import { getBtcTxStatusUrl, isInOptions, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import KeystoneStepView from './keystoneStepView';
 import LedgerStepView from './ledgerStepView';
 
 const SuccessActionsContainer = styled.div((props) => ({
@@ -62,6 +64,14 @@ function ExecuteBrc20Transaction() {
       errorCode === BRC20ErrorCode.DEVICE_LOCKED ||
       errorCode === BRC20ErrorCode.GENERAL_LEDGER_ERROR);
 
+  const isKeystone = isKeystoneAccount(selectedAccount);
+  const isKeystoneModalVisible =
+    isKeystone &&
+    (!isConnectSuccess ||
+      progress === ExecuteTransferProgressCodes.CreatingCommitTransaction ||
+      progress === ExecuteTransferProgressCodes.CreatingTransferTransaction) &&
+    (!errorCode || errorCode === BRC20ErrorCode.GENERAL_LEDGER_ERROR);
+
   // general ledger error is handled by the modal
   const showBody =
     !isLedger ||
@@ -71,9 +81,9 @@ function ExecuteBrc20Transaction() {
   const [loadingPercentage, setLoadingPercentage] = useState(0);
 
   useEffect(() => {
-    if (isLedger) return;
+    if (isLedger || isKeystone) return;
     executeTransfer();
-  }, [executeTransfer, isLedger]);
+  }, [executeTransfer, isLedger, isKeystone]);
 
   useEffect(() => {
     if (!progress) {
@@ -126,6 +136,38 @@ function ExecuteBrc20Transaction() {
       setIsConnecting(false);
     }
   };
+
+  const handleKeystoneConnect = useCallback(async () => {
+    try {
+      setIsConnecting(true);
+      const keystoneTransport = await createKeystoneTransport();
+
+      if (!keystoneTransport) {
+        setIsConnectSuccess(false);
+        setIsConnectFailed(true);
+        return;
+      }
+
+      setIsConnectSuccess(true);
+
+      executeTransfer({ keystoneTransport });
+    } catch (error) {
+      setIsConnectSuccess(false);
+      setIsConnectFailed(true);
+    } finally {
+      setIsConnecting(false);
+    }
+  }, [executeTransfer]);
+
+  useEffect(() => {
+    if (isConnecting || isConnectSuccess) {
+      return;
+    }
+    // auto connect keystone
+    if (isKeystoneModalVisible) {
+      handleKeystoneConnect();
+    }
+  }, [isKeystoneModalVisible, handleKeystoneConnect, isConnecting, isConnectSuccess]);
 
   const resultTexts = {
     SUCCESS: {
@@ -182,6 +224,29 @@ function ExecuteBrc20Transaction() {
             />
           )}
           <Button onClick={handleClickClose} title={t('LEDGER.CANCEL_BUTTON')} variant="tertiary" />
+        </SuccessActionsContainer>
+      </Sheet>
+      <Sheet title="" visible={isKeystoneModalVisible} onClose={handleClickClose}>
+        <KeystoneStepView
+          currentStep={progress}
+          isConnectSuccess={isConnectSuccess}
+          isConnectFailed={isConnectFailed || !!errorCode}
+          isDeviceLocked={errorCode === BRC20ErrorCode.DEVICE_LOCKED}
+        />
+        <SuccessActionsContainer>
+          {(!isConnectSuccess || errorCode === BRC20ErrorCode.DEVICE_LOCKED) && (
+            <Button
+              onClick={handleKeystoneConnect}
+              title={t(isConnectFailed ? 'KEYSTONE.RETRY_BUTTON' : 'KEYSTONE.CONNECT_BUTTON')}
+              disabled={isConnecting}
+              loading={isConnecting}
+            />
+          )}
+          <Button
+            onClick={handleClickClose}
+            title={t('KEYSTONE.CANCEL_BUTTON')}
+            variant="tertiary"
+          />
         </SuccessActionsContainer>
       </Sheet>
     </>

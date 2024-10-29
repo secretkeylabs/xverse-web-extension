@@ -1469,6 +1469,19 @@
         "TITLE": "Confirm the signature (2 of 2)",
         "SUBTITLE": "Sign the transfer of your BRC-20 token on your Ledger device to continue."
       }
+    },
+    "KEYSTONE": {
+      "CONNECT_BUTTON": "Connect",
+      "RETRY_BUTTON": "Retry",
+      "CANCEL_BUTTON": "Cancel",
+      "INSCRIPTION": {
+        "TITLE": "Confirm the signature (1 of 2)",
+        "SUBTITLE": "Sign the inscription of your BRC-20 token transfer on your Keystone device to continue."
+      },
+      "TRANSFER": {
+        "TITLE": "Confirm the signature (2 of 2)",
+        "SUBTITLE": "Sign the transfer of your BRC-20 token on your Keystone device to continue."
+      }
     }
   },
   "CACHE_MIGRATION_SCREEN": {

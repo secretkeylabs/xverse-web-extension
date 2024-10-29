@@ -5,13 +5,15 @@ import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { TransportWebUSB } from '@keystoneHQ/hw-transport-webusb';
 import {
   AnalyticsEvents,
   FeatureId,
   btcTransaction,
+  type AccountType,
   type Transport,
 } from '@secretkeylabs/xverse-core';
-import { isInOptions, isLedgerAccount } from '@utils/helper';
+import { isInOptions, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { getFtBalance } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
@@ -35,7 +37,7 @@ function SendRuneScreen() {
   const { data: runesCoinsList } = useRuneFungibleTokensQuery();
   // TODO: can we remove location.state here?
   const [recipientAddress, setRecipientAddress] = useState<string>(
-    location.state?.recipientAddress || '',
+    location.state?.recipientAddress,
   );
   const [amountError, setAmountError] = useState('');
   const [amountToSend, setAmountToSend] = useState<string>(location.state?.amount || '');
@@ -140,7 +142,7 @@ function SendRuneScreen() {
   }
 
   const handleCancel = () => {
-    if (isLedgerAccount(selectedAccount) && isInOption) {
+    if ((isLedgerAccount(selectedAccount) || isKeystoneAccount(selectedAccount)) && isInOption) {
       window.close();
       return;
     }
@@ -165,10 +167,18 @@ function SendRuneScreen() {
     return undefined;
   };
 
-  const handleSubmit = async (ledgerTransport?: Transport) => {
+  const handleSubmit = async (type?: AccountType, transport?: Transport | TransportWebUSB) => {
     try {
       setIsSubmitting(true);
-      const txnId = await transaction?.broadcast({ ledgerTransport, rbfEnabled: true });
+      const txnId = await transaction?.broadcast({
+        ...(type === 'ledger' && {
+          ledgerTransport: transport as Transport,
+        }),
+        ...(type === 'keystone' && {
+          keystoneTransport: transport as TransportWebUSB,
+        }),
+        rbfEnabled: true,
+      });
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
         protocol: 'runes',
         action: 'transfer',
