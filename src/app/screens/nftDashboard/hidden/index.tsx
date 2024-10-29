@@ -94,9 +94,9 @@ const tabs: TabButton[] = [
   },
 ];
 
-const tabKeyToIndex = (key?: string | null) => {
+const tabKeyToIndex = (visibleTabButtons: TabButton[], key?: string | null) => {
   if (!key) return 0;
-  return tabs.findIndex((tab) => tab.key === key);
+  return visibleTabButtons.findIndex((tab) => tab.key === key);
 };
 
 function NftDashboardHidden() {
@@ -122,14 +122,13 @@ function NftDashboardHidden() {
   const dispatch = useDispatch();
   const { hiddenCollectibleIds } = useWalletSelector();
   const [isOptionsModalVisible, setIsOptionsModalVisible] = useState(false);
-  const [tabIndex, setTabIndex] = useState(tabKeyToIndex(tab));
-
   const visibleTabButtons = tabs.filter((tabItem: TabButton) => {
     if (tabItem.key === 'inscriptions' && !hasActivatedOrdinalsKey) {
       return false;
     }
     return true;
   });
+  const [tabIndex, setTabIndex] = useState(tabKeyToIndex(visibleTabButtons, tab));
 
   const handleBackButtonClick = () => {
     navigate(`/nft-dashboard?tab=${tab}`);
@@ -242,8 +241,8 @@ function NftDashboardHidden() {
                 {visibleTabButtons.map(({ key, label }) => (
                   <TabItem
                     key={key}
-                    $active={tabIndex === tabKeyToIndex(key)}
-                    onClick={() => handleSelectTab(tabKeyToIndex(key))}
+                    $active={tabIndex === tabKeyToIndex(visibleTabButtons, key)}
+                    onClick={() => handleSelectTab(tabKeyToIndex(visibleTabButtons, key))}
                   >
                     {t(label)}
                   </TabItem>
