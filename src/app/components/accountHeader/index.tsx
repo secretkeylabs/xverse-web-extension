@@ -2,7 +2,7 @@ import AccountRow from '@components/accountRow';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import OptionsDialog from '@components/optionsDialog/optionsDialog';
@@ -10,14 +10,13 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import { DotsThreeVertical } from '@phosphor-icons/react';
 import { OPTIONS_DIALOG_WIDTH } from '@utils/constants';
 
-const SelectedAccountContainer = styled.div<{ $showBorderBottom?: boolean }>((props) => ({
+const SelectedAccountContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   position: 'relative',
   alignItems: 'center',
   justifyContent: 'space-between',
   padding: `${props.theme.space.l} ${props.theme.space.m}`,
-  borderBottom: props.$showBorderBottom ? `0.5px solid ${props.theme.colors.elevation3}` : 'none',
 }));
 
 const OptionsButton = styled.button(() => ({
@@ -58,15 +57,14 @@ const ButtonRow = styled.button`
 type Props = {
   disableMenuOption?: boolean;
   disableAccountSwitch?: boolean;
-  showBorderBottom?: boolean;
 };
 
 function AccountHeaderComponent({
   disableMenuOption = false,
   disableAccountSwitch = false,
-  showBorderBottom = true,
 }: Props) {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const selectedAccount = useSelectedAccount();
 
   const { t: optionsDialogTranslation } = useTranslation('translation', {
@@ -80,7 +78,7 @@ function AccountHeaderComponent({
 
   const handleAccountSelect = () => {
     if (!disableAccountSwitch) {
-      navigate('/account-list');
+      navigate('/account-list', { state: { from: pathname } });
     }
   };
 
@@ -102,7 +100,7 @@ function AccountHeaderComponent({
   };
 
   return (
-    <SelectedAccountContainer $showBorderBottom={showBorderBottom}>
+    <SelectedAccountContainer>
       <AccountRow
         account={selectedAccount!}
         isSelected

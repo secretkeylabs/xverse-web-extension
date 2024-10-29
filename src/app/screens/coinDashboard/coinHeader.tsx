@@ -6,7 +6,7 @@ import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import Lock from '@assets/img/transactions/Lock.svg';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
-import SmallActionButton from '@components/smallActionButton';
+import SquareButton from '@components/squareButton';
 import TokenImage from '@components/tokenImage';
 import useSelectedAccountBtcBalance from '@hooks/queries/useSelectedAccountBtcBalance';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
@@ -283,24 +283,18 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
       </BalanceInfoContainer>
       {renderStackingBalances()}
       <RowButtonContainer>
-        <SmallActionButton src={ArrowUp} text={t('SEND')} onPress={goToSendScreen} />
-        <SmallActionButton src={ArrowDown} text={t('RECEIVE')} onPress={navigateToReceive} />
-        {showSwaps && (
-          <SmallActionButton src={ArrowSwap} text={t('SWAP')} onPress={navigateToSwaps} />
-        )}
+        <SquareButton src={ArrowUp} text={t('SEND')} onPress={goToSendScreen} />
+        <SquareButton src={ArrowDown} text={t('RECEIVE')} onPress={navigateToReceive} />
+        {showSwaps && <SquareButton src={ArrowSwap} text={t('SWAP')} onPress={navigateToSwaps} />}
         {showRunesListing && (
-          <SmallActionButton
+          <SquareButton
             src={List}
             text={t('LIST')}
             onPress={() => navigate(`/list-rune/${fungibleToken.principal}`)}
           />
         )}
         {!fungibleToken && (
-          <SmallActionButton
-            src={Buy}
-            text={t('BUY')}
-            onPress={() => navigate(`/buy/${currency}`)}
-          />
+          <SquareButton src={Buy} text={t('BUY')} onPress={() => navigate(`/buy/${currency}`)} />
         )}
       </RowButtonContainer>
       <BottomModal

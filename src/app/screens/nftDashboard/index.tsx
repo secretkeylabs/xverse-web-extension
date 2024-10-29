@@ -89,7 +89,7 @@ function NftDashboard() {
       {isOrdinalReceiveAlertVisible && (
         <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose} />
       )}
-      <AccountHeaderComponent disableMenuOption={isGalleryOpen} showBorderBottom={false} />
+      <AccountHeaderComponent disableMenuOption={isGalleryOpen} />
       <Container>
         <PageHeader>
           <CollectibleContainer>

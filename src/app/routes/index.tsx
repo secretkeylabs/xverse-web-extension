@@ -1,4 +1,5 @@
 import RequestsRoutes from '@common/utils/route-urls';
+import AnimatedScreenContainer from '@components/animatedScreenContainer';
 import ExtendedScreenContainer from '@components/extendedScreenContainer';
 import AuthGuard from '@components/guards/auth';
 import OnboardingGuard from '@components/guards/onboarding';
@@ -94,6 +95,21 @@ import RoutePaths from './paths';
 const router = createHashRouter([
   {
     path: '/',
+    element: <AnimatedScreenContainer />,
+    errorElement: <ErrorBoundary />,
+    children: [
+      {
+        index: true,
+        element: (
+          <AuthGuard>
+            <Home />
+          </AuthGuard>
+        ),
+      },
+    ],
+  },
+  {
+    path: '/',
     element: <ScreenContainer />,
     errorElement: <ErrorBoundary />,
     children: [
@@ -118,14 +134,6 @@ const router = createHashRouter([
             <SingleTabGuard guardName="verifyLedger">
               <VerifyLedger />
             </SingleTabGuard>
-          </AuthGuard>
-        ),
-      },
-      {
-        index: true,
-        element: (
-          <AuthGuard>
-            <Home />
           </AuthGuard>
         ),
       },
@@ -286,7 +294,7 @@ const router = createHashRouter([
         element: <SpeedUpTransactionScreen />,
       },
       {
-        path: 'create-inscription',
+        path: 'create-inscription', // used by our legacy style inscriptions methods for the inscription service
         element: (
           <AuthGuard>
             <CreateInscription />
@@ -294,7 +302,7 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'create-repeat-inscriptions',
+        path: 'create-repeat-inscriptions', // used by our legacy style inscriptions methods for the inscription service
         element: (
           <AuthGuard>
             <CreateInscription />

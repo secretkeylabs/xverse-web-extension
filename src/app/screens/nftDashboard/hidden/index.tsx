@@ -200,7 +200,7 @@ function NftDashboardHidden() {
   return (
     <>
       {isGalleryOpen ? (
-        <AccountHeaderComponent disableMenuOption={isGalleryOpen} showBorderBottom={false} />
+        <AccountHeaderComponent disableMenuOption={isGalleryOpen} />
       ) : (
         <TopRow
           onClick={handleBackButtonClick}

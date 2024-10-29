@@ -16,7 +16,6 @@ const RowContainer = styled.div((props) => ({
   justifyContent: 'space-between',
   paddingLeft: props.theme.space.xl,
   paddingRight: props.theme.space.xl,
-  borderTop: `1px solid ${props.theme.colors.elevation3}`,
 }));
 
 const MovingDiv = styled(animated.div)((props) => ({

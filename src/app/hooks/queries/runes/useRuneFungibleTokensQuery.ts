@@ -15,7 +15,10 @@ export const fetchRuneBalances =
     fiatCurrency: string,
   ): (() => Promise<FungibleToken[]>) =>
   async () => {
-    const runeBalances = await runesApi.getRuneFungibleTokens(ordinalsAddress, true);
+    const runeBalances: FungibleToken[] = await runesApi.getRuneFungibleTokens(
+      ordinalsAddress,
+      true,
+    );
 
     if (!Array.isArray(runeBalances) || runeBalances.length === 0) {
       return [];
@@ -66,6 +69,7 @@ export const useRuneFungibleTokensQuery = (
     select: selectWithDerivedState,
     refetchOnWindowFocus: !!backgroundRefetch,
     refetchOnReconnect: !!backgroundRefetch,
+    keepPreviousData: true,
   });
 };
 

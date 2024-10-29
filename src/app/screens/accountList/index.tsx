@@ -57,7 +57,7 @@ const Title = styled.div((props) => ({
 function AccountList(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'ACCOUNT_SCREEN' });
   const navigate = useNavigate();
-  const { search } = useLocation();
+  const { search, state } = useLocation();
   const params = new URLSearchParams(search);
   const selectedAccount = useSelectedAccount();
   const { network, accountsList, ledgerAccountsList } = useWalletSelector();
@@ -72,7 +72,7 @@ function AccountList(): JSX.Element {
   }, [accountsList, ledgerAccountsList, network]);
 
   const handleBackButtonClick = () => {
-    navigate(-1);
+    navigate(state?.from || -1);
   };
 
   const handleAccountSelect = async (account: Account, goBack = true) => {

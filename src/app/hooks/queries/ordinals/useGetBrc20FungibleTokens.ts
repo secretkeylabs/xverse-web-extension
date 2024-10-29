@@ -80,6 +80,7 @@ export const useGetBrc20FungibleTokens = (select?: (data: FungibleTokenWithState
     queryKey: ['brc20-fungible-tokens', ordinalsAddress, network.type, fiatCurrency],
     queryFn,
     enabled: Boolean(network && ordinalsAddress),
+    keepPreviousData: true,
     select: selectWithDerivedState,
   });
 };

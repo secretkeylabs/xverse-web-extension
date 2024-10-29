@@ -207,7 +207,7 @@
     "AMOUNT": "Amount"
   },
   "DASHBOARD_SCREEN": {
-    "TOTAL_BALANCE": "total balance",
+    "TOTAL_BALANCE": "Total Balance",
     "BITCOIN": "Bitcoin",
     "STACKS": "Stacks",
     "ACCOUNT_NAME": "Account",
@@ -235,6 +235,13 @@
     },
     "TOKEN_HIDDEN": "Token hidden and reported",
     "UNDO": "Undo",
+    "ERRORS": {
+      "BTC_BALANCE": "Failed to load Bitcoin balance",
+      "STX_BALANCE": "Failed to load Stacks balance",
+      "SIP10_BALANCE": "Failed to load SIP10 token balances",
+      "BRC20_BALANCE": "Failed to load BRC20 token balances",
+      "RUNES_BALANCE": "Failed to load Rune balances"
+    },
     "ANNOUNCEMENTS": {
       "NATIVE_SEGWIT": {
         "TITLE": "Native SegWit is here!",

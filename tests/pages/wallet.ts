@@ -483,9 +483,9 @@ export default class Wallet {
 
     this.backToGallery = page.getByTestId('back-to-gallery');
     this.itemCollection = page.getByTestId('collection-item');
-    this.buttonSend = page.getByRole('button', { name: 'Send' });
-    this.buttonShare = page.getByRole('button', { name: 'Share' });
-    this.buttonReceive = page.getByRole('button', { name: 'Receive', exact: true });
+    this.buttonSend = page.locator('button').filter({ hasText: 'Send' });
+    this.buttonShare = page.locator('button').filter({ hasText: 'Share' });
+    this.buttonReceive = page.locator('button').filter({ hasText: 'Receive' });
     this.buttonOpenOrdinalViewer = page.getByRole('button', { name: 'Open in Ordinal Viewer' });
     this.labelBundle = page.locator('h1').filter({ hasText: 'Bundle' });
     this.labelSatsValue = page.locator('h1').filter({ hasText: 'Sats value' });
@@ -620,6 +620,12 @@ export default class Wallet {
   }
 
   async checkVisualsStartpage() {
+    // Wait for the balance element to be present in the DOM
+    await this.page.waitForSelector('[data-testid="total-balance-value"]', { state: 'attached' });
+
+    // Wait for a short duration to allow the animation to complete
+    await this.page.waitForTimeout(400);
+
     await expect(this.balance).toBeVisible();
     await expect(this.manageTokenButton).toBeVisible();
 
