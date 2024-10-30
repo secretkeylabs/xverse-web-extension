@@ -3,7 +3,7 @@ import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Spinner from '@ui-library/spinner';
 import { useEffect, type PropsWithChildren } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 const CenterChildContainer = styled.div`
@@ -24,6 +24,7 @@ const isInitialised = {
 
 function AuthGuard({ children }: PropsWithChildren) {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { encryptedSeed, isUnlocked, accountsList } = useWalletSelector();
   const { loadWallet, lockWallet } = useWalletReducer();
   const seedVault = useSeedVault();
@@ -40,7 +41,7 @@ function AuthGuard({ children }: PropsWithChildren) {
     if (encryptedSeed) {
       // this is a legacy seed store. If it exists, we need to migrate
       // it to the new seed vault which happens on login
-      navigate('/login');
+      navigate('/login', { state: { from: pathname } });
       return;
     }
 
@@ -63,7 +64,7 @@ function AuthGuard({ children }: PropsWithChildren) {
     try {
       await seedVault.getSeed();
     } catch (error) {
-      navigate('/login');
+      navigate('/login', { state: { from: pathname } });
     }
 
     await loadWallet(() => {

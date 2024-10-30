@@ -23,17 +23,6 @@ const getTextColor = (type: ToastType, theme: any): string => {
 
 const ToastContainer = styled.div<{ type: ToastType }>`
   display: flex;
-  flex-direction: row;
-  background: ${(props) => getBackgroundColor(props.type, props.theme)};
-  border-radius: 12px;
-  box-shadow: 0px 7px 16px -4px rgba(25, 25, 48, 0.25);
-  min-height: 44px;
-  padding: ${(props) => props.theme.space.s} ${(props) => props.theme.space.m};
-  width: auto;
-  max-width: 328px;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 80px;
 `;
 
 const ToastMessage = styled.p<{ type: ToastType; addMarginRight: boolean }>`

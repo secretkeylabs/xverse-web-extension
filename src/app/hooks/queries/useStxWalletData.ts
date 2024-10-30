@@ -21,6 +21,7 @@ const useStxWalletData = () => {
     queryFn: fetchStxWalletData,
     enabled: !!stxAddress,
     staleTime: 10 * 1000, // 10 secs
+    keepPreviousData: true,
   });
 };
 

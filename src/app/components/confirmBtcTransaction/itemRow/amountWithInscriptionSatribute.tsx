@@ -137,7 +137,7 @@ export default function AmountWithInscriptionSatribute({
                 />
               </Range>
               {(inscriptionSatributes.length > 0 || inscriptions.length > index + 1) && (
-                <Divider verticalMargin="s" />
+                <Divider $verticalMargin="s" />
               )}
             </>
           ))}
@@ -150,7 +150,7 @@ export default function AmountWithInscriptionSatribute({
                   inscriptionSatributes={inscriptionSatributes}
                 />
               </Range>
-              {satributesArray.length > 0 && <Divider verticalMargin="s" />}
+              {satributesArray.length > 0 && <Divider $verticalMargin="s" />}
             </>
           )}
           {satributesArray.map(
@@ -162,7 +162,7 @@ export default function AmountWithInscriptionSatribute({
                 <Range>
                   <RareSatRow item={item} />
                 </Range>
-                {satributesArray.length > index + 1 && <Divider verticalMargin="s" />}
+                {satributesArray.length > index + 1 && <Divider $verticalMargin="s" />}
               </>
             ),
           )}

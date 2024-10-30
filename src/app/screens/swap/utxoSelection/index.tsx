@@ -16,7 +16,6 @@ import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Button from '@ui-library/button';
-import SnackBar from '@ui-library/snackBar';
 import Spinner from '@ui-library/spinner';
 import BigNumber from 'bignumber.js';
 import { useEffect, useMemo, useState } from 'react';
@@ -157,14 +156,7 @@ export default function UtxoSelection({
 
   useEffect(() => {
     if (errorMessage || utxosError) {
-      const toastId = toast.custom(
-        <SnackBar
-          text={errorMessage ?? utxosError?.message}
-          type="error"
-          dismissToast={() => toast.remove(toastId)}
-        />,
-        { duration: 3000 },
-      );
+      toast.error(errorMessage ?? utxosError?.message, { duration: 3000 });
     }
   }, [errorMessage, utxosError]);
 

@@ -5,6 +5,7 @@
     "COMBO": "Combo",
     "SATS": "Sats",
     "BTC": "BTC",
+    "BALANCE": "Balance",
     "BITCOIN": "Bitcoin",
     "STACKS": "Stacks",
     "SATRIBUTES": "Satributes",
@@ -207,7 +208,7 @@
     "AMOUNT": "Amount"
   },
   "DASHBOARD_SCREEN": {
-    "TOTAL_BALANCE": "total balance",
+    "TOTAL_BALANCE": "Total Balance",
     "BITCOIN": "Bitcoin",
     "STACKS": "Stacks",
     "ACCOUNT_NAME": "Account",
@@ -235,6 +236,13 @@
     },
     "TOKEN_HIDDEN": "Token hidden and reported",
     "UNDO": "Undo",
+    "ERRORS": {
+      "BTC_BALANCE": "Failed to load Bitcoin balance",
+      "STX_BALANCE": "Failed to load Stacks balance",
+      "SIP10_BALANCE": "Failed to load SIP10 token balances",
+      "BRC20_BALANCE": "Failed to load BRC20 token balances",
+      "RUNES_BALANCE": "Failed to load Rune balances"
+    },
     "ANNOUNCEMENTS": {
       "NATIVE_SEGWIT": {
         "TITLE": "Native SegWit is here!",
@@ -737,9 +745,6 @@
     "ORDINALS": "Ordinals",
     "ORDINAL": "Ordinal",
     "INSCRIPTION": "Inscription",
-    "ACTIVATE_ORDINALS": "Activate Ordinals",
-    "ACTIVATE_ORDINALS_INFO": "You have Bitcoin Ordinals in your wallet. Would you like to display them? This is an experimental feature. You can change this setting at anytime.",
-    "ACTIVATE": "Activate",
     "DENY": "No",
     "COPIED": "Copied",
     "MINT": "Mint",
@@ -752,11 +757,6 @@
     "NFTS": "NFTs",
     "RARE_SAT": "Rare sat",
     "RARE_SATS": "Rare sats",
-    "NEW_FEATURE": "New Feature, Rare Sats",
-    "NEW_FEAT_RARE_SATS_DESCRIPTION": "Enable rare sats to display rare, interesting and unique sats in your wallet. You can change this setting at any time.",
-    "NEW_FEAT_RARE_SATS_ORDINALS_ENABLE": "Enable rare sats to display rare, interesting and unique sats in your wallet. Note than enabling rare sats will also enable Ordinals. You can change this setting at any time.",
-    "MAYBE_LATER": "Maybe Later",
-    "ENABLE": "Enable",
     "RARE_SATS_NOTICE_TITLE": "Don't see your rare sat?",
     "RARE_SATS_NOTICE_DETAIL": "Xverse supports most rare sats, but your sats may have other attributes.",
     "SEE_SUPPORTED": "See supported rarities",
@@ -935,7 +935,7 @@
     "ENTER_YOUR_NEW_PASSWORD": "Enter your new password",
     "CONFIRM_YOUR_NEW_PASSWORD": "Confirm your new password",
     "TEXT_INPUT_NEW_PASSWORD_LABEL": "New Password",
-    "ENABLE_RARE_SATS": "Enable Rare Sats (experimental)",
+    "ENABLE_RARE_SATS": "Enable Rare Sats",
     "ENABLE_ORDINALS_DETAIL": "Automatically scan your ordinal address for ordinals and display them in your collectibles and transaction review screens",
     "ENABLE_RARE_SATS_DETAIL": "Automatically scan your ordinal address for rare sats and display them in your collectibles and transaction review screens",
     "ENABLE_SPEED_UP_TRANSACTIONS": "Enable speed up transactions",

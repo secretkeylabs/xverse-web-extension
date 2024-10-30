@@ -1,5 +1,5 @@
-import { BetterBarLoader } from '@components/barLoader';
-import { StyledFiatAmountText } from '@components/fiatAmountText';
+import { BestBarLoader } from '@components/barLoader';
+import FiatAmountText from '@components/fiatAmountText';
 import TokenImage from '@components/tokenImage';
 import useSelectedAccountBtcBalance from '@hooks/queries/useSelectedAccountBtcBalance';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
@@ -22,16 +22,17 @@ const TileContainer = styled.button((props) => ({
   borderRadius: props.theme.radius(2),
 }));
 
-const RowContainer = styled.div({
+const RowContainer = styled.div((props) => ({
   flex: '1 0 auto',
   display: 'flex',
-});
+  columnGap: props.theme.space.m,
+}));
 
 const TextContainer = styled.div((props) => ({
-  marginLeft: props.theme.space.m,
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'flex-start',
+  rowGap: props.theme.space.xxxs,
 }));
 
 const AmountContainer = styled.div((props) => ({
@@ -40,6 +41,7 @@ const AmountContainer = styled.div((props) => ({
   marginLeft: props.theme.space.xxs,
   overflow: 'hidden',
   alignItems: 'flex-end',
+  rowGap: props.theme.space.xxxs,
 }));
 
 const LoaderMainContainer = styled.div({
@@ -52,23 +54,29 @@ const LoaderMainContainer = styled.div({
 const CoinTickerText = styled.p((props) => ({
   ...props.theme.typography.body_bold_m,
   color: props.theme.colors.white_0,
+  lineHeight: '140%',
+  minHeight: 20,
 }));
 
-const SubText = styled.p<{ fullWidth: boolean }>((props) => ({
-  ...props.theme.typography.body_medium_s,
+const SubText = styled.p<{ $fullWidth: boolean }>((props) => ({
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_200,
+  minHeight: 20,
+  lineHeight: '140%',
   textAlign: 'left',
-  maxWidth: props.fullWidth ? 'unset' : 120,
-  whiteSpace: props.fullWidth ? 'normal' : 'nowrap',
+  maxWidth: props.$fullWidth ? 'unset' : 120,
+  whiteSpace: props.$fullWidth ? 'normal' : 'nowrap',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
 }));
 
 const CoinBalanceText = styled.p((props) => ({
-  ...props.theme.typography.body_medium_m,
+  ...props.theme.typography.body_bold_m,
   color: props.theme.colors.white_0,
   overflow: 'hidden',
   textOverflow: 'ellipsis',
+  minHeight: 20,
+  lineHeight: '140%',
   maxWidth: '100%',
 }));
 
@@ -79,13 +87,18 @@ const TokenTitleContainer = styled.div({
   justifyContent: 'flex-start',
 });
 
-const StyledBarLoader = styled(BetterBarLoader)<{
-  withMarginBottom?: boolean;
+const StyledBarLoader = styled(BestBarLoader)<{
+  $withMarginBottom?: boolean;
 }>((props) => ({
-  padding: 0,
-  borderRadius: props.theme.radius(1),
-  marginBottom: props.withMarginBottom ? props.theme.space.xxs : 0,
+  marginBottom: props.$withMarginBottom ? props.theme.space.xxxs : 0,
 }));
+
+const StyledFiatAmountText = styled(FiatAmountText)`
+  ${(props) => props.theme.typography.body_medium_m}
+  color: ${(props) => props.theme.colors.white_200};
+  line-height: 140%;
+  min-height: 20px;
+`;
 
 const CoinBalanceContainer = styled.div`
   ${(props) => props.theme.typography.body_medium_m}
@@ -100,8 +113,8 @@ const FiatAmountContainer = styled.div`
 function TokenLoader() {
   return (
     <LoaderMainContainer>
-      <StyledBarLoader width={80} height={16} withMarginBottom />
-      <StyledBarLoader width={70} height={14} />
+      <StyledBarLoader width={53} height={20} $withMarginBottom />
+      <StyledBarLoader width={151} height={20} />
     </LoaderMainContainer>
   );
 }
@@ -132,7 +145,7 @@ function TokenTile({
   const { fiatCurrency, balanceHidden } = useWalletSelector();
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const { data: stxData } = useStxWalletData();
-  const { confirmedBalance: btcBalance } = useSelectedAccountBtcBalance();
+  const { confirmedPaymentBalance: btcBalance } = useSelectedAccountBtcBalance();
 
   const getTickerTitle = () => {
     if (currency === 'STX' || currency === 'BTC') return `${currency}`;
@@ -168,7 +181,7 @@ function TokenTile({
         <TextContainer>
           <CoinTickerText>{getTickerTitle()}</CoinTickerText>
           <TokenTitleContainer>
-            <SubText aria-label="Token SubTitle" fullWidth={hideSwapBalance}>
+            <SubText aria-label="Token SubTitle" $fullWidth={hideSwapBalance}>
               {title}
             </SubText>
           </TokenTitleContainer>

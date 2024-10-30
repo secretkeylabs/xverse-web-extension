@@ -135,7 +135,7 @@ function OrdinalDetailScreen() {
   const handleUnstarClick = (toastId: string) => {
     dispatch(removeFromStarCollectiblesAction({ address: ordinalsAddress, id: ordinal?.id ?? '' }));
     toast.remove(toastId);
-    toast.custom(<SnackBar text={t('UNSTAR_INSCRIPTION')} type="neutral" />);
+    toast(t('UNSTAR_INSCRIPTION'));
   };
 
   const handleStarClick = () => {
@@ -143,9 +143,9 @@ function OrdinalDetailScreen() {
       dispatch(
         removeFromStarCollectiblesAction({ address: ordinalsAddress, id: ordinal?.id ?? '' }),
       );
-      toast.custom(<SnackBar text={t('UNSTAR_INSCRIPTION')} type="neutral" />);
+      toast(t('UNSTAR_INSCRIPTION'));
     } else {
-      const toastId = toast.custom(
+      const toastId = toast(
         <SnackBar
           text={t('STAR_INSCRIPTION')}
           type="neutral"
@@ -169,7 +169,7 @@ function OrdinalDetailScreen() {
   const handleClickUndoHiding = (toastId: string) => {
     dispatch(removeFromHideCollectiblesAction({ address: ordinalsAddress, id: ordinal?.id ?? '' }));
     toast.remove(toastId);
-    toast.custom(<SnackBar text={t('INSCRIPTION_UNHIDDEN')} type="neutral" />, { duration: 2000 });
+    toast(t('INSCRIPTION_UNHIDDEN'));
   };
 
   const handleHideStandaloneInscription = () => {
@@ -181,7 +181,7 @@ function OrdinalDetailScreen() {
 
     optionsSheet.close();
     navigate('/nft-dashboard?tab=inscriptions');
-    const toastId = toast.custom(
+    const toastId = toast(
       <SnackBar
         text={t('INSCRIPTION_HIDDEN')}
         type="neutral"
@@ -198,7 +198,7 @@ function OrdinalDetailScreen() {
     const isLastHiddenItem = Object.keys(hiddenCollectibleIds[ordinalsAddress] ?? {}).length === 1;
     dispatch(removeFromHideCollectiblesAction({ address: ordinalsAddress, id: ordinal?.id ?? '' }));
     optionsSheet.close();
-    toast.custom(<SnackBar text={t('INSCRIPTION_UNHIDDEN')} type="neutral" />);
+    toast(t('INSCRIPTION_UNHIDDEN'));
     navigate(`/nft-dashboard/${isLastHiddenItem ? '' : 'hidden'}?tab=inscriptions`);
   };
 
@@ -211,7 +211,7 @@ function OrdinalDetailScreen() {
         }),
       );
 
-      const toastId = toast.custom(
+      const toastId = toast(
         <SnackBar
           text={optionsDialogT('NFT_AVATAR.SET_TOAST')}
           type="neutral"
@@ -227,7 +227,7 @@ function OrdinalDetailScreen() {
               }
 
               toast.remove(toastId);
-              toast.custom(<SnackBar text={optionsDialogT('NFT_AVATAR.UNDO')} type="neutral" />);
+              toast(optionsDialogT('NFT_AVATAR.UNDO'));
             },
           }}
         />,
@@ -239,7 +239,7 @@ function OrdinalDetailScreen() {
 
   const handleRemoveAvatar = useCallback(() => {
     dispatch(removeAccountAvatarAction({ address: ordinalsAddress }));
-    toast.custom(<SnackBar text={optionsDialogT('NFT_AVATAR.REMOVE_TOAST')} type="neutral" />);
+    toast(optionsDialogT('NFT_AVATAR.REMOVE_TOAST'));
     optionsSheet.close();
   }, [dispatch, ordinalsAddress, optionsDialogT, optionsSheet]);
 

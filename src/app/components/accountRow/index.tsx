@@ -10,7 +10,6 @@ import { removeAccountAvatarAction } from '@stores/wallet/actions/actionCreators
 import Button from '@ui-library/button';
 import Input from '@ui-library/input';
 import Sheet from '@ui-library/sheet';
-import SnackBar from '@ui-library/snackBar';
 import Spinner from '@ui-library/spinner';
 import { EMPTY_LABEL, HIDDEN_BALANCE_LABEL, LoaderSize } from '@utils/constants';
 import { getAccountBalanceKey, isLedgerAccount, validateAccountName } from '@utils/helper';
@@ -125,9 +124,7 @@ function AccountRow({
   const handleRemoveAvatar = () => {
     if (!account) return;
     dispatch(removeAccountAvatarAction({ address: account?.btcAddresses.taproot.address }));
-    toast.custom(
-      <SnackBar text={optionsDialogTranslation('NFT_AVATAR.REMOVE_TOAST')} type="neutral" />,
-    );
+    toast(optionsDialogTranslation('NFT_AVATAR.REMOVE_TOAST'));
   };
 
   const handleRemoveLedgerAccount = async () => {
