@@ -178,6 +178,16 @@ export default function TokenImage({
         );
       }
     }
+    if (fungibleToken.image) {
+      return (
+        <TickerImage
+          data-testid="token-image"
+          size={size}
+          src={fungibleToken.image}
+          onError={() => setImageError(true)}
+        />
+      );
+    }
     return tickerComponent();
   };
 
