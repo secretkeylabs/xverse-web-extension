@@ -32,6 +32,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import Theme from 'theme';
 import CoinHeader from './coinHeader';
+import TokenPrice from './tokenPrice';
 import TransactionsHistoryList from './transactionsHistoryList';
 
 const Container = styled.div((props) => ({
@@ -264,6 +265,7 @@ export default function CoinDashboard() {
       )}
       <Container>
         <CoinHeader currency={currency as CurrencyTypes} fungibleToken={selectedFt} />
+
         {displayTabs && (
           <FtInfoContainer>
             <Button
@@ -284,6 +286,12 @@ export default function CoinDashboard() {
             </Button>
           </FtInfoContainer>
         )}
+
+        <TokenPrice
+          currency={currency as CurrencyTypes}
+          fungibleToken={selectedFt as FungibleToken}
+        />
+
         {showTxHistory && (
           <TransactionsHistoryList
             coin={currency as CurrencyTypes}

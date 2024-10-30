@@ -6,6 +6,7 @@ import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import Lock from '@assets/img/transactions/Lock.svg';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
+import PercentageChange from '@components/percentageChange';
 import SmallActionButton from '@components/smallActionButton';
 import TokenImage from '@components/tokenImage';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
@@ -40,7 +41,9 @@ import {
   CoinBalanceText,
   Container,
   FiatAmountText,
+  FiatContainer,
   HeaderSeparator,
+  HourText,
   LockedStxContainer,
   ProtocolText,
   RowButtonContainer,
@@ -232,20 +235,24 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
               <CoinBalanceText data-testid="coin-balance">{`${value} ${getTokenTicker()}`}</CoinBalanceText>
             )}
           />
-          <NumericFormat
-            value={getFiatEquivalent(
-              Number(getBalanceAmount(currency, fungibleToken, stxData, btcBalance)),
-              currency,
-              BigNumber(stxBtcRate),
-              BigNumber(btcFiatRate),
-              fungibleToken,
-            )}
-            displayType="text"
-            thousandSeparator
-            prefix={`${currencySymbolMap[fiatCurrency]}`}
-            suffix={` ${fiatCurrency}`}
-            renderText={(value) => <FiatAmountText>{value}</FiatAmountText>}
-          />
+          <FiatContainer>
+            <NumericFormat
+              value={getFiatEquivalent(
+                Number(getBalanceAmount(currency, fungibleToken, stxData, btcBalance)),
+                currency,
+                BigNumber(stxBtcRate),
+                BigNumber(btcFiatRate),
+                fungibleToken,
+              )}
+              displayType="text"
+              thousandSeparator
+              prefix={`${currencySymbolMap[fiatCurrency]}`}
+              suffix={` ${fiatCurrency}`}
+              renderText={(value) => <FiatAmountText>{value}</FiatAmountText>}
+            />
+            <PercentageChange ftCurrencyPairs={[[fungibleToken, currency]]} />
+            <HourText>24h</HourText>
+          </FiatContainer>
         </BalanceValuesContainer>
       </BalanceInfoContainer>
       {renderStackingBalances()}
