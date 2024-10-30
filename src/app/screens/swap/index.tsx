@@ -51,8 +51,6 @@ import {
   isStxTx,
   mapFTNativeSwapTokenToTokenBasic,
   mapFTProtocolToSwapProtocol,
-  mapFtToSwapToken,
-  mapSwapProtocolToFTProtocol,
   mapSwapTokenToFT,
 } from './utils';
 import UtxoSelection from './utxoSelection';
@@ -195,23 +193,6 @@ export default function SwapScreen() {
 
   const onClickFrom = () => setTokenSelectionBottomSheet('from');
   const onClickTo = () => setTokenSelectionBottomSheet('to');
-
-  const getUserFTFromTokenTicker = (
-    protocol: Token['protocol'],
-    ticker: Token['ticker'],
-  ): FungibleToken | undefined => {
-    const ftProtocol = mapSwapProtocolToFTProtocol(protocol);
-
-    // add more protocols here when needed
-    switch (ftProtocol) {
-      case 'runes':
-        return coinsMasterList.find((coin) => coin.principal === ticker);
-      case 'stacks':
-        return coinsMasterList.find((coin) => coin.principal === ticker);
-      default:
-        return undefined;
-    }
-  };
 
   const isSwapRouteDisabled = !fromToken || !toToken;
 

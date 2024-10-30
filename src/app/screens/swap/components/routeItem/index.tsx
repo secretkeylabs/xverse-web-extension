@@ -1,6 +1,6 @@
 import TokenImage from '@components/tokenImage';
 import { CaretDown } from '@phosphor-icons/react';
-import { mapFtToCurrencyType, mapSwapTokenToFT, mapTokenToCurrencyType } from '@screens/swap/utils';
+import { mapFtToCurrencyType, mapSwapTokenToFT } from '@screens/swap/utils';
 import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { useTranslation } from 'react-i18next';
@@ -43,8 +43,7 @@ type Props = {
 export default function RouteItem({ label, token, onClick }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
 
-  const currency =
-    token && 'principal' in token ? mapFtToCurrencyType(token) : mapTokenToCurrencyType(token);
+  const currency = mapFtToCurrencyType(token);
 
   return (
     <div>
