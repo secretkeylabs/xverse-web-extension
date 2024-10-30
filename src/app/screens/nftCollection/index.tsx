@@ -153,7 +153,7 @@ function NftCollection() {
       }),
     );
     closeOptionsDialog();
-    toast.custom(<SnackBar text={t('COLLECTION_UNHIDDEN')} type="neutral" />);
+    toast(t('COLLECTION_UNHIDDEN'));
     navigate(`/nft-dashboard/${isLastHiddenItem ? '' : 'hidden'}?tab=nfts`);
   };
 
@@ -165,7 +165,7 @@ function NftCollection() {
       }),
     );
     toast.remove(toastId);
-    toast.custom(<SnackBar text={t('COLLECTION_UNHIDDEN')} type="neutral" />, {
+    toast(t('COLLECTION_UNHIDDEN'), {
       duration: LONG_TOAST_DURATION,
     });
   };
@@ -192,7 +192,7 @@ function NftCollection() {
 
     closeOptionsDialog();
     navigate('/nft-dashboard?tab=nfts');
-    const toastId = toast.custom(
+    const toastId = toast(
       <SnackBar
         text={t('COLLECTION_HIDDEN')}
         type="neutral"
@@ -213,7 +213,7 @@ function NftCollection() {
       }),
     );
     toast.remove(toastId);
-    toast.custom(<SnackBar text={t('UNSTAR_COLLECTION')} type="neutral" />);
+    toast(t('UNSTAR_COLLECTION'));
   };
 
   const handleStarClick = () => {
@@ -224,7 +224,7 @@ function NftCollection() {
           id: collectionData?.collection_id ?? '',
         }),
       );
-      toast.custom(<SnackBar text={t('UNSTAR_COLLECTION')} type="neutral" />, {
+      toast(t('UNSTAR_COLLECTION'), {
         duration: LONG_TOAST_DURATION,
       });
     } else {
@@ -234,7 +234,7 @@ function NftCollection() {
           id: collectionData?.collection_id ?? '',
         }),
       );
-      const toastId = toast.custom(
+      const toastId = toast(
         <SnackBar
           text={t('STAR_COLLECTION')}
           type="neutral"

@@ -98,9 +98,7 @@ function OrdinalsCollection() {
       removeFromHideCollectiblesAction({ address: ordinalsAddress, id: collectionId ?? '' }),
     );
     toast.remove(toastId);
-    toast.custom(<SnackBar text={t('COLLECTION_UNHIDDEN')} type="neutral" />, {
-      duration: LONG_TOAST_DURATION,
-    });
+    toast(t('COLLECTION_UNHIDDEN'));
   };
 
   const handleHideCollection = () => {
@@ -119,7 +117,7 @@ function OrdinalsCollection() {
 
     optionsSheet.close();
     navigate('/nft-dashboard?tab=inscriptions');
-    const toastId = toast.custom(
+    const toastId = toast(
       <SnackBar
         text={t('COLLECTION_HIDDEN')}
         type="neutral"
@@ -138,7 +136,7 @@ function OrdinalsCollection() {
       removeFromHideCollectiblesAction({ address: ordinalsAddress, id: collectionId ?? '' }),
     );
     optionsSheet.close();
-    toast.custom(<SnackBar text={t('COLLECTION_UNHIDDEN')} type="neutral" />);
+    toast(t('COLLECTION_UNHIDDEN'));
     navigate(`/nft-dashboard/${isLastHiddenItem ? '' : 'hidden'}?tab=inscriptions`);
   };
 
@@ -157,7 +155,7 @@ function OrdinalsCollection() {
       removeFromStarCollectiblesAction({ address: ordinalsAddress, id: collectionId ?? '' }),
     );
     toast.remove(toastId);
-    toast.custom(<SnackBar text={t('UNSTAR_COLLECTION')} type="neutral" />);
+    toast(t('UNSTAR_COLLECTION'));
   };
 
   const handleStarClick = () => {
@@ -165,10 +163,10 @@ function OrdinalsCollection() {
       dispatch(
         removeFromStarCollectiblesAction({ address: ordinalsAddress, id: collectionId ?? '' }),
       );
-      toast.custom(<SnackBar text={t('UNSTAR_COLLECTION')} type="neutral" />);
+      toast(t('UNSTAR_COLLECTION'));
     } else {
       dispatch(addToStarCollectiblesAction({ address: ordinalsAddress, id: collectionId ?? '' }));
-      const toastId = toast.custom(
+      const toastId = toast(
         <SnackBar
           text={t('STAR_COLLECTION')}
           type="neutral"

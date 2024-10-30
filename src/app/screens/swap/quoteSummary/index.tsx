@@ -199,7 +199,7 @@ export default function QuoteSummary({
   } = usePlaceUtxoOrder();
 
   useEffect(() => {
-    if (placeOrderError || placeUtxoOrderError) {
+    if (true) {
       onError(placeOrderError ?? placeUtxoOrderError ?? '');
     }
   }, [placeOrderError, placeUtxoOrderError]);

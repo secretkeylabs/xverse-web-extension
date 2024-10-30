@@ -152,7 +152,7 @@ function NftDashboardHidden() {
       }),
     );
     toast.remove(toastId);
-    toast.custom(<SnackBar text={t('ITEMS_RETURNED_TO_HIDDEN')} type="neutral" />, {
+    toast(t('ITEMS_RETURNED_TO_HIDDEN'), {
       duration: LONG_TOAST_DURATION,
     });
   };
@@ -169,7 +169,7 @@ function NftDashboardHidden() {
     dispatch(removeAllFromHideCollectiblesAction({ address: stxAddress }));
     handleBackButtonClick();
 
-    const toastId = toast.custom(
+    const toastId = toast(
       <SnackBar
         text={t('HIDDEN_ITEMS_RESTORED')}
         type="neutral"

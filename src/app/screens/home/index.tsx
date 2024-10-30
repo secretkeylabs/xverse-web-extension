@@ -207,7 +207,7 @@ function Home() {
 
   useEffect(() => {
     if (spamToken) {
-      const toastId = toast.custom(
+      const toastId = toast(
         <SnackBar
           text={t('TOKEN_HIDDEN')}
           type="neutral"
