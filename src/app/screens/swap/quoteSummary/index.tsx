@@ -32,14 +32,7 @@ import styled, { useTheme } from 'styled-components';
 import QuoteTile from '../quotesModal/quoteTile';
 import SlippageModalContent from '../slippageModal';
 import type { OrderInfo, StxOrderInfo } from '../types';
-import {
-  BAD_QUOTE_PERCENTAGE,
-  isRunesTx,
-  mapFTNativeSwapTokenToTokenBasic,
-  mapFtToCurrencyType,
-  mapSwapTokenToFT,
-  mapTokenToCurrencyType,
-} from '../utils';
+import { BAD_QUOTE_PERCENTAGE, isRunesTx, mapFTNativeSwapTokenToTokenBasic } from '../utils';
 import EditFee from './EditFee';
 import QuoteSummaryTile from './quoteSummaryTile';
 import usePlaceOrder from './usePlaceOrder';
@@ -239,7 +232,7 @@ export default function QuoteSummary({
     if (toToken?.protocol === 'runes') {
       return RUNE_DISPLAY_DEFAULTS.symbol;
     }
-    if (toToken?.ticker === 'STX') {
+    if (toToken?.principal === 'STX') {
       return 'STX';
     }
     return toToken?.name;
