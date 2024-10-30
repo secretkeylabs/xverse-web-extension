@@ -22,7 +22,7 @@ type Props = {
 };
 
 function TokenPrice({ currency, fungibleToken }: Props) {
-  const { t } = useTranslation('translation', { keyPrefix: 'COMMON' });
+  const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
   const { stxBtcRate, btcUsdRate } = useSupportedCoinRates();
 
   const currentPrice = useMemo(() => {
@@ -41,7 +41,7 @@ function TokenPrice({ currency, fungibleToken }: Props) {
   return (
     <Container>
       <StyledP typography="body_medium_m" color="white_200">
-        {currency === 'STX' || currency === 'BTC' ? currency : fungibleToken.name} Price
+        {currency === 'STX' || currency === 'BTC' ? currency : fungibleToken.name} {t('PRICE')}
       </StyledP>
       <NumericFormat
         value={formattedPrice}

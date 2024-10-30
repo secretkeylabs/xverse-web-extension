@@ -153,13 +153,15 @@ const RuneBundlesContainer = styled.div`
   gap: ${(props) => props.theme.space.s};
 `;
 
+type Tabs = 'first' | 'second' | 'third';
+
 export default function CoinDashboard() {
   const [searchParams] = useSearchParams();
   const ftKey = searchParams.get('ftKey') ?? '';
   const protocol = searchParams.get('protocol') ?? '';
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
-  const fromSecondaryTab = searchParams.get('secondaryTab') === 'true' ? 'secondary' : 'primary';
-  const [currentTab, setCurrentTab] = useState<'primary' | 'secondary'>(fromSecondaryTab);
+  const defaultTab: Tabs = searchParams.get('secondaryTab') === 'true' ? 'third' : 'first';
+  const [currentTab, setCurrentTab] = useState<Tabs>(defaultTab);
   const [showOptionsDialog, setShowOptionsDialog] = useState(false);
   const [optionsDialogIndents, setOptionsDialogIndents] = useState<
     { top: string; left: string } | undefined
@@ -192,10 +194,10 @@ export default function CoinDashboard() {
     selectedFt?.protocol === 'runes' ? selectedFt?.name : '',
   );
 
-  const showTxHistory = currentTab === 'primary';
-  const displayTabs = ['stacks', 'runes'].includes(protocol);
-  const showStxContract = currentTab === 'secondary' && selectedFt && protocol === 'stacks';
-  const showRuneBundles = currentTab === 'secondary' && selectedFt && protocol === 'runes';
+  const showData = currentTab === 'first';
+  const showTxHistory = currentTab === 'second';
+  const showStxContract = currentTab === 'third' && selectedFt && protocol === 'stacks';
+  const showRuneBundles = currentTab === 'third' && selectedFt && protocol === 'runes';
 
   useResetUserFlow('/coinDashboard');
 
@@ -266,31 +268,38 @@ export default function CoinDashboard() {
       <Container>
         <CoinHeader currency={currency as CurrencyTypes} fungibleToken={selectedFt} />
 
-        {displayTabs && (
-          <FtInfoContainer>
-            <Button
-              disabled={currentTab === 'primary'}
-              isSelected={currentTab === 'primary'}
-              onClick={() => setCurrentTab('primary')}
-            >
-              {t('TRANSACTIONS')}
-            </Button>
-            <Button
-              data-testid="coin-secondary-button"
-              disabled={currentTab === 'secondary'}
-              isSelected={currentTab === 'secondary'}
-              onClick={() => setCurrentTab('secondary')}
-            >
-              {protocol === 'stacks' && t('CONTRACT')}
-              {protocol === 'runes' && t('BUNDLES')}
-            </Button>
-          </FtInfoContainer>
-        )}
+        <FtInfoContainer>
+          <Button
+            disabled={currentTab === 'first'}
+            isSelected={currentTab === 'first'}
+            onClick={() => setCurrentTab('first')}
+          >
+            {t('DATA')}
+          </Button>
+          <Button
+            disabled={currentTab === 'second'}
+            isSelected={currentTab === 'second'}
+            onClick={() => setCurrentTab('second')}
+          >
+            {t('TRANSACTIONS')}
+          </Button>
+          <Button
+            data-testid="coin-secondary-button"
+            disabled={currentTab === 'third'}
+            isSelected={currentTab === 'third'}
+            onClick={() => setCurrentTab('third')}
+          >
+            {protocol === 'stacks' && t('CONTRACT')}
+            {protocol === 'runes' && t('BUNDLES')}
+          </Button>
+        </FtInfoContainer>
 
-        <TokenPrice
-          currency={currency as CurrencyTypes}
-          fungibleToken={selectedFt as FungibleToken}
-        />
+        {showData && (
+          <TokenPrice
+            currency={currency as CurrencyTypes}
+            fungibleToken={selectedFt as FungibleToken}
+          />
+        )}
 
         {showTxHistory && (
           <TransactionsHistoryList
@@ -303,7 +312,7 @@ export default function CoinDashboard() {
             brc20Token={protocol === 'brc-20' ? selectedFt?.principal || null : null}
             runeToken={protocol === 'runes' ? selectedFt?.name || null : null}
             runeSymbol={protocol === 'runes' ? selectedFt?.runeSymbol || null : null}
-            withTitle={!displayTabs}
+            withTitle={false}
           />
         )}
         {showStxContract && (

@@ -229,7 +229,8 @@
       "ALLOW": "Allow"
     },
     "TOKEN_HIDDEN": "Token hidden and reported",
-    "UNDO": "Undo"
+    "UNDO": "Undo",
+    "PRICE": "Price"
   },
   "TOKEN_SCREEN": {
     "ADD_COINS": "Manage tokens",
@@ -1046,7 +1047,9 @@
     "COMING_SOON": "Coming soon",
     "VERIFY_ADDRESS_ON_LEDGER": "Verify address on Ledger",
     "VIEW_ADDRESS": "View address",
-    "HIDE_AND_REPORT": "Hide & Report"
+    "HIDE_AND_REPORT": "Hide & Report",
+    "DATA": "DATA",
+    "PRICE": "Price"
   },
   "SPEED_UP_TRANSACTION": {
     "TITLE": "Speed up transaction",
