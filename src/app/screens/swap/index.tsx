@@ -138,7 +138,7 @@ export default function SwapScreen() {
   const { quotes, loading: quotesLoading, error: quotesError, fetchQuotes } = useGetQuotes();
   const coinsMasterList = useVisibleMasterCoinsList();
   const { tokenInfo: sip10FromTokenInfoUSD } = useGetSip10TokenInfo({
-    principal: toToken?.ticker,
+    principal: toToken?.principal,
     fiatCurrency: 'USD',
   });
 

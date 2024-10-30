@@ -68,7 +68,7 @@ function QuotesModal({
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
 
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
-  const { tokenInfo: toTokenInfo } = useGetSip10TokenInfo({ principal: toToken?.ticker });
+  const { tokenInfo: toTokenInfo } = useGetSip10TokenInfo({ principal: toToken?.principal });
 
   const sortQuotesByReceiveAmount = <T extends StxQuote | Quote>(quotes: T[]): T[] =>
     [...quotes].sort((a, b) => BigNumber(b.receiveAmount).comparedTo(a.receiveAmount));

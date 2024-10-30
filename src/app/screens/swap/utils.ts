@@ -136,7 +136,18 @@ export const isMotherToken = (token?: Token | FungibleToken) => {
   return identifier === 'BTC' || identifier === 'STX';
 };
 
-export const getTrackingIdentifier = (token?: Token | FungibleToken) => {
+export const getTrackingIdentifier = (token?: FungibleToken): string => {
+  if (!token) return '';
+
   const identifier = getIdentifier(token);
-  return isMotherToken(token) ? identifier : token?.name ?? identifier;
+
+  if (isMotherToken(token)) {
+    return identifier;
+  }
+
+  if (token.protocol === 'stacks') {
+    return token.ticker || token.name || identifier;
+  }
+
+  return token.name || identifier;
 };

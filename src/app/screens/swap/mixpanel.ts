@@ -56,7 +56,7 @@ function trackSwapMixPanel(
     fromTokenAmount = amount;
   } else if (stxBtcRate) {
     fromPrincipal = fromToken?.principal;
-    toPrincipal = toToken?.ticker;
+    toPrincipal = toToken?.principal;
 
     fromTokenAmount = amount;
     fromTokenUsdValue =

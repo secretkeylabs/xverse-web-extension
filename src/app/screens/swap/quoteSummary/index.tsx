@@ -165,7 +165,7 @@ export default function QuoteSummary({
   const { t } = useTranslation('translation');
 
   const { tokenInfo: sip10ToTokenInfo } = useGetSip10TokenInfo({
-    principal: toToken?.ticker,
+    principal: toToken?.principal,
   });
 
   const { tokenInfo: sip10FromTokenInfoUSD } = useGetSip10TokenInfo({
@@ -426,13 +426,7 @@ export default function QuoteSummary({
               provider="Amount"
               price={amount}
               token={fromToken}
-              subtitle={
-                fromToken?.principal === 'BTC'
-                  ? 'Bitcoin'
-                  : fromToken?.assetName !== ''
-                  ? fromToken?.assetName
-                  : fromToken?.name
-              }
+              subtitle={fromToken?.name}
               subtitleColorOverride="white_400"
               unit={fromUnit}
               fiatValue={fromTokenFiatValue}
