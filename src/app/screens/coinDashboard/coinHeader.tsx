@@ -66,7 +66,7 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
   // TODO: this should be a dumb component, move the logic to the parent
   // TODO: currently, we get btc and stx balances here for all currencies and FTs, but we should get them in
   // TODO: the relevant parent and pass them as props
-  const { confirmedBalance: btcBalance } = useSelectedAccountBtcBalance();
+  const { confirmedPaymentBalance: btcBalance } = useSelectedAccountBtcBalance();
   const { data: stxData } = useStxWalletData();
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const navigate = useNavigate();
@@ -178,7 +178,7 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
     }
     if (currency === 'STX') {
       if (new BigNumber(stxData?.locked ?? 0).gt(0)) {
-        return `Available ${commonT('STACKS')} Balance`;
+        return `${commonT('STACKS')} ${commonT('BALANCE')}`;
       }
       return commonT('STACKS');
     }

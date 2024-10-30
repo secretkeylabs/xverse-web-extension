@@ -30,19 +30,17 @@ export default function useSelectedAccountBtcBalance() {
     return { isLoading: true, isRefetching: false };
   }
 
-  const confirmedBalance = BigNumber(nativeBalance?.confirmedBalance ?? 0)
+  const confirmedPaymentBalance = BigNumber(nativeBalance?.confirmedBalance ?? 0)
     .plus(nestedBalance?.confirmedBalance ?? 0)
-    .plus(taprootBalance?.confirmedBalance ?? 0)
     .toNumber();
 
-  const unconfirmedBalance = BigNumber(nativeBalance?.unconfirmedBalance ?? 0)
+  const unconfirmedPaymentBalance = BigNumber(nativeBalance?.unconfirmedBalance ?? 0)
     .plus(nestedBalance?.unconfirmedBalance ?? 0)
-    .plus(taprootBalance?.unconfirmedBalance ?? 0)
     .toNumber();
 
   return {
-    confirmedBalance,
-    unconfirmedBalance,
+    confirmedPaymentBalance,
+    unconfirmedPaymentBalance,
     nativeBalance,
     nestedBalance,
     taprootBalance,
