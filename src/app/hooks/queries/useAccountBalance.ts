@@ -25,16 +25,8 @@ import { fetchSip10FungibleTokens } from './stx/useGetSip10FungibleTokens';
 const useAccountBalance = () => {
   const btcClient = useBtcClient();
   const stacksNetwork = useNetworkSelector();
-  const {
-    fiatCurrency,
-    network,
-    hideStx,
-    brc20ManageTokens,
-    sip10ManageTokens,
-    runesManageTokens,
-    spamTokens,
-    showSpamTokens,
-  } = useWalletSelector();
+  const { fiatCurrency, network, hideStx, sip10ManageTokens, spamTokens, showSpamTokens } =
+    useWalletSelector();
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const runesApi = useRunesApi();
   const dispatch = useDispatch();
@@ -73,12 +65,11 @@ const useAccountBalance = () => {
         return btcData.finalBalance.toString();
       };
 
-      const [nativeBalance, nestedBalance, taprootBalance] = await Promise.all([
+      const [nativeBalance, nestedBalance] = await Promise.all([
         getBtcBalance(account.btcAddresses.native?.address),
         getBtcBalance(account.btcAddresses.nested?.address),
-        getBtcBalance(account.btcAddresses.taproot.address),
       ]);
-      btcBalance = BigNumber(nativeBalance).plus(nestedBalance).plus(taprootBalance).toString();
+      btcBalance = BigNumber(nativeBalance).plus(nestedBalance).toString();
 
       if (account.btcAddresses.taproot.address) {
         const fetchBrc20Balances = fetchBrc20FungibleTokens(
@@ -133,6 +124,7 @@ const useAccountBalance = () => {
       btcFiatRate,
       hideStx,
     });
+
     dispatch(setAccountBalanceAction(getAccountBalanceKey(account), totalBalance));
     return totalBalance;
   };

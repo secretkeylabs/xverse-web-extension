@@ -14,7 +14,7 @@ const SpinnerContainer = styled.div`
 
 export default function BalanceBreakdown() {
   const { btcPaymentAddressType } = useWalletSelector();
-  const { confirmedBalance, nativeBalance, nestedBalance, taprootBalance, isLoading } =
+  const { confirmedPaymentBalance, nativeBalance, nestedBalance, taprootBalance, isLoading } =
     useSelectedAccountBtcBalance();
 
   if (isLoading) {
@@ -34,19 +34,19 @@ export default function BalanceBreakdown() {
       <AddressBalance
         balance={nativeBalance?.confirmedBalance}
         addressType="native"
-        totalBalance={confirmedBalance}
+        totalBalance={confirmedPaymentBalance}
       />
       {showNested && (
         <AddressBalance
           balance={nestedBalance?.confirmedBalance}
           addressType="nested"
-          totalBalance={confirmedBalance}
+          totalBalance={confirmedPaymentBalance}
         />
       )}
       <AddressBalance
         balance={taprootBalance?.confirmedBalance}
         addressType="taproot"
-        totalBalance={confirmedBalance}
+        totalBalance={confirmedPaymentBalance}
       />
     </SecondaryContainer>
   );
