@@ -25,6 +25,7 @@ const useStacksCollectibles = (showHiddenOnly?: boolean) => {
     queryKey: ['nft-collection-data', stxAddress, hiddenIds, starredIds, showHiddenOnly],
     queryFn: fetchNftCollections,
     staleTime: 5 * 60 * 1000, // 5mins
+    keepPreviousData: true,
   });
 };
 
