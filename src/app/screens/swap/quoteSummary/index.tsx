@@ -28,7 +28,7 @@ import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
-// import trackSwapMixPanel from '../mixpanel';
+import trackSwapMixPanel from '../mixpanel';
 import QuoteTile from '../quotesModal/quoteTile';
 import SlippageModalContent from '../slippageModal';
 import type { OrderInfo, StxOrderInfo } from '../types';
@@ -250,17 +250,16 @@ export default function QuoteSummary({
       return;
     }
 
-    // trackSwapMixPanel(AnalyticsEvents.ConfirmSwap, {
-    //   provider: quote.provider,
-    //   fromToken,
-    //   toToken,
-    //   amount,
-    //   quote,
-    //   btcUsdRate,
-    //   runeFloorPrice,
-    //   stxBtcRate,
-    //   fromTokenInfo: sip10FromTokenInfoUSD,
-    // });
+    trackSwapMixPanel(AnalyticsEvents.ConfirmSwap, {
+      provider: quote.provider,
+      fromToken,
+      toToken,
+      amount,
+      quote,
+      btcUsdRate,
+      stxBtcRate,
+      fromTokenInfo: sip10FromTokenInfoUSD,
+    });
 
     if (selectedIdentifiers) {
       const placeUtxoOrderRequest: PlaceUtxoOrderRequest = {

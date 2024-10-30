@@ -2,7 +2,6 @@ import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import RequestsRoutes from '@common/utils/route-urls';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery';
 import useGetSip10TokenInfo from '@hooks/queries/stx/useGetSip10TokenInfo';
 import useGetQuotes from '@hooks/queries/swaps/useGetQuotes';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
@@ -42,7 +41,7 @@ import PsbtConfirmation from './components/psbtConfirmation/psbtConfirmation';
 import RouteItem from './components/routeItem';
 import TokenFromBottomSheet from './components/tokenFromBottomSheet';
 import TokenToBottomSheet from './components/tokenToBottomSheet';
-// import trackSwapMixPanel from './mixpanel';
+import trackSwapMixPanel from './mixpanel';
 import QuoteSummary from './quoteSummary';
 import QuotesModal from './quotesModal';
 import type { OrderInfo, Side, StxOrderInfo } from './types';
@@ -137,7 +136,6 @@ export default function SwapScreen() {
   const params = new URLSearchParams(location.search);
   const defaultFrom = params.get('from');
   const { quotes, loading: quotesLoading, error: quotesError, fetchQuotes } = useGetQuotes();
-  const { data: runeFloorPrice } = useRuneFloorPriceQuery(toToken?.name ?? '');
   const coinsMasterList = useVisibleMasterCoinsList();
   const { tokenInfo: sip10FromTokenInfoUSD } = useGetSip10TokenInfo({
     principal: toToken?.ticker,
@@ -178,16 +176,15 @@ export default function SwapScreen() {
       return;
     }
 
-    // trackSwapMixPanel(AnalyticsEvents.FetchSwapQuote, {
-    //   fromToken,
-    //   toToken,
-    //   amount: amountForQuote,
-    //   quote,
-    //   btcUsdRate,
-    //   runeFloorPrice,
-    //   stxBtcRate,
-    //   fromTokenInfo: sip10FromTokenInfoUSD,
-    // });
+    trackSwapMixPanel(AnalyticsEvents.FetchSwapQuote, {
+      fromToken,
+      toToken,
+      amount: amountForQuote,
+      quote,
+      btcUsdRate,
+      stxBtcRate,
+      fromTokenInfo: sip10FromTokenInfoUSD,
+    });
 
     fetchQuotes({
       from: mapFTNativeSwapTokenToTokenBasic(fromToken),
@@ -359,13 +356,13 @@ export default function SwapScreen() {
       return;
     }
 
-    // trackMixPanel(AnalyticsEvents.SelectSwapQuote, {
-    //   provider: provider.provider.name,
-    //   from: getTrackingIdentifier(fromToken),
-    //   to: getTrackingIdentifier(toToken),
-    //   fromPrincipal: isStxTx({ fromToken, toToken }) ? fromToken.principal : undefined,
-    //   toPrincipal: isStxTx({ fromToken, toToken }) ? toToken.ticker : undefined,
-    // });
+    trackMixPanel(AnalyticsEvents.SelectSwapQuote, {
+      provider: provider.provider.name,
+      from: getTrackingIdentifier(fromToken),
+      to: getTrackingIdentifier(toToken),
+      fromPrincipal: isStxTx({ fromToken, toToken }) ? fromToken.principal : undefined,
+      toPrincipal: isStxTx({ fromToken, toToken }) ? toToken.ticker : undefined,
+    });
 
     if (isAmm) {
       setUtxosRequest(null);
@@ -388,21 +385,20 @@ export default function SwapScreen() {
   };
 
   const onConfirmExecute = () => {
-    // const provider = quote?.provider ?? selectedUtxoProvider?.provider;
-    // if (!fromToken || !toToken || !provider) {
-    //   return;
-    // }
-    // trackSwapMixPanel(AnalyticsEvents.SignSwap, {
-    //   provider,
-    //   fromToken,
-    //   toToken,
-    //   amount: amountForQuote,
-    //   quote,
-    //   btcUsdRate,
-    //   runeFloorPrice,
-    //   stxBtcRate,
-    //   fromTokenInfo: sip10FromTokenInfoUSD,
-    // });
+    const provider = quote?.provider ?? selectedUtxoProvider?.provider;
+    if (!fromToken || !toToken || !provider) {
+      return;
+    }
+    trackSwapMixPanel(AnalyticsEvents.SignSwap, {
+      provider,
+      fromToken,
+      toToken,
+      amount: amountForQuote,
+      quote,
+      btcUsdRate,
+      stxBtcRate,
+      fromTokenInfo: sip10FromTokenInfoUSD,
+    });
   };
 
   const QuoteModal = (

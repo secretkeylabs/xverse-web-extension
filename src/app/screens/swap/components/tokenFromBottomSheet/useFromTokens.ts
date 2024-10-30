@@ -1,6 +1,5 @@
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useVisibleMasterCoinsList from '@screens/swap/useVisibleMasterCoinsList';
-import { mapSwapProtocolToFTProtocol } from '@screens/swap/utils';
 import { type FungibleToken } from '@secretkeylabs/xverse-core';
 import { sortFtByFiatBalance } from '@utils/tokens';
 
