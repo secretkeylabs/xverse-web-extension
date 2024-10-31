@@ -3,8 +3,8 @@ import styled from 'styled-components';
 export const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
+  paddingLeft: props.theme.space.m,
+  paddingRight: props.theme.space.m,
 }));
 
 export const RowContainer = styled.div({
@@ -20,7 +20,7 @@ export const ProtocolText = styled.p((props) => ({
   height: 15,
   marginTop: props.theme.spacing(3),
   textTransform: 'uppercase',
-  marginLeft: props.theme.spacing(2),
+  marginLeft: props.theme.space.xxs,
   backgroundColor: props.theme.colors.white_400,
   padding: '1px 6px 1px',
   color: props.theme.colors.elevation0,
@@ -51,7 +51,7 @@ export const FiatAmountText = styled.p((props) => ({
   ...props.theme.headline_category_s,
   color: props.theme.colors.white_200,
   fontSize: '0.875rem',
-  marginTop: props.theme.spacing(2),
+  marginTop: props.theme.space.xxs,
   textAlign: 'center',
   cursor: 'pointer',
 }));
@@ -60,14 +60,14 @@ export const BalanceTitleText = styled.p((props) => ({
   ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_400,
   textAlign: 'center',
-  marginTop: props.theme.spacing(4),
+  marginTop: props.theme.space.xs,
 }));
 
 export const RowButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
-  marginTop: props.theme.spacing(11),
+  marginTop: props.theme.space.l,
   columnGap: props.theme.space.l,
 }));
 
@@ -75,8 +75,8 @@ export const HeaderSeparator = styled.div((props) => ({
   border: `0.5px solid ${props.theme.colors.white_400}`,
   width: '50%',
   alignSelf: 'center',
-  marginTop: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(8),
+  marginTop: props.theme.space.m,
+  marginBottom: props.theme.space.m,
 }));
 
 export const StxLockedText = styled.p((props) => ({
@@ -100,7 +100,7 @@ export const AvailableStxContainer = styled.div((props) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  marginTop: props.theme.spacing(4),
+  marginTop: props.theme.space.xs,
   span: {
     color: props.theme.colors.white_400,
     marginRight: props.theme.spacing(3),
@@ -108,13 +108,13 @@ export const AvailableStxContainer = styled.div((props) => ({
 }));
 
 export const VerifyOrViewContainer = styled.div((props) => ({
-  margin: props.theme.spacing(8),
-  marginTop: props.theme.spacing(16),
-  marginBottom: props.theme.spacing(20),
+  margin: props.theme.space.m,
+  marginTop: props.theme.space.xl,
+  marginBottom: props.theme.space.xxl,
 }));
 
 export const VerifyButtonContainer = styled.div((props) => ({
-  marginBottom: props.theme.spacing(6),
+  marginBottom: props.theme.space.s,
 }));
 
 export const StacksLockedInfoText = styled.span((props) => ({

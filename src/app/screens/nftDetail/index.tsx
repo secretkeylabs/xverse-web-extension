@@ -109,7 +109,7 @@ function NftDetailScreen() {
         }),
       );
 
-      const toastId = toast.custom(
+      const toastId = toast(
         <SnackBar
           text={optionsDialogT('NFT_AVATAR.SET_TOAST')}
           type="neutral"
@@ -125,7 +125,7 @@ function NftDetailScreen() {
               }
 
               toast.remove(toastId);
-              toast.custom(<SnackBar text={optionsDialogT('NFT_AVATAR.UNDO')} type="neutral" />);
+              toast(<SnackBar text={optionsDialogT('NFT_AVATAR.UNDO')} type="neutral" />);
             },
           }}
         />,
@@ -137,7 +137,7 @@ function NftDetailScreen() {
 
   const handleRemoveAvatar = useCallback(() => {
     dispatch(removeAccountAvatarAction({ address: ordinalsAddress }));
-    toast.custom(<SnackBar text={optionsDialogT('NFT_AVATAR.REMOVE_TOAST')} type="neutral" />);
+    toast(<SnackBar text={optionsDialogT('NFT_AVATAR.REMOVE_TOAST')} type="neutral" />);
     optionsSheet.close();
   }, [dispatch, optionsDialogT, ordinalsAddress, optionsSheet]);
 
@@ -155,7 +155,7 @@ function NftDetailScreen() {
       }),
     );
     toast.remove(toastId);
-    toast.custom(<SnackBar text={t('UNSTAR_INSCRIPTION')} type="neutral" />);
+    toast(t('UNSTAR_INSCRIPTION'));
   };
 
   const handleStarClick = () => {
@@ -166,7 +166,7 @@ function NftDetailScreen() {
           id: nftId,
         }),
       );
-      toast.custom(<SnackBar text={t('UNSTAR_INSCRIPTION')} type="neutral" />);
+      toast(t('UNSTAR_INSCRIPTION'));
     } else {
       dispatch(
         addToStarCollectiblesAction({
@@ -174,7 +174,7 @@ function NftDetailScreen() {
           id: nftId,
         }),
       );
-      const toastId = toast.custom(
+      const toastId = toast(
         <SnackBar
           text={t('STAR_INSCRIPTION')}
           type="neutral"

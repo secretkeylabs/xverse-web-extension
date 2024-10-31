@@ -75,26 +75,28 @@ function ExploreScreen() {
 
   const category = recommended?.filter((r) => r.category === activeTab);
 
-  return isLoading ? (
-    <LoaderContainer>
-      <Spinner color="white" size={30} />
-    </LoaderContainer>
-  ) : (
+  return (
     <>
-      <Container>
-        <StyledHeading typography="headline_l">{t('TITLE')}</StyledHeading>
-        <ExternalLink href={XVERSE_EXPLORE_URL} target="_blank" rel="noreferrer">
-          <ArrowsOut size={16} />
-          {t('EXPAND_VIEW')}
-        </ExternalLink>
-        <Subheader>
-          {t('FEATURED')}
-          <SwiperNavigation />
-        </Subheader>
-        {!!featured?.length && <FeaturedCardCarousel items={featured} />}
-        {tabs && <Tabs tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />}
-        {!!category?.length && <RecommendedApps items={category} />}
-      </Container>
+      {isLoading ? (
+        <LoaderContainer>
+          <Spinner color="white" size={30} />
+        </LoaderContainer>
+      ) : (
+        <Container>
+          <StyledHeading typography="headline_l">{t('TITLE')}</StyledHeading>
+          <ExternalLink href={XVERSE_EXPLORE_URL} target="_blank" rel="noreferrer">
+            <ArrowsOut size={16} />
+            {t('EXPAND_VIEW')}
+          </ExternalLink>
+          <Subheader>
+            {t('FEATURED')}
+            <SwiperNavigation />
+          </Subheader>
+          {!!featured?.length && <FeaturedCardCarousel items={featured} />}
+          {tabs && <Tabs tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />}
+          {!!category?.length && <RecommendedApps items={category} />}
+        </Container>
+      )}
       <BottomBar tab="explore" />
     </>
   );

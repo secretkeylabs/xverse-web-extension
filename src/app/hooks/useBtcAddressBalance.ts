@@ -25,5 +25,6 @@ export default function useBtcAddressBalance(address: string) {
     queryKey: ['btc-address-balance', address],
     queryFn: fetchBalance,
     staleTime: 10 * 1000, // 10 secs
+    keepPreviousData: true,
   });
 }

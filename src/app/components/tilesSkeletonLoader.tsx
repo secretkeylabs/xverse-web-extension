@@ -2,12 +2,12 @@ import { BetterBarLoader } from '@components/barLoader';
 import styled from 'styled-components';
 
 const TilesLoaderContainer = styled.div<{
-  isGalleryOpen?: boolean;
+  $isGalleryOpen?: boolean;
 }>((props) => ({
   width: '100%',
   display: 'flex',
   justifyContent: 'flex-start',
-  columnGap: props.isGalleryOpen ? props.theme.spacing(16) : props.theme.spacing(8),
+  columnGap: props.$isGalleryOpen ? props.theme.space.xl : props.theme.space.m,
 }));
 
 const TileLoaderContainer = styled.div({
@@ -16,12 +16,12 @@ const TileLoaderContainer = styled.div({
 });
 
 export const StyledBarLoader = styled(BetterBarLoader)<{
-  withMarginBottom?: boolean;
-  isGalleryOpen?: boolean;
+  $withMarginBottom?: boolean;
+  $isGalleryOpen?: boolean;
 }>((props) => ({
   padding: 0,
-  borderRadius: props.theme.radius(props.isGalleryOpen ? 3 : 1),
-  marginBottom: props.withMarginBottom ? props.theme.spacing(6) : 0,
+  borderRadius: props.theme.radius(props.$isGalleryOpen ? 3 : 1),
+  marginBottom: props.$withMarginBottom ? props.theme.space.s : 0,
 }));
 
 export function TilesSkeletonLoader({
@@ -34,23 +34,13 @@ export function TilesSkeletonLoader({
   isGalleryOpen?: boolean;
 }) {
   return (
-    <TilesLoaderContainer className={className} isGalleryOpen={isGalleryOpen}>
+    <TilesLoaderContainer className={className} $isGalleryOpen={isGalleryOpen}>
       <TileLoaderContainer>
-        <StyledBarLoader
-          width={tileSize}
-          height={tileSize}
-          isGalleryOpen={isGalleryOpen}
-          withMarginBottom
-        />
+        <StyledBarLoader width={tileSize} height={tileSize} $withMarginBottom />
         <StyledBarLoader width={107} height={14} />
       </TileLoaderContainer>
       <TileLoaderContainer>
-        <StyledBarLoader
-          width={tileSize}
-          height={tileSize}
-          isGalleryOpen={isGalleryOpen}
-          withMarginBottom
-        />
+        <StyledBarLoader width={tileSize} height={tileSize} $withMarginBottom />
         <StyledBarLoader width={107} height={14} />
       </TileLoaderContainer>
     </TilesLoaderContainer>

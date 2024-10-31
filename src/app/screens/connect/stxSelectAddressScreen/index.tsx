@@ -11,7 +11,7 @@ import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled'
 import Spinner from '@ui-library/spinner';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import AddressPurposeBox from '../addressPurposeBox';
 import {
   AddressBoxContainer,
@@ -29,10 +29,11 @@ import PermissionsList from '../permissionsList';
 function StxSelectAddressScreen() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { t } = useTranslation('translation', { keyPrefix: 'SELECT_BTC_ADDRESS_SCREEN' });
   const selectedAccount = useSelectedAccount();
   const { network } = useWalletSelector();
-  const [appIcon, setAppIcon] = useState<string>('');
+  const [appIcon, setAppIcon] = useState('');
   const [isLoadingIcon, setIsLoadingIcon] = useState(false);
   const { payload, origin, approveStxAddressRequest, cancelAddressRequest } =
     useStxAddressRequest();
@@ -85,7 +86,7 @@ function StxSelectAddressScreen() {
   }, [origin]);
 
   const handleSwitchAccount = () => {
-    navigate('/account-list?hideListActions=true');
+    navigate('/account-list?hideListActions=true', { state: { from: pathname } });
   };
 
   if (isLoadingIcon) {

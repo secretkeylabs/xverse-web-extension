@@ -1,4 +1,3 @@
-import FeatureIcon from '@assets/img/nftDashboard/rareSats/NewFeature.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import BottomTabBar from '@components/tabBar';
@@ -6,7 +5,6 @@ import WebGalleryButton from '@components/webGalleryButton';
 import { ArrowDown } from '@phosphor-icons/react';
 import Button from '@ui-library/button';
 import { StyledHeading } from '@ui-library/common.styled';
-import Dialog from '@ui-library/dialog';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import CollectiblesTabs from './collectiblesTabs';
@@ -75,8 +73,6 @@ function NftDashboard() {
   const nftDashboard = useNftDashboard();
   const {
     openReceiveModal,
-    showNewFeatureAlert,
-    hasActivatedOrdinalsKey,
     isOrdinalReceiveAlertVisible,
     openInGalleryView,
     onReceiveModalOpen,
@@ -85,34 +81,15 @@ function NftDashboard() {
     onOrdinalReceiveAlertClose,
     InscriptionListView,
     NftListView,
-    onActivateRareSatsAlertCrossPress,
-    onActivateRareSatsAlertDenyPress,
-    onActivateRareSatsAlertEnablePress,
     isGalleryOpen,
   } = nftDashboard;
+
   return (
     <>
       {isOrdinalReceiveAlertVisible && (
         <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose} />
       )}
-      {showNewFeatureAlert && (
-        <Dialog
-          title={t('NEW_FEATURE')}
-          description={
-            hasActivatedOrdinalsKey
-              ? t('NEW_FEAT_RARE_SATS_ORDINALS_ENABLE')
-              : t('NEW_FEAT_RARE_SATS_DESCRIPTION')
-          }
-          rightButtonText={t('ENABLE')}
-          leftButtonText={t('MAYBE_LATER')}
-          onRightButtonClick={onActivateRareSatsAlertEnablePress}
-          onLeftButtonClick={onActivateRareSatsAlertDenyPress}
-          onClose={onActivateRareSatsAlertCrossPress}
-          type="feedback"
-          icon={<img src={FeatureIcon} width="60" height="60" alt="new feature" />}
-        />
-      )}
-      <AccountHeaderComponent disableMenuOption={isGalleryOpen} showBorderBottom={false} />
+      <AccountHeaderComponent disableMenuOption={isGalleryOpen} />
       <Container>
         <PageHeader>
           <CollectibleContainer>
@@ -153,4 +130,5 @@ function NftDashboard() {
     </>
   );
 }
+
 export default NftDashboard;

@@ -13,8 +13,8 @@ import Banner from './banner';
 
 const CarouselContainer = styled.div`
   position: relative;
-  margin-top: ${({ theme }) => theme.space.xxs};
-  margin-bottom: ${({ theme }) => theme.space.xxs};
+  padding-top: ${({ theme }) => theme.space.xxs};
+  padding-bottom: ${({ theme }) => theme.space.xxs};
 
   .swiper {
     padding: 0;
