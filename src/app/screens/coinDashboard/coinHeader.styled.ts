@@ -38,6 +38,13 @@ export const BalanceValuesContainer = styled.div({
   flexDirection: 'column',
 });
 
+export const FiatContainer = styled.div((props) => ({
+  display: 'flex',
+  alignItems: 'center',
+  alignSelf: 'center',
+  marginTop: props.theme.space.xxs,
+}));
+
 export const CoinBalanceText = styled.p((props) => ({
   ...props.theme.typography.headline_l,
   fontSize: '1.5rem',
@@ -50,7 +57,13 @@ export const FiatAmountText = styled.p((props) => ({
   ...props.theme.headline_category_s,
   color: props.theme.colors.white_200,
   fontSize: '0.875rem',
-  marginTop: props.theme.spacing(2),
+  textAlign: 'center',
+  marginRight: props.theme.space.xxs,
+}));
+
+export const HourText = styled.p((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_200,
   textAlign: 'center',
 }));
 
