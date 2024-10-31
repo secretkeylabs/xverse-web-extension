@@ -194,8 +194,8 @@ export default function CoinDashboard() {
     selectedFt?.protocol === 'runes' ? selectedFt?.name : '',
   );
 
-  const showData = currentTab === 'first';
-  const showTxHistory = currentTab === 'second';
+  const showData = currentTab === 'second';
+  const showTxHistory = currentTab === 'first';
   const showStxContract = currentTab === 'third' && selectedFt && protocol === 'stacks';
   const showRuneBundles = currentTab === 'third' && selectedFt && protocol === 'runes';
 
@@ -274,14 +274,14 @@ export default function CoinDashboard() {
             isSelected={currentTab === 'first'}
             onClick={() => setCurrentTab('first')}
           >
-            {t('DATA')}
+            {t('TRANSACTIONS')}
           </Button>
           <Button
             disabled={currentTab === 'second'}
             isSelected={currentTab === 'second'}
             onClick={() => setCurrentTab('second')}
           >
-            {t('TRANSACTIONS')}
+            {t('DATA')}
           </Button>
           <Button
             data-testid="coin-secondary-button"
