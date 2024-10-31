@@ -1,4 +1,5 @@
 import SquaresFour from '@assets/img/nftDashboard/squares_four.svg';
+import UserCircleSlashed from '@assets/img/user_circle_slashed.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import CollectibleDetailTile from '@components/collectibleDetailTile';
 import SquareButton from '@components/squareButton';
@@ -13,8 +14,7 @@ import {
   DotsThreeVertical,
   Share,
   Star,
-  UserCircleCheck,
-  UserCircleMinus,
+  UserCircle,
 } from '@phosphor-icons/react';
 import NftImage from '@screens/nftDashboard/nftImage';
 import { StyledButton } from '@screens/ordinalsCollection/index.styled';
@@ -409,14 +409,14 @@ function NftDetailScreen() {
           {isNftSelectedAsAvatar ? (
             <StyledButton
               variant="tertiary"
-              icon={<UserCircleMinus size={24} color={Theme.colors.white_200} />}
+              icon={<img src={UserCircleSlashed} alt="Circle Slashed" />}
               title={optionsDialogT('NFT_AVATAR.REMOVE_ACTION')}
               onClick={handleRemoveAvatar}
             />
           ) : (
             <StyledButton
               variant="tertiary"
-              icon={<UserCircleCheck size={24} color={Theme.colors.white_200} />}
+              icon={<UserCircle size={24} color={Theme.colors.white_200} />}
               title={optionsDialogT('NFT_AVATAR.SET_ACTION')}
               onClick={handleSetAvatar}
             />

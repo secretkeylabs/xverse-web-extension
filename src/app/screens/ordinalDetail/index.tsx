@@ -1,4 +1,5 @@
 import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
+import UserCircleSlashed from '@assets/img/user_circle_slashed.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import AlertMessage from '@components/alertMessage';
 import CollectibleDetailTile from '@components/collectibleDetailTile';
@@ -8,7 +9,6 @@ import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useOptionsSheet from '@hooks/useOptionsSheet';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
-import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   ArchiveTray,
@@ -16,8 +16,7 @@ import {
   DotsThreeVertical,
   Share,
   Star,
-  UserCircleCheck,
-  UserCircleMinus,
+  UserCircle,
 } from '@phosphor-icons/react';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import { StyledButton } from '@screens/ordinalsCollection/index.styled';
@@ -649,14 +648,14 @@ function OrdinalDetailScreen() {
             (isInscriptionSelectedAsAvatar ? (
               <StyledButton
                 variant="tertiary"
-                icon={<UserCircleMinus size={24} color={Theme.colors.white_200} />}
+                icon={<img src={UserCircleSlashed} alt="Circle Slashed" />}
                 title={optionsDialogT('NFT_AVATAR.REMOVE_ACTION')}
                 onClick={handleRemoveAvatar}
               />
             ) : (
               <StyledButton
                 variant="tertiary"
-                icon={<UserCircleCheck size={24} color={Theme.colors.white_200} />}
+                icon={<UserCircle size={24} color={Theme.colors.white_200} />}
                 title={optionsDialogT('NFT_AVATAR.SET_ACTION')}
                 onClick={handleSetAvatar}
               />
