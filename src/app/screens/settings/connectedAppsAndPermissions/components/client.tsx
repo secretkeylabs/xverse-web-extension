@@ -1,10 +1,12 @@
 import { usePermissionsUtils } from '@components/permissionsManager';
-import type { Client as ClientType } from '@components/permissionsManager/schemas';
 import { CaretRight } from '@phosphor-icons/react';
-import { getAppIconFromWebManifest } from '@secretkeylabs/xverse-core';
+import {
+  getAppIconFromWebManifest,
+  permissions,
+  type Permissions,
+} from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import { useTheme } from 'styled-components';
-import type { ConnectedApp } from '.';
 import {
   Client,
   ClientDescription,
@@ -14,7 +16,10 @@ import {
   DappIconPlaceholder,
   PermissionContainer,
   PermissionText,
-} from './index.styles';
+} from '../index.styles';
+import type { ConnectedApp } from '../types';
+
+const { nameFromOrigin } = permissions.utils.originName;
 
 async function getWebsiteInfo(url: string): Promise<{ name: string; icon: string }> {
   try {
@@ -28,7 +33,7 @@ async function getWebsiteInfo(url: string): Promise<{ name: string; icon: string
 }
 
 type PermissionsProps = {
-  clientId: string;
+  clientId: Permissions.Store.Client['id'];
   color?: string;
 };
 export function ClientPermissions({ clientId, color }: PermissionsProps) {
@@ -43,48 +48,59 @@ export function ClientPermissions({ clientId, color }: PermissionsProps) {
 
     return (
       <PermissionContainer key={p.resourceId}>
-        {[...p.actions].map((a) => (
-          <PermissionText color={color} key={a}>
-            {a}
-          </PermissionText>
-        ))}
+        {Object.entries(p.actions).map(
+          ([name, isEnabled]) =>
+            isEnabled && (
+              <PermissionText color={color} key={name}>
+                {name}
+              </PermissionText>
+            ),
+        )}
       </PermissionContainer>
     );
   });
 }
 
+type AppIconProps = {
+  src?: string;
+};
+
+function AppIcon({ src }: AppIconProps) {
+  if (!src) {
+    return <DappIconPlaceholder width={32} height={32} color="white" />;
+  }
+
+  return <DappIcon src={src} alt="Dapp logo" />;
+}
+
 interface Props {
-  client: ConnectedApp;
+  connectedApp: ConnectedApp;
   setSelectedApp: (app: ConnectedApp) => void;
 }
 
-export default function ClientApp({ client, setSelectedApp }: Props) {
+export default function ClientApp({ connectedApp, setSelectedApp }: Props) {
   const theme = useTheme();
   const { data: appDetails } = useQuery({
-    queryKey: ['websiteInfo', client.id],
-    queryFn: () => getWebsiteInfo(client.id),
-    placeholderData: { name: client.name, icon: '' },
-    enabled: !!client.id,
+    queryKey: ['websiteInfo', connectedApp.client.id],
+    queryFn: () => getWebsiteInfo(connectedApp.client.id),
+    placeholderData: {
+      name: nameFromOrigin(connectedApp.client.origin),
+      icon: '',
+    },
+    enabled: !!connectedApp.client.id,
   });
 
   const handleSelectApp = () => {
-    setSelectedApp({
-      ...client,
-      name: appDetails?.name || client.name,
-    });
+    setSelectedApp(connectedApp);
   };
 
   return (
-    <Client key={client.id} onClick={handleSelectApp}>
+    <Client key={connectedApp.client.id} onClick={handleSelectApp}>
       <ClientDescription>
-        {appDetails?.icon ? (
-          <DappIcon src={appDetails.icon} alt="Dapp logo" />
-        ) : (
-          <DappIconPlaceholder width={32} height={32} color="white" />
-        )}
+        <AppIcon src={appDetails?.icon} />
         <ClientHeader>
-          <ClientName>{appDetails?.name}</ClientName>
-          <ClientPermissions clientId={client.id} color={theme.colors.white_200} />
+          <ClientName>{nameFromOrigin(connectedApp.client.origin)}</ClientName>
+          <ClientPermissions clientId={connectedApp.client.id} color={theme.colors.white_200} />
         </ClientHeader>
       </ClientDescription>
       <CaretRight size={16} color="white" />

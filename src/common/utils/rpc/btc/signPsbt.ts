@@ -1,7 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import type { WebBtcMessage } from '@common/types/message-types';
-import { RpcErrorCode } from '@sats-connect/core';
-import { z } from 'zod';
+import { RpcErrorCode, type SignPsbtRequestMessage } from '@sats-connect/core';
 import {
   listenForOriginTabClose,
   listenForPopupClose,
@@ -12,30 +10,14 @@ import {
 import RequestsRoutes from '../../route-urls';
 import { makeRPCError } from '../helpers';
 
-const SignPsbtSchema = z.object({
-  psbt: z.string(),
-  signInputs: z.record(z.array(z.number())), // Record<string, number[]>
-  broadcast: z.boolean().optional(),
-});
-
 export const handleSignPsbt = async (
-  message: WebBtcMessage<'signPsbt'>,
+  message: SignPsbtRequestMessage,
   port: chrome.runtime.Port,
 ) => {
-  const paramsParseResult = SignPsbtSchema.safeParse(message.params);
-  if (!paramsParseResult.success) {
-    const invalidParamsError = makeRPCError(message.id, {
-      code: RpcErrorCode.INVALID_PARAMS,
-      message: 'Invalid params',
-    });
-    port.postMessage(invalidParamsError);
-    return;
-  }
-
   const requestParams: ParamsKeyValueArray = [
     ['requestId', message.id as string],
-    ['signInputs', JSON.stringify(paramsParseResult.data.signInputs)],
-    ['psbt', paramsParseResult.data.psbt],
+    ['signInputs', JSON.stringify(message.params.signInputs)],
+    ['psbt', message.params.psbt],
   ];
 
   if (message.params.broadcast) requestParams.push(['broadcast', String(message.params.broadcast)]);

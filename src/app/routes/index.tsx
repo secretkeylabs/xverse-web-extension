@@ -16,9 +16,9 @@ import ConfirmNftTransaction from '@screens/confirmNftTransaction';
 import ConfirmStxTransaction from '@screens/confirmStxTransaction';
 import AuthenticationRequest from '@screens/connect/authenticationRequest';
 import BtcSelectAddressScreen from '@screens/connect/btcSelectAddressScreen';
+import { ConnectionRequest } from '@screens/connect/connectionRequest';
 import StxSelectAccountScreen from '@screens/connect/stxSelectAccountScreen';
 import StxSelectAddressScreen from '@screens/connect/stxSelectAddressScreen';
-import { ConnectionRequest } from '@screens/connectionRequest';
 import CreateInscription from '@screens/createInscription';
 import CreatePassword from '@screens/createPassword';
 import CreateWalletSuccess from '@screens/createWalletSuccess';
@@ -64,7 +64,7 @@ import RestoreFunds from '@screens/settings/advanced/restoreFunds';
 import RecoverRunes from '@screens/settings/advanced/restoreFunds/recoverRunes';
 import RestoreOrdinals from '@screens/settings/advanced/restoreFunds/restoreOrdinals';
 import ChangeNetworkScreen from '@screens/settings/changeNetwork';
-import ConnectedAppsAndPermissionsScreen from '@screens/settings/connectedAppsAndPermissions';
+import { ConnectedAppsAndPermissions } from '@screens/settings/connectedAppsAndPermissions';
 import Preferences from '@screens/settings/preferences';
 import FiatCurrencyScreen from '@screens/settings/preferences/fiatCurrency';
 import LockCountdown from '@screens/settings/preferences/lockCountdown';
@@ -423,7 +423,7 @@ const router = createHashRouter([
       },
       {
         path: RoutePaths.ConnectedAppsAndPermissions,
-        element: <ConnectedAppsAndPermissionsScreen />,
+        element: <ConnectedAppsAndPermissions />,
       },
       {
         path: 'tx-status',

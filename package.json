@@ -42,16 +42,16 @@
     "@phosphor-icons/react": "^2.1.0",
     "@playwright/test": "1.46.1",
     "@react-spring/web": "^9.6.1",
-    "@sats-connect/core": "0.3.0",
+    "@sats-connect/core": "0.4.0-6eb2eb5",
     "@scure/base": "^1.1.9",
     "@scure/btc-signer": "1.2.1",
-    "@secretkeylabs/xverse-core": "27.0.1",
+    "@secretkeylabs/xverse-core": "27.0.1-926ef0b",
     "@stacks/connect": "7.4.1",
     "@stacks/stacks-blockchain-api-types": "6.1.1",
     "@stacks/transactions": "6.16.1",
     "@tanstack/query-sync-storage-persister": "^4.29.1",
-    "@tanstack/react-query": "^4.29.3",
     "@tanstack/react-query-devtools": "^4.29.3",
+    "@tanstack/react-query": "^4.29.3",
     "@tanstack/react-query-persist-client": "^4.29.3",
     "argon2-browser": "^1.18.0",
     "async-mutex": "^0.5.0",
@@ -63,7 +63,6 @@
     "date-fns": "^2.29.3",
     "dotenv": "^16.4.5",
     "i18next": "^21.9.1",
-    "js-sha256": "^0.10.1",
     "jsontokens": "^4.0.1",
     "mixpanel-browser": "^2.47.0",
     "nanoid": "^4.0.0",
@@ -97,11 +96,10 @@
     "valibot": "0.33.2",
     "valid-url": "^1.0.9",
     "webextension-polyfill": "^0.10.0",
-    "zod": "3.22.4",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
-    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.7",
+    "@pmmmwh/react-refresh-webpack-plugin": "^0.5.15",
     "@tanstack/eslint-plugin-query": "^4.29.4",
     "@types/argon2-browser": "^1.18.1",
     "@types/chrome": "^0.0.237",
@@ -152,7 +150,7 @@
     "type-fest": "^2.19.0",
     "typescript": "^5.5.4",
     "typescript-plugin-styled-components": "^3.0.0",
-    "webpack": "^5.89.0",
-    "webpack-dev-server": "^4.11.0"
+    "webpack": "5.95.0",
+    "webpack-dev-server": "5.1.0"
   }
 }

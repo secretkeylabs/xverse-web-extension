@@ -1,19 +1,12 @@
+/* eslint-disable import/prefer-default-export */
 import { getTabIdFromPort } from '@common/utils';
 import getSelectedAccount, { embellishAccountWithDetails } from '@common/utils/getSelectedAccount';
-import { makeContext } from '@common/utils/popup';
 import { safePromise, type Result } from '@common/utils/safe';
-import * as utils from '@components/permissionsManager/utils';
-import { getBalanceRequestMessageSchema, type RpcRequestMessage } from '@sats-connect/core';
+import type { GetBalanceRequestMessage } from '@sats-connect/core';
 import { BitcoinEsploraApiProvider, type NetworkType } from '@secretkeylabs/xverse-core';
 import rootStore from '@stores/index';
-import * as v from 'valibot';
-import { handleInvalidMessage } from '../handle-invalid-message';
-import { hasAccountReadPermissions } from '../helpers';
 import { sendGetBalanceSuccessResponseMessage } from '../responseMessages/bitcoin';
-import {
-  sendAccessDeniedResponseMessage,
-  sendInternalErrorMessage,
-} from '../responseMessages/errors';
+import { sendInternalErrorMessage } from '../responseMessages/errors';
 
 async function getBalance(
   address: string,
@@ -45,35 +38,11 @@ async function getBalance(
   ];
 }
 
-const handleGetBalance = async (message: RpcRequestMessage, port: chrome.runtime.Port) => {
-  const parseResult = v.safeParse(getBalanceRequestMessageSchema, message);
-  if (!parseResult.success) {
-    handleInvalidMessage(message, getTabIdFromPort(port), parseResult.issues);
-    return;
-  }
-
-  const { origin, tabId } = makeContext(port);
-
-  const [error, store] = await utils.getPermissionsStore();
-  if (error) {
-    sendInternalErrorMessage({
-      tabId,
-      messageId: parseResult.output.id,
-      message: 'Error loading permissions store.',
-    });
-    return;
-  }
-
-  if (!hasAccountReadPermissions(origin, store)) {
-    sendAccessDeniedResponseMessage({ tabId, messageId: parseResult.output.id });
-    return;
-  }
-
-  await utils.permissionsStoreMutex.runExclusive(async () => {
-    // Update the last used time for the client
-    utils.updateClientMetadata(store, origin, { lastUsed: new Date().getTime() });
-    await utils.savePermissionsStore(store);
-  });
+export async function handleGetBalance(
+  message: GetBalanceRequestMessage,
+  port: chrome.runtime.Port,
+) {
+  const tabId = getTabIdFromPort(port);
 
   const {
     selectedAccountIndex,
@@ -92,7 +61,7 @@ const handleGetBalance = async (message: RpcRequestMessage, port: chrome.runtime
   });
 
   if (!account) {
-    sendInternalErrorMessage({ tabId, messageId: parseResult.output.id });
+    sendInternalErrorMessage({ tabId, messageId: message.id });
     return;
   }
 
@@ -103,7 +72,7 @@ const handleGetBalance = async (message: RpcRequestMessage, port: chrome.runtime
   if (getBalanceError) {
     sendInternalErrorMessage({
       tabId,
-      messageId: parseResult.output.id,
+      messageId: message.id,
       message: 'Error retrieving balance.',
     });
     return;
@@ -111,13 +80,11 @@ const handleGetBalance = async (message: RpcRequestMessage, port: chrome.runtime
 
   sendGetBalanceSuccessResponseMessage({
     tabId,
-    messageId: parseResult.output.id,
+    messageId: message.id,
     result: {
       confirmed: balances.confirmed.toString(),
       unconfirmed: balances.unconfirmed.toString(),
       total: balances.total.toString(),
     },
   });
-};
-
-export default handleGetBalance;
+}

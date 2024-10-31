@@ -2,8 +2,8 @@ import { getPopupPayload, type Context } from '@common/utils/popup';
 import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RequestError from '@components/requests/requestError';
 import {
-  transferRunesRequestSchema,
-  type TransferRunesRequest as TTransferRunesRequest,
+  runesTransferRequestMessageSchema,
+  type RunesTransferRequestMessage,
 } from '@sats-connect/core';
 import { type Transport } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
@@ -22,7 +22,7 @@ const LoaderContainer = styled.div(() => ({
 
 type TransferRunesRequestInnerProps = {
   context: Context;
-  data: TTransferRunesRequest;
+  data: RunesTransferRequestMessage;
 };
 function TransferRunesRequestInner({ data, context }: TransferRunesRequestInnerProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
@@ -93,7 +93,7 @@ function TransferRunesRequestInner({ data, context }: TransferRunesRequestInnerP
 }
 
 function TransferRunesRequest() {
-  const [error, data] = getPopupPayload(v.parser(transferRunesRequestSchema));
+  const [error, data] = getPopupPayload(v.parser(runesTransferRequestMessageSchema));
   if (error) {
     throw new Error('Invalid payload');
   }

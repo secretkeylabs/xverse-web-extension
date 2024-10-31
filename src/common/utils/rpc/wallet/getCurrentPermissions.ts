@@ -1,19 +1,19 @@
+/* eslint-disable no-restricted-syntax */
 /* eslint-disable import/prefer-default-export */
-import { dispatchEventToOrigin } from '@common/utils/messages/extensionToContentScript/dispatchEvent';
 import { makeContext } from '@common/utils/popup';
 import * as utils from '@components/permissionsManager/utils';
-import { type RenouncePermissionsRequestMessage } from '@sats-connect/core';
+import { type GetCurrentPermissionsRequestMessage } from '@sats-connect/core';
 import { permissions } from '@secretkeylabs/xverse-core';
 import { sendInternalErrorMessage } from '../responseMessages/errors';
-import { sendRenouncePermissionsSuccessResponseMessage } from '../responseMessages/wallet';
+import { sendGetCurrentPermissionsSuccessResponseMessage } from '../responseMessages/wallet';
 
-export const handleRenouncePermissions = async (
-  message: RenouncePermissionsRequestMessage,
+export async function handleGetPermissions(
+  message: GetCurrentPermissionsRequestMessage,
   port: chrome.runtime.Port,
-) => {
+) {
   const { origin, tabId } = makeContext(port);
-  const [error, store] = await utils.getPermissionsStore();
 
+  const [error, store] = await utils.getPermissionsStore();
   if (error) {
     sendInternalErrorMessage({
       tabId,
@@ -33,18 +33,9 @@ export const handleRenouncePermissions = async (
     return;
   }
 
-  await utils.permissionsStoreMutex.runExclusive(async () => {
-    permissions.utils.store.removeClient(store, clientId);
-    utils.savePermissionsStore(store);
-  });
-
-  dispatchEventToOrigin(origin, {
-    type: 'disconnect',
-  });
-
-  sendRenouncePermissionsSuccessResponseMessage({
+  sendGetCurrentPermissionsSuccessResponseMessage({
     tabId,
     messageId: message.id,
-    result: null,
+    result: permissions.utils.store.getClientPermissions(store.permissions, clientId),
   });
-};
+}

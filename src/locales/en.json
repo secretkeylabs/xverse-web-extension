@@ -960,6 +960,7 @@
     "DISCONNECT": "Disconnect",
     "DISCONNECT_ALL": "Disconnect all",
     "URL": "URL",
+    "NAME": "Name",
     "LAST_USED": "Last used",
     "PERMISSIONS": "Permissions"
   },

@@ -1,8 +1,8 @@
+import { permissions, type Permissions } from '@secretkeylabs/xverse-core';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { parse } from 'superjson';
 import * as v from 'valibot';
 import { permissionsPersistantStoreKeyName } from './constants';
-import { permissionsStoreSchema, type Client, type Permission, type Resource } from './schemas';
 import type { TPermissionsStoreContext, TPermissionsUtilsContext } from './types';
 import * as utils from './utils';
 
@@ -46,7 +46,7 @@ function PermissionsStoreProvider({ children }: { children: React.ReactNode }) {
     if (permissionsStoreChanges) {
       const { newValue } = permissionsStoreChanges;
       const hydrated = parse(newValue);
-      const parseResult = v.safeParse(permissionsStoreSchema, hydrated);
+      const parseResult = v.safeParse(permissions.store.permissionsStore, hydrated);
       if (!parseResult.success) {
         setValue({
           isLoading: false,
@@ -76,7 +76,30 @@ function PermissionsStoreProvider({ children }: { children: React.ReactNode }) {
     <PermissionsStoreContext.Provider value={value}>{children}</PermissionsStoreContext.Provider>
   );
 }
-export const usePermissionsStore = () => useContext(PermissionsStoreContext);
+const usePermissionsStore = () => useContext(PermissionsStoreContext);
+
+type EnsureStoreLoadedProps = {
+  renderChildren: (store: Permissions.Store.PermissionsStore) => React.ReactNode;
+};
+export function EnsureStoreLoaded({ renderChildren }: EnsureStoreLoadedProps): React.ReactElement {
+  const { isLoading, store, error } = usePermissionsStore();
+
+  if (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+    return <>Error loading permissions store.</>;
+  }
+
+  if (isLoading) {
+    return <>Loading...</>;
+  }
+
+  if (!store) {
+    return <>Failed to load permissions store</>;
+  }
+
+  return <>{renderChildren(store)}</>;
+}
 
 const PermissionsUtilsContext = createContext<TPermissionsUtilsContext | undefined>(undefined);
 function PermissionsUtilsProvider({ children }: { children: React.ReactNode }) {
@@ -85,51 +108,60 @@ function PermissionsUtilsProvider({ children }: { children: React.ReactNode }) {
   // Queries
 
   const getClientPermissions = useCallback(
-    (clientId: Client['id']) => {
+    (clientId: Permissions.Store.Client['id']) => {
       if (!store) {
         // eslint-disable-next-line no-console
         console.warn('[PermissionsUtilsProvider.getClientPermissions]: Store is not loaded yet.');
         return [];
       }
 
-      return utils.getClientPermissions(store.permissions, clientId);
+      return permissions.utils.store.getClientPermissions(store.permissions, clientId);
     },
     [store],
   );
 
   const getClientMetadata = useCallback(
-    (clientId: Client['id']) => {
+    (clientId: Permissions.Store.Client['id']) => {
       if (!store) {
         // eslint-disable-next-line no-console
         console.warn('[PermissionsUtilsProvider.getClientMetadata]: Store is not loaded yet.');
         return undefined;
       }
 
-      return utils.getClientMetadata(store, clientId);
+      return permissions.utils.store.getClientMetadata(store, clientId);
     },
     [store],
   );
   const getClientPermission = useCallback(
-    async (clientId: Client['id'], resourceId: Resource['id']) => {
+    async (
+      type: Permissions.Store.Permission['type'],
+      clientId: Permissions.Store.Client['id'],
+      resourceId: Permissions.Store.Resource['id'],
+    ) => {
       if (!store) {
         // eslint-disable-next-line no-console
         console.warn('[PermissionsUtilsProvider.getClientPermission]: Store is not loaded yet.');
         return undefined;
       }
 
-      return utils.getClientPermission(store.permissions, clientId, resourceId);
+      return permissions.utils.store.getClientPermission(
+        store.permissions,
+        type,
+        clientId,
+        resourceId,
+      );
     },
     [store],
   );
   const getResource = useCallback(
-    (resourceId: Resource['id']) => {
+    (resourceId: Permissions.Store.Resource['id']) => {
       if (!store) {
         // eslint-disable-next-line no-console
         console.warn('[PermissionsUtilsProvider.getResource]: Store is not loaded yet.');
         return undefined;
       }
 
-      return utils.getResource(store.resources, resourceId);
+      return permissions.utils.store.getResource(store.resources, resourceId);
     },
     [store],
   );
@@ -137,7 +169,7 @@ function PermissionsUtilsProvider({ children }: { children: React.ReactNode }) {
   // Mutations
 
   const addClient = useCallback(
-    async (client: Client) => {
+    async (client: Permissions.Store.Client) => {
       await utils.permissionsStoreMutex.runExclusive(async () => {
         if (!store) {
           // eslint-disable-next-line no-console
@@ -145,14 +177,14 @@ function PermissionsUtilsProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        utils.addClient(store, client);
+        permissions.utils.store.addClient(store.clients, client);
         await utils.savePermissionsStore(store);
       });
     },
     [store],
   );
   const addResource = useCallback(
-    async (resource: Resource) => {
+    async (resource: Permissions.Store.Resource) => {
       await utils.permissionsStoreMutex.runExclusive(async () => {
         if (!store) {
           // eslint-disable-next-line no-console
@@ -160,14 +192,14 @@ function PermissionsUtilsProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        utils.addResource(store.resources, resource);
+        permissions.utils.store.addResource(store.resources, resource);
         await utils.savePermissionsStore(store);
       });
     },
     [store],
   );
   const removeResource = useCallback(
-    async (resourceId: Resource['id']) => {
+    async (resourceId: Permissions.Store.Resource['id']) => {
       await utils.permissionsStoreMutex.runExclusive(async () => {
         if (!store) {
           // eslint-disable-next-line no-console
@@ -175,14 +207,14 @@ function PermissionsUtilsProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        utils.removeResource(store.resources, resourceId);
+        permissions.utils.store.removeResource(store.resources, resourceId);
         await utils.savePermissionsStore(store);
       });
     },
     [store],
   );
   const setPermission = useCallback(
-    async (permission: Permission) => {
+    async (permission: Permissions.Store.Permission) => {
       await utils.permissionsStoreMutex.runExclusive(async () => {
         if (!store) {
           // eslint-disable-next-line no-console
@@ -190,14 +222,23 @@ function PermissionsUtilsProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        utils.setPermission(store.clients, store.resources, store.permissions, permission);
+        permissions.utils.store.setPermission(
+          store.clients,
+          store.resources,
+          store.permissions,
+          permission,
+        );
         await utils.savePermissionsStore(store);
       });
     },
     [store],
   );
   const removePermission = useCallback(
-    async (clientId: Client['id'], resourceId: Resource['id']) => {
+    async (
+      type: Permissions.Store.Permission['type'],
+      clientId: Permissions.Store.Client['id'],
+      resourceId: Permissions.Store.Resource['id'],
+    ) => {
       await utils.permissionsStoreMutex.runExclusive(async () => {
         if (!store) {
           // eslint-disable-next-line no-console
@@ -205,14 +246,14 @@ function PermissionsUtilsProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        utils.removePermission(store.permissions, clientId, resourceId);
+        permissions.utils.store.removePermission(store.permissions, type, clientId, resourceId);
         await utils.savePermissionsStore(store);
       });
     },
     [store],
   );
   const removeAllClientPermissions = useCallback(
-    async (clientId: Client['id']) => {
+    async (clientId: Permissions.Store.Client['id']) => {
       await utils.permissionsStoreMutex.runExclusive(async () => {
         if (!store) {
           // eslint-disable-next-line no-console
@@ -222,14 +263,14 @@ function PermissionsUtilsProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        utils.removeAllClientPermissions(store.permissions, clientId);
+        permissions.utils.store.removeAllClientPermissions(store.permissions, clientId);
         await utils.savePermissionsStore(store);
       });
     },
     [store],
   );
   const removeClient = useCallback(
-    async (clientId: Client['id']) => {
+    async (clientId: Permissions.Store.Client['id']) => {
       await utils.permissionsStoreMutex.runExclusive(async () => {
         if (!store) {
           // eslint-disable-next-line no-console
@@ -237,7 +278,7 @@ function PermissionsUtilsProvider({ children }: { children: React.ReactNode }) {
           return;
         }
 
-        utils.removeClient(store, clientId);
+        permissions.utils.store.removeClient(store, clientId);
         await utils.savePermissionsStore(store);
       });
     },
@@ -252,7 +293,7 @@ function PermissionsUtilsProvider({ children }: { children: React.ReactNode }) {
         return;
       }
 
-      utils.removeAllClients(store);
+      permissions.utils.store.removeAllClients(store);
       await utils.savePermissionsStore(store);
     });
   }, [store]);

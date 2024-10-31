@@ -41,3 +41,18 @@ export const PermissionDescriptionsContainer = styled('div')((props) => ({
 export const AccountSwitcherContainer = styled('div')((props) => ({
   paddingBlockStart: props.theme.space.l,
 }));
+
+export const AddressBoxContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  width: '100%',
+  marginTop: props.theme.space.l,
+}));
+
+export const RequestMessage = styled.p((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_200,
+  textAlign: 'left',
+  wordWrap: 'break-word',
+  marginTop: props.theme.space.l,
+}));

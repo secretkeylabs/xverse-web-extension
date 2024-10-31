@@ -1,6 +1,4 @@
 import { MESSAGE_SOURCE } from '@common/types/message-types';
-import { makeAccountResourceId } from '@components/permissionsManager/resources';
-import type { PermissionsStore } from '@components/permissionsManager/schemas';
 import * as utils from '@components/permissionsManager/utils';
 import {
   RpcErrorCode,
@@ -11,13 +9,13 @@ import {
   type RpcId,
   type RpcSuccessResponse,
 } from '@sats-connect/core';
-import rootStore from '@stores/index';
-import getSelectedAccount from '../getSelectedAccount';
+import { error, permissions, success, type Result } from '@secretkeylabs/xverse-core';
+import { getOriginFromPort } from '..';
 
-export const makeRPCError = (id: RpcId, error: RpcError): RpcErrorResponse => ({
+export const makeRPCError = (id: RpcId, e: RpcError): RpcErrorResponse => ({
   jsonrpc: '2.0',
   id,
-  error,
+  error: e,
 });
 
 export const makeRpcSuccessResponse = <Method extends keyof Requests>(
@@ -56,42 +54,30 @@ export function makeSendPopupClosedUserRejectionMessage({
   };
 }
 
-export function hasAccountReadPermissions(origin: string, store: PermissionsStore): boolean {
-  const {
-    selectedAccountIndex,
-    selectedAccountType,
-    accountsList: softwareAccountsList,
-    ledgerAccountsList,
-    network,
-  } = rootStore.store.getState().walletState;
+/**
+ * Update the last used time for the client. Must be run within the permissions store mutex.
+ */
+export async function updateClientLastUsedTime(port: chrome.runtime.Port): Promise<Result<void>> {
+  const [storeError, store] = await utils.getPermissionsStore();
+  if (storeError)
+    return error({
+      name: 'LoadStoreError',
+      message: 'Error loading permissions store.',
+    });
 
-  const existingAccount = getSelectedAccount({
-    selectedAccountIndex,
-    selectedAccountType,
-    softwareAccountsList,
-    ledgerAccountsList,
+  const origin = getOriginFromPort(port);
+  const [clientIdError, clientId] = permissions.utils.store.makeClientId({ origin });
+  if (clientIdError)
+    return error({
+      name: 'ClientIdError',
+      message: 'Failed to create client ID during permissions check.',
+    });
+
+  permissions.utils.store.setClientMetadata(store.clientMetadata, {
+    clientId,
+    lastUsed: new Date().getTime(),
   });
+  await utils.savePermissionsStore(store);
 
-  if (!existingAccount) {
-    return false;
-  }
-
-  const permission = utils.getClientPermission(
-    store.permissions,
-    origin,
-    makeAccountResourceId({
-      accountId: selectedAccountIndex,
-      networkType: network.type,
-      masterPubKey: existingAccount.masterPubKey,
-    }),
-  );
-  if (!permission) {
-    return false;
-  }
-
-  if (!permission.actions.has('read')) {
-    return false;
-  }
-
-  return true;
+  return success(undefined);
 }
