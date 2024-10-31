@@ -1,13 +1,16 @@
-import PercentageChange from '@components/percentageChange';
-import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
-import { currencySymbolMap, type FungibleToken } from '@secretkeylabs/xverse-core';
-import { StyledP } from '@ui-library/common.styled';
-import type { CurrencyTypes } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
+
+import PercentageChange from '@components/percentageChange';
+import useGetExchangeRate from '@hooks/queries/useGetExchangeRate';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { currencySymbolMap, type FungibleToken } from '@secretkeylabs/xverse-core';
+import { StyledP } from '@ui-library/common.styled';
+import type { CurrencyTypes } from '@utils/constants';
 
 const Container = styled.div`
   display: flex;
@@ -23,20 +26,21 @@ type Props = {
 
 function TokenPrice({ currency, fungibleToken }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
+  const { fiatCurrency } = useWalletSelector();
+  const { data: exchangeRates } = useGetExchangeRate('USD');
   const { stxBtcRate, btcUsdRate } = useSupportedCoinRates();
 
-  const currentPrice = useMemo(() => {
-    switch (currency) {
-      case 'STX':
-        return BigNumber(stxBtcRate).multipliedBy(btcUsdRate);
-      case 'BTC':
-        return BigNumber(btcUsdRate);
-      default:
-        return BigNumber(fungibleToken?.currentPrice ?? 0);
-    }
-  }, [currency, stxBtcRate, btcUsdRate, fungibleToken]);
+  const exchangeRate = useMemo(
+    () => (exchangeRates ? Number(exchangeRates[fiatCurrency]) : 1),
+    [exchangeRates, fiatCurrency],
+  );
 
-  const formattedPrice = currentPrice.toFixed(2);
+  const currentPrice = useMemo(() => {
+    const baseRate = BigNumber(exchangeRate);
+    if (currency === 'STX') return baseRate.multipliedBy(stxBtcRate).multipliedBy(btcUsdRate);
+    if (currency === 'BTC') return baseRate.multipliedBy(btcUsdRate);
+    return baseRate.multipliedBy(fungibleToken?.currentPrice ?? 0);
+  }, [currency, stxBtcRate, btcUsdRate, fungibleToken, exchangeRate]);
 
   return (
     <Container>
@@ -44,11 +48,11 @@ function TokenPrice({ currency, fungibleToken }: Props) {
         {currency === 'STX' || currency === 'BTC' ? currency : fungibleToken.name} {t('PRICE')}
       </StyledP>
       <NumericFormat
-        value={formattedPrice}
+        value={currentPrice.toFixed(2)}
         displayType="text"
         thousandSeparator
-        prefix={`${currencySymbolMap.USD}`}
-        suffix=" USD"
+        prefix={`${currencySymbolMap[fiatCurrency]}`}
+        suffix={` ${fiatCurrency}`}
         renderText={(value) => (
           <StyledP typography="headline_l" color="white_0">
             {value}
