@@ -13,6 +13,7 @@ import { setBalanceHiddenToggleAction } from '@stores/wallet/actions/actionCreat
 import Spinner from '@ui-library/spinner';
 import { HIDDEN_BALANCE_LABEL, LoaderSize } from '@utils/constants';
 import { calculateTotalBalance, getAccountBalanceKey } from '@utils/helper';
+import BigNumber from 'bignumber.js';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
@@ -79,7 +80,7 @@ function BalanceCard(props: BalanceCardProps) {
   const selectedAccount = useSelectedAccount();
   const dispatch = useDispatch();
   const { fiatCurrency, hideStx, accountBalances, balanceHidden } = useWalletSelector();
-  const { confirmedBalance: btcBalance, isLoading: btcBalanceLoading } =
+  const { confirmedPaymentBalance: btcBalance, isLoading: btcBalanceLoading } =
     useSelectedAccountBtcBalance();
   const { data: stxData } = useStxWalletData();
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
@@ -92,7 +93,9 @@ function BalanceCard(props: BalanceCardProps) {
   const { data: runesCoinList } = useVisibleRuneFungibleTokens();
 
   const balance = calculateTotalBalance({
-    stxBalance: stxData?.balance.toString() ?? '0',
+    stxBalance: BigNumber(stxData?.balance ?? 0)
+      .plus(stxData?.locked ?? 0)
+      .toString(),
     btcBalance: (btcBalance ?? 0).toString(),
     sipCoinsList: sip10CoinsList,
     brcCoinsList: brc20CoinsList,

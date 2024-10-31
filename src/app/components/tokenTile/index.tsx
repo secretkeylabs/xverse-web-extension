@@ -132,7 +132,7 @@ function TokenTile({
   const { fiatCurrency, balanceHidden } = useWalletSelector();
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const { data: stxData } = useStxWalletData();
-  const { confirmedBalance: btcBalance } = useSelectedAccountBtcBalance();
+  const { confirmedPaymentBalance: btcBalance } = useSelectedAccountBtcBalance();
 
   const getTickerTitle = () => {
     if (currency === 'STX' || currency === 'BTC') return `${currency}`;
