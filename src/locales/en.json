@@ -1260,7 +1260,7 @@
         "SUBTITLE": "To continue, connect and unlock your device.",
         "ERROR_TITLE": "Connection error",
         "ERROR_SUBTITLE": "We weren't able to connect to your device.",
-        "ERROR_SUBTITLE_DEVICE_LOCKED": "Your Ledger device is locked. Please unlock it to continue."
+        "ERROR_SUBTITLE_DEVICE_LOCKED": "Your Keystone device is locked. Please unlock it to continue."
       },
       "CONFIRM": {
         "TITLE": "Confirm transaction",
@@ -1273,7 +1273,7 @@
         },
         "INVALID": {
           "ERROR_TITLE": "Data Invalid",
-          "ERROR_SUBTITLE": "Your Ledger device has rejected the message stating it is invalid."
+          "ERROR_SUBTITLE": "Your Keystone device has rejected the message stating it is invalid."
         }
       },
       "SUCCESS": {
