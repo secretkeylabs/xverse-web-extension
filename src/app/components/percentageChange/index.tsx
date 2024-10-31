@@ -156,7 +156,7 @@ function PercentageChange({
       : null;
 
   const formattedAmountChange = amountChangeInUsd
-    ? ['(', currencySymbolMap[fiatCurrency], increase ? '+' : '-', amountChangeInUsd, ')'].join('')
+    ? ['(', increase ? '+' : '-', currencySymbolMap[fiatCurrency], amountChangeInUsd, ')'].join('')
     : null;
 
   return (
