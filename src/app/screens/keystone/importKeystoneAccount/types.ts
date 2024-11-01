@@ -1,6 +1,5 @@
 export enum ImportKeystoneSteps {
   START = 0,
-  // IMPORTANT_WARNING = 3,
   CONNECT_KEYSTONE = 1,
   ADD_MULTIPLE_ACCOUNTS = 2,
   ADDRESS_ADDED = 3,

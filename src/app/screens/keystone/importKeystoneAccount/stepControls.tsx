@@ -45,14 +45,6 @@ function StepControls({
   switch (currentStep) {
     case ImportKeystoneSteps.START:
       return <Button onClick={handleClickNext} title={t('KEYSTONE_IMPORT_1_BUTTON')} />;
-    // case ImportKeystoneSteps.IMPORTANT_WARNING:
-    //   return (
-    //     <Button
-    //       onClick={handleClickNext}
-    //       title={t('LEDGER_IMPORT_CONTINUE_BUTTON')}
-    //       disabled={!isTogglerChecked}
-    //     />
-    //   );
     case ImportKeystoneSteps.CONNECT_KEYSTONE:
       return (
         <Button
