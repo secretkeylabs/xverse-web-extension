@@ -17,8 +17,8 @@ export const OnBoardingContentContainer = styled(animated.div)((props) => ({
   flexDirection: 'column',
   flex: 1,
   justifyContent: props.className === 'center' ? 'center' : 'none',
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
+  paddingLeft: props.theme.space.m,
+  paddingRight: props.theme.space.m,
 }));
 
 export const OnBoardingActionsContainer = styled.div((props) => ({
@@ -26,8 +26,8 @@ export const OnBoardingActionsContainer = styled.div((props) => ({
   display: 'flex',
   alignItems: 'flex-start',
   justifyContent: 'space-between',
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
+  paddingLeft: props.theme.space.m,
+  paddingRight: props.theme.space.m,
   marginBottom: props.theme.spacing(30),
 }));
 
@@ -36,7 +36,7 @@ export const SelectAssetTitle = styled.h1((props) => ({
 }));
 
 export const SelectAssetText = styled.p((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   color: props.theme.colors.white_200,
   textAlign: 'center',
 }));
@@ -45,9 +45,9 @@ export const AddAddressHeaderContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  gap: props.theme.spacing(8),
+  gap: props.theme.space.m,
   marginTop: props.theme.spacing(20),
-  marginBottom: props.theme.spacing(8),
+  marginBottom: props.theme.space.m,
 }));
 
 export const AddAddressDetailsContainer = styled.div((props) => ({
@@ -98,13 +98,13 @@ export const ActionButtonsContainer = styled.div({
 
 export const ActionButtonContainer = styled.div((props) => ({
   '&:not(:last-of-type)': {
-    marginBottom: props.theme.spacing(8),
+    marginBottom: props.theme.space.m,
   },
 }));
 
 export const LedgerFailViewContainer = styled.div((props) => ({
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
+  paddingLeft: props.theme.space.m,
+  paddingRight: props.theme.space.m,
   margin: 'auto',
 }));
 

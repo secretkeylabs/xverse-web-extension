@@ -1,6 +1,7 @@
 import BtcLogo from '@assets/img/btcFlashy.svg';
 import Button from '@ui-library/button';
 import Sheet from '@ui-library/sheet';
+import RoutePaths from 'app/routes/paths';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -45,7 +46,7 @@ export default function NativeSegWit({ isVisible, onClose }: Props) {
   const navigate = useNavigate();
 
   const onNavigate = () => {
-    navigate('/preferred-address');
+    navigate(RoutePaths.PreferredAddress);
     onClose();
   };
 

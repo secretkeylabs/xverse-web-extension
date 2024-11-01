@@ -11,30 +11,21 @@ import styled from 'styled-components';
 import EnterSeedPhrase from './enterSeedphrase';
 import PaymentAddressTypeSelector from './paymentAddressTypeSelector';
 
-const Body = styled.div(() => ({
-  display: 'flex',
-  height: '100%',
-  justifyContent: 'center',
-  alignItems: 'flex-start',
-  margin: '60px 0',
-}));
-
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  height: 'auto',
-  backgroundColor: props.theme.colors.elevation0,
-  padding: `${props.theme.spacing(12)}px`,
-  border: `1px solid ${props.theme.colors.elevation2}`,
-  borderRadius: props.theme.radius(2),
+  flex: 1,
+  padding: props.theme.space.m,
+  paddingBottom: 0,
+  overflowY: 'auto',
 }));
 
 const PasswordContainer = styled.div((props) => ({
   display: 'flex',
+  width: '100%',
   height: '100%',
-  width: '312px',
-  marginBottom: props.theme.spacing(32),
-  marginTop: props.theme.spacing(32),
+  marginBottom: props.theme.space.xxxl,
+  marginTop: props.theme.space.xxxl,
 }));
 
 function RestoreWallet(): JSX.Element {
@@ -148,12 +139,10 @@ function RestoreWallet(): JSX.Element {
   ];
 
   return (
-    <Body>
-      <Container>
-        <Dots numDots={restoreSteps.length} activeIndex={currentStepIndex} />
-        {restoreSteps[currentStepIndex]}
-      </Container>
-    </Body>
+    <Container>
+      <Dots numDots={restoreSteps.length} activeIndex={currentStepIndex} />
+      {restoreSteps[currentStepIndex]}
+    </Container>
   );
 }
 

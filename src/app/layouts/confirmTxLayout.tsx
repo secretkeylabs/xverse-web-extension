@@ -1,7 +1,8 @@
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import { isInOptions, type TabType } from '@utils/helper';
+import { ArrowLeft } from '@phosphor-icons/react';
+import type { TabType } from '@utils/helper';
 import type { PropsWithChildren } from 'react';
 import styled from 'styled-components';
 import { breakpoints, devices } from 'theme';
@@ -18,7 +19,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   margin: auto;
-  margin-top: ${(props) => props.theme.space.m};
+  margin-top: ${(props) => props.theme.space.xs};
   margin-bottom: ${(props) => props.theme.space.xxs};
   padding: 0 ${(props) => props.theme.space.xs};
   width: 100%;
@@ -31,8 +32,6 @@ const Container = styled.div`
     max-width: 588px;
     max-height: unset;
     height: auto;
-    padding: 0 ${(props) => props.theme.space.xs};
-    margin-bottom: ${(props) => props.theme.space.m};
   }
 `;
 
@@ -40,7 +39,21 @@ const BottomBarContainer = styled.div({
   marginTop: 'auto',
 });
 
-function SendLayout({
+const Button = styled.button`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: transparent;
+  border-radius: 24px;
+  padding: 5px;
+  width: 30px;
+  margin-bottom: ${(props) => props.theme.space.l};
+  :hover {
+    background-color: ${(props) => props.theme.colors.white_900};
+  }
+`;
+
+function ConfirmTxLayout({
   children,
   selectedBottomTab,
   onClickBack,
@@ -54,7 +67,7 @@ function SendLayout({
   showAccountHeader?: boolean;
   hideBottomBar?: boolean;
 }>) {
-  const isInOption = isInOptions();
+  const isScreenLargerThanXs = document.documentElement.clientWidth > Number(breakpoints.xs);
 
   return (
     <>
@@ -64,13 +77,20 @@ function SendLayout({
         <TopRow onClick={onClickBack!} showBackButton={!hideBackButton && !!onClickBack} />
       )}
       <ScrollContainer>
-        <Container>{children}</Container>
+        <Container>
+          {showAccountHeader && !hideBackButton && onClickBack && (
+            <Button onClick={onClickBack}>
+              <ArrowLeft size={20} color="white" />
+            </Button>
+          )}
+          {children}
+        </Container>
       </ScrollContainer>
       <BottomBarContainer>
-        {!isInOption && !hideBottomBar && <BottomBar tab={selectedBottomTab} />}
+        {!isScreenLargerThanXs && !hideBottomBar && <BottomBar tab={selectedBottomTab} />}
       </BottomBarContainer>
     </>
   );
 }
 
-export default SendLayout;
+export default ConfirmTxLayout;

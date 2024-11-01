@@ -11,6 +11,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { Plus } from '@phosphor-icons/react';
 import type { Account } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
+import { isInOptions } from '@utils/helper';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -92,9 +93,13 @@ function AccountList(): JSX.Element {
   };
 
   const onImportLedgerAccount = async () => {
-    await chrome.tabs.create({
-      url: chrome.runtime.getURL('options.html#/import-ledger'),
-    });
+    if (isInOptions()) {
+      navigate('/import-ledger');
+    } else {
+      await chrome.tabs.create({
+        url: chrome.runtime.getURL('options.html#/import-ledger'),
+      });
+    }
   };
 
   return (

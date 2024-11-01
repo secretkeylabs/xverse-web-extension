@@ -4,30 +4,31 @@ import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Container, SubTitle, Title } from '@screens/settings/index.styles';
+import RoutePaths from 'app/routes/paths';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import FundsRow from './fundsRow';
 
-function RestoreFunds() {
+function RecoverFunds() {
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_FUND_SCREEN' });
   const { hasActivatedOrdinalsKey } = useWalletSelector();
   const navigate = useNavigate();
 
-  const handleOnCancelClick = () => {
+  const handleGoBackClick = () => {
     navigate(-1);
   };
 
   const handleOnRestoreOrdinalClick = () => {
-    navigate('/restore-ordinals');
+    navigate(RoutePaths.RecoverOrdinals);
   };
 
   const onRecoverRunesClick = () => {
-    navigate('/recover-runes');
+    navigate(RoutePaths.RecoverRunes);
   };
 
   return (
     <>
-      <TopRow onClick={handleOnCancelClick} />
+      <TopRow onClick={handleGoBackClick} />
       <Container>
         <Title>{t('TITLE')} </Title>
         <SubTitle>{t('DESCRIPTION')}</SubTitle>
@@ -50,4 +51,4 @@ function RestoreFunds() {
   );
 }
 
-export default RestoreFunds;
+export default RecoverFunds;

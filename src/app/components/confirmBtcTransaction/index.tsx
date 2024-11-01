@@ -1,5 +1,4 @@
 import LedgerSteps from '@components/ledgerSteps';
-import type { Tab } from '@components/tabBar';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
@@ -14,12 +13,13 @@ import Callout, { type CalloutProps } from '@ui-library/callout';
 import { StickyHorizontalSplitButtonContainer, StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
+import type { TabType } from '@utils/helper';
 import { isLedgerAccount } from '@utils/helper';
+import ConfirmTxLayout from 'app/layouts/confirmTxLayout';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import type { Color } from '../../../theme';
-import SendLayout from '../../layouts/sendLayout';
 import useExtractTxSummary from './hooks/useExtractTxSummary';
 import { TxSummaryContext } from './hooks/useTxSummaryContext';
 import TransactionSummary from './transactionSummary';
@@ -64,7 +64,7 @@ type Props = {
   onFeeRateSet?: (feeRate: number) => void;
   feeRate?: number;
   title?: string;
-  selectedBottomTab?: Tab;
+  selectedBottomTab?: TabType;
   customCallout?: CalloutProps;
 };
 
@@ -129,8 +129,7 @@ function ConfirmBtcTransaction({
     const { hasInsufficientBalance, hasInvalidMint } = runes;
     return (
       <TxSummaryContext.Provider value={parsedTxSummaryContextValue}>
-        {/* TODO start a new layout. SendLayout was not intended for the review screens */}
-        <SendLayout
+        <ConfirmTxLayout
           selectedBottomTab={selectedBottomTab ?? 'dashboard'}
           onClickBack={onBackClick}
           hideBackButton={!onBackClick}
@@ -168,7 +167,7 @@ function ConfirmBtcTransaction({
               />
             </StickyHorizontalSplitButtonContainer>
           )}
-        </SendLayout>
+        </ConfirmTxLayout>
         <Sheet visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
           {isModalVisible && <LedgerSteps onConfirm={onConfirm} onCancel={onCancel} />}
         </Sheet>

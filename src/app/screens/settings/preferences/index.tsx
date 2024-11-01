@@ -3,6 +3,7 @@ import useChromeLocalStorage from '@hooks/useChromeLocalStorage';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { chromeLocalStorageKeys } from '@utils/chromeLocalStorage';
 import { getLockCountdownLabel } from '@utils/helper';
+import RoutePaths from 'app/routes/paths';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -35,15 +36,15 @@ function Preferences() {
   };
 
   const openFiatCurrencyScreen = () => {
-    navigate('/fiat-currency');
+    navigate(RoutePaths.FiatCurrency);
   };
 
   const openLockCountdownScreen = () => {
-    navigate('/lockCountdown');
+    navigate(RoutePaths.LockCountdown);
   };
 
   const openPrivacyPreferencesScreen = () => {
-    navigate('/privacy-preferences');
+    navigate(RoutePaths.PrivacyPreferences);
   };
 
   const handleBackButtonClick = () => {

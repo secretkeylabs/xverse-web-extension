@@ -8,6 +8,7 @@ import {
   ChangeActivateRBFAction,
 } from '@stores/wallet/actions/actionCreators';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
+import RoutePaths from 'app/routes/paths';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -30,7 +31,7 @@ function AdvancedSettings() {
   const isLedgerAccountSelected = isLedgerAccount(selectedAccount);
 
   const onPreferredAddressClick = () => {
-    navigate('/preferred-address');
+    navigate(RoutePaths.PreferredAddress);
   };
 
   const switchActivateOrdinalState = () => {
@@ -50,12 +51,12 @@ function AdvancedSettings() {
   const onRestoreFundClick = async () => {
     if (isLedgerAccountSelected && !isInOptions()) {
       await chrome.tabs.create({
-        url: chrome.runtime.getURL('options.html#/restore-funds'),
+        url: chrome.runtime.getURL(`options.html#${RoutePaths.RecoverFunds}`),
       });
       return;
     }
 
-    navigate('/restore-funds');
+    navigate(RoutePaths.RecoverFunds);
   };
 
   const handleBackButtonClick = () => {

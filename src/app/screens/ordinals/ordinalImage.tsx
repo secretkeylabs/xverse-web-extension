@@ -36,7 +36,7 @@ const ImageContainer = styled.div<ContainerProps>((props) => ({
   fontSize: '3em',
   wordWrap: 'break-word',
   backgroundColor: props.theme.colors.elevation1,
-  borderRadius: props.theme.radius(1),
+  borderRadius: props.theme.radius(2),
   '> img': {
     width: '100%',
   },
@@ -119,7 +119,7 @@ const OrdinalContentText = styled.p<TextProps>((props) => {
 });
 
 const StyledImage = styled(Image)`
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radius(2)}px;
   object-fit: contain;
   image-rendering: pixelated;
   display: flex;
@@ -139,7 +139,7 @@ const StyledBarLoader = styled(BetterBarLoader)((props) => ({
   marginBottom: 0,
 }));
 
-interface Props {
+type Props = {
   ordinal: Inscription | CondensedInscription;
   isNftDashboard?: boolean;
   inNftDetail?: boolean;
@@ -149,7 +149,7 @@ interface Props {
   withoutTitles?: boolean;
   placeholderIcon?: string;
   showContentTypeThumbnail?: boolean;
-}
+};
 
 function OrdinalImage({
   ordinal,

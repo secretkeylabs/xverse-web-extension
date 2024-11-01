@@ -1,4 +1,3 @@
-import ActionButton from '@components/button';
 import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
@@ -13,6 +12,7 @@ import {
   btcTransaction,
   type Transport,
 } from '@secretkeylabs/xverse-core';
+import Button from '@ui-library/button';
 import Spinner from '@ui-library/spinner';
 import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
@@ -62,7 +62,7 @@ const ButtonContainer = styled.div({
   alignItems: 'flex-end',
 });
 
-function RestoreOrdinals() {
+function RecoverOrdinals() {
   const { t } = useTranslation('translation');
   const selectedAccount = useSelectedAccount();
   const { ordinalsAddress, btcAddress } = selectedAccount;
@@ -211,7 +211,7 @@ function RestoreOrdinals() {
           <>
             <RestoreFundTitle>{t('RESTORE_ORDINAL_SCREEN.NO_FUNDS')}</RestoreFundTitle>
             <ButtonContainer>
-              <ActionButton text={t('RESTORE_ORDINAL_SCREEN.BACK')} onPress={handleOnCancelClick} />
+              <Button title={t('RESTORE_ORDINAL_SCREEN.BACK')} onClick={handleOnCancelClick} />
             </ButtonContainer>
           </>
         ) : (
@@ -240,4 +240,4 @@ function RestoreOrdinals() {
   );
 }
 
-export default RestoreOrdinals;
+export default RecoverOrdinals;

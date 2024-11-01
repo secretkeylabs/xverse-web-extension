@@ -34,7 +34,6 @@ const Title = styled.div`
 `;
 
 function SendStxScreen() {
-  const isInOption = isInOptions();
   const navigate = useNavigate();
   const { t } = useTranslation('translation');
 

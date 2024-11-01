@@ -1,5 +1,6 @@
 import Button from '@ui-library/button';
 import styled, { keyframes } from 'styled-components';
+import { devices } from 'theme';
 
 const slideYAndOpacity = keyframes`
     0% {
@@ -86,11 +87,11 @@ export const ArrowContainer = styled.div`
   z-index: 1;
 `;
 
-export const CaretButton = styled.button<{ disabled: boolean }>((props) => ({
+export const CaretButton = styled.button<{ $disabled: boolean }>((props) => ({
   backgroundColor: 'transparent',
-  cursor: props.disabled ? 'default' : 'pointer',
+  cursor: props.$disabled ? 'default' : 'pointer',
   svg: {
-    opacity: props.disabled ? 0.6 : 1,
+    opacity: props.$disabled ? 0.6 : 1,
     transition: 'opacity 0.1s ease',
   },
   '&:hover:enabled, &:focus:enabled': {
@@ -105,6 +106,9 @@ export const AnimationContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
+  [`@media ${devices.min.xs}`]: {
+    marginTop: '35%',
+  },
 });
 
 const LandingSectionContainer = styled.div({
@@ -113,6 +117,9 @@ const LandingSectionContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
+  [`@media ${devices.min.xs}`]: {
+    marginTop: '30%',
+  },
 });
 
 export const InitialTransitionLandingSectionContainer = styled(LandingSectionContainer)`

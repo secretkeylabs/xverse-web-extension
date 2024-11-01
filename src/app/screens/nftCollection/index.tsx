@@ -1,7 +1,5 @@
-import AccountHeaderComponent from '@components/accountHeader';
 import CollectibleCollectionGridItem from '@components/collectibleCollectionGridItem';
 import CollectibleDetailTile from '@components/collectibleDetailTile';
-import SquareButton from '@components/squareButton';
 import BottomTabBar from '@components/tabBar';
 import { StyledBarLoader, TilesSkeletonLoader } from '@components/tilesSkeletonLoader';
 import TopRow from '@components/topRow';
@@ -10,7 +8,11 @@ import WrenchErrorMessage from '@components/wrenchErrorMessage';
 import useNftDetail from '@hooks/queries/useNftDetail';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { ArchiveTray, ArrowLeft, DotsThreeVertical, Star } from '@phosphor-icons/react';
+import { TrayArrowDown, TrayArrowUp } from '@phosphor-icons/react';
+import {
+  CollectiblesContainer,
+  GridContainer,
+} from '@screens/nftDashboard/collectiblesTabs/index.styled';
 import Nft from '@screens/nftDashboard/nft';
 import NftImage from '@screens/nftDashboard/nftImage';
 import { StyledButton } from '@screens/ordinalsCollection/index.styled';
@@ -34,9 +36,6 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Theme from 'theme';
 import {
-  AssetDetailButtonText,
-  BackButton,
-  BackButtonContainer,
   BottomBarContainer,
   CollectionNameDiv,
   CollectionText,
@@ -46,7 +45,6 @@ import {
   NoCollectiblesText,
   PageHeader,
   PageHeaderContent,
-  StyledGridContainer,
 } from './index.styled';
 import useNftCollection from './useNftCollection';
 
@@ -250,30 +248,14 @@ function NftCollection() {
 
   return (
     <>
-      {isGalleryOpen ? (
-        <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-      ) : (
-        <TopRow
-          onClick={handleBackButtonClick}
-          onMenuClick={openOptionsDialog}
-          onStarClick={collectionHidden ? undefined : handleStarClick}
-          isStarred={collectionStarred}
-        />
-      )}
+      <TopRow
+        onClick={handleBackButtonClick}
+        onMenuClick={openOptionsDialog}
+        onStarClick={collectionHidden ? undefined : handleStarClick}
+        isStarred={collectionStarred}
+      />
       <Container>
-        <PageHeader $isGalleryOpen={isGalleryOpen}>
-          {isGalleryOpen && (
-            <BackButtonContainer>
-              <BackButton data-testid="back-button" onClick={handleBackButtonClick}>
-                <>
-                  <ArrowLeft weight="regular" size="20" color="white" />
-                  <AssetDetailButtonText data-testid="back">
-                    {t(collectionHidden ? 'BACK_TO_HIDDEN_COLLECTIBLES' : 'BACK_TO_GALLERY')}
-                  </AssetDetailButtonText>
-                </>
-              </BackButton>
-            </BackButtonContainer>
-          )}
+        <PageHeader>
           <PageHeaderContent $isGalleryOpen={isGalleryOpen}>
             <div>
               <HeadingText>{t('COLLECTION')}</HeadingText>
@@ -281,34 +263,6 @@ function NftCollection() {
                 <CollectionText>
                   {collectionData?.collection_name || <StyledBarLoader width={200} height={28} />}
                 </CollectionText>
-                {isGalleryOpen && (
-                  <>
-                    {collectionHidden ? null : (
-                      <SquareButton
-                        icon={
-                          collectionStarred ? (
-                            <Star size={16} color={Theme.colors.tangerine} weight="fill" />
-                          ) : (
-                            <Star size={16} color={Theme.colors.white_0} weight="bold" />
-                          )
-                        }
-                        onPress={handleStarClick}
-                        isTransparent
-                        size={44}
-                        radiusSize={12}
-                      />
-                    )}
-                    <SquareButton
-                      icon={
-                        <DotsThreeVertical size={20} color={Theme.colors.white_0} weight="bold" />
-                      }
-                      onPress={openOptionsDialog}
-                      isTransparent
-                      size={44}
-                      radiusSize={12}
-                    />
-                  </>
-                )}
               </CollectionNameDiv>
               {!isGalleryOpen && <WebGalleryButton onClick={openInGalleryView} />}
             </div>
@@ -332,14 +286,14 @@ function NftCollection() {
             </NftContainer>
           </PageHeaderContent>
         </PageHeader>
-        <>
+        <CollectiblesContainer>
           {isEmpty && <NoCollectiblesText>{t('NO_COLLECTIBLES')}</NoCollectiblesText>}
           {!!isError && <WrenchErrorMessage />}
-          <StyledGridContainer $isGalleryOpen={isGalleryOpen}>
+          <GridContainer $isGalleryOpen={isGalleryOpen}>
             {isLoading ? (
               <TilesSkeletonLoader
                 isGalleryOpen={isGalleryOpen}
-                tileSize={isGalleryOpen ? 276 : 151}
+                tileSize={isGalleryOpen ? 171 : 151}
               />
             ) : (
               collectionData?.all_nfts.map((nft) => (
@@ -352,14 +306,12 @@ function NftCollection() {
                 </IsVisibleOrPlaceholder>
               ))
             )}
-          </StyledGridContainer>
-        </>
+          </GridContainer>
+        </CollectiblesContainer>
       </Container>
-      {!isGalleryOpen && (
-        <BottomBarContainer>
-          <BottomTabBar tab="nft" />
-        </BottomBarContainer>
-      )}
+      <BottomBarContainer>
+        <BottomTabBar tab="nft" />
+      </BottomBarContainer>
       {isOptionsModalVisible && (
         <Sheet
           title={commonT('OPTIONS')}
@@ -369,14 +321,14 @@ function NftCollection() {
           {collectionHidden ? (
             <StyledButton
               variant="tertiary"
-              icon={<ArchiveTray size={24} color={Theme.colors.white_200} />}
+              icon={<TrayArrowUp size={24} color={Theme.colors.white_200} />}
               title={t('UNHIDE_COLLECTION')}
               onClick={handleUnHideCollection}
             />
           ) : (
             <StyledButton
               variant="tertiary"
-              icon={<ArchiveTray size={24} color={Theme.colors.white_200} />}
+              icon={<TrayArrowDown size={24} color={Theme.colors.white_200} />}
               title={t('HIDE_COLLECTION')}
               onClick={handleHideCollection}
             />

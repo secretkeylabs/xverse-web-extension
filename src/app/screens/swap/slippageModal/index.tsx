@@ -1,4 +1,4 @@
-import ActionButton from '@components/button';
+import Button from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
 import Input from '@ui-library/input';
 import BigNumber from 'bignumber.js';
@@ -109,14 +109,15 @@ function SlippageModalContent({
               ]
             : []),
         ]}
+        hideClear
         autoFocus
       />
       <Description>{t('SLIPPAGE_DESC')}</Description>
-      <ActionButton
+      <Button
         disabled={invalid || result.isZero()}
-        warning={invalid}
-        text={t('APPLY')}
-        onPress={() => onChange(result.div(100).toNumber())}
+        variant={invalid ? 'danger' : 'primary'}
+        title={t('APPLY')}
+        onClick={() => onChange(result.div(100).toNumber())}
       />
     </Container>
   );
