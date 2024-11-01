@@ -22,7 +22,12 @@
     "TO": "To",
     "FROM": "From",
     "OPTIONS": "Options",
-    "UNDO": "Undo"
+    "UNDO": "Undo",
+    "DASHBOARD": "Dashboard",
+    "COLLECTIBLES": "Collectibles",
+    "EARN": "Earn",
+    "EXPLORE": "Explore",
+    "SETTINGS": "Settings"
   },
   "INFORMATION": {
     "ORDINALS_ADDRESS_TOOLTIP": "These sats are used for your ordinals and runes. They cannot be spent with Xverse wallet."
@@ -379,7 +384,8 @@
     "ADVANCED_SETTING": "Advanced Settings",
     "EDIT_FEES": "Edit fees",
     "CONFIRM": "Confirm",
-    "CONFIRM_ALL": "Confirm all",
+    "CONFIRM_ALL_one": "Confirm",
+    "CONFIRM_ALL_other": "Confirm all",
     "CANCEL": "Cancel",
     "SATS": "sats",
     "BTC": "BTC",
@@ -391,7 +397,8 @@
     "AMOUNT_PLUS_FEES": "Amount + fees",
     "BUNDLE_PLUS_FEES": "Bundle size + fees",
     "REVIEW_TRANSACTION": "Review transaction",
-    "SIGN_TRANSACTIONS": "Sign {{count}} transactions",
+    "SIGN_TRANSACTIONS_one": "Sign {{count}} transaction",
+    "SIGN_TRANSACTIONS_other": "Sign {{count}} transactions",
     "SIGN_TRANSACTION": "Sign transaction",
     "AMOUNT": "Amount",
     "INSUFFICIENT_BALANCE": "Insufficient balance",

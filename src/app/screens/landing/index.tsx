@@ -6,7 +6,7 @@ import Dots from '@components/dots';
 import { CaretLeft, CaretRight } from '@phosphor-icons/react';
 import { isInOptions } from '@utils/helper';
 import { getIsTermsAccepted } from '@utils/localStorage';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Lottie from 'react-lottie';
 import { useNavigate } from 'react-router-dom';
@@ -39,6 +39,7 @@ function Landing() {
   const [slideTransitions, setSlideTransitions] = useState(false);
   const [transitionDirection, setTransitionDirection] = useState<'left' | 'right'>('right');
   const navigate = useNavigate();
+  const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
 
   const theme = useTheme();
   const onboardingViews = [
@@ -170,7 +171,7 @@ function Landing() {
       {animationComplete ? (
         <Container>
           <ArrowContainer>
-            <CaretButton disabled={currentStepIndex <= 0} onClick={handleClickBack}>
+            <CaretButton $disabled={currentStepIndex <= 0} onClick={handleClickBack}>
               <CaretLeft
                 size={theme.space.l}
                 color={theme.colors.white_0}
@@ -178,7 +179,7 @@ function Landing() {
               />
             </CaretButton>
             <CaretButton
-              disabled={currentStepIndex >= onboardingViews.length - 1}
+              $disabled={currentStepIndex >= onboardingViews.length - 1}
               onClick={handleClickNext}
             >
               <CaretRight
@@ -209,7 +210,7 @@ function Landing() {
         <AnimationContainer>
           <Lottie
             options={{ loop: false, animationData }}
-            width="70%"
+            width={isGalleryOpen ? '42.5%' : '70%'}
             eventListeners={[
               {
                 eventName: 'complete',

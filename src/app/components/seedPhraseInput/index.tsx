@@ -15,7 +15,7 @@ const InputGroup = styled.div`
 
 const Input = styled.input`
   ${(props) => props.theme.typography.body_medium_m};
-  max-width: 144px;
+  max-width: 130px;
   min-height: ${(props) => props.theme.spacing(22)}px;
   background-color: ${(props) => props.theme.colors.elevation0};
   color: ${(props) => props.theme.colors.white_0};

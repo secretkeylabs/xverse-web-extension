@@ -25,7 +25,6 @@ const Container = styled.div({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
-  maxWidth: 330,
   minHeight: 550,
 });
 

@@ -1,7 +1,6 @@
 import { delay } from '@common/utils/promises';
 import ActionButton from '@components/button';
 import InfoContainer from '@components/infoContainer';
-import FullScreenHeader from '@components/ledger/fullScreenHeader';
 import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
@@ -386,7 +385,6 @@ function VerifyLedger(): JSX.Element {
   if (mismatch) {
     return (
       <Container>
-        <FullScreenHeader />
         <LedgerFailViewContainer>
           <LedgerFailView title={t('TITLE_FAILED')} text={t('ADDRESS_MISMATCH')} />
           <LedgerFailButtonsContainer>
@@ -401,7 +399,6 @@ function VerifyLedger(): JSX.Element {
 
   return (
     <Container>
-      <FullScreenHeader />
       {transition((style) => (
         <>
           <OnBoardingContentContainer

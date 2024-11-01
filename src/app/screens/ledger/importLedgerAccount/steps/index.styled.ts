@@ -8,14 +8,12 @@ export const ImportStartContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  maxWidth: '328px',
 });
 
 export const ImportBeforeStartContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  maxWidth: '328px',
   paddingTop: props.theme.space.xl,
 }));
 
@@ -25,7 +23,7 @@ export const ImportStartTitle = styled.h1((props) => ({
   textAlign: 'center',
 }));
 export const ImportStartText = styled.p((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   textAlign: 'center',
   marginTop: props.theme.space.s,
   color: props.theme.colors.white_200,
@@ -33,13 +31,13 @@ export const ImportStartText = styled.p((props) => ({
 
 export const ImportBeforeStartTitle = styled.h1((props) => ({
   ...props.theme.headline_s,
-  marginTop: props.theme.spacing(5),
   textAlign: 'left',
   alignSelf: 'flex-start',
 }));
 export const ImportBeforeStartText = styled.p((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   textAlign: 'left',
+  alignSelf: 'flex-start',
   marginTop: props.theme.space.s,
   color: props.theme.colors.white_200,
 }));

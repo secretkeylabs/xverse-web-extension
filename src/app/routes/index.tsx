@@ -1,6 +1,5 @@
 import RequestsRoutes from '@common/utils/route-urls';
 import AnimatedScreenContainer from '@components/animatedScreenContainer';
-import ExtendedScreenContainer from '@components/extendedScreenContainer';
 import AuthGuard from '@components/guards/auth';
 import OnboardingGuard from '@components/guards/onboarding';
 import { SingleTabGuard } from '@components/guards/singleTab';
@@ -60,9 +59,9 @@ import Setting from '@screens/settings';
 import About from '@screens/settings/about';
 import AdvancedSettings from '@screens/settings/advanced';
 import PaymentAddressTypeSelector from '@screens/settings/advanced/paymentAddressTypeSelector';
-import RestoreFunds from '@screens/settings/advanced/restoreFunds';
-import RecoverRunes from '@screens/settings/advanced/restoreFunds/recoverRunes';
-import RestoreOrdinals from '@screens/settings/advanced/restoreFunds/restoreOrdinals';
+import RecoverFunds from '@screens/settings/advanced/recoverFunds';
+import RecoverOrdinals from '@screens/settings/advanced/recoverFunds/recoverOrdinals';
+import RecoverRunes from '@screens/settings/advanced/recoverFunds/recoverRunes';
 import ChangeNetworkScreen from '@screens/settings/changeNetwork';
 import { ConnectedAppsAndPermissions } from '@screens/settings/connectedAppsAndPermissions';
 import Preferences from '@screens/settings/preferences';
@@ -72,6 +71,7 @@ import PrivacyPreferencesScreen from '@screens/settings/preferences/privacyPrefe
 import Security from '@screens/settings/security';
 import BackupWalletScreen from '@screens/settings/security/backupWallet';
 import ChangePasswordScreen from '@screens/settings/security/changePassword';
+import ResetWalletScreen from '@screens/settings/security/resetWallet';
 import SignBatchPsbtRequest from '@screens/signBatchPsbtRequest';
 import SignMessageRequest from '@screens/signMessageRequest';
 import SignPsbtRequest from '@screens/signPsbtRequest';
@@ -110,12 +110,56 @@ const router = createHashRouter([
   },
   {
     path: '/',
-    element: <ScreenContainer />,
+    element: <ScreenContainer isSidebarVisible={false} />,
     errorElement: <ErrorBoundary />,
     children: [
       {
+        path: 'backup',
+        element: (
+          <OnboardingGuard>
+            <BackupWallet />
+          </OnboardingGuard>
+        ),
+      },
+      {
         path: 'landing',
         element: <Landing />,
+      },
+      {
+        path: 'login',
+        element: <Login />,
+      },
+      {
+        path: 'legal',
+        element: (
+          <OnboardingGuard>
+            <Legal />
+          </OnboardingGuard>
+        ),
+      },
+      {
+        path: 'forgotPassword',
+        element: <ForgotPassword />,
+      },
+      {
+        path: 'restoreWallet',
+        element: (
+          <OnboardingGuard>
+            <RestoreWallet />
+          </OnboardingGuard>
+        ),
+      },
+      {
+        path: 'backupWalletSteps',
+        element: (
+          <OnboardingGuard>
+            <BackupWalletSteps />
+          </OnboardingGuard>
+        ),
+      },
+      {
+        path: 'wallet-success/:action',
+        element: <CreateWalletSuccess />,
       },
       {
         path: 'import-ledger',
@@ -138,13 +182,16 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'legal',
-        element: (
-          <OnboardingGuard>
-            <Legal />
-          </OnboardingGuard>
-        ),
+        path: 'add-stx-address-ledger',
+        element: <LedgerAddStxAddress />,
       },
+    ],
+  },
+  {
+    path: '/',
+    element: <ScreenContainer isSidebarVisible />,
+    errorElement: <ErrorBoundary />,
+    children: [
       {
         path: 'manage-tokens',
         element: <ManageTokens />,
@@ -156,10 +203,6 @@ const router = createHashRouter([
       {
         path: 'receive/:currency',
         element: <Receive />,
-      },
-      {
-        path: 'add-stx-address-ledger',
-        element: <LedgerAddStxAddress />,
       },
       {
         path: 'swap',
@@ -194,24 +237,12 @@ const router = createHashRouter([
         element: <ConfirmLedgerStxTransaction />,
       },
       {
-        path: 'backup',
-        element: (
-          <OnboardingGuard>
-            <BackupWallet />
-          </OnboardingGuard>
-        ),
-      },
-      {
         path: 'create-password',
         element: (
           <OnboardingGuard>
             <CreatePassword />
           </OnboardingGuard>
         ),
-      },
-      {
-        path: 'wallet-success/:action',
-        element: <CreateWalletSuccess />,
       },
       {
         path: 'wallet-exists',
@@ -310,22 +341,6 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'login',
-        element: <Login />,
-      },
-      {
-        path: 'forgotPassword',
-        element: <ForgotPassword />,
-      },
-      {
-        path: 'backupWalletSteps',
-        element: (
-          <OnboardingGuard>
-            <BackupWalletSteps />
-          </OnboardingGuard>
-        ),
-      },
-      {
         path: 'stacking',
         element: (
           <AuthGuard>
@@ -390,35 +405,39 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'restore-funds',
-        element: <RestoreFunds />,
+        path: RoutePaths.RecoverFunds,
+        element: <RecoverFunds />,
       },
       {
-        path: 'restore-ordinals',
-        element: <RestoreOrdinals />,
+        path: RoutePaths.RecoverOrdinals,
+        element: <RecoverOrdinals />,
       },
       {
-        path: 'recover-runes',
+        path: RoutePaths.RecoverRunes,
         element: <RecoverRunes />,
       },
       {
-        path: 'fiat-currency',
+        path: RoutePaths.FiatCurrency,
         element: <FiatCurrencyScreen />,
       },
       {
-        path: 'privacy-preferences',
+        path: RoutePaths.PrivacyPreferences,
         element: <PrivacyPreferencesScreen />,
       },
       {
-        path: 'change-password',
+        path: RoutePaths.ChangePassword,
         element: <ChangePasswordScreen />,
       },
       {
-        path: 'change-network',
+        path: RoutePaths.ResetWallet,
+        element: <ResetWalletScreen />,
+      },
+      {
+        path: RoutePaths.ChangeNetwork,
         element: <ChangeNetworkScreen />,
       },
       {
-        path: 'backup-wallet',
+        path: RoutePaths.BackupWallet,
         element: <BackupWalletScreen />,
       },
       {
@@ -510,7 +529,7 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'lockCountdown',
+        path: RoutePaths.LockCountdown,
         element: (
           <AuthGuard>
             <LockCountdown />
@@ -533,7 +552,6 @@ const router = createHashRouter([
           </AuthGuard>
         ),
       },
-      // TODO can we move this into extended screen container?
       {
         path: RequestsRoutes.MintRune,
         element: (
@@ -542,7 +560,6 @@ const router = createHashRouter([
           </AuthGuard>
         ),
       },
-      // TODO can we move this into extended screen container?
       {
         path: RequestsRoutes.EtchRune,
         element: (
@@ -551,13 +568,14 @@ const router = createHashRouter([
           </AuthGuard>
         ),
       },
-    ],
-  },
-  {
-    path: '/',
-    element: <ExtendedScreenContainer />,
-    errorElement: <ErrorBoundary />,
-    children: [
+      {
+        path: 'nft-dashboard',
+        element: (
+          <AuthGuard>
+            <NftDashboard />
+          </AuthGuard>
+        ),
+      },
       {
         path: 'send-btc',
         element: <SendBtcScreen />,
@@ -569,14 +587,6 @@ const router = createHashRouter([
       {
         path: 'send-rune',
         element: <SendRuneScreen />,
-      },
-      {
-        path: 'nft-dashboard',
-        element: (
-          <AuthGuard>
-            <NftDashboard />
-          </AuthGuard>
-        ),
       },
       {
         path: 'nft-dashboard/hidden',
@@ -637,14 +647,6 @@ const router = createHashRouter([
       {
         path: 'nft-dashboard/supported-rarity-scale',
         element: <SupportedRarities />,
-      },
-      {
-        path: 'restoreWallet',
-        element: (
-          <OnboardingGuard>
-            <RestoreWallet />
-          </OnboardingGuard>
-        ),
       },
     ],
   },

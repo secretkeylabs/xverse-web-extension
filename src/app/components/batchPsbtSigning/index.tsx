@@ -31,7 +31,9 @@ import {
   BundleLinkContainer,
   BundleLinkText,
   ButtonsContainer,
+  CloseContainer,
   Container,
+  CrossButtonInline,
   HeaderContainer,
   InlineButtonsContainer,
   LoaderContainer,
@@ -39,7 +41,6 @@ import {
   OuterContainer,
   ReviewTransactionText,
   SmallButton,
-  StyledSheet,
 } from './index.styled';
 
 type ParsedPsbt = {
@@ -47,14 +48,14 @@ type ParsedPsbt = {
   summary: btcTransaction.PsbtSummary;
 };
 
-interface BatchPsbtSigningProps {
+type Props = {
   psbts: SignMultiplePsbtPayload[];
   onSigned: (signedPsbts: string[]) => void | Promise<void>;
   onCancel: () => void;
   onPostSignDone: () => void;
-}
+};
 
-function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: BatchPsbtSigningProps) {
+function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: Props) {
   const selectedAccount = useSelectedAccount();
   const { network } = useWalletSelector();
   const navigate = useNavigate();
@@ -193,6 +194,8 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: BatchPs
       });
       return hasDuplicate;
     });
+    const isSinglePsbt = parsedPsbts.length === 1;
+    const hideSummary = hasDuplicateInputs || isSinglePsbt;
 
     const renderBody = () => {
       if (isLoading) {
@@ -211,6 +214,7 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: BatchPs
 
       return (
         <>
+          <AccountHeaderComponent disableMenuOption disableAccountSwitch />
           <OuterContainer>
             <Container>
               <ReviewTransactionText>
@@ -226,7 +230,7 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: BatchPs
           <ButtonsContainer>
             <Button title={t('CANCEL')} variant="secondary" onClick={onCancel} />
             <Button
-              title={t('CONFIRM_ALL')}
+              title={t('CONFIRM_ALL', { count: parsedPsbts.length })}
               onClick={() => onSignPsbtConfirmed()}
               loading={isSigning}
             />
@@ -235,27 +239,24 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: BatchPs
       );
     };
 
-    const onReviewDone = () => {
-      setReviewTransaction(false);
-      setCurrentPsbtIndex(0);
-    };
+    const renderReview = () => {
+      const onClose = hideSummary
+        ? undefined
+        : () => {
+            setReviewTransaction(false);
+            setCurrentPsbtIndex(0);
+          };
 
-    return (
-      <>
-        <AccountHeaderComponent disableMenuOption disableAccountSwitch />
-        {renderBody()}
-        <StyledSheet
-          header=""
-          visible={(reviewTransaction || hasDuplicateInputs) && !isLoading}
-          onClose={hasDuplicateInputs ? undefined : onReviewDone}
-        >
+      return (
+        <>
+          <CloseContainer>{onClose && <CrossButtonInline onClick={onClose} />}</CloseContainer>
           <OuterContainer>
             <ModalContainer>
               <HeaderContainer>
                 <ReviewTransactionText>
                   {t('TRANSACTION')} {currentPsbtIndex + 1}/{parsedPsbts.length}
                 </ReviewTransactionText>
-                {hasDuplicateInputs && (
+                {hideSummary && (
                   <InlineButtonsContainer>
                     <SmallButton
                       title=""
@@ -287,17 +288,17 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: BatchPs
             </ModalContainer>
           </OuterContainer>
           <ButtonsContainer>
-            {hasDuplicateInputs && (
+            {hideSummary && (
               <>
                 <Button title={t('CANCEL')} variant="secondary" onClick={onCancel} />
                 <Button
-                  title={t('CONFIRM_ALL')}
+                  title={t('CONFIRM_ALL', { count: parsedPsbts.length })}
                   onClick={() => onSignPsbtConfirmed()}
                   loading={isSigning}
                 />
               </>
             )}
-            {!hasDuplicateInputs && (
+            {!hideSummary && (
               <>
                 <Button
                   title={t('PREVIOUS')}
@@ -321,9 +322,17 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: BatchPs
               </>
             )}
           </ButtonsContainer>
-        </StyledSheet>
-      </>
-    );
+        </>
+      );
+    };
+
+    if (!reviewTransaction && !hideSummary) {
+      // if there are duplicate inputs on the individual transactions, we won't show a summary
+      // and will have to ask the user to review each txn individually
+      return renderBody();
+    }
+
+    return renderReview();
   };
 
   const renderSigning = () => {

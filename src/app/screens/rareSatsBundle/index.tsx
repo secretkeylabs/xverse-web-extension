@@ -1,5 +1,3 @@
-import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
-import AccountHeaderComponent from '@components/accountHeader';
 import AlertMessage from '@components/alertMessage';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
@@ -9,11 +7,11 @@ import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { ArrowRight, ArrowUp } from '@phosphor-icons/react';
+import { ArrowUp } from '@phosphor-icons/react';
 import BundleContent from '@screens/rareSatsBundle/bundleContent';
 import type { Bundle } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
-import { StyledHeading, StyledP } from '@ui-library/common.styled';
+import { StyledHeading } from '@ui-library/common.styled';
 import {
   getBtcTxStatusUrl,
   getTruncatedAddress,
@@ -25,12 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import OrdinalAttributeComponent from '../ordinalDetail/ordinalAttributeComponent';
 import {
-  AssetDetailButtonText,
   AttributesContainer,
-  BackButton,
-  BackButtonContainer,
-  BundleRarityLinkContainer,
-  ButtonImage,
   Container,
   DetailSection,
   Header,
@@ -116,35 +109,11 @@ function RareSatsBundle() {
 
   const handleRarityScale = () => navigate('/nft-dashboard/supported-rarity-scale');
 
-  const goBackText = () => {
-    if (fromOrdinals) {
-      return t('SEND.MOVE_TO_ASSET_DETAIL');
-    }
-    if (fromRunes) {
-      return t('NFT_DETAIL_SCREEN.BACK_TO_RUNES');
-    }
-    return t('NFT_DETAIL_SCREEN.MOVE_TO_ASSET_DETAIL');
-  };
-
   return (
     <>
-      {isGalleryOpen ? (
-        <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-      ) : (
-        <TopRow onClick={handleBackButtonClick} />
-      )}
+      <TopRow onClick={handleBackButtonClick} />
       <Container isGalleryOpen={isGalleryOpen}>
         <PageHeader isGalleryOpen={isGalleryOpen}>
-          {isGalleryOpen && (
-            <BackButtonContainer>
-              <BackButton data-testid="back-button" onClick={handleBackButtonClick}>
-                <>
-                  <ButtonImage src={ArrowLeft} />
-                  <AssetDetailButtonText>{goBackText()}</AssetDetailButtonText>
-                </>
-              </BackButton>
-            </BackButtonContainer>
-          )}
           <PageHeaderContent isGalleryOpen={isGalleryOpen}>
             <Header isGalleryOpen={isGalleryOpen}>
               <StyledHeading typography="headline_xs" color="white_0">
@@ -163,14 +132,6 @@ function RareSatsBundle() {
                   onClick={handleSendOrdinal}
                 />
               </SendButtonContainer>
-              {isGalleryOpen && (
-                <BundleRarityLinkContainer onClick={handleRarityScale}>
-                  <StyledP typography="body_medium_m" color="currentColor">
-                    {t('RARE_SATS.RARITY_LINK_TEXT')}
-                  </StyledP>
-                  <ArrowRight size={16} weight="bold" color="currentColor" />
-                </BundleRarityLinkContainer>
-              )}
             </Header>
             <AttributesContainer isGalleryOpen={isGalleryOpen}>
               <DetailSection>
@@ -202,15 +163,6 @@ function RareSatsBundle() {
                 <BundleContent bundle={bundle as Bundle} />
               </SatRangeContainer>
             )}
-            {!isGalleryOpen && (
-              <SeeRarityContainer>
-                <Button
-                  title={t('RARE_SATS.RARITY_LINK_TEXT')}
-                  variant="secondary"
-                  onClick={handleRarityScale}
-                />
-              </SeeRarityContainer>
-            )}
           </PageHeaderContent>
         </PageHeader>
         {isGalleryOpen && <StyledSeparator />}
@@ -222,6 +174,13 @@ function RareSatsBundle() {
             <BundleContent bundle={bundle as Bundle} />
           </SatRangeContainer>
         )}
+        <SeeRarityContainer isGalleryOpen={isGalleryOpen}>
+          <Button
+            title={t('RARE_SATS.RARITY_LINK_TEXT')}
+            variant="secondary"
+            onClick={handleRarityScale}
+          />
+        </SeeRarityContainer>
         {showSendOrdinalsAlert && (
           <AlertMessage
             title={t('NFT_DETAIL_SCREEN.ORDINAL_PENDING_SEND_TITLE')}
@@ -232,7 +191,7 @@ function RareSatsBundle() {
           />
         )}
       </Container>
-      {!isGalleryOpen && <BottomTabBar tab="nft" />}
+      <BottomTabBar tab="nft" />
     </>
   );
 }

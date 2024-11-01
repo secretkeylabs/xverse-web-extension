@@ -10,45 +10,6 @@ interface DetailSectionProps {
   isGallery: boolean;
 }
 
-export const GalleryScrollContainer = styled.div((props) => ({
-  ...props.theme.scrollbar,
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-  alignItems: 'center',
-}));
-
-export const GalleryContainer = styled.div({
-  marginLeft: 'auto',
-  marginRight: 'auto',
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  alignItems: 'center',
-  width: '100%',
-  maxWidth: 1224,
-});
-
-export const BackButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  justifyContent: 'flex-start',
-  width: '100%',
-  maxWidth: 820,
-  marginTop: props.theme.spacing(40),
-  button: {
-    width: 'auto',
-  },
-}));
-
-export const ButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  position: 'relative',
-  flexDirection: 'row',
-  maxWidth: 400,
-  columnGap: props.theme.space.m,
-  marginBottom: props.theme.spacing(10.5),
-}));
-
 export const ExtensionContainer = styled.div((props) => ({
   ...props.theme.scrollbar,
   display: 'flex',
@@ -60,26 +21,14 @@ export const ExtensionContainer = styled.div((props) => ({
   paddingRight: props.theme.space.xs,
 }));
 
-export const OrdinalsContainer = styled.div((props) => ({
-  width: 376.5,
-  height: 376.5,
-  display: 'flex',
-  aspectRatio: '1',
-  flexDirection: 'column',
-  justifyContent: 'flex-start',
-  alignItems: 'flex-start',
-  borderRadius: 8,
-  marginBottom: props.theme.space.l,
-}));
-
-export const ExtensionOrdinalsContainer = styled.div((props) => ({
-  maxHeight: 136,
-  width: 136,
+export const ExtensionOrdinalsContainer = styled.div<{ $isGalleryOpen: boolean }>((props) => ({
+  maxHeight: props.$isGalleryOpen ? 174 : 136,
+  width: props.$isGalleryOpen ? 174 : 136,
   display: 'flex',
   aspectRatio: '1',
   justifyContent: 'center',
   alignItems: 'center',
-  borderRadius: props.theme.radius(1),
+  borderRadius: props.theme.radius(2),
   marginTop: props.theme.space.l,
   marginBottom: props.theme.space.m,
 }));
@@ -91,31 +40,9 @@ export const OrdinalTitleText = styled.h1((props) => ({
   textAlign: 'center',
 }));
 
-export const OrdinalGalleryTitleText = styled.h1((props) => ({
-  ...props.theme.typography.headline_l,
-  color: props.theme.colors.white_0,
-}));
-
-export const DescriptionText = styled.h1((props) => ({
-  ...props.theme.typography.headline_l,
-  color: props.theme.colors.white_0,
-  fontSize: 24,
-}));
-
 export const BottomBarContainer = styled.div({
   marginTop: 'auto',
 });
-
-export const RowContainer = styled.div<{
-  withGap?: boolean;
-}>((props) => ({
-  display: 'flex',
-  alignItems: 'flex-start',
-  marginTop: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(12),
-  flexDirection: 'row',
-  columnGap: props.withGap ? props.theme.spacing(20) : 0,
-}));
 
 export const ColumnContainer = styled.div({
   display: 'flex',
@@ -124,13 +51,13 @@ export const ColumnContainer = styled.div({
   width: '100%',
 });
 
-export const OrdinalDetailsContainer = styled.div<DetailSectionProps>((props) => ({
+export const OrdinalDetailsContainer = styled.div((props) => ({
   display: 'flex',
   alignItems: 'flex-start',
   flexDirection: 'column',
   wordBreak: 'break-all',
   whiteSpace: 'pre-wrap',
-  width: props.isGallery ? 400 : '100%',
+  width: '100%',
   marginTop: props.theme.spacing(8),
 }));
 
@@ -141,23 +68,17 @@ export const Row = styled.div({
   width: '100%',
 });
 
-export const DescriptionContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  marginBottom: props.theme.spacing(30),
-}));
-
 export const StyledWebGalleryButton = styled(WebGalleryButton)`
   margin-top: ${(props) => props.theme.space.xs};
 `;
 
-export const ViewInExplorerButton = styled.button<DetailSectionProps>((props) => ({
+export const ViewInExplorerButton = styled.button((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
   backgroundColor: 'transparent',
-  width: props.isGallery ? 392 : 328,
+  width: '100%',
   height: 44,
   padding: 12,
   borderRadius: 12,
@@ -194,16 +115,6 @@ export const CollectibleText = styled.h1((props) => ({
   textAlign: 'center',
 }));
 
-export const GalleryCollectibleText = styled.h1((props) => ({
-  ...props.theme.typography.body_bold_l,
-  color: props.theme.colors.white_400,
-}));
-
-export const GalleryButtonContainer = styled.div`
-  width: 190px;
-  border-radius: 12px;
-`;
-
 export const RowButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
@@ -227,12 +138,58 @@ export const DetailSection = styled.div<DetailSectionProps>((props) => ({
   width: '100%',
 }));
 
+export const ExtensionLoaderContainer = styled.div((props) => ({
+  height: '100%',
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'space-around',
+  alignItems: 'center',
+  paddingBottom: props.theme.space.l,
+  ...props.theme.scrollbar,
+}));
+
 export const StyledBarLoader = styled(BetterBarLoader)<{
   withMarginBottom?: boolean;
 }>((props) => ({
   padding: 0,
   borderRadius: props.theme.radius(1),
-  marginBottom: props.withMarginBottom ? props.theme.space.s : 0,
+  marginBottom: props.withMarginBottom ? props.theme.spacing(6) : 0,
+}));
+
+export const StyledSeparator = styled(Separator)`
+  width: 100%;
+`;
+
+export const TitleLoader = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+export const ActionButtonsLoader = styled.div((props) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  columnGap: props.theme.spacing(11),
+}));
+
+export const ActionButtonLoader = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  rowGap: props.theme.space.xs,
+}));
+
+export const InfoContainer = styled.div((props) => ({
+  width: '100%',
+  display: 'flex',
+  justifyContent: 'space-between',
+  marginTop: props.theme.space.m,
+  padding: `0 ${props.theme.space.m}`,
+}));
+
+export const InfoContainerColumn = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  rowGap: props.theme.space.xs,
 }));
 
 export const RareSatsBundleCallout = styled(Callout)<DetailSectionProps>((props) => ({
@@ -270,7 +227,4 @@ export const Badge = styled.div<{ backgroundColor?: string; isLastItem: boolean 
 }));
 export const SatributeBadgeLabel = styled(StyledP)`
   margin-left: ${(props) => props.theme.space.xs};
-`;
-export const DataItemsContainer = styled.div`
-  margin-top: ${(props) => props.theme.space.l};
 `;

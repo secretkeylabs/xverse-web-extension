@@ -5,6 +5,7 @@ import TopRow from '@components/topRow';
 import { useGetBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
 import { useRuneFungibleTokensQuery } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
 import { useGetSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
+import useOptionsDialog from '@hooks/useOptionsDialog';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -159,26 +160,10 @@ function ManageTokens() {
   const [selectedProtocol, setSelectedProtocol] = useState<FungibleTokenProtocol>(
     selectedAccount?.stxAddress ? 'stacks' : 'brc-20',
   );
-  const [showOptionsDialog, setShowOptionsDialog] = useState(false);
 
-  const [optionsDialogIndents, setOptionsDialogIndents] = useState<
-    { top: string; left: string } | undefined
-  >();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  const openOptionsDialog = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setShowOptionsDialog(true);
-
-    setOptionsDialogIndents({
-      top: `${(event.target as HTMLElement).parentElement?.getBoundingClientRect().top}px`,
-      left: `calc(100% - ${SPAM_OPTIONS_WIDTH}px)`,
-    });
-  };
-
-  const closeOptionsDialog = () => {
-    setShowOptionsDialog(false);
-  };
+  const menuDialog = useOptionsDialog(SPAM_OPTIONS_WIDTH);
 
   const toggled = (isEnabled: boolean, _coinName: string, coinKey: string) => {
     const runeFt = runesList?.find((ft: FungibleTokenWithStates) => ft.principal === coinKey);
@@ -245,11 +230,11 @@ function ManageTokens() {
 
   return (
     <>
-      <TopRow onClick={handleBackButtonClick} onMenuClick={openOptionsDialog} />
-      {showOptionsDialog && (
+      <TopRow onClick={handleBackButtonClick} onMenuClick={menuDialog.open} />
+      {menuDialog.isVisible && (
         <OptionsDialog
-          closeDialog={closeOptionsDialog}
-          optionsDialogIndents={optionsDialogIndents}
+          closeDialog={menuDialog.close}
+          optionsDialogIndents={menuDialog.indents}
           width={SPAM_OPTIONS_WIDTH}
         >
           <ButtonRow

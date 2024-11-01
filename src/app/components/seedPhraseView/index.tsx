@@ -16,7 +16,7 @@ const Container = styled.div((props) => ({
 
 const SeedContainer = styled.div<SeedContainerProps>((props) => ({
   display: 'grid',
-  gridTemplateColumns: ' 100px 100px 100px',
+  gridTemplateColumns: ' 1fr 1fr 1fr',
   textAlign: 'center',
   margin: 0,
   columnGap: props.theme.spacing(3),

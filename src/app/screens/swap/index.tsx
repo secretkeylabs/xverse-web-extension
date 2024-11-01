@@ -77,6 +77,7 @@ const RouteContainer = styled.div((props) => ({
   flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems: 'center',
+  gap: props.theme.space.s,
   margin: `${props.theme.space.l} 0`,
 }));
 
