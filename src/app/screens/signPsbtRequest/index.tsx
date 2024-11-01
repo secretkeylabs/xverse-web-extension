@@ -79,6 +79,9 @@ function SignPsbtRequest() {
         ...(accountType === 'ledger' && {
           ledgerTransport: transport as Transport,
         }),
+        ...(accountType === 'keystone' && {
+          keystoneTransport: transport as TransportWebUSB,
+        }),
       });
       const response = await confirmSignPsbt(signedPsbt);
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {

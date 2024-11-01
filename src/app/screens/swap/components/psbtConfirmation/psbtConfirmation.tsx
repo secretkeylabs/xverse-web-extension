@@ -132,6 +132,9 @@ export default function PsbtConfirmation({
         ...(accountType === 'ledger' && {
           ledgerTransport: transport as Transport,
         }),
+        ...(accountType === 'keystone' && {
+          keystoneTransport: transport as TransportWebUSB,
+        }),
       });
 
       if (!signedPsbt) {

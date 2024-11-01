@@ -4,8 +4,14 @@ import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { TransportWebUSB } from '@keystonehq/hw-transport-webusb';
 import type { TransactionSummary } from '@screens/sendBtc/helpers';
-import { AnalyticsEvents, btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
+import {
+  AnalyticsEvents,
+  btcTransaction,
+  type AccountType,
+  type Transport,
+} from '@secretkeylabs/xverse-core';
 import { removeAccountAvatarAction } from '@stores/wallet/actions/actionCreators';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
@@ -150,10 +156,18 @@ function SendOrdinalScreen() {
     return undefined;
   };
 
-  const handleSubmit = async (ledgerTransport?: Transport) => {
+  const handleSubmit = async (type?: AccountType, transport?: Transport | TransportWebUSB) => {
     try {
       setIsSubmitting(true);
-      const txnId = await transaction?.broadcast({ ledgerTransport, rbfEnabled: true });
+      const txnId = await transaction?.broadcast({
+        ...(type === 'ledger' && {
+          ledgerTransport: transport as Transport,
+        }),
+        ...(type === 'keystone' && {
+          keystoneTransport: transport as TransportWebUSB,
+        }),
+        rbfEnabled: true,
+      });
 
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
         protocol: 'ordinals',
