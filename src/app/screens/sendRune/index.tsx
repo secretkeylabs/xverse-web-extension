@@ -5,7 +5,7 @@ import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { TransportWebUSB } from '@keystoneHQ/hw-transport-webusb';
+import { TransportWebUSB } from '@keystonehq/hw-transport-webusb';
 import {
   AnalyticsEvents,
   FeatureId,

@@ -1,4 +1,4 @@
-import { TransportWebUSB } from '@keystoneHQ/hw-transport-webusb';
+import { TransportWebUSB } from '@keystonehq/hw-transport-webusb';
 import {
   signMessageKeystone,
   type MessageSigningProtocols,
