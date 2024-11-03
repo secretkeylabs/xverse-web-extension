@@ -164,16 +164,16 @@ const useStxTransactionRequest = (
       const contract = params.get('contract') ?? '';
       const functionName = params.get('functionName') ?? '';
       const argumentsString = params.get('arguments') ?? '';
-      const paramsParseResult = v.safeParse(
-        stxCallContractParamsSchema,
+      const argumentsParseResult = v.safeParse(
+        stxCallContractParamsSchema.entries.arguments,
         parse(decodeToken(argumentsString).payload as string),
       );
 
-      const argumentsArray = paramsParseResult.success
-        ? paramsParseResult.output.arguments
+      const argumentsArray = argumentsParseResult.success
+        ? argumentsParseResult.output
         : (() => {
             // eslint-disable-next-line no-console
-            console.error('Error parsing arguments', paramsParseResult.issues);
+            console.error('Error parsing arguments', argumentsParseResult.issues);
             return undefined;
           })();
 
