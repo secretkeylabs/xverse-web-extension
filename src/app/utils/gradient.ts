@@ -1,3 +1,5 @@
+import type { Account } from '@secretkeylabs/xverse-core';
+
 /* eslint-disable import/prefer-default-export */
 function toHex(str: string) {
   let result = '';
@@ -35,7 +37,8 @@ function stringToHslColor(str: string, saturation: number, lightness: number): s
   return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 }
 
-export function getAccountGradient(text: string): string[] {
+export function getAccountGradient(account: Account | null | undefined): string[] {
+  const text = account?.stxAddress || account?.btcAddresses.taproot.address || '';
   const pubKeyLikeString = toHex(text);
 
   const bg = stringToHslColor(text, 50, 60);

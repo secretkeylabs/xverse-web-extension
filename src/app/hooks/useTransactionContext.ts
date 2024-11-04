@@ -1,12 +1,12 @@
-import { btcTransaction, UtxoCache } from '@secretkeylabs/xverse-core';
+import { btcTransaction, UtxoCache, type BtcPaymentType } from '@secretkeylabs/xverse-core';
 import { useMemo } from 'react';
 import useBtcClient from './apiClients/useBtcClient';
 import useSeedVault from './useSeedVault';
 import useSelectedAccount from './useSelectedAccount';
 import useWalletSelector from './useWalletSelector';
 
-const useTransactionContext = () => {
-  const selectedAccount = useSelectedAccount();
+const useTransactionContext = (overridePayAddressType?: BtcPaymentType) => {
+  const selectedAccount = useSelectedAccount(overridePayAddressType);
   const { network } = useWalletSelector();
   const seedVault = useSeedVault();
   const btcClient = useBtcClient();
@@ -43,6 +43,7 @@ const useTransactionContext = () => {
       utxoCache,
       network: network.type,
       esploraApiProvider: btcClient,
+      btcPaymentAddressType: selectedAccount.btcAddressType,
     });
   }, [utxoCache, selectedAccount, network, seedVault, btcClient]);
 

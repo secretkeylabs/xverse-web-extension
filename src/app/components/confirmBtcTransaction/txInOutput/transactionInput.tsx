@@ -28,19 +28,18 @@ type Props = {
 };
 
 function TransactionInput({ input }: Props) {
-  const { btcAddress, ordinalsAddress } = useSelectedAccount();
+  const { btcAddresses } = useSelectedAccount();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
 
-  const isPaymentsAddress = input.extendedUtxo.address === btcAddress;
-  const isOrdinalsAddress = input.extendedUtxo.address === ordinalsAddress;
-  const isExternalInput = !isPaymentsAddress && !isOrdinalsAddress;
+  const userAddresses = Object.values(btcAddresses).map((address) => address.address);
+  const isExternalInput = userAddresses.every((address) => address !== input.extendedUtxo.address);
 
   // TODO: show this in the UI?
   // const insecureInput =
   //   input.sigHash === btc.SigHash.NONE || input.sigHash === btc.SigHash.NONE_ANYONECANPAY;
 
   const renderAddress = (addressToBeDisplayed: string) =>
-    addressToBeDisplayed === btcAddress || addressToBeDisplayed === ordinalsAddress ? (
+    userAddresses.some((address) => address === addressToBeDisplayed) ? (
       <TxIdContainer>
         <SubValueText data-testid="address-send" typography="body_medium_s">
           {getTruncatedAddress(addressToBeDisplayed)}
@@ -59,7 +58,7 @@ function TransactionInput({ input }: Props) {
         icon={InputIcon}
         hideAddress
         dataTestID="confirm-balance"
-        hideCopyButton={isPaymentsAddress || isOrdinalsAddress}
+        hideCopyButton={!isExternalInput}
         amount={`${satsToBtc(
           new BigNumber(input.extendedUtxo.utxo.value.toString()),
         ).toFixed()} BTC`}

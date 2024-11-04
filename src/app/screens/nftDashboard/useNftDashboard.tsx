@@ -4,11 +4,7 @@ import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Wrench } from '@phosphor-icons/react';
 import type { InscriptionCollectionsData, StacksCollectionData } from '@secretkeylabs/xverse-core';
-import {
-  ChangeActivateOrdinalsAction,
-  ChangeActivateRareSatsAction,
-  SetRareSatsNoticeDismissedAction,
-} from '@stores/wallet/actions/actionCreators';
+import { SetRareSatsNoticeDismissedAction } from '@stores/wallet/actions/actionCreators';
 import Button from '@ui-library/button';
 import { getCollectionKey } from '@utils/inscriptions';
 import { InvalidParamsError } from '@utils/query';
@@ -24,20 +20,20 @@ import NftTabGridItem from './nftTabGridItem';
 const NoCollectiblesText = styled.h1((props) => ({
   ...props.theme.typography.body_bold_m,
   color: props.theme.colors.white_200,
-  marginTop: props.theme.spacing(16),
+  marginTop: props.theme.space.xl,
   marginBottom: 'auto',
   textAlign: 'center',
 }));
 
 const ErrorContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(20),
+  marginTop: props.theme.space.xxl,
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
 }));
 
 const ErrorTextContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(8),
+  marginTop: props.theme.space.m,
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
@@ -72,11 +68,11 @@ function IsVisibleOrPlaceholder({ children }: PropsWithChildren) {
 
 export type NftDashboardState = {
   openReceiveModal: boolean;
-  showNewFeatureAlert: boolean;
   isOrdinalReceiveAlertVisible: boolean;
   stacksNftsQuery: ReturnType<typeof useStacksCollectibles>;
   inscriptionsQuery: ReturnType<typeof useAddressInscriptions>;
   hiddenInscriptionsQuery: ReturnType<typeof useAddressInscriptions>;
+  hiddenStacksNftsQuery: ReturnType<typeof useStacksCollectibles>;
   rareSatsQuery: ReturnType<typeof useAddressRareSats>;
   openInGalleryView: () => void;
   onReceiveModalOpen: () => void;
@@ -86,15 +82,14 @@ export type NftDashboardState = {
   InscriptionListView: () => JSX.Element;
   HiddenInscriptionListView: () => JSX.Element;
   NftListView: () => JSX.Element;
-  onActivateRareSatsAlertCrossPress: () => void;
-  onActivateRareSatsAlertDenyPress: () => void;
-  onActivateRareSatsAlertEnablePress: () => void;
+  HiddenNftListView: () => JSX.Element;
   onDismissRareSatsNotice: () => void;
   isGalleryOpen: boolean;
   hasActivatedOrdinalsKey?: boolean;
   hasActivatedRareSatsKey?: boolean;
   showNoticeAlert?: boolean;
   totalNfts: number;
+  totalHiddenNfts: number;
   totalInscriptions: number;
   totalHiddenInscriptions: number;
 };
@@ -105,10 +100,10 @@ const useNftDashboard = (): NftDashboardState => {
   const { hasActivatedOrdinalsKey, hasActivatedRareSatsKey, rareSatsNoticeDismissed } =
     useWalletSelector();
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
-  const [showNewFeatureAlert, setShowNewFeatureAlert] = useState(false);
   const [showNoticeAlert, setShowNoticeAlert] = useState(false);
   const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible] = useState(false);
   const stacksNftsQuery = useStacksCollectibles();
+  const hiddenStacksNftsQuery = useStacksCollectibles(true);
   const inscriptionsQuery = useAddressInscriptions();
   const hiddenInscriptionsQuery = useAddressInscriptions(true);
   const rareSatsQuery = useAddressRareSats();
@@ -117,17 +112,9 @@ const useNftDashboard = (): NftDashboardState => {
   const totalHiddenInscriptions = hiddenInscriptionsQuery.data?.pages?.[0]?.total_inscriptions ?? 0;
 
   const totalNfts = stacksNftsQuery.data?.total_nfts ?? 0;
+  const totalHiddenNfts = hiddenStacksNftsQuery.data?.total_nfts ?? 0;
 
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
-
-  useEffect(() => {
-    if (
-      (hasActivatedOrdinalsKey === undefined && totalInscriptions) ||
-      hasActivatedRareSatsKey === undefined
-    ) {
-      setShowNewFeatureAlert(true);
-    }
-  }, [hasActivatedOrdinalsKey, hasActivatedRareSatsKey, totalInscriptions]);
 
   useEffect(() => {
     setShowNoticeAlert(rareSatsNoticeDismissed === undefined);
@@ -270,21 +257,36 @@ const useNftDashboard = (): NftDashboardState => {
     );
   }, [stacksNftsQuery, isGalleryOpen, totalNfts, t]);
 
-  const onActivateRareSatsAlertCrossPress = () => {
-    setShowNewFeatureAlert(false);
-  };
+  const HiddenNftListView = useCallback(() => {
+    if (
+      hiddenStacksNftsQuery.error &&
+      !(hiddenStacksNftsQuery.error instanceof InvalidParamsError)
+    ) {
+      return (
+        <ErrorContainer>
+          <Wrench size={48} />
+          <ErrorTextContainer>
+            <ErrorText>{t('ERROR_RETRIEVING')}</ErrorText>
+            <ErrorText>{t('TRY_AGAIN')}</ErrorText>
+          </ErrorTextContainer>
+        </ErrorContainer>
+      );
+    }
 
-  const onActivateRareSatsAlertDenyPress = () => {
-    setShowNewFeatureAlert(false);
-    dispatch(ChangeActivateOrdinalsAction(true));
-    dispatch(ChangeActivateRareSatsAction(false));
-  };
+    if (totalHiddenNfts === 0) {
+      return <NoCollectiblesText>{t('NO_COLLECTIBLES')}</NoCollectiblesText>;
+    }
 
-  const onActivateRareSatsAlertEnablePress = () => {
-    setShowNewFeatureAlert(false);
-    dispatch(ChangeActivateOrdinalsAction(true));
-    dispatch(ChangeActivateRareSatsAction(true));
-  };
+    return (
+      <GridContainer $isGalleryOpen={isGalleryOpen}>
+        {hiddenStacksNftsQuery.data?.results.map((collection: StacksCollectionData) => (
+          <IsVisibleOrPlaceholder key={collection.collection_id}>
+            <NftTabGridItem item={collection} />
+          </IsVisibleOrPlaceholder>
+        ))}
+      </GridContainer>
+    );
+  }, [hiddenStacksNftsQuery, isGalleryOpen, totalHiddenNfts, t]);
 
   const onDismissRareSatsNotice = () => {
     setShowNoticeAlert(false);
@@ -293,9 +295,9 @@ const useNftDashboard = (): NftDashboardState => {
 
   return {
     openReceiveModal,
-    showNewFeatureAlert,
     isOrdinalReceiveAlertVisible,
     stacksNftsQuery,
+    hiddenStacksNftsQuery,
     inscriptionsQuery,
     hiddenInscriptionsQuery,
     openInGalleryView,
@@ -306,9 +308,7 @@ const useNftDashboard = (): NftDashboardState => {
     InscriptionListView,
     HiddenInscriptionListView,
     NftListView,
-    onActivateRareSatsAlertCrossPress,
-    onActivateRareSatsAlertDenyPress,
-    onActivateRareSatsAlertEnablePress,
+    HiddenNftListView,
     onDismissRareSatsNotice,
     isGalleryOpen,
     hasActivatedOrdinalsKey,
@@ -316,6 +316,7 @@ const useNftDashboard = (): NftDashboardState => {
     showNoticeAlert,
     rareSatsQuery,
     totalNfts,
+    totalHiddenNfts,
     totalInscriptions,
     totalHiddenInscriptions,
   };

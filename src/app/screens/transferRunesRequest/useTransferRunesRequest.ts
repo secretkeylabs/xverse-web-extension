@@ -3,7 +3,7 @@ import { sendUserRejectionMessage } from '@common/utils/rpc/responseMessages/err
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { RpcErrorCode, type TransferRunesRequest } from '@sats-connect/core';
+import { RpcErrorCode, type RunesTransferRequestMessage } from '@sats-connect/core';
 import { type TransactionSummary } from '@screens/sendBtc/helpers';
 import { btcTransaction, runesTransaction, type Transport } from '@secretkeylabs/xverse-core';
 import { useCallback, useEffect, useState } from 'react';
@@ -11,7 +11,7 @@ import { useCallback, useEffect, useState } from 'react';
 type Args = {
   tabId: number;
   messageId: string;
-  recipients: TransferRunesRequest['params']['recipients'];
+  recipients: RunesTransferRequestMessage['params']['recipients'];
 };
 const useTransferRunes = ({ tabId, messageId, recipients }: Args) => {
   const [txError, setTxError] = useState<{

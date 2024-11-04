@@ -59,6 +59,7 @@ function NodeInput({
   onClear,
   onReset,
   error,
+  disabled,
 }: {
   label: string;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -66,6 +67,7 @@ function NodeInput({
   onClear: () => void;
   onReset: () => void;
   error: string;
+  disabled?: boolean;
 }) {
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
   const theme = useTheme();
@@ -74,12 +76,14 @@ function NodeInput({
     <div>
       <NodeInputHeader>
         <NodeText>{label}</NodeText>
-        <NodeResetButton onClick={onReset}>{t('RESET_TO_DEFAULT')}</NodeResetButton>
+        <NodeResetButton onClick={onReset} disabled={disabled}>
+          {t('RESET_TO_DEFAULT')}
+        </NodeResetButton>
       </NodeInputHeader>
       <InputContainer>
-        <Input data-testid={label} onChange={onChange} value={value} />
+        <Input data-testid={label} onChange={onChange} value={value} disabled={disabled} />
         {value && (
-          <Button onClick={onClear}>
+          <Button onClick={onClear} disabled={disabled}>
             <XCircle size={18} weight="fill" color={theme.colors.white_200} />
           </Button>
         )}

@@ -131,12 +131,12 @@ function RareSats({
               // eslint-disable-next-line react/jsx-key
               <Range>
                 <RareSatRow item={item} />
-                {i < satributes.length - 1 && <Divider verticalMargin="s" />}
+                {i < satributes.length - 1 && <Divider $verticalMargin="s" />}
               </Range>
             ))}
           {bundleSize && totalExoticSats !== bundleSize && (
             <>
-              <Divider verticalMargin="s" />
+              <Divider $verticalMargin="s" />
               <Range>
                 <RareSatRow
                   item={{

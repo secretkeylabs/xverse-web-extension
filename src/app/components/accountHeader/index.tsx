@@ -1,23 +1,21 @@
 import AccountRow from '@components/accountRow';
 import useWalletReducer from '@hooks/useWalletReducer';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import OptionsDialog from '@components/optionsDialog/optionsDialog';
+import useOptionsDialog from '@hooks/useOptionsDialog';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import { DotsThreeVertical } from '@phosphor-icons/react';
-import { OPTIONS_DIALOG_WIDTH } from '@utils/constants';
 
-const SelectedAccountContainer = styled.div<{ $showBorderBottom?: boolean }>((props) => ({
+const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   position: 'relative',
   alignItems: 'center',
   justifyContent: 'space-between',
   padding: `${props.theme.space.l} ${props.theme.space.m}`,
-  borderBottom: props.$showBorderBottom ? `0.5px solid ${props.theme.colors.elevation3}` : 'none',
 }));
 
 const OptionsButton = styled.button(() => ({
@@ -58,43 +56,26 @@ const ButtonRow = styled.button`
 type Props = {
   disableMenuOption?: boolean;
   disableAccountSwitch?: boolean;
-  showBorderBottom?: boolean;
 };
 
 function AccountHeaderComponent({
   disableMenuOption = false,
   disableAccountSwitch = false,
-  showBorderBottom = true,
 }: Props) {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const selectedAccount = useSelectedAccount();
+  const menuDialog = useOptionsDialog();
 
   const { t: optionsDialogTranslation } = useTranslation('translation', {
     keyPrefix: 'OPTIONS_DIALOG',
   });
-  const [showOptionsDialog, setShowOptionsDialog] = useState(false);
   const { lockWallet } = useWalletReducer();
-  const [optionsDialogIndents, setOptionsDialogIndents] = useState<
-    { top: string; left: string } | undefined
-  >();
 
   const handleAccountSelect = () => {
     if (!disableAccountSwitch) {
-      navigate('/account-list');
+      navigate('/account-list', { state: { from: pathname } });
     }
-  };
-
-  const openOptionsDialog = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setShowOptionsDialog(true);
-
-    setOptionsDialogIndents({
-      top: `${(event.target as HTMLElement).parentElement?.getBoundingClientRect().top}px`,
-      left: `calc(100% - ${OPTIONS_DIALOG_WIDTH}px)`,
-    });
-  };
-
-  const closeOptionsDialog = () => {
-    setShowOptionsDialog(false);
   };
 
   const handleLockWallet = async () => {
@@ -102,7 +83,7 @@ function AccountHeaderComponent({
   };
 
   return (
-    <SelectedAccountContainer $showBorderBottom={showBorderBottom}>
+    <Container>
       <AccountRow
         account={selectedAccount!}
         isSelected
@@ -110,19 +91,19 @@ function AccountHeaderComponent({
         disabledAccountSelect={disableAccountSwitch}
       />
       {!disableMenuOption && (
-        <OptionsButton aria-label="Open Header Options" onClick={openOptionsDialog}>
+        <OptionsButton aria-label="Open Header Options" onClick={menuDialog.open}>
           <DotsThreeVertical size={20} fill="white" weight="bold" />
         </OptionsButton>
       )}
-      {showOptionsDialog && (
-        <OptionsDialog closeDialog={closeOptionsDialog} optionsDialogIndents={optionsDialogIndents}>
+      {menuDialog.isVisible && (
+        <OptionsDialog closeDialog={menuDialog.close} optionsDialogIndents={menuDialog.indents}>
           <ButtonRow onClick={handleAccountSelect}>
             {optionsDialogTranslation('SWITCH_ACCOUNT')}
           </ButtonRow>
           <ButtonRow onClick={handleLockWallet}>{optionsDialogTranslation('LOCK')}</ButtonRow>
         </OptionsDialog>
       )}
-    </SelectedAccountContainer>
+    </Container>
   );
 }
 

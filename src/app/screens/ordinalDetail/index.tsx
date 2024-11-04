@@ -1,5 +1,4 @@
-import ArrowLeft from '@assets/img/dashboard/arrow_left.svg';
-import AccountHeaderComponent from '@components/accountHeader';
+import UserCircleSlashed from '@assets/img/user_circle_slashed.svg';
 import AlertMessage from '@components/alertMessage';
 import CollectibleDetailTile from '@components/collectibleDetailTile';
 import RareSatIcon from '@components/rareSatIcon/rareSatIcon';
@@ -8,18 +7,8 @@ import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useOptionsSheet from '@hooks/useOptionsSheet';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
-import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import {
-  ArrowUp,
-  DotsThreeVertical,
-  Share,
-  Star,
-  TrayArrowDown,
-  TrayArrowUp,
-  UserCircleCheck,
-  UserCircleMinus,
-} from '@phosphor-icons/react';
+import { ArrowUp, Share, TrayArrowDown, TrayArrowUp, UserCircle } from '@phosphor-icons/react';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import { StyledButton } from '@screens/ordinalsCollection/index.styled';
 import {
@@ -30,11 +19,10 @@ import {
   removeFromStarCollectiblesAction,
   setAccountAvatarAction,
 } from '@stores/wallet/actions/actionCreators';
-import Button from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import SnackBar from '@ui-library/snackBar';
-import { EMPTY_LABEL } from '@utils/constants';
+import { EMPTY_LABEL, LONG_TOAST_DURATION } from '@utils/constants';
 import { getRareSatsColorsByRareSatsType, getRareSatsLabelByType } from '@utils/rareSats';
 import { useCallback } from 'react';
 import toast from 'react-hot-toast';
@@ -45,36 +33,24 @@ import Theme from '../../../theme';
 import {
   ActionButtonLoader,
   ActionButtonsLoader,
-  BackButtonContainer,
   Badge,
   BottomBarContainer,
-  ButtonContainer,
   ButtonHiglightedText,
   ButtonText,
   CollectibleText,
   ColumnContainer,
-  DataItemsContainer,
-  DescriptionContainer,
-  DescriptionText,
   DetailSection,
   Divider,
   ExtensionContainer,
   ExtensionLoaderContainer,
   ExtensionOrdinalsContainer,
-  GalleryButtonContainer,
-  GalleryCollectibleText,
-  GalleryContainer,
-  GalleryLoaderContainer,
-  GalleryScrollContainer,
   InfoContainer,
+  InfoContainerColumn,
   OrdinalDetailsContainer,
-  OrdinalGalleryTitleText,
-  OrdinalsContainer,
   OrdinalTitleText,
   RareSatsBundleCallout,
   Row,
   RowButtonContainer,
-  RowContainer,
   SatributeBadgeLabel,
   SatributesBadgeContainer,
   SatributesBadges,
@@ -117,13 +93,11 @@ function OrdinalDetailScreen() {
     openInOrdinalsExplorer,
     handleNavigationToRareSatsBundle,
     onCopyClick,
-    backButtonText,
   } = ordinalDetails;
-  const selectedAccount = useSelectedAccount();
   const { starredCollectibleIds, hiddenCollectibleIds, avatarIds } = useWalletSelector();
-  const currentAvatar = avatarIds[selectedAccount.btcAddress];
+  const selectedAvatar = avatarIds[ordinalsAddress];
   const isInscriptionSelectedAsAvatar =
-    currentAvatar?.type === 'inscription' && currentAvatar.inscription.id === ordinal?.id;
+    selectedAvatar?.type === 'inscription' && selectedAvatar.inscription.id === ordinal?.id;
   const inscriptionStarred = starredCollectibleIds[ordinalsAddress]?.some(
     ({ id }) => id === ordinal?.id,
   );
@@ -140,25 +114,29 @@ function OrdinalDetailScreen() {
 
   useResetUserFlow('/ordinal-detail');
 
+  const handleUnstarClick = (toastId: string) => {
+    dispatch(removeFromStarCollectiblesAction({ address: ordinalsAddress, id: ordinal?.id ?? '' }));
+    toast.remove(toastId);
+    toast(t('UNSTAR_INSCRIPTION'));
+  };
+
   const handleStarClick = () => {
     if (inscriptionStarred) {
-      const toastId = toast.custom(
-        <SnackBar
-          text={t('UNSTAR_INSCRIPTION')}
-          type="neutral"
-          dismissToast={() => toast.remove(toastId)}
-        />,
-      );
       dispatch(
         removeFromStarCollectiblesAction({ address: ordinalsAddress, id: ordinal?.id ?? '' }),
       );
+      toast(t('UNSTAR_INSCRIPTION'));
     } else {
-      const toastId = toast.custom(
+      const toastId = toast(
         <SnackBar
           text={t('STAR_INSCRIPTION')}
           type="neutral"
-          dismissToast={() => toast.remove(toastId)}
+          action={{
+            text: commonT('UNDO'),
+            onClick: () => handleUnstarClick(toastId),
+          }}
         />,
+        { duration: LONG_TOAST_DURATION },
       );
       dispatch(
         addToStarCollectiblesAction({
@@ -173,19 +151,19 @@ function OrdinalDetailScreen() {
   const handleClickUndoHiding = (toastId: string) => {
     dispatch(removeFromHideCollectiblesAction({ address: ordinalsAddress, id: ordinal?.id ?? '' }));
     toast.remove(toastId);
-    toast.custom(<SnackBar text={t('INSCRIPTION_UNHIDDEN')} type="neutral" />, { duration: 2000 });
+    toast(t('INSCRIPTION_UNHIDDEN'));
   };
 
   const handleHideStandaloneInscription = () => {
     dispatch(addToHideCollectiblesAction({ address: ordinalsAddress, id: ordinal?.id ?? '' }));
 
     if (isInscriptionSelectedAsAvatar) {
-      dispatch(removeAccountAvatarAction({ address: selectedAccount.btcAddress }));
+      dispatch(removeAccountAvatarAction({ address: ordinalsAddress }));
     }
 
     optionsSheet.close();
     navigate('/nft-dashboard?tab=inscriptions');
-    const toastId = toast.custom(
+    const toastId = toast(
       <SnackBar
         text={t('INSCRIPTION_HIDDEN')}
         type="neutral"
@@ -194,7 +172,7 @@ function OrdinalDetailScreen() {
           onClick: () => handleClickUndoHiding(toastId),
         }}
       />,
-      { duration: 4000 },
+      { duration: LONG_TOAST_DURATION },
     );
   };
 
@@ -202,35 +180,36 @@ function OrdinalDetailScreen() {
     const isLastHiddenItem = Object.keys(hiddenCollectibleIds[ordinalsAddress] ?? {}).length === 1;
     dispatch(removeFromHideCollectiblesAction({ address: ordinalsAddress, id: ordinal?.id ?? '' }));
     optionsSheet.close();
-    toast.custom(<SnackBar text={t('INSCRIPTION_UNHIDDEN')} type="neutral" />);
+    toast(t('INSCRIPTION_UNHIDDEN'));
     navigate(`/nft-dashboard/${isLastHiddenItem ? '' : 'hidden'}?tab=inscriptions`);
   };
 
   const handleSetAvatar = useCallback(() => {
-    const address = selectedAccount.btcAddress;
-
-    if (address && ordinal?.id) {
+    if (ordinalsAddress && ordinal?.id) {
       dispatch(
         setAccountAvatarAction({
-          address,
+          address: ordinalsAddress,
           avatar: { type: 'inscription', inscription: ordinal },
         }),
       );
 
-      const toastId = toast.custom(
+      const toastId = toast(
         <SnackBar
           text={optionsDialogT('NFT_AVATAR.SET_TOAST')}
           type="neutral"
           action={{
             text: commonT('UNDO'),
             onClick: () => {
-              if (currentAvatar?.type) {
-                dispatch(setAccountAvatarAction({ address, avatar: currentAvatar }));
+              if (selectedAvatar?.type) {
+                dispatch(
+                  setAccountAvatarAction({ address: ordinalsAddress, avatar: selectedAvatar }),
+                );
               } else {
-                dispatch(removeAccountAvatarAction({ address }));
+                dispatch(removeAccountAvatarAction({ address: ordinalsAddress }));
               }
 
               toast.remove(toastId);
+              toast(optionsDialogT('NFT_AVATAR.UNDO'));
             },
           }}
         />,
@@ -238,17 +217,17 @@ function OrdinalDetailScreen() {
     }
 
     optionsSheet.close();
-  }, [dispatch, optionsDialogT, commonT, selectedAccount, ordinal, optionsSheet, currentAvatar]);
+  }, [dispatch, optionsDialogT, commonT, ordinalsAddress, ordinal, optionsSheet, selectedAvatar]);
 
   const handleRemoveAvatar = useCallback(() => {
-    dispatch(removeAccountAvatarAction({ address: selectedAccount.btcAddress }));
-    toast.custom(<SnackBar text={optionsDialogT('NFT_AVATAR.REMOVE_TOAST')} type="neutral" />);
+    dispatch(removeAccountAvatarAction({ address: ordinalsAddress }));
+    toast(optionsDialogT('NFT_AVATAR.REMOVE_TOAST'));
     optionsSheet.close();
-  }, [dispatch, selectedAccount.btcAddress, optionsDialogT, optionsSheet]);
+  }, [dispatch, ordinalsAddress, optionsDialogT, optionsSheet]);
 
   const ordinalDetailAttributes = (
-    <OrdinalDetailsContainer isGallery={isGalleryOpen}>
-      {!isGalleryOpen && ordinal?.collection_id && (
+    <OrdinalDetailsContainer>
+      {ordinal?.collection_id && (
         <DetailSection isGallery={isGalleryOpen}>
           <CollectibleDetailTile title={t('COLLECTION')} value={ordinal?.collection_name ?? ''} />
           <CollectibleDetailTile
@@ -258,7 +237,7 @@ function OrdinalDetailScreen() {
           />
         </DetailSection>
       )}
-      {!isGalleryOpen && ordinal?.collection_id && (
+      {ordinal?.collection_id && (
         <CollectibleDetailTile
           title={t('EST_ITEM_VALUE')}
           value={
@@ -274,7 +253,7 @@ function OrdinalDetailScreen() {
       )}
 
       <CollectibleDetailTile title={t('ID')} value={ordinal?.id!} />
-      {!isGalleryOpen && <CollectibleDetailTile title={t('ADDRESS')} value={ordinal?.address!} />}
+      <CollectibleDetailTile title={t('ADDRESS')} value={ordinal?.address!} />
       <DetailSection isGallery={isGalleryOpen}>
         {ordinal?.value && (
           <CollectibleDetailTile
@@ -446,231 +425,14 @@ function OrdinalDetailScreen() {
     </SatributesBadgeContainer>
   );
 
-  const extensionView = isLoading ? (
-    <ExtensionLoaderContainer>
-      <TitleLoader>
-        <StyledBarLoader width={100} height={18.5} withMarginBottom />
-        <StyledBarLoader width={100} height={30} />
-      </TitleLoader>
-      <StyledBarLoader width={100} height={18.5} />
-      <StyledBarLoader width={136} height={136} />
-      <ActionButtonsLoader>
-        <ActionButtonLoader>
-          <StyledBarLoader width={48} height={48} />
-          <StyledBarLoader width={30} height={15.5} />
-        </ActionButtonLoader>
-        <ActionButtonLoader>
-          <StyledBarLoader width={48} height={48} />
-          <StyledBarLoader width={30} height={15.5} />
-        </ActionButtonLoader>
-      </ActionButtonsLoader>
-      <StyledSeparator />
-      <InfoContainer>
-        <div>
-          <StyledBarLoader width={100} height={18.5} />
-          <StyledBarLoader width={80} height={18.5} />
-        </div>
-        <div>
-          <StyledBarLoader width={100} height={18.5} />
-          <StyledBarLoader width={80} height={18.5} />
-        </div>
-      </InfoContainer>
-    </ExtensionLoaderContainer>
-  ) : (
-    <ExtensionContainer>
-      <CollectibleText>
-        {isBrc20Ordinal ? t('BRC20_INSCRIPTION') : ordinal?.collection_name || t('INSCRIPTION')}
-      </CollectibleText>
-      <OrdinalTitleText>{ordinal?.number}</OrdinalTitleText>
-      <StyledWebGalleryButton onClick={openInGalleryView} />
-      <ExtensionOrdinalsContainer>
-        <OrdinalImage ordinal={ordinal!} />
-      </ExtensionOrdinalsContainer>
-      {satributesIcons}
-      <RowButtonContainer>
-        <SquareButton
-          icon={<ArrowUp weight="regular" size="20" />}
-          text={t('SEND')}
-          onPress={handleSendOrdinal}
-        />
-        <SquareButton
-          icon={<Share weight="regular" color="white" size="20" />}
-          text={t('SHARE')}
-          onPress={onCopyClick}
-          hoverDialogId={`copy-url-${ordinal?.id}`}
-          isTransparent
-        />
-        <StyledTooltip
-          anchorId={`copy-url-${ordinal?.id}`}
-          variant="light"
-          content={t('COPIED')}
-          events={['click']}
-          place="top"
-        />
-      </RowButtonContainer>
-      {rareSats}
-      <Divider />
-      {stributesBadges}
-      {isBrc20Ordinal ? showBrc20OrdinalDetail(false) : ordinalDetailAttributes}
-      <ViewInExplorerButton isGallery={isGalleryOpen} onClick={openInOrdinalsExplorer}>
-        <ButtonText>{t('VIEW_IN')}</ButtonText>
-        <ButtonHiglightedText>{t('ORDINAL_VIEWER')}</ButtonHiglightedText>
-      </ViewInExplorerButton>
-    </ExtensionContainer>
-  );
-
-  const galleryView = isLoading ? (
-    <GalleryScrollContainer>
-      <GalleryContainer>
-        <BackButtonContainer>
-          <Button
-            variant="tertiary"
-            icon={<img src={ArrowLeft} alt="go back" />}
-            data-testid="back-to-gallery"
-            onClick={handleBackButtonClick}
-            title={backButtonText}
-          />
-        </BackButtonContainer>
-
-        <RowContainer withGap>
-          <StyledBarLoader width={376.5} height={376.5} />
-          <GalleryLoaderContainer>
-            <StyledBarLoader width={120} height={21} withMarginBottom />
-            <StyledBarLoader width={180} height={40} withMarginBottom />
-            <StyledBarLoader width={100} height={18.5} withMarginBottom />
-            <ButtonContainer>
-              <StyledBarLoader width={190} height={44} />
-              <StyledBarLoader width={190} height={44} />
-            </ButtonContainer>
-            <StyledBarLoader width={100} height={31} withMarginBottom />
-            <StyledBarLoader width={400} height={18.5} withMarginBottom />
-            <StyledBarLoader width={400} height={18.5} withMarginBottom />
-            <StyledBarLoader width={400} height={18.5} withMarginBottom />
-            <StyledBarLoader width={400} height={18.5} withMarginBottom />
-            <StyledBarLoader width={400} height={18.5} withMarginBottom />
-            <StyledBarLoader width={400} height={18.5} withMarginBottom />
-            <StyledBarLoader width={392} height={44} />
-          </GalleryLoaderContainer>
-        </RowContainer>
-      </GalleryContainer>
-    </GalleryScrollContainer>
-  ) : (
-    <GalleryScrollContainer>
-      <GalleryContainer>
-        <BackButtonContainer>
-          <Button
-            variant="tertiary"
-            icon={<img src={ArrowLeft} alt="go back" />}
-            data-testid="back-button"
-            onClick={handleBackButtonClick}
-            title={backButtonText}
-          />
-        </BackButtonContainer>
-
-        <RowContainer withGap>
-          <OrdinalsContainer>
-            <OrdinalImage ordinal={ordinal!} inNftDetail />
-          </OrdinalsContainer>
-          <DescriptionContainer>
-            <GalleryCollectibleText>
-              {isBrc20Ordinal
-                ? t('BRC20_INSCRIPTION')
-                : ordinal?.collection_name || t('INSCRIPTION')}
-            </GalleryCollectibleText>
-            <OrdinalGalleryTitleText data-testid="ordinal-number">
-              {ordinal?.number}
-            </OrdinalGalleryTitleText>
-            {satributesIcons}
-            <RowContainer>
-              <ButtonText>{t('OWNED_BY')}</ButtonText>
-              <ButtonHiglightedText>{`${ordinalsAddress.substring(
-                0,
-                4,
-              )}...${ordinalsAddress.substring(
-                ordinalsAddress.length - 4,
-                ordinalsAddress.length,
-              )}`}</ButtonHiglightedText>
-            </RowContainer>
-
-            <ButtonContainer>
-              <GalleryButtonContainer>
-                <Button
-                  icon={<ArrowUp weight="bold" size="16" />}
-                  title={t('SEND')}
-                  onClick={handleSendOrdinal}
-                />
-              </GalleryButtonContainer>
-              <GalleryButtonContainer>
-                <Button
-                  icon={<Share weight="bold" color="white" size="16" />}
-                  title={t('SHARE')}
-                  onClick={onCopyClick}
-                  id={`copy-url-${ordinal?.id}`}
-                  variant="secondary"
-                />
-                <StyledTooltip
-                  anchorId={`copy-url-${ordinal?.id}`}
-                  content={t('COPIED')}
-                  events={['click']}
-                  place="top"
-                  variant="light"
-                />
-              </GalleryButtonContainer>
-              {!isHidden && (
-                <SquareButton
-                  icon={
-                    inscriptionStarred ? (
-                      <Star size={16} color={Theme.colors.tangerine} weight="fill" />
-                    ) : (
-                      <Star size={16} color={Theme.colors.white_0} weight="bold" />
-                    )
-                  }
-                  onPress={handleStarClick}
-                  isTransparent
-                  size={44}
-                  radiusSize={12}
-                />
-              )}
-              {(!isHidden || isStandaloneInscription) && (
-                <SquareButton
-                  icon={<DotsThreeVertical size={20} color={Theme.colors.white_0} weight="bold" />}
-                  onPress={optionsSheet.open}
-                  isTransparent
-                  size={44}
-                  radiusSize={12}
-                />
-              )}
-            </ButtonContainer>
-            <DescriptionText>{t('DATA')}</DescriptionText>
-            {rareSats}
-            <DataItemsContainer>
-              {stributesBadges}
-              {isBrc20Ordinal ? showBrc20OrdinalDetail(true) : ordinalDetailAttributes}
-            </DataItemsContainer>
-            <ViewInExplorerButton isGallery={isGalleryOpen} onClick={openInOrdinalsExplorer}>
-              <ButtonText>{t('VIEW_IN')}</ButtonText>
-              <ButtonHiglightedText>{t('ORDINAL_VIEWER')}</ButtonHiglightedText>
-            </ViewInExplorerButton>
-          </DescriptionContainer>
-        </RowContainer>
-      </GalleryContainer>
-    </GalleryScrollContainer>
-  );
-
-  const displayContent = isGalleryOpen && ordinal !== null ? galleryView : extensionView;
-
   return (
     <>
-      {isGalleryOpen ? (
-        <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-      ) : (
-        <TopRow
-          onClick={handleBackButtonClick}
-          onStarClick={isHidden ? undefined : handleStarClick}
-          isStarred={inscriptionStarred}
-          onMenuClick={!isHidden || isStandaloneInscription ? optionsSheet.open : undefined}
-        />
-      )}
+      <TopRow
+        onClick={handleBackButtonClick}
+        onStarClick={isHidden ? undefined : handleStarClick}
+        isStarred={inscriptionStarred}
+        onMenuClick={!isHidden || isStandaloneInscription ? optionsSheet.open : undefined}
+      />
       {showSendOridnalsAlert && (
         <AlertMessage
           title={t('ORDINAL_PENDING_SEND_TITLE')}
@@ -680,12 +442,91 @@ function OrdinalDetailScreen() {
           description={t('ORDINAL_PENDING_SEND_DESCRIPTION')}
         />
       )}
-      {displayContent}
-      {!isGalleryOpen && (
-        <BottomBarContainer>
-          <BottomTabBar tab="nft" />
-        </BottomBarContainer>
+      {isLoading ? (
+        <ExtensionLoaderContainer>
+          <TitleLoader>
+            <StyledBarLoader width={100} height={18.5} withMarginBottom />
+            <StyledBarLoader width={100} height={30} withMarginBottom />
+          </TitleLoader>
+          {!isGalleryOpen && (
+            <div>
+              <StyledBarLoader width={100} height={18.5} withMarginBottom />
+            </div>
+          )}
+          <div>
+            <StyledBarLoader
+              width={isGalleryOpen ? 174 : 136}
+              height={isGalleryOpen ? 174 : 136}
+              withMarginBottom
+            />
+          </div>
+          <ActionButtonsLoader>
+            <ActionButtonLoader>
+              <StyledBarLoader width={48} height={48} />
+              <StyledBarLoader width={30} height={15.5} />
+            </ActionButtonLoader>
+            <ActionButtonLoader>
+              <StyledBarLoader width={48} height={48} />
+              <StyledBarLoader width={30} height={15.5} />
+            </ActionButtonLoader>
+          </ActionButtonsLoader>
+          <StyledSeparator />
+          <InfoContainer>
+            <InfoContainerColumn>
+              <StyledBarLoader width={100} height={18.5} />
+              <StyledBarLoader width={80} height={18.5} />
+            </InfoContainerColumn>
+            <InfoContainerColumn>
+              <StyledBarLoader width={100} height={18.5} />
+              <StyledBarLoader width={80} height={18.5} />
+            </InfoContainerColumn>
+          </InfoContainer>
+        </ExtensionLoaderContainer>
+      ) : (
+        <ExtensionContainer>
+          <CollectibleText>
+            {isBrc20Ordinal ? t('BRC20_INSCRIPTION') : ordinal?.collection_name || t('INSCRIPTION')}
+          </CollectibleText>
+          <OrdinalTitleText>{ordinal?.number}</OrdinalTitleText>
+          {!isGalleryOpen && <StyledWebGalleryButton onClick={openInGalleryView} />}
+          <ExtensionOrdinalsContainer $isGalleryOpen={isGalleryOpen}>
+            <OrdinalImage ordinal={ordinal!} />
+          </ExtensionOrdinalsContainer>
+          {satributesIcons}
+          <RowButtonContainer>
+            <SquareButton
+              icon={<ArrowUp weight="regular" size="20" />}
+              text={t('SEND')}
+              onPress={handleSendOrdinal}
+            />
+            <SquareButton
+              icon={<Share weight="regular" color="white" size="20" />}
+              text={t('SHARE')}
+              onPress={onCopyClick}
+              hoverDialogId={`copy-url-${ordinal?.id}`}
+              isTransparent
+            />
+            <StyledTooltip
+              anchorId={`copy-url-${ordinal?.id}`}
+              variant="light"
+              content={t('COPIED')}
+              events={['click']}
+              place="top"
+            />
+          </RowButtonContainer>
+          {rareSats}
+          <Divider />
+          {stributesBadges}
+          {isBrc20Ordinal ? showBrc20OrdinalDetail(false) : ordinalDetailAttributes}
+          <ViewInExplorerButton onClick={openInOrdinalsExplorer}>
+            <ButtonText>{t('VIEW_IN')}</ButtonText>
+            <ButtonHiglightedText>{t('ORDINAL_VIEWER')}</ButtonHiglightedText>
+          </ViewInExplorerButton>
+        </ExtensionContainer>
       )}
+      <BottomBarContainer>
+        <BottomTabBar tab="nft" />
+      </BottomBarContainer>
       {optionsSheet.isVisible && (
         <Sheet
           title={commonT('OPTIONS')}
@@ -696,14 +537,14 @@ function OrdinalDetailScreen() {
             (isInscriptionSelectedAsAvatar ? (
               <StyledButton
                 variant="tertiary"
-                icon={<UserCircleMinus size={24} color={Theme.colors.white_200} />}
+                icon={<img src={UserCircleSlashed} alt="Circle Slashed" />}
                 title={optionsDialogT('NFT_AVATAR.REMOVE_ACTION')}
                 onClick={handleRemoveAvatar}
               />
             ) : (
               <StyledButton
                 variant="tertiary"
-                icon={<UserCircleCheck size={24} color={Theme.colors.white_200} />}
+                icon={<UserCircle size={24} color={Theme.colors.white_200} />}
                 title={optionsDialogT('NFT_AVATAR.SET_ACTION')}
                 onClick={handleSetAvatar}
               />

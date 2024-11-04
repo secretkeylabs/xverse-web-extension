@@ -1,6 +1,6 @@
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
-import { delay } from '@common/utils/ledger';
+import { delay } from '@common/utils/promises';
 import ConfirmScreen from '@components/confirmScreen';
 import InfoContainer from '@components/infoContainer';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
@@ -220,7 +220,7 @@ function MessageSigning({
           <InfoContainer bodyText={t('SIGNATURE_REQUEST.SIGNING_WARNING')} type="Info" />
         </MainContainer>
       </ConfirmScreen>
-      <Sheet title="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
+      <Sheet visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
         {currentStepIndex === 0 && (
           <LedgerConnectionView
             title={t('SIGNATURE_REQUEST.LEDGER.CONNECT.TITLE')}

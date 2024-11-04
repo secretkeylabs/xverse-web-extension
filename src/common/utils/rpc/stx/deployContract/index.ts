@@ -1,43 +1,20 @@
-import { MESSAGE_SOURCE, type WebBtcMessage } from '@common/types/message-types';
-import { getTabIdFromPort, isUndefined, stringifyData } from '@common/utils';
+import { MESSAGE_SOURCE } from '@common/types/message-types';
+import { stringifyData } from '@common/utils';
 import {
   listenForPopupClose,
   makeSearchParamsWithDefaults,
   triggerRequestWindowOpen,
 } from '@common/utils/legacy-external-message-handler';
 import RequestsRoutes from '@common/utils/route-urls';
-import { RpcErrorCode } from '@sats-connect/core';
+import { RpcErrorCode, type StxDeployContractRequestMessage } from '@sats-connect/core';
 import { makeRPCError } from '../../helpers';
-import {
-  sendInvalidParametersResponseMessage,
-  sendMissingParametersMessage,
-} from '../../responseMessages/errors';
-import { deployContractParamsSchema } from './paramsSchema';
 
-async function deployContract(
-  message: WebBtcMessage<'stx_deployContract'>,
-  port: chrome.runtime.Port,
-) {
-  if (isUndefined(message.params)) {
-    sendMissingParametersMessage({ tabId: getTabIdFromPort(port), messageId: message.id });
-    return;
-  }
-
-  const paramsParseResult = deployContractParamsSchema.safeParse(message.params);
-  if (!paramsParseResult.success) {
-    sendInvalidParametersResponseMessage({
-      tabId: getTabIdFromPort(port),
-      messageId: message.id,
-      error: paramsParseResult.error,
-    });
-    return;
-  }
-
+async function deployContract(message: StxDeployContractRequestMessage, port: chrome.runtime.Port) {
   const popupParams = {
     // RPC params
-    name: paramsParseResult.data.name,
-    clarityCode: stringifyData(paramsParseResult.data.clarityCode),
-    clarityVersion: paramsParseResult.data.clarityVersion,
+    name: message.params.name,
+    clarityCode: stringifyData(message.params.clarityCode),
+    clarityVersion: message.params.clarityVersion,
 
     // Metadata
     rpcMethod: 'stx_deployContract',

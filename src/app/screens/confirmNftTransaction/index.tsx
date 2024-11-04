@@ -77,8 +77,8 @@ function ConfirmNftTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const selectedAccount = useSelectedAccount();
-  const { avatarIds } = useWalletSelector();
-  const currentAvatar = avatarIds[selectedAccount.btcAddress];
+  const { avatarIds, network } = useWalletSelector();
+  const selectedAvatar = avatarIds[selectedAccount.ordinalsAddress];
   const [fee, setFee] = useState<BigNumber>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -89,7 +89,6 @@ function ConfirmNftTransaction() {
 
   const { unsignedTx: unsignedTxHex, recipientAddress } = location.state;
   const unsignedTx = useMemo(() => deserializeTransaction(unsignedTxHex), [unsignedTxHex]);
-  const { network } = useWalletSelector();
   const { refetch } = useStxWalletData();
   const selectedNetwork = useNetworkSelector();
   const {
@@ -117,8 +116,8 @@ function ConfirmNftTransaction() {
         refetch();
       }, 1000);
 
-      if (currentAvatar?.type === 'stacks' && currentAvatar.nft?.token_id === nft?.token_id) {
-        dispatch(removeAccountAvatarAction({ address: selectedAccount.btcAddress }));
+      if (selectedAvatar?.type === 'stacks' && selectedAvatar.nft?.token_id === nft?.token_id) {
+        dispatch(removeAccountAvatarAction({ address: selectedAccount.ordinalsAddress }));
       }
     }
   }, [
@@ -126,9 +125,9 @@ function ConfirmNftTransaction() {
     navigate,
     refetch,
     stxTxBroadcastData,
-    selectedAccount.btcAddress,
+    selectedAccount.ordinalsAddress,
     nft,
-    currentAvatar,
+    selectedAvatar,
   ]);
 
   useEffect(() => {

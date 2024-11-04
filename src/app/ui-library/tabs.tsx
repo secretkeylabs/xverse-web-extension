@@ -30,14 +30,16 @@ export const TabItem = styled.button<{ $active?: boolean }>`
         `}
 `;
 
-type TabProps<T> = {
-  tabs: { label: string; value: T }[];
+export type TabProp<T> = { label: string; value: T };
+
+type TabsProps<T> = {
+  tabs: TabProp<T>[];
   activeTab: T;
   onTabClick: (value: T) => void;
   className?: string;
 };
 
-function Tabs<T extends unknown>({ tabs, activeTab, onTabClick, className }: TabProps<T>) {
+export function Tabs<T extends unknown>({ tabs, activeTab, onTabClick, className }: TabsProps<T>) {
   return (
     <TabContainer className={className}>
       {tabs.map((tab) => (
@@ -52,5 +54,3 @@ function Tabs<T extends unknown>({ tabs, activeTab, onTabClick, className }: Tab
     </TabContainer>
   );
 }
-
-export default Tabs;

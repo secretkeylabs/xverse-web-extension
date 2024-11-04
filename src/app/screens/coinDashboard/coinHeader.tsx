@@ -7,9 +7,9 @@ import Lock from '@assets/img/transactions/Lock.svg';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import PercentageChange from '@components/percentageChange';
-import SmallActionButton from '@components/smallActionButton';
+import SquareButton from '@components/squareButton';
 import TokenImage from '@components/tokenImage';
-import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useSelectedAccountBtcBalance from '@hooks/queries/useSelectedAccountBtcBalance';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useHasFeature from '@hooks/useHasFeature';
@@ -24,7 +24,9 @@ import {
   microstacksToStx,
   type FungibleToken,
 } from '@secretkeylabs/xverse-core';
+import { setBalanceHiddenToggleAction } from '@stores/wallet/actions/actionCreators';
 import type { CurrencyTypes } from '@utils/constants';
+import { HIDDEN_BALANCE_LABEL } from '@utils/constants';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { getBalanceAmount, getFtTicker } from '@utils/tokens';
@@ -32,6 +34,7 @@ import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
   AvailableStxContainer,
@@ -61,21 +64,25 @@ type Props = {
 
 export default function CoinHeader({ currency, fungibleToken }: Props) {
   const selectedAccount = useSelectedAccount();
-  const { fiatCurrency, network, selectedAccountType } = useWalletSelector();
-  const { data: btcBalance } = useBtcWalletData();
+  const { fiatCurrency, network, balanceHidden } = useWalletSelector();
+
+  // TODO: this should be a dumb component, move the logic to the parent
+  // TODO: currently, we get btc and stx balances here for all currencies and FTs, but we should get them in
+  // TODO: the relevant parent and pass them as props
+  const { confirmedPaymentBalance: btcBalance } = useSelectedAccountBtcBalance();
   const { data: stxData } = useStxWalletData();
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
+  const { t: commonT } = useTranslation('translation', { keyPrefix: 'COMMON' });
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const isReceivingAddressesVisible = !isLedgerAccount(selectedAccount);
+  const dispatch = useDispatch();
 
   const showRunesListing =
     (useHasFeature(FeatureId.RUNES_LISTING) || process.env.NODE_ENV === 'development') &&
     network.type === 'Mainnet' &&
-    fungibleToken?.protocol === 'runes' &&
-    // TODO: remove this once we implement ledger batch PSBT signing flow
-    selectedAccountType !== 'ledger';
+    fungibleToken?.protocol === 'runes';
 
   const handleReceiveModalOpen = () => {
     setOpenReceiveModal(true);
@@ -108,7 +115,12 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
                 value={microstacksToStx(new BigNumber(stxData?.locked ?? '0')).toString()}
                 displayType="text"
                 thousandSeparator
-                renderText={(value: string) => <StxLockedText>{`${value} STX`}</StxLockedText>}
+                renderText={(value: string) => (
+                  <StxLockedText>
+                    {balanceHidden && HIDDEN_BALANCE_LABEL}
+                    {!balanceHidden && `${value} STX`}
+                  </StxLockedText>
+                )}
               />
             </LockedStxContainer>
             <AvailableStxContainer>
@@ -117,7 +129,12 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
                 value={microstacksToStx(new BigNumber(stxData?.availableBalance ?? 0)).toString()}
                 displayType="text"
                 thousandSeparator
-                renderText={(value: string) => <StxLockedText>{`${value} STX`}</StxLockedText>}
+                renderText={(value: string) => (
+                  <StxLockedText>
+                    {balanceHidden && HIDDEN_BALANCE_LABEL}
+                    {!balanceHidden && `${value} STX`}
+                  </StxLockedText>
+                )}
               />
             </AvailableStxContainer>
           </Container>
@@ -157,20 +174,21 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
 
   const getDashboardTitle = () => {
     if (fungibleToken?.name) {
-      return `${fungibleToken.name} ${t('BALANCE')}`;
+      return fungibleToken.name;
     }
-
     if (!currency) {
       return '';
     }
-
     if (currency === 'STX') {
-      return `Stacks ${t('BALANCE')}`;
+      if (new BigNumber(stxData?.locked ?? 0).gt(0)) {
+        return `${commonT('STACKS')} ${commonT('BALANCE')}`;
+      }
+      return commonT('STACKS');
     }
     if (currency === 'BTC') {
-      return `Bitcoin ${t('BALANCE')}`;
+      return commonT('BITCOIN');
     }
-    return `${currency} ${t('BALANCE')}`;
+    return `${currency}`;
   };
 
   const isCrossChainSwapsEnabled = useHasFeature(FeatureId.CROSS_CHAIN_SWAPS);
@@ -183,6 +201,14 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
     currency === 'BTC' ||
     (currency === 'STX' && isStacksSwapsEnabled);
   const showSwaps = isCrossChainSwapsEnabled && isSwapEligibleCurrency;
+
+  const fiatValue = getFiatEquivalent(
+    Number(getBalanceAmount(currency, fungibleToken, stxData, btcBalance)),
+    currency,
+    BigNumber(stxBtcRate),
+    BigNumber(btcFiatRate),
+    fungibleToken,
+  );
 
   const navigateToSwaps = () => {
     if (!showSwaps) {
@@ -208,6 +234,9 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
     handleReceiveModalOpen();
   };
 
+  const toggleHideBalance = () =>
+    dispatch(setBalanceHiddenToggleAction({ toggle: !balanceHidden }));
+
   return (
     <Container>
       <BalanceInfoContainer>
@@ -232,24 +261,28 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
             displayType="text"
             thousandSeparator
             renderText={(value: string) => (
-              <CoinBalanceText data-testid="coin-balance">{`${value} ${getTokenTicker()}`}</CoinBalanceText>
+              <CoinBalanceText data-testid="coin-balance" onClick={toggleHideBalance}>
+                {balanceHidden && HIDDEN_BALANCE_LABEL}
+                {!balanceHidden && `${value} ${getTokenTicker()}`}
+              </CoinBalanceText>
             )}
           />
           <FiatContainer>
-            <NumericFormat
-              value={getFiatEquivalent(
-                Number(getBalanceAmount(currency, fungibleToken, stxData, btcBalance)),
-                currency,
-                BigNumber(stxBtcRate),
-                BigNumber(btcFiatRate),
-                fungibleToken,
-              )}
-              displayType="text"
-              thousandSeparator
-              prefix={`${currencySymbolMap[fiatCurrency]}`}
-              suffix={` ${fiatCurrency}`}
-              renderText={(value) => <FiatAmountText>{value}</FiatAmountText>}
-            />
+            {fiatValue && (
+              <NumericFormat
+                value={fiatValue}
+                displayType="text"
+                thousandSeparator
+                prefix={`${currencySymbolMap[fiatCurrency]}`}
+                suffix={` ${fiatCurrency}`}
+                renderText={(value) => (
+                  <FiatAmountText onClick={toggleHideBalance}>
+                    {balanceHidden && HIDDEN_BALANCE_LABEL}
+                    {!balanceHidden && value}
+                  </FiatAmountText>
+                )}
+              />
+            )}
             <PercentageChange ftCurrencyPairs={[[fungibleToken, currency]]} />
             <HourText>24h</HourText>
           </FiatContainer>
@@ -257,24 +290,18 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
       </BalanceInfoContainer>
       {renderStackingBalances()}
       <RowButtonContainer>
-        <SmallActionButton src={ArrowUp} text={t('SEND')} onPress={goToSendScreen} />
-        <SmallActionButton src={ArrowDown} text={t('RECEIVE')} onPress={navigateToReceive} />
-        {showSwaps && (
-          <SmallActionButton src={ArrowSwap} text={t('SWAP')} onPress={navigateToSwaps} />
-        )}
+        <SquareButton src={ArrowUp} text={t('SEND')} onPress={goToSendScreen} />
+        <SquareButton src={ArrowDown} text={t('RECEIVE')} onPress={navigateToReceive} />
+        {showSwaps && <SquareButton src={ArrowSwap} text={t('SWAP')} onPress={navigateToSwaps} />}
         {showRunesListing && (
-          <SmallActionButton
+          <SquareButton
             src={List}
             text={t('LIST')}
             onPress={() => navigate(`/list-rune/${fungibleToken.principal}`)}
           />
         )}
         {!fungibleToken && (
-          <SmallActionButton
-            src={Buy}
-            text={t('BUY')}
-            onPress={() => navigate(`/buy/${currency}`)}
-          />
+          <SquareButton src={Buy} text={t('BUY')} onPress={() => navigate(`/buy/${currency}`)} />
         )}
       </RowButtonContainer>
       <BottomModal

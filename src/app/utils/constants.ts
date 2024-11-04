@@ -1,5 +1,4 @@
 /* eslint-disable prefer-destructuring */
-/* eslint-disable prefer-destructuring */
 import type { Provider } from '@sats-connect/core';
 import type { NetworkType } from '@secretkeylabs/xverse-core';
 
@@ -35,8 +34,6 @@ export const MIX_PANEL_TOKEN = process.env.MIX_PANEL_TOKEN;
 export const MIX_PANEL_EXPLORE_APP_TOKEN = process.env.MIX_PANEL_EXPLORE_APP_TOKEN;
 
 export const MAGIC_EDEN_RUNES_URL = 'https://magiceden.io/runes';
-export const UNISAT_RUNES_URL = 'https://unisat.io/runes';
-export const OKX_RUNES_URL = 'https://www.okx.com/web3/marketplace/runes';
 
 export type CurrencyTypes = 'STX' | 'BTC' | 'FT' | 'NFT' | 'Ordinal' | 'brc20-Ordinal' | 'RareSat';
 export enum LoaderSize {
@@ -67,11 +64,13 @@ export const DEFAULT_TRANSITION_OPTIONS = {
 };
 
 export const MAX_ACC_NAME_LENGTH = 20;
-
 // UI
+export const ANIMATION_EASING = (progress: number) => 1 - (1 - progress) ** 3; // ease out (0, 0, 0.58, 1)
 export const EMPTY_LABEL = '--';
+export const HIDDEN_BALANCE_LABEL = '●●●●●●';
 export const OPTIONS_DIALOG_WIDTH = 179;
 export const SPAM_OPTIONS_WIDTH = 244;
+export const LONG_TOAST_DURATION = 4000;
 
 export const XverseProviderInfo: Provider = {
   id: 'XverseProviders.BitcoinProvider',

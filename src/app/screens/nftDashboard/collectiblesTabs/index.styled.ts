@@ -7,13 +7,20 @@ export const GridContainer = styled.div<{
   $isGalleryOpen: boolean;
 }>((props) => ({
   display: 'grid',
-  columnGap: props.$isGalleryOpen ? props.theme.space.xl : props.theme.space.m,
-  rowGap: props.$isGalleryOpen ? props.theme.space.xl : props.theme.space.l,
+  columnGap: props.theme.space.m,
+  rowGap: props.theme.space.l,
   marginTop: props.theme.space.l,
+  overflowX: 'hidden',
   gridTemplateColumns: props.$isGalleryOpen
-    ? 'repeat(auto-fill,minmax(220px,1fr))'
+    ? 'repeat(auto-fill,minmax(170px,1fr))'
     : 'repeat(auto-fill,minmax(150px,1fr))',
 }));
+
+export const CollectiblesContainer = styled.div`
+  padding: 0 ${(props) => props.theme.space.xs};
+  padding-bottom: ${(props) => props.theme.space.xl};
+  width: 100%;
+`;
 
 export const RareSatsTabContainer = styled.div((props) => ({
   marginTop: props.theme.space.l,
@@ -67,7 +74,6 @@ export const LoaderContainer = styled.div({
 
 export const CountLoaderContainer = styled.div((props) => ({
   marginTop: props.theme.space.s,
-  marginBottom: props.theme.space.l,
 }));
 
 export const StyledButton = styled(Button)`
@@ -76,6 +82,18 @@ export const StyledButton = styled(Button)`
     padding: 0;
     width: auto;
     min-height: 20px;
+
+    &:hover:enabled {
+      opacity: 0.8;
+    }
+  }
+`;
+
+export const StyledSheetButton = styled(Button)`
+  &.tertiary {
+    justify-content: flex-start;
+    color: ${(props) => props.theme.colors.white_200};
+    padding-left: 0;
 
     &:hover:enabled {
       opacity: 0.8;

@@ -2,6 +2,7 @@ import type {
   Account,
   AccountType,
   AppInfo,
+  BtcPaymentType,
   FungibleToken,
   Inscription,
   NetworkType,
@@ -17,6 +18,8 @@ export const UpdateSoftwareAccountsKey = 'UpdateSoftwareAccountsKey';
 export const SetFeeMultiplierKey = 'SetFeeMultiplierKey';
 export const ChangeFiatCurrencyKey = 'ChangeFiatCurrency';
 export const ChangeNetworkKey = 'ChangeNetwork';
+export const ChangeBtcPaymentAddressTypeKey = 'ChangeBtcPaymentAddressTypeKey';
+export const EnableNestedSegWitAddressKey = 'EnableNestedSegWitAddressKey';
 export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
 export const RareSatsNoticeDismissedKey = 'RareSatsNoticeDismissedKey';
 export const ChangeHasActivatedRareSatsKey = 'ChangeHasActivatedRareSatsKey';
@@ -40,10 +43,12 @@ export const UpdateSavedNamesKey = 'UpdateSavedNamesKey';
 export const AddToStarCollectiblesKey = 'AddToStarCollectiblesKey';
 export const RemoveFromStarCollectiblesKey = 'RemoveFromStarCollectiblesKey';
 export const AddToHideCollectiblesKey = 'AddToHideCollectiblesKey';
+export const SetHiddenCollectiblesKey = 'SetHiddenCollectiblesKey';
 export const RemoveFromHideCollectiblesKey = 'RemoveFromHideCollectiblesKey';
 export const RemoveAllFromHideCollectiblesKey = 'RemoveAllFromHideCollectiblesKey';
 export const SetAccountAvatarKey = 'SetAccountAvatarKey';
 export const RemoveAccountAvatarKey = 'RemoveAccountAvatarKey';
+export const SetBalanceHiddenToggleKey = 'SetBalanceHiddenToggleKey';
 
 export enum WalletSessionPeriods {
   LOW = 15,
@@ -57,6 +62,8 @@ export interface WalletState {
   ledgerAccountsList: Account[];
   selectedAccountIndex: number;
   selectedAccountType: AccountType;
+  btcPaymentAddressType: BtcPaymentType;
+  allowNestedSegWitAddress: boolean;
   network: SettingsNetwork; // currently selected network urls and type
   savedNetworks: SettingsNetwork[]; // previously set network urls for type
   encryptedSeed: string;
@@ -87,7 +94,8 @@ export interface WalletState {
   };
   hiddenCollectibleIds: Record<string, Record<string, string>>;
   starredCollectibleIds: Record<string, Array<{ id: string; collectionId: string }>>;
-  avatarIds: Record<string, AvatarInfo | null>;
+  avatarIds: Record<string, AvatarInfo>;
+  balanceHidden: boolean;
 }
 
 export interface StoreEncryptedSeed {
@@ -124,6 +132,15 @@ export interface ChangeFiatCurrency {
 export interface ChangeNetwork {
   type: typeof ChangeNetworkKey;
   network: SettingsNetwork;
+}
+
+export interface EnableNestedSegWitAddress {
+  type: typeof EnableNestedSegWitAddressKey;
+}
+
+export interface ChangeBtcPaymentAddressType {
+  type: typeof ChangeBtcPaymentAddressTypeKey;
+  btcPaymentType: BtcPaymentType;
 }
 
 export interface ChangeActivateOrdinals {
@@ -197,7 +214,7 @@ export interface SetWalletUnlocked {
 
 export interface SetAccountBalance {
   type: typeof SetAccountBalanceKey;
-  btcAddress: string;
+  accountKey: string;
   totalBalance: string;
 }
 
@@ -258,6 +275,11 @@ export interface RemoveAllFromHideCollectibles {
   address: string;
 }
 
+export interface SetHiddenCollectibles {
+  type: typeof SetHiddenCollectiblesKey;
+  collectibleIds: Record<string, Record<string, string>>;
+}
+
 export interface SetAccountAvatar {
   type: typeof SetAccountAvatarKey;
   address: string;
@@ -279,6 +301,11 @@ export type AvatarInfo =
       nft: NftData;
     };
 
+export interface SetBalanceHiddenToggle {
+  type: typeof SetBalanceHiddenToggleKey;
+  toggle: boolean;
+}
+
 export type WalletActions =
   | ResetWallet
   | UpdateSoftwareAccounts
@@ -288,6 +315,8 @@ export type WalletActions =
   | SetFeeMultiplier
   | ChangeFiatCurrency
   | ChangeNetwork
+  | EnableNestedSegWitAddress
+  | ChangeBtcPaymentAddressType
   | ChangeActivateOrdinals
   | ChangeActivateRareSats
   | ChangeActivateRBF
@@ -312,5 +341,7 @@ export type WalletActions =
   | AddToHideCollectibles
   | RemoveFromHideCollectibles
   | RemoveAllFromHideCollectibles
+  | SetHiddenCollectibles
   | SetAccountAvatar
-  | RemoveAccountAvatar;
+  | RemoveAccountAvatar
+  | SetBalanceHiddenToggle;

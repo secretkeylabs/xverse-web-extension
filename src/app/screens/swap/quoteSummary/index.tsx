@@ -171,10 +171,6 @@ export default function QuoteSummary({
   selectedIdentifiers,
 }: QuoteSummaryProps) {
   const { t } = useTranslation('translation');
-  const { tokenInfo: sip10ToTokenInfoUSD } = useGetSip10TokenInfo({
-    principal: toToken?.ticker,
-    fiatCurrency: 'USD',
-  });
 
   const { tokenInfo: sip10ToTokenInfo } = useGetSip10TokenInfo({
     principal: toToken?.ticker,
@@ -203,7 +199,7 @@ export default function QuoteSummary({
   } = usePlaceUtxoOrder();
 
   useEffect(() => {
-    if (placeOrderError || placeUtxoOrderError) {
+    if (true) {
       onError(placeOrderError ?? placeUtxoOrderError ?? '');
     }
   }, [placeOrderError, placeUtxoOrderError]);

@@ -2,7 +2,7 @@ import AccountHeaderComponent from '@components/accountHeader';
 import { TxSummaryContext } from '@components/confirmBtcTransaction/hooks/useTxSummaryContext';
 import ConfirmBatchBtcTransactions from '@components/confirmBtcTransaction/indexBatch';
 import TransactionSummary from '@components/confirmBtcTransaction/transactionSummary';
-import InfoContainer from '@components/infoContainer';
+import LedgerSteps from '@components/ledgerSteps';
 import LoadingTransactionStatus from '@components/loadingTransactionStatus';
 import type { ConfirmationStatus } from '@components/loadingTransactionStatus/circularSvgAnimation';
 import useSelectedAccount from '@hooks/useSelectedAccount';
@@ -16,9 +16,11 @@ import {
   btcTransaction,
   extractViewSummary,
   type AggregatedSummary,
+  type Transport,
   type UserTransactionSummary,
 } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
+import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
 import { isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
@@ -29,14 +31,16 @@ import {
   BundleLinkContainer,
   BundleLinkText,
   ButtonsContainer,
+  CloseContainer,
   Container,
+  CrossButtonInline,
+  HeaderContainer,
+  InlineButtonsContainer,
   LoaderContainer,
   ModalContainer,
   OuterContainer,
   ReviewTransactionText,
-  StyledSheet,
-  TransparentButtonContainer,
-  TxReviewModalControls,
+  SmallButton,
 } from './index.styled';
 
 type ParsedPsbt = {
@@ -44,26 +48,29 @@ type ParsedPsbt = {
   summary: btcTransaction.PsbtSummary;
 };
 
-interface BatchPsbtSigningProps {
+type Props = {
   psbts: SignMultiplePsbtPayload[];
   onSigned: (signedPsbts: string[]) => void | Promise<void>;
   onCancel: () => void;
-}
+  onPostSignDone: () => void;
+};
 
-function BatchPsbtSigning({ onSigned, psbts, onCancel }: BatchPsbtSigningProps) {
+function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: Props) {
   const selectedAccount = useSelectedAccount();
   const { network } = useWalletSelector();
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
+  const txnContext = useTransactionContext();
+  useTrackMixPanelPageViewed();
+
   const [isSigning, setIsSigning] = useState(false);
   const [isSigningComplete, setIsSigningComplete] = useState(false);
   const [signingPsbtIndex, setSigningPsbtIndex] = useState(1);
   const [currentPsbtIndex, setCurrentPsbtIndex] = useState(0);
   const [reviewTransaction, setReviewTransaction] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const txnContext = useTransactionContext();
-  useTrackMixPanelPageViewed();
   const [parsedPsbts, setParsedPsbts] = useState<ParsedPsbt[]>([]);
+  const [isLedgerModalVisible, setIsLedgerModalVisible] = useState(false);
 
   const individualTxSummaryContext = useMemo(
     () => ({
@@ -109,11 +116,13 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel }: BatchPsbtSigningProps) 
     })();
   }, [psbts, txnContext, network, navigate, t]);
 
-  const onSignPsbtConfirmed = async () => {
+  const onSignPsbtConfirmed = async (transport?: Transport) => {
     try {
-      if (isLedgerAccount(selectedAccount)) {
+      if (isLedgerAccount(selectedAccount) && !transport) {
+        setIsLedgerModalVisible(true);
         return;
       }
+
       setIsSigning(true);
 
       const signedPsbts: string[] = [];
@@ -128,6 +137,7 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel }: BatchPsbtSigningProps) 
 
         const psbtBase64 = await enhancedPsbt.getSignedPsbtBase64({
           finalize: false,
+          ledgerTransport: transport,
         });
         signedPsbts.push(psbtBase64);
 
@@ -146,6 +156,7 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel }: BatchPsbtSigningProps) 
       setIsSigning(false);
 
       onSigned(signedPsbts);
+      setIsLedgerModalVisible(false);
     } catch (err) {
       setIsSigning(false);
       setIsSigningComplete(false);
@@ -164,13 +175,170 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel }: BatchPsbtSigningProps) 
     }
   };
 
-  const closeCallback = () => {
-    window.close();
+  const renderSign = isSigning || isSigningComplete;
+
+  const renderPreSign = () => {
+    if (renderSign) return null;
+
+    const visitedInputs = new Set<string>();
+    const hasDuplicateInputs = parsedPsbts.some((parsedPsbt) => {
+      const inputLocations = parsedPsbt.summary.inputs.map(
+        (input) => input.extendedUtxo.utxo.txid + input.extendedUtxo.utxo.vout,
+      );
+      const hasDuplicate = inputLocations.some((input) => {
+        if (visitedInputs.has(input)) {
+          return true;
+        }
+        visitedInputs.add(input);
+        return false;
+      });
+      return hasDuplicate;
+    });
+    const isSinglePsbt = parsedPsbts.length === 1;
+    const hideSummary = hasDuplicateInputs || isSinglePsbt;
+
+    const renderBody = () => {
+      if (isLoading) {
+        return (
+          <LoaderContainer>
+            <Spinner color="white" size={50} />
+          </LoaderContainer>
+        );
+      }
+
+      if (hasDuplicateInputs) {
+        // if there are duplicate inputs on the individual transactions, we won't show a summary
+        // and will have to ask the user to review each txn individually
+        return null;
+      }
+
+      return (
+        <>
+          <AccountHeaderComponent disableMenuOption disableAccountSwitch />
+          <OuterContainer>
+            <Container>
+              <ReviewTransactionText>
+                {t('SIGN_TRANSACTIONS', { count: parsedPsbts.length })}
+              </ReviewTransactionText>
+              <BundleLinkContainer onClick={() => setReviewTransaction(true)}>
+                <BundleLinkText>{t('REVIEW_ALL')}</BundleLinkText>
+                <ArrowRight size={12} weight="bold" />
+              </BundleLinkContainer>
+              <ConfirmBatchBtcTransactions summaries={parsedPsbts} />
+            </Container>
+          </OuterContainer>
+          <ButtonsContainer>
+            <Button title={t('CANCEL')} variant="secondary" onClick={onCancel} />
+            <Button
+              title={t('CONFIRM_ALL', { count: parsedPsbts.length })}
+              onClick={() => onSignPsbtConfirmed()}
+              loading={isSigning}
+            />
+          </ButtonsContainer>
+        </>
+      );
+    };
+
+    const renderReview = () => {
+      const onClose = hideSummary
+        ? undefined
+        : () => {
+            setReviewTransaction(false);
+            setCurrentPsbtIndex(0);
+          };
+
+      return (
+        <>
+          <CloseContainer>{onClose && <CrossButtonInline onClick={onClose} />}</CloseContainer>
+          <OuterContainer>
+            <ModalContainer>
+              <HeaderContainer>
+                <ReviewTransactionText>
+                  {t('TRANSACTION')} {currentPsbtIndex + 1}/{parsedPsbts.length}
+                </ReviewTransactionText>
+                {hideSummary && (
+                  <InlineButtonsContainer>
+                    <SmallButton
+                      title=""
+                      variant="secondary"
+                      onClick={() => {
+                        setCurrentPsbtIndex((prevIndex) => prevIndex - 1);
+                      }}
+                      icon={<ArrowLeft size={16} weight="bold" />}
+                      disabled={currentPsbtIndex === 0}
+                    />
+                    <SmallButton
+                      title=""
+                      variant="secondary"
+                      onClick={() => {
+                        setCurrentPsbtIndex((prevIndex) => prevIndex + 1);
+                      }}
+                      icon={<ArrowRight size={16} weight="bold" />}
+                      iconPosition="right"
+                      disabled={currentPsbtIndex === parsedPsbts.length - 1}
+                    />
+                  </InlineButtonsContainer>
+                )}
+              </HeaderContainer>
+              {!!parsedPsbts[currentPsbtIndex] && (
+                <TxSummaryContext.Provider value={individualTxSummaryContext}>
+                  <TransactionSummary />
+                </TxSummaryContext.Provider>
+              )}
+            </ModalContainer>
+          </OuterContainer>
+          <ButtonsContainer>
+            {hideSummary && (
+              <>
+                <Button title={t('CANCEL')} variant="secondary" onClick={onCancel} />
+                <Button
+                  title={t('CONFIRM_ALL', { count: parsedPsbts.length })}
+                  onClick={() => onSignPsbtConfirmed()}
+                  loading={isSigning}
+                />
+              </>
+            )}
+            {!hideSummary && (
+              <>
+                <Button
+                  title={t('PREVIOUS')}
+                  variant="secondary"
+                  onClick={() => {
+                    setCurrentPsbtIndex((prevIndex) => prevIndex - 1);
+                  }}
+                  icon={<ArrowLeft size={16} weight="bold" />}
+                  disabled={currentPsbtIndex === 0}
+                />
+                <Button
+                  title={t('NEXT')}
+                  variant="secondary"
+                  onClick={() => {
+                    setCurrentPsbtIndex((prevIndex) => prevIndex + 1);
+                  }}
+                  icon={<ArrowRight size={16} weight="bold" />}
+                  iconPosition="right"
+                  disabled={currentPsbtIndex === parsedPsbts.length - 1}
+                />
+              </>
+            )}
+          </ButtonsContainer>
+        </>
+      );
+    };
+
+    if (!reviewTransaction && !hideSummary) {
+      // if there are duplicate inputs on the individual transactions, we won't show a summary
+      // and will have to ask the user to review each txn individually
+      return renderBody();
+    }
+
+    return renderReview();
   };
 
-  const signingStatus: ConfirmationStatus = isSigningComplete ? 'SUCCESS' : 'LOADING';
+  const renderSigning = () => {
+    if (!renderSign || (!isSigningComplete && isLedgerModalVisible)) return null;
 
-  if (isSigning || isSigningComplete) {
+    const signingStatus: ConfirmationStatus = isSigningComplete ? 'SUCCESS' : 'LOADING';
     return (
       <LoadingTransactionStatus
         status={signingStatus}
@@ -183,137 +351,35 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel }: BatchPsbtSigningProps) 
           description: t('THIS_MAY_TAKE_A_FEW_MINUTES'),
         }}
         loadingPercentage={isSigningComplete ? 1 : signingPsbtIndex / psbts.length}
-        primaryAction={{ onPress: closeCallback, text: t('CLOSE') }}
+        primaryAction={{ onPress: onPostSignDone, text: t('CLOSE') }}
         withLoadingBgCircle
       />
     );
-  }
-
-  const visitedInputs = new Set<string>();
-  const hasDuplicateInputs = parsedPsbts.some((parsedPsbt) => {
-    const inputLocations = parsedPsbt.summary.inputs.map(
-      (input) => input.extendedUtxo.utxo.txid + input.extendedUtxo.utxo.vout,
-    );
-    const hasDuplicate = inputLocations.some((input) => {
-      if (visitedInputs.has(input)) {
-        return true;
-      }
-      visitedInputs.add(input);
-      return false;
-    });
-    return hasDuplicate;
-  });
-
-  const renderBody = () => {
-    if (hasDuplicateInputs) {
-      // if there are duplicate inputs on the individual transactions, we won't show a summary
-      // and will have to ask the user to review each txn individually
-      return null;
-    }
-
-    if (isLoading) {
-      return (
-        <LoaderContainer>
-          <Spinner color="white" size={50} />
-        </LoaderContainer>
-      );
-    }
-
-    const isLedger = isLedgerAccount(selectedAccount);
-
-    return (
-      <>
-        <OuterContainer>
-          <Container>
-            {isLedger ? (
-              <InfoContainer bodyText={t('LEDGER.BATCH_NOT_SUPPORTED')} />
-            ) : (
-              <>
-                <ReviewTransactionText>
-                  {t('SIGN_TRANSACTIONS', { count: parsedPsbts.length })}
-                </ReviewTransactionText>
-                <BundleLinkContainer onClick={() => setReviewTransaction(true)}>
-                  <BundleLinkText>{t('REVIEW_ALL')}</BundleLinkText>
-                  <ArrowRight size={12} weight="bold" />
-                </BundleLinkContainer>
-                <ConfirmBatchBtcTransactions summaries={parsedPsbts} />
-              </>
-            )}
-          </Container>
-        </OuterContainer>
-        <ButtonsContainer>
-          <TransparentButtonContainer>
-            <Button title={t('CANCEL')} variant="secondary" onClick={onCancel} />
-          </TransparentButtonContainer>
-          <Button
-            title={t('CONFIRM_ALL')}
-            onClick={onSignPsbtConfirmed}
-            loading={isSigning}
-            disabled={isLedger}
-          />
-        </ButtonsContainer>
-      </>
-    );
   };
 
-  const reviewDoneText = hasDuplicateInputs ? t('CONFIRM_ALL') : t('DONE');
-  const onReviewDone = hasDuplicateInputs
-    ? onSignPsbtConfirmed
-    : () => {
-        setReviewTransaction(false);
-        setCurrentPsbtIndex(0);
-      };
+  const onLedgerCancel = () => {
+    if (isSigning) {
+      onCancel();
+      return;
+    }
+
+    setIsLedgerModalVisible(false);
+  };
 
   return (
     <>
-      <AccountHeaderComponent disableMenuOption disableAccountSwitch />
-      {renderBody()}
-      <StyledSheet
-        header=""
-        visible={reviewTransaction || hasDuplicateInputs}
-        onClose={() => {
-          setReviewTransaction(false);
-          setCurrentPsbtIndex(0);
-        }}
-      >
-        <OuterContainer>
-          <ModalContainer>
-            <ReviewTransactionText>
-              {t('TRANSACTION')} {currentPsbtIndex + 1}/{parsedPsbts.length}
-            </ReviewTransactionText>
-            {!!parsedPsbts[currentPsbtIndex] && (
-              <TxSummaryContext.Provider value={individualTxSummaryContext}>
-                <TransactionSummary />
-              </TxSummaryContext.Provider>
-            )}
-          </ModalContainer>
-        </OuterContainer>
-        <TxReviewModalControls>
-          <Button
-            title={t('PREVIOUS')}
-            variant="secondary"
-            onClick={() => {
-              setCurrentPsbtIndex((prevIndex) => prevIndex - 1);
-            }}
-            icon={<ArrowLeft color="white" size={16} weight="bold" />}
-            disabled={currentPsbtIndex === 0}
+      {renderPreSign()}
+      {renderSigning()}
+      <Sheet visible={isLedgerModalVisible} onClose={() => setIsLedgerModalVisible(false)}>
+        {isLedgerModalVisible && (
+          <LedgerSteps
+            onConfirm={onSignPsbtConfirmed}
+            onCancel={onLedgerCancel}
+            txnToSignCount={psbts.length}
+            txnSignIndex={signingPsbtIndex}
           />
-          {currentPsbtIndex < parsedPsbts.length - 1 && (
-            <Button
-              title={t('NEXT')}
-              variant="secondary"
-              onClick={() => {
-                setCurrentPsbtIndex((prevIndex) => prevIndex + 1);
-              }}
-              icon={<ArrowRight color="white" size={16} weight="bold" />}
-              iconPosition="right"
-            />
-          )}
-          {currentPsbtIndex === parsedPsbts.length - 1 && (
-            <Button title={reviewDoneText} onClick={onReviewDone} />
-          )}
-        </TxReviewModalControls>
-      </StyledSheet>
+        )}
+      </Sheet>
     </>
   );
 }

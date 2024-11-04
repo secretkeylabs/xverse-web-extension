@@ -1,4 +1,5 @@
 import TopRow from '@components/topRow';
+import useCanUserSwitchPaymentType from '@hooks/useCanUserSwitchPaymentType';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
@@ -7,6 +8,7 @@ import {
   ChangeActivateRBFAction,
 } from '@stores/wallet/actions/actionCreators';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
+import RoutePaths from 'app/routes/paths';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -17,9 +19,20 @@ function AdvancedSettings() {
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { hasActivatedOrdinalsKey, hasActivatedRareSatsKey, hasActivatedRBFKey } =
-    useWalletSelector();
+  const {
+    hasActivatedOrdinalsKey,
+    hasActivatedRareSatsKey,
+    hasActivatedRBFKey,
+    btcPaymentAddressType,
+  } = useWalletSelector();
   const selectedAccount = useSelectedAccount();
+  const showBtcAddressTypeSelector = useCanUserSwitchPaymentType();
+
+  const isLedgerAccountSelected = isLedgerAccount(selectedAccount);
+
+  const onPreferredAddressClick = () => {
+    navigate(RoutePaths.PreferredAddress);
+  };
 
   const switchActivateOrdinalState = () => {
     dispatch(ChangeActivateOrdinalsAction(!hasActivatedOrdinalsKey));
@@ -36,24 +49,38 @@ function AdvancedSettings() {
   };
 
   const onRestoreFundClick = async () => {
-    if (isLedgerAccount(selectedAccount) && !isInOptions()) {
+    if (isLedgerAccountSelected && !isInOptions()) {
       await chrome.tabs.create({
-        url: chrome.runtime.getURL('options.html#/restore-funds'),
+        url: chrome.runtime.getURL(`options.html#${RoutePaths.RecoverFunds}`),
       });
       return;
     }
 
-    navigate('/restore-funds');
+    navigate(RoutePaths.RecoverFunds);
   };
 
   const handleBackButtonClick = () => {
     navigate(-1);
   };
+
+  const payAddressType =
+    btcPaymentAddressType === 'native'
+      ? t('PREFERRED_BTC_ADDRESS.NATIVE_SEGWIT')
+      : t('PREFERRED_BTC_ADDRESS.NESTED_SEGWIT');
+
   return (
     <>
       <TopRow onClick={handleBackButtonClick} />
       <Container>
         <Title>{t('ADVANCED')}</Title>
+        {showBtcAddressTypeSelector && (
+          <SettingComponent
+            text={t('PREFERRED_BTC_ADDRESS.TITLE')}
+            textDetail={payAddressType}
+            onClick={onPreferredAddressClick}
+            showDivider
+          />
+        )}
         <SettingComponent
           text={t('ENABLE_SPEED_UP_TRANSACTIONS')}
           description={t('ENABLE_SPEED_UP_TRANSACTIONS_DETAIL')}

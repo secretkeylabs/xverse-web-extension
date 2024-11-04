@@ -15,6 +15,7 @@ const Container = styled.div((props) => ({
   flex: 1,
   padding: `0 ${props.theme.space.s}`,
   paddingTop: props.theme.space.xxl,
+  paddingBottom: props.theme.space.xs,
 }));
 
 function ChangePasswordScreen() {
@@ -93,7 +94,6 @@ function ChangePasswordScreen() {
             handleBack={handleBackButtonClick}
             checkPasswordStrength
             stackButtonAlignment
-            createPasswordFlow
             autoFocus
           />
         )}

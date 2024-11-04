@@ -15,7 +15,7 @@ const InputGroup = styled.div`
 
 const Input = styled.input`
   ${(props) => props.theme.typography.body_medium_m};
-  max-width: 144px;
+  max-width: 130px;
   min-height: ${(props) => props.theme.spacing(22)}px;
   background-color: ${(props) => props.theme.colors.elevation0};
   color: ${(props) => props.theme.colors.white_0};
@@ -245,7 +245,7 @@ export default function SeedPhraseInput({
       </InputGrid>
       <ErrorMessage visible={!!seedError}>{seedError}</ErrorMessage>
       <TransparentButton onClick={handleClickShow24Words} type="button">
-        {t('HAVE_A_24_WORDS_SEEDPHRASE?', { number: show24Words ? '12' : '24' })}
+        {t('HAVE_A_COUNT_WORDS_SEED_PHRASE', { number: show24Words ? '12' : '24' })}
       </TransparentButton>
     </InputContainer>
   );

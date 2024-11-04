@@ -1,6 +1,6 @@
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
-import { delay } from '@common/utils/ledger';
+import { delay } from '@common/utils/promises';
 import { makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
@@ -89,7 +89,7 @@ function SignatureRequest(): JSX.Element {
           txid: '',
           currency: 'STX',
           errorTitle: t('SIGNATURE_REQUEST.SIGNATURE_ERROR_TITLE'),
-          error: t('CONFIRM_TRANSACTION.NETWORK_MISMATCH'),
+          error: t('REQUEST_ERRORS.NETWORK_MISMATCH'),
           browserTx: true,
         },
       });
@@ -104,7 +104,7 @@ function SignatureRequest(): JSX.Element {
           txid: '',
           currency: 'STX',
           errorTitle: t('SIGNATURE_REQUEST.SIGNATURE_ERROR_TITLE'),
-          error: t('CONFIRM_TRANSACTION.ADDRESS_MISMATCH'),
+          error: t('REQUEST_ERRORS.ADDRESS_MISMATCH_STX'),
           browserTx: true,
         },
       });

@@ -1,7 +1,5 @@
-import AccountHeaderComponent from '@components/accountHeader';
 import CollectibleCollectionGridItem from '@components/collectibleCollectionGridItem';
 import CollectibleDetailTile from '@components/collectibleDetailTile';
-import SquareButton from '@components/squareButton';
 import BottomTabBar from '@components/tabBar';
 import { TilesSkeletonLoader } from '@components/tilesSkeletonLoader';
 import TopRow from '@components/topRow';
@@ -11,13 +9,11 @@ import useOptionsSheet from '@hooks/useOptionsSheet';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { TrayArrowDown, TrayArrowUp } from '@phosphor-icons/react';
 import {
-  ArrowLeft,
-  DotsThreeVertical,
-  Star,
-  TrayArrowDown,
-  TrayArrowUp,
-} from '@phosphor-icons/react';
+  CollectiblesContainer,
+  GridContainer,
+} from '@screens/nftDashboard/collectiblesTabs/index.styled';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import {
   addToHideCollectiblesAction,
@@ -30,13 +26,13 @@ import Button from '@ui-library/button';
 import { StyledHeading, StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import SnackBar from '@ui-library/snackBar';
-import { EMPTY_LABEL } from '@utils/constants';
+import { EMPTY_LABEL, LONG_TOAST_DURATION } from '@utils/constants';
 import {
   getInscriptionsCollectionGridItemId,
   getInscriptionsCollectionGridItemSubText,
   getInscriptionsCollectionGridItemSubTextColor,
 } from '@utils/inscriptions';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -44,8 +40,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Theme from 'theme';
 import {
   AttributesContainer,
-  BackButton,
-  BackButtonContainer,
   BottomBarContainer,
   CollectionNameDiv,
   Container,
@@ -55,8 +49,6 @@ import {
   PageHeaderContent,
   StyledBarLoader,
   StyledButton,
-  StyledGridContainer,
-  StyledSeparator,
   StyledWebGalleryButton,
   StyledWrenchErrorMessage,
 } from './index.styled';
@@ -65,10 +57,10 @@ function OrdinalsCollection() {
   const { t } = useTranslation('translation', { keyPrefix: 'COLLECTIBLE_COLLECTION_SCREEN' });
   const { t: tCommon } = useTranslation('translation', { keyPrefix: 'COMMON' });
   const navigate = useNavigate();
-  const { btcAddress, ordinalsAddress } = useSelectedAccount();
+  const { ordinalsAddress } = useSelectedAccount();
   const { id: collectionId, from } = useParams();
   const { starredCollectibleIds, hiddenCollectibleIds, avatarIds } = useWalletSelector();
-  const currentAvatar = avatarIds[btcAddress];
+  const selectedAvatar = avatarIds[ordinalsAddress];
   const optionsSheet = useOptionsSheet();
   const { data, error, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useAddressCollectionInscriptions(collectionId);
@@ -104,26 +96,26 @@ function OrdinalsCollection() {
       removeFromHideCollectiblesAction({ address: ordinalsAddress, id: collectionId ?? '' }),
     );
     toast.remove(toastId);
-    toast.custom(<SnackBar text={t('COLLECTION_UNHIDDEN')} type="neutral" />, { duration: 4000 });
+    toast(t('COLLECTION_UNHIDDEN'));
   };
 
   const handleHideCollection = () => {
     dispatch(addToHideCollectiblesAction({ address: ordinalsAddress, id: collectionId ?? '' }));
 
-    if (currentAvatar?.type === 'inscription') {
+    if (selectedAvatar?.type === 'inscription') {
       const shouldHideAvatar = data?.pages
         ?.map((page) => page?.data)
         .flat()
-        .some((inscription) => inscription.id === currentAvatar.inscription.id);
+        .some((inscription) => inscription.id === selectedAvatar.inscription.id);
 
       if (shouldHideAvatar) {
-        dispatch(removeAccountAvatarAction({ address: btcAddress }));
+        dispatch(removeAccountAvatarAction({ address: ordinalsAddress }));
       }
     }
 
     optionsSheet.close();
     navigate('/nft-dashboard?tab=inscriptions');
-    const toastId = toast.custom(
+    const toastId = toast(
       <SnackBar
         text={t('COLLECTION_HIDDEN')}
         type="neutral"
@@ -132,7 +124,7 @@ function OrdinalsCollection() {
           onClick: () => handleClickUndoHiding(toastId),
         }}
       />,
-      { duration: 4000 },
+      { duration: LONG_TOAST_DURATION },
     );
   };
 
@@ -142,7 +134,7 @@ function OrdinalsCollection() {
       removeFromHideCollectiblesAction({ address: ordinalsAddress, id: collectionId ?? '' }),
     );
     optionsSheet.close();
-    toast.custom(<SnackBar text={t('COLLECTION_UNHIDDEN')} type="neutral" />);
+    toast(t('COLLECTION_UNHIDDEN'));
     navigate(`/nft-dashboard/${isLastHiddenItem ? '' : 'hidden'}?tab=inscriptions`);
   };
 
@@ -156,55 +148,47 @@ function OrdinalsCollection() {
     ? `${collectionMarketData?.floor_price?.toFixed(8)} BTC`
     : EMPTY_LABEL;
 
+  const handleClickUndoStarring = (toastId: string) => {
+    dispatch(
+      removeFromStarCollectiblesAction({ address: ordinalsAddress, id: collectionId ?? '' }),
+    );
+    toast.remove(toastId);
+    toast(t('UNSTAR_COLLECTION'));
+  };
+
   const handleStarClick = () => {
     if (collectionStarred) {
-      const toastId = toast.custom(
-        <SnackBar
-          text={t('UNSTAR_COLLECTION')}
-          type="neutral"
-          dismissToast={() => toast.remove(toastId)}
-        />,
-      );
       dispatch(
         removeFromStarCollectiblesAction({ address: ordinalsAddress, id: collectionId ?? '' }),
       );
+      toast(t('UNSTAR_COLLECTION'));
     } else {
-      const toastId = toast.custom(
+      dispatch(addToStarCollectiblesAction({ address: ordinalsAddress, id: collectionId ?? '' }));
+      const toastId = toast(
         <SnackBar
           text={t('STAR_COLLECTION')}
           type="neutral"
-          dismissToast={() => toast.remove(toastId)}
+          action={{
+            text: tCommon('UNDO'),
+            onClick: () => handleClickUndoStarring(toastId),
+          }}
         />,
+        { duration: LONG_TOAST_DURATION },
       );
-      dispatch(addToStarCollectiblesAction({ address: ordinalsAddress, id: collectionId ?? '' }));
     }
   };
 
   return (
     <>
-      {isGalleryOpen ? (
-        <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-      ) : (
-        <TopRow
-          onClick={handleBackButtonClick}
-          onMenuClick={optionsSheet.open}
-          onStarClick={collectionHidden ? undefined : handleStarClick}
-          isStarred={collectionStarred}
-        />
-      )}
+      <TopRow
+        onClick={handleBackButtonClick}
+        onMenuClick={optionsSheet.open}
+        onStarClick={collectionHidden ? undefined : handleStarClick}
+        isStarred={collectionStarred}
+      />
       <Container>
-        <PageHeader isGalleryOpen={isGalleryOpen}>
-          {isGalleryOpen && (
-            <BackButtonContainer>
-              <BackButton onClick={handleBackButtonClick}>
-                <ArrowLeft size={16} color="currentColor" />
-                <StyledP data-testid="back-to-gallery" typography="body_m" color="white_0">
-                  {t(collectionHidden ? 'BACK_TO_HIDDEN_COLLECTIBLES' : 'BACK_TO_GALLERY')}
-                </StyledP>
-              </BackButton>
-            </BackButtonContainer>
-          )}
-          <PageHeaderContent isGalleryOpen={isGalleryOpen}>
+        <PageHeader>
+          <PageHeaderContent $isGalleryOpen={isGalleryOpen}>
             <div>
               <StyledP typography="body_bold_m" color="white_400">
                 {t('COLLECTION')}
@@ -213,38 +197,10 @@ function OrdinalsCollection() {
                 <StyledHeading typography="headline_s" color="white_0">
                   {collectionHeading || <StyledBarLoader width={200} height={28} />}
                 </StyledHeading>
-                {isGalleryOpen && (
-                  <>
-                    {collectionHidden ? null : (
-                      <SquareButton
-                        icon={
-                          collectionStarred ? (
-                            <Star size={16} color={Theme.colors.tangerine} weight="fill" />
-                          ) : (
-                            <Star size={16} color={Theme.colors.white_0} weight="bold" />
-                          )
-                        }
-                        onPress={handleStarClick}
-                        isTransparent
-                        size={44}
-                        radiusSize={12}
-                      />
-                    )}
-                    <SquareButton
-                      icon={
-                        <DotsThreeVertical size={20} color={Theme.colors.white_0} weight="bold" />
-                      }
-                      onPress={optionsSheet.open}
-                      isTransparent
-                      size={44}
-                      radiusSize={12}
-                    />
-                  </>
-                )}
               </CollectionNameDiv>
               {!isGalleryOpen && <StyledWebGalleryButton onClick={openInGalleryView} />}
             </div>
-            <AttributesContainer isGalleryOpen={isGalleryOpen}>
+            <AttributesContainer $isGalleryOpen={isGalleryOpen}>
               <CollectibleDetailTile
                 title={t('COLLECTION_FLOOR_PRICE')}
                 value={collectionFloorPrice}
@@ -260,15 +216,14 @@ function OrdinalsCollection() {
             </AttributesContainer>
           </PageHeaderContent>
         </PageHeader>
-        {isGalleryOpen && <StyledSeparator />}
-        <div>
+        <CollectiblesContainer>
           {isEmpty && <NoCollectiblesText>{t('NO_COLLECTIBLES')}</NoCollectiblesText>}
           {!!error && <StyledWrenchErrorMessage />}
-          <StyledGridContainer $isGalleryOpen={isGalleryOpen}>
+          <GridContainer $isGalleryOpen={isGalleryOpen}>
             {isLoading ? (
               <TilesSkeletonLoader
                 isGalleryOpen={isGalleryOpen}
-                tileSize={isGalleryOpen ? 276 : 151}
+                tileSize={isGalleryOpen ? 171 : 151}
               />
             ) : (
               data?.pages
@@ -287,7 +242,7 @@ function OrdinalsCollection() {
                   </CollectibleCollectionGridItem>
                 ))
             )}
-          </StyledGridContainer>
+          </GridContainer>
           {hasNextPage && (
             <LoadMoreButtonContainer>
               <Button
@@ -299,13 +254,11 @@ function OrdinalsCollection() {
               />
             </LoadMoreButtonContainer>
           )}
-        </div>
+        </CollectiblesContainer>
       </Container>
-      {!isGalleryOpen && (
-        <BottomBarContainer>
-          <BottomTabBar tab="nft" />
-        </BottomBarContainer>
-      )}
+      <BottomBarContainer>
+        <BottomTabBar tab="nft" />
+      </BottomBarContainer>
       {optionsSheet.isVisible && (
         <Sheet
           title={tCommon('OPTIONS')}

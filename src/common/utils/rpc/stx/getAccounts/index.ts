@@ -1,6 +1,4 @@
-import type { WebBtcMessage } from '@common/types/message-types';
-import { getTabIdFromPort, isUndefined } from '@common/utils';
-import { RpcErrorCode } from '@sats-connect/core';
+import { RpcErrorCode, type StxGetAccountsRequestMessage } from '@sats-connect/core';
 import {
   listenForPopupClose,
   makeSearchParamsWithDefaults,
@@ -8,17 +6,11 @@ import {
 } from '../../../legacy-external-message-handler';
 import RequestsRoutes from '../../../route-urls';
 import { makeRPCError } from '../../helpers';
-import { sendMissingParametersMessage } from '../../responseMessages/errors';
 
 const handleGetStxAccounts = async (
-  message: WebBtcMessage<'stx_getAccounts'>,
+  message: StxGetAccountsRequestMessage,
   port: chrome.runtime.Port,
 ) => {
-  if (isUndefined(message.params)) {
-    sendMissingParametersMessage({ tabId: getTabIdFromPort(port), messageId: message.id });
-    return;
-  }
-
   const popupParams = {
     messageId: String(message.id),
     rpcMethod: 'stx_getAccounts',

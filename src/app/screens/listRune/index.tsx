@@ -71,7 +71,7 @@ export default function ListRuneScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'LIST_RUNE_SCREEN' });
   const navigate = useNavigate();
   const { runeId } = useParams();
-  const { visible: runesCoinsList } = useVisibleRuneFungibleTokens(false);
+  const { data: runesCoinsList } = useVisibleRuneFungibleTokens(false);
   const selectedRune = runesCoinsList.find((ft) => ft.principal === runeId);
   const { fiatCurrency } = useWalletSelector();
   const { btcFiatRate } = useSupportedCoinRates();
@@ -231,15 +231,13 @@ export default function ListRuneScreen() {
     dispatch({ type: 'UPDATE_ONE_LIST_ITEM', key, payload: updatedSelectedListItem });
     if (
       Object.values(listItemsMap).filter((listItem) => listItem.selected).length ===
-        listItemsResponse?.length ??
-      0
+      listItemsResponse?.length
     ) {
       dispatch({ type: 'SET_SELECT_ALL_TOGGLE', payload: true });
     }
     if (
       Object.values(listItemsMap).filter((listItem) => !listItem.selected).length ===
-        listItemsResponse?.length ??
-      0
+      listItemsResponse?.length
     ) {
       dispatch({ type: 'SET_SELECT_ALL_TOGGLE', payload: false });
     }
@@ -287,7 +285,7 @@ export default function ListRuneScreen() {
         ),
       });
     }
-  }, [listItemsResponse, runeFloorPrice, location.state, selectedRune]);
+  }, [listItemsResponse.length, runeFloorPrice, location.state, selectedRune?.decimals]);
 
   useEffect(() => {
     if (signPsbtPayload) {
@@ -329,7 +327,9 @@ export default function ListRuneScreen() {
         selectedRuneId={selectedRune?.principal ?? ''}
         getDesc={getDesc}
       >
-        <NoItemsContainer>{t('NO_UNLISTED_ITEMS')}</NoItemsContainer>
+        <NoItemsContainer typography="body_medium_s" color="white_200">
+          {t('NO_UNLISTED_ITEMS')}
+        </NoItemsContainer>
       </WrapperComponent>
     );
   }

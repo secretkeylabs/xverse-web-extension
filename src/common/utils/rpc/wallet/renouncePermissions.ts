@@ -1,42 +1,40 @@
 /* eslint-disable import/prefer-default-export */
-import { getTabIdFromPort } from '@common/utils';
 import { dispatchEventToOrigin } from '@common/utils/messages/extensionToContentScript/dispatchEvent';
 import { makeContext } from '@common/utils/popup';
 import * as utils from '@components/permissionsManager/utils';
-import {
-  renouncePermissionsRequestMessageSchema,
-  type RpcRequestMessage,
-} from '@sats-connect/core';
-import * as v from 'valibot';
-import { handleInvalidMessage } from '../handle-invalid-message';
+import { type RenouncePermissionsRequestMessage } from '@sats-connect/core';
+import { permissions } from '@secretkeylabs/xverse-core';
 import { sendInternalErrorMessage } from '../responseMessages/errors';
 import { sendRenouncePermissionsSuccessResponseMessage } from '../responseMessages/wallet';
 
 export const handleRenouncePermissions = async (
-  message: RpcRequestMessage,
+  message: RenouncePermissionsRequestMessage,
   port: chrome.runtime.Port,
 ) => {
-  const parseResult = v.safeParse(renouncePermissionsRequestMessageSchema, message);
-
-  if (!parseResult.success) {
-    handleInvalidMessage(message, getTabIdFromPort(port), parseResult.issues);
-    return;
-  }
-
   const { origin, tabId } = makeContext(port);
   const [error, store] = await utils.getPermissionsStore();
 
   if (error) {
     sendInternalErrorMessage({
       tabId,
-      messageId: parseResult.output.id,
+      messageId: message.id,
       message: 'Error loading permissions store.',
     });
     return;
   }
 
+  const [clientIdError, clientId] = permissions.utils.store.makeClientId({ origin });
+  if (clientIdError) {
+    sendInternalErrorMessage({
+      tabId,
+      messageId: message.id,
+      message: 'Error creating client ID.',
+    });
+    return;
+  }
+
   await utils.permissionsStoreMutex.runExclusive(async () => {
-    utils.removeClient(store, origin);
+    permissions.utils.store.removeClient(store, clientId);
     utils.savePermissionsStore(store);
   });
 
@@ -46,7 +44,7 @@ export const handleRenouncePermissions = async (
 
   sendRenouncePermissionsSuccessResponseMessage({
     tabId,
-    messageId: parseResult.output.id,
-    result: true,
+    messageId: message.id,
+    result: null,
   });
 };

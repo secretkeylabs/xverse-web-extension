@@ -38,7 +38,7 @@ function OnboardingGuard({ children }: WalletExistsGuardProps): React.ReactEleme
           return;
         }
 
-        unlockVault('');
+        await unlockVault('');
         setIsWalletInitialized(false);
       } catch (e) {
         // seed exists and unlocking with empty password failed

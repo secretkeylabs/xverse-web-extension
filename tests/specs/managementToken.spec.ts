@@ -13,278 +13,143 @@ test.describe('Token Management', () => {
     await wallet.checkVisualsStartpage();
     await expect(wallet.balance).toHaveText('$0.00');
     await wallet.manageTokenButton.click();
-    await expect(page.url()).toContain('manage-tokens');
+    expect(page.url()).toContain('manage-tokens');
     await expect(wallet.buttonBack).toBeVisible();
     await expect(wallet.buttonSip10).toBeVisible();
     await expect(wallet.buttonBRC20).toBeVisible();
     await expect(wallet.buttonRunes).toBeVisible();
     await expect(wallet.headingTokens).toBeVisible();
 
-    // Check SIP10 token
-    await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
-    const amounttokenSIP = await wallet.labelCoinTitle.count();
-
-    await expect(amounttokenSIP).toBeGreaterThanOrEqual(15);
-    await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenSIP - 1);
+    // Check SIP10 token tab - only Stacks should be showing when user has no sip10 balances
+    await wallet.buttonSip10.click();
+    await expect(wallet.labelCoinTitle).toHaveCount(1);
+    await expect(wallet.checkboxToken).toHaveCount(1);
     await expect(wallet.checkboxTokenActive).toHaveCount(1);
-    await expect(wallet.checkboxToken).toHaveCount(amounttokenSIP);
+    await expect(wallet.checkboxTokenInactive).toHaveCount(0);
 
-    // Check BRC20 token
+    // Check BRC20 token tab - nothing shows when user has no brc20 balances
     await wallet.buttonBRC20.click();
-    await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
-    const amounttokenBRC20 = await wallet.labelCoinTitle.count();
-    await expect(amounttokenBRC20).toBeGreaterThanOrEqual(8);
-    await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenBRC20);
-    await expect(wallet.checkboxTokenActive).toHaveCount(0);
-    await expect(wallet.checkboxToken).toHaveCount(amounttokenBRC20);
-
-    // Check rune token
-    await wallet.buttonRunes.click();
     await expect(wallet.labelCoinTitle).toHaveCount(0);
+    await expect(wallet.checkboxToken).toHaveCount(0);
     await expect(wallet.checkboxTokenInactive).toHaveCount(0);
     await expect(wallet.checkboxTokenActive).toHaveCount(0);
+
+    // Check rune token tab - nothing shows when user has no runes balances
+    await wallet.buttonRunes.click();
+    await expect(wallet.labelCoinTitle).toHaveCount(0);
     await expect(wallet.checkboxToken).toHaveCount(0);
+    await expect(wallet.checkboxTokenInactive).toHaveCount(0);
+    await expect(wallet.checkboxTokenActive).toHaveCount(0);
   });
 
-  test('Enable and disable some BRC-20 token', async ({ page, extensionId }) => {
-    const onboardingPage = new Onboarding(page);
+  test('Toggle a BRC-20 token', async ({ page, extensionId }) => {
     const wallet = new Wallet(page);
-    await onboardingPage.createWalletSkipBackup(strongPW);
+    await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
-    await test.step('Enable a random token', async () => {
-      await page.goto(`chrome-extension://${extensionId}/popup.html`);
-      await wallet.checkVisualsStartpage();
-      // Check balances
-      await expect(wallet.balance).toBeVisible();
-      await expect(wallet.balance).toHaveText('$0.00');
-      let balanceText = await wallet.getBalanceOfAllTokens();
-      await expect(balanceText).toBe(0);
-      await wallet.manageTokenButton.click();
-      await expect(page.url()).toContain('manage-tokens');
-      await wallet.buttonBRC20.click();
-      await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
-      const amounttokenBRC20 = await wallet.labelCoinTitle.count();
-      // Enable random token
-      const tokenName = await wallet.toggleRandomToken(true);
-      // Check that amount of checkboxes changed
-      await expect(wallet.checkboxTokenActive).toHaveCount(1);
-      await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenBRC20 - 1);
-      await wallet.buttonBack.click();
-      // new enabled token should be visible on dashboard
-      await expect(wallet.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeVisible();
-      // Check balances
-      await expect(wallet.balance).toBeVisible();
-      await expect(wallet.balance).toHaveText('$0.00');
-      balanceText = await wallet.getBalanceOfAllTokens();
-      await expect(balanceText).toBe(0);
-    });
-
-    await test.step('Enable some more token', async () => {
+    await test.step('Toggle a random token', async () => {
       await wallet.manageTokenButton.click();
       await wallet.buttonBRC20.click();
-      await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
-      const amounttokenBRC20 = await wallet.labelCoinTitle.count();
-      const tokenName1 = await wallet.toggleRandomToken(true);
-      const tokenName2 = await wallet.toggleRandomToken(true);
-      const tokenName3 = await wallet.toggleRandomToken(true);
-      await expect(wallet.checkboxTokenActive).toHaveCount(4);
-      await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenBRC20 - 4);
-      await wallet.buttonBack.click();
-      // new enabled tokens should be visible on dashboard
-      await expect(wallet.labelTokenSubtitle.getByText(tokenName1, { exact: true })).toBeVisible();
-      await expect(wallet.labelTokenSubtitle.getByText(tokenName2, { exact: true })).toBeVisible();
-      await expect(wallet.labelTokenSubtitle.getByText(tokenName3, { exact: true })).toBeVisible();
-    });
 
-    await test.step('Disable a random token', async () => {
-      await page.goto(`chrome-extension://${extensionId}/popup.html`);
-      await wallet.checkVisualsStartpage();
-      await wallet.manageTokenButton.click();
-      await expect(page.url()).toContain('manage-tokens');
-      await wallet.buttonBRC20.click();
-      await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
-      const amounttokenBRC20 = await wallet.labelCoinTitle.count();
-      const tokenName = await wallet.toggleRandomToken(false);
-      await expect(wallet.checkboxTokenActive).toHaveCount(3);
-      await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenBRC20 - 3);
-      await wallet.buttonBack.click();
-      // new enabled token should be visible on dashboard
-      await expect(wallet.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeHidden();
-      // Check balances
-      await expect(wallet.balance).toBeVisible();
-      await expect(wallet.balance).toHaveText('$0.00');
-      const balanceText = await wallet.getBalanceOfAllTokens();
-      await expect(balanceText).toBe(0);
-    });
-  });
-
-  test('Enable and disable some SIP-10 token', async ({ page, extensionId }) => {
-    const onboardingPage = new Onboarding(page);
-    const wallet = new Wallet(page);
-    await onboardingPage.createWalletSkipBackup(strongPW);
-
-    await test.step('Enable a random token', async () => {
-      await page.goto(`chrome-extension://${extensionId}/popup.html`);
-      await wallet.checkVisualsStartpage();
-      // Check balances
-      await expect(wallet.balance).toBeVisible();
-      await expect(wallet.balance).toHaveText('$0.00');
-      let balanceText = await wallet.getBalanceOfAllTokens();
-      await expect(balanceText).toBe(0);
-      await wallet.manageTokenButton.click();
-      await expect(page.url()).toContain('manage-tokens');
-      await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
-      const amounttokenSIP = await wallet.labelCoinTitle.count();
-      // Enable random token
-      const tokenName = await wallet.toggleRandomToken(true);
-      // Check that amount of checkboxes changed
-      await expect(wallet.checkboxTokenActive).toHaveCount(2);
-      await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenSIP - 2);
-      await wallet.buttonBack.click();
-      // new enabled token should be visible on dashboard
-      await expect(wallet.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeVisible();
-      // Check balances
-      await expect(wallet.balance).toBeVisible();
-      await expect(wallet.balance).toHaveText('$0.00');
-      balanceText = await wallet.getBalanceOfAllTokens();
-      await expect(balanceText).toBe(0);
-    });
-
-    await test.step('Enable some more token', async () => {
-      await wallet.manageTokenButton.click();
-      await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
-      const amounttokenSIP = await wallet.labelCoinTitle.count();
-      const tokenName1 = await wallet.toggleRandomToken(true);
-      const tokenName2 = await wallet.toggleRandomToken(true);
-      const tokenName3 = await wallet.toggleRandomToken(true);
-      await expect(wallet.checkboxTokenActive).toHaveCount(5);
-      await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenSIP - 5);
-      await wallet.buttonBack.click();
-      // new enabled tokens should be visible on dashboard
-      await expect(wallet.labelTokenSubtitle.getByText(tokenName1, { exact: true })).toBeVisible();
-      await expect(wallet.labelTokenSubtitle.getByText(tokenName2, { exact: true })).toBeVisible();
-      await expect(wallet.labelTokenSubtitle.getByText(tokenName3, { exact: true })).toBeVisible();
-    });
-
-    await test.step('Disable a random token', async () => {
-      await page.goto(`chrome-extension://${extensionId}/popup.html`);
-      await wallet.checkVisualsStartpage();
-      await wallet.manageTokenButton.click();
-      await expect(page.url()).toContain('manage-tokens');
-      await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
-      const amounttokenSIP = await wallet.labelCoinTitle.count();
-      const tokenName = await wallet.toggleRandomToken(false);
-      await expect(wallet.checkboxTokenActive).toHaveCount(4);
-      await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenSIP - 4);
-      await wallet.buttonBack.click();
-      // new enabled token should be visible on dashboard
-      await expect(wallet.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeHidden();
-      // Check balances
-      await expect(wallet.balance).toBeVisible();
-      await expect(wallet.balance).toHaveText('$0.00');
-      const balanceText = await wallet.getBalanceOfAllTokens();
-      await expect(balanceText).toBe(0);
-    });
-  });
-
-  test('Enable and disable all SIP-10 token', async ({ page, extensionId }) => {
-    const onboardingPage = new Onboarding(page);
-    const wallet = new Wallet(page);
-    await onboardingPage.createWalletSkipBackup(strongPW);
-
-    await test.step('Enable a all tokens', async () => {
-      await page.goto(`chrome-extension://${extensionId}/popup.html`);
-      await wallet.checkVisualsStartpage();
-      // Check balances
-      await expect(wallet.balance).toBeVisible();
-      await expect(wallet.balance).toHaveText('$0.00');
-      let balanceText = await wallet.getBalanceOfAllTokens();
-      await expect(balanceText).toBe(0);
-      await expect(wallet.labelTokenSubtitle).toHaveCount(2);
-      await wallet.manageTokenButton.click();
-      await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
-      const amounttokenSIP = await wallet.labelCoinTitle.count();
-      await expect(page.url()).toContain('manage-tokens');
-      await expect(wallet.checkboxToken).toHaveCount(amounttokenSIP);
-      await wallet.toggleAllTokens(true);
-      await expect(wallet.checkboxTokenActive).toHaveCount(amounttokenSIP);
-      await expect(wallet.checkboxTokenInactive).toHaveCount(0);
-      await wallet.buttonBack.click();
-      await expect(wallet.labelTokenSubtitle).toHaveCount(amounttokenSIP + 1);
-      await expect(wallet.balance).toBeVisible();
-      await expect(wallet.balance).toHaveText('$0.00');
-      balanceText = await wallet.getBalanceOfAllTokens();
-      await expect(balanceText).toBe(0);
-    });
-
-    await test.step('Disable all tokens', async () => {
-      await page.goto(`chrome-extension://${extensionId}/popup.html`);
-      await wallet.checkVisualsStartpage();
-      await wallet.manageTokenButton.click();
-      await expect(page.url()).toContain('manage-tokens');
-      await wallet.toggleAllTokens(false);
-      await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
-      const amounttokenSIP = await wallet.labelCoinTitle.count();
-      await expect(wallet.checkboxTokenActive).toHaveCount(0);
-      await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenSIP);
-      await wallet.buttonBack.click();
-      await expect(wallet.labelTokenSubtitle).toHaveCount(1);
-      // Check balances
-      await expect(wallet.balance).toBeVisible();
-      await expect(wallet.balance).toHaveText('$0.00');
-      const balanceText = await wallet.getBalanceOfAllTokens();
-      await expect(balanceText).toBe(0);
-    });
-  });
-  test('Enable and disable all BRC-20 token', async ({ page, extensionId }) => {
-    const onboardingPage = new Onboarding(page);
-    const wallet = new Wallet(page);
-    await onboardingPage.createWalletSkipBackup(strongPW);
-
-    await test.step('Enable a all tokens', async () => {
-      await page.goto(`chrome-extension://${extensionId}/popup.html`);
-      await wallet.checkVisualsStartpage();
-      // Check balances
-      await expect(wallet.balance).toBeVisible();
-      await expect(wallet.balance).toHaveText('$0.00');
-      let balanceText = await wallet.getBalanceOfAllTokens();
-      await expect(balanceText).toBe(0);
-      await expect(wallet.labelTokenSubtitle).toHaveCount(2);
-      await wallet.manageTokenButton.click();
-      await expect(page.url()).toContain('manage-tokens');
-      await wallet.buttonBRC20.click();
-      await expect(wallet.checkboxTokenInactive.first()).toBeVisible();
-      const amounttokenBRC20 = await wallet.labelCoinTitle.count();
-      await expect(wallet.checkboxToken).toHaveCount(amounttokenBRC20);
-      await wallet.toggleAllTokens(true);
-      await expect(wallet.checkboxTokenActive).toHaveCount(amounttokenBRC20);
-      await expect(wallet.checkboxTokenInactive).toHaveCount(0);
-      await wallet.buttonBack.click();
-      await expect(wallet.labelTokenSubtitle).toHaveCount(amounttokenBRC20 + 2);
-      await expect(wallet.balance).toBeVisible();
-      await expect(wallet.balance).toHaveText('$0.00');
-      balanceText = await wallet.getBalanceOfAllTokens();
-      await expect(balanceText).toBe(0);
-    });
-
-    await test.step('Disable all tokens', async () => {
-      await page.goto(`chrome-extension://${extensionId}/popup.html`);
-      await wallet.checkVisualsStartpage();
-      await wallet.manageTokenButton.click();
-      await expect(page.url()).toContain('manage-tokens');
-      await wallet.buttonBRC20.click();
+      // NOTE: requires an account with at least 1 brc20 token with balance
       await expect(wallet.checkboxTokenActive.first()).toBeVisible();
-      const amounttokenBRC20 = await wallet.labelCoinTitle.count();
-      await wallet.toggleAllTokens(false);
-      await expect(wallet.checkboxTokenActive).toHaveCount(0);
-      await expect(wallet.checkboxTokenInactive).toHaveCount(amounttokenBRC20);
+
+      // disable a random token
+      const tokenName = await wallet.toggleRandomToken(false);
+
+      // expect token to be hidden on dashboard
+      const fetchTokens = page.waitForResponse((response) =>
+        response.url().includes('/brc20/tokens'),
+      );
       await wallet.buttonBack.click();
-      await expect(wallet.labelTokenSubtitle).toHaveCount(2);
-      // Check balances
-      await expect(wallet.balance).toBeVisible();
-      await expect(wallet.balance).toHaveText('$0.00');
-      const balanceText = await wallet.getBalanceOfAllTokens();
-      await expect(balanceText).toBe(0);
+      await fetchTokens;
+      await expect(wallet.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeHidden();
+
+      // enable the token again
+      await wallet.manageTokenButton.click();
+      await wallet.buttonBRC20.click();
+      await page.getByTestId(tokenName).locator('label').click();
+
+      // expect to be visible again on dashboard
+      const fetchTokensAgain = page.waitForResponse((response) =>
+        response.url().includes('/brc20/tokens'),
+      );
+      await wallet.buttonBack.click();
+      await fetchTokensAgain;
+      await expect(wallet.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeVisible();
+    });
+  });
+
+  test('Toggle a SIP-10 token', async ({ page, extensionId }) => {
+    const wallet = new Wallet(page);
+    await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
+
+    await test.step('Toggle a random token', async () => {
+      await wallet.manageTokenButton.click();
+      await wallet.buttonSip10.click();
+
+      // NOTE: requires an account with at least 1 sip10 token with balance
+      await expect(wallet.checkboxTokenActive.first()).toBeVisible();
+
+      // disable a random token
+      const tokenName = await wallet.toggleRandomToken(false);
+
+      // expect token to be hidden on dashboard
+      const fetchTokens = page.waitForResponse((response) =>
+        response.url().includes('/sip10/tokens'),
+      );
+      await wallet.buttonBack.click();
+      await fetchTokens;
+      await expect(wallet.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeHidden();
+
+      // enable the token again
+      await wallet.manageTokenButton.click();
+      await wallet.buttonSip10.click();
+      await page.getByTestId(tokenName).locator('label').click();
+
+      // expect to be visible again on dashboard
+      const fetchTokensAgain = page.waitForResponse((response) =>
+        response.url().includes('/sip10/tokens'),
+      );
+      await wallet.buttonBack.click();
+      await fetchTokensAgain;
+      await expect(wallet.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeVisible();
+    });
+  });
+
+  test('Toggle a Runes token', async ({ page, extensionId }) => {
+    const wallet = new Wallet(page);
+    await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
+
+    await test.step('Toggle a random token', async () => {
+      await wallet.manageTokenButton.click();
+      await wallet.buttonRunes.click();
+
+      // NOTE: requires an account with at least 1 runes token with balance
+      await expect(wallet.checkboxTokenActive.first()).toBeVisible();
+
+      // disable a random token
+      const tokenName = await wallet.toggleRandomToken(false);
+
+      // expect token to be hidden on dashboard
+      const fetchTokens = page.waitForResponse((response) =>
+        response.url().includes('/runes/fiat-rates'),
+      );
+      await wallet.buttonBack.click();
+      await fetchTokens;
+      await expect(wallet.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeHidden();
+
+      // enable the token again
+      await wallet.manageTokenButton.click();
+      await wallet.buttonRunes.click();
+      await page.getByTestId(tokenName).locator('label').click();
+
+      // expect to be visible again on dashboard
+      const fetchTokensAgain = page.waitForResponse((response) =>
+        response.url().includes('/runes/fiat-rates'),
+      );
+      await wallet.buttonBack.click();
+      await fetchTokensAgain;
+      await expect(wallet.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeVisible();
     });
   });
 });

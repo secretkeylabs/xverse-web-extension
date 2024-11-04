@@ -109,22 +109,18 @@ function SelectFeeRate({
   const [selected, setSelected] = useState<FeePriority | 'custom' | null>(null);
 
   useEffect(() => {
-    if (feeRate) {
-      if (feeRate === feeRates.high?.toString()) {
-        if (!selected) {
-          setSelected('high');
-        }
-      }
-      if (feeRate === feeRates.medium?.toString()) {
-        if (!selected) {
-          setSelected('medium');
-        }
-      }
-      if (feeRate === feeRates.low?.toString()) {
-        if (!selected) {
-          setSelected('low');
-        }
-      }
+    if (!feeRate || selected) return;
+
+    const feeRateString = feeRate.toString();
+
+    if (feeRateString === feeRates.high?.toString()) {
+      setSelected('high');
+    } else if (feeRateString === feeRates.medium?.toString()) {
+      setSelected('medium');
+    } else if (feeRateString === feeRates.low?.toString()) {
+      setSelected('low');
+    } else {
+      setSelected('custom');
     }
   }, [feeRates, feeRate, selected]);
 

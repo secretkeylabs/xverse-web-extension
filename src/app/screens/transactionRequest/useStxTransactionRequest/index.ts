@@ -1,10 +1,12 @@
-import { parseData } from '@common/utils';
 import { getPopupPayload, type Context } from '@common/utils/popup';
-import { callContractParamsSchema } from '@common/utils/rpc/stx/callContract/paramsSchema';
-import { deployContractParamsSchema } from '@common/utils/rpc/stx/deployContract/paramsSchema';
+// import { callContractParamsSchema } from '@common/utils/rpc/stx/callContract/paramsSchema';
 import useNetworkSelector from '@hooks/useNetwork';
 import useSelectedAccount from '@hooks/useSelectedAccount';
-import { stxSignTransactionRequestMessageSchema } from '@sats-connect/core';
+import {
+  stxCallContractParamsSchema,
+  stxDeployContractParamsSchema,
+  stxSignTransactionRequestMessageSchema,
+} from '@sats-connect/core';
 import { txPayloadToRequest } from '@secretkeylabs/xverse-core';
 import {
   TransactionTypes,
@@ -14,6 +16,7 @@ import {
 import { AuthType, PayloadType, deserializeTransaction } from '@stacks/transactions';
 import { createUnsecuredToken, decodeToken } from 'jsontokens';
 import { useLocation } from 'react-router-dom';
+import { parse } from 'superjson';
 import * as v from 'valibot';
 import type { Return } from './types';
 import { getPayload, isDeployContractPayload } from './utils';
@@ -161,15 +164,18 @@ const useStxTransactionRequest = (
       const contract = params.get('contract') ?? '';
       const functionName = params.get('functionName') ?? '';
       const argumentsString = params.get('arguments') ?? '';
-      const [error, data] = parseData(argumentsString, callContractParamsSchema.shape.arguments);
+      const paramsParseResult = v.safeParse(
+        stxCallContractParamsSchema,
+        parse(decodeToken(argumentsString).payload as string),
+      );
 
-      const argumentsArray = error
-        ? (() => {
+      const argumentsArray = paramsParseResult.success
+        ? paramsParseResult.output.arguments
+        : (() => {
             // eslint-disable-next-line no-console
-            console.error('Error parsing arguments', error);
+            console.error('Error parsing arguments', paramsParseResult.issues);
             return undefined;
-          })()
-        : data;
+          })();
 
       const payload: ContractCallPayload = {
         txType: TransactionTypes.ContractCall,
@@ -198,16 +204,17 @@ const useStxTransactionRequest = (
     case 'stx_deployContract': {
       const name = params.get('name') ?? '';
       const clarityCodeParam = params.get('clarityCode') ?? '';
-      const [, clarityCode] = parseData(
-        clarityCodeParam,
-        deployContractParamsSchema.shape.clarityCode,
-      );
-      // Currently unused
-      // const clarityVersion = params.get('clarityVersion') ?? '';
+      const clarityCode = (() => {
+        const parseResult = v.safeParse(
+          stxDeployContractParamsSchema.entries.clarityCode,
+          clarityCodeParam,
+        );
+        return parseResult.success ? parseResult.output : '';
+      })();
 
       const payload: ContractDeployPayload = {
         contractName: name,
-        codeBody: clarityCode ?? '',
+        codeBody: clarityCode,
         txType: TransactionTypes.ContractDeploy,
         publicKey: stxPublicKey,
       };

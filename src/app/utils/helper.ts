@@ -4,7 +4,7 @@ import {
   microstacksToStx,
   satsToBtc,
   type Account,
-  type FungibleToken,
+  type FungibleTokenWithStates,
   type NetworkType,
   type NftData,
   type SettingsNetwork,
@@ -12,6 +12,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { ChainID } from '@stacks/transactions';
 import { getFtBalance } from '@utils/tokens';
+import RoutePaths from 'app/routes/paths';
 import BigNumber from 'bignumber.js';
 import type { TFunction } from 'react-i18next';
 import {
@@ -82,9 +83,12 @@ export const getTruncatedAddress = (address: string, lengthToShow = 4) =>
     address.length,
   )}`;
 
-export const getShortTruncatedAddress = (address: string) => {
+export const getShortTruncatedAddress = (address: string, charCount = 8) => {
   if (address) {
-    return `${address.substring(0, 8)}...${address.substring(address.length - 8, address.length)}`;
+    return `${address.substring(0, charCount)}...${address.substring(
+      address.length - charCount,
+      address.length,
+    )}`;
   }
 };
 
@@ -240,6 +244,11 @@ export const validateAccountName = (
   return null;
 };
 
+export const getAccountBalanceKey = (account: Account | null) => {
+  if (!account) return '';
+  return `${account.accountType}-${account.id}`;
+};
+
 export const calculateTotalBalance = ({
   stxBalance,
   btcBalance,
@@ -252,9 +261,9 @@ export const calculateTotalBalance = ({
 }: {
   stxBalance?: string;
   btcBalance?: string;
-  sipCoinsList: FungibleToken[];
-  brcCoinsList: FungibleToken[];
-  runesCoinList: FungibleToken[];
+  sipCoinsList: FungibleTokenWithStates[];
+  brcCoinsList: FungibleTokenWithStates[];
+  runesCoinList: FungibleTokenWithStates[];
   stxBtcRate: string;
   btcFiatRate: string;
   hideStx: boolean;
@@ -277,7 +286,7 @@ export const calculateTotalBalance = ({
 
   if (sipCoinsList) {
     totalBalance = sipCoinsList.reduce((acc, coin) => {
-      if (coin.visible && coin.tokenFiatRate && coin.decimals) {
+      if (coin.isEnabled && coin.tokenFiatRate && coin.decimals) {
         const tokenUnits = new BigNumber(10).exponentiatedBy(new BigNumber(coin.decimals));
         const coinFiatValue = new BigNumber(coin.balance)
           .dividedBy(tokenUnits)
@@ -291,7 +300,7 @@ export const calculateTotalBalance = ({
 
   if (brcCoinsList) {
     totalBalance = brcCoinsList.reduce((acc, coin) => {
-      if (coin.visible && coin.tokenFiatRate) {
+      if (coin.isEnabled && coin.tokenFiatRate) {
         const coinFiatValue = new BigNumber(coin.balance).multipliedBy(
           new BigNumber(coin.tokenFiatRate),
         );
@@ -304,7 +313,7 @@ export const calculateTotalBalance = ({
 
   if (runesCoinList) {
     totalBalance = runesCoinList.reduce((acc, coin) => {
-      if (coin.visible && coin.tokenFiatRate) {
+      if (coin.isEnabled && coin.tokenFiatRate) {
         const coinFiatValue = new BigNumber(getFtBalance(coin)).multipliedBy(
           new BigNumber(coin.tokenFiatRate),
         );
@@ -335,3 +344,31 @@ export const satsToBtcString = (num: BigNumber) =>
     .replace(/\.?0+$/, '');
 
 export const sanitizeRuneName = (runeName) => runeName.replace(/[^A-Za-z]+/g, '').toUpperCase();
+
+export type TabType = 'dashboard' | 'nft' | 'stacking' | 'explore' | 'settings';
+
+export const getActiveTab = (currentPath: string): TabType => {
+  if (
+    currentPath.includes('/nft-dashboard') ||
+    currentPath.includes('/ordinal-detail') ||
+    currentPath.includes('send-ordinal') ||
+    currentPath.includes('send-nft')
+  ) {
+    return 'nft';
+  }
+
+  if (currentPath.includes('/stacking')) {
+    return 'stacking';
+  }
+
+  if (currentPath.includes('/explore')) {
+    return 'explore';
+  }
+
+  if (currentPath.includes(RoutePaths.Settings)) {
+    return 'settings';
+  }
+
+  // Default to dashboard for all other routes
+  return 'dashboard';
+};

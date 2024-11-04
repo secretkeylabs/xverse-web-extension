@@ -1,13 +1,12 @@
+import { Copy } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { Tooltip } from 'react-tooltip';
 import styled from 'styled-components';
 
-import copyIcon from '@assets/img/Copy.svg';
-
 const StyledToolTip = styled(Tooltip)`
-  background-color: #ffffff;
+  background-color: ${({ theme }) => theme.colors.white_0};
   color: #12151e;
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radius(1)}px;
   padding: 7px;
 `;
 
@@ -16,48 +15,39 @@ const AddressComponent = styled.p({
 });
 
 const AddressComponentTitle = styled.p((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.body_m,
   color: props.theme.colors.white_200,
-  marginBottom: props.theme.spacing(2),
+  marginBottom: props.theme.space.xxs,
 }));
 
-const AddressComponentContainer = styled.div({
+const AddressComponentContainer = styled.div((props) => ({
   width: '100%',
   display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'space-between',
   alignItems: 'flex-start',
-});
+  gap: props.theme.space.xs,
+}));
 
 const AddressCompononentText = styled.p((props) => ({
-  ...props.theme.body_medium_m,
-  maxWidth: '300px',
+  ...props.theme.typography.body_medium_m,
   wordBreak: 'break-all',
 }));
 
 const CopyButton = styled.button`
-  color: #ffffff;
   display: flex;
-  flexdirection: row;
-  alignitems: center;
-  justifycontent: center;
   background: transparent;
-  :hover {
-    opacity: 1;
+  transition: opacity 0.1s ease;
+  &:hover {
+    opacity: 0.8;
   }
-  :focus {
-    opacity: 1;
+  &:active {
+    opacity: 0.6;
   }
 `;
 
-const CopyImage = styled.img((props) => ({
-  marginLeft: props.theme.spacing(2),
-}));
-
-interface Props {
+type Props = {
   title: string;
   address?: string;
-}
+};
 
 function LedgerAddressComponent({ title, address }: Props) {
   const [isCopied, setIsCopied] = useState(false);
@@ -79,7 +69,7 @@ function LedgerAddressComponent({ title, address }: Props) {
       <AddressComponentContainer>
         <AddressCompononentText>{address}</AddressCompononentText>
         <CopyButton id={`${title}_anchor`} onClick={handleClick}>
-          <CopyImage src={copyIcon} alt="copy" />
+          <Copy color="white" size={20} />
         </CopyButton>
         <StyledToolTip
           anchorId={`${title}_anchor`}

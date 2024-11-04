@@ -12,6 +12,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import Input, { ConvertComplication, MaxButton } from '@ui-library/input';
+import { HIDDEN_BALANCE_LABEL } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -68,7 +69,7 @@ type Props = {
 
 function StxAmountSelector({ amount, setAmount, sendMax, setSendMax, disabled = false }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
-  const { fiatCurrency } = useWalletSelector();
+  const { fiatCurrency, balanceHidden } = useWalletSelector();
   const { data: stxData } = useStxWalletData();
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const stxBalanceStr = stxData?.availableBalance.toString() ?? '0';
@@ -187,7 +188,9 @@ function StxAmountSelector({ amount, setAmount, sendMax, setSendMax, disabled = 
           prefix={useStxValue ? '' : `~ ${currencySymbolMap[fiatCurrency]}`}
           renderText={(value: string) => (
             <div data-testid="balance-label">
-              <BalanceText>{t('BALANCE')}</BalanceText> {value} {useStxValue ? 'STX' : fiatCurrency}
+              <BalanceText>{t('BALANCE')}</BalanceText>
+              {balanceHidden && ` ${HIDDEN_BALANCE_LABEL}`}
+              {!balanceHidden && ` ${value} ${useStxValue ? 'STX' : fiatCurrency}`}
             </div>
           )}
         />

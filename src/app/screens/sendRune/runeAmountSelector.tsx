@@ -4,6 +4,7 @@ import { ArrowsDownUp } from '@phosphor-icons/react';
 import { currencySymbolMap, type FungibleToken } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import Input, { ConvertComplication, MaxButton, VertRule } from '@ui-library/input';
+import { HIDDEN_BALANCE_LABEL } from '@utils/constants';
 import { ftDecimals } from '@utils/helper';
 import { getFtTicker } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
@@ -69,7 +70,7 @@ function RuneAmountSelector({
   amountError,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
-  const { fiatCurrency } = useWalletSelector();
+  const { fiatCurrency, balanceHidden } = useWalletSelector();
   const [displayAmount, setDisplayAmount] = useState(amountToSend);
   const tokenDecimals = Number(token.decimals ?? 0);
   const tokenBalance = new BigNumber(ftDecimals(token.balance, tokenDecimals));
@@ -144,8 +145,9 @@ function RuneAmountSelector({
           prefix={useTokenValue ? '' : `~ ${currencySymbolMap[fiatCurrency]}`}
           renderText={(value: string) => (
             <BalanceTextWrapper data-testid="balance-label">
-              <BalanceText>{t('BALANCE')}</BalanceText> {value}{' '}
-              {useTokenValue ? getFtTicker(token) : fiatCurrency}
+              <BalanceText>{t('BALANCE')}</BalanceText>
+              {balanceHidden && ` ${HIDDEN_BALANCE_LABEL}`}
+              {!balanceHidden && ` ${value} ${useTokenValue ? getFtTicker(token) : fiatCurrency}`}
             </BalanceTextWrapper>
           )}
         />

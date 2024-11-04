@@ -3,7 +3,7 @@ import stxIcon from '@assets/img/dashboard/stx_icon.svg';
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import { MESSAGE_SOURCE } from '@common/types/message-types';
-import { delay } from '@common/utils/ledger';
+import { delay } from '@common/utils/promises';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
@@ -105,7 +105,7 @@ function AuthenticationRequest() {
   const [isTxRejected, setIsTxRejected] = useState(false);
   const { t } = useTranslation('translation', { keyPrefix: 'AUTH_REQUEST_SCREEN' });
   const navigate = useNavigate();
-  const { search } = useLocation();
+  const { search, pathname } = useLocation();
   const params = new URLSearchParams(search);
   const authRequestToken = params.get('authRequest') ?? '';
   const authRequest = decodeToken(authRequestToken) as unknown as AuthRequest;
@@ -267,7 +267,7 @@ function AuthenticationRequest() {
   };
 
   const handleSwitchAccount = () => {
-    navigate('/account-list?hideListActions=true');
+    navigate('/account-list?hideListActions=true', { state: { from: pathname } });
   };
 
   const handleAddStxLedgerAccount = async () => {

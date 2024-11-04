@@ -3,7 +3,7 @@ import Button from '@ui-library/button';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-const Form = styled.form({
+const Container = styled.div({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
@@ -21,36 +21,34 @@ const Title = styled.h1((props) => ({
 const ButtonContainer = styled.div((props) => ({
   width: '100%',
   marginTop: 'auto',
-  marginBottom: props.theme.spacing(30),
+  marginBottom: props.theme.spacing(15),
 }));
 
-interface Props {
+type Props = {
   seed: string;
   setSeed: (seed: string) => void;
   onContinue: () => void;
   seedError: string;
   setSeedError: (err: string) => void;
-}
+};
 
-function EnterSeedPhrase(props: Props): JSX.Element {
-  const { onContinue, seed, setSeed, seedError, setSeedError } = props;
-
+function EnterSeedPhrase({
+  seed,
+  setSeed,
+  onContinue,
+  seedError,
+  setSeedError,
+}: Props): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_WALLET_SCREEN' });
 
   return (
-    <Form
-      onSubmit={(e) => {
-        e.preventDefault();
-
-        onContinue();
-      }}
-    >
+    <Container>
       <Title>{t('ENTER_SEED_HEADER')}</Title>
       <SeedPhraseInput onSeedChange={setSeed} seedError={seedError} setSeedError={setSeedError} />
       <ButtonContainer>
         <Button onClick={onContinue} disabled={seed === ''} title={t('CONTINUE_BUTTON')} />
       </ButtonContainer>
-    </Form>
+    </Container>
   );
 }
 

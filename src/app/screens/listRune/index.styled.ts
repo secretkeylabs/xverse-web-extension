@@ -134,6 +134,7 @@ export const RightAlignStyledP = styled(StyledP)`
   text-align: right;
 `;
 
-export const NoItemsContainer = styled.div((props) => ({
-  padding: `${props.theme.space.m} ${props.theme.space.s}`,
+export const NoItemsContainer = styled(StyledP)((props) => ({
+  marginTop: props.theme.space.xxxl,
+  textAlign: 'center',
 }));

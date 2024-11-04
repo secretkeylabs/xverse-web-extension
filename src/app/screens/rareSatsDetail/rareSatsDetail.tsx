@@ -54,11 +54,9 @@ function RareSatsDetailScreen() {
       <Container>
         <StyledP typography="body_bold_l">TODO</StyledP>
       </Container>
-      {!isGalleryOpen && (
-        <BottomBarContainer>
-          <BottomTabBar tab="nft" />
-        </BottomBarContainer>
-      )}
+      <BottomBarContainer>
+        <BottomTabBar tab="nft" />
+      </BottomBarContainer>
     </>
   );
 }

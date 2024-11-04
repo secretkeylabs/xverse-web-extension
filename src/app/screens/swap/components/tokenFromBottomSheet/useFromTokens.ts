@@ -1,11 +1,11 @@
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
-import useMasterCoinsList from '@screens/swap/useMasterCoinsList';
+import useVisibleMasterCoinsList from '@screens/swap/useVisibleMasterCoinsList';
 import { mapSwapProtocolToFTProtocol } from '@screens/swap/utils';
 import { type Token } from '@secretkeylabs/xverse-core';
 import { sortFtByFiatBalance } from '@utils/tokens';
 
 const useFromTokens = (toToken?: Token) => {
-  const tokens = useMasterCoinsList();
+  const tokens = useVisibleMasterCoinsList();
   const { stxBtcRate, btcFiatRate } = useSupportedCoinRates();
 
   // Sort tokens, keeping BTC as the first element, and STX (if enabled) as the second

@@ -1,10 +1,8 @@
 import AccountHeaderComponent from '@components/accountHeader';
-import BottomBar, { type Tab } from '@components/tabBar';
+import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import { ArrowLeft } from '@phosphor-icons/react';
-import { StyledP } from '@ui-library/common.styled';
+import { isInOptions, type TabType } from '@utils/helper';
 import type { PropsWithChildren } from 'react';
-import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import { breakpoints, devices } from 'theme';
 
@@ -33,44 +31,14 @@ const Container = styled.div`
     max-width: 588px;
     max-height: unset;
     height: auto;
-    border: 1px solid ${(props) => props.theme.colors.elevation3};
-    border-radius: ${(props) => props.theme.space.s};
-    padding-top: ${(props) => props.theme.space.l};
-    padding-left: ${(props) => props.theme.space.m};
-    padding-right: ${(props) => props.theme.space.m};
-    padding-bottom: ${(props) => props.theme.space.xxl};
-    margin-top: ${(props) => props.theme.space.xxxxl};
+    padding: 0 ${(props) => props.theme.space.xs};
     margin-bottom: ${(props) => props.theme.space.m};
-  }
-`;
-
-const FooterContainer = styled.div`
-  display: none;
-
-  @media only screen and ${devices.min.s} {
-    display: flex;
-    justify-content: center;
-    margin-bottom: ${(props) => props.theme.space.xxl};
   }
 `;
 
 const BottomBarContainer = styled.div({
   marginTop: 'auto',
 });
-
-const Button = styled.button`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: transparent;
-  border-radius: 24px;
-  padding: 5px;
-  width: 30px;
-  margin-bottom: ${(props) => props.theme.space.l};
-  :hover {
-    background-color: ${(props) => props.theme.colors.white_900};
-  }
-`;
 
 function SendLayout({
   children,
@@ -80,40 +48,26 @@ function SendLayout({
   showAccountHeader = false,
   hideBottomBar = false,
 }: PropsWithChildren<{
-  selectedBottomTab: Tab;
+  selectedBottomTab: TabType;
   onClickBack?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   hideBackButton?: boolean;
   showAccountHeader?: boolean;
   hideBottomBar?: boolean;
 }>) {
-  const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
-  const isScreenLargerThanXs = document.documentElement.clientWidth > Number(breakpoints.xs);
-  const year = new Date().getFullYear();
+  const isInOption = isInOptions();
 
   return (
     <>
-      {isScreenLargerThanXs || showAccountHeader ? (
+      {showAccountHeader ? (
         <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       ) : (
         <TopRow onClick={onClickBack!} showBackButton={!hideBackButton && !!onClickBack} />
       )}
       <ScrollContainer>
-        <Container>
-          {isScreenLargerThanXs && !hideBackButton && onClickBack && (
-            <Button onClick={onClickBack}>
-              <ArrowLeft size={20} color="white" />
-            </Button>
-          )}
-          {children}
-        </Container>
-        <FooterContainer>
-          <StyledP typography="body_medium_m" color="white_400">
-            {t('COPYRIGHT', { year })}
-          </StyledP>
-        </FooterContainer>
+        <Container>{children}</Container>
       </ScrollContainer>
       <BottomBarContainer>
-        {!isScreenLargerThanXs && !hideBottomBar && <BottomBar tab={selectedBottomTab} />}
+        {!isInOption && !hideBottomBar && <BottomBar tab={selectedBottomTab} />}
       </BottomBarContainer>
     </>
   );

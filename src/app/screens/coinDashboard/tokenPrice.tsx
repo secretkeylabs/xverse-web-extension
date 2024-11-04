@@ -21,7 +21,7 @@ const Container = styled.div`
 
 type Props = {
   currency: CurrencyTypes;
-  fungibleToken: FungibleToken;
+  fungibleToken: FungibleToken | undefined;
 };
 
 function TokenPrice({ currency, fungibleToken }: Props) {
@@ -45,7 +45,7 @@ function TokenPrice({ currency, fungibleToken }: Props) {
   return (
     <Container>
       <StyledP typography="body_medium_m" color="white_200">
-        {currency === 'STX' || currency === 'BTC' ? currency : fungibleToken.name} {t('PRICE')}
+        {currency === 'STX' || currency === 'BTC' ? currency : fungibleToken?.name} {t('PRICE')}
       </StyledP>
       <NumericFormat
         value={currentPrice.toFixed(2)}

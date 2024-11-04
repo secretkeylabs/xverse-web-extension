@@ -1,7 +1,7 @@
-import { CaretLeft, CaretRight, XCircle } from '@phosphor-icons/react';
+import { CaretLeft, CaretRight } from '@phosphor-icons/react';
 import type { NotificationBanner } from '@secretkeylabs/xverse-core';
 import { setNotificationBannersAction } from '@stores/wallet/actions/actionCreators';
-import { CrossButton } from '@ui-library/sheet';
+import CrossButton from '@ui-library/crossButton';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
@@ -9,13 +9,12 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import { Navigation, Pagination } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import Theme from 'theme';
 import Banner from './banner';
 
 const CarouselContainer = styled.div`
   position: relative;
-  margin-top: ${({ theme }) => theme.space.xxs};
-  margin-bottom: ${({ theme }) => theme.space.xxs};
+  padding-top: ${({ theme }) => theme.space.xxs};
+  padding-bottom: ${({ theme }) => theme.space.xxs};
 
   .swiper {
     padding: 0;
@@ -88,10 +87,9 @@ const PaginationContainer = styled.div`
 `;
 
 const StyledCrossButton = styled(CrossButton)`
-  z-index: 1;
-  position: absolute;
   top: -8px;
   right: -6px;
+  z-index: 1;
 `;
 
 type Props = {
@@ -108,9 +106,7 @@ function BannerCarousel({ items }: Props) {
 
   return (
     <CarouselContainer>
-      <StyledCrossButton onClick={dismissBanner}>
-        <XCircle size={24} weight="fill" color={Theme.colors.white_200} />
-      </StyledCrossButton>
+      <StyledCrossButton onClick={dismissBanner} />
       <Swiper
         slidesPerView="auto"
         spaceBetween={16}
