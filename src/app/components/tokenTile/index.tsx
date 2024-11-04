@@ -206,12 +206,6 @@ function TokenTile({
               />
             )}
           </CoinBalanceContainer>
-          <FiatAmountContainer>
-            {balanceHidden && HIDDEN_BALANCE_LABEL}
-            {!balanceHidden && (
-              <StyledFiatAmountText fiatAmount={getFiatAmount()} fiatCurrency={fiatCurrency} />
-            )}
-          </FiatAmountContainer>
           <FiatCurrencyRow>
             <PercentageChange ftCurrencyPairs={[[fungibleToken, currency]]} />
             <StyledFiatAmountText fiatAmount={getFiatAmount()} fiatCurrency={fiatCurrency} />
