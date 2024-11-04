@@ -67,6 +67,9 @@ function SignMessageRequest() {
       if (msg.includes('UR parsing rejected')) {
         msg = t('SIGNATURE_REQUEST.KEYSTONE.CONFIRM.DENIED.ERROR_SUBTITLE');
       }
+      if (msg.includes('mfp does not match')) {
+        msg = t('SIGNATURE_REQUEST.KEYSTONE.CONFIRM.NOT_MATCH_MFP');
+      }
     }
 
     setValidationError({ error: msg });

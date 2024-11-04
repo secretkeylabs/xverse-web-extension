@@ -1,56 +1,32 @@
 import keystoneConnectBtcIcon from '@assets/img/keystone/keystone_import_connect_btc.svg';
 import keystoneImportStartIcon from '@assets/img/keystone/keystone_import_start.svg';
 import ledgerAccountSwitchIcon from '@assets/img/ledger/account_switch.svg';
-import btcIcon from '@assets/img/ledger/btc_icon.svg';
 import btcOrdinalsIcon from '@assets/img/ledger/btc_ordinals_icon.svg';
 import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
-import ordinalsIcon from '@assets/img/ledger/ordinals_icon.svg';
-import LedgerFailView from '@components/ledger/failLedgerView';
-import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
 import LedgerInput from '@components/ledger/ledgerInput';
 import { useTranslation } from 'react-i18next';
 import KeystoneConnectionView from '../../../../components/keystone/connectKeystoneView';
 import { ImportKeystoneSteps } from '../types';
 
-import KeystoneFailView from '@components/keystone/failKeystoneView';
+import { LinkButton } from '@ui-library/button';
 import {
   AddAccountNameContainer,
   AddAccountNameTitleContainer,
-  AddAddressDetailsContainer,
-  AddAddressHeaderContainer,
   AddressAddedContainer,
-  ConfirmationStep,
-  ConfirmationStepsContainer,
-  ConfirmationText,
   CreateAnotherAccountContainer,
   CreateMultipleAccountsText,
   CustomLink,
   EndScreenContainer,
   EndScreenTextContainer,
-  ImportBeforeStartContainer,
-  ImportBeforeStartText,
-  ImportBeforeStartTitle,
-  ImportCardContainer,
   ImportStartContainer,
   ImportStartImage,
   ImportStartText,
   ImportStartTitle,
-  Option,
-  OptionIcon,
-  OptionsContainer,
-  SelectAssetFootNote,
   SelectAssetText,
-  SelectAssetTextContainer,
   SelectAssetTitle,
-  TogglerContainer,
-  TogglerText,
-  WarningIcon,
 } from './index.styled';
 
-const LINK_TO_LEDGER_ACCOUNT_ISSUE_GUIDE =
-  'https://support.xverse.app/hc/en-us/articles/17901278165773';
-const LINK_TO_LEDGER_PASSPHRASE_GUIDE =
-  'https://support.xverse.app/hc/en-us/articles/17901278165773';
+const LINK_TO_KEYSTONE_MAIN_SITE = 'https://keyst.one';
 
 type Props = {
   isConnectSuccess: boolean;
@@ -82,7 +58,13 @@ function Steps({
         <ImportStartContainer>
           <ImportStartImage src={keystoneImportStartIcon} />
           <ImportStartTitle>{t('KEYSTONE_IMPORT_1_TITLE')}</ImportStartTitle>
-          <ImportStartText>{t('KEYSTONE_IMPORT_1_SUBTITLE')}</ImportStartText>
+          <ImportStartText>
+            {t('KEYSTONE_IMPORT_1_SUBTITLE')}
+            {'  '}
+            <CustomLink href={LINK_TO_KEYSTONE_MAIN_SITE} target="_blank" rel="noopener noreferrer">
+              {t('BUY_KEYSTONE')}
+            </CustomLink>
+          </ImportStartText>
         </ImportStartContainer>
       );
     case ImportKeystoneSteps.CONNECT_KEYSTONE:

@@ -127,7 +127,7 @@
   },
   "KEYSTONE_IMPORT_SCREEN": {
     "KEYSTONE_IMPORT_1_TITLE": "Secure Your Assets with Keystone",
-    "KEYSTONE_IMPORT_1_SUBTITLE": "Connecting a Keystone hardware wallet to Xverse is the most secure way to store your Bitcoin, Ordinals, BRC-20 and more.",
+    "KEYSTONE_IMPORT_1_SUBTITLE": "Keystone supports up to 3 sets of seed phrases to store different assets. You can use one Keystone hardware wallet to manage your ordinals, rune, and BRC20 assets separately.",
     "KEYSTONE_IMPORT_1_BUTTON": "Get started",
     "KEYSTONE_IMPORT_2_TITLE": "Select assets",
     "KEYSTONE_IMPORT_2_SUBTITLE": "Choose the assets you want to manage with this wallet.",
@@ -189,23 +189,7 @@
     "KEYSTONE_IMPORT_YES_BUTTON": "Add a new account",
     "KEYSTONE_IMPORT_CANCEL_BUTTON": "Cancel",
     "LEARN_MORE": "Learn More",
-    "KEYSTONE_BEFORE_GETTING_STARTED": {
-      "TITLE": "Before getting started",
-      "DESCRIPTION": "Do you use KEYSTONE Live with the hardware wallet device you wish to connect?",
-      "OPTIONS": {
-        "USE_KEYSTONE_LIVE": "I use KEYSTONE Live with the device.",
-        "DONT_USE_KEYSTONE_LIVE": "I do not use KEYSTONE Live with the device."
-      },
-      "IMPORTANT_WARNING": {
-        "TITLE": "Important - Please read",
-        "TEXT_1": "It is not recommended to use Xverse and KEYSTONE Live, or other Bitcoin wallets with the same hardware device as this could lead to unintentional transfers of Ordinals.",
-        "TEXT_2": "You should use a separate device for Xverse and Ordinals or set a passphrase on your KEYSTONE to create a different set of accounts for Xverse. See",
-        "TEXT_3": "Only continue if you're an advanced user and you know what you're doing. Do not create and use a taproot address on KEYSTONE Live if you are using Xverse.",
-        "PASSPHRASE_FOR_ORDINALS": "How To Set A Passphrase For Ordinals",
-        "UNDERSTAND_THE_RISKS": "I understand the risks and wish to continue anyway",
-        "UNDERSTAND_SHOULD_NOT_USE_KEYSTONE_LIVE": "I understand I should not use KEYSTONE Live or other Bitcoin wallets with the same hardware device"
-      }
-    },
+    "BUY_KEYSTONE": "Buy your Keystone device here.",
     "ADDRESS_MISMATCH": "There’s a mismatch between your signing address and the address you’re logged with.",
     "CLOSE_BUTTON": "Close",
     "TITLE_FAILED": "Connection failed"
@@ -1274,7 +1258,8 @@
         "INVALID": {
           "ERROR_TITLE": "Data Invalid",
           "ERROR_SUBTITLE": "Your Keystone device has rejected the message stating it is invalid."
-        }
+        },
+        "NOT_MATCH_MFP": "Message rejected. Please select the correct wallet."
       },
       "SUCCESS": {
         "TITLE": "Signature confirmed",

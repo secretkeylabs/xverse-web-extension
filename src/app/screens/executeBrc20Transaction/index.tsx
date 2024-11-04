@@ -70,12 +70,13 @@ function ExecuteBrc20Transaction() {
     (!isConnectSuccess ||
       progress === ExecuteTransferProgressCodes.CreatingCommitTransaction ||
       progress === ExecuteTransferProgressCodes.CreatingTransferTransaction) &&
-    (!errorCode || errorCode === BRC20ErrorCode.GENERAL_LEDGER_ERROR);
+    (!errorCode || errorCode === BRC20ErrorCode.GENERAL_KEYSTONE_ERROR);
 
   // general ledger error is handled by the modal
   const showBody =
     !isLedger ||
     (errorCode !== BRC20ErrorCode.GENERAL_LEDGER_ERROR &&
+      errorCode !== BRC20ErrorCode.GENERAL_KEYSTONE_ERROR &&
       errorCode !== BRC20ErrorCode.DEVICE_LOCKED);
 
   const [loadingPercentage, setLoadingPercentage] = useState(0);

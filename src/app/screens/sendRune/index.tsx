@@ -195,11 +195,20 @@ function SendRuneScreen() {
       });
     } catch (e) {
       console.error(e);
+      let msg = e;
+      if (e instanceof Error) {
+        if (e.message.includes('Export address is just allowed on specific pages')) {
+          msg = t('SIGNATURE_REQUEST.KEYSTONE.CONFIRM.ERROR_SUBTITLE');
+        }
+        if (e.message.includes('UR parsing rejected')) {
+          msg = t('SIGNATURE_REQUEST.KEYSTONE.CONFIRM.DENIED.ERROR_SUBTITLE');
+        }
+      }
       navigate('/tx-status', {
         state: {
           txid: '',
           currency: 'BTC',
-          error: `${e}`,
+          error: `${msg}`,
           browserTx: isInOption,
         },
       });

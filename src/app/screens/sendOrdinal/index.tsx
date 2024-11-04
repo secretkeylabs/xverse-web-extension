@@ -17,6 +17,7 @@ import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import RoutePaths from 'app/routes/paths';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import StepDisplay from './stepDisplay';
@@ -29,6 +30,7 @@ function SendOrdinalScreen() {
 
   const location = useLocation();
   const { id } = useParams();
+  const { t } = useTranslation('translation');
   const params = new URLSearchParams(location.search);
   const isRareSatParam = params.get('isRareSat');
   const vout = params.get('vout');
@@ -192,11 +194,20 @@ function SendOrdinalScreen() {
       }
     } catch (e) {
       console.error(e);
+      let msg = e;
+      if (e instanceof Error) {
+        if (e.message.includes('Export address is just allowed on specific pages')) {
+          msg = t('SIGNATURE_REQUEST.KEYSTONE.CONFIRM.ERROR_SUBTITLE');
+        }
+        if (e.message.includes('UR parsing rejected')) {
+          msg = t('SIGNATURE_REQUEST.KEYSTONE.CONFIRM.DENIED.ERROR_SUBTITLE');
+        }
+      }
       navigate('/tx-status', {
         state: {
           txid: '',
           currency: 'BTC',
-          error: `${e}`,
+          error: `${msg}`,
           browserTx: isInOption,
         },
       });
