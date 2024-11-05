@@ -16,7 +16,6 @@ const SignPsbtSchema = z.object({
   psbt: z.string(),
   signInputs: z.record(z.array(z.number())), // Record<string, number[]>
   broadcast: z.boolean().optional(),
-  allowedSignHash: z.number().optional(),
 });
 
 export const handleSignPsbt = async (
@@ -40,8 +39,6 @@ export const handleSignPsbt = async (
   ];
 
   if (message.params.broadcast) requestParams.push(['broadcast', String(message.params.broadcast)]);
-  if (message.params.allowedSignHash)
-    requestParams.push(['allowedSigHash', message.params.allowedSignHash.toString()]);
 
   const { urlParams, tabId } = makeSearchParamsWithDefaults(port, requestParams);
 
@@ -51,7 +48,7 @@ export const handleSignPsbt = async (
     id,
     response: makeRPCError(message.id, {
       code: RpcErrorCode.USER_REJECTION,
-      message: 'User rejected request to send transfer',
+      message: 'User rejected request to sign a psbt',
     }),
   });
 

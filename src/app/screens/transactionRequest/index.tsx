@@ -7,7 +7,6 @@ import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  buf2hex,
   createDeployContractRequest,
   extractFromPayload,
   fetchStxPendingTxData,
@@ -25,9 +24,9 @@ import RoutePaths from 'app/routes/paths';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import useStxTransactionRequest from './useStxTransactionRequest';
+import useStxTransactionRequest, { type DataStxSignTransaction } from './useStxTransactionRequest';
 
 const LoaderContainer = styled.div((props) => ({
   display: 'flex',
@@ -40,7 +39,11 @@ const LoaderContainer = styled.div((props) => ({
 function TransactionRequest() {
   const selectedAccount = useSelectedAccount();
   const { network, feeMultipliers, accountsList } = useWalletSelector();
-  const txReq = useStxTransactionRequest();
+  const location = useLocation();
+  const { dataStxSignTransactionOverride } = (location.state || {}) as {
+    dataStxSignTransactionOverride?: DataStxSignTransaction;
+  };
+  const txReq = useStxTransactionRequest(dataStxSignTransactionOverride);
   const navigate = useNavigate();
   const selectedNetwork = useNetworkSelector();
   const { switchAccount } = useWalletReducer();
@@ -84,11 +87,12 @@ function TransactionRequest() {
       transaction?.auth,
     );
     setUnsignedTx(unsignedSendStxTx);
+
     navigate(RoutePaths.ConfirmStacksTransaction, {
       state: {
-        unsignedTx: buf2hex(unsignedSendStxTx.serialize()),
+        unsignedTx: Buffer.from(unsignedSendStxTx.serialize()).toString('hex'),
         sponsored: tokenTransferPayload.sponsored,
-        isBrowserTx: true,
+        isBrowserTx: !dataStxSignTransactionOverride,
         tabId,
         messageId,
         requestToken,
@@ -165,6 +169,7 @@ function TransactionRequest() {
       navigate(RoutePaths.ConfirmStacksTransaction, {
         state: {
           unsignedTx: payload.txHex,
+          fee: payload.fee,
           sponsored: payload.sponsored,
           isBrowserTx: true,
           tabId,
@@ -226,7 +231,7 @@ function TransactionRequest() {
           state: {
             txid: '',
             currency: 'STX',
-            error: t('ADDRESS_MISMATCH'),
+            error: t('ADDRESS_MISMATCH_STX'),
             browserTx: true,
             tabId,
             messageId,

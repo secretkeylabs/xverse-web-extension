@@ -6,6 +6,7 @@ import {
   sendMessageAuthorizedConnectedClients,
   sendMessageConnectedClient,
   sendMessageConnectedClients,
+  sendMessageToOrigin,
 } from '../utils';
 
 /**
@@ -38,10 +39,17 @@ export async function dispatchEventConnectedClients(data: WalletEvent) {
  * @public
  */
 export async function dispatchEventAuthorizedConnectedClients(
-  permission: Omit<Permission, 'clientId'>,
+  permissions: Omit<Permission, 'clientId'>[],
   data: WalletEvent,
 ) {
-  sendMessageAuthorizedConnectedClients(permission, {
+  sendMessageAuthorizedConnectedClients(permissions, {
+    type: contentScriptWalletEventMessageName,
+    data,
+  });
+}
+
+export async function dispatchEventToOrigin(origin: string, data: WalletEvent) {
+  sendMessageToOrigin(origin, {
     type: contentScriptWalletEventMessageName,
     data,
   });

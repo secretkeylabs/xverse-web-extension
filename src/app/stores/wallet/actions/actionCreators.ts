@@ -3,6 +3,7 @@ import type {
   Account,
   AccountType,
   AppInfo,
+  BtcPaymentType,
   FungibleToken,
   NetworkType,
   SettingsNetwork,
@@ -87,6 +88,21 @@ export function ChangeNetworkAction(network: SettingsNetwork): actions.ChangeNet
   return {
     type: actions.ChangeNetworkKey,
     network,
+  };
+}
+
+export function EnableNestedSegWitAddress(): actions.EnableNestedSegWitAddress {
+  return {
+    type: actions.EnableNestedSegWitAddressKey,
+  };
+}
+
+export function ChangeBtcPaymentAddressType(
+  newType: BtcPaymentType,
+): actions.ChangeBtcPaymentAddressType {
+  return {
+    type: actions.ChangeBtcPaymentAddressTypeKey,
+    btcPaymentType: newType,
   };
 }
 
@@ -200,12 +216,12 @@ export function setWalletUnlockedAction(isUnlocked: boolean): actions.SetWalletU
 }
 
 export function setAccountBalanceAction(
-  btcAddress: string,
+  accountKey: string,
   totalBalance: string,
 ): actions.SetAccountBalance {
   return {
     type: actions.SetAccountBalanceKey,
-    btcAddress,
+    accountKey,
     totalBalance,
   };
 }
@@ -246,3 +262,90 @@ export const updateSavedNamesAction = (
   networkType,
   names,
 });
+
+export function addToStarCollectiblesAction(params: {
+  address: string;
+  id: string;
+  collectionId?: string;
+}): actions.AddToStarCollectibles {
+  return {
+    type: actions.AddToStarCollectiblesKey,
+    ...params,
+  };
+}
+
+export function removeFromStarCollectiblesAction(params: {
+  address: string;
+  id: string;
+}): actions.RemoveFromStarCollectibles {
+  return {
+    type: actions.RemoveFromStarCollectiblesKey,
+    ...params,
+  };
+}
+
+export function addToHideCollectiblesAction(params: {
+  address: string;
+  id: string;
+}): actions.AddToHideCollectibles {
+  return {
+    type: actions.AddToHideCollectiblesKey,
+    ...params,
+  };
+}
+
+export function removeFromHideCollectiblesAction(params: {
+  address: string;
+  id: string;
+}): actions.RemoveFromHideCollectibles {
+  return {
+    type: actions.RemoveFromHideCollectiblesKey,
+    ...params,
+  };
+}
+
+export function removeAllFromHideCollectiblesAction(params: {
+  address: string;
+}): actions.RemoveAllFromHideCollectibles {
+  return {
+    type: actions.RemoveAllFromHideCollectiblesKey,
+    ...params,
+  };
+}
+
+export function setHiddenCollectiblesAction(params: {
+  collectibleIds: Record<string, Record<string, string>>;
+}): actions.SetHiddenCollectibles {
+  return {
+    type: actions.SetHiddenCollectiblesKey,
+    ...params,
+  };
+}
+
+export function setAccountAvatarAction(params: {
+  address: string;
+  avatar: actions.AvatarInfo;
+}): actions.SetAccountAvatar {
+  return {
+    type: actions.SetAccountAvatarKey,
+    ...params,
+  };
+}
+
+export function removeAccountAvatarAction(params: {
+  address: string;
+}): actions.RemoveAccountAvatar {
+  return {
+    type: actions.RemoveAccountAvatarKey,
+    ...params,
+  };
+}
+
+export function setBalanceHiddenToggleAction(params: {
+  toggle: boolean;
+}): actions.SetBalanceHiddenToggle {
+  return {
+    type: actions.SetBalanceHiddenToggleKey,
+    ...params,
+  };
+}

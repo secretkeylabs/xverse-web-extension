@@ -1,4 +1,5 @@
-import { delay, getDeviceNewAccountIndex, getNewAccountId } from '@common/utils/ledger';
+import { getDeviceNewAccountIndex, getNewAccountId } from '@common/utils/ledger';
+import { delay } from '@common/utils/promises';
 import FullScreenHeader from '@components/ledger/fullScreenHeader';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -200,12 +201,8 @@ function ImportLedger(): JSX.Element {
         const ledgerAccount: Account = {
           id: newAccountId,
           stxAddress: stacksCreds?.address || '',
-          btcAddress: btcCreds?.address || '',
-          ordinalsAddress: ordinalsCreds?.address || '',
           masterPubKey: masterPubKey || masterFingerPrint || '',
           stxPublicKey: stacksCreds?.publicKey || '',
-          btcPublicKey: btcCreds?.publicKey || '',
-          ordinalsPublicKey: ordinalsCreds?.publicKey || '',
           accountType: 'ledger',
           accountName: `Ledger Account ${newAccountId + 1}`,
           deviceAccountIndex: getDeviceNewAccountIndex(
@@ -213,6 +210,16 @@ function ImportLedger(): JSX.Element {
             network.type,
             masterPubKey || masterFingerPrint,
           ),
+          btcAddresses: {
+            native: {
+              address: btcCreds?.address || '',
+              publicKey: btcCreds?.publicKey || '',
+            },
+            taproot: {
+              address: ordinalsCreds?.address || '',
+              publicKey: ordinalsCreds?.publicKey || '',
+            },
+          },
         };
         await addLedgerAccount(ledgerAccount);
         await delay(1000);
@@ -224,10 +231,16 @@ function ImportLedger(): JSX.Element {
       if (currentAccount && isBitcoinSelected) {
         const ledgerAccount: Account = {
           ...currentAccount,
-          btcAddress: btcCreds?.address || '',
-          btcPublicKey: btcCreds?.publicKey || '',
-          ordinalsAddress: ordinalsCreds?.address || '',
-          ordinalsPublicKey: ordinalsCreds?.publicKey || '',
+          btcAddresses: {
+            native: {
+              address: btcCreds?.address || '',
+              publicKey: btcCreds?.publicKey || '',
+            },
+            taproot: {
+              address: ordinalsCreds?.address || '',
+              publicKey: ordinalsCreds?.publicKey || '',
+            },
+          },
         };
         await updateLedgerAccounts(ledgerAccount);
         await delay(1000);
@@ -383,8 +396,8 @@ function ImportLedger(): JSX.Element {
     setCurrentStep(ImportLedgerSteps.START);
   };
 
-  const handleAssetSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.id === 'stx_select_card') {
+  const handleAssetSelect = (selectedAsset: 'Bitcoin' | 'Stacks') => {
+    if (selectedAsset === 'Stacks') {
       setIsStacksSelected(!isStacksSelected);
     }
   };

@@ -1,154 +1,91 @@
 import AccountHeaderComponent from '@components/accountHeader';
-import { BetterBarLoader } from '@components/barLoader';
-import ActionButton from '@components/button';
 import CollectibleCollectionGridItem from '@components/collectibleCollectionGridItem';
 import CollectibleDetailTile from '@components/collectibleDetailTile';
-import Separator from '@components/separator';
+import SquareButton from '@components/squareButton';
 import BottomTabBar from '@components/tabBar';
 import { TilesSkeletonLoader } from '@components/tilesSkeletonLoader';
 import TopRow from '@components/topRow';
-import WebGalleryButton from '@components/webGalleryButton';
-import WrenchErrorMessage from '@components/wrenchErrorMessage';
-import useAddressInscriptions from '@hooks/queries/ordinals/useAddressInscriptions';
+import useAddressCollectionInscriptions from '@hooks/queries/ordinals/useAddressCollectionInscriptions';
 import useInscriptionCollectionMarketData from '@hooks/queries/ordinals/useCollectionMarketData';
+import useOptionsSheet from '@hooks/useOptionsSheet';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
-import { ArrowLeft } from '@phosphor-icons/react';
-import { GridContainer } from '@screens/nftDashboard/collectiblesTabs';
+import useSelectedAccount from '@hooks/useSelectedAccount';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { ArchiveTray, ArrowLeft, DotsThreeVertical, Star } from '@phosphor-icons/react';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
+import {
+  addToHideCollectiblesAction,
+  addToStarCollectiblesAction,
+  removeAccountAvatarAction,
+  removeFromHideCollectiblesAction,
+  removeFromStarCollectiblesAction,
+} from '@stores/wallet/actions/actionCreators';
+import Button from '@ui-library/button';
 import { StyledHeading, StyledP } from '@ui-library/common.styled';
-import { EMPTY_LABEL } from '@utils/constants';
+import Sheet from '@ui-library/sheet';
+import SnackBar from '@ui-library/snackBar';
+import { EMPTY_LABEL, LONG_TOAST_DURATION } from '@utils/constants';
 import {
   getInscriptionsCollectionGridItemId,
   getInscriptionsCollectionGridItemSubText,
   getInscriptionsCollectionGridItemSubTextColor,
 } from '@utils/inscriptions';
 import { useMemo } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import styled from 'styled-components';
-
-interface DetailSectionProps {
-  isGalleryOpen?: boolean;
-}
-
-/* layout */
-// TODO tim: create a reusable layout
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  ${(props) => props.theme.scrollbar}
-`;
-
-const PageHeader = styled.div<DetailSectionProps>`
-  padding: ${(props) => props.theme.space.xs};
-  padding-top: 0;
-  max-width: 1224px;
-  margin-top: ${(props) => (props.isGalleryOpen ? props.theme.space.xxl : props.theme.space.l)};
-  margin-left: auto;
-  margin-right: auto;
-  width: 100%;
-`;
-
-// TODO tim: use media queries for this once we get responsive layouts with breakpoints
-const PageHeaderContent = styled.div<DetailSectionProps>`
-  display: flex;
-  flex-direction: ${(props) => (props.isGalleryOpen ? 'row' : 'column')};
-  justify-content: ${(props) => (props.isGalleryOpen ? 'space-between' : 'initial')};
-  row-gap: ${(props) => props.theme.space.xl};
-`;
-
-const AttributesContainer = styled.div<DetailSectionProps>`
-  display: flex;
-  flex-direction: ${(props) => (props.isGalleryOpen ? 'column' : 'row')};
-  justify-content: ${(props) => (props.isGalleryOpen ? 'space-between' : 'initial')};
-  column-gap: ${(props) => props.theme.space.m};
-`;
-
-const BottomBarContainer = styled.div({
-  marginTop: 'auto',
-});
-
-const StyledSeparator = styled(Separator)`
-  margin-bottom: ${(props) => props.theme.space.xxl};
-`;
-
-const StyledGridContainer = styled(GridContainer)`
-  margin-top: ${(props) => props.theme.space.s};
-  padding: 0 ${(props) => props.theme.space.xs};
-  padding-bottom: ${(props) => props.theme.space.xl};
-  max-width: 1224px;
-  margin-left: auto;
-  margin-right: auto;
-  width: 100%;
-`;
-
-/* components */
-
-const StyledWebGalleryButton = styled(WebGalleryButton)`
-  margin-top: ${(props) => props.theme.space.xs};
-`;
-
-const StyledWrenchErrorMessage = styled(WrenchErrorMessage)`
-  margin-top: ${(props) => props.theme.space.xxl};
-`;
-
-const BackButtonContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  margin-bottom: ${(props) => props.theme.space.xxl};
-`;
-
-const BackButton = styled.button((props) => ({
-  display: 'flex',
-  alignItems: 'center',
-  gap: props.theme.space.xxs,
-  background: 'transparent',
-  marginBottom: props.theme.spacing(12),
-  color: props.theme.colors.white_0,
-}));
-
-const NoCollectiblesText = styled.p((props) => ({
-  ...props.theme.body_bold_m,
-  color: props.theme.colors.white_200,
-  marginTop: props.theme.spacing(16),
-  marginBottom: 'auto',
-  textAlign: 'center',
-}));
-
-const LoadMoreButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  marginBottom: props.theme.spacing(30),
-  marginTop: props.theme.space.xl,
-  button: {
-    width: 156,
-  },
-}));
-
-const StyledBarLoader = styled(BetterBarLoader)((props) => ({
-  padding: 0,
-  borderRadius: props.theme.radius(1),
-  marginTop: props.theme.spacing(2),
-}));
+import Theme from 'theme';
+import {
+  AttributesContainer,
+  BackButton,
+  BackButtonContainer,
+  BottomBarContainer,
+  CollectionNameDiv,
+  Container,
+  LoadMoreButtonContainer,
+  NoCollectiblesText,
+  PageHeader,
+  PageHeaderContent,
+  StyledBarLoader,
+  StyledButton,
+  StyledGridContainer,
+  StyledSeparator,
+  StyledWebGalleryButton,
+  StyledWrenchErrorMessage,
+} from './index.styled';
 
 function OrdinalsCollection() {
   const { t } = useTranslation('translation', { keyPrefix: 'COLLECTIBLE_COLLECTION_SCREEN' });
+  const { t: tCommon } = useTranslation('translation', { keyPrefix: 'COMMON' });
   const navigate = useNavigate();
-  const { id: collectionId } = useParams();
+  const { ordinalsAddress } = useSelectedAccount();
+  const { id: collectionId, from } = useParams();
+  const { starredCollectibleIds, hiddenCollectibleIds, avatarIds } = useWalletSelector();
+  const selectedAvatar = avatarIds[ordinalsAddress];
+  const optionsSheet = useOptionsSheet();
   const { data, error, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } =
-    useAddressInscriptions(collectionId);
+    useAddressCollectionInscriptions(collectionId);
   const { data: collectionMarketData, isLoading: isLoadingMarketData } =
     useInscriptionCollectionMarketData(collectionId);
-
+  const dispatch = useDispatch();
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
+
+  const collectionStarred = starredCollectibleIds[ordinalsAddress]?.some(
+    ({ id }) => id === collectionId,
+  );
+  const collectionHidden = Object.keys(hiddenCollectibleIds[ordinalsAddress] ?? {}).some(
+    (id) => id === collectionId,
+  );
+
+  const comesFromHidden = from === 'hidden';
 
   useResetUserFlow('/ordinals-collection');
 
-  const handleBackButtonClick = () => {
-    navigate('/nft-dashboard?tab=inscriptions');
-  };
+  const handleBackButtonClick = () =>
+    navigate(
+      `/nft-dashboard${comesFromHidden || collectionHidden ? '/hidden' : ''}?tab=inscriptions`,
+    );
 
   const openInGalleryView = async () => {
     await chrome.tabs.create({
@@ -156,8 +93,56 @@ function OrdinalsCollection() {
     });
   };
 
-  const isEmpty = !isLoading && !error && data?.pages?.[0]?.total === 0;
+  const handleClickUndoHiding = (toastId: string) => {
+    dispatch(
+      removeFromHideCollectiblesAction({ address: ordinalsAddress, id: collectionId ?? '' }),
+    );
+    toast.remove(toastId);
+    toast.custom(<SnackBar text={t('COLLECTION_UNHIDDEN')} type="neutral" />, {
+      duration: LONG_TOAST_DURATION,
+    });
+  };
 
+  const handleHideCollection = () => {
+    dispatch(addToHideCollectiblesAction({ address: ordinalsAddress, id: collectionId ?? '' }));
+
+    if (selectedAvatar?.type === 'inscription') {
+      const shouldHideAvatar = data?.pages
+        ?.map((page) => page?.data)
+        .flat()
+        .some((inscription) => inscription.id === selectedAvatar.inscription.id);
+
+      if (shouldHideAvatar) {
+        dispatch(removeAccountAvatarAction({ address: ordinalsAddress }));
+      }
+    }
+
+    optionsSheet.close();
+    navigate('/nft-dashboard?tab=inscriptions');
+    const toastId = toast.custom(
+      <SnackBar
+        text={t('COLLECTION_HIDDEN')}
+        type="neutral"
+        action={{
+          text: tCommon('UNDO'),
+          onClick: () => handleClickUndoHiding(toastId),
+        }}
+      />,
+      { duration: LONG_TOAST_DURATION },
+    );
+  };
+
+  const handleUnHideCollection = () => {
+    const isLastHiddenItem = Object.keys(hiddenCollectibleIds[ordinalsAddress] ?? {}).length === 1;
+    dispatch(
+      removeFromHideCollectiblesAction({ address: ordinalsAddress, id: collectionId ?? '' }),
+    );
+    optionsSheet.close();
+    toast.custom(<SnackBar text={t('COLLECTION_UNHIDDEN')} type="neutral" />);
+    navigate(`/nft-dashboard/${isLastHiddenItem ? '' : 'hidden'}?tab=inscriptions`);
+  };
+
+  const isEmpty = !isLoading && !error && data?.pages?.[0]?.total === 0;
   const collectionHeading = data?.pages?.[0].collection_name;
   const estPortfolioValue =
     data && data?.pages?.[0].portfolio_value !== 0
@@ -167,36 +152,101 @@ function OrdinalsCollection() {
     ? `${collectionMarketData?.floor_price?.toFixed(8)} BTC`
     : EMPTY_LABEL;
 
+  const handleClickUndoStarring = (toastId: string) => {
+    dispatch(
+      removeFromStarCollectiblesAction({ address: ordinalsAddress, id: collectionId ?? '' }),
+    );
+    toast.remove(toastId);
+    toast.custom(<SnackBar text={t('UNSTAR_COLLECTION')} type="neutral" />);
+  };
+
+  const handleStarClick = () => {
+    if (collectionStarred) {
+      dispatch(
+        removeFromStarCollectiblesAction({ address: ordinalsAddress, id: collectionId ?? '' }),
+      );
+      toast.custom(<SnackBar text={t('UNSTAR_COLLECTION')} type="neutral" />);
+    } else {
+      dispatch(addToStarCollectiblesAction({ address: ordinalsAddress, id: collectionId ?? '' }));
+      const toastId = toast.custom(
+        <SnackBar
+          text={t('STAR_COLLECTION')}
+          type="neutral"
+          action={{
+            text: tCommon('UNDO'),
+            onClick: () => handleClickUndoStarring(toastId),
+          }}
+        />,
+        { duration: LONG_TOAST_DURATION },
+      );
+    }
+  };
+
   return (
     <>
       {isGalleryOpen ? (
         <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
       ) : (
-        <TopRow onClick={handleBackButtonClick} />
+        <TopRow
+          onClick={handleBackButtonClick}
+          onMenuClick={optionsSheet.open}
+          onStarClick={collectionHidden ? undefined : handleStarClick}
+          isStarred={collectionStarred}
+        />
       )}
       <Container>
-        <PageHeader isGalleryOpen={isGalleryOpen}>
+        <PageHeader $isGalleryOpen={isGalleryOpen}>
           {isGalleryOpen && (
             <BackButtonContainer>
               <BackButton onClick={handleBackButtonClick}>
                 <ArrowLeft size={16} color="currentColor" />
                 <StyledP data-testid="back-to-gallery" typography="body_m" color="white_0">
-                  {t('BACK_TO_GALLERY')}
+                  {t(collectionHidden ? 'BACK_TO_HIDDEN_COLLECTIBLES' : 'BACK_TO_GALLERY')}
                 </StyledP>
               </BackButton>
             </BackButtonContainer>
           )}
-          <PageHeaderContent isGalleryOpen={isGalleryOpen}>
+          <PageHeaderContent $isGalleryOpen={isGalleryOpen}>
             <div>
               <StyledP typography="body_bold_m" color="white_400">
                 {t('COLLECTION')}
               </StyledP>
-              <StyledHeading typography="headline_s" color="white_0">
-                {collectionHeading || <StyledBarLoader width={200} height={28} />}
-              </StyledHeading>
+              <CollectionNameDiv>
+                <StyledHeading typography="headline_s" color="white_0">
+                  {collectionHeading || <StyledBarLoader width={200} height={28} />}
+                </StyledHeading>
+                {isGalleryOpen && (
+                  <>
+                    {collectionHidden ? null : (
+                      <SquareButton
+                        icon={
+                          collectionStarred ? (
+                            <Star size={16} color={Theme.colors.tangerine} weight="fill" />
+                          ) : (
+                            <Star size={16} color={Theme.colors.white_0} weight="bold" />
+                          )
+                        }
+                        onPress={handleStarClick}
+                        isTransparent
+                        size={44}
+                        radiusSize={12}
+                      />
+                    )}
+                    <SquareButton
+                      icon={
+                        <DotsThreeVertical size={20} color={Theme.colors.white_0} weight="bold" />
+                      }
+                      onPress={optionsSheet.open}
+                      isTransparent
+                      size={44}
+                      radiusSize={12}
+                    />
+                  </>
+                )}
+              </CollectionNameDiv>
               {!isGalleryOpen && <StyledWebGalleryButton onClick={openInGalleryView} />}
             </div>
-            <AttributesContainer isGalleryOpen={isGalleryOpen}>
+            <AttributesContainer $isGalleryOpen={isGalleryOpen}>
               <CollectibleDetailTile
                 title={t('COLLECTION_FLOOR_PRICE')}
                 value={collectionFloorPrice}
@@ -216,7 +266,7 @@ function OrdinalsCollection() {
         <div>
           {isEmpty && <NoCollectiblesText>{t('NO_COLLECTIBLES')}</NoCollectiblesText>}
           {!!error && <StyledWrenchErrorMessage />}
-          <StyledGridContainer isGalleryOpen={isGalleryOpen}>
+          <StyledGridContainer $isGalleryOpen={isGalleryOpen}>
             {isLoading ? (
               <TilesSkeletonLoader
                 isGalleryOpen={isGalleryOpen}
@@ -233,7 +283,7 @@ function OrdinalsCollection() {
                     itemId={getInscriptionsCollectionGridItemId(inscription)}
                     itemSubText={getInscriptionsCollectionGridItemSubText(inscription)}
                     itemSubTextColor={getInscriptionsCollectionGridItemSubTextColor(inscription)}
-                    onClick={() => navigate(`/nft-dashboard/ordinal-detail/${inscription.id}`)}
+                    onClick={() => navigate(`/nft-dashboard/ordinal-detail/${inscription?.id}`)}
                   >
                     <OrdinalImage ordinal={inscription} />
                   </CollectibleCollectionGridItem>
@@ -242,12 +292,12 @@ function OrdinalsCollection() {
           </StyledGridContainer>
           {hasNextPage && (
             <LoadMoreButtonContainer>
-              <ActionButton
-                transparent
-                text={t('LOAD_MORE')}
-                processing={isFetchingNextPage}
+              <Button
+                variant="secondary"
+                title={t('LOAD_MORE')}
+                loading={isFetchingNextPage}
                 disabled={isFetchingNextPage}
-                onPress={() => fetchNextPage()}
+                onClick={() => fetchNextPage()}
               />
             </LoadMoreButtonContainer>
           )}
@@ -257,6 +307,29 @@ function OrdinalsCollection() {
         <BottomBarContainer>
           <BottomTabBar tab="nft" />
         </BottomBarContainer>
+      )}
+      {optionsSheet.isVisible && (
+        <Sheet
+          title={tCommon('OPTIONS')}
+          visible={optionsSheet.isVisible}
+          onClose={optionsSheet.close}
+        >
+          {collectionHidden ? (
+            <StyledButton
+              variant="tertiary"
+              icon={<ArchiveTray size={24} color={Theme.colors.white_200} />}
+              title={t('UNHIDE_COLLECTION')}
+              onClick={handleUnHideCollection}
+            />
+          ) : (
+            <StyledButton
+              variant="tertiary"
+              icon={<ArchiveTray size={24} color={Theme.colors.white_200} />}
+              title={t('HIDE_COLLECTION')}
+              onClick={handleHideCollection}
+            />
+          )}
+        </Sheet>
       )}
     </>
   );

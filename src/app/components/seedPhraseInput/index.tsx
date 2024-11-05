@@ -245,7 +245,7 @@ export default function SeedPhraseInput({
       </InputGrid>
       <ErrorMessage visible={!!seedError}>{seedError}</ErrorMessage>
       <TransparentButton onClick={handleClickShow24Words} type="button">
-        {t('HAVE_A_24_WORDS_SEEDPHRASE?', { number: show24Words ? '12' : '24' })}
+        {t('HAVE_A_COUNT_WORDS_SEED_PHRASE', { number: show24Words ? '12' : '24' })}
       </TransparentButton>
     </InputContainer>
   );

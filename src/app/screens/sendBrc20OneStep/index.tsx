@@ -37,8 +37,6 @@ function SendBrc20Screen() {
   const [processing, setProcessing] = useState(false);
   const transactionContext = useTransactionContext();
 
-  const isFullScreen = isInOptions();
-
   useResetUserFlow('/send-brc20-one-step');
 
   const principal = searchParams.get('principal');
@@ -165,7 +163,7 @@ function SendBrc20Screen() {
 
   return (
     <>
-      <TopRow title={t('SEND')} onClick={handleBackButtonClick} showBackButton={!isFullScreen} />
+      <TopRow title={t('SEND')} onClick={handleBackButtonClick} showBackButton />
       <Brc20TransferForm
         amountToSend={amountToSend}
         onAmountChange={onInputChange}

@@ -1,20 +1,12 @@
-import { makeRPCError, sendRpcResponse } from '@common/utils/rpc/helpers';
+import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
-import useHasFeature from '@hooks/useHasFeature';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { RpcErrorCode } from '@sats-connect/core';
 import type { TransactionSummary } from '@screens/sendBtc/helpers';
-import {
-  AnalyticsEvents,
-  btcTransaction,
-  FeatureId,
-  parseSummaryForRunes,
-  type RuneSummary,
-  type Transport,
-} from '@secretkeylabs/xverse-core';
+import { AnalyticsEvents, btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
 import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
 import { trackMixPanel } from '@utils/mixpanel';
@@ -50,8 +42,6 @@ function BtcSendRequest() {
   const [feeRate, setFeeRate] = useState('');
   const [transaction, setTransaction] = useState<btcTransaction.EnhancedTransaction | undefined>();
   const [summary, setSummary] = useState<TransactionSummary | undefined>();
-  const [runeSummary, setRuneSummary] = useState<RuneSummary | undefined>();
-  const hasRunesSupport = useHasFeature(FeatureId.RUNES_SUPPORT);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -74,7 +64,6 @@ function BtcSendRequest() {
   useEffect(() => {
     if (!payload || !transactionContext || !feeRate) {
       setSummary(undefined);
-      setRuneSummary(undefined);
       return;
     }
     const generateTxnAndSummary = async () => {
@@ -84,13 +73,6 @@ function BtcSendRequest() {
         const newSummary = await newTransaction.getSummary();
         setTransaction(newTransaction);
         setSummary(newSummary);
-        if (newSummary && hasRunesSupport) {
-          setRuneSummary(
-            await parseSummaryForRunes(transactionContext, newSummary, transactionContext.network, {
-              separateTransfersOnNoExternalInputs: true,
-            }),
-          );
-        }
       } catch (e) {
         setTransaction(undefined);
         setSummary(undefined);
@@ -123,23 +105,35 @@ function BtcSendRequest() {
 
   useEffect(() => {
     const checkIfMismatch = () => {
+      let errorTitle = '';
+      let error = '';
+      let textAlignment = 'center';
+
       if (payload.senderAddress !== selectedAccount.btcAddress) {
-        navigate('/tx-status', {
-          state: {
-            txid: '',
-            currency: 'STX',
-            error: t('CONFIRM_TRANSACTION.ADDRESS_MISMATCH'),
-            browserTx: true,
-          },
-        });
+        if (
+          selectedAccount.btcAddresses.native?.address === payload.senderAddress ||
+          selectedAccount.btcAddresses.nested?.address === payload.senderAddress
+        ) {
+          errorTitle = t('REQUEST_ERRORS.ADDRESS_TYPE_MISMATCH_TITLE');
+          error = t('REQUEST_ERRORS.ADDRESS_TYPE_MISMATCH');
+        } else {
+          errorTitle = t('REQUEST_ERRORS.ADDRESS_MISMATCH_TITLE');
+          error = t('REQUEST_ERRORS.ADDRESS_MISMATCH');
+        }
+        textAlignment = 'left';
+      } else if (payload.network.type !== network.type) {
+        error = t('REQUEST_ERRORS.NETWORK_MISMATCH');
       }
-      if (payload.network.type !== network.type) {
+
+      if (error) {
         navigate('/tx-status', {
           state: {
             txid: '',
             currency: 'BTC',
-            error: t('CONFIRM_TRANSACTION.NETWORK_MISMATCH'),
+            errorTitle,
+            error,
             browserTx: true,
+            textAlignment,
           },
         });
       }
@@ -166,6 +160,15 @@ function BtcSendRequest() {
     checkIfValidAmount();
   }, [payload]);
 
+  const handleCancel = () => {
+    const response = makeRPCError(requestId, {
+      code: RpcErrorCode.USER_REJECTION,
+      message: 'User rejected request to send transfer',
+    });
+    sendRpcResponse(+tabId, response);
+    window.close();
+  };
+
   const handleSubmit = async (ledgerTransport?: Transport) => {
     try {
       setIsSubmitting(true);
@@ -175,16 +178,26 @@ function BtcSendRequest() {
         action: 'transfer',
         wallet_type: selectedAccount.accountType || 'software',
       });
-      navigate('/tx-status', {
-        state: {
+      if (txnId) {
+        const sendTransferResponse = makeRpcSuccessResponse<'sendTransfer'>(requestId, {
           txid: txnId,
-          currency: 'BTC',
-          error: '',
-          browserTx: true,
-        },
-      });
+        });
+        sendRpcResponse(+tabId, sendTransferResponse);
+        navigate('/tx-status', {
+          state: {
+            txid: txnId,
+            currency: 'BTC',
+            error: '',
+            browserTx: true,
+          },
+        });
+      }
     } catch (e) {
-      console.error(e);
+      const response = makeRPCError(requestId, {
+        code: RpcErrorCode.INTERNAL_ERROR,
+        message: (e as any).message,
+      });
+      sendRpcResponse(+tabId, response);
       navigate('/tx-status', {
         state: {
           txid: '',
@@ -212,11 +225,10 @@ function BtcSendRequest() {
   return (
     <ConfirmBtcTransaction
       summary={summary}
-      runeSummary={runeSummary}
       isLoading={isLoading}
       confirmText={t('COMMON.CONFIRM')}
       cancelText={t('COMMON.CANCEL')}
-      onCancel={() => window.close()}
+      onCancel={handleCancel}
       onConfirm={handleSubmit}
       getFeeForFeeRate={calculateFeeForFeeRate}
       onFeeRateSet={(newFeeRate) => setFeeRate(newFeeRate.toString())}
@@ -224,6 +236,7 @@ function BtcSendRequest() {
       isSubmitting={isSubmitting}
       isBroadcast
       hideBottomBar
+      showAccountHeader
     />
   );
 }

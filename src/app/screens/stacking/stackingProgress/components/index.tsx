@@ -5,9 +5,10 @@ export const Container = styled.button((props) => ({
   flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems: 'center',
-  background: props.theme.colors.elevation1,
+  backgroundColor: 'transparent',
+  border: `1px solid ${props.theme.colors.white_850}`,
   borderRadius: props.theme.radius(2),
-  padding: props.theme.spacing(9),
+  padding: props.theme.space.m,
 }));
 
 export const TextContainer = styled.div({
@@ -23,17 +24,17 @@ export const StatusContainer = styled.div((props) => ({
   alignItems: 'center',
   background: 'rgba(81, 214, 166, 0.15)',
   borderRadius: props.theme.radius(7),
-  paddingLeft: props.theme.spacing(7),
-  paddingRight: props.theme.spacing(7),
-  paddingTop: props.theme.spacing(4),
-  paddingBottom: props.theme.spacing(4),
+  paddingLeft: props.theme.space.m,
+  paddingRight: props.theme.space.m,
+  paddingTop: props.theme.space.xs,
+  paddingBottom: props.theme.space.xs,
 }));
 
 export const Dot = styled.div((props) => ({
   width: 7,
   height: 7,
   borderRadius: props.theme.radius(9),
-  marginRight: props.theme.spacing(4),
+  marginRight: props.theme.space.xs,
   background: props.theme.colors.feedback.success,
 }));
 
@@ -41,16 +42,16 @@ export const ColumnContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'flex-start',
-  marginLeft: props.theme.spacing(6),
+  marginLeft: props.theme.space.s,
 }));
 
 export const BoldText = styled.h1((props) => ({
-  ...props.theme.body_bold_m,
+  ...props.theme.typography.body_bold_m,
   color: props.theme.colors.white_0,
 }));
 
 export const SubText = styled.h1((props) => ({
-  ...props.theme.body_xs,
+  ...props.theme.typography.body_s,
   color: props.theme.colors.white_400,
 }));
 

@@ -60,19 +60,27 @@ interface Props {
     ft?: FungibleToken;
   };
   subtitle?: string;
-  subtitleColor?: Color;
+  subtitleColorOverride?: Color;
   fiatValue?: string;
   floorText?: string;
   onClick?: () => void;
   unit?: string;
 }
 
+const TruncatedP = styled(StyledP)<{ $textAlign: string }>`
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 120px;
+  text-align: ${({ $textAlign }) => $textAlign};
+`;
+
 function QuoteTile({
   provider,
   price,
   image,
   subtitle,
-  subtitleColor,
+  subtitleColorOverride,
   fiatValue,
   floorText,
   onClick,
@@ -81,22 +89,39 @@ function QuoteTile({
   const theme = useTheme();
   const { fiatCurrency } = useWalletSelector();
 
+  const getSubtitleColor = (): Color | undefined => {
+    if (!subtitle) return undefined;
+    return subtitle.startsWith('+') ? 'danger_light' : 'success_light';
+  };
+
+  const subtitleColor = subtitleColorOverride ?? getSubtitleColor();
+
   return (
     <Container data-testid="swap-place-button" onClick={onClick} clickable={Boolean(onClick)}>
       <TokenImage currency={image.currency} fungibleToken={image.ft} size={32} />
       <InfoContainer>
         <RowCenter>
-          <StyledP data-testid="place-name" typography="body_bold_m" color="white_0">
+          <TruncatedP
+            $textAlign="left"
+            data-testid="place-name"
+            typography="body_bold_m"
+            color="white_0"
+          >
             {provider}
-          </StyledP>
+          </TruncatedP>
           <NumericFormat
             value={price}
             displayType="text"
             thousandSeparator
             renderText={() => (
-              <StyledP data-testid="quote-label" typography="body_bold_m" color="white_0">
+              <TruncatedP
+                $textAlign="right"
+                data-testid="quote-label"
+                typography="body_bold_m"
+                color="white_0"
+              >
                 {formatNumber(price)} {unit}
-              </StyledP>
+              </TruncatedP>
             )}
           />
         </RowCenter>
@@ -114,11 +139,11 @@ function QuoteTile({
               value={fiatValue}
               displayType="text"
               thousandSeparator
-              suffix={` ${fiatCurrency}`}
               prefix="~ $"
+              suffix={` ${fiatCurrency}`}
               renderText={(value: string) => (
                 <StyledP data-testid="usd-text" typography="body_s" color="white_200">
-                  {value}
+                  {value || '--'}
                 </StyledP>
               )}
             />

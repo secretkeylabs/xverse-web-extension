@@ -1,13 +1,12 @@
-import { ArrowLeft, DotsThreeVertical } from '@phosphor-icons/react';
+import { ArrowLeft, DotsThreeVertical, FadersHorizontal, Star } from '@phosphor-icons/react';
+import type { MutableRefObject } from 'react';
 import styled from 'styled-components';
 import Theme from 'theme';
 
 const TopSectionContainer = styled.div((props) => ({
   display: 'flex',
-  minHeight: 18,
-  marginTop: props.theme.space.l,
-  marginBottom: props.theme.spacing(9),
-  marginLeft: props.theme.space.m,
+  minHeight: 20,
+  margin: `${props.theme.space.l} ${props.theme.space.m}`,
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
@@ -32,14 +31,25 @@ const BackButton = styled.button((props) => ({
   },
 }));
 
-const MenuButton = styled.button((props) => ({
+const MenuButton = styled.button({
   display: 'flex',
   justifyContent: 'flex-end',
   backgroundColor: 'transparent',
-  padding: props.theme.space.xxs,
   position: 'absolute',
-  right: props.theme.space.xxs,
-}));
+  right: 0,
+  opacity: 0.7,
+  transition: 'opacity 0.1s ease',
+  '&:hover': {
+    opacity: 1,
+  },
+  '&:active': {
+    opacity: 0.6,
+  },
+});
+
+const StyledMenuButton = styled(MenuButton)<{ $marginRight: boolean }>`
+  margin-right: ${(props) => (props.$marginRight ? '36px' : '0px')};
+`;
 
 type Props = {
   title?: string;
@@ -47,9 +57,23 @@ type Props = {
   showBackButton?: boolean;
   className?: string;
   onMenuClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onSettingsClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  settingsRef?: MutableRefObject<HTMLButtonElement | null>;
+  onStarClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  isStarred?: boolean;
 };
 
-function TopRow({ title, onClick, showBackButton = true, className, onMenuClick }: Props) {
+function TopRow({
+  title,
+  onClick,
+  showBackButton = true,
+  className,
+  onMenuClick,
+  onSettingsClick,
+  settingsRef,
+  onStarClick,
+  isStarred,
+}: Props) {
   return (
     <TopSectionContainer className={className}>
       {showBackButton && (
@@ -58,9 +82,20 @@ function TopRow({ title, onClick, showBackButton = true, className, onMenuClick 
         </BackButton>
       )}
       {title && <HeaderText>{title}</HeaderText>}
+      {onStarClick && (
+        <StyledMenuButton onClick={onStarClick} $marginRight={Boolean(onMenuClick)}>
+          {!isStarred && <Star size={20} color={Theme.colors.white_0} />}
+          {isStarred && <Star size={20} color={Theme.colors.tangerine} weight="fill" />}
+        </StyledMenuButton>
+      )}
       {onMenuClick && (
         <MenuButton onClick={onMenuClick}>
-          <DotsThreeVertical size={20} color={Theme.colors.white_200} />
+          <DotsThreeVertical size={20} color={Theme.colors.white_0} weight="bold" />
+        </MenuButton>
+      )}
+      {onSettingsClick && (
+        <MenuButton onClick={onSettingsClick} ref={settingsRef}>
+          <FadersHorizontal size={20} color={Theme.colors.white_200} />
         </MenuButton>
       )}
     </TopSectionContainer>

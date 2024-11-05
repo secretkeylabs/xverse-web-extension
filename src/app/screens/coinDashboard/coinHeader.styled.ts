@@ -44,6 +44,7 @@ export const CoinBalanceText = styled.p((props) => ({
   color: props.theme.colors.white_0,
   textAlign: 'center',
   wordBreak: 'break-all',
+  cursor: 'pointer',
 }));
 
 export const FiatAmountText = styled.p((props) => ({
@@ -52,6 +53,7 @@ export const FiatAmountText = styled.p((props) => ({
   fontSize: '0.875rem',
   marginTop: props.theme.spacing(2),
   textAlign: 'center',
+  cursor: 'pointer',
 }));
 
 export const BalanceTitleText = styled.p((props) => ({

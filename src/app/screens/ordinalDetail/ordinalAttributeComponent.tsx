@@ -7,49 +7,47 @@ const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'flex-start',
-  marginTop: props.theme.spacing(8),
+  marginTop: props.theme.space.m,
   width: '100%',
 }));
 
-const RowContainer = styled.div((props) => ({
+const RowContainer = styled.div({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'flex-start',
   width: '100%',
-}));
+});
 
 const TitleText = styled.h1((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_400,
   textAlign: 'center',
 }));
 
-interface ValueTextProps {
+const ValueText = styled.p<{
   color?: string;
   fullWidth?: boolean;
-}
-
-const ValueText = styled.p<ValueTextProps>((props) => ({
-  ...props.theme.body_medium_m,
+}>((props) => ({
+  ...props.theme.typography.body_medium_m,
   textAlign: 'left',
-  color: props.color || props.theme.colors.white[0],
+  color: props.color || props.theme.colors.white_0,
   width: props.fullWidth ? '100%' : 'auto',
   overflowWrap: 'break-word',
   wordWrap: 'break-word',
   wordBreak: 'break-word',
 }));
 
-const OrdinalsTag = styled.div({
+const OrdinalsTag = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
-  marginLeft: 2,
+  marginLeft: props.theme.space.xxxs,
   background: 'rgba(39, 42, 68, 0.6)',
   borderRadius: 40,
   height: 22,
   padding: '3px 6px',
-});
+}));
 
 const ButtonIcon = styled.img({
   width: 12,
@@ -57,14 +55,14 @@ const ButtonIcon = styled.img({
 });
 
 const Text = styled.h1((props) => ({
-  ...props.theme.body_bold_m,
+  ...props.theme.typography.body_bold_m,
   textTransform: 'uppercase',
   color: props.theme.colors.white_0,
   fontSize: 10,
-  marginLeft: props.theme.spacing(2),
+  marginLeft: props.theme.space.xxs,
 }));
 
-interface Props {
+type Props = {
   title: string;
   value?: string;
   isAddress?: boolean;
@@ -72,7 +70,7 @@ interface Props {
   valueColor?: string;
   customValue?: React.ReactNode;
   suffix?: string;
-}
+};
 
 function OrdinalAttributeComponent({
   title,

@@ -18,7 +18,7 @@ import type {
 } from '@stacks/stacks-blockchain-api-types';
 import Spinner from '@ui-library/spinner';
 import type { CurrencyTypes } from '@utils/constants';
-import { formatDate } from '@utils/date';
+import { formatDate, formatDateKey } from '@utils/date';
 import { isLedgerAccount } from '@utils/helper';
 import {
   isAddressTransactionWithTransfers,
@@ -34,18 +34,18 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-const ListItemsContainer = styled.div({
+const ListItemsContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
-});
+  marginTop: props.theme.space.l,
+}));
 
 const ListHeader = styled.h1((props) => ({
-  marginTop: props.theme.spacing(20),
-  marginBottom: props.theme.spacing(12),
-  marginLeft: props.theme.spacing(8),
-  marginRight: props.theme.spacing(8),
-  ...props.theme.headline_s,
+  ...props.theme.typography.headline_xs,
+  margin: props.theme.space.m,
+  marginTop: 0,
+  marginBottom: props.theme.space.l,
 }));
 
 const LoadingContainer = styled.div({
@@ -65,7 +65,7 @@ const NoTransactionsContainer = styled.div((props) => ({
 }));
 
 const GroupContainer = styled(animated.div)((props) => ({
-  marginBottom: props.theme.spacing(8),
+  marginBottom: props.theme.space.m,
 }));
 
 const SectionHeader = styled.div((props) => ({
@@ -73,8 +73,8 @@ const SectionHeader = styled.div((props) => ({
   flexDirection: 'row',
   alignItems: 'center',
   marginBottom: props.theme.spacing(7),
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
+  paddingLeft: props.theme.space.m,
+  paddingRight: props.theme.space.m,
 }));
 
 const SectionSeparator = styled.div((props) => ({
@@ -86,87 +86,161 @@ const SectionSeparator = styled.div((props) => ({
 const SectionTitle = styled.p((props) => ({
   ...props.theme.body_xs,
   color: props.theme.colors.white_200,
-  marginRight: props.theme.spacing(4),
+  marginRight: props.theme.space.xs,
 }));
-
-interface TransactionsHistoryListProps {
-  coin: CurrencyTypes;
-  stxTxFilter: string | null;
-  brc20Token: string | null;
-  runeToken: string | null;
-  runeSymbol: string | null;
-}
-
-const sortTransactionsByBlockHeight = (transactions: BtcTransactionData[]) =>
-  transactions.sort((txA, txB) => {
-    if (txB.blockHeight > txA.blockHeight) {
-      return 1;
-    }
-    return -1;
-  });
 
 const groupBtcTxsByDate = (
   transactions: BtcTransactionData[],
-): { [x: string]: BtcTransactionData[] } => {
+): [Date, string, BtcTransactionData[]][] => {
   const pendingTransactions: BtcTransactionData[] = [];
   const processedTransactions: { [x: string]: BtcTransactionData[] } = {};
 
   transactions.forEach((transaction) => {
-    const txDate = formatDate(new Date(transaction.seenTime));
     if (transaction.txStatus === 'pending') {
       pendingTransactions.push(transaction);
     } else {
-      if (!processedTransactions[txDate]) processedTransactions[txDate] = [transaction];
-      else processedTransactions[txDate].push(transaction);
-
-      sortTransactionsByBlockHeight(processedTransactions[txDate]);
+      const txDateKey = formatDateKey(new Date(transaction.seenTime));
+      if (!processedTransactions[txDateKey]) {
+        processedTransactions[txDateKey] = [];
+      }
+      processedTransactions[txDateKey].push(transaction);
     }
   });
-  sortTransactionsByBlockHeight(pendingTransactions);
+
+  const result: [Date, string, BtcTransactionData[]][] = [];
+
   if (pendingTransactions.length > 0) {
-    const result = { Pending: pendingTransactions, ...processedTransactions };
-    return result;
+    result.push([new Date(), 'Pending', pendingTransactions]);
   }
-  return processedTransactions;
+
+  Object.values(processedTransactions).forEach((grp) => {
+    if (grp.length === 0) {
+      return;
+    }
+
+    grp.sort((txA, txB) => {
+      // sort by block height first
+      const blockHeightDiff = txB.blockHeight - txA.blockHeight;
+      if (blockHeightDiff !== 0) {
+        return blockHeightDiff;
+      }
+
+      // if block height is the same, sort by txid for consistency
+      return txB.txid.localeCompare(txA.txid);
+    });
+
+    result.push([new Date(grp[0].seenTime), formatDate(new Date(grp[0].seenTime)), grp]);
+  });
+
+  result.sort((a, b) => b[0].getTime() - a[0].getTime());
+
+  return result;
 };
 
 const groupRuneTxsByDate = (
   transactions: GetRunesActivityForAddressEvent[],
-): Record<string, GetRunesActivityForAddressEvent[]> => {
-  const mappedTransactions = {};
+): [Date, string, GetRunesActivityForAddressEvent[]][] => {
+  const processedTransactions: { [x: string]: GetRunesActivityForAddressEvent[] } = {};
+
   transactions.forEach((transaction) => {
-    const txDate = formatDate(new Date(transaction.blockTimestamp));
-    if (!mappedTransactions[txDate]) {
-      mappedTransactions[txDate] = [transaction];
-    } else {
-      mappedTransactions[txDate].push(transaction);
+    const txDateKey = formatDateKey(new Date(transaction.blockTimestamp));
+    if (!processedTransactions[txDateKey]) {
+      processedTransactions[txDateKey] = [];
     }
+    processedTransactions[txDateKey].push(transaction);
   });
-  return mappedTransactions;
+
+  const result: [Date, string, GetRunesActivityForAddressEvent[]][] = [];
+
+  Object.values(processedTransactions).forEach((grp) => {
+    if (grp.length === 0) {
+      return;
+    }
+
+    grp.sort((txA, txB) => {
+      // sort by block height first
+      const blockHeightDiff = txB.blockHeight - txA.blockHeight;
+      if (blockHeightDiff !== 0) {
+        return blockHeightDiff;
+      }
+
+      // if block height is the same, sort by txid for consistency
+      return txB.txid.localeCompare(txA.txid);
+    });
+
+    result.push([
+      new Date(grp[0].blockTimestamp),
+      formatDate(new Date(grp[0].blockTimestamp)),
+      grp,
+    ]);
+  });
+
+  result.sort((a, b) => b[0].getTime() - a[0].getTime());
+
+  return result;
 };
 
-const groupedTxsByDateMap = (txs: (AddressTransactionWithTransfers | MempoolTransaction)[]) =>
-  txs.reduce(
-    (
-      all: { [x: string]: (AddressTransactionWithTransfers | Tx)[] },
-      transaction: AddressTransactionWithTransfers | Tx,
-    ) => {
-      const date = formatDate(
-        new Date(
-          isAddressTransactionWithTransfers(transaction) && transaction.tx?.burn_block_time_iso
-            ? transaction.tx.burn_block_time_iso
-            : Date.now(),
-        ),
-      );
-      if (!all[date]) {
-        all[date] = [transaction];
-      } else {
-        all[date].push(transaction);
+const groupedTxsByDateMap = (
+  transactions: (AddressTransactionWithTransfers | MempoolTransaction)[],
+): [Date, string, (AddressTransactionWithTransfers | Tx)[]][] => {
+  const getBlockTimestamp = (tx: AddressTransactionWithTransfers | Tx): Date => {
+    let dateStr: string;
+
+    if (isAddressTransactionWithTransfers(tx)) {
+      dateStr = tx.tx.burn_block_time_iso;
+    } else if ('receipt_time_iso' in tx) {
+      dateStr = tx.receipt_time_iso;
+    } else {
+      dateStr = '';
+    }
+
+    return dateStr ? new Date(dateStr) : new Date();
+  };
+
+  const getTxid = (tx: AddressTransactionWithTransfers | Tx): string => {
+    if (isAddressTransactionWithTransfers(tx)) {
+      return tx.tx.tx_id;
+    }
+    return tx.tx_id;
+  };
+
+  const processedTransactions: { [x: string]: (AddressTransactionWithTransfers | Tx)[] } = {};
+
+  transactions.forEach((transaction) => {
+    const txDate = getBlockTimestamp(transaction);
+    const txDateKey = formatDateKey(txDate);
+
+    if (!processedTransactions[txDateKey]) {
+      processedTransactions[txDateKey] = [];
+    }
+    processedTransactions[txDateKey].push(transaction);
+  });
+
+  const result: [Date, string, (AddressTransactionWithTransfers | Tx)[]][] = [];
+
+  Object.values(processedTransactions).forEach((grp) => {
+    if (grp.length === 0) {
+      return;
+    }
+
+    grp.sort((txA, txB) => {
+      // sort by block height first
+      const blockHeightDiff = getBlockTimestamp(txB).getTime() - getBlockTimestamp(txA).getTime();
+      if (blockHeightDiff !== 0) {
+        return blockHeightDiff;
       }
-      return all;
-    },
-    {},
-  );
+
+      // if block height is the same, sort by txid for consistency
+      return getTxid(txB).localeCompare(getTxid(txA));
+    });
+
+    result.push([getBlockTimestamp(grp[0]), formatDate(new Date(getBlockTimestamp(grp[0]))), grp]);
+  });
+
+  result.sort((a, b) => b[0].getTime() - a[0].getTime());
+
+  return result;
+};
 
 const filterStxTxs = (
   txs: (AddressTransactionWithTransfers | MempoolTransaction)[],
@@ -189,13 +263,29 @@ const filterStxTxs = (
     );
   });
 
-export default function TransactionsHistoryList(props: TransactionsHistoryListProps) {
-  const { coin, stxTxFilter, brc20Token, runeToken, runeSymbol } = props;
+type Props = {
+  coin: CurrencyTypes;
+  stxTxFilter: string | null;
+  brc20Token: string | null;
+  runeToken: string | null;
+  runeSymbol: string | null;
+  withTitle?: boolean;
+};
+
+function TransactionsHistoryList({
+  coin,
+  stxTxFilter,
+  brc20Token,
+  runeToken,
+  runeSymbol,
+  withTitle = true,
+}: Props) {
+  const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
   const selectedAccount = useSelectedAccount();
   const { network, selectedAccountType } = useWalletSelector();
   const btcClient = useBtcClient();
   const seedVault = useSeedVault();
-  const { data, isLoading, isFetching, error } = useTransactions(
+  const { data, isLoading, error } = useTransactions(
     (coin as CurrencyTypes) || 'STX',
     brc20Token,
     runeToken,
@@ -209,7 +299,6 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
     },
   });
 
-  const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
   const wallet = selectedAccount
     ? {
         ...selectedAccount,
@@ -245,20 +334,20 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
       return groupedTxsByDateMap(filteredTxs);
     }
     return groupedTxsByDateMap(data as (AddressTransactionWithTransfers | MempoolTransaction)[]);
-  }, [data, isLoading, isFetching]);
+  }, [data, coin, stxTxFilter]);
 
   return (
     <ListItemsContainer>
-      <ListHeader>{t('TRANSACTION_HISTORY_TITLE')}</ListHeader>
+      {withTitle && <ListHeader>{t('TRANSACTION_HISTORY_TITLE')}</ListHeader>}
       {groupedTxs &&
         !isLoading &&
-        Object.keys(groupedTxs).map((group) => (
+        groupedTxs.map(([, group, items]) => (
           <GroupContainer key={group} style={styles}>
             <SectionHeader>
               <SectionTitle>{group}</SectionTitle>
               <SectionSeparator />
             </SectionHeader>
-            {groupedTxs[group].map((transaction) => {
+            {items.map((transaction) => {
               if (wallet && isRuneTransaction(transaction)) {
                 return (
                   <RuneTransactionHistoryItem
@@ -317,3 +406,5 @@ export default function TransactionsHistoryList(props: TransactionsHistoryListPr
     </ListItemsContainer>
   );
 }
+
+export default TransactionsHistoryList;

@@ -61,12 +61,16 @@ export function sendAddressMismatchMessage({ tabId, messageId }: BaseArgs) {
   );
 }
 
-export function sendInternalErrorMessage({ tabId, messageId }: BaseArgs) {
+export function sendInternalErrorMessage({
+  tabId,
+  messageId,
+  message,
+}: BaseArgs & { message?: string }) {
   sendRpcResponse(
     tabId,
     makeRPCError(messageId, {
       code: RpcErrorCode.INTERNAL_ERROR,
-      message: 'Internal error.',
+      message: message ?? 'Internal error.',
     }),
   );
 }

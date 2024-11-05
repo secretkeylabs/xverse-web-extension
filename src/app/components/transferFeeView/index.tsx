@@ -1,11 +1,12 @@
 import AmountWithInscriptionSatribute from '@components/confirmBtcTransaction/itemRow/amountWithInscriptionSatribute';
 import FiatAmountText from '@components/fiatAmountText';
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   btcTransaction,
   getBtcFiatEquivalent,
   getFiatEquivalent,
+  type RareSatsType,
 } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import BigNumber from 'bignumber.js';
@@ -46,9 +47,16 @@ type Props = {
   feePerVByte?: BigNumber;
   fee: BigNumber;
   currency: string;
-  inscriptions?: btcTransaction.IOInscription[];
+  inscriptions?:
+    | btcTransaction.IOInscription[]
+    | (btcTransaction.IOInscription & { satributes: RareSatsType[] })[]
+    | (Omit<btcTransaction.IOInscription, 'offset'> & { satributes: RareSatsType[] })[];
   satributes?: btcTransaction.IOSatribute[];
-  onShowInscription?: (inscription: btcTransaction.IOInscription) => void;
+  onShowInscription?: (
+    inscription:
+      | (btcTransaction.IOInscription & { satributes: RareSatsType[] })
+      | (Omit<btcTransaction.IOInscription, 'offset'> & { satributes: RareSatsType[] }),
+  ) => void;
 };
 
 function TransferFeeView({
@@ -63,7 +71,7 @@ function TransferFeeView({
   const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
 
   const { fiatCurrency } = useWalletSelector();
-  const { btcFiatRate, stxBtcRate } = useCoinRates();
+  const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
 
   return (
     <Container>

@@ -5,12 +5,15 @@ const useChromeLocalStorage = <T extends unknown>(key: string, defaultValue?: T)
   const queryClient = useQueryClient();
 
   const { data: value, isFetching } = useQuery({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: ['chromeLocalStorage', key],
     queryFn: async () => {
       const result = await chromeStorage.local.getItem<T>(key);
       return result === undefined ? defaultValue : result;
     },
     refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    staleTime: 60 * 60 * 1000, // 1 hour
   });
 
   const mutation = useMutation({

@@ -2,21 +2,10 @@ import { makeRPCError, sendRpcResponse } from '@common/utils/rpc/helpers';
 import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RequestError from '@components/requests/requestError';
 import useSubmitRuneSellPsbt from '@hooks/queries/runes/useSubmitRuneSellPsbt';
-import useHasFeature from '@hooks/useHasFeature';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
-import useTransactionContext from '@hooks/useTransactionContext';
-import useWalletSelector from '@hooks/useWalletSelector';
 import { RpcErrorCode } from '@sats-connect/core';
-import { SigHash } from '@scure/btc-signer';
-import {
-  AnalyticsEvents,
-  FeatureId,
-  btcTransaction,
-  parseSummaryForRunes,
-  type RuneSummary,
-  type Transport,
-} from '@secretkeylabs/xverse-core';
+import { AnalyticsEvents, btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
 import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,7 +19,6 @@ function SignPsbtRequest() {
   const navigate = useNavigate();
   const selectedAccount = useSelectedAccount();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const txnContext = useTransactionContext();
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const magicEdenPsbt = searchParams.get('magicEdenPsbt');
@@ -38,8 +26,6 @@ function SignPsbtRequest() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSigning, setIsSigning] = useState(false);
   const [summary, setSummary] = useState<PSBTSummary | undefined>();
-  const [runeSummary, setRuneSummary] = useState<RuneSummary | undefined>(undefined);
-  const hasRunesSupport = useHasFeature(FeatureId.RUNES_SUPPORT);
   const { payload, parsedPsbt, confirmSignPsbt, cancelSignPsbt, onCloseError, requestId, tabId } =
     useSignPsbt();
   const { validationError, setValidationError } = useSignPsbtValidationGate({
@@ -51,8 +37,6 @@ function SignPsbtRequest() {
 
   useTrackMixPanelPageViewed();
 
-  const { network } = useWalletSelector();
-
   const { submitRuneSellPsbt } = useSubmitRuneSellPsbt();
 
   useEffect(() => {
@@ -63,13 +47,6 @@ function SignPsbtRequest() {
       // TODO move this block into useSignPsbt
       .then(async (txSummary) => {
         setSummary(txSummary);
-        if (hasRunesSupport) {
-          setRuneSummary(
-            await parseSummaryForRunes(txnContext, txSummary, network.type, {
-              separateTransfersOnNoExternalInputs: true,
-            }),
-          );
-        }
         setIsLoading(false);
       })
       .catch((err) => {
@@ -87,12 +64,13 @@ function SignPsbtRequest() {
   }, [parsedPsbt]);
 
   const onConfirm = async (ledgerTransport?: Transport) => {
+    if (!parsedPsbt) return;
+
     setIsSigning(true);
     try {
-      const signedPsbt = await parsedPsbt?.getSignedPsbtBase64({
+      const signedPsbt = await parsedPsbt.getSignedPsbtBase64({
         finalize: payload.broadcast,
         ledgerTransport,
-        allowedSigHash: magicEdenPsbt && runeId ? [SigHash.SINGLE_ANYONECANPAY] : undefined,
       });
       const response = await confirmSignPsbt(signedPsbt);
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
@@ -173,6 +151,7 @@ function SignPsbtRequest() {
         error={validationError.error}
         errorTitle={validationError.errorTitle}
         onClose={onCloseClick}
+        textAlignment={validationError.alignment}
       />
     );
   }
@@ -180,7 +159,6 @@ function SignPsbtRequest() {
   return (
     <ConfirmBtcTransaction
       summary={summary}
-      runeSummary={runeSummary}
       isLoading={isLoading}
       isSubmitting={isSigning}
       isBroadcast={payload.broadcast}

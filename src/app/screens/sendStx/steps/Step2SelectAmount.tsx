@@ -1,11 +1,12 @@
-import useCoinRates from '@hooks/queries/useCoinRates';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useNetworkSelector from '@hooks/useNetwork';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   buf2hex,
+  estimateStacksTransactionWithFallback,
   generateUnsignedStxTokenTransferTransaction,
   generateUnsignedTransaction,
   getStxFiatEquivalent,
@@ -14,7 +15,7 @@ import {
   type FungibleToken,
   type StacksTransaction,
 } from '@secretkeylabs/xverse-core';
-import { deserializeTransaction, estimateTransaction } from '@stacks/transactions';
+import { deserializeTransaction } from '@stacks/transactions';
 import SelectFeeRate, { type FeeRates } from '@ui-components/selectFeeRate';
 import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
@@ -90,7 +91,7 @@ function Step2SelectAmount({
   const { stxAddress, stxPublicKey } = useSelectedAccount();
   const { fiatCurrency, feeMultipliers } = useWalletSelector();
   const { data: stxData } = useStxWalletData();
-  const { btcFiatRate, stxBtcRate } = useCoinRates();
+  const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const stxBalance = stxData?.availableBalance.toString() ?? '0';
   const ftBalance = fungibleToken ? getFtBalance(fungibleToken) : '0';
 
@@ -205,9 +206,8 @@ function Step2SelectAmount({
     const fetchStxFees = async () => {
       try {
         const unsignedTx: StacksTransaction = deserializeTransaction(unsignedSendStxTx);
-        const [low, medium, high] = await estimateTransaction(
-          unsignedTx.payload,
-          undefined,
+        const [low, medium, high] = await estimateStacksTransactionWithFallback(
+          unsignedTx,
           selectedNetwork,
         );
 
@@ -218,7 +218,11 @@ function Step2SelectAmount({
         };
 
         if (feeMultipliers?.thresholdHighStacksFee) {
-          stxFees = modifyRecommendedStxFees(stxFees, feeMultipliers);
+          stxFees = modifyRecommendedStxFees(
+            stxFees,
+            feeMultipliers,
+            unsignedTx.payload.payloadType,
+          );
         }
         setFees({
           low: Number(microstacksToStx(new BigNumber(stxFees.low))),

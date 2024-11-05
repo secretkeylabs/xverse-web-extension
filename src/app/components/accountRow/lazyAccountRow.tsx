@@ -1,30 +1,39 @@
 import useIntersectionObserver from '@hooks/useIntersectionObserver';
 import useWalletSelector from '@hooks/useWalletSelector';
 import type { Account } from '@secretkeylabs/xverse-core';
+import { getAccountBalanceKey } from '@utils/helper';
 import { useEffect, useRef, useState } from 'react';
 import AccountRow from '.';
 
-function LazyAccountRow(props: {
+type Props = {
   account: Account | null;
   isSelected: boolean;
   onAccountSelected: (account: Account, goBack?: boolean) => void;
   isAccountListView?: boolean;
   disabledAccountSelect?: boolean;
   fetchBalance?: (account: Account | null) => void;
-}) {
+};
+
+function LazyAccountRow(props: Props) {
   const { fetchBalance, account } = props;
   const { accountBalances } = useWalletSelector();
-  const totalBalance = accountBalances[account?.btcAddress ?? ''];
   const [shouldFetch, setShouldFetch] = useState(false);
   const ref = useRef(null);
 
   useIntersectionObserver(ref, () => setShouldFetch(true), {});
 
   useEffect(() => {
-    if (fetchBalance && shouldFetch && !totalBalance) {
-      fetchBalance(account);
+    if (
+      !shouldFetch ||
+      !fetchBalance ||
+      !account ||
+      getAccountBalanceKey(account) in accountBalances
+    ) {
+      return;
     }
-  }, [shouldFetch, totalBalance]);
+
+    fetchBalance(account);
+  }, [account, shouldFetch]);
 
   return (
     <div ref={ref}>

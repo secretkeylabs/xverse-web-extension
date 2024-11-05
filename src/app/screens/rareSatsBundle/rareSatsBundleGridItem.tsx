@@ -1,4 +1,3 @@
-/* eslint-disable import/prefer-default-export */
 import ExoticSatsRow from '@components/exoticSatsRow/exoticSatsRow';
 import RareSatIcon from '@components/rareSatIcon/rareSatIcon';
 import type { BundleSatRange } from '@secretkeylabs/xverse-core';
@@ -19,17 +18,18 @@ const Range = styled.div`
   flex-wrap: wrap;
 `;
 
-const Container = styled.div((props) => ({
+const Container = styled.div<{ isGalleryOpen?: boolean }>((props) => ({
   marginBottom: props.theme.space.s,
-  padding: `0 ${props.theme.space.m}`,
+  padding: props.isGalleryOpen ? `0 ${props.theme.space.m}` : 0,
 }));
 
-export function RareSatsBundleGridItem({ item }: { item: BundleSatRange }) {
+export default function RareSatsBundleGridItem({ item }: { item: BundleSatRange }) {
+  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   return (
-    <Container>
+    <Container isGalleryOpen={isGalleryOpen}>
       <ExoticSatsRow
         title={getSatLabel(item.satributes)}
-        satAmount={item.totalSats}
+        satAmount={Number(item.totalSats)}
         inscriptions={item.inscriptions}
         icons={
           <RangeContainer>

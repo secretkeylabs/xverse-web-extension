@@ -1,13 +1,18 @@
 import type { RuneItem } from '@utils/runes';
 
+type SupportedSections = 'SELECT_RUNES' | 'SELECT_MARKETPLACES' | 'SET_PRICES';
+
 interface ListRunesState {
   listItemsMap: Record<string, RuneItem>;
-  section: 'SELECT_RUNES' | 'SET_PRICES';
+  section: SupportedSections;
   selectAllToggle: boolean;
   runePriceOption: 1 | 1.05 | 1.1 | 1.2 | 'custom';
   customRunePrice: number | null;
   individualCustomItem: string | null;
-  toggleCustomPriceModal: boolean;
+  toggleCustomPriceModal: {
+    title: string;
+    visible: boolean;
+  };
 }
 
 type Action =
@@ -15,12 +20,12 @@ type Action =
   | { type: 'TOGGLE_ALL_LIST_ITEMS'; payload: boolean }
   | { type: 'SET_ALL_LIST_ITEMS_PRICES'; payload: number }
   | { type: 'UPDATE_ONE_LIST_ITEM'; key: string; payload: RuneItem }
-  | { type: 'SET_SECTION'; payload: 'SELECT_RUNES' | 'SET_PRICES' }
+  | { type: 'SET_SECTION'; payload: SupportedSections }
   | { type: 'SET_SELECT_ALL_TOGGLE'; payload: boolean }
   | { type: 'SET_RUNE_PRICE_OPTION'; payload: 1 | 1.05 | 1.1 | 1.2 | 'custom' }
   | { type: 'SET_CUSTOM_RUNE_PRICE'; payload: number | null }
   | { type: 'SET_INDIVIDUAL_CUSTOM_ITEM'; payload: string | null }
-  | { type: 'SET_TOGGLE_CUSTOM_PRICE_MODAL'; payload: boolean }
+  | { type: 'SET_TOGGLE_CUSTOM_PRICE_MODAL'; payload: { title: string; visible: boolean } }
   | { type: 'RESTORE_STATE_FROM_PSBT'; payload: ListRunesState };
 
 export const initialListRunesState: ListRunesState = {
@@ -30,7 +35,10 @@ export const initialListRunesState: ListRunesState = {
   runePriceOption: 1,
   customRunePrice: null,
   individualCustomItem: null,
-  toggleCustomPriceModal: false,
+  toggleCustomPriceModal: {
+    title: '',
+    visible: false,
+  },
 };
 
 export function ListRunesReducer(state: ListRunesState, action: Action): ListRunesState {

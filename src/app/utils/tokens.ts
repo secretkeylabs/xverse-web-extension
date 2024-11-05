@@ -9,7 +9,10 @@ import type { CurrencyTypes } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import { ftDecimals, getTicker } from './helper';
 
-export function getFtTicker(ft: FungibleToken) {
+export function getFtTicker(ft: FungibleToken): string {
+  if (ft?.protocol === 'runes') {
+    return ft.runeSymbol ?? ft.ticker ?? '';
+  }
   if (ft?.ticker) {
     return ft.protocol === 'brc-20' ? ft.ticker.toUpperCase() : ft.ticker;
   }

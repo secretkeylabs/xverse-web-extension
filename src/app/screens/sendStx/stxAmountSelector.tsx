@@ -1,7 +1,7 @@
 import FiatAmountText from '@components/fiatAmountText';
 import { microStxToStx } from '@components/postCondition/postConditionView/helper';
-import useCoinRates from '@hooks/queries/useCoinRates';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowsDownUp } from '@phosphor-icons/react';
 import {
@@ -12,6 +12,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import Input, { ConvertComplication, MaxButton } from '@ui-library/input';
+import { HIDDEN_BALANCE_LABEL } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -40,6 +41,13 @@ const StyledFiatAmountText = styled(FiatAmountText)`
   color: ${(props) => props.theme.colors.white_200};
 `;
 
+const ConvertedAmountWrapper = styled.div`
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
 const inputValidator = /^[0-9.]*$/;
 const stxInputExtractor = /[0-9]+[.]?[0-9]{0,6}/;
 const stxInputValidator = /^[0-9]+[.]?[0-9]{0,6}$/;
@@ -61,9 +69,9 @@ type Props = {
 
 function StxAmountSelector({ amount, setAmount, sendMax, setSendMax, disabled = false }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
-  const { fiatCurrency } = useWalletSelector();
+  const { fiatCurrency, balanceHidden } = useWalletSelector();
   const { data: stxData } = useStxWalletData();
-  const { btcFiatRate, stxBtcRate } = useCoinRates();
+  const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const stxBalanceStr = stxData?.availableBalance.toString() ?? '0';
 
   const [amountDisplay, setAmountDisplay] = useState(
@@ -180,7 +188,9 @@ function StxAmountSelector({ amount, setAmount, sendMax, setSendMax, disabled = 
           prefix={useStxValue ? '' : `~ ${currencySymbolMap[fiatCurrency]}`}
           renderText={(value: string) => (
             <div data-testid="balance-label">
-              <BalanceText>{t('BALANCE')}</BalanceText> {value} {useStxValue ? 'STX' : fiatCurrency}
+              <BalanceText>{t('BALANCE')}</BalanceText>
+              {balanceHidden && ` ${HIDDEN_BALANCE_LABEL}`}
+              {!balanceHidden && ` ${value} ${useStxValue ? 'STX' : fiatCurrency}`}
             </div>
           )}
         />
@@ -188,29 +198,29 @@ function StxAmountSelector({ amount, setAmount, sendMax, setSendMax, disabled = 
       complications={
         <>
           <ConvertComplication disabled={disabled} onClick={handleUseStxValueChange}>
-            {useStxValue ? (
-              <StyledFiatAmountText
-                fiatAmount={getStxFiatEquivalent(
-                  BigNumber(amount),
-                  BigNumber(stxBtcRate),
-                  BigNumber(btcFiatRate),
-                )}
-                fiatCurrency={fiatCurrency}
-              />
-            ) : (
-              <NumericFormat
-                value={microStxToStxString(amount)}
-                displayType="text"
-                thousandSeparator
-                renderText={(value: string) => (
-                  <div>
+            <ConvertedAmountWrapper>
+              {useStxValue ? (
+                <StyledFiatAmountText
+                  fiatAmount={getStxFiatEquivalent(
+                    BigNumber(amount),
+                    BigNumber(stxBtcRate),
+                    BigNumber(btcFiatRate),
+                  )}
+                  fiatCurrency={fiatCurrency}
+                />
+              ) : (
+                <NumericFormat
+                  value={microStxToStxString(amount)}
+                  displayType="text"
+                  thousandSeparator
+                  renderText={(value: string) => (
                     <AmountText typography="body_medium_s" color="white_200">
                       {value} STX
                     </AmountText>
-                  </div>
-                )}
-              />
-            )}
+                  )}
+                />
+              )}
+            </ConvertedAmountWrapper>
             <ArrowsDownUp size={16} color={Theme.colors.white_200} />
           </ConvertComplication>
           <VertRule />

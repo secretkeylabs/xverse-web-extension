@@ -1,26 +1,27 @@
-import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
-import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
+import useMasterCoinsList from '@screens/swap/useMasterCoinsList';
 import { mapFTProtocolToSwapProtocol } from '@screens/swap/utils';
-import { getXverseApiClient, type Protocol, type TokenBasic } from '@secretkeylabs/xverse-core';
+import {
+  getXverseApiClient,
+  type Protocol,
+  type Token,
+  type TokenBasic,
+} from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import { handleRetries } from '@utils/query';
 
 const useToTokens = (protocol: Protocol, from?: TokenBasic, query?: string) => {
-  const { network, spamTokens } = useWalletSelector();
+  const coinsMasterList = useMasterCoinsList();
+  const { network, spamTokens, runesManageTokens, sip10ManageTokens } = useWalletSelector();
   const spamTokenSet = new Set(spamTokens);
-  const { visible: runesCoinsList } = useVisibleRuneFungibleTokens();
-  const { btcAddress } = useSelectedAccount();
 
-  const runesBasicTokens =
-    runesCoinsList.map((ft) => ({
+  const userTokens =
+    coinsMasterList.map((ft) => ({
       ticker: ft.principal,
-      protocol: mapFTProtocolToSwapProtocol(ft.protocol ?? 'runes'),
+      protocol: mapFTProtocolToSwapProtocol(ft),
     })) ?? [];
 
   const search = query?.trim().replace(/\s+/g, ' ').replace(/ /g, '•') ?? '';
-  const btcBasicToken: TokenBasic = { protocol: 'btc', ticker: 'BTC' };
-  const userTokens = [...(btcAddress ? [btcBasicToken] : [])].concat(runesBasicTokens);
 
   const queryFn = async () => {
     const response = await getXverseApiClient(network.type).swaps.getDestinationTokens({
@@ -30,7 +31,13 @@ const useToTokens = (protocol: Protocol, from?: TokenBasic, query?: string) => {
       userTokens,
     });
 
-    const sortedResponse = response.items.sort((a) => (a.protocol === 'btc' ? -1 : 1));
+    const sortedResponse = response.items.sort((a, b) => {
+      if (a.protocol === 'btc') return -1;
+      if (b.protocol === 'btc') return 1;
+      if (a.protocol === 'stx') return -1;
+      if (b.protocol === 'stx') return 1;
+      return 0;
+    });
 
     const filteredResponse = from
       ? sortedResponse.filter((s) => s.ticker !== from.ticker)
@@ -39,12 +46,20 @@ const useToTokens = (protocol: Protocol, from?: TokenBasic, query?: string) => {
     return filteredResponse;
   };
 
+  const select = (data: Token[]) =>
+    data.filter(
+      (token) =>
+        !spamTokenSet.has(token.ticker) ||
+        runesManageTokens[token.ticker] === true || // allow user to enable spam tokens
+        sip10ManageTokens[token.ticker] === true,
+    );
+
   return useQuery({
     enabled: userTokens.length > 0,
     retry: handleRetries,
     queryKey: ['swap-from-tokens', network.type, userTokens, protocol, from, search],
     queryFn,
-    select: (data) => data.filter((rune) => !spamTokenSet.has(rune.ticker)),
+    select,
   });
 };
 

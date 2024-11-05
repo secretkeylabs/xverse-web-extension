@@ -2,12 +2,14 @@ import Dots from '@components/dots';
 import { useWalletExistsContext } from '@components/guards/onboarding';
 import PasswordInput from '@components/passwordInput';
 import useWalletReducer from '@hooks/useWalletReducer';
+import type { BtcPaymentType } from '@secretkeylabs/xverse-core';
 import * as bip39 from 'bip39';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import EnterSeedPhrase from './enterSeedphrase';
+import PaymentAddressTypeSelector from './paymentAddressTypeSelector';
 
 const Body = styled.div(() => ({
   display: 'flex',
@@ -37,7 +39,8 @@ const PasswordContainer = styled.div((props) => ({
 
 function RestoreWallet(): JSX.Element {
   const { t } = useTranslation('translation');
-  const { restoreWallet } = useWalletReducer();
+  const { restoreWallet, enableNestedSegWitAddress, changeBtcPaymentAddressType } =
+    useWalletReducer();
   const [isRestoring, setIsRestoring] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [password, setPassword] = useState('');
@@ -45,30 +48,16 @@ function RestoreWallet(): JSX.Element {
   const [seedPhrase, setSeedPhrase] = useState('');
   const [seedError, setSeedError] = useState('');
   const [error, setError] = useState('');
+  const [btcPayAddressType, setBtcPayAddressType] = useState<BtcPaymentType>('native');
   const navigate = useNavigate();
   const { disableWalletExistsGuard } = useWalletExistsContext();
 
   const cleanMnemonic = (rawSeed: string): string =>
     rawSeed.replace(/\s\s+/g, ' ').replace(/\n/g, ' ').trim();
 
-  const handleNewPasswordBack = () => {
-    setCurrentStepIndex(0);
-  };
-
-  const handleConfirmPasswordBack = () => {
-    setCurrentStepIndex(1);
-  };
-
-  function validateMnemonic(seed: string) {
-    if (bip39.validateMnemonic(seed)) {
-      return true;
-    }
-    return false;
-  }
-
   const onSeedPhraseContinue = () => {
     const seed = cleanMnemonic(seedPhrase);
-    if (validateMnemonic(seed)) {
+    if (bip39.validateMnemonic(seed)) {
       setSeedError('');
       setCurrentStepIndex(1);
     } else {
@@ -76,11 +65,23 @@ function RestoreWallet(): JSX.Element {
     }
   };
 
-  const handleContinuePasswordCreation = () => {
+  const onAccountTypeContinue = () => {
     setCurrentStepIndex(2);
   };
 
-  const handleConfirmPassword = async () => {
+  const onNewPasswordBack = () => {
+    setCurrentStepIndex(1);
+  };
+
+  const onNewPasswordContinue = () => {
+    setCurrentStepIndex(3);
+  };
+
+  const handleConfirmPasswordBack = () => {
+    setCurrentStepIndex(2);
+  };
+
+  const onConfirmPasswordContinue = async () => {
     setIsRestoring(true);
     if (confirmPassword === password) {
       setError('');
@@ -91,6 +92,11 @@ function RestoreWallet(): JSX.Element {
       await restoreWallet(seed, password);
       setIsRestoring(false);
 
+      // we allow the user to switch between address types if restoring the wallet
+      // this disabled by default for new wallets
+      enableNestedSegWitAddress();
+      changeBtcPaymentAddressType(btcPayAddressType);
+
       navigate('/wallet-success/restore', { replace: true });
     } else {
       setIsRestoring(false);
@@ -100,32 +106,39 @@ function RestoreWallet(): JSX.Element {
 
   const restoreSteps = [
     <EnterSeedPhrase
+      key="seed"
       seed={seedPhrase}
       setSeed={setSeedPhrase}
       onContinue={onSeedPhraseContinue}
       seedError={seedError}
       setSeedError={setSeedError}
     />,
-    <PasswordContainer>
+    <PaymentAddressTypeSelector
+      key="addressType"
+      seedPhrase={seedPhrase}
+      selectedType={btcPayAddressType}
+      onSelectedTypeChange={setBtcPayAddressType}
+      onContinue={onAccountTypeContinue}
+    />,
+    <PasswordContainer key="password">
       <PasswordInput
         title={t('CREATE_PASSWORD_SCREEN.CREATE_PASSWORD_TITLE')}
         inputLabel={t('CREATE_PASSWORD_SCREEN.TEXT_INPUT_NEW_PASSWORD_LABEL')}
         enteredPassword={password}
         setEnteredPassword={setPassword}
-        handleContinue={handleContinuePasswordCreation}
-        handleBack={handleNewPasswordBack}
+        handleContinue={onNewPasswordContinue}
+        handleBack={onNewPasswordBack}
         checkPasswordStrength
-        createPasswordFlow
         autoFocus
       />
     </PasswordContainer>,
-    <PasswordContainer>
+    <PasswordContainer key="confirmPassword">
       <PasswordInput
         title={t('CREATE_PASSWORD_SCREEN.CONFIRM_PASSWORD_TITLE')}
         inputLabel={t('CREATE_PASSWORD_SCREEN.TEXT_INPUT_NEW_PASSWORD_LABEL')}
         enteredPassword={confirmPassword}
         setEnteredPassword={setConfirmPassword}
-        handleContinue={handleConfirmPassword}
+        handleContinue={onConfirmPasswordContinue}
         handleBack={handleConfirmPasswordBack}
         passwordError={error}
         loading={isRestoring}

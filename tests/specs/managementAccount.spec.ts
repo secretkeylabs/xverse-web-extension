@@ -12,7 +12,7 @@ test.describe('Account Management', () => {
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
     await wallet.checkVisualsStartpage();
     await wallet.labelAccountName.click();
-    await expect(page.url()).toContain('account-list');
+    expect(page.url()).toContain('account-list');
     await expect(wallet.labelAccountName).toHaveCount(1);
     await expect(wallet.buttonGenerateAccount).toBeVisible();
     await expect(wallet.buttonConnectHardwareWallet).toBeVisible();
@@ -32,7 +32,7 @@ test.describe('Account Management', () => {
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
     await wallet.checkVisualsStartpage();
     await wallet.labelAccountName.click();
-    await expect(page.url()).toContain('account-list');
+    expect(page.url()).toContain('account-list');
     await expect(wallet.labelAccountName).toHaveCount(1);
     await wallet.buttonAccountOptions.click();
     await expect(wallet.buttonRenameAccount).toBeVisible();
@@ -65,7 +65,7 @@ test.describe('Account Management', () => {
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
     await wallet.checkVisualsStartpage();
     await wallet.labelAccountName.click();
-    await expect(page.url()).toContain('account-list');
+    expect(page.url()).toContain('account-list');
     await expect(wallet.labelAccountName).toHaveCount(1);
     await wallet.buttonAccountOptions.click();
     await expect(wallet.buttonRenameAccount).toBeVisible();
@@ -93,14 +93,14 @@ test.describe('Account Management', () => {
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
     await wallet.checkVisualsStartpage();
     await wallet.labelAccountName.click();
-    await expect(page.url()).toContain('account-list');
+    expect(page.url()).toContain('account-list');
     await expect(wallet.labelAccountName).toHaveCount(1);
     await wallet.buttonGenerateAccount.click();
     await expect(wallet.labelAccountName).toHaveCount(2);
     await expect(wallet.buttonAccountOptions).toHaveCount(2);
     await expect(wallet.accountBalance).toHaveCount(2);
     const balanceText = await wallet.getBalanceOfAllAccounts();
-    await expect(balanceText).toBe(0);
+    expect(balanceText).toBe(0);
   });
 
   test('Switch to another account and switch back', async ({ page, extensionId }) => {
@@ -111,12 +111,12 @@ test.describe('Account Management', () => {
     await wallet.checkVisualsStartpage();
     await expect(wallet.labelAccountName).toHaveText('Account 1');
     await wallet.labelAccountName.click();
-    await expect(page.url()).toContain('account-list');
+    expect(page.url()).toContain('account-list');
     await expect(wallet.labelAccountName).toHaveCount(1);
     await wallet.buttonGenerateAccount.click();
     await expect(wallet.labelAccountName).toHaveCount(2);
     const balanceText = await wallet.getBalanceOfAllAccounts();
-    await expect(balanceText).toBe(0);
+    expect(balanceText).toBe(0);
     await wallet.labelAccountName.last().click();
     await wallet.checkVisualsStartpage();
     await expect(wallet.labelAccountName).toHaveText('Account 2');

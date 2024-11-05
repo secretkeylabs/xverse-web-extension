@@ -1,10 +1,12 @@
 import useRunesApi from '@hooks/apiClients/useRunesApi';
-import useHasFeature from '@hooks/useHasFeature';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { FeatureId, type FungibleToken } from '@secretkeylabs/xverse-core';
+import {
+  getFungibleTokenStates,
+  type FungibleToken,
+  type FungibleTokenWithStates,
+} from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
-import BigNumber from 'bignumber.js';
 
 export const fetchRuneBalances =
   (
@@ -31,48 +33,44 @@ export const fetchRuneBalances =
     }
   };
 
-export const useRuneFungibleTokensQuery = (backgroundRefetch = true) => {
+export const useRuneFungibleTokensQuery = (
+  select?: (data: FungibleTokenWithStates[]) => any,
+  backgroundRefetch = true,
+) => {
   const { ordinalsAddress } = useSelectedAccount();
-  const { network, fiatCurrency, spamTokens, showSpamTokens } = useWalletSelector();
-  const showRunes = useHasFeature(FeatureId.RUNES_SUPPORT);
+  const { runesManageTokens, network, fiatCurrency, spamTokens, showSpamTokens } =
+    useWalletSelector();
   const runesApi = useRunesApi();
-  const queryFn = fetchRuneBalances(runesApi, ordinalsAddress, fiatCurrency);
-  const query = useQuery({
-    queryKey: ['get-rune-fungible-tokens', network.type, ordinalsAddress, fiatCurrency],
-    enabled: Boolean(network && ordinalsAddress && showRunes),
-    refetchOnWindowFocus: backgroundRefetch,
-    refetchOnReconnect: backgroundRefetch,
-    queryFn,
-  });
 
-  return {
-    ...query,
-    unfilteredData: query.data,
-    data: query.data?.filter((ft) => {
-      let passedSpamCheck = true;
-      if (spamTokens?.length) {
-        passedSpamCheck = showSpamTokens || !spamTokens.includes(ft.principal);
-      }
-      return passedSpamCheck;
-    }),
+  const queryFn = fetchRuneBalances(runesApi, ordinalsAddress, fiatCurrency);
+  const selectWithDerivedState = (data: FungibleToken[]) => {
+    const withDerivedState = data.map(
+      (ft: FungibleToken) =>
+        ({
+          ...ft,
+          ...getFungibleTokenStates({
+            fungibleToken: ft,
+            manageTokens: runesManageTokens,
+            spamTokens,
+            showSpamTokens,
+          }),
+        } as FungibleTokenWithStates),
+    );
+    return select ? select(withDerivedState) : withDerivedState;
   };
+
+  return useQuery({
+    queryKey: ['get-rune-fungible-tokens', network.type, ordinalsAddress, fiatCurrency],
+    queryFn,
+    enabled: Boolean(network && ordinalsAddress),
+    select: selectWithDerivedState,
+    refetchOnWindowFocus: !!backgroundRefetch,
+    refetchOnReconnect: !!backgroundRefetch,
+  });
 };
 
-/*
- * This hook is used to get the list of runes which the user has not hidden
- */
-export const useVisibleRuneFungibleTokens = (
-  backgroundRefetch = true,
-): ReturnType<typeof useRuneFungibleTokensQuery> & {
-  visible: FungibleToken[];
-} => {
-  const { runesManageTokens } = useWalletSelector();
-  const runesQuery = useRuneFungibleTokensQuery(backgroundRefetch);
-  return {
-    ...runesQuery,
-    visible: (runesQuery.data ?? []).filter((ft) => {
-      const userSetting = runesManageTokens[ft.principal];
-      return userSetting === true || (userSetting === undefined && new BigNumber(ft.balance).gt(0));
-    }),
-  };
+// convenience hook to get only enabled rune fungible tokens
+export const useVisibleRuneFungibleTokens = (backgroundRefetch = true) => {
+  const selectEnabled = (data: FungibleTokenWithStates[]) => data.filter((ft) => ft.isEnabled);
+  return useRuneFungibleTokensQuery(selectEnabled, backgroundRefetch);
 };

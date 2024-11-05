@@ -83,7 +83,7 @@ function Security() {
     <>
       <TopRow onClick={handleBackButtonClick} />
       <Container>
-        <Title>Security</Title>
+        <Title>{t('CATEGORIES.SECURITY')}</Title>
         {showResetWalletDisplay && (
           <ResetWalletContainer>
             <PasswordInput
@@ -109,6 +109,7 @@ function Security() {
           text={t('RESET_WALLET')}
           onClick={openResetWalletPrompt}
           showWarningTitle
+          showArrow={false}
         />
         <ResetWalletPrompt
           showResetWalletPrompt={showResetWalletPrompt}

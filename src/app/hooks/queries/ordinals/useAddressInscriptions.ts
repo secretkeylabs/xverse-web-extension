@@ -1,40 +1,47 @@
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getCollectionSpecificInscriptions } from '@secretkeylabs/xverse-core';
+import { getXverseApiClient } from '@secretkeylabs/xverse-core';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { handleRetries, InvalidParamsError } from '@utils/query';
 
 const PAGE_SIZE = 30;
 
 /**
- * Get inscriptions belonging to an address, filtered by collection id
+ * Get collections belonging to an address
  */
-const useAddressInscriptions = (collectionId?: string) => {
+const useAddressInscriptions = (showHiddenOnly?: boolean) => {
   const { ordinalsAddress } = useSelectedAccount();
   const { network } = useWalletSelector();
+  const xverseApi = getXverseApiClient(network.type);
+  const { hiddenCollectibleIds, starredCollectibleIds } = useWalletSelector();
+  const starredIds = starredCollectibleIds[ordinalsAddress]?.map(({ id }) => id);
 
-  const getInscriptionsByAddress = async ({ pageParam = 0 }) => {
-    if (!ordinalsAddress || !collectionId) {
-      throw new InvalidParamsError('ordinalsAddress and collectionId are required');
+  const getCollectionsByAddress = async ({ pageParam = 0 }) => {
+    if (!ordinalsAddress) {
+      throw new InvalidParamsError('ordinalsAddress is required');
     }
-    return getCollectionSpecificInscriptions(
-      network.type,
-      ordinalsAddress,
-      collectionId,
-      pageParam || 0, // offset,
-      PAGE_SIZE, // limit
-    );
+    return xverseApi.getCollections(ordinalsAddress, pageParam, PAGE_SIZE, {
+      hiddenCollectibleIds: Object.keys(hiddenCollectibleIds[ordinalsAddress] ?? {}),
+      starredCollectibleIds: starredIds,
+      showHiddenOnly,
+    });
   };
 
   return useInfiniteQuery(
-    ['inscriptions', ordinalsAddress, collectionId], // cache key
-    getInscriptionsByAddress,
+    [
+      'address-inscriptions',
+      ordinalsAddress,
+      Object.keys(hiddenCollectibleIds[ordinalsAddress] ?? {}),
+      starredIds,
+      showHiddenOnly,
+    ],
+    getCollectionsByAddress,
     {
-      enabled: !!(collectionId && ordinalsAddress),
+      enabled: !!ordinalsAddress,
       retry: handleRetries,
       getNextPageParam: (lastpage, pages) => {
         const currentLength = pages
-          .map((page) => page.data)
+          .map((page) => page.results)
           .filter(Boolean)
           .flat().length;
         if (currentLength < lastpage.total) {
@@ -42,7 +49,7 @@ const useAddressInscriptions = (collectionId?: string) => {
         }
         return false;
       },
-      staleTime: 1 * 60 * 1000, // 1 min
+      staleTime: 60 * 1000, // 1 min
     },
   );
 };

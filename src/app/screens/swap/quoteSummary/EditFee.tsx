@@ -12,23 +12,12 @@ const EditRow = styled.span`
   gap: 7px;
 `;
 
-const Label = styled.span<{
-  $size: 'm' | 's';
-  $variant: 'action' | 'light' | 'mid' | 'dark';
+const EditFeeButton = styled.button<{
   $clickable?: boolean;
 }>`
-  ${(props) =>
-    props.$size === 'm'
-      ? props.theme.typography.body_medium_m
-      : props.theme.typography.body_medium_s};
-  color: ${(props) =>
-    props.$variant === 'action'
-      ? props.theme.colors.tangerine
-      : props.$variant === 'light'
-      ? props.theme.colors.white_0
-      : props.$variant === 'mid'
-      ? props.theme.colors.white_200
-      : props.theme.colors.white_400};
+  ${(props) => props.theme.typography.body_medium_m};
+  background-color: transparent;
+  color: ${(props) => props.theme.colors.tangerine};
   transition: color 0.1s ease;
   margin-bottom: ${(props) => props.theme.space.xxs};
   cursor: ${(props) => (props.$clickable ? 'pointer' : 'default')};
@@ -119,15 +108,13 @@ function EditFee({
   return (
     <div>
       <EditRow>
-        <Label
+        <EditFeeButton
           data-testid="fee-button"
-          $size="m"
-          $variant="action"
           $clickable={!isLoading}
           onClick={() => setEditing((cur) => !cur)}
         >
           {t('COMMON.EDIT')} <PencilSimple size={16} weight="fill" />
-        </Label>
+        </EditFeeButton>
       </EditRow>
       {editing && (
         <FeeSelectPopup

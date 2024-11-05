@@ -26,6 +26,29 @@ export const clientsTableSchema = v.set(clientSchema);
  */
 export type ClientsTable = v.InferOutput<typeof clientsTableSchema>;
 
+/**
+ * @public
+ */
+export const clientMetadataSchema = v.object({
+  clientId: clientSchema.entries.id,
+  lastUsed: v.optional(v.number()),
+});
+
+/**
+ * @public
+ */
+export type ClientMetadata = v.InferOutput<typeof clientMetadataSchema>;
+
+/**
+ * @public
+ */
+export const clientMetadataTableSchema = v.set(clientMetadataSchema);
+
+/**
+ * @public
+ */
+export type ClientMetadataTable = v.InferOutput<typeof clientMetadataTableSchema>;
+
 // Resources
 
 /**
@@ -96,8 +119,9 @@ export type PermissionsTable = v.InferOutput<typeof permissionsTableSchema>;
  * @public
  */
 export const permissionsStoreSchema = v.object({
-  version: v.literal(2),
+  version: v.literal(3),
   clients: clientsTableSchema,
+  clientMetadata: clientMetadataTableSchema,
   resources: resourcesTableSchema,
   permissions: permissionsTableSchema,
 });
@@ -105,4 +129,4 @@ export const permissionsStoreSchema = v.object({
 /**
  * @public
  */
-export type PermissionsStoreV1 = v.InferOutput<typeof permissionsStoreSchema>;
+export type PermissionsStore = v.InferOutput<typeof permissionsStoreSchema>;

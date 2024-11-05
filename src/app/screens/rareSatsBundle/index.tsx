@@ -10,7 +10,8 @@ import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowRight, ArrowUp } from '@phosphor-icons/react';
-import type { BundleSatRange } from '@secretkeylabs/xverse-core';
+import BundleContent from '@screens/rareSatsBundle/bundleContent';
+import type { Bundle } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import { StyledHeading, StyledP } from '@ui-library/common.styled';
 import {
@@ -21,7 +22,7 @@ import {
 } from '@utils/helper';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import OrdinalAttributeComponent from '../ordinalDetail/ordinalAttributeComponent';
 import {
   AssetDetailButtonText,
@@ -42,14 +43,14 @@ import {
   StyledSeparator,
   StyledWebGalleryButton,
 } from './index.styled';
-import { RareSatsBundleGridItem } from './rareSatsBundleGridItem';
 
 function RareSatsBundle() {
   const { t } = useTranslation('translation');
   const navigate = useNavigate();
   const location = useLocation();
-  const { source } = location.state || {};
+  const { source, runeId } = location.state || {};
   const selectedAccount = useSelectedAccount();
+  const [searchParams] = useSearchParams();
   const { network } = useWalletSelector();
   const { selectedSatBundle: bundle } = useNftDataSelector();
   const { isPending, pendingTxHash } = usePendingOrdinalTxs(bundle?.txid);
@@ -57,42 +58,53 @@ function RareSatsBundle() {
   const { setSelectedSatBundleDetails } = useSatBundleDataReducer();
 
   const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
+  const fromRunes = !!searchParams.get('fromRune') || source === 'RuneBundlesTab';
+  const fromOrdinals = source === 'OrdinalDetail';
+  const isEmpty = !bundle?.satRanges?.length;
 
   useResetUserFlow('/rare-sats-bundle');
 
   const handleBackButtonClick = () => {
-    if (source === 'OrdinalDetail') {
-      navigate(-1);
-    } else {
-      navigate('/nft-dashboard?tab=rareSats');
-    }
     setSelectedSatBundleDetails(null);
+    if (fromOrdinals) {
+      return navigate(-1);
+    }
+    if (fromRunes) {
+      return navigate(
+        `/coinDashboard/FT?ftKey=${
+          searchParams.get('fromRune') || runeId
+        }&protocol=runes&secondaryTab=true`,
+      );
+    }
+    return navigate('/nft-dashboard?tab=rareSats');
   };
 
   const openInGalleryView = async () => {
-    await chrome.tabs.create({
-      url: chrome.runtime.getURL('options.html#/nft-dashboard/rare-sats-bundle'),
-    });
+    let baseUrl = 'options.html#/nft-dashboard/rare-sats-bundle';
+    const fromRune = searchParams.get('fromRune') || runeId;
+
+    if (fromRune) {
+      baseUrl += `?fromRune=${fromRune}`;
+    }
+    await chrome.tabs.create({ url: chrome.runtime.getURL(baseUrl) });
   };
 
-  const onCloseAlert = () => {
-    setShowSendOrdinalsAlert(false);
-  };
+  const onCloseAlert = () => setShowSendOrdinalsAlert(false);
 
   const handleSendOrdinal = async () => {
     if (isPending) {
       return setShowSendOrdinalsAlert(true);
     }
-
-    const link = `/nft-dashboard/ordinal-detail/${bundle?.txid}/send-ordinal?isRareSat=true&vout=${bundle?.vout}`;
-
+    const hasRune = !!(searchParams.get('fromRune') || runeId);
+    const link = `/nft-dashboard/ordinal-detail/${bundle?.txid}/send-ordinal?isRareSat=true&vout=${
+      bundle?.vout
+    }${hasRune ? `&fromRune=${searchParams.get('fromRune') || runeId}` : ''}`;
     if (isLedgerAccount(selectedAccount) && !isInOptions()) {
       await chrome.tabs.create({
         url: chrome.runtime.getURL(`options.html#${link}`),
       });
       return;
     }
-
     navigate(link);
   };
 
@@ -102,45 +114,48 @@ function RareSatsBundle() {
     }
   };
 
-  const handleRarityScale = () => {
-    navigate('/nft-dashboard/supported-rarity-scale');
+  const handleRarityScale = () => navigate('/nft-dashboard/supported-rarity-scale');
+
+  const goBackText = () => {
+    if (fromOrdinals) {
+      return t('SEND.MOVE_TO_ASSET_DETAIL');
+    }
+    if (fromRunes) {
+      return t('NFT_DETAIL_SCREEN.BACK_TO_RUNES');
+    }
+    return t('NFT_DETAIL_SCREEN.MOVE_TO_ASSET_DETAIL');
   };
-
-  const goBackText =
-    location.state && location.state.source === 'OrdinalDetail'
-      ? t('SEND.MOVE_TO_ASSET_DETAIL')
-      : t('NFT_DETAIL_SCREEN.MOVE_TO_ASSET_DETAIL');
-
-  const isEmpty = !bundle?.satRanges?.length;
 
   return (
     <>
       {isGalleryOpen ? (
         <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
       ) : (
-        <TopRow title={t('RARE_SATS.SATS_BUNDLE')} onClick={handleBackButtonClick} />
+        <TopRow onClick={handleBackButtonClick} />
       )}
-      <Container>
+      <Container isGalleryOpen={isGalleryOpen}>
         <PageHeader isGalleryOpen={isGalleryOpen}>
           {isGalleryOpen && (
             <BackButtonContainer>
               <BackButton data-testid="back-button" onClick={handleBackButtonClick}>
                 <>
                   <ButtonImage src={ArrowLeft} />
-                  <AssetDetailButtonText>{goBackText}</AssetDetailButtonText>
+                  <AssetDetailButtonText>{goBackText()}</AssetDetailButtonText>
                 </>
               </BackButton>
             </BackButtonContainer>
           )}
           <PageHeaderContent isGalleryOpen={isGalleryOpen}>
             <Header isGalleryOpen={isGalleryOpen}>
-              <StyledP typography="body_bold_m" color="white_400">
-                {t('NFT_DASHBOARD_SCREEN.RARE_SATS')}
-              </StyledP>
-              <StyledHeading typography="headline_m" color="white_0">
-                {bundle?.totalExoticSats}
+              <StyledHeading typography="headline_xs" color="white_0">
+                {t('NFT_DASHBOARD_SCREEN.BUNDLE')}
               </StyledHeading>
               {!isGalleryOpen && <StyledWebGalleryButton onClick={openInGalleryView} />}
+              <OrdinalAttributeComponent
+                title={t('NFT_DETAIL_SCREEN.RARE_SATS')}
+                value={bundle?.totalExoticSats.toString()}
+                isAddress
+              />
               <SendButtonContainer isGalleryOpen={isGalleryOpen}>
                 <Button
                   icon={<ArrowUp weight="bold" size="16" />}
@@ -157,14 +172,34 @@ function RareSatsBundle() {
                 </BundleRarityLinkContainer>
               )}
             </Header>
+            <AttributesContainer isGalleryOpen={isGalleryOpen}>
+              <DetailSection>
+                <OrdinalAttributeComponent
+                  title={t('NFT_DETAIL_SCREEN.OWNED_BY')}
+                  value={getTruncatedAddress(selectedAccount.ordinalsAddress, 6)}
+                  isAddress
+                />
+                <OrdinalAttributeComponent
+                  title={t('RARE_SATS.SATS_VALUE')}
+                  value={`${bundle?.value}`}
+                  suffix=" sats"
+                />
+              </DetailSection>
+              <OrdinalAttributeComponent
+                title={t('NFT_DETAIL_SCREEN.ID')}
+                value={bundle?.txid}
+                isAddress
+              />
+              {!isGalleryOpen && (
+                <OrdinalAttributeComponent title={t('NFT_DETAIL_SCREEN.CONTENT')} />
+              )}
+            </AttributesContainer>
             {isEmpty && (
               <NoCollectiblesText>{t('NFT_DASHBOARD_SCREEN.NO_COLLECTIBLES')}</NoCollectiblesText>
             )}
             {!isGalleryOpen && (
               <SatRangeContainer isGalleryOpen={isGalleryOpen}>
-                {bundle?.satRanges.map((item: BundleSatRange) => (
-                  <RareSatsBundleGridItem key={`${item.block}-${item.offset}`} item={item} />
-                ))}
+                <BundleContent bundle={bundle as Bundle} />
               </SatRangeContainer>
             )}
             {!isGalleryOpen && (
@@ -176,25 +211,6 @@ function RareSatsBundle() {
                 />
               </SeeRarityContainer>
             )}
-            <AttributesContainer isGalleryOpen={isGalleryOpen}>
-              <DetailSection>
-                <OrdinalAttributeComponent
-                  title={t('RARE_SATS.SATS_VALUE')}
-                  value={`${bundle?.value}`}
-                  suffix=" sats"
-                />
-                <OrdinalAttributeComponent
-                  title={t('NFT_DETAIL_SCREEN.OWNED_BY')}
-                  value={getTruncatedAddress(selectedAccount.ordinalsAddress, 6)}
-                  isAddress
-                />
-              </DetailSection>
-              <OrdinalAttributeComponent
-                title={t('NFT_DETAIL_SCREEN.ID')}
-                value={bundle?.txid}
-                isAddress
-              />
-            </AttributesContainer>
           </PageHeaderContent>
         </PageHeader>
         {isGalleryOpen && <StyledSeparator />}
@@ -203,9 +219,7 @@ function RareSatsBundle() {
         )}
         {isGalleryOpen && (
           <SatRangeContainer isGalleryOpen={isGalleryOpen}>
-            {bundle?.satRanges.map((item: BundleSatRange) => (
-              <RareSatsBundleGridItem key={`${item.block}-${item.offset}`} item={item} />
-            ))}
+            <BundleContent bundle={bundle as Bundle} />
           </SatRangeContainer>
         )}
         {showSendOrdinalsAlert && (

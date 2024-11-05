@@ -1,5 +1,6 @@
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import {
+  estimateStacksTransactionWithFallback,
   mempoolApi,
   microstacksToStx,
   rbf,
@@ -9,7 +10,7 @@ import {
   type StacksTransaction,
   type StxTransactionData,
 } from '@secretkeylabs/xverse-core';
-import { deserializeTransaction, estimateTransaction } from '@stacks/transactions';
+import { deserializeTransaction } from '@stacks/transactions';
 import { isLedgerAccount } from '@utils/helper';
 import axios from 'axios';
 import BigNumber from 'bignumber.js';
@@ -137,9 +138,8 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
       const txRaw: string = await getRawTransaction(transaction.txid, network);
       const unsignedTx: StacksTransaction = deserializeTransaction(txRaw);
 
-      const [slow, medium, high] = await estimateTransaction(
-        unsignedTx.payload,
-        undefined,
+      const [slow, medium, high] = await estimateStacksTransactionWithFallback(
+        unsignedTx,
         selectedNetwork,
       );
 

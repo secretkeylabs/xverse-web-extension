@@ -35,8 +35,8 @@ import styled from 'styled-components';
 
 const Image = styled.img<{ size?: number }>`
   object-fit: cover;
-  width: ${(props) => `${props.size}px` ?? '100%'};
-  height: ${(props) => `${props.size}px` ?? '100%'};
+  width: ${(props) => (typeof props.size === 'undefined' ? '100%' : `${props.size}px`)};
+  height: ${(props) => (typeof props.size === 'undefined' ? '100%' : `${props.size}px`)};
 `;
 
 interface Props {

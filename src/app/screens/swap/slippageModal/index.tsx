@@ -1,7 +1,7 @@
-/* eslint-disable import/prefer-default-export */
 import ActionButton from '@components/button';
 import { StyledP } from '@ui-library/common.styled';
 import Input from '@ui-library/input';
+import BigNumber from 'bignumber.js';
 import { useState, type ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -16,6 +16,7 @@ const TitleRow = styled.div`
   display: flex;
   justify-content: space-between;
 `;
+
 const ResetButton = styled.button((props) => ({
   display: 'inline',
   background: 'transparent',
@@ -36,23 +37,29 @@ const Description = styled.p((props) => ({
   color: props.theme.colors.white_400,
 }));
 
-const DEFAULT_SLIPPAGE = '5';
-export function SlippageModalContent({
+function SlippageModalContent({
+  defaultSlippage,
   slippage,
   slippageThreshold,
   slippageDecimals,
   onChange,
 }: {
+  defaultSlippage: number;
   slippage: number;
   slippageThreshold?: number;
   slippageDecimals?: number;
   onChange: (slippage: number) => void;
 }) {
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
-  const [percentage, setPercentage] = useState(`${(slippage * 100).toString()}`);
-  const result = Number(percentage);
-  const invalid = !Number.isNaN(result) && result >= 100;
-  const showSlippageWarning = slippageThreshold ? result > slippageThreshold * 100 : false;
+  const [percentage, setPercentage] = useState(new BigNumber(slippage).times(100).toString());
+
+  const result = new BigNumber(percentage);
+  const invalid = result.isNaN() || result.gte(100);
+  const showSlippageWarning = slippageThreshold
+    ? result.gt(new BigNumber(slippageThreshold).times(100))
+    : false;
+
+  const DEFAULT_SLIPPAGE = new BigNumber(defaultSlippage).times(100).toString();
 
   const allowDecimalsNumber = slippageDecimals ?? 2;
 
@@ -106,11 +113,13 @@ export function SlippageModalContent({
       />
       <Description>{t('SLIPPAGE_DESC')}</Description>
       <ActionButton
-        disabled={invalid || !result}
+        disabled={invalid || result.isZero()}
         warning={invalid}
         text={t('APPLY')}
-        onPress={() => onChange(result / 100)}
+        onPress={() => onChange(result.div(100).toNumber())}
       />
     </Container>
   );
 }
+
+export default SlippageModalContent;

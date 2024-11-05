@@ -1,5 +1,6 @@
 import ActionButton from '@components/button';
 import TokenImage from '@components/tokenImage';
+import useWalletSelector from '@hooks/useWalletSelector';
 import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import Callout from '@ui-library/callout';
 import { StickyButtonContainer } from '@ui-library/common.styled';
@@ -8,6 +9,7 @@ import {
   isDangerFeedback,
   type InputFeedbackProps,
 } from '@ui-library/inputFeedback';
+import { HIDDEN_BALANCE_LABEL } from '@utils/constants';
 import { getFtTicker } from '@utils/tokens';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
@@ -147,6 +149,7 @@ function Brc20TransferForm(props: Props) {
   } = props;
 
   const tokenCurrency = getFtTicker(token);
+  const { balanceHidden } = useWalletSelector();
 
   return (
     <Container>
@@ -164,11 +167,14 @@ function Brc20TransferForm(props: Props) {
             <Label>{t('AMOUNT')}</Label>
             <BalanceText>{t('BALANCE')}:</BalanceText>
             <Text>
-              <NumericFormat
-                value={token.balance.toString()}
-                displayType="text"
-                thousandSeparator
-              />
+              {balanceHidden && HIDDEN_BALANCE_LABEL}
+              {!balanceHidden && (
+                <NumericFormat
+                  value={token.balance.toString()}
+                  displayType="text"
+                  thousandSeparator
+                />
+              )}
             </Text>
           </RowContainer>
           <AmountInputContainer error={isDangerFeedback(amountError)}>

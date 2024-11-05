@@ -13,7 +13,7 @@ import { StyledP } from '@ui-library/common.styled';
 
 import useGetUtxos from '@hooks/queries/swaps/useGetUtxos';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Button from '@ui-library/button';
 import SnackBar from '@ui-library/snackBar';
@@ -136,7 +136,7 @@ export default function UtxoSelection({
   const { t: commonT } = useTranslation('translation', { keyPrefix: 'COMMON' });
 
   const { fiatCurrency } = useWalletSelector();
-  const { btcFiatRate } = useCoinRates();
+  const { btcFiatRate } = useSupportedCoinRates();
   const { data: btcBalance } = useBtcWalletData();
 
   const totalRunesPerBtc = new BigNumber(100000000).dividedBy(

@@ -53,6 +53,10 @@ const RowCenter = styled.div<{ justifyContent: 'space-between' | 'flex-start' }>
   justify-content: ${(props) => props.justifyContent};
 `;
 
+const ConvertedFiatP = styled(StyledP)`
+  word-break: break-word;
+`;
+
 const BalanceP = styled(StyledP)`
   word-break: break-word;
   text-align: right;
@@ -129,10 +133,11 @@ export default function AmountInput({ max, input, balance }: Props) {
           displayType="text"
           thousandSeparator
           prefix={`~${currencySymbolMap[input.fiatCurrency]}`}
+          suffix={` ${input.fiatCurrency}`}
           renderText={(value: string) => (
-            <StyledP data-testid="usd-text" typography="body_s" color="white_400">
-              {value} {input.fiatCurrency}
-            </StyledP>
+            <ConvertedFiatP data-testid="usd-text" typography="body_s" color="white_400">
+              {value || '--'}
+            </ConvertedFiatP>
           )}
         />
       </Container>

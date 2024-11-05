@@ -1,4 +1,5 @@
 import TokenTile from '@components/tokenTile';
+import { getTrackingIdentifier } from '@screens/swap/utils';
 import { AnalyticsEvents, type FungibleToken, type Token } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
@@ -23,7 +24,7 @@ const StyledTokenTile = styled(TokenTile)`
 interface Props {
   visible: boolean;
   title: string;
-  onSelectCoin: (token: FungibleToken | 'BTC') => void;
+  onSelectCoin: (token: FungibleToken) => void;
   onClose: () => void;
   to?: Token;
 }
@@ -36,23 +37,40 @@ export default function TokenFromBottomSheet({ visible, title, onSelectCoin, onC
     <Sheet visible={visible} title={title} onClose={onClose}>
       <Container>
         {fromTokens.map((token) => {
-          if (token === 'BTC') {
+          if (token.principal === 'BTC') {
             return (
               <StyledTokenTile
-                key={token}
+                key={token.principal}
                 title="Bitcoin"
                 currency="BTC"
                 onPress={() => {
                   onSelectCoin(token);
                   trackMixPanel(AnalyticsEvents.SelectTokenToSwapFrom, {
-                    selectedToken: 'Bitcoin',
+                    selectedToken: 'BTC',
                   });
                   onClose();
                 }}
               />
             );
           }
-          if (token.protocol === 'runes' && 'principal' in token) {
+          if (token.principal === 'STX') {
+            return (
+              <StyledTokenTile
+                key={token.principal}
+                title="Stacks"
+                currency="STX"
+                onPress={() => {
+                  onSelectCoin(token);
+                  trackMixPanel(AnalyticsEvents.SelectTokenToSwapFrom, {
+                    selectedToken: 'STX',
+                    principal: 'STX',
+                  });
+                  onClose();
+                }}
+              />
+            );
+          }
+          if ((token.protocol === 'runes' || token.protocol === 'stacks') && 'principal' in token) {
             return (
               <StyledTokenTile
                 key={token.principal}
@@ -61,7 +79,8 @@ export default function TokenFromBottomSheet({ visible, title, onSelectCoin, onC
                 onPress={() => {
                   onSelectCoin(token);
                   trackMixPanel(AnalyticsEvents.SelectTokenToSwapFrom, {
-                    selectedToken: token.name,
+                    selectedToken: getTrackingIdentifier(token),
+                    principal: token.protocol === 'stacks' ? token.principal : undefined,
                   });
                   onClose();
                 }}

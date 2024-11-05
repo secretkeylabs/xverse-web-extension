@@ -14,7 +14,7 @@ import RequestsRoutes from '../../route-urls';
 import { makeRPCError, sendRpcResponse } from '../helpers';
 
 const MintRuneParamsSchema = z.object({
-  appServiceFee: z.string().optional(),
+  appServiceFee: z.number().optional(),
   appServiceFeeAddress: z.string().optional(),
   destinationAddress: z.string(),
   feeRate: z.number(),
@@ -49,7 +49,7 @@ const handleMintRune = async (message: WebBtcMessage<'runes_mint'>, port: chrome
     id,
     response: makeRPCError(message.id, {
       code: RpcErrorCode.USER_REJECTION,
-      message: 'User rejected request to send transfer',
+      message: 'User rejected request to mint a rune',
     }),
   });
   listenForOriginTabClose({ tabId });

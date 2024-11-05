@@ -1,14 +1,14 @@
 import { getTabIdFromPort } from '@common/utils';
-import getSelectedAccount from '@common/utils/getSelectedAccount';
+import getSelectedAccount, { embellishAccountWithDetails } from '@common/utils/getSelectedAccount';
 import { makeContext } from '@common/utils/popup';
 import { safePromise, type Result } from '@common/utils/safe';
-import { makeAccountResourceId } from '@components/permissionsManager/resources';
 import * as utils from '@components/permissionsManager/utils';
 import { getBalanceRequestMessageSchema, type RpcRequestMessage } from '@sats-connect/core';
 import { BitcoinEsploraApiProvider, type NetworkType } from '@secretkeylabs/xverse-core';
 import rootStore from '@stores/index';
 import * as v from 'valibot';
 import { handleInvalidMessage } from '../handle-invalid-message';
+import { hasAccountReadPermissions } from '../helpers';
 import { sendGetBalanceSuccessResponseMessage } from '../responseMessages/bitcoin';
 import {
   sendAccessDeniedResponseMessage,
@@ -47,24 +47,33 @@ async function getBalance(
 
 const handleGetBalance = async (message: RpcRequestMessage, port: chrome.runtime.Port) => {
   const parseResult = v.safeParse(getBalanceRequestMessageSchema, message);
-
   if (!parseResult.success) {
     handleInvalidMessage(message, getTabIdFromPort(port), parseResult.issues);
     return;
   }
 
   const { origin, tabId } = makeContext(port);
-  const [error, store] = await utils.loadPermissionsStore();
 
+  const [error, store] = await utils.getPermissionsStore();
   if (error) {
-    sendInternalErrorMessage({ tabId, messageId: parseResult.output.id });
+    sendInternalErrorMessage({
+      tabId,
+      messageId: parseResult.output.id,
+      message: 'Error loading permissions store.',
+    });
     return;
   }
 
-  if (!store) {
+  if (!hasAccountReadPermissions(origin, store)) {
     sendAccessDeniedResponseMessage({ tabId, messageId: parseResult.output.id });
     return;
   }
+
+  await utils.permissionsStoreMutex.runExclusive(async () => {
+    // Update the last used time for the client
+    utils.updateClientMetadata(store, origin, { lastUsed: new Date().getTime() });
+    await utils.savePermissionsStore(store);
+  });
 
   const {
     selectedAccountIndex,
@@ -72,43 +81,31 @@ const handleGetBalance = async (message: RpcRequestMessage, port: chrome.runtime
     accountsList: softwareAccountsList,
     ledgerAccountsList,
     network,
+    btcPaymentAddressType,
   } = rootStore.store.getState().walletState;
 
-  const existingAccount = getSelectedAccount({
+  const account = getSelectedAccount({
     selectedAccountIndex,
     selectedAccountType,
     softwareAccountsList,
     ledgerAccountsList,
   });
 
-  if (!existingAccount) {
+  if (!account) {
     sendInternalErrorMessage({ tabId, messageId: parseResult.output.id });
     return;
   }
 
-  const permission = utils.getClientPermission(
-    store.permissions,
-    origin,
-    makeAccountResourceId({
-      accountId: selectedAccountIndex,
-      networkType: network.type,
-      masterPubKey: existingAccount.masterPubKey,
-    }),
-  );
-  if (!permission) {
-    sendAccessDeniedResponseMessage({ tabId, messageId: parseResult.output.id });
-    return;
-  }
+  const detailedAccount = embellishAccountWithDetails(account, btcPaymentAddressType);
 
-  if (!permission.actions.has('read')) {
-    sendAccessDeniedResponseMessage({ tabId, messageId: parseResult.output.id });
-    return;
-  }
-
-  const address = existingAccount.btcAddress;
+  const address = detailedAccount.btcAddress;
   const [getBalanceError, balances] = await getBalance(address, network.type);
   if (getBalanceError) {
-    sendInternalErrorMessage({ tabId, messageId: parseResult.output.id });
+    sendInternalErrorMessage({
+      tabId,
+      messageId: parseResult.output.id,
+      message: 'Error retrieving balance.',
+    });
     return;
   }
 

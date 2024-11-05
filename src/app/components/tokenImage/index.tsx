@@ -7,7 +7,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import { XVERSE_ORDIVIEW_URL, type CurrencyTypes } from '@utils/constants';
 import { getTicker } from '@utils/helper';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 const DEFAULT_SIZE = 40;
@@ -64,13 +64,14 @@ const ProtocolImage = styled.img({
   width: '100%',
 });
 
-export interface TokenImageProps {
+interface TokenImageProps {
   currency?: CurrencyTypes;
   fungibleToken?: FungibleToken;
   loading?: boolean;
   size?: number;
   round?: boolean;
   showProtocolIcon?: boolean;
+  customProtocolIcon?: string;
 }
 
 export default function TokenImage({
@@ -80,6 +81,7 @@ export default function TokenImage({
   size,
   round,
   showProtocolIcon = true,
+  customProtocolIcon,
 }: TokenImageProps) {
   const { network } = useWalletSelector();
   const ftProtocol = fungibleToken?.protocol;
@@ -94,35 +96,35 @@ export default function TokenImage({
     }
   }, [currency]);
 
-  const getProtocolIcon = () => {
-    if (!ftProtocol) {
+  const ticker =
+    fungibleToken?.ticker ||
+    (fungibleToken?.name ? getTicker(fungibleToken.name) : fungibleToken?.assetName || '');
+
+  const tickerComponent = () => (
+    <TickerIconContainer size={size} round={round}>
+      <TickerIconText data-testid="token-image">{ticker.substring(0, 4)}</TickerIconText>
+    </TickerIconContainer>
+  );
+
+  const protocolIcon = useMemo(() => {
+    if (!ftProtocol && !customProtocolIcon) {
       return null;
     }
-    switch (ftProtocol) {
-      case 'stacks':
-        return <ProtocolImage src={IconStacks} alt="stacks" />;
-      case 'brc-20':
-        return <ProtocolImage src={OrdinalIcon} alt="brc20" />;
-      case 'runes':
-        return <ProtocolImage src={RunesIcon} alt="runes" />;
-      default:
-        return null;
-    }
-  };
+
+    const protocolToIcon = {
+      'brc-20': <ProtocolImage src={OrdinalIcon} alt="brc20" />,
+      stacks: <ProtocolImage src={IconStacks} alt="stacks" />,
+      runes: <ProtocolImage src={RunesIcon} alt="runes" />,
+    };
+
+    return ftProtocol ? (
+      protocolToIcon[ftProtocol]
+    ) : (
+      <ProtocolImage src={customProtocolIcon} alt="custom" />
+    );
+  }, [ftProtocol, customProtocolIcon]);
 
   const renderIcon = () => {
-    const ticker =
-      fungibleToken?.ticker ||
-      (fungibleToken?.name ? getTicker(fungibleToken.name) : fungibleToken?.assetName || '');
-
-    if (imageError) {
-      return (
-        <TickerIconContainer size={size} round={round}>
-          <TickerIconText data-testid="token-image">{ticker.substring(0, 4)}</TickerIconText>
-        </TickerIconContainer>
-      );
-    }
-
     if (!fungibleToken) {
       return (
         <TickerImage
@@ -132,6 +134,27 @@ export default function TokenImage({
           onError={() => setImageError(true)}
         />
       );
+    }
+    if (fungibleToken.protocol === 'runes') {
+      if (fungibleToken.runeInscriptionId) {
+        return (
+          <TickerImage
+            data-testid="token-image"
+            size={size}
+            src={`${XVERSE_ORDIVIEW_URL(network.type)}/thumbnail/${
+              fungibleToken.runeInscriptionId
+            }`}
+            onError={() => setImageError(true)}
+          />
+        );
+      }
+      if (fungibleToken?.runeSymbol) {
+        return (
+          <TickerIconContainer size={size} round={round}>
+            <TickerIconText data-testid="token-image">{fungibleToken.runeSymbol}</TickerIconText>
+          </TickerIconContainer>
+        );
+      }
     }
     if (fungibleToken?.image) {
       return (
@@ -143,29 +166,7 @@ export default function TokenImage({
         />
       );
     }
-    if (fungibleToken.runeInscriptionId) {
-      return (
-        <TickerImage
-          data-testid="token-image"
-          size={size}
-          src={`${XVERSE_ORDIVIEW_URL(network.type)}/thumbnail/${fungibleToken.runeInscriptionId}`}
-          onError={() => setImageError(true)}
-        />
-      );
-    }
-    if (fungibleToken.runeSymbol) {
-      return (
-        <TickerIconContainer size={size} round={round}>
-          <TickerIconText data-testid="token-image">{fungibleToken.runeSymbol}</TickerIconText>
-        </TickerIconContainer>
-      );
-    }
-
-    return (
-      <TickerIconContainer size={size} round={round}>
-        <TickerIconText data-testid="token-image">{ticker.substring(0, 4)}</TickerIconText>
-      </TickerIconContainer>
-    );
+    return tickerComponent();
   };
 
   if (loading) {
@@ -180,9 +181,9 @@ export default function TokenImage({
 
   return (
     <TickerProtocolContainer>
-      {renderIcon()}
-      {ftProtocol && showProtocolIcon && (
-        <ProtocolIcon isSquare={ftProtocol === 'runes'}>{getProtocolIcon()}</ProtocolIcon>
+      {imageError ? tickerComponent() : renderIcon()}
+      {showProtocolIcon && protocolIcon && (
+        <ProtocolIcon isSquare={ftProtocol === 'runes'}>{protocolIcon}</ProtocolIcon>
       )}
     </TickerProtocolContainer>
   );

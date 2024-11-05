@@ -3,17 +3,21 @@ import RuneAmount from '@components/confirmBtcTransaction/itemRow/runeAmount';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import type { TransactionSummary } from '@screens/sendBtc/helpers';
 import {
+  AnalyticsEvents,
   btcTransaction,
   parseSummaryForRunes,
   runesTransaction,
   type RuneSummary,
+  type Transport,
 } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
+import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -74,6 +78,7 @@ function RecoverRunes() {
   const [summary, setSummary] = useState<TransactionSummary>();
   const [runeSummary, setRuneSummary] = useState<RuneSummary>();
   const [isConfirmTx, setIsConfirmTx] = useState(false);
+  const selectedAccount = useSelectedAccount();
 
   const { data: btcFeeRates } = useBtcFeeRate();
   const context = useTransactionContext();
@@ -81,10 +86,7 @@ function RecoverRunes() {
   const generateTransactionAndSummary = async (desiredFeeRate: number) => {
     const tx = await runesTransaction.recoverRunes(context, desiredFeeRate);
     const txSummary = await tx.getSummary();
-    const txRuneSummary = await parseSummaryForRunes(context, txSummary, context.network, {
-      separateTransfersOnNoExternalInputs: true,
-    });
-
+    const txRuneSummary = await parseSummaryForRunes(context, txSummary, context.network);
     return { transaction: tx, summary: txSummary, runeSummary: txRuneSummary };
   };
 
@@ -134,10 +136,15 @@ function RecoverRunes() {
   const handleToggleConfirmTx = () => setIsConfirmTx(!isConfirmTx);
   const handleOnNavigateBack = () => navigate(-1);
 
-  const onClickTransfer = async () => {
+  const onClickTransfer = async (ledgerTransport?: Transport) => {
     setIsBroadcasting(true);
     try {
-      const txnId = await enhancedTxn?.broadcast();
+      const txnId = await enhancedTxn?.broadcast({ ledgerTransport, rbfEnabled: true });
+      trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
+        protocol: 'runes',
+        action: 'transfer',
+        wallet_type: selectedAccount?.accountType || 'software',
+      });
       navigate('/tx-status', {
         state: {
           txid: txnId,
@@ -174,7 +181,6 @@ function RecoverRunes() {
     ) : (
       <ConfirmBtcTransaction
         summary={summary}
-        runeSummary={runeSummary}
         title={t('TITLE')}
         isLoading={isLoading}
         isSubmitting={isBroadcasting}

@@ -1,4 +1,4 @@
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { PencilSimple } from '@phosphor-icons/react';
 import FloorComparisonLabel from '@screens/listRune/floorComparisonLabel';
@@ -61,6 +61,11 @@ const InfoRowContainer = styled.div`
   gap: ${(props) => props.theme.space.xs};
 `;
 
+const RightAlignContainer = styled.div(() => ({
+  display: 'flex',
+  justifyContent: 'end',
+}));
+
 type Props = {
   runeAmount: number;
   runeSymbol: string;
@@ -79,7 +84,7 @@ function SetRunePriceItem({
   handleShowCustomPriceModal,
 }: Props) {
   const { t } = useTranslation('translation');
-  const { btcFiatRate } = useCoinRates();
+  const { btcFiatRate } = useSupportedCoinRates();
   const { fiatCurrency } = useWalletSelector();
 
   return (
@@ -150,13 +155,15 @@ function SetRunePriceItem({
           </InfoRowContainer>
         </InfoContainer>
       </ItemContainer>
-      <FloorComparisonLabel
-        floorPriceSats={floorPriceSats}
-        priceSats={satPrice}
-        lowError={satPrice * runeAmount < 10000}
-        highError={satPrice * runeAmount > 1000000000}
-        typography="body_medium_s"
-      />
+      <RightAlignContainer>
+        <FloorComparisonLabel
+          floorPriceSats={floorPriceSats}
+          priceSats={satPrice}
+          lowError={satPrice * runeAmount < 10000}
+          highError={satPrice * runeAmount > 1000000000}
+          typography="body_medium_s"
+        />
+      </RightAlignContainer>
     </>
   );
 }

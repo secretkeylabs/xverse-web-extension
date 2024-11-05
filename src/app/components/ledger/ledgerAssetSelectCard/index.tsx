@@ -1,27 +1,24 @@
 import styled from 'styled-components';
 
-const CardContainer = styled.label((props) => ({
+const CardContainer = styled.button((props) => ({
   display: 'flex',
-  flexDirection: 'row',
-  gap: props.theme.spacing(6),
+  gap: props.theme.space.s,
   justifyContent: 'flex-start',
+  alignItems: 'center',
   padding: props.theme.spacing(7),
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
+  paddingLeft: props.theme.space.m,
+  paddingRight: props.theme.space.m,
   cursor: 'pointer',
-  transition: 'background 0.2s ease, border 0.2s ease',
-  background:
-    props.className === 'checked' ? props.theme.colors.background.selectBackground : 'transparent',
+  transition: 'background 0.1s ease, border 0.1s ease',
+  textAlign: 'left',
+  color: props.theme.colors.white_0,
+  background: props.theme.colors.elevation1,
   borderRadius: props.theme.radius(2),
   border: `1px solid ${
-    props.className === 'checked' ? props.theme.colors.border.select : props.theme.colors.white_900
+    props.className === 'checked' ? '#7383ff4d' : props.theme.colors.elevation1
   }`,
   userSelect: 'none',
 }));
-
-const CardInput = styled.input({
-  display: 'none',
-});
 
 const CardIconContainer = styled.div((props) => ({
   display: 'flex',
@@ -46,38 +43,35 @@ const CardText = styled.p((props) => ({
   color: props.theme.colors.white_400,
 }));
 
-interface Props {
+type Props = {
   icon: string;
   title: string;
   text: string;
-  id: string;
+  name: 'Bitcoin' | 'Stacks';
   isChecked: boolean;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onClick: (selectedAsset: 'Bitcoin' | 'Stacks') => void;
   squareIcon?: boolean;
-}
+};
 
 function LedgerAssetSelectCard({
   icon,
   title,
   text,
-  id,
+  name,
   isChecked,
-  onChange: handleChange,
+  onClick: handleClick,
   squareIcon = false,
 }: Props) {
   return (
-    <div>
-      <CardContainer htmlFor={id} className={isChecked ? 'checked' : ''}>
-        <CardIconContainer>
-          <CardIcon src={icon} alt={`${title} icon`} $squareIcon={squareIcon} />
-        </CardIconContainer>
-        <div>
-          <CardTitle>{title}</CardTitle>
-          <CardText>{text}</CardText>
-        </div>
-      </CardContainer>
-      <CardInput id={id} type="checkbox" checked={isChecked} onChange={handleChange} />
-    </div>
+    <CardContainer className={isChecked ? 'checked' : ''} onClick={() => handleClick(name)}>
+      <CardIconContainer>
+        <CardIcon src={icon} alt={`${title} icon`} $squareIcon={squareIcon} />
+      </CardIconContainer>
+      <div>
+        <CardTitle>{title}</CardTitle>
+        <CardText>{text}</CardText>
+      </div>
+    </CardContainer>
   );
 }
 

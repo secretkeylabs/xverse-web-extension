@@ -1,5 +1,5 @@
 import IconStacks from '@assets/img/dashboard/stx_icon.svg';
-import type { ConfirmStxTransactionState, LedgerTransactionType } from '@common/types/ledger';
+import type { ConfirmStxTransactionState } from '@common/types/ledger';
 import {
   sendInternalErrorMessage,
   sendUserRejectionMessage,
@@ -54,6 +54,13 @@ const AlertContainer = styled.div((props) => ({
 const SpendDelegatedStxWarning = styled(Callout)((props) => ({
   marginBottom: props.theme.space.m,
 }));
+
+const Subtitle = styled.p`
+  ${(props) => props.theme.typography.body_medium_m};
+  color: ${(props) => props.theme.colors.white_200};
+  margin-top: ${(props) => props.theme.space.s};
+  margin-bottom: ${(props) => props.theme.space.xs};
+`;
 
 function ConfirmStxTransaction() {
   const { t } = useTranslation('translation');
@@ -211,16 +218,14 @@ function ConfirmStxTransaction() {
 
   const handleConfirmClick = (txs: StacksTransaction[]) => {
     if (isLedgerAccount(selectedAccount)) {
-      const type: LedgerTransactionType = 'STX';
       const fee = new BigNumber(txs[0].auth.spendingCondition.fee.toString());
       const state: ConfirmStxTransactionState = {
         unsignedTx: Buffer.from(unsignedTx.serialize()),
-        type,
         recipients: [{ address: recipient, amountMicrostacks: amount }],
         fee,
       };
 
-      navigate('/confirm-ledger-tx', { state });
+      navigate('/confirm-ledger-stx-tx', { state });
       return;
     }
     const rawTx = buf2hex(txs[0].serialize());
@@ -350,6 +355,7 @@ function ConfirmStxTransaction() {
           currencyType="STX"
           title={t('CONFIRM_TRANSACTION.AMOUNT')}
         />
+        <Subtitle>{t('CONFIRM_TRANSACTION.TRANSACTION_DETAILS')}</Subtitle>
         <TransactionDetailComponent title={t('CONFIRM_TRANSACTION.NETWORK')} value={network.type} />
         {memo && <TransferMemoView memo={memo} />}
         {hasTabClosed && (

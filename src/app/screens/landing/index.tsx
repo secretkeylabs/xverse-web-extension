@@ -131,13 +131,13 @@ const InitialTransitionLandingSectionContainer = styled(LandingSectionContainer)
   animation: ${() => slideY} 0.2s ease-out;
 `;
 
-const TransitionLeftLandingSectionContainer = styled(LandingSectionContainer)`
-  animation: ${slideLeftAnimation} 0.3s cubic-bezier(0, 0, 0.58, 1) forwards;
-`;
-
-const TransitionRightLandingSectionContainer = styled(LandingSectionContainer)`
-  animation: ${() => slideRightAnimation} 0.3s cubic-bezier(0, 0, 0.58, 1) forwards;
-`;
+const TransitionLandingSectionContainer = styled(LandingSectionContainer)<{
+  $direction: 'left' | 'right';
+}>((props) => ({
+  animation: `${
+    props.$direction === 'left' ? slideLeftAnimation : slideRightAnimation
+  } 0.3s cubic-bezier(0, 0, 0.58, 1) forwards`,
+}));
 
 const Logo = styled.img`
   width: 135px;
@@ -155,13 +155,13 @@ const OnboardingContainer = styled.div((props) => ({
   marginBottom: props.theme.space.l,
 }));
 
-const TransitionLeftOnboardingContainer = styled(OnboardingContainer)`
-  animation: ${() => slideLeftAnimation} 0.3s cubic-bezier(0, 0, 0.58, 1) forwards;
-`;
-
-const TransitionRightOnboardingContainer = styled(OnboardingContainer)`
-  animation: ${() => slideRightAnimation} 0.3s cubic-bezier(0, 0, 0.58, 1) forwards;
-`;
+const TransitionOnboardingContainer = styled(OnboardingContainer)<{
+  $direction: 'left' | 'right';
+}>((props) => ({
+  animation: `${
+    props.$direction === 'left' ? slideLeftAnimation : slideRightAnimation
+  } 0.3s cubic-bezier(0, 0, 0.58, 1) forwards`,
+}));
 
 const OnBoardingImage = styled.img(() => ({
   marginTop: -26,
@@ -201,7 +201,9 @@ const RestoreButton = styled(Button)((props) => ({
 function Landing() {
   const { t } = useTranslation('translation', { keyPrefix: 'LANDING_SCREEN' });
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
-  const [animationComplete, setAnimationComplete] = useState(false);
+  const [animationComplete, setAnimationComplete] = useState(
+    process.env.SKIP_ANIMATION_WALLET_STARTUP === 'true',
+  );
   const [slideTransitions, setSlideTransitions] = useState(false);
   const [transitionDirection, setTransitionDirection] = useState<'left' | 'right'>('right');
   const navigate = useNavigate();
@@ -305,24 +307,19 @@ function Landing() {
     if (slideTransitions) {
       switch (currentStepIndex) {
         case 0:
-          return transitionDirection === 'left' ? (
-            <TransitionLeftLandingSectionContainer key={currentStepIndex}>
+          return (
+            <TransitionLandingSectionContainer
+              key={currentStepIndex}
+              $direction={transitionDirection}
+            >
               {renderLandingSection()}
-            </TransitionLeftLandingSectionContainer>
-          ) : (
-            <TransitionRightLandingSectionContainer key={currentStepIndex}>
-              {renderLandingSection()}
-            </TransitionRightLandingSectionContainer>
+            </TransitionLandingSectionContainer>
           );
         default:
-          return transitionDirection === 'left' ? (
-            <TransitionLeftOnboardingContainer key={currentStepIndex}>
+          return (
+            <TransitionOnboardingContainer key={currentStepIndex} $direction={transitionDirection}>
               {renderOnboardingContent(currentStepIndex)}
-            </TransitionLeftOnboardingContainer>
-          ) : (
-            <TransitionRightOnboardingContainer key={currentStepIndex}>
-              {renderOnboardingContent(currentStepIndex)}
-            </TransitionRightOnboardingContainer>
+            </TransitionOnboardingContainer>
           );
       }
     } else {

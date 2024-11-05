@@ -26,10 +26,6 @@ export const EditNonceButton = styled(Button)((props) => ({
   padding: props.theme.space.xxs,
   '&.tertiary': {
     color: props.theme.colors.tangerine,
-    '&:focus-visible': {
-      color: props.theme.colors.tangerine,
-      opacity: 0.8,
-    },
     '&:hover:enabled': {
       color: props.theme.colors.tangerine,
       opacity: 0.8,

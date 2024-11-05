@@ -41,3 +41,18 @@ header h2 {
 :focus {
   outline: none;
 }
+
+:focus-visible {
+  position: relative;
+  border-radius: 4px;
+}
+
+:focus-visible::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  outline: 1px solid #ffffff;
+  border: 2px solid #ee7a30;
+  border-radius: inherit;
+  pointer-events: none;
+}

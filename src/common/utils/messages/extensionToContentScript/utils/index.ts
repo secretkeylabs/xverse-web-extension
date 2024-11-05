@@ -1,5 +1,5 @@
 import type { Permission } from '@components/permissionsManager/schemas';
-import { loadPermissionsStore } from '@components/permissionsManager/utils';
+import { getPermissionsStore } from '@components/permissionsManager/utils';
 import { type ContentScriptMessage } from '../schemas';
 
 /**
@@ -37,7 +37,7 @@ function clientOriginToUrlMatchPattern(tabOrigin: string) {
  * @public
  */
 export async function sendMessageConnectedClient(id: string, message: ContentScriptMessage) {
-  const [error, store] = await loadPermissionsStore();
+  const [error, store] = await getPermissionsStore();
   if (error) {
     // eslint-disable-next-line no-console
     console.error('Failed to load permissions store:', error);
@@ -76,7 +76,7 @@ export async function sendMessageConnectedClient(id: string, message: ContentScr
  * @public
  */
 export async function sendMessageConnectedClients(message: ContentScriptMessage) {
-  const [error, store] = await loadPermissionsStore();
+  const [error, store] = await getPermissionsStore();
   if (error) {
     // eslint-disable-next-line no-console
     console.error('Failed to load permissions store:', error);
@@ -108,10 +108,10 @@ export async function sendMessageConnectedClients(message: ContentScriptMessage)
  * @public
  */
 export async function sendMessageAuthorizedConnectedClients(
-  permission: Omit<Permission, 'clientId'>,
+  permissions: Omit<Permission, 'clientId'>[],
   message: ContentScriptMessage,
 ) {
-  const [error, store] = await loadPermissionsStore();
+  const [error, store] = await getPermissionsStore();
   if (error) {
     // eslint-disable-next-line no-console
     console.error('Failed to load permissions store:', error);
@@ -125,10 +125,12 @@ export async function sendMessageAuthorizedConnectedClients(
   }
 
   const authorizedClientIds = [...store.permissions]
-    .filter(
-      (p) =>
-        p.resourceId === permission.resourceId &&
-        [...permission.actions].every((action) => p.actions.has(action)),
+    .filter((p) =>
+      permissions.some(
+        (permission) =>
+          p.resourceId === permission.resourceId &&
+          [...permission.actions].every((action) => p.actions.has(action)),
+      ),
     )
     .map((p) => p.clientId);
 
@@ -152,6 +154,17 @@ export async function sendMessageAuthorizedConnectedClients(
     (tab): tab is chrome.tabs.Tab & { readonly id: number } => typeof tab.id === 'number',
   );
 
+  sendMessageContentScriptTabs(
+    clientTabs.map((tab) => tab.id),
+    message,
+  );
+}
+
+export async function sendMessageToOrigin(origin: string, message: ContentScriptMessage) {
+  const url = clientOriginToUrlMatchPattern(origin);
+  const clientTabs = (await chrome.tabs.query({ url })).filter(
+    (tab): tab is chrome.tabs.Tab & { readonly id: number } => typeof tab.id === 'number',
+  );
   sendMessageContentScriptTabs(
     clientTabs.map((tab) => tab.id),
     message,

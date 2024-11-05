@@ -26,7 +26,7 @@ function ShowOrdinalReceiveAlert({ onOrdinalReceiveAlertClose }: Props) {
       onButtonClick={onOrdinalReceiveAlertClose}
       tickMarkButtonText={t('DO_NOT_SHOW_MESSAGE')}
       tickMarkButtonClick={onToggleReceiveOrdinalAlert}
-      tickMarkButtonChecked={!showOrdinalReceiveAlert ?? false}
+      tickMarkButtonChecked={!showOrdinalReceiveAlert}
     />
   );
 }

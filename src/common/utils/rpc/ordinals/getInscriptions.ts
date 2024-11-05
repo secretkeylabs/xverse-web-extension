@@ -22,10 +22,14 @@ const handleGetInscriptions = async (message: RpcRequestMessage, port: chrome.ru
     return;
   }
   const { origin, tabId } = makeContext(port);
-  const [loadError, store] = await utils.loadPermissionsStore();
+  const [loadError, store] = await utils.getPermissionsStore();
 
   if (loadError) {
-    sendInternalErrorMessage({ tabId, messageId: message.id });
+    sendInternalErrorMessage({
+      tabId,
+      messageId: message.id,
+      message: 'Error loading permissions store.',
+    });
     return;
   }
 
@@ -80,11 +84,17 @@ const handleGetInscriptions = async (message: RpcRequestMessage, port: chrome.ru
     return;
   }
 
+  await utils.permissionsStoreMutex.runExclusive(async () => {
+    // Update the last used time for the client
+    utils.updateClientMetadata(store, origin, { lastUsed: new Date().getTime() });
+    await utils.savePermissionsStore(store);
+  });
+
   const ordinalsApi = new OrdinalsApi({ network: network.type });
 
   try {
     const inscriptionsList = await ordinalsApi.getInscriptions(
-      existingAccount.ordinalsAddress,
+      existingAccount.btcAddresses.taproot.address,
       parseResult.output.params.offset,
       parseResult.output.params.limit,
     );

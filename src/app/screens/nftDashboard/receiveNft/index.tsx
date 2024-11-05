@@ -3,24 +3,26 @@ import plusIcon from '@assets/img/dashboard/plus.svg';
 import stacksIcon from '@assets/img/dashboard/stx_icon.svg';
 import ordinalsIcon from '@assets/img/nftDashboard/ordinals_icon.svg';
 import ActionButton from '@components/button';
-import UpdatedBottomModal from '@components/updatedBottomModal';
+import ReceiveCardComponent from '@components/receiveCardComponent';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Plus } from '@phosphor-icons/react';
+import Sheet from '@ui-library/sheet';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import ReceiveCardComponent from '../../../components/receiveCardComponent';
+
+const GalleryModalContainer = styled.div((props) => ({
+  padding: `0 ${props.theme.space.m}`,
+}));
 
 const ColumnContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   marginTop: props.theme.space.l,
   marginBottom: props.theme.space.xl,
-  paddingLeft: props.theme.space.m,
-  paddingRight: props.theme.space.m,
   gap: props.theme.space.m,
 }));
 
@@ -80,12 +82,12 @@ const VerifyButtonContainer = styled.div((props) => ({
   marginBottom: props.theme.spacing(6),
 }));
 
-interface Props {
+type Props = {
   visible: boolean;
   onClose: () => void;
   setOrdinalReceiveAlert: () => void;
   isGalleryOpen: boolean;
-}
+};
 
 function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAlert }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
@@ -140,14 +142,15 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAle
           onQrAddressClick={onOrdinalsReceivePress}
           showVerifyButton={choseToVerifyAddresses}
           currency="ORD"
-        >
-          <IconContainer>
-            <Icon src={ordinalsIcon} />
-            <IconBackground>
-              <Plus weight="bold" size={12} />
-            </IconBackground>
-          </IconContainer>
-        </ReceiveCardComponent>
+          icon={
+            <IconContainer>
+              <Icon src={ordinalsIcon} />
+              <IconBackground>
+                <Plus weight="bold" size={12} />
+              </IconBackground>
+            </IconContainer>
+          }
+        />
       )}
 
       {stxAddress && (
@@ -157,14 +160,15 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAle
           onQrAddressClick={onReceivePress}
           showVerifyButton={choseToVerifyAddresses}
           currency="STX"
-        >
-          <IconContainer>
-            <Icon src={stacksIcon} />
-            <IconBackground>
-              <Plus weight="bold" size={12} />
-            </IconBackground>
-          </IconContainer>
-        </ReceiveCardComponent>
+          icon={
+            <IconContainer>
+              <Icon src={stacksIcon} />
+              <IconBackground>
+                <Plus weight="bold" size={12} />
+              </IconBackground>
+            </IconContainer>
+          }
+        />
       )}
 
       {isLedgerAccount(selectedAccount) && !stxAddress && (
@@ -214,16 +218,14 @@ function ReceiveNftModal({ visible, onClose, isGalleryOpen, setOrdinalReceiveAle
           <img src={Cross} alt="cross" />
         </ButtonImage>
       </RowContainer>
-      {isReceivingAddressesVisible ? receiveContent : verifyOrViewAddresses}
+      <GalleryModalContainer>
+        {isReceivingAddressesVisible ? receiveContent : verifyOrViewAddresses}
+      </GalleryModalContainer>
     </>
   ) : (
-    <UpdatedBottomModal
-      visible={visible}
-      header={t('RECEIVE_NFT')}
-      onClose={handleReceiveModalClose}
-    >
+    <Sheet visible={visible} title={t('RECEIVE_NFT')} onClose={handleReceiveModalClose}>
       {isReceivingAddressesVisible ? receiveContent : verifyOrViewAddresses}
-    </UpdatedBottomModal>
+    </Sheet>
   );
 }
 

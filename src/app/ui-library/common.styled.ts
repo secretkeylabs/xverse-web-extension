@@ -1,4 +1,4 @@
-import { Tab, TabList } from 'react-tabs';
+import { TabList } from 'react-tabs';
 import styled from 'styled-components';
 import type { Color, Typography } from 'theme';
 
@@ -65,28 +65,6 @@ export const StickyButtonContainer = styled.div`
  */
 export const StyledTabList = styled(TabList)`
   display: flex;
-  gap: ${(props) => props.theme.spacing(2)}px;
+  gap: ${(props) => props.theme.space.xxs};
   list-style: none;
-`;
-
-export const StyledTab = styled(Tab)`
-  ${(props) => props.theme.typography.body_bold_s}
-  padding: ${(props) => props.theme.spacing(4)}px ${(props) => props.theme.spacing(6)}px;
-  border-radius: ${(props) => props.theme.radius(2)}px;
-  text-transform: uppercase;
-  cursor: pointer;
-  color: ${(props) => props.theme.colors.white_0};
-  background-color: ${(props) => props.theme.colors.elevation0};
-
-  :hover {
-    background-color: ${(props) => props.theme.colors.elevation1};
-  }
-
-  &.react-tabs__tab--selected {
-    background-color: ${(props) => props.theme.colors.elevation3};
-  }
-
-  :active {
-    background-color: ${(props) => props.theme.colors.elevation5};
-  }
 `;

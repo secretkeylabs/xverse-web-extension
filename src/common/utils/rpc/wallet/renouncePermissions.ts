@@ -1,5 +1,6 @@
 /* eslint-disable import/prefer-default-export */
 import { getTabIdFromPort } from '@common/utils';
+import { dispatchEventToOrigin } from '@common/utils/messages/extensionToContentScript/dispatchEvent';
 import { makeContext } from '@common/utils/popup';
 import * as utils from '@components/permissionsManager/utils';
 import {
@@ -8,10 +9,7 @@ import {
 } from '@sats-connect/core';
 import * as v from 'valibot';
 import { handleInvalidMessage } from '../handle-invalid-message';
-import {
-  sendAccessDeniedResponseMessage,
-  sendInternalErrorMessage,
-} from '../responseMessages/errors';
+import { sendInternalErrorMessage } from '../responseMessages/errors';
 import { sendRenouncePermissionsSuccessResponseMessage } from '../responseMessages/wallet';
 
 export const handleRenouncePermissions = async (
@@ -26,21 +24,24 @@ export const handleRenouncePermissions = async (
   }
 
   const { origin, tabId } = makeContext(port);
-  const [error, store] = await utils.loadPermissionsStore();
+  const [error, store] = await utils.getPermissionsStore();
 
   if (error) {
-    sendInternalErrorMessage({ tabId, messageId: parseResult.output.id });
-    return;
-  }
-
-  if (!store) {
-    sendAccessDeniedResponseMessage({ tabId, messageId: parseResult.output.id });
+    sendInternalErrorMessage({
+      tabId,
+      messageId: parseResult.output.id,
+      message: 'Error loading permissions store.',
+    });
     return;
   }
 
   await utils.permissionsStoreMutex.runExclusive(async () => {
-    utils.removeClient(store.clients, store.permissions, origin);
+    utils.removeClient(store, origin);
     utils.savePermissionsStore(store);
+  });
+
+  dispatchEventToOrigin(origin, {
+    type: 'disconnect',
   });
 
   sendRenouncePermissionsSuccessResponseMessage({

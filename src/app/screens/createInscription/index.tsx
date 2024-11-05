@@ -27,10 +27,9 @@ import ConfirmScreen from '@components/confirmScreen';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { isLedgerAccount } from '@utils/helper';
 
-import InscribeSection from '@components/confirmBtcTransaction/inscribeSection';
 import useBtcClient from '@hooks/apiClients/useBtcClient';
-import useCoinRates from '@hooks/queries/useCoinRates';
 import useConfirmedBtcBalance from '@hooks/queries/useConfirmedBtcBalance';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import Button from '@ui-library/button';
@@ -38,6 +37,7 @@ import { StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
 import { trackMixPanel } from '@utils/mixpanel';
+import InscribeSection from 'app/components/confirmBtcTransaction/sections/inscribeSection';
 import CompleteScreen from './CompleteScreen';
 import EditFee from './EditFee';
 import ErrorModal from './ErrorModal';
@@ -108,7 +108,7 @@ function CreateInscription() {
   const selectedAccount = useSelectedAccount();
   const { ordinalsAddress, btcAddress } = selectedAccount;
   const { network, fiatCurrency } = useWalletSelector();
-  const { btcFiatRate } = useCoinRates();
+  const { btcFiatRate } = useSupportedCoinRates();
 
   const transactionContext = useTransactionContext();
 
@@ -481,7 +481,6 @@ function CreateInscription() {
             />
           )}
           <Sheet
-            title=""
             visible={isLedgerConnectVisible}
             onClose={isConnectSuccess ? undefined : handleLedgerConnectCancel}
           >

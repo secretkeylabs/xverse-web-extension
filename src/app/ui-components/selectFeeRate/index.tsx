@@ -16,25 +16,31 @@ const RowContainer = styled.div`
 
 const Label = styled.span<{
   $size: 'm' | 's';
-  $variant: 'action' | 'light' | 'mid' | 'dark';
-  $clickable?: boolean;
+  $variant: 'light' | 'dark';
 }>`
   ${(props) =>
     props.$size === 'm'
       ? props.theme.typography.body_medium_m
       : props.theme.typography.body_medium_s};
   color: ${(props) =>
-    props.$variant === 'action'
-      ? props.theme.colors.tangerine
-      : props.$variant === 'light'
-      ? props.theme.colors.white_0
-      : props.$variant === 'mid'
-      ? props.theme.colors.white_200
-      : props.theme.colors.white_400};
+    props.$variant === 'light' ? props.theme.colors.white_0 : props.theme.colors.white_400};
+  transition: color 0.1s ease;
+  margin-bottom: ${(props) => props.theme.space.xxs};
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: ${(props) => props.theme.space.xxs};
+`;
+
+const EditButton = styled.button<{
+  $clickable?: boolean;
+}>`
+  ${(props) => props.theme.typography.body_medium_m};
+  color: ${(props) => props.theme.colors.tangerine};
+  background-color: transparent;
   transition: color 0.1s ease;
   margin-bottom: ${(props) => props.theme.space.xxs};
   cursor: ${(props) => (props.$clickable ? 'pointer' : 'default')};
-  transition: color 0.1s ease;
 
   user-select: ${(props) => (props.$clickable ? 'none' : 'auto')};
 
@@ -103,22 +109,18 @@ function SelectFeeRate({
   const [selected, setSelected] = useState<FeePriority | 'custom' | null>(null);
 
   useEffect(() => {
-    if (feeRate) {
-      if (feeRate === feeRates.high?.toString()) {
-        if (!selected) {
-          setSelected('high');
-        }
-      }
-      if (feeRate === feeRates.medium?.toString()) {
-        if (!selected) {
-          setSelected('medium');
-        }
-      }
-      if (feeRate === feeRates.low?.toString()) {
-        if (!selected) {
-          setSelected('low');
-        }
-      }
+    if (!feeRate || selected) return;
+
+    const feeRateString = feeRate.toString();
+
+    if (feeRateString === feeRates.high?.toString()) {
+      setSelected('high');
+    } else if (feeRateString === feeRates.medium?.toString()) {
+      setSelected('medium');
+    } else if (feeRateString === feeRates.low?.toString()) {
+      setSelected('low');
+    } else {
+      setSelected('custom');
     }
   }, [feeRates, feeRate, selected]);
 
@@ -151,15 +153,13 @@ function SelectFeeRate({
               {feeRateSpeed}{' '}
             </Label>
           )}
-          <Label
+          <EditButton
             data-testid="fee-button"
-            $size="m"
-            $variant="action"
             $clickable={!isLoading}
             onClick={() => setEditing((cur) => !cur)}
           >
             {t('COMMON.EDIT')} <PencilSimple size={16} weight="fill" />
-          </Label>
+          </EditButton>
         </EditRow>
         {/* Fee can either be an absolute amount or a rate */}
         {/* If feeRateUnits is not defined, therefore an absolute fee is used */}

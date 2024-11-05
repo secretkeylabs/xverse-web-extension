@@ -1,51 +1,48 @@
-import { XCircle } from '@phosphor-icons/react';
 import { isInOptions } from '@utils/helper';
 import Modal from 'react-modal';
 import styled, { useTheme } from 'styled-components';
-
-export const CrossButton = styled.button`
-  background-color: transparent;
-  cursor: pointer;
-  display: flex;
-  transition: opacity 0.1s ease;
-
-  &:hover {
-    opacity: 0.8;
-  }
-
-  &:active {
-    opacity: 0.6;
-  }
-`;
+import CrossButton from './crossButton';
 
 const Title = styled.h1((props) => ({
   ...props.theme.typography.body_bold_l,
   flex: 1,
+  width: '100%',
 }));
 
-const RowContainer = styled.div((props) => ({
+const HeaderContainer = styled.div((props) => ({
   display: 'flex',
-  flexDirection: 'row',
+  flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'space-between',
   margin: props.theme.space.m,
+  gap: props.theme.space.m,
+  minHeight: props.theme.space.l,
 }));
 
 const CustomisedModal = styled(Modal)`
-  overflow-y: auto;
   position: absolute;
-  &::-webkit-scrollbar {
-    display: none;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  &:focus-visible::after {
+    border: none;
+    outline: none;
   }
 `;
 
 const BodyContainer = styled.div`
+  position: relative;
+  flex: 1;
+  overflow-y: auto;
   margin: ${(props) => props.theme.space.m};
+  margin-top: 0;
 `;
 
 type Props = {
-  title: string;
+  title?: string;
   visible: boolean;
+  logo?: React.ReactNode;
   children: React.ReactNode;
   onClose?: () => void;
   overlayStylesOverriding?: {};
@@ -56,6 +53,7 @@ type Props = {
 
 function Sheet({
   title,
+  logo,
   children,
   visible,
   onClose,
@@ -97,21 +95,18 @@ function Sheet({
   return (
     <CustomisedModal
       isOpen={visible}
-      parentSelector={() => document.getElementById('app') as HTMLElement}
+      appElement={document.getElementById('app') as HTMLElement}
       ariaHideApp={false}
       style={customStyles}
       className={className}
       shouldCloseOnOverlayClick={shouldCloseOnOverlayClick}
       onRequestClose={onClose}
     >
-      <RowContainer>
+      {onClose && <CrossButton onClick={onClose} />}
+      <HeaderContainer>
+        {logo}
         <Title>{title}</Title>
-        {onClose && (
-          <CrossButton onClick={onClose}>
-            <XCircle color={theme.colors.white_200} weight="fill" size="28" />
-          </CrossButton>
-        )}
-      </RowContainer>
+      </HeaderContainer>
       <BodyContainer>{children}</BodyContainer>
     </CustomisedModal>
   );

@@ -1,52 +1,70 @@
-import getSelectedAccount from '@common/utils/getSelectedAccount';
-import type { Account } from '@secretkeylabs/xverse-core';
-import type { StoreState } from '@stores/index';
+import getSelectedAccount, {
+  embellishAccountWithDetails,
+  type AccountWithDetails,
+} from '@common/utils/getSelectedAccount';
+import useWalletSelector from '@hooks/useWalletSelector';
+import type { BtcPaymentType } from '@secretkeylabs/xverse-core';
 import { useMemo } from 'react';
-import { useSelector } from 'react-redux';
 import useWalletReducer from './useWalletReducer';
 
-const useSelectedAccount = (): Account => {
+const useSelectedAccount = (overridePayAddressType?: BtcPaymentType): AccountWithDetails => {
   const { switchAccount } = useWalletReducer();
+  const {
+    selectedAccountIndex,
+    selectedAccountType,
+    accountsList: softwareAccountsList,
+    ledgerAccountsList,
+    btcPaymentAddressType,
+  } = useWalletSelector();
 
-  const selectedAccountIndex = useSelector(
-    (state: StoreState) => state.walletState.selectedAccountIndex,
-  );
-  const selectedAccountType = useSelector(
-    (state: StoreState) => state.walletState.selectedAccountType,
-  );
-  const softwareAccountsList = useSelector((state: StoreState) => state.walletState.accountsList);
-  const ledgerAccountsList = useSelector(
-    (state: StoreState) => state.walletState.ledgerAccountsList,
-  );
-
-  const selectedAccount = useMemo(() => {
-    const existingAccount = getSelectedAccount({
+  return useMemo(() => {
+    let account = getSelectedAccount({
       selectedAccountIndex,
       selectedAccountType,
       softwareAccountsList,
       ledgerAccountsList,
     });
 
-    if (existingAccount) {
-      return existingAccount;
+    if (!account) {
+      [account] = softwareAccountsList;
+      if (!account) {
+        // this should never happen
+        // if it does, then this hook is being called before onboarding is complete, which is a bug
+        // and should be picked up during dev time
+        throw new Error('No account found');
+      }
+      switchAccount(account);
     }
 
-    const fallbackAccount = softwareAccountsList[0];
+    let accountType = btcPaymentAddressType;
 
-    if (fallbackAccount) {
-      switchAccount(fallbackAccount);
+    if (overridePayAddressType) {
+      switch (overridePayAddressType) {
+        case 'nested':
+          if (account.btcAddresses.nested) {
+            accountType = overridePayAddressType;
+          }
+          break;
+        case 'native':
+          if (account.btcAddresses.native) {
+            accountType = overridePayAddressType;
+          }
+          break;
+        default:
+          break;
+      }
     }
 
-    return fallbackAccount;
+    return embellishAccountWithDetails(account, accountType);
   }, [
     selectedAccountIndex,
     selectedAccountType,
     softwareAccountsList,
     ledgerAccountsList,
     switchAccount,
+    btcPaymentAddressType,
+    overridePayAddressType,
   ]);
-
-  return selectedAccount;
 };
 
 export default useSelectedAccount;

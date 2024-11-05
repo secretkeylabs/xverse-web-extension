@@ -1,26 +1,15 @@
 import RecipientSelector from '@components/recipientSelector';
-import TokenImage from '@components/tokenImage';
-import type { RuneSummary } from '@secretkeylabs/xverse-core';
+import type { BtcPaymentType } from '@secretkeylabs/xverse-core';
 import ConfirmBtcTransaction from 'app/components/confirmBtcTransaction';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import SendLayout from '../../layouts/sendLayout';
+import AccountSelector from './accountSelector';
 import AmountSelector from './amountSelector';
 import type { TransactionSummary } from './helpers';
-import { Step, getNextStep } from './steps';
-
-const TitleContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 0 0;
-`;
-
-const Title = styled.div`
-  ${(props) => props.theme.typography.headline_xs}
-  margin-top: ${(props) => props.theme.spacing(6)}px;
-  margin-bottom: ${(props) => props.theme.spacing(12)}px;
-`;
+import { Step, getNextStep, getPreviousStep } from './steps';
+import Title from './title';
 
 const Container = styled.div`
   display: flex;
@@ -30,11 +19,12 @@ const Container = styled.div`
 
 type Props = {
   summary: TransactionSummary | undefined;
-  runeSummary: RuneSummary | undefined;
   currentStep: Step;
   setCurrentStep: (step: Step) => void;
   recipientAddress: string;
   setRecipientAddress: (address: string) => void;
+  overridePaymentType: BtcPaymentType;
+  setOverridePaymentType: (paymentType: BtcPaymentType) => void;
   amountSats: string;
   setAmountSats: (amount: string) => void;
   feeRate: string;
@@ -43,19 +33,20 @@ type Props = {
   setSendMax: (sendMax: boolean) => void;
   getFeeForFeeRate: (feeRate: number, useEffectiveFeeRate?: boolean) => Promise<number | undefined>;
   onConfirm: () => void;
-  onBack: () => void;
   onCancel: () => void;
   isLoading: boolean;
   isSubmitting: boolean;
+  userCanSwitchPayType: boolean;
 };
 
 function StepDisplay({
   summary,
-  runeSummary,
   currentStep,
   setCurrentStep,
   recipientAddress,
   setRecipientAddress,
+  overridePaymentType,
+  setOverridePaymentType,
   amountSats,
   setAmountSats,
   feeRate,
@@ -64,29 +55,49 @@ function StepDisplay({
   setSendMax,
   getFeeForFeeRate,
   onConfirm,
-  onBack,
   onCancel,
   isLoading,
   isSubmitting,
+  userCanSwitchPayType,
 }: Props) {
   const { t } = useTranslation('translation');
-  const header = (
-    <TitleContainer>
-      <TokenImage currency="BTC" />
-      <Title>{t('SEND.SEND')}</Title>
-    </TitleContainer>
-  );
+
+  const [shouldSkipAccountSelect, setShouldSkipAccountSelect] = useState(false);
+
+  const showAccountSelect = !shouldSkipAccountSelect && userCanSwitchPayType;
+
+  const onBack = () => {
+    if (currentStep > 0) {
+      setCurrentStep(getPreviousStep(currentStep, showAccountSelect));
+    } else {
+      onCancel();
+    }
+  };
+
   switch (currentStep) {
     case Step.SelectRecipient:
       return (
         <SendLayout selectedBottomTab="dashboard" onClickBack={onBack}>
           <Container>
             <RecipientSelector
-              header={header}
+              header={<Title title={t('SEND.SEND')} showBtcIcon />}
               recipientAddress={recipientAddress}
               setRecipientAddress={setRecipientAddress}
-              onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient))}
+              onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient, showAccountSelect))}
               isLoading={isLoading}
+            />
+          </Container>
+        </SendLayout>
+      );
+    case Step.SelectAccount:
+      return (
+        <SendLayout selectedBottomTab="dashboard" onClickBack={onBack}>
+          <Container>
+            <AccountSelector
+              overridePaymentType={overridePaymentType}
+              setOverridePaymentType={setOverridePaymentType}
+              onNext={() => setCurrentStep(getNextStep(Step.SelectAccount, showAccountSelect))}
+              onSkipDetected={() => setShouldSkipAccountSelect(true)}
             />
           </Container>
         </SendLayout>
@@ -96,8 +107,8 @@ function StepDisplay({
         <SendLayout selectedBottomTab="dashboard" onClickBack={onBack}>
           <Container>
             <AmountSelector
-              header={header}
               amountSats={amountSats}
+              overridePaymentType={overridePaymentType}
               setAmountSats={setAmountSats}
               feeRate={feeRate}
               setFeeRate={setFeeRate}
@@ -106,7 +117,7 @@ function StepDisplay({
               fee={(summary as TransactionSummary)?.fee.toString()}
               getFeeForFeeRate={getFeeForFeeRate}
               dustFiltered={(summary as TransactionSummary)?.dustFiltered ?? false}
-              onNext={() => setCurrentStep(getNextStep(Step.SelectAmount))}
+              onNext={() => setCurrentStep(getNextStep(Step.SelectAmount, showAccountSelect))}
               hasSufficientFunds={!!summary || isLoading}
               isLoading={isLoading}
             />
@@ -121,7 +132,6 @@ function StepDisplay({
       return (
         <ConfirmBtcTransaction
           summary={summary}
-          runeSummary={runeSummary}
           isLoading={false}
           confirmText={t('COMMON.CONFIRM')}
           cancelText={t('COMMON.CANCEL')}

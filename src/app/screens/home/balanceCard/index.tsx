@@ -3,18 +3,21 @@ import { useVisibleBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc
 import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useAccountBalance from '@hooks/queries/useAccountBalance';
-import useBtcWalletData from '@hooks/queries/useBtcWalletData';
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSelectedAccountBtcBalance from '@hooks/queries/useSelectedAccountBtcBalance';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { currencySymbolMap } from '@secretkeylabs/xverse-core';
+import { setBalanceHiddenToggleAction } from '@stores/wallet/actions/actionCreators';
 import Spinner from '@ui-library/spinner';
-import { LoaderSize } from '@utils/constants';
-import { calculateTotalBalance } from '@utils/helper';
+import { HIDDEN_BALANCE_LABEL, LoaderSize } from '@utils/constants';
+import { calculateTotalBalance, getAccountBalanceKey } from '@utils/helper';
+import BigNumber from 'bignumber.js';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 const RowContainer = styled.div((props) => ({
@@ -61,8 +64,10 @@ const BalanceContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'flex-start',
+  width: 'fit-content',
   alignItems: 'center',
   gap: props.theme.spacing(5),
+  cursor: 'pointer',
 }));
 
 interface BalanceCardProps {
@@ -73,20 +78,23 @@ interface BalanceCardProps {
 function BalanceCard(props: BalanceCardProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const selectedAccount = useSelectedAccount();
-  const { fiatCurrency, hideStx, accountBalances } = useWalletSelector();
-  const { data: btcBalance } = useBtcWalletData();
+  const dispatch = useDispatch();
+  const { fiatCurrency, hideStx, accountBalances, balanceHidden } = useWalletSelector();
+  const { confirmedPaymentBalance: btcBalance, isLoading: btcBalanceLoading } =
+    useSelectedAccountBtcBalance();
   const { data: stxData } = useStxWalletData();
-  const { btcFiatRate, stxBtcRate } = useCoinRates();
+  const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const { setAccountBalance } = useAccountBalance();
   const { isLoading, isRefetching } = props;
-  const oldTotalBalance = accountBalances[selectedAccount.btcAddress];
-  const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
-  const { visible: brc20CoinsList } = useVisibleBrc20FungibleTokens();
-  const { visible: runesCoinList } = useVisibleRuneFungibleTokens();
+  // TODO: refactor this into a hook
+  const oldTotalBalance = accountBalances[getAccountBalanceKey(selectedAccount)];
+  const { data: sip10CoinsList } = useVisibleSip10FungibleTokens();
+  const { data: brc20CoinsList } = useVisibleBrc20FungibleTokens();
+  const { data: runesCoinList } = useVisibleRuneFungibleTokens();
 
   const balance = calculateTotalBalance({
-    stxBalance: stxData?.balance.toString() ?? '0',
-    btcBalance: btcBalance?.toString() ?? '0',
+    stxBalance: BigNumber(stxData?.balance ?? 0).toString(),
+    btcBalance: (btcBalance ?? 0).toString(),
     sipCoinsList: sip10CoinsList,
     brcCoinsList: brc20CoinsList,
     runesCoinList,
@@ -96,14 +104,14 @@ function BalanceCard(props: BalanceCardProps) {
   });
 
   useEffect(() => {
-    if (!balance || !selectedAccount || isLoading || isRefetching) {
+    if (!balance || !selectedAccount || isLoading || btcBalanceLoading || isRefetching) {
       return;
     }
 
     if (oldTotalBalance !== balance) {
       setAccountBalance(selectedAccount, balance);
     }
-  }, [balance, oldTotalBalance, selectedAccount, isLoading, isRefetching]);
+  }, [balance, oldTotalBalance, selectedAccount, isLoading, isRefetching, btcBalanceLoading]);
 
   useEffect(() => {
     (() => {
@@ -125,6 +133,12 @@ function BalanceCard(props: BalanceCardProps) {
     })();
   });
 
+  const onClickBalance = () => dispatch(setBalanceHiddenToggleAction({ toggle: !balanceHidden }));
+
+  const onKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') onClickBalance();
+  };
+
   return (
     <>
       <RowContainer>
@@ -138,20 +152,29 @@ function BalanceCard(props: BalanceCardProps) {
           <BarLoader loaderSize={LoaderSize.LARGE} />
         </BarLoaderContainer>
       ) : (
-        <BalanceContainer>
-          <NumericFormat
-            value={balance}
-            displayType="text"
-            prefix={`${currencySymbolMap[fiatCurrency]}`}
-            thousandSeparator
-            renderText={(value: string) => (
-              <BalanceAmountText data-testid="total-balance-value">{value}</BalanceAmountText>
-            )}
-          />
-          {isRefetching && (
-            <div>
-              <Spinner color="white" size={16} />
-            </div>
+        <BalanceContainer onClick={onClickBalance} role="button" tabIndex={0} onKeyDown={onKeyDown}>
+          {balanceHidden && (
+            <BalanceAmountText data-testid="total-balance-value">
+              {HIDDEN_BALANCE_LABEL}
+            </BalanceAmountText>
+          )}
+          {!balanceHidden && (
+            <>
+              <NumericFormat
+                value={balance}
+                displayType="text"
+                prefix={`${currencySymbolMap[fiatCurrency]}`}
+                thousandSeparator
+                renderText={(value: string) => (
+                  <BalanceAmountText data-testid="total-balance-value">{value}</BalanceAmountText>
+                )}
+              />
+              {isRefetching && (
+                <div>
+                  <Spinner color="white" size={16} />
+                </div>
+              )}
+            </>
           )}
         </BalanceContainer>
       )}

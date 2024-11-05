@@ -1,18 +1,11 @@
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import useCanUserSwitchPaymentType from '@hooks/useCanUserSwitchPaymentType';
 import useDebounce from '@hooks/useDebounce';
-import useHasFeature from '@hooks/useHasFeature';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
-import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
-import {
-  AnalyticsEvents,
-  btcTransaction,
-  FeatureId,
-  parseSummaryForRunes,
-  type RuneSummary,
-  type Transport,
-} from '@secretkeylabs/xverse-core';
-import { isInOptions, isLedgerAccount } from '@utils/helper';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { AnalyticsEvents, btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
+import { isInOptions } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -22,7 +15,7 @@ import {
   type TransactionSummary,
 } from './helpers';
 import StepDisplay from './stepDisplay';
-import { getPreviousStep, Step } from './steps';
+import { Step } from './steps';
 
 function SendBtcScreen() {
   const navigate = useNavigate();
@@ -31,9 +24,13 @@ function SendBtcScreen() {
 
   useResetUserFlow('/send-btc');
 
+  const { selectedAccountType, btcPaymentAddressType } = useWalletSelector();
+  const [overridePaymentType, setOverridePaymentType] = useState(btcPaymentAddressType);
+
   const { data: btcFeeRate, isLoading: feeRatesLoading } = useBtcFeeRate();
-  const selectedAccount = useSelectedAccount();
-  const transactionContext = useTransactionContext();
+  const transactionContext = useTransactionContext(overridePaymentType);
+  const userCanSwitchPayType = useCanUserSwitchPaymentType();
+
   const [recipientAddress, setRecipientAddress] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -47,13 +44,12 @@ function SendBtcScreen() {
 
   const [transaction, setTransaction] = useState<btcTransaction.EnhancedTransaction | undefined>();
   const [summary, setSummary] = useState<TransactionSummary | undefined>();
-  const [runeSummary, setRuneSummary] = useState<RuneSummary | undefined>();
-  const hasRunesSupport = useHasFeature(FeatureId.RUNES_SUPPORT);
 
   useEffect(() => {
     if (!feeRate && btcFeeRate && !feeRatesLoading) {
       setFeeRate(btcFeeRate.regular.toString());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- specifically don't care if feeRate changes
   }, [btcFeeRate, feeRatesLoading]);
 
   const generateTransactionAndSummary = async (feeRateOverride?: number) => {
@@ -76,7 +72,6 @@ function SendBtcScreen() {
     if (!debouncedRecipient || !feeRate) {
       setTransaction(undefined);
       setSummary(undefined);
-      setRuneSummary(undefined);
       return;
     }
 
@@ -93,16 +88,6 @@ function SendBtcScreen() {
           setSummary(transactionDetails.summary);
           if (sendMax) {
             setAmountSats(transactionDetails.summary.outputs[0].amount.toString());
-          }
-          if (hasRunesSupport) {
-            setRuneSummary(
-              await parseSummaryForRunes(
-                transactionContext,
-                transactionDetails.summary,
-                transactionContext.network,
-                { separateTransfersOnNoExternalInputs: true },
-              ),
-            );
           }
         } else {
           setTransaction(undefined);
@@ -128,22 +113,15 @@ function SendBtcScreen() {
     return () => {
       isCancelled.current = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- don't care if generateTxnAndSummary changes
   }, [transactionContext, debouncedRecipient, amountSats, feeRate, sendMax]);
 
   const handleCancel = () => {
-    if (isLedgerAccount(selectedAccount) && isInOption) {
+    if (selectedAccountType === 'ledger' && isInOption) {
       window.close();
       return;
     }
-    navigate('/');
-  };
-
-  const handleBackButtonClick = () => {
-    if (currentStep > 0) {
-      setCurrentStep(getPreviousStep(currentStep));
-    } else {
-      handleCancel();
-    }
+    navigate(`/coinDashboard/BTC`);
   };
 
   const calculateFeeForFeeRate = async (desiredFeeRate: number): Promise<number | undefined> => {
@@ -160,7 +138,7 @@ function SendBtcScreen() {
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
         protocol: 'bitcoin',
         action: 'transfer',
-        wallet_type: selectedAccount.accountType || 'software',
+        wallet_type: selectedAccountType,
       });
 
       navigate('/tx-status', {
@@ -202,11 +180,12 @@ function SendBtcScreen() {
   return (
     <StepDisplay
       summary={summary}
-      runeSummary={runeSummary}
       currentStep={currentStep}
       setCurrentStep={setCurrentStep}
       recipientAddress={recipientAddress}
       setRecipientAddress={setRecipientAddress}
+      overridePaymentType={overridePaymentType}
+      setOverridePaymentType={setOverridePaymentType}
       amountSats={amountSats}
       setAmountSats={setAmountSatsSafe}
       feeRate={feeRate}
@@ -214,11 +193,11 @@ function SendBtcScreen() {
       getFeeForFeeRate={calculateFeeForFeeRate}
       sendMax={sendMax}
       setSendMax={setSendMax}
-      onBack={handleBackButtonClick}
       onCancel={handleCancel}
       onConfirm={handleSubmit}
       isLoading={isLoading}
       isSubmitting={isSubmitting}
+      userCanSwitchPayType={userCanSwitchPayType}
     />
   );
 }

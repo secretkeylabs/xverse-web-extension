@@ -1,5 +1,5 @@
 import FiatAmountText from '@components/fiatAmountText';
-import useCoinRates from '@hooks/queries/useCoinRates';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getBtcFiatEquivalent } from '@secretkeylabs/xverse-core';
 import { EMPTY_LABEL } from '@utils/constants';
@@ -74,7 +74,7 @@ function SpeedUpBtcTransaction({
   const { t } = useTranslation('translation', { keyPrefix: 'SPEED_UP_TRANSACTION' });
   const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
   const { fiatCurrency } = useWalletSelector();
-  const { btcFiatRate } = useCoinRates();
+  const { btcFiatRate } = useSupportedCoinRates();
 
   const theme = useTheme();
 

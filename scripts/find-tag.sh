@@ -10,10 +10,17 @@ if [[ -z "$TAG" ]]; then
   exit 1
 fi
 
-if cat releases.json | jq '.[].tag_name' | grep $TAG; then
+if cat releases.json  | jq -r '.[].tag_name' | grep $TAG; then
   echo found releases matching $TAG
-  LATEST_TAG=$(cat releases.json | jq -r '.[].tag_name' | grep $TAG | head -1)
-  LATEST_RC=$(echo $LATEST_TAG | grep rc | sed 's/.*-rc.\(.*\)/\1/')
+
+  for i in $(cat releases.json  | jq -r '.[].tag_name' | grep $TAG); do
+    LATEST_RUNNING=$(echo $i | grep rc | sed 's/.*-rc.\(.*\)/\1/')
+
+    if [[ -z "$LATEST_RC" || $LATEST_RUNNING -gt $LATEST_RC ]]; then
+      LATEST_RC=$LATEST_RUNNING
+    fi
+  done
+
   if [[ -z "$LATEST_RC" ]]; then
     echo $TAG was already released
     exit 1;

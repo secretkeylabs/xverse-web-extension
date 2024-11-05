@@ -1,7 +1,6 @@
 import Eye from '@assets/img/createPassword/Eye.svg';
 import EyeSlash from '@assets/img/createPassword/EyeSlash.svg';
 import logo from '@assets/img/xverse_logo.svg';
-import useSanityCheck from '@hooks/useSanityCheck';
 import useSeedVault from '@hooks/useSeedVault';
 import useSeedVaultMigration from '@hooks/useSeedVaultMigration';
 import useWalletReducer from '@hooks/useWalletReducer';
@@ -46,7 +45,7 @@ const AppVersion = styled.p((props) => ({
   ...props.theme.typography.body_s,
   color: props.theme.colors.white_0,
   textAlign: 'right',
-  marginTop: props.theme.spacing(8),
+  marginTop: props.theme.space.m,
 }));
 
 const TopSectionContainer = styled.div((props) => ({
@@ -69,10 +68,10 @@ const PasswordInputContainer = styled.div((props) => ({
   alignItems: 'center',
   width: '100%',
   border: `1px solid ${props.theme.colors.elevation3}`,
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
+  paddingLeft: props.theme.space.m,
+  paddingRight: props.theme.space.m,
   borderRadius: props.theme.radius(1),
-  marginTop: props.theme.spacing(4),
+  marginTop: props.theme.space.xs,
 }));
 
 const PasswordInput = styled.input((props) => ({
@@ -94,7 +93,7 @@ const LandingTitle = styled.h1((props) => ({
 }));
 
 const ButtonContainer = styled.div((props) => ({
-  marginTop: props.theme.spacing(8),
+  marginTop: props.theme.space.m,
   width: '100%',
 }));
 
@@ -102,15 +101,19 @@ const ErrorMessage = styled.h2((props) => ({
   ...props.theme.typography.body_medium_m,
   textAlign: 'left',
   color: props.theme.colors.feedback.error,
-  marginTop: props.theme.spacing(4),
+  marginTop: props.theme.space.xs,
 }));
 
-const ForgotPasswordButton = styled.a((props) => ({
+const ForgotPasswordButton = styled.button((props) => ({
   ...props.theme.typography.body_m,
   textAlign: 'center',
-  marginTop: props.theme.spacing(12),
+  marginTop: props.theme.space.l,
   color: props.theme.colors.white_0,
   textDecoration: 'underline',
+  backgroundColor: 'transparent',
+  ':hover': {
+    textDecoration: 'none',
+  },
 }));
 
 function Login(): JSX.Element {
@@ -118,13 +121,13 @@ function Login(): JSX.Element {
   const navigate = useNavigate();
   const { unlockWallet } = useWalletReducer();
   const { hasSeed } = useSeedVault();
-  const { getSanityCheck } = useSanityCheck();
   const { migrateCachedStorage, isVaultUpdated } = useSeedVaultMigration();
-  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
-  const [password, setPassword] = useState<string>('');
-  const [error, setError] = useState<string>('');
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [showMigration, setShowMigration] = useState(false);
+
   const styles = useSpring({
     from: {
       opacity: 0,
@@ -168,8 +171,7 @@ function Login(): JSX.Element {
     // Check for SeedVault Migrations
     try {
       const hasMigrated = await isVaultUpdated();
-      const sanityCheck = await getSanityCheck('X-Current-Version');
-      if (!hasMigrated && sanityCheck) {
+      if (!hasMigrated) {
         setShowMigration(true);
       } else {
         setIsVerifying(false);
@@ -194,7 +196,7 @@ function Login(): JSX.Element {
 
   useEffect(() => {
     const keyDownHandler = async (event) => {
-      if (event.key === 'Enter') {
+      if (event.key === 'Enter' && !!password && document.activeElement?.id === 'password-input') {
         event.preventDefault();
         await handleVerifyPassword();
       }
@@ -214,7 +216,7 @@ function Login(): JSX.Element {
     <>
       {!showMigration ? (
         <ScreenContainer>
-          <AppVersion>Beta</AppVersion>
+          <AppVersion>{t('BETA_VERSION')}</AppVersion>
           <ContentContainer style={styles}>
             <TopSectionContainer>
               <Logo src={logo} />
@@ -223,6 +225,7 @@ function Login(): JSX.Element {
             <PasswordInputLabel>{t('PASSWORD_INPUT_LABEL')}</PasswordInputLabel>
             <PasswordInputContainer>
               <PasswordInput
+                id="password-input"
                 type={isPasswordVisible ? 'text' : 'password'}
                 value={password}
                 onChange={handlePasswordChange}

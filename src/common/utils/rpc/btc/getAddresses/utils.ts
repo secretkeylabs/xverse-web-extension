@@ -1,8 +1,8 @@
 /* eslint-disable import/prefer-default-export */
+import type { AccountWithDetails } from '@common/utils/getSelectedAccount';
 import { AddressPurpose, AddressType } from '@sats-connect/core';
-import type { Account } from '@secretkeylabs/xverse-core';
 
-export function accountPurposeAddresses(account: Account, purposes: AddressPurpose[]) {
+export function accountPurposeAddresses(account: AccountWithDetails, purposes: AddressPurpose[]) {
   return purposes.map((purpose) => {
     if (purpose === AddressPurpose.Ordinals) {
       return {
@@ -24,7 +24,7 @@ export function accountPurposeAddresses(account: Account, purposes: AddressPurpo
       address: account.btcAddress,
       publicKey: account.btcPublicKey,
       purpose: AddressPurpose.Payment,
-      addressType: account.accountType === 'ledger' ? AddressType.p2wpkh : AddressType.p2sh,
+      addressType: account.btcAddressType === 'native' ? AddressType.p2wpkh : AddressType.p2sh,
     };
   });
 }

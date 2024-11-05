@@ -29,7 +29,7 @@ import ForgotPassword from '@screens/forgotPassword';
 import Home from '@screens/home';
 import Landing from '@screens/landing';
 import LedgerAddStxAddress from '@screens/ledger/addStxAddress';
-import ConfirmLedgerTransaction from '@screens/ledger/confirmLedgerTransaction';
+import ConfirmLedgerStxTransaction from '@screens/ledger/confirmLedgerStxTransaction';
 import ImportLedger from '@screens/ledger/importLedgerAccount';
 import VerifyLedger from '@screens/ledger/verifyLedgerAccountAddress';
 import Legal from '@screens/legal';
@@ -38,6 +38,7 @@ import ManageTokens from '@screens/manageTokens';
 import MintRune from '@screens/mintRune';
 import NftCollection from '@screens/nftCollection';
 import NftDashboard from '@screens/nftDashboard';
+import NftDashboardHidden from '@screens/nftDashboard/hidden';
 import SupportedRarities from '@screens/nftDashboard/supportedRarities';
 import NftDetailScreen from '@screens/nftDetail';
 import OrdinalDetailScreen from '@screens/ordinalDetail';
@@ -46,6 +47,7 @@ import RareSatsBundle from '@screens/rareSatsBundle';
 import RareSatsDetailScreen from '@screens/rareSatsDetail/rareSatsDetail';
 import Receive from '@screens/receive';
 import RestoreWallet from '@screens/restoreWallet';
+import RuneListingBatchSigningScreen from '@screens/runeListingBatchSigning';
 import SendBrc20OneStepScreen from '@screens/sendBrc20OneStep';
 import SendBtcScreen from '@screens/sendBtc';
 import SendInscriptionsRequest from '@screens/sendInscriptionsRequest';
@@ -56,6 +58,7 @@ import SendStxScreen from '@screens/sendStx';
 import Setting from '@screens/settings';
 import About from '@screens/settings/about';
 import AdvancedSettings from '@screens/settings/advanced';
+import PaymentAddressTypeSelector from '@screens/settings/advanced/paymentAddressTypeSelector';
 import RestoreFunds from '@screens/settings/advanced/restoreFunds';
 import RecoverRunes from '@screens/settings/advanced/restoreFunds/recoverRunes';
 import RestoreOrdinals from '@screens/settings/advanced/restoreFunds/restoreOrdinals';
@@ -70,18 +73,18 @@ import BackupWalletScreen from '@screens/settings/security/backupWallet';
 import ChangePasswordScreen from '@screens/settings/security/changePassword';
 import SignBatchPsbtRequest from '@screens/signBatchPsbtRequest';
 import SignMessageRequest from '@screens/signMessageRequest';
-import SignMessageRequestInApp from '@screens/signMessageRequestInApp';
 import SignPsbtRequest from '@screens/signPsbtRequest';
+import SignRuneDelistingMessage from '@screens/signRuneDelistingMessage';
 import SignatureRequest from '@screens/signatureRequest';
 import SpeedUpTransactionScreen from '@screens/speedUpTransaction';
 import Stacking from '@screens/stacking';
 import SwapScreen from '@screens/swap';
-import SwapStacksScreen from '@screens/swap/swap-stacks';
-import SwapStacksConfirmation from '@screens/swap/swapStacksConfirmation';
 import TransactionRequest from '@screens/transactionRequest';
 import TransactionStatus from '@screens/transactionStatus';
+import MultipleMarketplaceListingResult from '@screens/transactionStatus/multipleMarketplaceListingResult';
 import TransferRunesRequest from '@screens/transferRunesRequest';
 import UnlistRuneScreen from '@screens/unlistRune';
+import UnlistRuneUtxoScreen from '@screens/unlistRuneUtxo';
 import WalletExists from '@screens/walletExists';
 import BtcSendRequest from 'app/screens/btcSendRequest';
 import ListRuneScreen from 'app/screens/listRune';
@@ -155,14 +158,6 @@ const router = createHashRouter([
         element: <SwapScreen />,
       },
       {
-        path: 'swap-stacks',
-        element: <SwapStacksScreen />,
-      },
-      {
-        path: 'swap-stacks-confirm',
-        element: <SwapStacksConfirmation />,
-      },
-      {
         path: RoutePaths.ConfirmStacksTransaction,
         element: <ConfirmStxTransaction />,
       },
@@ -187,8 +182,8 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'confirm-ledger-tx',
-        element: <ConfirmLedgerTransaction />,
+        path: 'confirm-ledger-stx-tx',
+        element: <ConfirmLedgerStxTransaction />,
       },
       {
         path: 'backup',
@@ -263,10 +258,18 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'batch-psbt-signing-request',
+        path: RequestsRoutes.SignBatchBtcTx,
         element: (
           <AuthGuard>
             <SignBatchPsbtRequest />
+          </AuthGuard>
+        ),
+      },
+      {
+        path: RequestsRoutes.RuneListingBatchSigning,
+        element: (
+          <AuthGuard>
+            <RuneListingBatchSigningScreen />
           </AuthGuard>
         ),
       },
@@ -371,6 +374,14 @@ const router = createHashRouter([
         ),
       },
       {
+        path: RoutePaths.PreferredAddress,
+        element: (
+          <AuthGuard>
+            <PaymentAddressTypeSelector />
+          </AuthGuard>
+        ),
+      },
+      {
         path: 'restore-funds',
         element: <RestoreFunds />,
       },
@@ -411,12 +422,20 @@ const router = createHashRouter([
         element: <TransactionStatus />,
       },
       {
+        path: 'multiple-marketplace-listing-result',
+        element: <MultipleMarketplaceListingResult />,
+      },
+      {
         path: 'buy/:currency',
         element: <Buy />,
       },
       {
         path: 'list-rune/:runeId',
         element: <ListRuneScreen />,
+      },
+      {
+        path: 'unlist-rune/:runeId/utxo',
+        element: <UnlistRuneUtxoScreen />,
       },
       {
         path: 'unlist-rune/:runeId',
@@ -443,10 +462,10 @@ const router = createHashRouter([
         ),
       },
       {
-        path: RequestsRoutes.SignMessageRequestInApp,
+        path: RequestsRoutes.SignRuneDelistingMessage,
         element: (
           <AuthGuard>
-            <SignMessageRequestInApp />
+            <SignRuneDelistingMessage />
           </AuthGuard>
         ),
       },
@@ -552,6 +571,14 @@ const router = createHashRouter([
         ),
       },
       {
+        path: 'nft-dashboard/hidden',
+        element: (
+          <AuthGuard>
+            <NftDashboardHidden />
+          </AuthGuard>
+        ),
+      },
+      {
         path: 'nft-dashboard/rare-sats-bundle',
         element: (
           <AuthGuard>
@@ -560,7 +587,7 @@ const router = createHashRouter([
         ),
       },
       {
-        path: 'nft-dashboard/ordinals-collection/:id',
+        path: 'nft-dashboard/ordinals-collection/:id/:from?',
         element: (
           <AuthGuard>
             <OrdinalsCollection />
@@ -572,7 +599,7 @@ const router = createHashRouter([
         element: <NftDetailScreen />,
       },
       {
-        path: 'nft-dashboard/ordinal-detail/:id',
+        path: 'nft-dashboard/ordinal-detail/:id/:from?',
         element: <OrdinalDetailScreen />,
       },
       {
@@ -584,7 +611,7 @@ const router = createHashRouter([
         element: <SendNft />,
       },
       {
-        path: 'nft-dashboard/nft-collection/:id',
+        path: 'nft-dashboard/nft-collection/:id/:from?',
         element: (
           <AuthGuard>
             <NftCollection />

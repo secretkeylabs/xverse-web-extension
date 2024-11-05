@@ -29,7 +29,7 @@ const TransactionTitleText = styled.p((props) => ({
 export default function TransactionTitle(props: TransactionTitleProps) {
   const { transaction } = props;
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
-  const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
+  const { data: sip10CoinsList } = useVisibleSip10FungibleTokens();
 
   const getTokenTransferTitle = (
     tx: StxTransactionData | BtcTransactionData | Brc20HistoryTransactionData,

@@ -4,6 +4,9 @@ import { isInOptions } from '@utils/helper';
 import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 
+const BUTTON_WIDTH = 56;
+const BUTTON_HEIGHT = 32;
+
 const RowContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
@@ -11,46 +14,61 @@ const RowContainer = styled.div((props) => ({
   width: '100%',
   minHeight: 64,
   justifyContent: 'space-between',
-  paddingLeft: props.theme.spacing(30),
-  paddingRight: props.theme.spacing(30),
+  paddingLeft: props.theme.space.xl,
+  paddingRight: props.theme.space.xl,
   borderTop: `1px solid ${props.theme.colors.elevation3}`,
 }));
 
 const MovingDiv = styled(animated.div)((props) => ({
-  width: 56,
-  height: 32,
+  width: BUTTON_WIDTH,
+  height: BUTTON_HEIGHT,
   backgroundColor: props.theme.colors.white_900,
   position: 'absolute',
-  bottom: 18,
-  left: 20,
+  bottom: BUTTON_HEIGHT / 2,
   borderRadius: 16,
 }));
 
 const Button = styled.button({
-  backgroundColor: 'transparent',
   zIndex: 2,
+  width: BUTTON_WIDTH,
+  height: BUTTON_HEIGHT,
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderRadius: 16,
+  backgroundColor: 'transparent',
 });
 
 export type Tab = 'dashboard' | 'nft' | 'stacking' | 'explore' | 'settings';
 
-interface Props {
+type Props = {
   tab: Tab;
-}
+};
+
 function BottomTabBar({ tab }: Props) {
   const navigate = useNavigate();
   const theme = useTheme();
 
   const getPosition = () => {
-    if (tab === 'nft') return 78;
-    if (tab === 'stacking') return 132;
-    if (tab === 'explore') return 186;
-    if (tab === 'settings') return 239;
-    return 25;
+    const containerPadding = parseInt(theme.space.xl, 10);
+    const gap = (window.innerWidth - 2 * containerPadding - 5 * BUTTON_WIDTH) / 4;
+
+    switch (tab) {
+      case 'nft':
+        return containerPadding + BUTTON_WIDTH + gap;
+      case 'stacking':
+        return containerPadding + 2 * (BUTTON_WIDTH + gap);
+      case 'explore':
+        return containerPadding + 3 * (BUTTON_WIDTH + gap);
+      case 'settings':
+        return containerPadding + 4 * (BUTTON_WIDTH + gap);
+      default: // 'dashboard'
+        return containerPadding;
+    }
   };
 
   const styles = useSpring({
-    from: { x: getPosition() }, // TODO: enable slide animation
-    to: { x: getPosition() },
+    left: getPosition(), // TODO: enable slide animation
     config: {
       duration: 200,
       easing: easings.easeOutCirc,

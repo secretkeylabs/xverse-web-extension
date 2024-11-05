@@ -1,7 +1,7 @@
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
-import { delay } from '@common/utils/ledger';
+import { delay } from '@common/utils/promises';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
@@ -19,6 +19,7 @@ import useRbfTransactionData, {
 } from '@hooks/useRbfTransactionData';
 import useSeedVault from '@hooks/useSeedVault';
 import useSelectedAccount from '@hooks/useSelectedAccount';
+import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { CarProfile, Lightning, RocketLaunch, ShootingStar } from '@phosphor-icons/react';
@@ -77,6 +78,7 @@ function SpeedUpTransactionScreen() {
   const selectedStacksNetwork = useNetworkSelector();
   const isBtc = isBtcTransaction(stxTransaction || btcTransaction);
   const [isBroadcasting, setIsBroadcasting] = useState(false);
+  const transactionContext = useTransactionContext();
 
   const handleClickFeeButton = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (e.currentTarget.value === 'custom') {
@@ -218,7 +220,7 @@ function SpeedUpTransactionScreen() {
       const signedTx = await rbfTransaction.getReplacementTransaction({
         feeRate: Number(feeRateInput),
         ledgerTransport: transport,
-        getSeedPhrase: getSeed,
+        context: transactionContext,
       });
 
       await btcClient.sendRawTransaction(signedTx.hex);
