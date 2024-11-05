@@ -8,6 +8,7 @@ import OptionsDialog from '@components/optionsDialog/optionsDialog';
 import useOptionsDialog from '@hooks/useOptionsDialog';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import { DotsThreeVertical } from '@phosphor-icons/react';
+import RoutePaths from 'app/routes/paths';
 
 const Container = styled.div((props) => ({
   display: 'flex',
@@ -74,7 +75,7 @@ function AccountHeaderComponent({
 
   const handleAccountSelect = () => {
     if (!disableAccountSwitch) {
-      navigate('/account-list', { state: { from: pathname } });
+      navigate(RoutePaths.AccountList, { state: { from: pathname } });
     }
   };
 
