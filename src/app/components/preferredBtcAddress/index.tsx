@@ -105,7 +105,7 @@ export function GlobalPreferredBtcAddressSheet({
   });
 
   const { changeBtcPaymentAddressType } = useWalletReducer();
-  const { btcPaymentAddressType, allowNestedSegWitAddress } = useWalletSelector();
+  const { btcPaymentAddressType } = useWalletSelector();
 
   const onSaveAddressType = (newType: BtcPaymentType) => {
     if (newType !== btcPaymentAddressType) {
@@ -114,11 +114,6 @@ export function GlobalPreferredBtcAddressSheet({
     }
     onHide();
   };
-
-  if (!allowNestedSegWitAddress) {
-    onHide();
-    return null;
-  }
 
   return (
     <PreferredBtcAddressSheet
