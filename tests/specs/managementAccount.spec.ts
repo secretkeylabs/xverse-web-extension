@@ -15,7 +15,8 @@ test.describe('Account Management', () => {
     await expect(page.url()).toContain('account-list');
     await expect(wallet.labelAccountName).toHaveCount(1);
     await expect(wallet.buttonGenerateAccount).toBeVisible();
-    await expect(wallet.buttonConnectHardwareWallet).toBeVisible();
+    await expect(wallet.buttonConnectLedgerWallet).toBeVisible();
+    await expect(wallet.buttonConnectKeystoneWallet).toBeVisible();
     await expect(wallet.buttonBack).toBeVisible();
     await expect(wallet.buttonAccountOptions).toBeVisible();
     await expect(wallet.accountBalance).toBeVisible();
