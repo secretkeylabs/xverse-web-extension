@@ -3,10 +3,12 @@ import useGetCoinsMarketData from '@hooks/queries/useGetCoinsMarketData';
 import useGetExchangeRate from '@hooks/queries/useGetExchangeRate';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
+import useHasFeature from '@hooks/useHasFeature';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CaretDown, CaretUp } from '@phosphor-icons/react';
 import {
   currencySymbolMap,
+  FeatureId,
   getFiatEquivalent,
   type FungibleToken,
 } from '@secretkeylabs/xverse-core';
@@ -73,6 +75,11 @@ function PercentageChange({
 
   const btcMarketData = useGetCoinsMarketData('bitcoin');
   const stxMarketData = useGetCoinsMarketData('blockstack');
+
+  const showPortfolioTracking = useHasFeature(FeatureId.PORTFOLIO_TRACKING);
+  if (!showPortfolioTracking) {
+    return null;
+  }
 
   let currentPrice = 0;
   const [currentBalance, oldBalance] = ftCurrencyPairs
