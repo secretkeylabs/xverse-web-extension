@@ -72,6 +72,7 @@ export const useGetSip10FungibleTokens = (select?: (data: FungibleTokenWithState
     queryKey: ['sip10-fungible-tokens', network.type, stxAddress, fiatCurrency],
     queryFn,
     enabled: Boolean(network && stxAddress),
+    keepPreviousData: true,
     select: selectWithDerivedState,
   });
 };

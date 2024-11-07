@@ -1,6 +1,5 @@
-import { createUnsecuredToken, decodeToken } from 'jsontokens';
-import { parse, stringify } from 'superjson';
-import { ZodSchema } from 'zod';
+import { createUnsecuredToken } from 'jsontokens';
+import { stringify } from 'superjson';
 
 export function getTabIdFromPort(port: chrome.runtime.Port) {
   const tabId = port.sender?.tab?.id;
@@ -22,17 +21,6 @@ export function getOriginFromPort(port: chrome.runtime.Port) {
   return origin;
 }
 
-export function isUndefined(value: unknown): value is undefined {
-  return typeof value === 'undefined';
-}
-
 export function stringifyData(data: unknown) {
   return createUnsecuredToken(stringify(data));
-}
-
-export function parseData<TData>(stringifiedData: string, schema: ZodSchema<TData>) {
-  const parseResult = schema.safeParse(parse(decodeToken(stringifiedData).payload as any));
-  if (!parseResult.success) return [parseResult.error, null] as const;
-
-  return [null, parseResult.data] as const;
 }

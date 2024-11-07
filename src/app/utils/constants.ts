@@ -1,5 +1,4 @@
 /* eslint-disable prefer-destructuring */
-/* eslint-disable prefer-destructuring */
 import type { Provider } from '@sats-connect/core';
 import type { NetworkType } from '@secretkeylabs/xverse-core';
 
@@ -66,6 +65,7 @@ export const DEFAULT_TRANSITION_OPTIONS = {
 
 export const MAX_ACC_NAME_LENGTH = 20;
 // UI
+export const ANIMATION_EASING = (progress: number) => 1 - (1 - progress) ** 3; // ease out (0, 0, 0.58, 1)
 export const EMPTY_LABEL = '--';
 export const HIDDEN_BALANCE_LABEL = '●●●●●●';
 export const OPTIONS_DIALOG_WIDTH = 179;

@@ -40,7 +40,8 @@ const Wrapper = styled.div<{ $isTransparent?: boolean; $size?: number }>((props)
 
 const Title = styled.span((props) => ({
   ...props.theme.typography.body_medium_s,
-  color: props.theme.colors.white_0,
+  lineHeight: '140%',
+  color: props.theme.colors.white_200,
   textAlign: 'center',
 }));
 

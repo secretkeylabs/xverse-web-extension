@@ -3,7 +3,7 @@ import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useOrdinalsServiceApi from '@hooks/apiClients/useOrdinalsServiceApi';
 import useRunesApi from '@hooks/apiClients/useRunesApi';
 import useTransactionContext from '@hooks/useTransactionContext';
-import { RpcErrorCode, type MintRunesParams, type Params } from '@sats-connect/core';
+import { RpcErrorCode, type Params, type RunesMintParams } from '@sats-connect/core';
 import { generateTransaction, type TransactionBuildPayload } from '@screens/sendBtc/helpers';
 import { type Rune, type Transport } from '@secretkeylabs/xverse-core';
 import { useState } from 'react';
@@ -28,7 +28,7 @@ const useRuneMintRequestParams = () => {
 
 const useMintRequest = (): {
   runeInfo: Rune | null;
-  mintRequest: MintRunesParams;
+  mintRequest: RunesMintParams;
   orderTx: TransactionBuildPayload | null;
   mintError: { code: number | undefined; message: string } | null;
   feeRate: string;

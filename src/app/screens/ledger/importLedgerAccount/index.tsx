@@ -1,6 +1,5 @@
 import { getDeviceNewAccountIndex, getNewAccountId } from '@common/utils/ledger';
 import { delay } from '@common/utils/promises';
-import FullScreenHeader from '@components/ledger/fullScreenHeader';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
@@ -404,7 +403,6 @@ function ImportLedger(): JSX.Element {
 
   return (
     <Container>
-      <FullScreenHeader />
       {transition((style) => (
         <>
           <OnBoardingContentContainer

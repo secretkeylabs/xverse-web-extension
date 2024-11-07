@@ -5,7 +5,6 @@ import { delay } from '@common/utils/promises';
 import ActionButton from '@components/button';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import LedgerFailView from '@components/ledger/failLedgerView';
-import FullScreenHeader from '@components/ledger/fullScreenHeader';
 import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletReducer from '@hooks/useWalletReducer';
@@ -270,7 +269,6 @@ function AddStxAddress(): JSX.Element {
   if (mismatch) {
     return (
       <Container>
-        <FullScreenHeader />
         <LedgerFailViewContainer>
           <LedgerFailView title={t('TITLE_FAILED')} text={t('ADDRESS_MISMATCH')} />
           <LedgerFailButtonsContainer>
@@ -285,7 +283,6 @@ function AddStxAddress(): JSX.Element {
 
   return (
     <Container>
-      <FullScreenHeader />
       {transition((style) => (
         <>
           <OnBoardingContentContainer style={style}>{renderContent()}</OnBoardingContentContainer>

@@ -2,8 +2,6 @@ import getSelectedAccount from '@common/utils/getSelectedAccount';
 import { getDeviceAccountIndex } from '@common/utils/ledger';
 import { dispatchEventAuthorizedConnectedClients } from '@common/utils/messages/extensionToContentScript/dispatchEvent';
 import { delay } from '@common/utils/promises';
-import { makeAccountResourceId } from '@components/permissionsManager/resources';
-import type { Permission } from '@components/permissionsManager/schemas';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
@@ -12,19 +10,20 @@ import {
   decryptSeedPhraseCBC,
   getAccountFromSeedPhrase,
   getBnsName,
+  permissions,
   restoreWalletWithAccounts,
   StacksMainnet,
   StacksNetwork,
   StacksTestnet,
   type Account,
   type NetworkType,
+  type Permissions,
   type SettingsNetwork,
 } from '@secretkeylabs/xverse-core';
 import {
   ChangeBtcPaymentAddressType,
   ChangeNetworkAction,
   changeShowDataCollectionAlertAction,
-  EnableNestedSegWitAddress,
   resetWalletAction,
   selectAccount,
   setWalletHideStxAction,
@@ -429,24 +428,28 @@ const useWalletReducer = () => {
 
       dispatch(selectAccount(nextAccount));
 
-      const changeEventPermissions: Omit<Permission, 'clientId'>[] = [
+      const accountId = permissions.utils.account.makeAccountId({
+        accountId: nextAccount.id,
+        networkType: network.type,
+        masterPubKey: nextAccount.masterPubKey,
+      });
+      const changeEventPermissions: Omit<Permissions.Store.Permission, 'clientId'>[] = [
         {
-          resourceId: makeAccountResourceId({
-            accountId: nextAccount.id,
-            masterPubKey: nextAccount.masterPubKey,
-            networkType: network.type,
-          }),
-          actions: new Set(['read']),
+          type: 'account',
+          resourceId: permissions.resources.account.makeAccountResourceId(accountId),
+          actions: { read: true },
         },
       ];
       if (currentlySelectedAccount) {
+        const currentAccountId = permissions.utils.account.makeAccountId({
+          accountId: currentlySelectedAccount.id,
+          networkType: network.type,
+          masterPubKey: currentlySelectedAccount.masterPubKey,
+        });
         changeEventPermissions.push({
-          resourceId: makeAccountResourceId({
-            accountId: currentlySelectedAccount.id,
-            masterPubKey: currentlySelectedAccount.masterPubKey,
-            networkType: network.type,
-          }),
-          actions: new Set(['read']),
+          type: 'account',
+          resourceId: permissions.resources.account.makeAccountResourceId(currentAccountId),
+          actions: { read: true },
         });
       }
 
@@ -474,20 +477,26 @@ const useWalletReducer = () => {
       dispatchEventAuthorizedConnectedClients(
         [
           {
-            resourceId: makeAccountResourceId({
-              accountId: currentlySelectedAccount.id,
-              masterPubKey: currentlySelectedAccount.masterPubKey,
-              networkType: network.type,
-            }),
-            actions: new Set(['read']),
+            type: 'account',
+            resourceId: permissions.resources.account.makeAccountResourceId(
+              permissions.utils.account.makeAccountId({
+                accountId: currentlySelectedAccount.id,
+                masterPubKey: currentlySelectedAccount.masterPubKey,
+                networkType: network.type,
+              }),
+            ),
+            actions: { read: true },
           },
           {
-            resourceId: makeAccountResourceId({
-              accountId: currentlySelectedAccount.id,
-              masterPubKey: currentlySelectedAccount.masterPubKey,
-              networkType: changedNetwork.type,
-            }),
-            actions: new Set(['read']),
+            type: 'account',
+            resourceId: permissions.resources.account.makeAccountResourceId(
+              permissions.utils.account.makeAccountId({
+                accountId: currentlySelectedAccount.id,
+                masterPubKey: currentlySelectedAccount.masterPubKey,
+                networkType: changedNetwork.type,
+              }),
+            ),
+            actions: { read: true },
           },
         ],
         { type: 'networkChange' },
@@ -565,10 +574,6 @@ const useWalletReducer = () => {
     dispatch(updateSavedNamesAction(network.type, updatedSavedNames));
   };
 
-  const enableNestedSegWitAddress = () => {
-    dispatch(EnableNestedSegWitAddress());
-  };
-
   const changeBtcPaymentAddressType = async (btcPaymentAddressType: 'native' | 'nested') => {
     dispatch(ChangeBtcPaymentAddressType(btcPaymentAddressType));
 
@@ -576,12 +581,15 @@ const useWalletReducer = () => {
       dispatchEventAuthorizedConnectedClients(
         [
           {
-            resourceId: makeAccountResourceId({
-              accountId: currentlySelectedAccount.id,
-              masterPubKey: currentlySelectedAccount.masterPubKey,
-              networkType: network.type,
-            }),
-            actions: new Set(['read']),
+            type: 'account',
+            resourceId: permissions.resources.account.makeAccountResourceId(
+              permissions.utils.account.makeAccountId({
+                accountId: currentlySelectedAccount.id,
+                masterPubKey: currentlySelectedAccount.masterPubKey,
+                networkType: network.type,
+              }),
+            ),
+            actions: { read: true },
           },
         ],
         { type: 'accountChange' },
@@ -605,7 +613,6 @@ const useWalletReducer = () => {
     renameSoftwareAccount,
     toggleStxVisibility,
     changeShowDataCollectionAlert,
-    enableNestedSegWitAddress,
     changeBtcPaymentAddressType,
   };
 };

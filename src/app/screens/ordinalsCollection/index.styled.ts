@@ -2,7 +2,6 @@ import { BetterBarLoader } from '@components/barLoader';
 import Separator from '@components/separator';
 import WebGalleryButton from '@components/webGalleryButton';
 import WrenchErrorMessage from '@components/wrenchErrorMessage';
-import { GridContainer } from '@screens/nftDashboard/collectiblesTabs/index.styled';
 import Button from '@ui-library/button';
 import styled from 'styled-components';
 
@@ -48,20 +47,6 @@ export const BottomBarContainer = styled.div({
   marginTop: 'auto',
 });
 
-export const StyledSeparator = styled(Separator)`
-  margin-bottom: ${(props) => props.theme.space.xxl};
-`;
-
-export const StyledGridContainer = styled(GridContainer)`
-  margin-top: ${(props) => props.theme.space.s};
-  padding: 0 ${(props) => props.theme.space.xs};
-  padding-bottom: ${(props) => props.theme.space.xl};
-  max-width: 1224px;
-  margin-left: auto;
-  margin-right: auto;
-  width: 100%;
-`;
-
 /* components */
 
 export const StyledWebGalleryButton = styled(WebGalleryButton)`
@@ -72,22 +57,8 @@ export const StyledWrenchErrorMessage = styled(WrenchErrorMessage)`
   margin-top: ${(props) => props.theme.space.xxl};
 `;
 
-export const BackButtonContainer = styled.div`
-  display: flex;
-  margin-bottom: ${(props) => props.theme.space.xxl};
-`;
-
-export const BackButton = styled.button((props) => ({
-  display: 'flex',
-  alignItems: 'center',
-  gap: props.theme.space.xxs,
-  background: 'transparent',
-  marginBottom: props.theme.spacing(12),
-  color: props.theme.colors.white_0,
-}));
-
 export const NoCollectiblesText = styled.p((props) => ({
-  ...props.theme.body_bold_m,
+  ...props.theme.typography.body_bold_m,
   color: props.theme.colors.white_200,
   marginTop: props.theme.spacing(16),
   marginBottom: 'auto',

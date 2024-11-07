@@ -1,5 +1,6 @@
+import { sha256 } from '@noble/hashes/sha2';
+import { bytesToHex } from '@noble/hashes/utils';
 import { AnalyticsEvents, type AnalyticsEventProperties } from '@secretkeylabs/xverse-core';
-import { sha256 } from 'js-sha256';
 import type { Callback, RequestOptions } from 'mixpanel-browser';
 import { getMixpanelInstance, mixpanelInstances } from '../mixpanelSetup';
 
@@ -49,7 +50,7 @@ export const optInMixPanel = (masterPubKey?: string) => {
     getMixpanelInstance(instanceKey).opt_in_tracking();
 
     if (masterPubKey) {
-      getMixpanelInstance(instanceKey).identify(sha256(masterPubKey));
+      getMixpanelInstance(instanceKey).identify(bytesToHex(sha256(masterPubKey)));
     }
   });
 };

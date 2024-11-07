@@ -1,6 +1,17 @@
-import BottomModal from '@components/bottomModal';
 import Button from '@ui-library/button';
+import CrossButton from '@ui-library/crossButton';
 import styled from 'styled-components';
+
+export const CloseContainer = styled.div((props) => ({
+  display: 'flex',
+  justifyContent: 'flex-end',
+  marginBottom: props.theme.space.s,
+}));
+
+export const CrossButtonInline = styled(CrossButton)((props) => ({
+  position: 'relative',
+  marginBottom: props.theme.space.s,
+}));
 
 export const OuterContainer = styled.div`
   display: flex;
@@ -44,6 +55,7 @@ export const LoaderContainer = styled.div((props) => ({
 export const ReviewTransactionText = styled.h1((props) => ({
   ...props.theme.headline_s,
   color: props.theme.colors.white_0,
+  marginBottom: props.theme.space.xs,
   textAlign: 'left',
 }));
 
@@ -63,14 +75,6 @@ export const BundleLinkText = styled.div((props) => ({
   ...props.theme.typography.body_medium_m,
   marginRight: props.theme.space.xxs,
 }));
-
-export const StyledSheet = styled(BottomModal)`
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  max-height: 100% !important;
-  background-color: ${(props) => props.theme.colors.elevation0} !important;
-`;
 
 export const ButtonsContainer = styled.div((props) => ({
   display: 'flex',

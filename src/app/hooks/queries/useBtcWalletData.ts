@@ -17,6 +17,7 @@ const useBtcWalletData = () => {
     queryFn: fetchBtcWalletData,
     enabled: !!btcAddress,
     staleTime: 10 * 1000, // 10 secs
+    keepPreviousData: true,
   });
 };
 

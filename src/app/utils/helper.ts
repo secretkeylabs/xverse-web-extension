@@ -12,6 +12,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { ChainID } from '@stacks/transactions';
 import { getFtBalance } from '@utils/tokens';
+import RoutePaths from 'app/routes/paths';
 import BigNumber from 'bignumber.js';
 import type { TFunction } from 'react-i18next';
 import {
@@ -343,3 +344,31 @@ export const satsToBtcString = (num: BigNumber) =>
     .replace(/\.?0+$/, '');
 
 export const sanitizeRuneName = (runeName) => runeName.replace(/[^A-Za-z]+/g, '').toUpperCase();
+
+export type TabType = 'dashboard' | 'nft' | 'stacking' | 'explore' | 'settings';
+
+export const getActiveTab = (currentPath: string): TabType => {
+  if (
+    currentPath.includes('/nft-dashboard') ||
+    currentPath.includes('/ordinal-detail') ||
+    currentPath.includes('send-ordinal') ||
+    currentPath.includes('send-nft')
+  ) {
+    return 'nft';
+  }
+
+  if (currentPath.includes('/stacking')) {
+    return 'stacking';
+  }
+
+  if (currentPath.includes('/explore')) {
+    return 'explore';
+  }
+
+  if (currentPath.includes(RoutePaths.Settings)) {
+    return 'settings';
+  }
+
+  // Default to dashboard for all other routes
+  return 'dashboard';
+};

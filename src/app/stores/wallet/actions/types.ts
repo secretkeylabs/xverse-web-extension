@@ -19,7 +19,6 @@ export const SetFeeMultiplierKey = 'SetFeeMultiplierKey';
 export const ChangeFiatCurrencyKey = 'ChangeFiatCurrency';
 export const ChangeNetworkKey = 'ChangeNetwork';
 export const ChangeBtcPaymentAddressTypeKey = 'ChangeBtcPaymentAddressTypeKey';
-export const EnableNestedSegWitAddressKey = 'EnableNestedSegWitAddressKey';
 export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
 export const RareSatsNoticeDismissedKey = 'RareSatsNoticeDismissedKey';
 export const ChangeHasActivatedRareSatsKey = 'ChangeHasActivatedRareSatsKey';
@@ -63,7 +62,6 @@ export interface WalletState {
   selectedAccountIndex: number;
   selectedAccountType: AccountType;
   btcPaymentAddressType: BtcPaymentType;
-  allowNestedSegWitAddress: boolean;
   network: SettingsNetwork; // currently selected network urls and type
   savedNetworks: SettingsNetwork[]; // previously set network urls for type
   encryptedSeed: string;
@@ -132,10 +130,6 @@ export interface ChangeFiatCurrency {
 export interface ChangeNetwork {
   type: typeof ChangeNetworkKey;
   network: SettingsNetwork;
-}
-
-export interface EnableNestedSegWitAddress {
-  type: typeof EnableNestedSegWitAddressKey;
 }
 
 export interface ChangeBtcPaymentAddressType {
@@ -315,7 +309,6 @@ export type WalletActions =
   | SetFeeMultiplier
   | ChangeFiatCurrency
   | ChangeNetwork
-  | EnableNestedSegWitAddress
   | ChangeBtcPaymentAddressType
   | ChangeActivateOrdinals
   | ChangeActivateRareSats

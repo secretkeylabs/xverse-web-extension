@@ -91,12 +91,6 @@ export function ChangeNetworkAction(network: SettingsNetwork): actions.ChangeNet
   };
 }
 
-export function EnableNestedSegWitAddress(): actions.EnableNestedSegWitAddress {
-  return {
-    type: actions.EnableNestedSegWitAddressKey,
-  };
-}
-
 export function ChangeBtcPaymentAddressType(
   newType: BtcPaymentType,
 ): actions.ChangeBtcPaymentAddressType {

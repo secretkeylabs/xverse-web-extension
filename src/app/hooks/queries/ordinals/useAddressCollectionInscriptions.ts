@@ -48,6 +48,7 @@ const useAddressCollectionInscriptions = (collectionId?: string) => {
         return false;
       },
       staleTime: 60 * 1000, // 1 min
+      keepPreviousData: true,
     },
   );
 };

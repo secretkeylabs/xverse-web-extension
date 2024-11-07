@@ -27,7 +27,6 @@ import {
 } from '@secretkeylabs/xverse-core';
 import Button, { LinkButton } from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
-import SnackBar from '@ui-library/snackBar';
 import { formatNumber, satsToBtcString } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { getFtBalance } from '@utils/tokens';
@@ -78,6 +77,7 @@ const RouteContainer = styled.div((props) => ({
   flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems: 'center',
+  gap: props.theme.space.s,
   margin: `${props.theme.space.l} 0`,
 }));
 
@@ -347,10 +347,7 @@ export default function SwapScreen() {
 
   useEffect(() => {
     if (errorMessage) {
-      const toastId = toast.custom(
-        <SnackBar text={errorMessage} type="error" dismissToast={() => toast.remove(toastId)} />,
-        { duration: 3000 },
-      );
+      toast.error(errorMessage, { duration: 3000 });
       // Reset
       setErrorMessage('');
     }
@@ -417,6 +414,7 @@ export default function SwapScreen() {
       ammProviders={quotes?.amm || []}
       utxoProviders={quotes?.utxo || []}
       stxProviders={quotes?.stx || []}
+      amount={amount}
       toToken={toToken}
       ammProviderClicked={(provider: Quote) => {
         setProvider(true, provider);

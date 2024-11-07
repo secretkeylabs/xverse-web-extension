@@ -11,9 +11,10 @@ import Button from '@ui-library/button';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
 import { trackMixPanel } from '@utils/mixpanel';
+import RoutePaths from 'app/routes/paths';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import AddressPurposeBox from '../addressPurposeBox';
 import PermissionsList from '../permissionsList';
 import {
@@ -33,6 +34,7 @@ import useBtcAddressRequest from './useBtcAddressRequest';
 function BtcSelectAddressScreen() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const { t } = useTranslation('translation', { keyPrefix: 'SELECT_BTC_ADDRESS_SCREEN' });
   const selectedAccount = useSelectedAccount();
   const { network } = useWalletSelector();
@@ -165,7 +167,7 @@ function BtcSelectAddressScreen() {
   );
 
   const handleSwitchAccount = () => {
-    navigate('/account-list?hideListActions=true');
+    navigate(`${RoutePaths.AccountList}?hideListActions=true`);
   };
 
   if (isLoadingIcon) {

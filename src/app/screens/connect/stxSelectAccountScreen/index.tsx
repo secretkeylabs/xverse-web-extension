@@ -9,6 +9,7 @@ import SelectAccount from '@screens/connect/selectAccount';
 import { getAppIconFromWebManifest } from '@secretkeylabs/xverse-core';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
+import RoutePaths from 'app/routes/paths';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -85,7 +86,7 @@ function StxSelectAccountScreen() {
   }, [origin]);
 
   const handleSwitchAccount = () => {
-    navigate('/account-list?hideListActions=true');
+    navigate(`${RoutePaths.AccountList}?hideListActions=true`);
   };
 
   if (isLoadingIcon) {

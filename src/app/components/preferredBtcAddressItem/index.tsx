@@ -1,7 +1,9 @@
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { CheckCircle } from '@phosphor-icons/react';
 import { satsToBtc } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
+import { HIDDEN_BALANCE_LABEL } from '@utils/constants';
 import { getShortTruncatedAddress } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import styled from 'styled-components';
@@ -56,22 +58,24 @@ type Props = {
   isSelected: boolean;
 };
 
-export default function preferredBtcAddressItem({
+export default function PreferredBtcAddressItem({
   title,
   onClick,
   address,
   balanceSats,
   isSelected,
 }: Props) {
+  const { balanceHidden } = useWalletSelector();
   const balance =
     balanceSats !== undefined ? `${satsToBtc(BigNumber(balanceSats.toString()))} BTC` : '';
+
   return (
     <Button type="button" onClick={onClick} $isSelected={isSelected}>
       <BtcIcon src={IconBitcoin} />
       <TextContainer>
         <RowContainer>
           <StyledP typography="body_m">{title}</StyledP>
-          <StyledP typography="body_m">{balance}</StyledP>
+          <StyledP typography="body_m">{balanceHidden ? HIDDEN_BALANCE_LABEL : balance}</StyledP>
         </RowContainer>
         <RowContainer>
           <StyledP typography="body_m" color="white_400">

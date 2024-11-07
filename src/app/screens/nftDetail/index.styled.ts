@@ -1,9 +1,7 @@
+import { BetterBarLoader } from '@components/barLoader';
+import Separator from '@components/separator';
 import { Tooltip } from 'react-tooltip';
 import styled from 'styled-components';
-
-interface DetailSectionProps {
-  $isGallery: boolean;
-}
 
 export const ExtensionContainer = styled.div((props) => ({
   ...props.theme.scrollbar,
@@ -14,13 +12,6 @@ export const ExtensionContainer = styled.div((props) => ({
   flex: 1,
   paddingLeft: props.theme.space.xs,
   paddingRight: props.theme.space.xs,
-}));
-
-export const BackButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  width: 800,
-  marginTop: props.theme.spacing(40),
 }));
 
 export const ButtonContainer = styled.div((props) => ({
@@ -35,31 +26,15 @@ export const ButtonContainer = styled.div((props) => ({
   borderBottom: `1px solid ${props.theme.colors.elevation3}`,
 }));
 
-export const ColumnContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-});
-
-export const NftContainer = styled.div((props) => ({
-  width: 376.5,
-  height: 376.5,
-  display: 'flex',
-  aspectRatio: '1',
-  flexDirection: 'column',
-  justifyContent: 'flex-start',
-  alignItems: 'flex-start',
-  borderRadius: 8,
-  marginBottom: props.theme.space.l,
-}));
-
-export const ExtensionNftContainer = styled.div((props) => ({
-  maxHeight: 148,
-  width: 148,
+export const ExtensionNftContainer = styled.div<{ $isGalleryOpen: boolean }>((props) => ({
+  maxHeight: props.$isGalleryOpen ? 174 : 136,
+  width: props.$isGalleryOpen ? 174 : 136,
   display: 'flex',
   aspectRatio: 1,
   justifyContent: 'center',
   alignItems: 'center',
-  borderRadius: 8,
+  borderRadius: props.theme.radius(2),
+  marginTop: props.theme.space.s,
   marginBottom: props.theme.space.l,
 }));
 
@@ -76,48 +51,18 @@ export const CollectibleText = styled.p((props) => ({
   textAlign: 'center',
 }));
 
-export const NftGalleryTitleText = styled.h1((props) => ({
-  ...props.theme.typography.headline_l,
-  color: props.theme.colors.white_0,
-  marginBottom: props.theme.space.xs,
-}));
-
-export const NftOwnedByText = styled.p((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_400,
-  textAlign: 'center',
-}));
-
-export const OwnerAddressText = styled.p((props) => ({
-  ...props.theme.typography.body_medium_m,
-  textAlign: 'center',
-  marginLeft: props.theme.spacing(3),
-}));
-
 export const BottomBarContainer = styled.div({
   marginTop: 'auto',
-});
-
-export const RowContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'row',
 });
 
 export const GridContainer = styled.div((props) => ({
   display: 'grid',
   width: '100%',
-  marginTop: props.theme.spacing(6),
+  marginTop: props.theme.space.s,
   columnGap: props.theme.space.xs,
   rowGap: props.theme.space.xs,
   gridTemplateColumns: 'repeat(auto-fit,minmax(150px,1fr))',
   marginBottom: props.theme.space.m,
-}));
-
-export const DescriptionContainer = styled.div((props) => ({
-  display: 'flex',
-  marginLeft: props.theme.space.xxl,
-  flexDirection: 'column',
-  marginBottom: props.theme.spacing(30),
 }));
 
 export const AttributeText = styled.p((props) => ({
@@ -134,7 +79,7 @@ export const WebGalleryButton = styled.button((props) => ({
   backgroundColor: 'transparent',
   width: '100%',
   marginTop: props.theme.space.xs,
-  marginBottom: props.theme.space.l,
+  marginBottom: props.theme.space.xs,
 }));
 
 export const WebGalleryButtonText = styled.div((props) => ({
@@ -149,75 +94,45 @@ export const ButtonImage = styled.img((props) => ({
   transform: 'all',
 }));
 
-export const BackButton = styled.button((props) => ({
+export const ExtensionLoaderContainer = styled.div((props) => ({
+  height: '100%',
   display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'flex-start',
+  flexDirection: 'column',
+  justifyContent: 'space-around',
   alignItems: 'center',
-  background: 'transparent',
-  marginBottom: props.theme.space.l,
+  paddingBottom: props.theme.space.l,
+  ...props.theme.scrollbar,
 }));
 
 export const SeeDetailsButtonContainer = styled.div((props) => ({
+  width: '100%',
   marginBottom: props.theme.spacing(27),
   marginTop: props.theme.space.xs,
 }));
 
-export const Button = styled.button<DetailSectionProps>((props) => ({
+export const Button = styled.button((props) => ({
+  ...props.theme.typography.body_medium_m,
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
   backgroundColor: 'transparent',
-  width: props.$isGallery ? 400 : 328,
+  width: '100%',
   height: 44,
   padding: 12,
   borderRadius: 12,
-  marginTop: props.theme.spacing(6),
+  marginTop: props.theme.space.s,
   border: `1px solid ${props.theme.colors.white_800}`,
 }));
 
 export const ButtonText = styled.p((props) => ({
-  ...props.theme.typography.body_m,
   color: props.theme.colors.white_400,
-}));
-
-export const AssetDeatilButtonText = styled.div((props) => ({
-  ...props.theme.typography.body_m,
-  color: props.theme.colors.white_0,
-  marginLeft: 2,
-  textAlign: 'center',
-}));
-
-export const GalleryCollectibleText = styled.p((props) => ({
-  ...props.theme.typography.body_bold_l,
-  color: props.theme.colors.white_400,
-}));
-
-export const GalleryScrollContainer = styled.div((props) => ({
-  ...props.theme.scrollbar,
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-  alignItems: 'center',
 }));
 
 export const ButtonHiglightedText = styled.p((props) => ({
-  ...props.theme.typography.body_m,
   color: props.theme.colors.white_0,
   marginLeft: props.theme.space.xxs,
   marginRight: props.theme.space.xxs,
-}));
-
-export const GalleryRowContainer = styled.div<{
-  $withGap?: boolean;
-}>((props) => ({
-  display: 'flex',
-  alignItems: 'flex-start',
-  marginTop: props.theme.space.m,
-  marginBottom: props.theme.space.l,
-  flexDirection: 'row',
-  columnGap: props.$withGap ? props.theme.space.m : 0,
 }));
 
 export const StyledTooltip = styled(Tooltip)`
@@ -230,31 +145,60 @@ export const StyledTooltip = styled(Tooltip)`
   }
 `;
 
-export const GalleryContainer = styled.div({
-  marginLeft: 'auto',
-  marginRight: 'auto',
+export const StyledBarLoader = styled(BetterBarLoader)<{
+  $withMarginBottom?: boolean;
+}>((props) => ({
+  padding: 0,
+  borderRadius: props.theme.radius(1),
+  marginBottom: props.$withMarginBottom ? props.theme.space.s : 0,
+}));
+
+export const ActionButtonLoader = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  justifyContent: 'center',
   alignItems: 'center',
-  width: '100%',
-  maxWidth: 1224,
-});
+  rowGap: props.theme.space.xs,
+}));
 
-export const NftDetailsContainer = styled.div<DetailSectionProps>((props) => ({
+export const ActionButtonsLoader = styled.div((props) => ({
+  display: 'flex',
+  justifyContent: 'center',
+  columnGap: props.theme.spacing(11),
+}));
+
+export const StyledSeparator = styled(Separator)`
+  width: 100%;
+`;
+
+export const TitleLoader = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+export const NftDetailsContainer = styled.div((props) => ({
   display: 'flex',
   alignItems: 'flex-start',
   flexDirection: 'column',
   wordBreak: 'break-all',
   whiteSpace: 'pre-wrap',
-  width: props.$isGallery ? 400 : '100%',
+  width: '100%',
   marginTop: props.theme.space.m,
 }));
 
-export const DetailSection = styled.div<DetailSectionProps>((props) => ({
+export const DetailSection = styled.div<{
+  $isGallery: boolean;
+}>((props) => ({
   display: 'flex',
   flexDirection: !props.$isGallery ? 'row' : 'column',
   justifyContent: 'center',
   width: '100%',
   columnGap: props.theme.space.m,
+}));
+
+export const InfoContainer = styled.div((props) => ({
+  width: '100%',
+  display: 'flex',
+  justifyContent: 'space-between',
+  padding: `0 ${props.theme.space.m}`,
+  marginTop: props.theme.space.m,
 }));

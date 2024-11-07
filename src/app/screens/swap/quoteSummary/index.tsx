@@ -4,6 +4,7 @@ import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery'
 import useGetSip10TokenInfo from '@hooks/queries/stx/useGetSip10TokenInfo';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import useNetworkSelector from '@hooks/useNetwork';
 import useSearchParamsState from '@hooks/useSearchParamsState';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -11,6 +12,7 @@ import { ArrowDown, ArrowRight, WarningOctagon } from '@phosphor-icons/react';
 import {
   AnalyticsEvents,
   RUNE_DISPLAY_DEFAULTS,
+  capStxFeeAtThreshold,
   getBtcFiatEquivalent,
   getStxFiatEquivalent,
   stxToMicrostacks,
@@ -20,6 +22,7 @@ import {
   type Quote,
   type Token,
 } from '@secretkeylabs/xverse-core';
+import { deserializeTransaction } from '@stacks/transactions';
 import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
 import { StyledP } from '@ui-library/common.styled';
@@ -171,10 +174,6 @@ export default function QuoteSummary({
   selectedIdentifiers,
 }: QuoteSummaryProps) {
   const { t } = useTranslation('translation');
-  const { tokenInfo: sip10ToTokenInfoUSD } = useGetSip10TokenInfo({
-    principal: toToken?.ticker,
-    fiatCurrency: 'USD',
-  });
 
   const { tokenInfo: sip10ToTokenInfo } = useGetSip10TokenInfo({
     principal: toToken?.ticker,
@@ -189,7 +188,7 @@ export default function QuoteSummary({
   const { btcFiatRate, btcUsdRate, stxBtcRate } = useSupportedCoinRates();
   const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey, stxAddress, stxPublicKey } =
     useSelectedAccount();
-
+  const network = useNetworkSelector();
   const {
     loading: isPlaceOrderLoading,
     error: placeOrderError,
@@ -203,7 +202,7 @@ export default function QuoteSummary({
   } = usePlaceUtxoOrder();
 
   useEffect(() => {
-    if (placeOrderError || placeUtxoOrderError) {
+    if (true) {
       onError(placeOrderError ?? placeUtxoOrderError ?? '');
     }
   }, [placeOrderError, placeUtxoOrderError]);
@@ -329,6 +328,9 @@ export default function QuoteSummary({
       const placeOrderResponse = await placeStxOrder(placeStxOrderRequest);
 
       if (placeOrderResponse?.unsignedTransaction) {
+        const swapTx = deserializeTransaction(placeOrderResponse.unsignedTransaction);
+        await capStxFeeAtThreshold(swapTx, network);
+        placeOrderResponse.unsignedTransaction = Buffer.from(swapTx.serialize()).toString('hex');
         onStxOrderPlaced({ order: placeOrderResponse, providerCode: quote.provider.code });
       }
     }
