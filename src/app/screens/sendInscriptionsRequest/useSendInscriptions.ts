@@ -2,6 +2,7 @@ import { getPopupPayload } from '@common/utils/popup';
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import { sendUserRejectionMessage } from '@common/utils/rpc/responseMessages/errors';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import { TransportWebUSB } from '@keystonehq/hw-transport-webusb';
 import { RpcErrorCode, sendInscriptionsSchema } from '@sats-connect/core';
@@ -32,6 +33,7 @@ const useSendInscriptions = () => {
 
   const [isExecuting, setIsExecuting] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const selectedAccount = useSelectedAccount();
   const {
     popupPayloadSendInscriptions: {
       context: { tabId },
@@ -107,6 +109,7 @@ const useSendInscriptions = () => {
         ...(type === 'keystone' && {
           keystoneTransport: transport as TransportWebUSB,
         }),
+        selectedAccount,
         rbfEnabled: false,
       });
       if (!txid) {

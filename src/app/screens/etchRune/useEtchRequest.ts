@@ -1,5 +1,6 @@
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import useOrdinalsServiceApi from '@hooks/apiClients/useOrdinalsServiceApi';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import { TransportWebUSB } from '@keystonehq/hw-transport-webusb';
 import { RpcErrorCode, type Params } from '@sats-connect/core';
@@ -27,6 +28,7 @@ const useEtchRequestRequestParams = () => {
 
 const useEtchRequest = () => {
   const { etchRequest, requestId, tabId } = useEtchRequestRequestParams();
+  const selectedAccount = useSelectedAccount();
   const txContext = useTransactionContext();
   const ordinalsServiceApi = useOrdinalsServiceApi();
   const [etchError, setEtchError] = useState<{
@@ -116,6 +118,7 @@ const useEtchRequest = () => {
         ...(type === 'keystone' && {
           keystoneTransport: transport as TransportWebUSB,
         }),
+        selectedAccount,
         rbfEnabled: false,
       });
       if (!txid) {

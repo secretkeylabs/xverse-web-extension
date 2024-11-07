@@ -173,6 +173,7 @@ function BtcSendRequest() {
         ...(type === 'keystone' && {
           keystoneTransport: transport as TransportWebUSB,
         }),
+        selectedAccount,
         rbfEnabled: true,
       });
 

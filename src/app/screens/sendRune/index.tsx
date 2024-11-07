@@ -177,6 +177,7 @@ function SendRuneScreen() {
         ...(type === 'keystone' && {
           keystoneTransport: transport as TransportWebUSB,
         }),
+        selectedAccount,
         rbfEnabled: true,
       });
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {

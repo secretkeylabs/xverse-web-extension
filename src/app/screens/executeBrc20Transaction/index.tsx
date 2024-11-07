@@ -160,16 +160,6 @@ function ExecuteBrc20Transaction() {
     }
   }, [executeTransfer]);
 
-  useEffect(() => {
-    if (isConnecting || isConnectSuccess) {
-      return;
-    }
-    // auto connect keystone
-    if (isKeystoneModalVisible) {
-      handleKeystoneConnect();
-    }
-  }, [isKeystoneModalVisible, handleKeystoneConnect, isConnecting, isConnectSuccess]);
-
   const resultTexts = {
     SUCCESS: {
       title: t('TRANSACTION_HEADLINE', { status: 'Broadcasted' }),

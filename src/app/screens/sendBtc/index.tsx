@@ -10,7 +10,7 @@ import {
   type AccountType,
   type Transport,
 } from '@secretkeylabs/xverse-core';
-import { isInOptions, isLedgerAccount } from '@utils/helper';
+import { isInOptions, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -120,7 +120,7 @@ function SendBtcScreen() {
   }, [transactionContext, debouncedRecipient, amountSats, feeRate, sendMax]);
 
   const handleCancel = () => {
-    if (isLedgerAccount(selectedAccount) && isInOption) {
+    if ((isLedgerAccount(selectedAccount) || isKeystoneAccount(selectedAccount)) && isInOption) {
       window.close();
       return;
     }
@@ -151,6 +151,7 @@ function SendBtcScreen() {
         ...(type === 'keystone' && {
           keystoneTransport: transport as TransportWebUSB,
         }),
+        selectedAccount,
         rbfEnabled: true,
       });
 

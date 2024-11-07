@@ -168,6 +168,7 @@ function SendOrdinalScreen() {
         ...(type === 'keystone' && {
           keystoneTransport: transport as TransportWebUSB,
         }),
+        selectedAccount,
         rbfEnabled: true,
       });
 

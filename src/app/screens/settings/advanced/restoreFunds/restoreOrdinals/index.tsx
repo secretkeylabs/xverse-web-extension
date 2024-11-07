@@ -150,6 +150,7 @@ function RestoreOrdinals() {
         ...(type === 'keystone' && {
           keystoneTransport: transport as TransportWebUSB,
         }),
+        selectedAccount,
         rbfEnabled: true,
       });
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {

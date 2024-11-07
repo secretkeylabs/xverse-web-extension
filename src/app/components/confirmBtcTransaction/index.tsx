@@ -237,20 +237,6 @@ function ConfirmBtcTransaction({
     }
   };
 
-  // auto confirm keystone connect and confirm
-  useEffect(() => {
-    if (!extractedTxSummary || isButtonDisabled) return;
-
-    if (isKeystoneModalVisible) {
-      handleKeystoneConnectAndConfirm();
-    }
-  }, [
-    extractedTxSummary,
-    handleKeystoneConnectAndConfirm,
-    isButtonDisabled,
-    isKeystoneModalVisible,
-  ]);
-
   if (isLoading || extractTxSummaryLoading) {
     return (
       <LoaderContainer>

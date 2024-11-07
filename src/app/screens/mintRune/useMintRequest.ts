@@ -1,6 +1,7 @@
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import useOrdinalsServiceApi from '@hooks/apiClients/useOrdinalsServiceApi';
 import useRunesApi from '@hooks/apiClients/useRunesApi';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import { TransportWebUSB } from '@keystonehq/hw-transport-webusb';
 import { RpcErrorCode, type MintRunesParams, type Params } from '@sats-connect/core';
@@ -41,6 +42,7 @@ const useMintRequest = (): {
   cancelMintRequest: () => Promise<void>;
 } => {
   const { mintRequest, requestId, tabId } = useRuneMintRequestParams();
+  const selectedAccount = useSelectedAccount();
   const txContext = useTransactionContext();
   const ordinalsServiceApi = useOrdinalsServiceApi();
   const runesApi = useRunesApi();
@@ -153,6 +155,7 @@ const useMintRequest = (): {
         ...(type === 'keystone' && {
           keystoneTransport: transport as TransportWebUSB,
         }),
+        selectedAccount,
         rbfEnabled: false,
       });
       if (!txid) {

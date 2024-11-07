@@ -1,6 +1,7 @@
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import { sendUserRejectionMessage } from '@common/utils/rpc/responseMessages/errors';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { TransportWebUSB } from '@keystonehq/hw-transport-webusb';
@@ -32,6 +33,7 @@ const useTransferRunes = ({ tabId, messageId, recipients }: Args) => {
   const { data: btcFeeRates } = useBtcFeeRate();
   const { network } = useWalletSelector();
   const txContext = useTransactionContext();
+  const selectedAccount = useSelectedAccount();
 
   const generateTransferTxAndSummary = useCallback(
     async (desiredFeeRate: number) => {
@@ -101,6 +103,7 @@ const useTransferRunes = ({ tabId, messageId, recipients }: Args) => {
           ...(type === 'keystone' && {
             keystoneTransport: transport as TransportWebUSB,
           }),
+          selectedAccount,
           rbfEnabled: false,
         });
         if (!txid) {
@@ -127,7 +130,7 @@ const useTransferRunes = ({ tabId, messageId, recipients }: Args) => {
         setIsExecuting(false);
       }
     },
-    [messageId, tabId, transaction],
+    [messageId, tabId, transaction, selectedAccount],
   );
 
   const cancelRunesTransferRequest = useCallback(async () => {

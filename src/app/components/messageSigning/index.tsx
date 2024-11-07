@@ -226,13 +226,6 @@ function MessageSigning({
     }
   }, [accountType, handleKeystoneConnectAndConfirm, handleLedgerConnectAndConfirm]);
 
-  // keystone auto start connect
-  useEffect(() => {
-    if (accountType === 'keystone') {
-      handleConnectAndConfirm();
-    }
-  }, [accountType, handleConnectAndConfirm]);
-
   const confirmSignMessage = async () => {
     const seedPhrase = await getSeed();
     return signMessage({

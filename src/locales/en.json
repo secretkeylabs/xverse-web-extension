@@ -1241,7 +1241,7 @@
     "KEYSTONE": {
       "CONNECT": {
         "TITLE": "Connect Your Keystone",
-        "SUBTITLE": "To continue, connect and unlock your device.",
+        "SUBTITLE": "Connect your Keystone device, make sure it’s unlocked, and on the homepage.",
         "ERROR_TITLE": "Connection error",
         "ERROR_SUBTITLE": "We weren't able to connect to your device.",
         "ERROR_SUBTITLE_DEVICE_LOCKED": "Your Keystone device is locked. Please unlock it to continue."
