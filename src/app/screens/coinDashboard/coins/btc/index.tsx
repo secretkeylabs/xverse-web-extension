@@ -4,6 +4,8 @@ import TopRow from '@components/topRow';
 import useCanUserSwitchPaymentType from '@hooks/useCanUserSwitchPaymentType';
 import { broadcastResetUserFlow, useResetUserFlow } from '@hooks/useResetUserFlow';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
+import type { Tab } from '@screens/coinDashboard';
+import TokenPrice from '@screens/coinDashboard/tokenPrice';
 import { Tabs, type TabProp } from '@ui-library/tabs';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -16,9 +18,9 @@ import BalanceBreakdown from './balanceBreakdown';
 export default function CoinDashboard() {
   const [searchParams] = useSearchParams();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
-  const fromSecondaryTab = searchParams.get('secondaryTab') === 'true' ? 'secondary' : 'primary';
+  const fromSecondaryTab = searchParams.get('secondaryTab') === 'true' ? 'third' : 'first';
 
-  const [currentTab, setCurrentTab] = useState<'primary' | 'secondary'>(fromSecondaryTab);
+  const [currentTab, setCurrentTab] = useState<Tab>(fromSecondaryTab);
   const [showPreferredBtcAddressSheet, setShowPreferredBtcAddressSheet] = useState(false);
 
   useResetUserFlow('/coinDashboard');
@@ -34,14 +36,18 @@ export default function CoinDashboard() {
 
   const onCancelAddressType = () => setShowPreferredBtcAddressSheet(false);
 
-  const tabs: TabProp<'primary' | 'secondary'>[] = [
+  const tabs: TabProp<Tab>[] = [
     {
       label: t('TRANSACTIONS'),
-      value: 'primary',
+      value: 'first',
+    },
+    {
+      label: t('DATA'),
+      value: 'second',
     },
     {
       label: t('BREAKDOWN'),
-      value: 'secondary',
+      value: 'third',
     },
   ];
 
@@ -54,10 +60,10 @@ export default function CoinDashboard() {
           <Tabs
             tabs={tabs}
             activeTab={currentTab}
-            onTabClick={(tabClicked: 'primary' | 'secondary') => setCurrentTab(tabClicked)}
+            onTabClick={(tabClicked: Tab) => setCurrentTab(tabClicked)}
           />
         </FtInfoContainer>
-        {currentTab === 'primary' && (
+        {currentTab === 'first' && (
           <TransactionsHistoryList
             withTitle={false}
             coin="BTC"
@@ -67,7 +73,8 @@ export default function CoinDashboard() {
             runeSymbol={null}
           />
         )}
-        {currentTab === 'secondary' && <BalanceBreakdown />}
+        {currentTab === 'second' && <TokenPrice currency="BTC" fungibleToken={undefined} />}
+        {currentTab === 'third' && <BalanceBreakdown />}
       </Container>
       <BottomBar tab="dashboard" />
       <GlobalPreferredBtcAddressSheet

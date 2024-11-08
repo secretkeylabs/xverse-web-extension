@@ -1,5 +1,6 @@
 import { BestBarLoader } from '@components/barLoader';
 import FiatAmountText from '@components/fiatAmountText';
+import PercentageChange from '@components/percentageChange';
 import TokenImage from '@components/tokenImage';
 import useSelectedAccountBtcBalance from '@hooks/queries/useSelectedAccountBtcBalance';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
@@ -93,6 +94,10 @@ const StyledBarLoader = styled(BestBarLoader)<{
   marginBottom: props.$withMarginBottom ? props.theme.space.xxxs : 0,
 }));
 
+const FiatCurrencyRow = styled.div({
+  display: 'flex',
+  alignItems: 'center',
+});
 const StyledFiatAmountText = styled(FiatAmountText)`
   ${(props) => props.theme.typography.body_medium_m}
   color: ${(props) => props.theme.colors.white_200};
@@ -201,12 +206,10 @@ function TokenTile({
               />
             )}
           </CoinBalanceContainer>
-          <FiatAmountContainer>
-            {balanceHidden && HIDDEN_BALANCE_LABEL}
-            {!balanceHidden && (
-              <StyledFiatAmountText fiatAmount={getFiatAmount()} fiatCurrency={fiatCurrency} />
-            )}
-          </FiatAmountContainer>
+          <FiatCurrencyRow>
+            <PercentageChange ftCurrencyPairs={[[fungibleToken, currency]]} />
+            <StyledFiatAmountText fiatAmount={getFiatAmount()} fiatCurrency={fiatCurrency} />
+          </FiatCurrencyRow>
         </AmountContainer>
       )}
     </TileContainer>

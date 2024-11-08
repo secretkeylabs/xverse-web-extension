@@ -241,6 +241,7 @@
     },
     "TOKEN_HIDDEN": "Token hidden and reported",
     "UNDO": "Undo",
+    "PRICE": "Price",
     "ERRORS": {
       "BTC_BALANCE": "Failed to load Bitcoin balance",
       "STX_BALANCE": "Failed to load Stacks balance",
@@ -1106,7 +1107,9 @@
     "COMING_SOON": "Coming soon",
     "VERIFY_ADDRESS_ON_LEDGER": "Verify address on Ledger",
     "VIEW_ADDRESS": "View address",
-    "HIDE_AND_REPORT": "Hide & Report"
+    "HIDE_AND_REPORT": "Hide & Report",
+    "DATA": "DATA",
+    "PRICE": "Price"
   },
   "SPEED_UP_TRANSACTION": {
     "TITLE": "Speed up transaction",
