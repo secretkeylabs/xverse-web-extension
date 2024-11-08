@@ -126,13 +126,13 @@ export const InitialTransitionLandingSectionContainer = styled(LandingSectionCon
   animation: ${() => slideY} 0.2s ease-out;
 `;
 
-export const TransitionLandingSectionContainer = styled(LandingSectionContainer)<{
-  $direction: 'left' | 'right';
-}>((props) => ({
-  animation: `${
-    props.$direction === 'left' ? slideLeftAnimation : slideRightAnimation
-  } 0.3s cubic-bezier(0, 0, 0.58, 1) forwards`,
-}));
+export const LeftTransitionLandingSectionContainer = styled(LandingSectionContainer)`
+  animation: ${slideLeftAnimation} 0.3s cubic-bezier(0, 0, 0.58, 1) forwards;
+`;
+
+export const RightTransitionLandingSectionContainer = styled(LandingSectionContainer)`
+  animation: ${slideRightAnimation} 0.3s cubic-bezier(0, 0, 0.58, 1) forwards;
+`;
 
 export const Logo = styled.img`
   width: 135px;
@@ -150,13 +150,13 @@ const OnboardingContainer = styled.div((props) => ({
   marginBottom: props.theme.space.l,
 }));
 
-export const TransitionOnboardingContainer = styled(OnboardingContainer)<{
-  $direction: 'left' | 'right';
-}>((props) => ({
-  animation: `${
-    props.$direction === 'left' ? slideLeftAnimation : slideRightAnimation
-  } 0.3s cubic-bezier(0, 0, 0.58, 1) forwards`,
-}));
+export const LeftTransitionOnboardingContainer = styled(OnboardingContainer)`
+  animation: ${slideLeftAnimation} 0.3s cubic-bezier(0, 0, 0.58, 1) forwards;
+`;
+
+export const RightTransitionOnboardingContainer = styled(OnboardingContainer)`
+  animation: ${slideRightAnimation} 0.3s cubic-bezier(0, 0, 0.58, 1) forwards;
+`;
 
 export const OnBoardingImage = styled.img(() => ({
   marginTop: -26,

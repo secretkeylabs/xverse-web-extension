@@ -116,7 +116,7 @@ function SettingComponent({
         >
           <Column>
             <ComponentText
-              $textColor={showWarningTitle ? theme.colors.feedback.error : theme.colors.white_200}
+              $textColor={showWarningTitle ? theme.colors.danger_medium : theme.colors.white_200}
             >
               {text}
             </ComponentText>

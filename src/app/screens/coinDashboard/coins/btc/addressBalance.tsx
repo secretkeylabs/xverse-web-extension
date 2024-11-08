@@ -63,7 +63,7 @@ const StarIconContainer = styled.div((props) => ({
 type AddressBalanceProps = {
   balance: number | undefined;
   addressType: BtcAddressType | undefined;
-  totalBalance: number | undefined;
+  totalBalance?: number | undefined;
 };
 
 export default function AddressBalance({
@@ -102,7 +102,9 @@ export default function AddressBalance({
           <StyledP typography="body_bold_m">BTC</StyledP>
           {addressType && <BtcAddressTypeLabel addressType={addressType} />}
         </AddressTypeContainer>
-        <StyledP typography="body_m" color="white_200">{`${balancePercentage}%`}</StyledP>
+        <StyledP typography="body_m" color="white_200">
+          {totalBalance && `${balancePercentage}%`}
+        </StyledP>
       </TitleContainer>
       <BalanceContainer>
         <StyledP typography="body_bold_m">

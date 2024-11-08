@@ -123,7 +123,7 @@ const ErrorMessage = styled.p<{ visible: boolean }>`
   ${(props) => props.theme.typography.body_s};
   visibility: ${(props) => (props.visible ? 'visible' : 'hidden')};
   text-align: center;
-  color: ${(props) => props.theme.colors.feedback.error};
+  color: ${(props) => props.theme.colors.danger_medium};
   margin-top: ${(props) => props.theme.spacing(12)}px;
   margin-bottom: ${(props) => props.theme.spacing(15)}px;
 `;

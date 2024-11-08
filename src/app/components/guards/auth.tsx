@@ -65,6 +65,7 @@ function AuthGuard({ children }: PropsWithChildren) {
       await seedVault.getSeed();
     } catch (error) {
       navigate('/login', { state: { from: pathname } });
+      return;
     }
 
     await loadWallet(() => {

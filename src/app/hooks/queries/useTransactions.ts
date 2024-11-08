@@ -25,8 +25,7 @@ export default function useTransactions(
   runeToken: string | null,
 ) {
   const selectedAccount = useSelectedAccount();
-  const { network, hasActivatedOrdinalsKey, btcPaymentAddressType, allowNestedSegWitAddress } =
-    useWalletSelector();
+  const { network, hasActivatedOrdinalsKey, btcPaymentAddressType } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
   const btcClient = useBtcClient();
   const fetchTransactions = async (): Promise<
@@ -59,7 +58,6 @@ export default function useTransactions(
         selectedAccount,
         btcClient,
         hasActivatedOrdinalsKey as boolean,
-        allowNestedSegWitAddress ? undefined : btcPaymentAddressType,
       );
     }
     return [];

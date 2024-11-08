@@ -30,8 +30,7 @@ const PasswordContainer = styled.div((props) => ({
 
 function RestoreWallet(): JSX.Element {
   const { t } = useTranslation('translation');
-  const { restoreWallet, enableNestedSegWitAddress, changeBtcPaymentAddressType } =
-    useWalletReducer();
+  const { restoreWallet, changeBtcPaymentAddressType } = useWalletReducer();
   const [isRestoring, setIsRestoring] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [password, setPassword] = useState('');
@@ -83,9 +82,6 @@ function RestoreWallet(): JSX.Element {
       await restoreWallet(seed, password);
       setIsRestoring(false);
 
-      // we allow the user to switch between address types if restoring the wallet
-      // this disabled by default for new wallets
-      enableNestedSegWitAddress();
       changeBtcPaymentAddressType(btcPayAddressType);
 
       navigate('/wallet-success/restore', { replace: true });

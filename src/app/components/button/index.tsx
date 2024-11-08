@@ -13,7 +13,7 @@ const Button = styled.button<ButtonProps>((props) => ({
   alignItems: 'center',
   borderRadius: props.theme.radius(1),
   backgroundColor: props.warning
-    ? props.theme.colors.feedback.error
+    ? props.theme.colors.danger_medium
     : props.theme.colors.action.classic,
   width: '100%',
   height: 44,

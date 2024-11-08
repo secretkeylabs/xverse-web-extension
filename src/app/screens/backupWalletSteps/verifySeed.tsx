@@ -65,7 +65,7 @@ const NthSpan = styled.span`
 
 const ErrorMessage = styled.p<{ visible: boolean }>`
   ${(props) => props.theme.typography.body_s};
-  color: ${(props) => props.theme.colors.feedback.error};
+  color: ${(props) => props.theme.colors.danger_medium};
   visibility: ${(props) => (props.visible ? 'initial' : 'hidden')};
 `;
 

@@ -12,7 +12,6 @@ import {
   ChangeShowBtcReceiveAlertKey,
   ChangeShowDataCollectionAlertKey,
   ChangeShowOrdinalReceiveAlertKey,
-  EnableNestedSegWitAddressKey,
   RareSatsNoticeDismissedKey,
   RemoveAccountAvatarKey,
   RemoveAllFromHideCollectiblesKey,
@@ -75,7 +74,6 @@ export const initialWalletState: WalletState = {
   selectedAccountIndex: 0,
   selectedAccountType: 'software',
   btcPaymentAddressType: 'native',
-  allowNestedSegWitAddress: false,
   encryptedSeed: '',
   fiatCurrency: 'USD',
   sip10ManageTokens: {},
@@ -175,11 +173,6 @@ const walletReducer = (
         ],
         accountsList: [],
         accountBalances: {},
-      };
-    case EnableNestedSegWitAddressKey:
-      return {
-        ...state,
-        allowNestedSegWitAddress: true,
       };
     case ChangeBtcPaymentAddressTypeKey:
       return {

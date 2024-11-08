@@ -24,7 +24,6 @@ import {
   ChangeBtcPaymentAddressType,
   ChangeNetworkAction,
   changeShowDataCollectionAlertAction,
-  EnableNestedSegWitAddress,
   resetWalletAction,
   selectAccount,
   setWalletHideStxAction,
@@ -575,10 +574,6 @@ const useWalletReducer = () => {
     dispatch(updateSavedNamesAction(network.type, updatedSavedNames));
   };
 
-  const enableNestedSegWitAddress = () => {
-    dispatch(EnableNestedSegWitAddress());
-  };
-
   const changeBtcPaymentAddressType = async (btcPaymentAddressType: 'native' | 'nested') => {
     dispatch(ChangeBtcPaymentAddressType(btcPaymentAddressType));
 
@@ -618,7 +613,6 @@ const useWalletReducer = () => {
     renameSoftwareAccount,
     toggleStxVisibility,
     changeShowDataCollectionAlert,
-    enableNestedSegWitAddress,
     changeBtcPaymentAddressType,
   };
 };

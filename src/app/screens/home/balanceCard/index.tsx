@@ -105,9 +105,7 @@ function BalanceCard({ isLoading, isRefetching }: Props) {
   const { data: runesCoinList } = useVisibleRuneFungibleTokens();
 
   const balance = calculateTotalBalance({
-    stxBalance: BigNumber(stxData?.balance ?? 0)
-      .plus(stxData?.locked ?? 0)
-      .toString(),
+    stxBalance: BigNumber(stxData?.balance ?? 0).toString(),
     btcBalance: (btcBalance ?? 0).toString(),
     sipCoinsList: sip10CoinsList,
     brcCoinsList: brc20CoinsList,

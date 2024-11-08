@@ -4,14 +4,12 @@ import { WalletSessionPeriods } from '@stores/wallet/actions/types';
 import chromeStorage from '@utils/chromeStorage';
 import { addMinutes } from 'date-fns';
 import { useDispatch } from 'react-redux';
-import useSeedVault from './useSeedVault';
 
 const SESSION_START_TIME_KEY = 'sessionStartTime';
 
 const useWalletSession = () => {
   const { walletLockPeriod } = useWalletSelector();
   const dispatch = useDispatch();
-  const { isVaultUnlocked } = useSeedVault();
 
   const setSessionStartTime = () => {
     const sessionStartTime = new Date().getTime();
@@ -26,11 +24,10 @@ const useWalletSession = () => {
   };
 
   const shouldLock = async () => {
-    const isUnlocked = await isVaultUnlocked();
-    if (!isUnlocked) return false;
     const startTime = await getSessionStartTime();
     // we don't know when the session started, so we assume we need to lock
     if (!startTime) return true;
+
     const currentTime = new Date().getTime();
     return currentTime >= addMinutes(startTime, walletLockPeriod).getTime();
   };
