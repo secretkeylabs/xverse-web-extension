@@ -43,11 +43,7 @@ export default function BalanceBreakdown() {
           totalBalance={confirmedPaymentBalance}
         />
       )}
-      <AddressBalance
-        balance={taprootBalance?.confirmedBalance}
-        addressType="taproot"
-        totalBalance={confirmedPaymentBalance}
-      />
+      <AddressBalance balance={taprootBalance?.confirmedBalance} addressType="taproot" />
     </SecondaryContainer>
   );
 }
