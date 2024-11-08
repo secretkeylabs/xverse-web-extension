@@ -47,6 +47,7 @@ const handleGetStxAddresses = async (
     selectedAccountType,
     accountsList: softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
   } = rootStore.store.getState().walletState;
 
   const account = getSelectedAccount({
@@ -54,6 +55,7 @@ const handleGetStxAddresses = async (
     selectedAccountType,
     softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
   });
 
   if (!account) {

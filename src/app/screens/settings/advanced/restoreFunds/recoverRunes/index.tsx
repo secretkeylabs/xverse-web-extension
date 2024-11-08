@@ -5,12 +5,14 @@ import TopRow from '@components/topRow';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
+import { TransportWebUSB } from '@keystonehq/hw-transport-webusb';
 import type { TransactionSummary } from '@screens/sendBtc/helpers';
 import {
   AnalyticsEvents,
   btcTransaction,
   parseSummaryForRunes,
   runesTransaction,
+  type AccountType,
   type RuneSummary,
   type Transport,
 } from '@secretkeylabs/xverse-core';
@@ -136,10 +138,18 @@ function RecoverRunes() {
   const handleToggleConfirmTx = () => setIsConfirmTx(!isConfirmTx);
   const handleOnNavigateBack = () => navigate(-1);
 
-  const onClickTransfer = async (ledgerTransport?: Transport) => {
+  const onClickTransfer = async (type?: AccountType, transport?: Transport | TransportWebUSB) => {
     setIsBroadcasting(true);
     try {
-      const txnId = await enhancedTxn?.broadcast({ ledgerTransport, rbfEnabled: true });
+      const txnId = await enhancedTxn?.broadcast({
+        ...(type === 'ledger' && {
+          ledgerTransport: transport as Transport,
+        }),
+        ...(type === 'keystone' && {
+          keystoneTransport: transport as TransportWebUSB,
+        }),
+        rbfEnabled: true,
+      });
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
         protocol: 'runes',
         action: 'transfer',

@@ -37,6 +37,7 @@
   },
   "dependencies": {
     "@aryzing/superqs": "0.0.6",
+    "@keystonehq/hw-transport-webusb": "^0.5.1",
     "@ledgerhq/hw-transport-webusb": "^6.27.13",
     "@phosphor-icons/react": "^2.1.0",
     "@playwright/test": "1.46.1",

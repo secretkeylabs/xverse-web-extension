@@ -27,6 +27,7 @@ import ExecuteBrc20Transaction from '@screens/executeBrc20Transaction';
 import Explore from '@screens/explore';
 import ForgotPassword from '@screens/forgotPassword';
 import Home from '@screens/home';
+import ImportKeystone from '@screens/keystone/importKeystoneAccount';
 import Landing from '@screens/landing';
 import LedgerAddStxAddress from '@screens/ledger/addStxAddress';
 import ConfirmLedgerStxTransaction from '@screens/ledger/confirmLedgerStxTransaction';
@@ -106,6 +107,16 @@ const router = createHashRouter([
           <AuthGuard>
             <SingleTabGuard guardName="importLedger">
               <ImportLedger />
+            </SingleTabGuard>
+          </AuthGuard>
+        ),
+      },
+      {
+        path: 'import-keystone',
+        element: (
+          <AuthGuard>
+            <SingleTabGuard guardName="importKeystone">
+              <ImportKeystone />
             </SingleTabGuard>
           </AuthGuard>
         ),

@@ -62,6 +62,7 @@ export function hasAccountReadPermissions(origin: string, store: PermissionsStor
     selectedAccountType,
     accountsList: softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
     network,
   } = rootStore.store.getState().walletState;
 
@@ -70,6 +71,7 @@ export function hasAccountReadPermissions(origin: string, store: PermissionsStor
     selectedAccountType,
     softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
   });
 
   if (!existingAccount) {

@@ -1,9 +1,11 @@
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import useOrdinalsServiceApi from '@hooks/apiClients/useOrdinalsServiceApi';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
+import { TransportWebUSB } from '@keystonehq/hw-transport-webusb';
 import { RpcErrorCode, type Params } from '@sats-connect/core';
 import { generateTransaction, type TransactionBuildPayload } from '@screens/sendBtc/helpers';
-import { type Transport } from '@secretkeylabs/xverse-core';
+import { type AccountType, type Transport } from '@secretkeylabs/xverse-core';
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import SuperJSON from 'superjson';
@@ -26,6 +28,7 @@ const useEtchRequestRequestParams = () => {
 
 const useEtchRequest = () => {
   const { etchRequest, requestId, tabId } = useEtchRequestRequestParams();
+  const selectedAccount = useSelectedAccount();
   const txContext = useTransactionContext();
   const ordinalsServiceApi = useOrdinalsServiceApi();
   const [etchError, setEtchError] = useState<{
@@ -102,11 +105,20 @@ const useEtchRequest = () => {
     }
   };
 
-  const payAndConfirmEtchRequest = async (ledgerTransport?: Transport) => {
+  const payAndConfirmEtchRequest = async (
+    type?: AccountType,
+    transport?: Transport | TransportWebUSB,
+  ) => {
     try {
       setIsExecuting(true);
       const txid = await orderTx?.transaction.broadcast({
-        ledgerTransport,
+        ...(type === 'ledger' && {
+          ledgerTransport: transport as Transport,
+        }),
+        ...(type === 'keystone' && {
+          keystoneTransport: transport as TransportWebUSB,
+        }),
+        selectedAccount,
         rbfEnabled: false,
       });
       if (!txid) {

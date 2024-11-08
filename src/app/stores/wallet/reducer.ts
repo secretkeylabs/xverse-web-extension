@@ -32,6 +32,7 @@ import {
   SetWalletLockPeriodKey,
   SetWalletUnlockedKey,
   StoreEncryptedSeedKey,
+  UpdateKeystoneAccountsKey,
   UpdateLedgerAccountsKey,
   UpdateSavedNamesKey,
   UpdateSoftwareAccountsKey,
@@ -68,6 +69,7 @@ export const initialWalletState: WalletState = {
   savedNetworks: initialNetworksList,
   accountsList: [],
   ledgerAccountsList: [],
+  keystoneAccountsList: [],
   selectedAccountIndex: 0,
   selectedAccountType: 'software',
   encryptedSeed: '',
@@ -135,6 +137,11 @@ const walletReducer = (
       return {
         ...state,
         ledgerAccountsList: action.ledgerAccountsList,
+      };
+    case UpdateKeystoneAccountsKey:
+      return {
+        ...state,
+        keystoneAccountsList: action.keystoneAccountsList,
       };
     case SelectAccountKey:
       return {
