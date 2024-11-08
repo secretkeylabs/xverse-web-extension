@@ -14,7 +14,7 @@ const Container = styled.div<{
   padding: props.theme.spacing(8),
   marginBottom: props.theme.spacing(6),
   border: `1px solid ${
-    props.type === 'Warning' ? props.theme.colors.feedback.error_700 : 'rgba(255, 255, 255, 0.2)'
+    props.type === 'Warning' ? props.theme.colors.danger_dark_600 : 'rgba(255, 255, 255, 0.2)'
   }`,
 }));
 

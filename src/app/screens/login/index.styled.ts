@@ -87,7 +87,7 @@ export const ButtonContainer = styled.div((props) => ({
 export const ErrorMessage = styled.h2((props) => ({
   ...props.theme.typography.body_medium_m,
   textAlign: 'left',
-  color: props.theme.colors.feedback.error,
+  color: props.theme.colors.danger_medium,
   marginTop: props.theme.space.xs,
 }));
 

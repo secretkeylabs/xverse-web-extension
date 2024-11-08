@@ -3,15 +3,6 @@ import styled from 'styled-components';
 
 type ToastType = 'success' | 'error' | 'neutral';
 
-const getBackgroundColor = (type: ToastType, theme: any): string => {
-  const colors = {
-    success: theme.colors.feedback.success,
-    error: theme.colors.danger_dark,
-    neutral: theme.colors.white_0,
-  };
-  return colors[type] || theme.colors.feedback.neutral;
-};
-
 const getTextColor = (type: ToastType, theme: any): string => {
   const colors = {
     success: theme.colors.elevation0,

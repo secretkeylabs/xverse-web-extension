@@ -52,7 +52,7 @@ const LoaderContainer = styled.div({
 const ErrorText = styled.h1((props) => ({
   ...props.theme.typography.body_s,
   marginBottom: 20,
-  color: props.theme.colors.feedback.error,
+  color: props.theme.colors.danger_medium,
 }));
 
 const ButtonContainer = styled.div({
