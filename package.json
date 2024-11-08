@@ -1,7 +1,7 @@
 {
   "name": "xverse-web-extension",
   "description": "A Bitcoin wallet for Web3",
-  "version": "0.44.3",
+  "version": "0.45.0",
   "private": true,
   "engines": {
     "node": "^18.18.2"
@@ -42,16 +42,16 @@
     "@phosphor-icons/react": "^2.1.0",
     "@playwright/test": "1.46.1",
     "@react-spring/web": "^9.6.1",
-    "@sats-connect/core": "0.4.0-6eb2eb5",
+    "@sats-connect/core": "0.4.0",
     "@scure/base": "^1.1.9",
     "@scure/btc-signer": "1.2.1",
-    "@secretkeylabs/xverse-core": "27.0.1-926ef0b",
+    "@secretkeylabs/xverse-core": "27.1.1",
     "@stacks/connect": "7.4.1",
     "@stacks/stacks-blockchain-api-types": "6.1.1",
     "@stacks/transactions": "6.16.1",
     "@tanstack/query-sync-storage-persister": "^4.29.1",
-    "@tanstack/react-query-devtools": "^4.29.3",
     "@tanstack/react-query": "^4.29.3",
+    "@tanstack/react-query-devtools": "^4.29.3",
     "@tanstack/react-query-persist-client": "^4.29.3",
     "argon2-browser": "^1.18.0",
     "async-mutex": "^0.5.0",

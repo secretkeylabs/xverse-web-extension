@@ -21,13 +21,15 @@ import {
   CreateButton,
   InitialTransitionLandingSectionContainer,
   LandingTitle,
+  LeftTransitionLandingSectionContainer,
+  LeftTransitionOnboardingContainer,
   Logo,
   OnBoardingContent,
   OnBoardingImage,
   OnboardingTitle,
   RestoreButton,
-  TransitionLandingSectionContainer,
-  TransitionOnboardingContainer,
+  RightTransitionLandingSectionContainer,
+  RightTransitionOnboardingContainer,
 } from './index.styled';
 
 function Landing() {
@@ -138,19 +140,26 @@ function Landing() {
 
   const renderTransitions = () => {
     if (slideTransitions) {
+      const TransitionLandingSectionContainer =
+        transitionDirection === 'right'
+          ? RightTransitionLandingSectionContainer
+          : LeftTransitionLandingSectionContainer;
+
+      const TransitionOnboardingContainer =
+        transitionDirection === 'right'
+          ? RightTransitionOnboardingContainer
+          : LeftTransitionOnboardingContainer;
+
       switch (currentStepIndex) {
         case 0:
           return (
-            <TransitionLandingSectionContainer
-              key={currentStepIndex}
-              $direction={transitionDirection}
-            >
+            <TransitionLandingSectionContainer key={currentStepIndex}>
               {renderLandingSection()}
             </TransitionLandingSectionContainer>
           );
         default:
           return (
-            <TransitionOnboardingContainer key={currentStepIndex} $direction={transitionDirection}>
+            <TransitionOnboardingContainer key={currentStepIndex}>
               {renderOnboardingContent(currentStepIndex)}
             </TransitionOnboardingContainer>
           );

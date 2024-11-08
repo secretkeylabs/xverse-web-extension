@@ -9,9 +9,10 @@ import SelectAccount from '@screens/connect/selectAccount';
 import { getAppIconFromWebManifest } from '@secretkeylabs/xverse-core';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
+import RoutePaths from 'app/routes/paths';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import AddressPurposeBox from '../addressPurposeBox';
 import {
   AddressBoxContainer,
@@ -29,7 +30,6 @@ import PermissionsList from '../permissionsList';
 function StxSelectAccountScreen() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { pathname } = useLocation();
   const { t } = useTranslation('translation', { keyPrefix: 'SELECT_BTC_ADDRESS_SCREEN' });
   const selectedAccount = useSelectedAccount();
   const { network } = useWalletSelector();
@@ -86,7 +86,7 @@ function StxSelectAccountScreen() {
   }, [origin]);
 
   const handleSwitchAccount = () => {
-    navigate('/account-list?hideListActions=true', { state: { from: pathname } });
+    navigate(`${RoutePaths.AccountList}?hideListActions=true`);
   };
 
   if (isLoadingIcon) {
