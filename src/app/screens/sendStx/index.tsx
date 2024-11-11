@@ -1,11 +1,27 @@
 import TokenImage from '@components/tokenImage';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
+import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
+import useDebounce from '@hooks/useDebounce';
+import useNetworkSelector from '@hooks/useNetwork';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
-import { microstacksToStx, stxToMicrostacks } from '@secretkeylabs/xverse-core';
-import { isInOptions, isLedgerAccount } from '@utils/helper';
+import useSelectedAccount from '@hooks/useSelectedAccount';
+import useWalletSelector from '@hooks/useWalletSelector';
+import {
+  buf2hex,
+  estimateStacksTransactionWithFallback,
+  generateUnsignedStxTokenTransferTransaction,
+  generateUnsignedTransaction,
+  microstacksToStx,
+  stxToMicrostacks,
+  type StacksTransaction,
+} from '@secretkeylabs/xverse-core';
+import { deserializeTransaction } from '@stacks/transactions';
+import type { FeeRates } from '@ui-components/selectFeeRate';
+import { convertAmountToFtDecimalPlaces } from '@utils/helper';
+import { modifyRecommendedStxFees } from '@utils/transactions/transactions';
 import SendLayout from 'app/layouts/sendLayout';
 import BigNumber from 'bignumber.js';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
@@ -51,8 +67,14 @@ function SendStxScreen() {
     stateAddress ? Step.SelectAmount : Step.SelectRecipient,
   );
 
-  // Shared states
-  const [isLoading, setIsLoading] = useState(false);
+  // required stx hooks/states for tx construction
+  const [isLoadingTx, setIsLoadingTx] = useState(false);
+  const { stxAddress, stxPublicKey } = useSelectedAccount();
+  const selectedNetwork = useNetworkSelector();
+  const { feeMultipliers } = useWalletSelector();
+  const { data: stxPendingTxData } = useStxPendingTxData();
+  const [feeRates, setFeeRates] = useState<FeeRates>({});
+  const [unsignedSendStxTx, setUnsignedSendStxTx] = useState('');
 
   // Step 1 states
   const [recipientAddress, setRecipientAddress] = useState(stateAddress ?? '');
@@ -71,10 +93,13 @@ function SendStxScreen() {
       '',
   );
   const [sendMax, setSendMax] = useState(false);
-  const [feeRate, setFeeRate] = useState(
+  const [fee, setFee] = useState(
     previousFee ? microstacksToStx(new BigNumber(previousFee)).toString() : '',
   );
-  const [unsignedSendStxTx, setUnsignedSendStxTx] = useState('');
+
+  // Debounced values
+  const debouncedRecipient = useDebounce(recipientAddress, 300);
+  const debouncedAmount = useDebounce(amount, 300);
 
   const handleCancel = () => {
     if (fungibleToken) {
@@ -93,6 +118,113 @@ function SendStxScreen() {
       handleCancel();
     }
   };
+
+  useEffect(() => {
+    let isActiveCall = true;
+    const constructTx = async () => {
+      try {
+        setIsLoadingTx(true);
+        if (fungibleToken) {
+          let convertedAmount = debouncedAmount;
+          if (debouncedAmount && fungibleToken.decimals) {
+            convertedAmount = convertAmountToFtDecimalPlaces(
+              debouncedAmount,
+              fungibleToken.decimals,
+            ).toString();
+          }
+          // Create STX SIP-10 transfer transaction
+          const rawUnsignedSendFtTx: StacksTransaction = await generateUnsignedTransaction({
+            amount: convertedAmount,
+            senderAddress: stxAddress,
+            recipientAddress: debouncedRecipient,
+            contractAddress: fungibleToken.principal.split('.')[0],
+            contractName: fungibleToken.principal.split('.')[1],
+            assetName: fungibleToken?.assetName ?? '',
+            publicKey: stxPublicKey,
+            network: selectedNetwork,
+            pendingTxs: stxPendingTxData?.pendingTransactions ?? [],
+            memo,
+          });
+          if (isActiveCall) {
+            setUnsignedSendStxTx(buf2hex(rawUnsignedSendFtTx.serialize()));
+          }
+          return;
+        }
+        // Create STX transfer transaction
+        const rawUnsignedSendStxTx: StacksTransaction =
+          await generateUnsignedStxTokenTransferTransaction(
+            debouncedRecipient,
+            debouncedAmount,
+            memo,
+            stxPendingTxData?.pendingTransactions ?? [],
+            stxPublicKey,
+            selectedNetwork,
+          );
+        if (isActiveCall) {
+          setUnsignedSendStxTx(buf2hex(rawUnsignedSendStxTx.serialize()));
+        }
+      } catch (e) {
+        console.error(e);
+      } finally {
+        if (isActiveCall) {
+          setIsLoadingTx(false);
+        }
+      }
+    };
+    constructTx();
+    return () => {
+      isActiveCall = false;
+    };
+  }, [
+    debouncedRecipient,
+    debouncedAmount,
+    memo,
+    stxPendingTxData?.pendingTransactions,
+    stxPublicKey,
+    stxAddress,
+    selectedNetwork,
+    setIsLoadingTx,
+    setUnsignedSendStxTx,
+    fungibleToken,
+  ]);
+
+  // TODO: feeRates dont change much in the context of STX transfers so we only need to run this once
+  useEffect(() => {
+    const fetchStxFees = async () => {
+      try {
+        const unsignedTx: StacksTransaction = deserializeTransaction(unsignedSendStxTx);
+        const [low, medium, high] = await estimateStacksTransactionWithFallback(
+          unsignedTx,
+          selectedNetwork,
+        );
+        let stxFees = {
+          low: low.fee,
+          medium: medium.fee,
+          high: high.fee,
+        };
+        if (feeMultipliers?.thresholdHighStacksFee) {
+          stxFees = modifyRecommendedStxFees(
+            stxFees,
+            feeMultipliers,
+            unsignedTx.payload.payloadType,
+          );
+        }
+        setFeeRates({
+          low: Number(microstacksToStx(new BigNumber(stxFees.low))),
+          medium: Number(microstacksToStx(new BigNumber(stxFees.medium))),
+          high: Number(microstacksToStx(new BigNumber(stxFees.high))),
+        });
+        if (!fee || Number(fee) <= 0) {
+          setFee(Number(microstacksToStx(new BigNumber(stxFees.medium))).toString());
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    if (unsignedSendStxTx.length > 0) {
+      fetchStxFees();
+    }
+  }, [fee, feeMultipliers, selectedNetwork, unsignedSendStxTx]);
 
   const header = (
     <TitleContainer>
@@ -114,11 +246,8 @@ function SendStxScreen() {
               setRecipientDomain={setRecipientDomain}
               memo={memo}
               setMemo={setMemo}
-              onNext={() => {
-                setIsLoading(false);
-                setCurrentStep(getNextStep(Step.SelectRecipient, true));
-              }}
-              isLoading={isLoading}
+              onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient, true))}
+              isLoading={isLoadingTx || recipientAddress !== debouncedRecipient}
             />
           </Container>
         </SendLayout>
@@ -131,19 +260,15 @@ function SendStxScreen() {
               header={header}
               amount={amount}
               setAmount={setAmount}
-              setFeeRate={setFeeRate}
+              fee={fee}
+              setFee={setFee}
               sendMax={sendMax}
               setSendMax={setSendMax}
-              fee={feeRate}
-              getFeeForFeeRate={(fee) => Promise.resolve(fee)}
+              feeRates={feeRates}
+              getFeeForFeeRate={(feeRate) => Promise.resolve(feeRate)}
               dustFiltered={false}
               onNext={() => setCurrentStep(getNextStep(Step.SelectAmount, true))}
-              isLoading={isLoading}
-              setIsLoading={setIsLoading}
-              unsignedSendStxTx={unsignedSendStxTx}
-              setUnsignedSendStxTx={setUnsignedSendStxTx}
-              recipientAddress={recipientAddress}
-              memo={memo}
+              isLoading={isLoadingTx || amount !== debouncedAmount}
               fungibleToken={fungibleToken}
             />
           </Container>
@@ -153,16 +278,16 @@ function SendStxScreen() {
       return (
         <Step3Confirm
           unsignedSendStxTx={unsignedSendStxTx}
-          fee={feeRate}
+          fee={fee}
           ftConfirmParams={
             fungibleToken
               ? {
                   unsignedTx: unsignedSendStxTx,
-                  amount,
+                  amount: debouncedAmount,
                   fungibleToken,
                   memo,
-                  recipientAddress,
-                  selectedFee: stxToMicrostacks(new BigNumber(feeRate)).toString(),
+                  recipientAddress: debouncedRecipient,
+                  selectedFee: stxToMicrostacks(new BigNumber(fee)).toString(),
                 }
               : undefined
           }

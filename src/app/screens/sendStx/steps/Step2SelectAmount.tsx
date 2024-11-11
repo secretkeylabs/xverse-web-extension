@@ -1,29 +1,18 @@
-import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
-import useNetworkSelector from '@hooks/useNetwork';
-import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  buf2hex,
-  estimateStacksTransactionWithFallback,
-  generateUnsignedStxTokenTransferTransaction,
-  generateUnsignedTransaction,
   getStxFiatEquivalent,
   microstacksToStx,
   stxToMicrostacks,
   type FungibleToken,
-  type StacksTransaction,
 } from '@secretkeylabs/xverse-core';
-import { deserializeTransaction } from '@stacks/transactions';
 import SelectFeeRate, { type FeeRates } from '@ui-components/selectFeeRate';
 import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
-import { convertAmountToFtDecimalPlaces } from '@utils/helper';
 import { getFtBalance } from '@utils/tokens';
-import { modifyRecommendedStxFees } from '@utils/transactions/transactions';
 import BigNumber from 'bignumber.js';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -49,46 +38,37 @@ const Buttons = styled.div`
 type Props = {
   amount: string;
   setAmount: (amount: string) => void;
-  setFeeRate: (feeRate: string) => void;
   sendMax: boolean;
   setSendMax: (sendMax: boolean) => void;
   fee: string;
+  setFee: (fee: string) => void;
+  feeRates: FeeRates;
   getFeeForFeeRate: (feeRate: number, useEffectiveFeeRate?: boolean) => Promise<number | undefined>;
   onNext: () => void;
   dustFiltered: boolean;
-  setIsLoading: (isLoading: boolean) => void;
   isLoading?: boolean;
   header?: React.ReactNode;
-  recipientAddress: string;
-  memo: string;
-  unsignedSendStxTx: string;
-  setUnsignedSendStxTx: (unsignedSendStxTx: string) => void;
   fungibleToken?: FungibleToken;
 };
 
 function Step2SelectAmount({
-  recipientAddress,
-  memo,
   amount,
   setAmount,
-  setFeeRate,
+  setFee,
   sendMax,
   setSendMax,
   fee,
+  feeRates,
   getFeeForFeeRate,
   onNext,
-  setIsLoading,
   isLoading,
   dustFiltered,
   header,
-  unsignedSendStxTx,
-  setUnsignedSendStxTx,
   fungibleToken,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const navigate = useNavigate();
 
-  const { stxAddress, stxPublicKey } = useSelectedAccount();
   const { fiatCurrency, feeMultipliers } = useWalletSelector();
   const { data: stxData } = useStxWalletData();
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
@@ -127,121 +107,8 @@ function Step2SelectAmount({
         setAmount(newAmount.toString());
       }
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sendMax, fee]);
-
-  const { data: stxPendingTxData } = useStxPendingTxData();
-  const selectedNetwork = useNetworkSelector();
-
-  const [fees, setFees] = useState<FeeRates>({});
-
-  // Reactively construct a tx
-  useEffect(() => {
-    const createTx = async () => {
-      try {
-        setIsLoading(true);
-
-        if (fungibleToken) {
-          // Create FT transfer transaction
-          let convertedAmount = amount;
-          if (amount && fungibleToken.decimals) {
-            convertedAmount = convertAmountToFtDecimalPlaces(
-              amount,
-              fungibleToken.decimals,
-            ).toString();
-          }
-
-          const rawUnsignedSendFtTx: StacksTransaction = await generateUnsignedTransaction({
-            amount: convertedAmount,
-            senderAddress: stxAddress,
-            recipientAddress,
-            contractAddress: fungibleToken.principal.split('.')[0],
-            contractName: fungibleToken.principal.split('.')[1],
-            assetName: fungibleToken?.assetName ?? '',
-            publicKey: stxPublicKey,
-            network: selectedNetwork,
-            pendingTxs: stxPendingTxData?.pendingTransactions ?? [],
-            memo,
-          });
-          setUnsignedSendStxTx(buf2hex(rawUnsignedSendFtTx.serialize()));
-          return;
-        }
-
-        // Create STX transfer transaction
-        const rawUnsignedSendStxTx: StacksTransaction =
-          await generateUnsignedStxTokenTransferTransaction(
-            recipientAddress,
-            amount,
-            memo,
-            stxPendingTxData?.pendingTransactions ?? [],
-            stxPublicKey,
-            selectedNetwork,
-          );
-        setUnsignedSendStxTx(buf2hex(rawUnsignedSendStxTx.serialize()));
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    createTx();
-  }, [
-    amount,
-    feeMultipliers,
-    memo,
-    recipientAddress,
-    selectedNetwork,
-    setIsLoading,
-    setUnsignedSendStxTx,
-    stxPendingTxData?.pendingTransactions,
-    stxPublicKey,
-    fungibleToken,
-    stxAddress,
-  ]);
-
-  // Reactively estimate fees
-  useEffect(() => {
-    const fetchStxFees = async () => {
-      try {
-        const unsignedTx: StacksTransaction = deserializeTransaction(unsignedSendStxTx);
-        const [low, medium, high] = await estimateStacksTransactionWithFallback(
-          unsignedTx,
-          selectedNetwork,
-        );
-
-        let stxFees = {
-          low: low.fee,
-          medium: medium.fee,
-          high: high.fee,
-        };
-
-        if (feeMultipliers?.thresholdHighStacksFee) {
-          stxFees = modifyRecommendedStxFees(
-            stxFees,
-            feeMultipliers,
-            unsignedTx.payload.payloadType,
-          );
-        }
-        setFees({
-          low: Number(microstacksToStx(new BigNumber(stxFees.low))),
-          medium: Number(microstacksToStx(new BigNumber(stxFees.medium))),
-          high: Number(microstacksToStx(new BigNumber(stxFees.high))),
-        });
-        if (!fee || Number(fee) <= 0) {
-          setFeeRate(Number(microstacksToStx(new BigNumber(stxFees.medium))).toString());
-        }
-      } catch (e) {
-        console.error(e);
-      }
-    };
-
-    if (unsignedSendStxTx.length > 0) {
-      fetchStxFees();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedNetwork, unsignedSendStxTx]);
 
   return (
     <Container>
@@ -271,11 +138,11 @@ function Step2SelectAmount({
               fee={fee}
               feeRate={fee}
               feeUnits="STX"
-              setFeeRate={setFeeRate}
+              setFeeRate={setFee}
               baseToFiat={stxToFiat}
               fiatUnit={fiatCurrency}
               getFeeForFeeRate={getFeeForFeeRate}
-              feeRates={fees}
+              feeRates={feeRates}
               feeRateLimits={{ min: 0.000001, max: feeMultipliers?.thresholdHighStacksFee }}
               isLoading={isLoading}
               absoluteBalance={Number(microstacksToStx(new BigNumber(stxBalance)))}
