@@ -47,15 +47,13 @@ function SnackBar({ text, type, dismissToast, action }: Props) {
     <ToastContainer type={type}>
       {type !== 'neutral' && dismissToast && (
         <ToastDismissButton onClick={dismissToast} type={type}>
-          {type === 'error' && <XCircle size={20} />}
-          {type === 'success' && <CheckCircle size={20} />}
+          {type === 'error' && <XCircle size={20} weight="bold" />}
+          {type === 'success' && <CheckCircle size={20} weight="bold" />}
         </ToastDismissButton>
       )}
-
       <ToastMessage type={type} addMarginRight={Boolean(action)}>
         {text}
       </ToastMessage>
-
       {action?.text && (
         <ToastActionButton onClick={action?.onClick} type={type}>
           {action?.text}

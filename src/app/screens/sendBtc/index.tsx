@@ -195,7 +195,7 @@ function SendBtcScreen() {
       setSendMax={setSendMax}
       onCancel={handleCancel}
       onConfirm={handleSubmit}
-      isLoading={isLoading}
+      isLoading={isLoading || recipientAddress !== debouncedRecipient}
       isSubmitting={isSubmitting}
       userCanSwitchPayType={userCanSwitchPayType}
     />

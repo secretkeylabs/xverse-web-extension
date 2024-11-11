@@ -1,5 +1,4 @@
 import PlaceholderImage from '@assets/img/nftDashboard/nft_fallback.svg';
-import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import type { Brc20Definition } from '@secretkeylabs/xverse-core';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
@@ -110,37 +109,8 @@ const TickerIconText = styled.h1<{
   };
 });
 
-const OrdinalsTag = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  background: props.theme.colors.elevation1,
-  borderRadius: 40,
-  width: 79,
-  height: 22,
-  left: 12,
-  bottom: 12,
-  zIndex: 1000,
-  position: 'absolute',
-  padding: '3px 6px',
-}));
-const ButtonIcon = styled.img({
-  width: 12,
-  height: 12,
-});
-
-const Text = styled.h1((props) => ({
-  ...props.theme.body_bold_m,
-  textTransform: 'uppercase',
-  color: props.theme.colors.white_0,
-  fontSize: 10,
-  marginLeft: props.theme.spacing(4),
-}));
-
 interface Brc20TileProps {
   brcContent: Brc20Definition;
-  isNftDashboard?: boolean;
   inNftDetail?: boolean;
   isSmallImage?: boolean;
   isGalleryOpen: boolean;
@@ -152,7 +122,6 @@ export default function Brc20Tile(props: Brc20TileProps) {
   const {
     brcContent,
     isSmallImage,
-    isNftDashboard,
     inNftDetail,
     isGalleryOpen,
     withoutSizeIncrease,
@@ -206,12 +175,6 @@ export default function Brc20Tile(props: Brc20TileProps) {
               )}
             />
           )}
-          {isNftDashboard && (
-            <OrdinalsTag>
-              <ButtonIcon src={OrdinalsIcon} />
-              <Text>{t('ORDINAL')}</Text>
-            </OrdinalsTag>
-          )}
         </BRC20Container>
       </ImageContainer>
     );
@@ -240,12 +203,6 @@ export default function Brc20Tile(props: Brc20TileProps) {
         <OrdinalContentText inNftSend={false} withoutSizeIncrease={withoutSizeIncrease}>
           {JSON.stringify(brcContent)}
         </OrdinalContentText>
-        {isNftDashboard && (
-          <OrdinalsTag>
-            <ButtonIcon src={OrdinalsIcon} />
-            <Text>{t('ORDINAL')}</Text>
-          </OrdinalsTag>
-        )}
       </ImageContainer>
     );
   }
