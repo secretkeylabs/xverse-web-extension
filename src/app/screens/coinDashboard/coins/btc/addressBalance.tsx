@@ -103,7 +103,7 @@ export default function AddressBalance({
           {addressType && <BtcAddressTypeLabel addressType={addressType} />}
         </AddressTypeContainer>
         <StyledP typography="body_m" color="white_200">
-          {totalBalance && `${balancePercentage}%`}
+          {totalBalance !== undefined ? `${balancePercentage}%` : ''}
         </StyledP>
       </TitleContainer>
       <BalanceContainer>
