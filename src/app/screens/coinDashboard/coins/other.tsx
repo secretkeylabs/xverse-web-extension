@@ -178,7 +178,7 @@ export default function CoinDashboard() {
             isSelected={currentTab === 'second'}
             onClick={() => setCurrentTab('second')}
           >
-            {t('DATA')}
+            {t('MARKET')}
           </Button>
           <Button
             data-testid="coin-secondary-button"

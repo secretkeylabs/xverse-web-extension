@@ -42,7 +42,7 @@ export default function CoinDashboard() {
       value: 'first',
     },
     {
-      label: t('DATA'),
+      label: t('MARKET'),
       value: 'second',
     },
     {
