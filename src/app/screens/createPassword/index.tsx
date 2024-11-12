@@ -11,7 +11,7 @@ const Container = styled.div((props) => ({
   display: 'flex',
   flex: 1,
   flexDirection: 'column',
-  padding: props.theme.spacing(8),
+  padding: props.theme.space.m,
 }));
 
 const StepsContainer = styled.div((props) => ({
@@ -25,17 +25,19 @@ const PasswordContainer = styled.div((props) => ({
   display: 'flex',
   height: '100%',
   marginBottom: props.theme.spacing(15),
-  marginTop: props.theme.spacing(32),
+  marginTop: props.theme.space.xxxl,
 }));
 
 const StepDot = styled.div<{
-  active: boolean;
+  $active: boolean;
 }>((props) => ({
   width: 8,
   height: 8,
   borderRadius: 4,
-  backgroundColor: props.active ? props.theme.colors.action.classic : props.theme.colors.elevation3,
-  marginRight: props.theme.spacing(4),
+  backgroundColor: props.$active
+    ? props.theme.colors.action.classic
+    : props.theme.colors.elevation3,
+  marginRight: props.theme.space.xs,
 }));
 
 // TODO refactor to delete this whole screen and use the backup steps screen instead
@@ -88,13 +90,13 @@ function CreatePassword(): JSX.Element {
         {Array(2)
           .fill(0)
           .map((view, index) => (
-            <StepDot active={index === currentStepIndex} key={index.toString() + 1} />
+            <StepDot $active={index === currentStepIndex} key={index.toString() + 1} />
           ))}
       </StepsContainer>
       <PasswordContainer>
         {currentStepIndex === 0 ? (
           <PasswordInput
-            title={t('CREATE_PASSWORD_TITLE')}
+            title={t('ENTER_PASSWORD_TITLE')}
             inputLabel={t('TEXT_INPUT_NEW_PASSWORD_LABEL')}
             enteredPassword={password}
             setEnteredPassword={setPassword}
