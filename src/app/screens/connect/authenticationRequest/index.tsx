@@ -220,7 +220,7 @@ function AuthenticationRequest() {
       stxAddress: {
         mainnet: selectedAccount.stxAddress,
         testnet: publicKeyToAddress(AddressVersion.MainnetSingleSig, {
-          data: Buffer.from(selectedAccount.stxPublicKey, 'hex'),
+          data: Uint8Array.from(Buffer.from(selectedAccount.stxPublicKey, 'hex')),
           type: StacksMessageType.PublicKey,
         }),
       },

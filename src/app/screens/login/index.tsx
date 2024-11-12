@@ -11,7 +11,7 @@ import Button from '@ui-library/button';
 import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   AppVersion,
   ButtonContainer,
@@ -31,7 +31,6 @@ import {
 function Login(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'LOGIN_SCREEN' });
   const navigate = useNavigate();
-  const { state } = useLocation();
   const { unlockWallet } = useWalletReducer();
   const { hasSeed } = useSeedVault();
   const { migrateCachedStorage, isVaultUpdated } = useSeedVaultMigration();
@@ -89,19 +88,11 @@ function Login(): JSX.Element {
         setShowMigration(true);
       } else {
         setIsVerifying(false);
-        if (state?.from) {
-          navigate(state?.from, { state: { from: '/login' } }); // this is needed for AnimatedScreenContainer where we check the state.from
-        } else {
-          navigate(-1);
-        }
+        navigate(-1);
       }
     } catch (err) {
       setIsVerifying(false);
-      if (state?.from) {
-        navigate(state?.from, { state: { from: '/login' } }); // this is needed for AnimatedScreenContainer where we check the state.from
-      } else {
-        navigate(-1);
-      }
+      navigate(-1);
     }
   };
 
