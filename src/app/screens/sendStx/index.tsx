@@ -1,6 +1,7 @@
 import TokenImage from '@components/tokenImage';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
+import useCancellableEffect from '@hooks/useCancellableEffect';
 import useDebounce from '@hooks/useDebounce';
 import useNetworkSelector from '@hooks/useNetwork';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
@@ -119,11 +120,11 @@ function SendStxScreen() {
     }
   };
 
-  useEffect(() => {
-    let isActiveCall = true;
-    const constructTx = async () => {
+  useCancellableEffect(
+    async (isEffectActive) => {
       try {
         setIsLoadingTx(true);
+
         if (fungibleToken) {
           let convertedAmount = debouncedAmount;
           if (debouncedAmount && fungibleToken.decimals) {
@@ -132,8 +133,7 @@ function SendStxScreen() {
               fungibleToken.decimals,
             ).toString();
           }
-          // Create STX SIP-10 transfer transaction
-          const rawUnsignedSendFtTx: StacksTransaction = await generateUnsignedTransaction({
+          const rawUnsignedSendFtTx = await generateUnsignedTransaction({
             amount: convertedAmount,
             senderAddress: stxAddress,
             recipientAddress: debouncedRecipient,
@@ -145,48 +145,44 @@ function SendStxScreen() {
             pendingTxs: stxPendingTxData?.pendingTransactions ?? [],
             memo,
           });
-          if (isActiveCall) {
+
+          if (isEffectActive()) {
             setUnsignedSendStxTx(buf2hex(rawUnsignedSendFtTx.serialize()));
           }
           return;
         }
-        // Create STX transfer transaction
-        const rawUnsignedSendStxTx: StacksTransaction =
-          await generateUnsignedStxTokenTransferTransaction(
-            debouncedRecipient,
-            debouncedAmount,
-            memo,
-            stxPendingTxData?.pendingTransactions ?? [],
-            stxPublicKey,
-            selectedNetwork,
-          );
-        if (isActiveCall) {
+
+        const rawUnsignedSendStxTx = await generateUnsignedStxTokenTransferTransaction(
+          debouncedRecipient,
+          debouncedAmount,
+          memo,
+          stxPendingTxData?.pendingTransactions ?? [],
+          stxPublicKey,
+          selectedNetwork,
+        );
+
+        if (isEffectActive()) {
           setUnsignedSendStxTx(buf2hex(rawUnsignedSendStxTx.serialize()));
         }
       } catch (e) {
         console.error(e);
       } finally {
-        if (isActiveCall) {
-          setIsLoadingTx(false);
-        }
+        if (isEffectActive()) setIsLoadingTx(false);
       }
-    };
-    constructTx();
-    return () => {
-      isActiveCall = false;
-    };
-  }, [
-    debouncedRecipient,
-    debouncedAmount,
-    memo,
-    stxPendingTxData?.pendingTransactions,
-    stxPublicKey,
-    stxAddress,
-    selectedNetwork,
-    setIsLoadingTx,
-    setUnsignedSendStxTx,
-    fungibleToken,
-  ]);
+    },
+    [
+      debouncedRecipient,
+      debouncedAmount,
+      memo,
+      stxPendingTxData?.pendingTransactions,
+      stxPublicKey,
+      stxAddress,
+      selectedNetwork,
+      setIsLoadingTx,
+      setUnsignedSendStxTx,
+      fungibleToken,
+    ],
+  );
 
   // TODO: feeRates dont change much in the context of STX transfers so we only need to run this once
   useEffect(() => {
