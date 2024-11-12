@@ -1,7 +1,7 @@
 import AccountRow from '@components/accountRow';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 import OptionsDialog from '@components/optionsDialog/optionsDialog';
@@ -64,7 +64,6 @@ function AccountHeaderComponent({
   disableAccountSwitch = false,
 }: Props) {
   const navigate = useNavigate();
-  const { pathname } = useLocation();
   const selectedAccount = useSelectedAccount();
   const menuDialog = useOptionsDialog();
 
@@ -75,7 +74,7 @@ function AccountHeaderComponent({
 
   const handleAccountSelect = () => {
     if (!disableAccountSwitch) {
-      navigate(RoutePaths.AccountList, { state: { from: pathname } });
+      navigate(RoutePaths.AccountList);
     }
   };
 
