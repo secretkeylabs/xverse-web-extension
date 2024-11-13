@@ -20,6 +20,10 @@ const Title = styled.div`
   ${(props) => props.theme.typography.headline_xs}
   margin-top: ${(props) => props.theme.space.s};
   margin-bottom: ${(props) => props.theme.space.l};
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 300px;
+  white-space: nowrap;
 `;
 
 const Container = styled.div`

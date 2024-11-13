@@ -48,6 +48,7 @@ export const StyledFiatAmountText = styled(FiatAmountText)`
 
 export const RightAlignedStyledFiatAmountText = styled(StyledFiatAmountText)`
   text-align: right;
+  flex: 1 0 auto;
 `;
 
 export default FiatAmountText;

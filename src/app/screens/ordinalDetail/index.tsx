@@ -266,6 +266,7 @@ function OrdinalDetailScreen() {
         if (hoursUntilNextRefresh >= 1) {
           toast(
             t('REFRESHING_THUMBNAIL_TIMEOUT_HOURS', { count: Math.ceil(hoursUntilNextRefresh) }),
+            { duration: LONG_TOAST_DURATION },
           );
           return;
         }
@@ -274,6 +275,7 @@ function OrdinalDetailScreen() {
           t('REFRESHING_THUMBNAIL_TIMEOUT_MINUTES', {
             count: Math.ceil(minutesUntilNextRefresh),
           }),
+          { duration: LONG_TOAST_DURATION },
         );
         await cacheBustPromise;
       })
