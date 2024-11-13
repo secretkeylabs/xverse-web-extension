@@ -1148,7 +1148,8 @@
     "TIME": {
       "SEVERAL_HOURS_OR_MORE": "several hours or more",
       "HOUR": "hour",
-      "MINUTES": "mins"
+      "MINUTES": "mins",
+      "SECONDS": "sec"
     }
   },
   "POST_CONDITION_MESSAGE": {
