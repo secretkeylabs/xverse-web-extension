@@ -8,12 +8,13 @@ import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungib
 import useRuneUtxosQuery from '@hooks/queries/runes/useRuneUtxosQuery';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useSpamTokens from '@hooks/queries/useSpamTokens';
+import useHasFeature from '@hooks/useHasFeature';
 import { broadcastResetUserFlow, useResetUserFlow } from '@hooks/useResetUserFlow';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import { Flag } from '@phosphor-icons/react';
 import RuneBundleRow from '@screens/coinDashboard/runes/bundleRow';
 import type { FungibleToken } from '@secretkeylabs/xverse-core';
-import { mapRareSatsAPIResponseToBundle } from '@secretkeylabs/xverse-core';
+import { FeatureId, mapRareSatsAPIResponseToBundle } from '@secretkeylabs/xverse-core';
 import {
   setBrc20ManageTokensAction,
   setRunesManageTokensAction,
@@ -116,7 +117,7 @@ export default function CoinDashboard() {
   };
 
   const closeOptionsDialog = () => setShowOptionsDialog(false);
-
+  const showDataTab = useHasFeature(FeatureId.PORTFOLIO_TRACKING);
   return (
     <>
       <TopRow
@@ -173,13 +174,15 @@ export default function CoinDashboard() {
           >
             {t('TRANSACTIONS')}
           </Button>
-          <Button
-            disabled={currentTab === 'second'}
-            isSelected={currentTab === 'second'}
-            onClick={() => setCurrentTab('second')}
-          >
-            {t('MARKET')}
-          </Button>
+          {showDataTab && (
+            <Button
+              disabled={currentTab === 'second'}
+              isSelected={currentTab === 'second'}
+              onClick={() => setCurrentTab('second')}
+            >
+              {t('MARKET')}
+            </Button>
+          )}
           <Button
             data-testid="coin-secondary-button"
             disabled={currentTab === 'third'}

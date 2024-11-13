@@ -2,10 +2,12 @@ import { GlobalPreferredBtcAddressSheet } from '@components/preferredBtcAddress'
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useCanUserSwitchPaymentType from '@hooks/useCanUserSwitchPaymentType';
+import useHasFeature from '@hooks/useHasFeature';
 import { broadcastResetUserFlow, useResetUserFlow } from '@hooks/useResetUserFlow';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import type { Tab } from '@screens/coinDashboard';
 import TokenPrice from '@screens/coinDashboard/tokenPrice';
+import { FeatureId } from '@secretkeylabs/xverse-core';
 import { Tabs, type TabProp } from '@ui-library/tabs';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -35,6 +37,7 @@ export default function CoinDashboard() {
   useTrackMixPanelPageViewed({});
 
   const onCancelAddressType = () => setShowPreferredBtcAddressSheet(false);
+  const showDataTab = useHasFeature(FeatureId.PORTFOLIO_TRACKING);
 
   const tabs: TabProp<Tab>[] = [
     {
@@ -42,14 +45,17 @@ export default function CoinDashboard() {
       value: 'first',
     },
     {
-      label: t('MARKET'),
-      value: 'second',
-    },
-    {
       label: t('BREAKDOWN'),
       value: 'third',
     },
   ];
+
+  if (showDataTab) {
+    tabs.splice(1, 0, {
+      label: t('MARKET'),
+      value: 'second',
+    });
+  }
 
   return (
     <>
