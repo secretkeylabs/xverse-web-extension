@@ -442,9 +442,10 @@ export default class Wallet {
     this.buttonBRC20 = page.getByRole('button', { name: 'BRC-20' });
     this.buttonRunes = page.getByRole('button', { name: 'RUNES' });
     this.headingTokens = page.getByRole('heading', { name: 'Manage tokens' });
+
     this.divTokenRow = page.getByLabel('Token Row');
     this.labelTokenSubtitle = page.getByLabel('Token SubTitle');
-    this.labelCoinBalanceCurrency = page.getByLabel('CoinBalance Container').locator('span');
+    this.labelCoinBalanceCurrency = page.getByLabel('CurrencyBalance Container').locator('span');
     this.labelCoinBalanceCrypto = page.getByLabel('CoinBalance Container').locator('p');
 
     // Coin details
