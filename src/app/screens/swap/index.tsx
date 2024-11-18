@@ -2,7 +2,6 @@ import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import RequestsRoutes from '@common/utils/route-urls';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery';
 import useGetSip10TokenInfo from '@hooks/queries/stx/useGetSip10TokenInfo';
 import useGetQuotes from '@hooks/queries/swaps/useGetQuotes';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
@@ -137,7 +136,6 @@ export default function SwapScreen() {
   const params = new URLSearchParams(location.search);
   const defaultFrom = params.get('from');
   const { quotes, loading: quotesLoading, error: quotesError, fetchQuotes } = useGetQuotes();
-  const { data: runeFloorPrice } = useRuneFloorPriceQuery(toToken?.name ?? '');
   const coinsMasterList = useVisibleMasterCoinsList();
   const { tokenInfo: sip10FromTokenInfoUSD } = useGetSip10TokenInfo({
     principal: toToken?.ticker,
@@ -184,7 +182,6 @@ export default function SwapScreen() {
       amount: amountForQuote,
       quote,
       btcUsdRate,
-      runeFloorPrice,
       stxBtcRate,
       fromTokenInfo: sip10FromTokenInfoUSD,
     });
@@ -399,7 +396,6 @@ export default function SwapScreen() {
       amount: amountForQuote,
       quote,
       btcUsdRate,
-      runeFloorPrice,
       stxBtcRate,
       fromTokenInfo: sip10FromTokenInfoUSD,
     });
@@ -458,6 +454,16 @@ export default function SwapScreen() {
     navigate(RequestsRoutes.TransactionRequest, {
       state: {
         dataStxSignTransactionOverride,
+        mixpanelMetadata: {
+          provider: quote.provider,
+          fromToken,
+          toToken,
+          amount: amountForQuote,
+          quote,
+          btcUsdRate,
+          stxBtcRate,
+          fromTokenInfo: sip10FromTokenInfoUSD,
+        },
       },
     });
   }

@@ -241,6 +241,7 @@
     },
     "TOKEN_HIDDEN": "Token hidden and reported",
     "UNDO": "Undo",
+    "PRICE": "Price",
     "ERRORS": {
       "BTC_BALANCE": "Failed to load Bitcoin balance",
       "STX_BALANCE": "Failed to load Stacks balance",
@@ -603,9 +604,15 @@
     "CONFIRM_YOUR_SEEDPHRASE": "Confirm you've recorded your seed phrase correctly."
   },
   "CREATE_PASSWORD_SCREEN": {
-    "CREATE_PASSWORD_TITLE": "Enter a password to protect your wallet",
+    "CREATE_PASSWORD_TITLE": "Create your password",
+    "CREATE_PASSWORD_DESCRIPTION": "Create a strong password to protect your wallet. Your password must be at least 8 characters in length.",
+    "ENTER_PASSWORD_TITLE": "Enter a password to protect your wallet",
     "CONFIRM_PASSWORD_TITLE": "Confirm your password",
     "ENTER_PASSWORD": "Enter your current password",
+    "CREATE_PASSWORD_LABEL": "Create password",
+    "CONFIRM_PASSWORD_LABEL": "Confirm password",
+    "CREATE_PASSWORD_PLACEHOLDER": "Type your password",
+    "CONFIRM_PASSWORD_PLACEHOLDER": "Type your password again",
     "TEXT_INPUT_NEW_PASSWORD_LABEL": "Password",
     "TEXT_INPUT_CONFIRM_PASSWORD_LABEL": "Confirm Password",
     "CONTINUE_BUTTON": "Continue",
@@ -698,8 +705,9 @@
     "RESET": "Reset"
   },
   "RESTORE_WALLET_SCREEN": {
-    "ENTER_SEED_HEADER": "Enter your seed phrase to restore your wallet.",
-    "SEED_INPUT_ERROR": "Invalid seed phrase, please try again",
+    "ENTER_SEED_TITLE": "Restore Wallet",
+    "ENTER_SEED_DESCRIPTION": "Enter or paste your 12 or 24 word seedphrase to restore your wallet",
+    "SEED_INPUT_ERROR": "Seed phrase does not match, please try again.",
     "CONTINUE_BUTTON": "Continue",
     "HAVE_A_COUNT_WORDS_SEED_PHRASE": "Have a {{number}} words seed phrase?",
     "SELECT_ADDRESS_TYPE": {
@@ -821,6 +829,13 @@
     "UNHIDE_INSCRIPTION": "Unhide",
     "INSCRIPTION_HIDDEN": "Item hidden",
     "INSCRIPTION_UNHIDDEN": "Item un-hidden",
+    "REFRESH_THUMBNAIL": "Refresh Thumbnail",
+    "REFRESHING_THUMBNAIL": "Refreshing thumbnail",
+    "REFRESHING_THUMBNAIL_TIMEOUT_HOURS_one": "We've queued this thumbnail for an update. Try to refresh again in {{count}} hour.",
+    "REFRESHING_THUMBNAIL_TIMEOUT_HOURS_other": "We've queued this thumbnail for an update. Try to refresh again in {{count}} hours.",
+    "REFRESHING_THUMBNAIL_TIMEOUT_MINUTES_one": "We've queued this thumbnail for an update. Try to refresh again in {{count}} minute.",
+    "REFRESHING_THUMBNAIL_TIMEOUT_MINUTES_other": "We've queued this thumbnail for an update. Try to refresh again in {{count}} minutes.",
+    "REFRESHING_THUMBNAIL_ERROR": "Failed to refresh thumbnail. Please try again.",
     "SEND": "Send",
     "SHARE": "Share",
     "OWNED_BY": "Owned by",
@@ -1106,7 +1121,10 @@
     "COMING_SOON": "Coming soon",
     "VERIFY_ADDRESS_ON_LEDGER": "Verify address on Ledger",
     "VIEW_ADDRESS": "View address",
-    "HIDE_AND_REPORT": "Hide & Report"
+    "HIDE_AND_REPORT": "Hide & Report",
+    "DATA": "DATA",
+    "MARKET": "MARKET",
+    "PRICE": "Price"
   },
   "SPEED_UP_TRANSACTION": {
     "TITLE": "Speed up transaction",
@@ -1130,7 +1148,8 @@
     "TIME": {
       "SEVERAL_HOURS_OR_MORE": "several hours or more",
       "HOUR": "hour",
-      "MINUTES": "mins"
+      "MINUTES": "mins",
+      "SECONDS": "sec"
     }
   },
   "POST_CONDITION_MESSAGE": {

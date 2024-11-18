@@ -8,7 +8,14 @@ import TopRow from '@components/topRow';
 import useOptionsSheet from '@hooks/useOptionsSheet';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { ArrowUp, Share, TrayArrowDown, TrayArrowUp, UserCircle } from '@phosphor-icons/react';
+import {
+  ArrowCounterClockwise,
+  ArrowUp,
+  Share,
+  TrayArrowDown,
+  TrayArrowUp,
+  UserCircle,
+} from '@phosphor-icons/react';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import { StyledButton } from '@screens/ordinalsCollection/index.styled';
 import {
@@ -22,9 +29,11 @@ import {
 import { StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import SnackBar from '@ui-library/snackBar';
-import { EMPTY_LABEL, LONG_TOAST_DURATION } from '@utils/constants';
+import Spinner from '@ui-library/spinner';
+import { EMPTY_LABEL, LONG_TOAST_DURATION, XVERSE_ORDIVIEW_URL } from '@utils/constants';
+import { isThumbnailInscription } from '@utils/inscriptions';
 import { getRareSatsColorsByRareSatsType, getRareSatsLabelByType } from '@utils/rareSats';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -47,6 +56,7 @@ import {
   InfoContainer,
   InfoContainerColumn,
   OrdinalDetailsContainer,
+  OrdinalTitleContainer,
   OrdinalTitleText,
   RareSatsBundleCallout,
   Row,
@@ -71,7 +81,8 @@ function OrdinalDetailScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DETAIL_SCREEN' });
   const { t: commonT } = useTranslation('translation', { keyPrefix: 'COMMON' });
   const navigate = useNavigate();
-
+  const [refreshingThumbnail, setRefreshingThumbnail] = useState(false);
+  const [refreshedThumbnailTimestamp, setRefreshedThumbnailTimestamp] = useState(Date.now());
   const ordinalDetails = useOrdinalDetail();
   const {
     ordinal,
@@ -94,7 +105,8 @@ function OrdinalDetailScreen() {
     handleNavigationToRareSatsBundle,
     onCopyClick,
   } = ordinalDetails;
-  const { starredCollectibleIds, hiddenCollectibleIds, avatarIds } = useWalletSelector();
+  const { starredCollectibleIds, hiddenCollectibleIds, avatarIds, network } = useWalletSelector();
+  const canRefreshInscription = ordinal && isThumbnailInscription(ordinal) && !refreshingThumbnail;
   const selectedAvatar = avatarIds[ordinalsAddress];
   const isInscriptionSelectedAsAvatar =
     selectedAvatar?.type === 'inscription' && selectedAvatar.inscription.id === ordinal?.id;
@@ -192,7 +204,6 @@ function OrdinalDetailScreen() {
           avatar: { type: 'inscription', inscription: ordinal },
         }),
       );
-
       const toastId = toast(
         <SnackBar
           text={optionsDialogT('NFT_AVATAR.SET_TOAST')}
@@ -207,7 +218,6 @@ function OrdinalDetailScreen() {
               } else {
                 dispatch(removeAccountAvatarAction({ address: ordinalsAddress }));
               }
-
               toast.remove(toastId);
               toast(optionsDialogT('NFT_AVATAR.UNDO'));
             },
@@ -215,7 +225,6 @@ function OrdinalDetailScreen() {
         />,
       );
     }
-
     optionsSheet.close();
   }, [dispatch, optionsDialogT, commonT, ordinalsAddress, ordinal, optionsSheet, selectedAvatar]);
 
@@ -224,6 +233,57 @@ function OrdinalDetailScreen() {
     toast(optionsDialogT('NFT_AVATAR.REMOVE_TOAST'));
     optionsSheet.close();
   }, [dispatch, ordinalsAddress, optionsDialogT, optionsSheet]);
+
+  const handleRefreshThumbnail = useCallback(() => {
+    setRefreshingThumbnail(true);
+
+    const cacheBustPromise = fetch(
+      `${XVERSE_ORDIVIEW_URL(network.type)}/thumbnail/${ordinal?.id}`,
+      { method: 'DELETE' },
+    )
+      .then(async (res) => {
+        // must bust cache regardless if no refresh - retrieve server's latest image to ensure browser cache consistency
+        // we can do this in the background, no need to await
+        fetch(`${XVERSE_ORDIVIEW_URL(network.type)}/thumbnail/${ordinal?.id}`, {
+          cache: 'reload',
+        })
+          .then(() => setRefreshedThumbnailTimestamp(Date.now()))
+          .catch(() => {
+            // ignore errors
+          });
+
+        if (res.ok) {
+          toast.success(t('REFRESHING_THUMBNAIL'));
+          return;
+        }
+
+        const { timeUntilNextRefreshMs } = await res.json();
+        if ((timeUntilNextRefreshMs ?? 0) <= 0) {
+          toast(t('REFRESHING_THUMBNAIL_ERROR'));
+          return;
+        }
+        const hoursUntilNextRefresh = timeUntilNextRefreshMs / (1000 * 60 * 60);
+        if (hoursUntilNextRefresh >= 1) {
+          toast(
+            t('REFRESHING_THUMBNAIL_TIMEOUT_HOURS', { count: Math.ceil(hoursUntilNextRefresh) }),
+            { duration: LONG_TOAST_DURATION },
+          );
+          return;
+        }
+        const minutesUntilNextRefresh = Math.ceil(timeUntilNextRefreshMs / (1000 * 60));
+        toast(
+          t('REFRESHING_THUMBNAIL_TIMEOUT_MINUTES', {
+            count: Math.ceil(minutesUntilNextRefresh),
+          }),
+          { duration: LONG_TOAST_DURATION },
+        );
+        await cacheBustPromise;
+      })
+      .catch(() => toast(t('REFRESHING_THUMBNAIL_ERROR')))
+      .finally(() => setRefreshingThumbnail(false));
+
+    optionsSheet.close();
+  }, [network.type, optionsSheet, ordinal?.id, t]);
 
   const ordinalDetailAttributes = (
     <OrdinalDetailsContainer>
@@ -487,10 +547,13 @@ function OrdinalDetailScreen() {
           <CollectibleText>
             {isBrc20Ordinal ? t('BRC20_INSCRIPTION') : ordinal?.collection_name || t('INSCRIPTION')}
           </CollectibleText>
-          <OrdinalTitleText>{ordinal?.number}</OrdinalTitleText>
+          <OrdinalTitleContainer>
+            <OrdinalTitleText>{ordinal?.number}</OrdinalTitleText>
+            {refreshingThumbnail && <Spinner color="white" size={20} />}
+          </OrdinalTitleContainer>
           {!isGalleryOpen && <StyledWebGalleryButton onClick={openInGalleryView} />}
           <ExtensionOrdinalsContainer $isGalleryOpen={isGalleryOpen}>
-            <OrdinalImage ordinal={ordinal!} />
+            <OrdinalImage ordinal={ordinal!} thumbnailTimestamp={refreshedThumbnailTimestamp} />
           </ExtensionOrdinalsContainer>
           {satributesIcons}
           <RowButtonContainer>
@@ -565,6 +628,14 @@ function OrdinalDetailScreen() {
                 onClick={handleHideStandaloneInscription}
               />
             ))}
+          {canRefreshInscription && (
+            <StyledButton
+              variant="tertiary"
+              icon={<ArrowCounterClockwise size={24} color={Theme.colors.white_200} />}
+              title={t('REFRESH_THUMBNAIL')}
+              onClick={handleRefreshThumbnail}
+            />
+          )}
         </Sheet>
       )}
     </>

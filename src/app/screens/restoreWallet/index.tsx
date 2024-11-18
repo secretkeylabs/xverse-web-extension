@@ -1,6 +1,6 @@
+import CreatePassword from '@components/createPassword';
 import Dots from '@components/dots';
 import { useWalletExistsContext } from '@components/guards/onboarding';
-import PasswordInput from '@components/passwordInput';
 import useWalletReducer from '@hooks/useWalletReducer';
 import type { BtcPaymentType } from '@secretkeylabs/xverse-core';
 import * as bip39 from 'bip39';
@@ -15,8 +15,7 @@ const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
-  padding: props.theme.space.m,
-  paddingBottom: 0,
+  padding: `${props.theme.space.l} ${props.theme.space.m} 0`,
   overflowY: 'auto',
 }));
 
@@ -24,8 +23,8 @@ const PasswordContainer = styled.div((props) => ({
   display: 'flex',
   width: '100%',
   height: '100%',
-  marginBottom: props.theme.space.xxxl,
-  marginTop: props.theme.space.xxxl,
+  marginTop: props.theme.space.xs,
+  flex: '1 0 auto',
 }));
 
 function RestoreWallet(): JSX.Element {
@@ -55,22 +54,6 @@ function RestoreWallet(): JSX.Element {
     }
   };
 
-  const onAccountTypeContinue = () => {
-    setCurrentStepIndex(2);
-  };
-
-  const onNewPasswordBack = () => {
-    setCurrentStepIndex(1);
-  };
-
-  const onNewPasswordContinue = () => {
-    setCurrentStepIndex(3);
-  };
-
-  const handleConfirmPasswordBack = () => {
-    setCurrentStepIndex(2);
-  };
-
   const onConfirmPasswordContinue = async () => {
     setIsRestoring(true);
     if (confirmPassword === password) {
@@ -84,11 +67,15 @@ function RestoreWallet(): JSX.Element {
 
       changeBtcPaymentAddressType(btcPayAddressType);
 
-      navigate('/wallet-success/restore', { replace: true });
+      setCurrentStepIndex(2);
     } else {
       setIsRestoring(false);
       setError(t('CREATE_PASSWORD_SCREEN.CONFIRM_PASSWORD_MATCH_ERROR'));
     }
+  };
+
+  const onAccountTypeContinue = () => {
+    navigate('/wallet-success/restore', { replace: true });
   };
 
   const restoreSteps = [
@@ -100,6 +87,18 @@ function RestoreWallet(): JSX.Element {
       seedError={seedError}
       setSeedError={setSeedError}
     />,
+    <PasswordContainer key="password">
+      <CreatePassword
+        password={password}
+        setPassword={setPassword}
+        confirmPassword={confirmPassword}
+        setConfirmPassword={setConfirmPassword}
+        handleContinue={onConfirmPasswordContinue}
+        loading={isRestoring}
+        confirmPasswordError={error}
+        checkPasswordStrength
+      />
+    </PasswordContainer>,
     <PaymentAddressTypeSelector
       key="addressType"
       seedPhrase={seedPhrase}
@@ -107,31 +106,6 @@ function RestoreWallet(): JSX.Element {
       onSelectedTypeChange={setBtcPayAddressType}
       onContinue={onAccountTypeContinue}
     />,
-    <PasswordContainer key="password">
-      <PasswordInput
-        title={t('CREATE_PASSWORD_SCREEN.CREATE_PASSWORD_TITLE')}
-        inputLabel={t('CREATE_PASSWORD_SCREEN.TEXT_INPUT_NEW_PASSWORD_LABEL')}
-        enteredPassword={password}
-        setEnteredPassword={setPassword}
-        handleContinue={onNewPasswordContinue}
-        handleBack={onNewPasswordBack}
-        checkPasswordStrength
-        autoFocus
-      />
-    </PasswordContainer>,
-    <PasswordContainer key="confirmPassword">
-      <PasswordInput
-        title={t('CREATE_PASSWORD_SCREEN.CONFIRM_PASSWORD_TITLE')}
-        inputLabel={t('CREATE_PASSWORD_SCREEN.TEXT_INPUT_NEW_PASSWORD_LABEL')}
-        enteredPassword={confirmPassword}
-        setEnteredPassword={setConfirmPassword}
-        handleContinue={onConfirmPasswordContinue}
-        handleBack={handleConfirmPasswordBack}
-        passwordError={error}
-        loading={isRestoring}
-        autoFocus
-      />
-    </PasswordContainer>,
   ];
 
   return (

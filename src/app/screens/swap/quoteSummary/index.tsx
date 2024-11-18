@@ -268,7 +268,6 @@ export default function QuoteSummary({
       amount,
       quote,
       btcUsdRate,
-      runeFloorPrice,
       stxBtcRate,
       fromTokenInfo: sip10FromTokenInfoUSD,
     });

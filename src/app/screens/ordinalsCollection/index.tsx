@@ -56,34 +56,42 @@ import {
 function OrdinalsCollection() {
   const { t } = useTranslation('translation', { keyPrefix: 'COLLECTIBLE_COLLECTION_SCREEN' });
   const { t: tCommon } = useTranslation('translation', { keyPrefix: 'COMMON' });
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { ordinalsAddress } = useSelectedAccount();
+  const optionsSheet = useOptionsSheet();
   const { id: collectionId, from } = useParams();
   const { starredCollectibleIds, hiddenCollectibleIds, avatarIds } = useWalletSelector();
-  const selectedAvatar = avatarIds[ordinalsAddress];
-  const optionsSheet = useOptionsSheet();
+
   const { data, error, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useAddressCollectionInscriptions(collectionId);
   const { data: collectionMarketData, isLoading: isLoadingMarketData } =
     useInscriptionCollectionMarketData(collectionId);
-  const dispatch = useDispatch();
-  const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
-
-  const collectionStarred = starredCollectibleIds[ordinalsAddress]?.some(
-    ({ id }) => id === collectionId,
-  );
-  const collectionHidden = Object.keys(hiddenCollectibleIds[ordinalsAddress] ?? {}).some(
-    (id) => id === collectionId,
-  );
 
   const comesFromHidden = from === 'hidden';
+  const selectedAvatar = avatarIds[ordinalsAddress];
+  const isEmpty = !isLoading && !error && data?.pages?.[0]?.total === 0;
+  const collectionHeading = data?.pages?.[0].collection_name;
+  const estPortfolioValue =
+    data && data?.pages?.[0].portfolio_value !== 0
+      ? `${data?.pages?.[0].portfolio_value.toFixed(8)} BTC`
+      : EMPTY_LABEL;
+  const collectionFloorPrice = collectionMarketData?.floor_price
+    ? `${collectionMarketData?.floor_price?.toFixed(8)} BTC`
+    : EMPTY_LABEL;
+
+  const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
+  const collectionStarred: boolean = useMemo(
+    () => starredCollectibleIds[ordinalsAddress]?.some(({ id }) => id === collectionId),
+    [collectionId, ordinalsAddress, starredCollectibleIds],
+  );
+  const collectionHidden = useMemo(
+    () =>
+      Object.keys(hiddenCollectibleIds[ordinalsAddress] ?? {}).some((id) => id === collectionId),
+    [collectionId, ordinalsAddress, hiddenCollectibleIds],
+  );
 
   useResetUserFlow('/ordinals-collection');
-
-  const handleBackButtonClick = () =>
-    navigate(
-      `/nft-dashboard${comesFromHidden || collectionHidden ? '/hidden' : ''}?tab=inscriptions`,
-    );
 
   const openInGalleryView = async () => {
     await chrome.tabs.create({
@@ -101,13 +109,11 @@ function OrdinalsCollection() {
 
   const handleHideCollection = () => {
     dispatch(addToHideCollectiblesAction({ address: ordinalsAddress, id: collectionId ?? '' }));
-
     if (selectedAvatar?.type === 'inscription') {
       const shouldHideAvatar = data?.pages
         ?.map((page) => page?.data)
         .flat()
-        .some((inscription) => inscription.id === selectedAvatar.inscription.id);
-
+        .some((inscription) => inscription && inscription.id === selectedAvatar.inscription.id);
       if (shouldHideAvatar) {
         dispatch(removeAccountAvatarAction({ address: ordinalsAddress }));
       }
@@ -137,16 +143,6 @@ function OrdinalsCollection() {
     toast(t('COLLECTION_UNHIDDEN'));
     navigate(`/nft-dashboard/${isLastHiddenItem ? '' : 'hidden'}?tab=inscriptions`);
   };
-
-  const isEmpty = !isLoading && !error && data?.pages?.[0]?.total === 0;
-  const collectionHeading = data?.pages?.[0].collection_name;
-  const estPortfolioValue =
-    data && data?.pages?.[0].portfolio_value !== 0
-      ? `${data?.pages?.[0].portfolio_value.toFixed(8)} BTC`
-      : EMPTY_LABEL;
-  const collectionFloorPrice = collectionMarketData?.floor_price
-    ? `${collectionMarketData?.floor_price?.toFixed(8)} BTC`
-    : EMPTY_LABEL;
 
   const handleClickUndoStarring = (toastId: string) => {
     dispatch(
@@ -181,7 +177,13 @@ function OrdinalsCollection() {
   return (
     <>
       <TopRow
-        onClick={handleBackButtonClick}
+        onClick={() =>
+          navigate(
+            `/nft-dashboard${
+              comesFromHidden || collectionHidden ? '/hidden' : ''
+            }?tab=inscriptions`,
+          )
+        }
         onMenuClick={optionsSheet.open}
         onStarClick={collectionHidden ? undefined : handleStarClick}
         isStarred={collectionStarred}

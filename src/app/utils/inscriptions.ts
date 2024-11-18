@@ -1,9 +1,20 @@
 import {
   isBrcTransferValid,
+  type CondensedInscription,
   type Inscription,
   type InscriptionCollectionsData,
 } from '@secretkeylabs/xverse-core';
 import type { Color } from 'theme';
+
+export const isThumbnailInscription = (ordinal: Inscription | CondensedInscription): boolean => {
+  const contentType = ordinal.content_type;
+  return (
+    !contentType ||
+    contentType.includes('image/svg') ||
+    contentType.includes('html') ||
+    contentType.startsWith('video/')
+  );
+};
 
 export const isCollection = (collection: InscriptionCollectionsData): boolean =>
   collection.collection_id !== null;

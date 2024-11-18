@@ -49,7 +49,7 @@ export const ErrorContainer = styled.div((props) => ({
 
 export const ErrorText = styled.p((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.feedback.error,
+  color: props.theme.colors.danger_medium,
 }));
 
 export const ReviewTransactionText = styled.h1((props) => ({

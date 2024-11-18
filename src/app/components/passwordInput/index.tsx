@@ -84,19 +84,19 @@ function PasswordInput({
     };
   } else if (score <= PasswordStrength.WeakScore) {
     passwordStrengthLabel = {
-      color: theme.colors.feedback.error,
+      color: theme.colors.danger_medium,
       width: '20%',
-      message: <p style={{ color: theme.colors.feedback.error }}>{t('PASSWORD_STRENGTH_WEAK')}</p>,
+      message: <p style={{ color: theme.colors.danger_medium }}>{t('PASSWORD_STRENGTH_WEAK')}</p>,
     };
   } else if (score <= PasswordStrength.AverageScore) {
     passwordStrengthLabel = {
-      color: theme.colors.feedback.caution,
+      color: theme.colors.caution,
       width: '50%',
       message: <p>{t('PASSWORD_STRENGTH_MEDIUM')}</p>,
     };
   } else {
     passwordStrengthLabel = {
-      color: theme.colors.feedback.success,
+      color: theme.colors.success_medium,
       width: '100%',
       message: <p>{t('PASSWORD_STRENGTH_STRONG')}</p>,
     };

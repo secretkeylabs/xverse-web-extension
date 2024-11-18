@@ -1,5 +1,6 @@
 import useAddressInscription from '@hooks/queries/ordinals/useAddressInscription';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import useCancellableEffect from '@hooks/useCancellableEffect';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
@@ -59,17 +60,18 @@ function SendOrdinalScreen() {
     }
   }, [btcFeeRate, feeRatesLoading]);
 
-  useEffect(() => {
-    if (!recipientAddress || !feeRate) {
-      setTransaction(undefined);
-      setSummary(undefined);
-      setInsufficientFundsError(false);
-      return;
-    }
-    let isActiveEffect = true;
-    const generateTxnAndSummary = async () => {
+  useCancellableEffect(
+    async (isEffectActive) => {
+      if (!recipientAddress || !feeRate) {
+        setTransaction(undefined);
+        setSummary(undefined);
+        setInsufficientFundsError(false);
+        return;
+      }
+
       setIsLoading(true);
       setInsufficientFundsError(false);
+
       try {
         const transactionDetails = isRareSat
           ? await btcTransaction.sendOrdinals(
@@ -83,13 +85,13 @@ function SendOrdinalScreen() {
               Number(feeRate),
             );
 
-        if (!isActiveEffect) return;
-        if (!transactionDetails) return;
-        setTransaction(transactionDetails);
-        setSummary(await transactionDetails.getSummary());
+        if (isEffectActive() && transactionDetails) {
+          setTransaction(transactionDetails);
+          setSummary(await transactionDetails.getSummary());
+        }
       } catch (e) {
+        if (!isEffectActive()) return;
         if (e instanceof Error) {
-          // don't log the error if it's just an insufficient funds error
           if (e.message.includes('Insufficient funds')) {
             setInsufficientFundsError(true);
           } else {
@@ -99,16 +101,11 @@ function SendOrdinalScreen() {
         setTransaction(undefined);
         setSummary(undefined);
       } finally {
-        if (isActiveEffect) {
-          setIsLoading(false);
-        }
+        if (isEffectActive()) setIsLoading(false);
       }
-    };
-    generateTxnAndSummary();
-    return () => {
-      isActiveEffect = false;
-    };
-  }, [context, recipientAddress, feeRate, id]);
+    },
+    [context, recipientAddress, feeRate, id, vout, isRareSat],
+  );
 
   if (!selectedOrdinal && !isRareSat) {
     navigate('/');

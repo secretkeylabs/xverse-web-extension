@@ -6,9 +6,9 @@ const Container = styled.div({
   justifyContent: 'center',
 });
 
-const DotWrapper = styled.button((props) => ({
+const DotButton = styled.button((props) => ({
   cursor: props.onClick ? 'pointer' : 'default',
-  padding: props.theme.space.xxs,
+  padding: 3,
   backgroundColor: 'transparent',
 }));
 
@@ -16,40 +16,30 @@ const Dot = styled.div<{
   $active: boolean;
   $size?: number;
 }>((props) => ({
-  width: props.$size ?? 8,
-  height: props.$size ?? 8,
+  width: props.$active ? 18 : props.$size ?? 6,
+  height: props.$size ?? 6,
   borderRadius: 50,
-  backgroundColor: props.$active ? props.theme.colors.white_0 : props.theme.colors.white_800,
+  backgroundColor: props.$active ? props.theme.colors.white_0 : props.theme.colors.white_600,
 }));
 
 type Props = {
   numDots: number;
   activeIndex: number;
-  dotStrategy?: 'completion' | 'selection';
   size?: number;
   handleClickDot?: (index: number) => void;
 };
 
-export default function Dots({
-  numDots,
-  activeIndex,
-  dotStrategy,
-  size,
-  handleClickDot,
-}: Props): JSX.Element {
-  const getStrategy = (index: number) => {
-    if (dotStrategy === 'selection') {
-      return index === activeIndex;
-    }
-    return index <= activeIndex;
-  };
-
+export default function Dots({ numDots, activeIndex, size, handleClickDot }: Props): JSX.Element {
   return (
     <Container>
       {Array.from({ length: numDots }, (_, i) => (
-        <DotWrapper key={i} onClick={handleClickDot ? () => handleClickDot(i) : undefined}>
-          <Dot $active={getStrategy(i)} $size={size} />
-        </DotWrapper>
+        <DotButton
+          key={i}
+          onClick={handleClickDot ? () => handleClickDot(i) : undefined}
+          tabIndex={handleClickDot ? 0 : -1} // for accessibility, to avoid focus on the dots when they are not clickable
+        >
+          <Dot $active={i === activeIndex} $size={size} />
+        </DotButton>
       ))}
     </Container>
   );

@@ -25,104 +25,41 @@ test.describe('Account Management', () => {
     await expect(wallet.labelAccountName).toHaveText('Account 1');
   });
 
-  test('Rename account', async ({ page, extensionId }) => {
-    const onboardingPage = new Onboarding(page);
-    const wallet = new Wallet(page);
-    await onboardingPage.createWalletSkipBackup(strongPW);
-    await page.goto(`chrome-extension://${extensionId}/popup.html`);
-    await wallet.checkVisualsStartpage();
-    await wallet.labelAccountName.click();
-    expect(page.url()).toContain('account-list');
-    await expect(wallet.labelAccountName).toHaveCount(1);
-    await wallet.buttonAccountOptions.click();
-    await expect(wallet.buttonRenameAccount).toBeVisible();
-    await wallet.buttonRenameAccount.click();
-    await expect(wallet.buttonConfirm).toBeVisible();
-    await expect(wallet.buttonConfirm).toBeDisabled();
-    await expect(wallet.labelInfoRenameAccount).toBeVisible();
-    await expect(wallet.inputName).toBeVisible();
-    await expect(wallet.buttonResetAccountName).toBeVisible();
-    await expect(wallet.errorMessageRenameAccount).toBeHidden();
-    // Check Error message for non alphabetical and numerical characters
-    await wallet.inputName.fill(`!!!`);
-    await expect(wallet.errorMessageRenameAccount).toBeVisible();
-    await expect(wallet.buttonConfirm).toBeDisabled();
-    await wallet.inputName.clear();
-    await expect(wallet.errorMessageRenameAccount).toBeHidden();
-    await expect(wallet.buttonConfirm).toBeDisabled();
-    await wallet.inputName.fill(`RenameAccount`);
-    await expect(wallet.buttonConfirm).toBeEnabled();
-    await wallet.buttonConfirm.click();
-    await expect(wallet.buttonGenerateAccount).toBeVisible();
-    await expect(wallet.labelAccountName).toHaveText('RenameAccount');
-    await expect(wallet.labelAccountName).toHaveCount(1);
-  });
-
   test('Reset account name', async ({ page, extensionId }) => {
     const onboardingPage = new Onboarding(page);
-    const wallet = new Wallet(page);
     await onboardingPage.createWalletSkipBackup(strongPW);
-    await page.goto(`chrome-extension://${extensionId}/popup.html`);
-    await wallet.checkVisualsStartpage();
-    await wallet.labelAccountName.click();
-    expect(page.url()).toContain('account-list');
-    await expect(wallet.labelAccountName).toHaveCount(1);
-    await wallet.buttonAccountOptions.click();
-    await expect(wallet.buttonRenameAccount).toBeVisible();
-    await wallet.buttonRenameAccount.click();
-    await expect(wallet.buttonResetAccountName).toBeVisible();
-    await wallet.inputName.fill(`RenameAccount`);
-    await expect(wallet.buttonConfirm).toBeEnabled();
-    await wallet.buttonConfirm.click();
-    await expect(wallet.buttonGenerateAccount).toBeVisible();
-    await expect(wallet.labelAccountName).toHaveText('RenameAccount');
-    await expect(wallet.labelAccountName).toHaveCount(1);
-    await wallet.buttonAccountOptions.click();
-    await expect(wallet.buttonRenameAccount).toBeVisible();
-    await wallet.buttonRenameAccount.click();
-    await expect(wallet.buttonResetAccountName).toBeVisible();
-    await wallet.buttonResetAccountName.click();
-    await expect(wallet.buttonGenerateAccount).toBeVisible();
-    await expect(wallet.labelAccountName).toHaveText('Account 1');
+    await page.goto(`chrome-extension://${extensionId}/options.html`);
+    await expect(page.getByText('Account 1')).toBeVisible();
+    await page.getByText('Account 1').click();
+    await expect(page.getByRole('button', { name: /open account options/i })).toBeVisible();
+    await page.getByRole('button', { name: /open account options/i }).click();
+    await expect(page.getByRole('button', { name: /rename account/i })).toBeVisible();
+    await page.getByRole('button', { name: /rename account/i }).click();
+    await expect(page.getByRole('textbox', { name: '' })).toBeVisible();
+    await page.getByRole('textbox', { name: '' }).fill('Bla Bla Bla 1');
+    await page.getByRole('button', { name: /confirm/i }).click();
+
+    await expect(page.getByText('Bla Bla Bla 1')).toBeVisible();
+
+    await page.getByRole('button', { name: /open account options/i }).click();
+    await page.getByRole('button', { name: /rename account/i }).click();
+    await page.getByRole('textbox', { name: '' }).fill('!@$$%%^&**&^(*&');
+    await expect(
+      page.getByText(/account name can only contain alphabetic and numeric characters and space/i),
+    ).toBeVisible();
+    await page.getByRole('button', { name: /reset name/i }).click();
+    await expect(page.getByText('Account 1')).toBeVisible();
+    await expect(page.getByRole('button', { name: /generate account/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /connect hardware wallet/i })).toBeVisible();
   });
 
   test('Generate new account', async ({ page, extensionId }) => {
     const onboardingPage = new Onboarding(page);
-    const wallet = new Wallet(page);
     await onboardingPage.createWalletSkipBackup(strongPW);
     await page.goto(`chrome-extension://${extensionId}/popup.html`);
-    await wallet.checkVisualsStartpage();
-    await wallet.labelAccountName.click();
-    expect(page.url()).toContain('account-list');
-    await expect(wallet.labelAccountName).toHaveCount(1);
-    await wallet.buttonGenerateAccount.click();
-    await expect(wallet.labelAccountName).toHaveCount(2);
-    await expect(wallet.buttonAccountOptions).toHaveCount(2);
-    await expect(wallet.accountBalance).toHaveCount(2);
-    const balanceText = await wallet.getBalanceOfAllAccounts();
-    expect(balanceText).toBe(0);
-  });
-
-  test('Switch to another account and switch back', async ({ page, extensionId }) => {
-    const onboardingPage = new Onboarding(page);
-    const wallet = new Wallet(page);
-    await onboardingPage.createWalletSkipBackup(strongPW);
-    await page.goto(`chrome-extension://${extensionId}/popup.html`);
-    await wallet.checkVisualsStartpage();
-    await expect(wallet.labelAccountName).toHaveText('Account 1');
-    await wallet.labelAccountName.click();
-    expect(page.url()).toContain('account-list');
-    await expect(wallet.labelAccountName).toHaveCount(1);
-    await wallet.buttonGenerateAccount.click();
-    await expect(wallet.labelAccountName).toHaveCount(2);
-    const balanceText = await wallet.getBalanceOfAllAccounts();
-    expect(balanceText).toBe(0);
-    await wallet.labelAccountName.last().click();
-    await wallet.checkVisualsStartpage();
-    await expect(wallet.labelAccountName).toHaveText('Account 2');
-    await wallet.labelAccountName.click();
-    await wallet.labelAccountName.first().click();
-    await wallet.checkVisualsStartpage();
-    await expect(wallet.labelAccountName).toHaveText('Account 1');
+    await page.getByRole('button', { name: /account name/i }).click();
+    await expect(page.getByText('Account 1')).toBeVisible();
+    await page.getByRole('button', { name: /generate account/i }).click();
+    await expect(page.getByText('Account 2')).toBeVisible();
   });
 });

@@ -93,6 +93,7 @@ type Props = {
   requestToken: string;
   attachment: Buffer | undefined;
   broadcastAfterSigning: boolean;
+  onSignTransaction?: () => void;
 };
 
 export default function ContractCallRequest({
@@ -106,6 +107,7 @@ export default function ContractCallRequest({
   messageId,
   rpcMethod,
   broadcastAfterSigning,
+  onSignTransaction,
 }: Props) {
   const selectedNetwork = useNetworkSelector();
   const [hasTabClosed, setHasTabClosed] = useState(false);
@@ -115,7 +117,8 @@ export default function ContractCallRequest({
   );
   const { executeStxOrder } = useExecuteOrder();
   const [isLoading, setIsLoading] = useState(false);
-  const isStxSwap = messageId === 'velar' || messageId === 'alex';
+  // TODO fix this to be less hacky
+  const isStxSwap = messageId === 'velar' || messageId === 'alex' || messageId === 'bitflow';
 
   // SignTransaction Params
   const isMultiSigTx = isMultiSig(unsignedTx);
@@ -279,6 +282,7 @@ export default function ContractCallRequest({
       setIsLoading(false);
 
       if (response) {
+        if (onSignTransaction) onSignTransaction();
         navigate('/tx-status', {
           state: {
             txid: response.txid,

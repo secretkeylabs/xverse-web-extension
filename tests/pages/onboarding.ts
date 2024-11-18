@@ -88,7 +88,9 @@ export default class Onboarding {
     this.header = page.locator('#app h3');
     this.inputPassword = page.locator('input[type="password"]');
     this.errorMessage2 = page.locator('p').filter({ hasText: 'Please make sure your' });
-    this.errorMessageSeedPhrase = page.locator('p').filter({ hasText: 'Invalid seed phrase' });
+    this.errorMessageSeedPhrase = page
+      .locator('p')
+      .filter({ hasText: 'Seed phrase does not match' });
     this.labelSecurityLevelWeak = page.locator('p').filter({ hasText: 'Weak' });
     this.labelSecurityLevelMedium = page.locator('p').filter({ hasText: 'Medium' });
     this.labelSecurityLevelStrong = page.locator('p').filter({ hasText: 'Strong' });
@@ -99,7 +101,7 @@ export default class Onboarding {
     this.instruction = page.getByRole('heading', { name: 'Locate Xverse' });
     this.headingWalletRestored = page.getByRole('heading', { name: 'Wallet restored' });
     this.buttonCloseTab = page.getByRole('button', { name: 'Close this tab' });
-    this.headingRestoreWallet = page.getByRole('heading', { name: 'restore your wallet' });
+    this.headingRestoreWallet = page.getByRole('heading', { name: 'Restore Wallet' });
     this.button24SeedPhrase = page.getByRole('button', { name: '24 words' });
     this.button12SeedPhrase = page.getByRole('button', { name: '12 words' });
     this.inputSeedPhraseWord = page.locator('input');

@@ -299,11 +299,13 @@ function Input({
         </ComplicationsContainer>
       </InputContainer>
       {subText && <SubText>{subText}</SubText>}
-      <Feedback>
-        {feedback?.map((f) => (
-          <InputFeedback key={f.message} message={f.message} variant={f.variant} />
-        ))}
-      </Feedback>
+      {!!feedback?.length && (
+        <Feedback>
+          {feedback?.map((f) => (
+            <InputFeedback key={f.message} message={f.message} variant={f.variant} />
+          ))}
+        </Feedback>
+      )}
     </Container>
   );
 }

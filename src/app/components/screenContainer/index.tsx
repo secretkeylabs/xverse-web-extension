@@ -37,7 +37,7 @@ const RouteContainer = styled.div`
   height: 100%;
   margin: auto;
   background-color: ${(props) => props.theme.colors.elevation0};
-  border: 1px solid ${(props) => props.theme.colors.elevation2};
+  border: 1px solid ${(props) => props.theme.colors.white_900};
 
   @media ${devices.min.xs} {
     border-radius: ${(props) => props.theme.radius(2)}px;

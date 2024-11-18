@@ -3,15 +3,6 @@ import styled from 'styled-components';
 
 type ToastType = 'success' | 'error' | 'neutral';
 
-const getBackgroundColor = (type: ToastType, theme: any): string => {
-  const colors = {
-    success: theme.colors.feedback.success,
-    error: theme.colors.danger_dark,
-    neutral: theme.colors.white_0,
-  };
-  return colors[type] || theme.colors.feedback.neutral;
-};
-
 const getTextColor = (type: ToastType, theme: any): string => {
   const colors = {
     success: theme.colors.elevation0,
@@ -56,15 +47,13 @@ function SnackBar({ text, type, dismissToast, action }: Props) {
     <ToastContainer type={type}>
       {type !== 'neutral' && dismissToast && (
         <ToastDismissButton onClick={dismissToast} type={type}>
-          {type === 'error' && <XCircle size={20} />}
-          {type === 'success' && <CheckCircle size={20} />}
+          {type === 'error' && <XCircle size={20} weight="bold" />}
+          {type === 'success' && <CheckCircle size={20} weight="bold" />}
         </ToastDismissButton>
       )}
-
       <ToastMessage type={type} addMarginRight={Boolean(action)}>
         {text}
       </ToastMessage>
-
       {action?.text && (
         <ToastActionButton onClick={action?.onClick} type={type}>
           {action?.text}
