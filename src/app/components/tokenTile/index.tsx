@@ -31,7 +31,10 @@ const TokenImageContainer = styled.div((props) => ({
 }));
 
 const RowContainers = styled.div`
-  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  flex: 1;
 `;
 
 const RowContainer = styled.div((props) => ({
