@@ -6,7 +6,6 @@ import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import Lock from '@assets/img/transactions/Lock.svg';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
-import PercentageChange from '@components/percentageChange';
 import SquareButton from '@components/squareButton';
 import TokenImage from '@components/tokenImage';
 import useSelectedAccountBtcBalance from '@hooks/queries/useSelectedAccountBtcBalance';
@@ -46,7 +45,6 @@ import {
   FiatAmountText,
   FiatContainer,
   HeaderSeparator,
-  HourText,
   LockedStxContainer,
   ProtocolText,
   RowButtonContainer,
@@ -283,8 +281,6 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
                 )}
               />
             )}
-            <PercentageChange ftCurrencyPairs={[[fungibleToken, currency]]} />
-            <HourText>24h</HourText>
           </FiatContainer>
         </BalanceValuesContainer>
       </BalanceInfoContainer>

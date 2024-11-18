@@ -63,13 +63,6 @@ export const FiatAmountText = styled.p((props) => ({
   marginTop: props.theme.space.xxs,
 }));
 
-export const HourText = styled.p((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_200,
-  textAlign: 'center',
-  cursor: 'pointer',
-}));
-
 export const BalanceTitleText = styled.p((props) => ({
   ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_400,
