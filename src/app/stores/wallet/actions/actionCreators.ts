@@ -343,3 +343,19 @@ export function setBalanceHiddenToggleAction(params: {
     ...params,
   };
 }
+
+export function setShowBalanceInBtcAction(params: {
+  toggle: boolean;
+}): actions.SetShowBalanceInBtc {
+  return {
+    type: actions.SetShowBalanceInBtcToggleKey,
+    ...params,
+  };
+}
+
+export const setWalletBackupStatusAction = (
+  hasBackedUpWallet: boolean,
+): actions.SetWalletBackupStatus => ({
+  type: actions.SetWalletBackupStatusKey,
+  hasBackedUpWallet,
+});

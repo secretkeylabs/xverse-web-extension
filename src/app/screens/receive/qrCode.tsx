@@ -2,15 +2,15 @@ import QRCodeStyling, { type DotType, type Options } from 'qr-code-styling';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 
-interface Props {
-  image: string;
-  data: string;
-  gradientColor: string;
-}
-
 const QRCodeContainer = styled.div({
   display: 'flex',
 });
+
+type Props = {
+  image: string;
+  data: string;
+  gradientColor: string;
+};
 
 function QrCode({ image, data, gradientColor }: Props) {
   const options: Options = useMemo(

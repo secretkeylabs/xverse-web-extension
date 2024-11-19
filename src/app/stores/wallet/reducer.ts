@@ -27,10 +27,12 @@ import {
   SetHiddenCollectiblesKey,
   SetNotificationBannersKey,
   SetRunesManageTokensKey,
+  SetShowBalanceInBtcToggleKey,
   SetShowSpamTokensKey,
   SetSip10ManageTokensKey,
   SetSpamTokenKey,
   SetSpamTokensKey,
+  SetWalletBackupStatusKey,
   SetWalletHideStxKey,
   SetWalletLockPeriodKey,
   SetWalletUnlockedKey,
@@ -100,6 +102,8 @@ export const initialWalletState: WalletState = {
   starredCollectibleIds: {},
   avatarIds: {},
   balanceHidden: false,
+  showBalanceInBtc: false,
+  hasBackedUpWallet: true,
 };
 
 /**
@@ -386,6 +390,16 @@ const walletReducer = (
         balanceHidden: action.toggle,
       };
     }
+    case SetShowBalanceInBtcToggleKey:
+      return {
+        ...state,
+        showBalanceInBtc: action.toggle,
+      };
+    case SetWalletBackupStatusKey:
+      return {
+        ...state,
+        hasBackedUpWallet: action.hasBackedUpWallet,
+      };
     default:
       return state;
   }

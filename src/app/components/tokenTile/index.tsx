@@ -1,4 +1,5 @@
 import { BestBarLoader } from '@components/barLoader';
+import BtcAmountText from '@components/btcAmountText';
 import FiatAmountText from '@components/fiatAmountText';
 import PercentageChange from '@components/percentageChange';
 import TokenImage from '@components/tokenImage';
@@ -6,8 +7,11 @@ import useSelectedAccountBtcBalance from '@hooks/queries/useSelectedAccountBtcBa
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getFiatEquivalent, type FungibleToken } from '@secretkeylabs/xverse-core';
-import { StyledP } from '@ui-library/common.styled';
+import {
+  getFiatBtcEquivalent,
+  getFiatEquivalent,
+  type FungibleToken,
+} from '@secretkeylabs/xverse-core';
 import type { CurrencyTypes } from '@utils/constants';
 import { HIDDEN_BALANCE_LABEL } from '@utils/constants';
 import { getBalanceAmount, getFtTicker } from '@utils/tokens';
@@ -109,6 +113,11 @@ const StyledFiatAmountText = styled(FiatAmountText)`
   min-height: 20px;
 `;
 
+const FiatAmountContainer = styled.div`
+  ${(props) => props.theme.typography.body_medium_m}
+  color: ${(props) => props.theme.colors.white_200};
+`;
+
 type Props = {
   title: string;
   loading?: boolean;
@@ -132,7 +141,7 @@ function TokenTile({
   showProtocolIcon = true,
   hideSwapBalance = false,
 }: Props) {
-  const { fiatCurrency, balanceHidden } = useWalletSelector();
+  const { fiatCurrency, balanceHidden, showBalanceInBtc } = useWalletSelector();
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const { data: stxData } = useStxWalletData();
   const { confirmedPaymentBalance: btcBalance } = useSelectedAccountBtcBalance();
@@ -152,11 +161,11 @@ function TokenTile({
       BigNumber(btcFiatRate),
       fungibleToken,
     );
-    if (fiatAmount) {
-      return BigNumber(fiatAmount);
-    }
-    return undefined;
+
+    return fiatAmount ? BigNumber(fiatAmount) : undefined;
   };
+
+  const fiatAmount = getFiatAmount();
 
   return (
     <TileContainer onClick={handleTokenPressed} className={className} aria-label="Token Row">
@@ -196,14 +205,22 @@ function TokenTile({
           {loading && <StyledBarLoader width="20%" height={20} />}
           {!loading && !hideSwapBalance && (
             <AmountContainer aria-label="CurrencyBalance Container">
-              {balanceHidden ? (
-                <StyledP typography="body_medium_m" color="white_200">
-                  {HIDDEN_BALANCE_LABEL}
-                </StyledP>
-              ) : (
+              {showBalanceInBtc && currency !== 'BTC' && (
+                <BtcAmountText
+                  btcAmount={
+                    fiatAmount
+                      ? getFiatBtcEquivalent(fiatAmount, BigNumber(btcFiatRate)).toString()
+                      : undefined
+                  }
+                />
+              )}
+              {!showBalanceInBtc && balanceHidden && (
+                <FiatAmountContainer>{HIDDEN_BALANCE_LABEL}</FiatAmountContainer>
+              )}
+              {(!showBalanceInBtc || currency === 'BTC') && !balanceHidden && (
                 <FiatCurrencyRow>
                   <PercentageChange ftCurrencyPairs={[[fungibleToken, currency]]} />
-                  <StyledFiatAmountText fiatAmount={getFiatAmount()} fiatCurrency={fiatCurrency} />
+                  <StyledFiatAmountText fiatAmount={fiatAmount} fiatCurrency={fiatCurrency} />
                 </FiatCurrencyRow>
               )}
             </AmountContainer>

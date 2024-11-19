@@ -1,13 +1,13 @@
 import MoonPay from '@assets/img/dashboard/moonpay.svg';
 import PayPal from '@assets/img/dashboard/paypal.svg';
 import Transak from '@assets/img/dashboard/transak.svg';
-import InfoContainer from '@components/infoContainer';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useHasFeature from '@hooks/useHasFeature';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { FeatureId, getMoonPaySignedUrl } from '@secretkeylabs/xverse-core';
+import Callout from '@ui-library/callout';
 import Spinner from '@ui-library/spinner';
 import { MOON_PAY_API_KEY, MOON_PAY_URL, TRANSAC_API_KEY, TRANSAC_URL } from '@utils/constants';
 import { useState } from 'react';
@@ -22,17 +22,23 @@ const Container = styled.div`
   height: 100%;
   padding-left: 22px;
   padding-right: 22px;
-  padding-top: 26px;
+  padding-top: ${({ theme }) => theme.space.xs};
   overflow-y: auto;
   &::-webkit-scrollbar {
     display: none;
   }
 `;
 
-const Text = styled.h1((props) => ({
-  ...props.theme.body_m,
+const Title = styled.h1((props) => ({
+  ...props.theme.typography.headline_xs,
+  color: props.theme.colors.white_0,
+}));
+
+const Text = styled.p((props) => ({
+  ...props.theme.typography.body_m,
   color: props.theme.colors.white_200,
-  marginBottom: props.theme.spacing(14),
+  marginTop: props.theme.space.m,
+  marginBottom: props.theme.space.l,
 }));
 
 const LoaderContainer = styled.div({
@@ -51,12 +57,16 @@ const LoaderContainer = styled.div({
   alignItems: 'center',
 });
 
+const InfoMessageContainer = styled.div((props) => ({
+  marginTop: props.theme.space.xxs,
+}));
+
 function Buy() {
   const { t } = useTranslation('translation', { keyPrefix: 'BUY_SCREEN' });
   const navigate = useNavigate();
   const { currency } = useParams();
   const { stxAddress, btcAddress } = useSelectedAccount();
-  const { network } = useWalletSelector();
+  const { network, hasBackedUpWallet } = useWalletSelector();
   const address = currency === 'STX' ? stxAddress : btcAddress;
   const [loading, setLoading] = useState(false);
   const showPaypal = useHasFeature(FeatureId.PAYPAL);
@@ -107,13 +117,14 @@ function Buy() {
 
   return (
     <>
-      <TopRow title={`${t('BUY')} ${currency}`} onClick={handleBackButtonClick} />
+      <TopRow backupReminder={!hasBackedUpWallet} onClick={handleBackButtonClick} />
       <Container>
         {loading && (
           <LoaderContainer>
             <Spinner color="white" size={20} />
           </LoaderContainer>
         )}
+        <Title>{`${t('BUY')} ${currency}`}</Title>
         <Text>{t('PURCHASE_CRYPTO')}</Text>
         <RedirectButton text={t('MOONPAY')} src={MoonPay} onClick={getMoonPayUrl} />
         <RedirectButton text={t('TRANSAK')} src={Transak} onClick={getTransacUrl} />
@@ -125,7 +136,9 @@ function Buy() {
             onClick={() => getMoonPayUrl('paypal')}
           />
         )}
-        <InfoContainer titleText={t('DISCLAIMER')} bodyText={t('THIRD_PARTY_WARNING')} />
+        <InfoMessageContainer>
+          <Callout titleText={t('DISCLAIMER')} bodyText={t('THIRD_PARTY_WARNING')} />
+        </InfoMessageContainer>
       </Container>
       <BottomBar tab="dashboard" />
     </>

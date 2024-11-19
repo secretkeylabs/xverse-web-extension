@@ -5,7 +5,6 @@ import {
   isStxTx,
   mapFTMotherProtocolToSwapProtocol,
   mapFTProtocolToSwapProtocol,
-  mapSwapProtocolToFTProtocol,
   mapSwapTokenToFT,
 } from '@screens/swap/utils';
 import {

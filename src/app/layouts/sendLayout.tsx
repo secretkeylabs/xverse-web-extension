@@ -1,6 +1,7 @@
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { isInOptions, type TabType } from '@utils/helper';
 import type { PropsWithChildren } from 'react';
 import styled from 'styled-components';
@@ -55,13 +56,18 @@ function SendLayout({
   hideBottomBar?: boolean;
 }>) {
   const isInOption = isInOptions();
+  const { hasBackedUpWallet } = useWalletSelector();
 
   return (
     <>
       {showAccountHeader ? (
         <AccountHeaderComponent disableMenuOption disableAccountSwitch />
       ) : (
-        <TopRow onClick={onClickBack!} showBackButton={!hideBackButton && !!onClickBack} />
+        <TopRow
+          backupReminder={!hasBackedUpWallet}
+          onClick={onClickBack!}
+          showBackButton={!hideBackButton && !!onClickBack}
+        />
       )}
       <ScrollContainer>
         <Container>{children}</Container>
