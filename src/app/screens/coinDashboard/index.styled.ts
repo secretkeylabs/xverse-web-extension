@@ -10,6 +10,7 @@ export const Container = styled.div((props) => ({
   '&::-webkit-scrollbar': {
     display: 'none',
   },
+  paddingBottom: props.theme.space.xl,
 }));
 
 export const SecondaryContainer = styled.div((props) => ({
