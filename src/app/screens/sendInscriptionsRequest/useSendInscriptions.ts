@@ -3,15 +3,15 @@ import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/u
 import { sendUserRejectionMessage } from '@common/utils/rpc/responseMessages/errors';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useTransactionContext from '@hooks/useTransactionContext';
-import { RpcErrorCode, sendInscriptionsSchema } from '@sats-connect/core';
+import { RpcErrorCode, sendInscriptionsRequestMessageSchema } from '@sats-connect/core';
 import { type TransactionSummary } from '@screens/sendBtc/helpers';
 import { btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
 import { useEffect, useState } from 'react';
 import * as v from 'valibot';
 
 const useSendInscriptionsRequest = () => {
-  const [error, popupPayloadSendInscriptions] = getPopupPayload((data) =>
-    v.parse(sendInscriptionsSchema, data),
+  const [error, popupPayloadSendInscriptions] = getPopupPayload(
+    v.parser(sendInscriptionsRequestMessageSchema),
   );
   if (!popupPayloadSendInscriptions) {
     throw new Error('Invalid payload');

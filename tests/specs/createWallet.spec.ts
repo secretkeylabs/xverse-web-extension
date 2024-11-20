@@ -110,39 +110,48 @@ test.describe('Create and Restore Wallet Flow', () => {
       await expect(landingPage.buttonRestoreWallet).toBeVisible();
       await landingPage.buttonRestoreWallet.click();
 
-      await context.waitForEvent('page');
+      const newPage = await context.waitForEvent('page');
 
       // Clicking on restore opens in this setup a new page for legal
-      const newPage = await context.pages()[context.pages().length - 1];
       await expect(newPage.url()).toContain('legal');
 
       const onboardingPage2 = new Onboarding(newPage);
+      await expect(newPage.getByRole('button', { name: /accept/i })).toBeVisible();
 
-      await onboardingPage2.buttonAccept.click();
+      await newPage.getByRole('button', { name: /accept/i }).click();
       await expect(newPage.url()).toContain('restore');
-      await onboardingPage2.checkRestoreWalletSeedPhrasePage();
 
       const seedWords = JSON.parse(fs.readFileSync(filePathSeedWords, 'utf8'));
 
       for (let i = 0; i < seedWords.length; i++) {
         await onboardingPage2.inputWord(i).fill(seedWords[i]);
       }
-      await expect(onboardingPage2.buttonContinue).toBeEnabled();
-      await onboardingPage2.buttonContinue.click();
+      await expect(newPage.getByRole('button', { name: /continue/i })).toBeVisible();
+      await newPage.getByRole('button', { name: /continue/i }).click();
+
+      await expect(newPage.getByPlaceholder('Type your password', { exact: true })).toBeVisible();
+      await newPage.getByPlaceholder('Type your password', { exact: true }).fill(strongPW);
+
+      await expect(
+        newPage.getByPlaceholder('Type your password again', { exact: true }),
+      ).toBeVisible();
+      await newPage.getByPlaceholder('Type your password again', { exact: true }).fill(strongPW);
+
+      await expect(newPage.getByRole('button', { name: /continue/i })).toBeVisible();
+      await newPage.getByRole('button', { name: /continue/i }).click();
+
+      await expect(newPage.getByText('Preferred Address Type')).toBeVisible();
 
       // address type screen (native/nested), we'll just continue with the default
-      await expect(onboardingPage2.buttonContinue).toBeEnabled();
-      await onboardingPage2.buttonContinue.click();
+      await newPage.getByRole('button', { name: /continue/i }).click();
+      await expect(newPage.getByRole('img', { name: /success/i })).toBeVisible();
 
-      await onboardingPage2.inputPassword.fill(strongPW);
-      await onboardingPage2.buttonContinue.click();
-      await onboardingPage2.inputPassword.fill(strongPW);
-      await onboardingPage2.buttonContinue.click();
-      await expect(onboardingPage2.imageSuccess).toBeVisible();
-      await expect(onboardingPage2.headingWalletRestored).toBeVisible();
-      await expect(onboardingPage2.buttonCloseTab).toBeVisible();
+      // Wallet restored
+      await expect(newPage.getByText(/wallet restored/i)).toBeVisible();
+      await expect(newPage.getByRole('button', { name: /close this tab/i })).toBeVisible();
+
       // Open the wallet directly via URL
-      await newPage.goto(`chrome-extension://${extensionId}/popup.html`);
+      await newPage.goto(`chrome-extension://${extensionId}/options.html`);
       const newWallet = new Wallet(newPage);
       await newWallet.checkVisualsStartpage();
 

@@ -1,5 +1,5 @@
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
-import { ArchiveTray } from '@phosphor-icons/react';
+import { TrayArrowDown } from '@phosphor-icons/react';
 import { mapRareSatsAPIResponseToBundle, type Bundle } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
@@ -130,32 +130,32 @@ export default function CollectiblesTabs({
       )}
       {hasActivatedOrdinalsKey && (
         <TabPanel>
-          <div>
-            {inscriptionsQuery.isInitialLoading ? (
-              <SkeletonLoader isGalleryOpen={isGalleryOpen} />
-            ) : (
-              <>
-                {totalInscriptions > 0 && (
-                  <TopBarContainer>
-                    <StyledP data-testid="total-items" typography="body_medium_m" color="white_200">
-                      {totalInscriptions === 1
-                        ? t('TOTAL_ITEMS_ONE')
-                        : t('TOTAL_ITEMS', { count: totalInscriptions })}
-                    </StyledP>
-                    <StyledButton
-                      variant="tertiary"
-                      icon={<ArchiveTray size={20} color={Theme.colors.white_200} />}
-                      title={t('HIDDEN_COLLECTIBLES')}
-                      onClick={() => {
-                        navigate(`/nft-dashboard/hidden?tab=${tabs[tabIndex]?.key}`);
-                      }}
-                    />
-                  </TopBarContainer>
+          {inscriptionsQuery.isInitialLoading ? (
+            <SkeletonLoader isGalleryOpen={isGalleryOpen} />
+          ) : (
+            <>
+              <TopBarContainer>
+                {totalInscriptions > 0 ? (
+                  <StyledP data-testid="total-items" typography="body_medium_m" color="white_200">
+                    {totalInscriptions === 1
+                      ? t('TOTAL_ITEMS_ONE')
+                      : t('TOTAL_ITEMS', { count: totalInscriptions })}
+                  </StyledP>
+                ) : (
+                  <div />
                 )}
-                {inscriptionListView}
-              </>
-            )}
-          </div>
+                <StyledButton
+                  variant="tertiary"
+                  icon={<TrayArrowDown size={20} color={Theme.colors.white_200} />}
+                  title={t('HIDDEN_COLLECTIBLES')}
+                  onClick={() => {
+                    navigate(`/nft-dashboard/hidden?tab=${tabs[tabIndex]?.key}`);
+                  }}
+                />
+              </TopBarContainer>
+              {inscriptionListView}
+            </>
+          )}
         </TabPanel>
       )}
       <TabPanel>
@@ -170,7 +170,7 @@ export default function CollectiblesTabs({
                 </StyledP>
                 <StyledButton
                   variant="tertiary"
-                  icon={<ArchiveTray size={20} color={Theme.colors.white_200} />}
+                  icon={<TrayArrowDown size={20} color={Theme.colors.white_200} />}
                   title={t('HIDDEN_COLLECTIBLES')}
                   onClick={() => {
                     navigate('/nft-dashboard/hidden?tab=nfts');

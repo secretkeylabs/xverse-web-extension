@@ -17,7 +17,7 @@ const InputField = styled.input<{
 }>((props) => ({
   ...props.theme.typography.body_medium_m,
   background: props.theme.colors.elevation_n1,
-  border: `1px solid ${props.error ? props.theme.colors.feedback.error : '#303354'}`,
+  border: `1px solid ${props.error ? props.theme.colors.danger_medium : '#303354'}`,
   borderRadius: '8px',
   padding: '10px 16px',
   color: props.theme.colors.white_0,

@@ -85,7 +85,7 @@ export default function BackupWalletSteps(): JSX.Element {
       disableWalletExistsGuard?.();
       const seed = await seedVault.getSeed();
 
-      await createWallet(seed, password);
+      await createWallet(seed, password, true);
 
       navigate('/wallet-success/create', { replace: true });
     } else {
@@ -105,7 +105,7 @@ export default function BackupWalletSteps(): JSX.Element {
     />,
     <PasswordContainer key="CREATE_PASSWORD">
       <PasswordInput
-        title={t('CREATE_PASSWORD_TITLE')}
+        title={t('ENTER_PASSWORD_TITLE')}
         inputLabel={t('TEXT_INPUT_NEW_PASSWORD_LABEL')}
         enteredPassword={password}
         setEnteredPassword={setPassword}

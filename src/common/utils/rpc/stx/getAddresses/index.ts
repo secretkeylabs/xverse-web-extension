@@ -1,8 +1,11 @@
-import { type WebBtcMessage } from '@common/types/message-types';
+import { getTabIdFromPort } from '@common/utils';
 import getSelectedAccount from '@common/utils/getSelectedAccount';
-import { makeContext } from '@common/utils/popup';
-import * as utils from '@components/permissionsManager/utils';
-import { AddressPurpose, AddressType, RpcErrorCode } from '@sats-connect/core';
+import {
+  AddressPurpose,
+  AddressType,
+  RpcErrorCode,
+  type StxGetAddressesRequestMessage,
+} from '@sats-connect/core';
 import rootStore from '@stores/index';
 import {
   listenForPopupClose,
@@ -10,37 +13,19 @@ import {
   triggerRequestWindowOpen,
 } from '../../../legacy-external-message-handler';
 import RequestsRoutes from '../../../route-urls';
-import { hasAccountReadPermissions, makeRPCError } from '../../helpers';
-import {
-  sendAccessDeniedResponseMessage,
-  sendInternalErrorMessage,
-} from '../../responseMessages/errors';
+import { makeRPCError } from '../../helpers';
 import { sendGetAddressesSuccessResponseMessage } from '../../responseMessages/stacks';
 
 const handleGetStxAddresses = async (
-  message: WebBtcMessage<'stx_getAddresses'>,
+  message: StxGetAddressesRequestMessage,
   port: chrome.runtime.Port,
 ) => {
   const popupParams = {
     messageId: String(message.id),
     rpcMethod: 'stx_getAddresses',
   };
-  const { origin, tabId } = makeContext(port);
 
-  const [error, store] = await utils.getPermissionsStore();
-  if (error) {
-    sendInternalErrorMessage({
-      tabId,
-      messageId: message.id,
-      message: 'Error loading permissions store.',
-    });
-    return;
-  }
-
-  if (!hasAccountReadPermissions(origin, store)) {
-    sendAccessDeniedResponseMessage({ tabId, messageId: message.id });
-    return;
-  }
+  const tabId = getTabIdFromPort(port);
 
   const {
     selectedAccountIndex,

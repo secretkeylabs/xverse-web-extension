@@ -15,38 +15,16 @@ const Container = styled.div((props) => ({
   flexDirection: 'row',
   width: '100%',
   marginBottom: props.theme.space.m,
+  alignItems: 'center',
 }));
 
-const IconOuterContainer = styled.div((_) => ({
+const IconOuterContainer = styled.div((props) => ({
   display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
+  marginRight: props.theme.space.m,
 }));
 
 const IconContainer = styled.div((_) => ({
   position: 'relative',
-}));
-
-const TitleContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'space-between',
-  margin: `${props.theme.space.s} ${props.theme.space.m}`,
-}));
-
-const AddressTypeContainer = styled.div((_) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  gap: '4px',
-}));
-
-const BalanceContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'flex-end',
-  margin: `${props.theme.space.s} ${props.theme.space.m}`,
-  flexGrow: 1,
 }));
 
 const StarIconContainer = styled.div((props) => ({
@@ -57,13 +35,52 @@ const StarIconContainer = styled.div((props) => ({
   borderRadius: '50%',
   padding: '2.2px',
   display: 'flex',
-  alignItems: 'center',
 }));
+
+const RowContainers = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+`;
+
+const RowContainer = styled.div((props) => ({
+  display: 'flex',
+  columnGap: props.theme.space.m,
+  justifyContent: 'center',
+}));
+
+const AddressTypeContainer = styled.div((_) => ({
+  display: 'flex',
+  flex: 1,
+  justifyContent: 'flex-start',
+  gap: '4px',
+}));
+
+const BalanceContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  ${(props) => props.theme.typography.body_bold_m};
+`;
+
+const BalancePercentageContainer = styled.div`
+  display: flex;
+  flex: 1;
+  justify-content: flex-start;
+  ${(props) => props.theme.typography.body_m};
+  color: ${(props) => props.theme.colors.white_200};
+`;
+
+const CurrencyBalanceContainer = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  ${(props) => props.theme.typography.body_m};
+  color: ${(props) => props.theme.colors.white_200};
+`;
 
 type AddressBalanceProps = {
   balance: number | undefined;
   addressType: BtcAddressType | undefined;
-  totalBalance: number | undefined;
+  totalBalance?: number | undefined;
 };
 
 export default function AddressBalance({
@@ -97,28 +114,32 @@ export default function AddressBalance({
           )}
         </IconContainer>
       </IconOuterContainer>
-      <TitleContainer>
-        <AddressTypeContainer>
-          <StyledP typography="body_bold_m">BTC</StyledP>
-          {addressType && <BtcAddressTypeLabel addressType={addressType} />}
-        </AddressTypeContainer>
-        <StyledP typography="body_m" color="white_200">{`${balancePercentage}%`}</StyledP>
-      </TitleContainer>
-      <BalanceContainer>
-        <StyledP typography="body_bold_m">
-          {balanceHidden ? HIDDEN_BALANCE_LABEL : satsToBtc(BigNumber(balance)).toString()}
-        </StyledP>
-        <StyledP typography="body_m" color="white_200">
-          {balanceHidden ? (
-            HIDDEN_BALANCE_LABEL
-          ) : (
-            <FiatAmountText
-              fiatAmount={getBtcFiatEquivalent(BigNumber(balance), BigNumber(btcFiatRate))}
-              fiatCurrency={fiatCurrency}
-            />
-          )}
-        </StyledP>
-      </BalanceContainer>
+      <RowContainers>
+        <RowContainer>
+          <AddressTypeContainer>
+            <StyledP typography="body_bold_m">BTC</StyledP>
+            {addressType && <BtcAddressTypeLabel addressType={addressType} />}
+          </AddressTypeContainer>
+          <BalanceContainer>
+            {balanceHidden ? HIDDEN_BALANCE_LABEL : satsToBtc(BigNumber(balance)).toString()}
+          </BalanceContainer>
+        </RowContainer>
+        <RowContainer>
+          <BalancePercentageContainer>
+            {totalBalance !== undefined ? `${balancePercentage}%` : ''}
+          </BalancePercentageContainer>
+          <CurrencyBalanceContainer>
+            {balanceHidden ? (
+              HIDDEN_BALANCE_LABEL
+            ) : (
+              <FiatAmountText
+                fiatAmount={getBtcFiatEquivalent(BigNumber(balance), BigNumber(btcFiatRate))}
+                fiatCurrency={fiatCurrency}
+              />
+            )}
+          </CurrencyBalanceContainer>
+        </RowContainer>
+      </RowContainers>
     </Container>
   );
 }

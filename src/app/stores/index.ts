@@ -14,6 +14,7 @@ import type {
   WalletStateV3,
   WalletStateV4,
   WalletStateV5,
+  WalletStateV6,
 } from './wallet/actions/migrationTypes';
 import { type AvatarInfo, type WalletState } from './wallet/actions/types';
 import walletReducer, { initialWalletState, rehydrateError } from './wallet/reducer';
@@ -67,7 +68,7 @@ const migrations = {
       state.selectedAccount?.deviceAccountIndex ?? state.selectedAccount?.id ?? 0,
     selectedAccountType: state.selectedAccount?.accountType ?? 'software',
   }),
-  5: (state: WalletStateV4): WalletState => {
+  5: (state: WalletStateV4): WalletStateV5 => {
     const migrateAccount =
       (accountType: 'software' | 'ledger') =>
       (account: AccountV1 & { btcAddresses?: AccountBtcAddressesV5 }): AccountV5 => {
@@ -149,24 +150,45 @@ const migrations = {
       balanceHidden: false,
     };
   },
+  6: (state: WalletStateV5): WalletStateV6 => {
+    const { allowNestedSegWitAddress, ...migratedState } = state;
+    return migratedState as WalletState;
+  },
+  7: (state: WalletStateV6): WalletState => ({
+    ...state,
+    showBalanceInBtc: false,
+    hasBackedUpWallet: true,
+  }),
   /* *
    * When adding a new migration, add the new wallet state type to the migrationTypes file
-   * and add the migration here. Update the previous head migration's output type to be the versioned wallet state.
+   * and add the migration here.
    * The last migration should be a function that takes the previous state and returns the current WalletState type.
    *
    * e.g. if the current head is this:
-   * 6: (state: WalletStateV5): WalletState => ({
+   * 6: (state: WalletStateV5): WalletStateV6 => {
+   *   const newState = { ...state };
+   *   // migrate state here
+   *   return newState as WalletState;
+   * }
    *
    * Then update it to this:
-   * 6: (state: WalletStateV5): WalletStateV6 => ({
+   * 6: (state: WalletStateV5): WalletStateV6 => {
+   *   const newState = { ...state };
+   *   // migrate state here
+   *   return newState;
+   * }
    *
    * And add this:
-   * 7: (state: WalletStateV6): WalletState => ({
+   * 7: (state: WalletStateV6): WalletStateV7 => {
+   *   const newState = { ...state };
+   *   // migrate state here
+   *   return newState as WalletState;  // << ensure this cast is done on the last migration
+   * }
    * */
 };
 
 const WalletPersistConfig: PersistConfig<WalletState> = {
-  version: 5,
+  version: 6,
   key: 'walletState',
   storage: chromeStorage.local,
   migrate: createMigrate(migrations as any, { debug: false }),

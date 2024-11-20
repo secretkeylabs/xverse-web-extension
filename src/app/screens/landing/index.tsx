@@ -6,7 +6,7 @@ import Dots from '@components/dots';
 import { CaretLeft, CaretRight } from '@phosphor-icons/react';
 import { isInOptions } from '@utils/helper';
 import { getIsTermsAccepted } from '@utils/localStorage';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Lottie from 'react-lottie';
 import { useNavigate } from 'react-router-dom';
@@ -21,13 +21,15 @@ import {
   CreateButton,
   InitialTransitionLandingSectionContainer,
   LandingTitle,
+  LeftTransitionLandingSectionContainer,
+  LeftTransitionOnboardingContainer,
   Logo,
   OnBoardingContent,
   OnBoardingImage,
   OnboardingTitle,
   RestoreButton,
-  TransitionLandingSectionContainer,
-  TransitionOnboardingContainer,
+  RightTransitionLandingSectionContainer,
+  RightTransitionOnboardingContainer,
 } from './index.styled';
 
 function Landing() {
@@ -39,6 +41,7 @@ function Landing() {
   const [slideTransitions, setSlideTransitions] = useState(false);
   const [transitionDirection, setTransitionDirection] = useState<'left' | 'right'>('right');
   const navigate = useNavigate();
+  const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
 
   const theme = useTheme();
   const onboardingViews = [
@@ -137,19 +140,26 @@ function Landing() {
 
   const renderTransitions = () => {
     if (slideTransitions) {
+      const TransitionLandingSectionContainer =
+        transitionDirection === 'right'
+          ? RightTransitionLandingSectionContainer
+          : LeftTransitionLandingSectionContainer;
+
+      const TransitionOnboardingContainer =
+        transitionDirection === 'right'
+          ? RightTransitionOnboardingContainer
+          : LeftTransitionOnboardingContainer;
+
       switch (currentStepIndex) {
         case 0:
           return (
-            <TransitionLandingSectionContainer
-              key={currentStepIndex}
-              $direction={transitionDirection}
-            >
+            <TransitionLandingSectionContainer key={currentStepIndex}>
               {renderLandingSection()}
             </TransitionLandingSectionContainer>
           );
         default:
           return (
-            <TransitionOnboardingContainer key={currentStepIndex} $direction={transitionDirection}>
+            <TransitionOnboardingContainer key={currentStepIndex}>
               {renderOnboardingContent(currentStepIndex)}
             </TransitionOnboardingContainer>
           );
@@ -170,7 +180,7 @@ function Landing() {
       {animationComplete ? (
         <Container>
           <ArrowContainer>
-            <CaretButton disabled={currentStepIndex <= 0} onClick={handleClickBack}>
+            <CaretButton $disabled={currentStepIndex <= 0} onClick={handleClickBack}>
               <CaretLeft
                 size={theme.space.l}
                 color={theme.colors.white_0}
@@ -178,7 +188,7 @@ function Landing() {
               />
             </CaretButton>
             <CaretButton
-              disabled={currentStepIndex >= onboardingViews.length - 1}
+              $disabled={currentStepIndex >= onboardingViews.length - 1}
               onClick={handleClickNext}
             >
               <CaretRight
@@ -193,9 +203,7 @@ function Landing() {
             <Dots
               numDots={onboardingViews.length}
               activeIndex={currentStepIndex}
-              dotStrategy="selection"
               handleClickDot={handleClickDot}
-              size={6}
             />
             <CreateButton onClick={() => proceedToWallet()} title={t('CREATE_WALLET_BUTTON')} />
             <RestoreButton
@@ -209,7 +217,7 @@ function Landing() {
         <AnimationContainer>
           <Lottie
             options={{ loop: false, animationData }}
-            width="70%"
+            width={isGalleryOpen ? '42.5%' : '70%'}
             eventListeners={[
               {
                 eventName: 'complete',

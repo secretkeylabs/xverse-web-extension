@@ -1,43 +1,17 @@
-import { MESSAGE_SOURCE, type WebBtcMessage } from '@common/types/message-types';
-import { getTabIdFromPort, isUndefined } from '@common/utils';
+import { MESSAGE_SOURCE } from '@common/types/message-types';
 import {
   listenForPopupClose,
   makeSearchParamsWithDefaults,
   triggerRequestWindowOpen,
 } from '@common/utils/legacy-external-message-handler';
 import RequestsRoutes from '@common/utils/route-urls';
-import { RpcErrorCode } from '@sats-connect/core';
-import { z } from 'zod';
+import { RpcErrorCode, type StxSignStructuredMessageRequestMessage } from '@sats-connect/core';
 import { makeRPCError } from '../../helpers';
-import {
-  sendInvalidParametersResponseMessage,
-  sendMissingParametersMessage,
-} from '../../responseMessages/errors';
-
-const rpcParamsSchema = z.object({
-  message: z.string(),
-  domain: z.string(),
-});
 
 async function handleStacksSignStructuredMessage(
-  message: WebBtcMessage<'stx_signStructuredMessage'>,
+  message: StxSignStructuredMessageRequestMessage,
   port: chrome.runtime.Port,
 ) {
-  if (isUndefined(message.params)) {
-    sendMissingParametersMessage({ tabId: getTabIdFromPort(port), messageId: message.id });
-    return;
-  }
-
-  const paramsParseResult = rpcParamsSchema.safeParse(message.params);
-  if (!paramsParseResult.success) {
-    sendInvalidParametersResponseMessage({
-      tabId: getTabIdFromPort(port),
-      messageId: message.id,
-      error: paramsParseResult.error,
-    });
-    return;
-  }
-
   const requestParams = {
     message: message.params.message,
     domain: message.params.domain,

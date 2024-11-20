@@ -229,28 +229,6 @@ const Theme = {
       select: 'rgba(115, 131, 255, 0.4)',
     },
 
-    feedback: {
-      /**
-       * @deprecated use theme.colors.success_medium
-       */
-      success: '#55B86E',
-
-      /**
-       * @deprecated use theme.colors.caution
-       */
-      caution: '#F2A900',
-
-      /**
-       * @deprecated use theme.colors.danger_medium
-       */
-      error: '#EA4848',
-
-      /**
-       * @deprecated use theme.colors.danger_dark_600
-       */
-      error_700: 'rgba(171, 48, 48, 0.4)',
-    },
-
     /**
      * @deprecated
      */

@@ -1,7 +1,5 @@
-import AccountHeaderComponent from '@components/accountHeader';
 import CollectibleCollectionGridItem from '@components/collectibleCollectionGridItem';
 import CollectibleDetailTile from '@components/collectibleDetailTile';
-import SquareButton from '@components/squareButton';
 import BottomTabBar from '@components/tabBar';
 import { TilesSkeletonLoader } from '@components/tilesSkeletonLoader';
 import TopRow from '@components/topRow';
@@ -11,7 +9,11 @@ import useOptionsSheet from '@hooks/useOptionsSheet';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { ArchiveTray, ArrowLeft, DotsThreeVertical, Star } from '@phosphor-icons/react';
+import { TrayArrowDown, TrayArrowUp } from '@phosphor-icons/react';
+import {
+  CollectiblesContainer,
+  GridContainer,
+} from '@screens/nftDashboard/collectiblesTabs/index.styled';
 import OrdinalImage from '@screens/ordinals/ordinalImage';
 import {
   addToHideCollectiblesAction,
@@ -38,8 +40,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Theme from 'theme';
 import {
   AttributesContainer,
-  BackButton,
-  BackButtonContainer,
   BottomBarContainer,
   CollectionNameDiv,
   Container,
@@ -49,8 +49,6 @@ import {
   PageHeaderContent,
   StyledBarLoader,
   StyledButton,
-  StyledGridContainer,
-  StyledSeparator,
   StyledWebGalleryButton,
   StyledWrenchErrorMessage,
 } from './index.styled';
@@ -58,34 +56,42 @@ import {
 function OrdinalsCollection() {
   const { t } = useTranslation('translation', { keyPrefix: 'COLLECTIBLE_COLLECTION_SCREEN' });
   const { t: tCommon } = useTranslation('translation', { keyPrefix: 'COMMON' });
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const { ordinalsAddress } = useSelectedAccount();
+  const optionsSheet = useOptionsSheet();
   const { id: collectionId, from } = useParams();
   const { starredCollectibleIds, hiddenCollectibleIds, avatarIds } = useWalletSelector();
-  const selectedAvatar = avatarIds[ordinalsAddress];
-  const optionsSheet = useOptionsSheet();
+
   const { data, error, isLoading, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useAddressCollectionInscriptions(collectionId);
   const { data: collectionMarketData, isLoading: isLoadingMarketData } =
     useInscriptionCollectionMarketData(collectionId);
-  const dispatch = useDispatch();
-  const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
-
-  const collectionStarred = starredCollectibleIds[ordinalsAddress]?.some(
-    ({ id }) => id === collectionId,
-  );
-  const collectionHidden = Object.keys(hiddenCollectibleIds[ordinalsAddress] ?? {}).some(
-    (id) => id === collectionId,
-  );
 
   const comesFromHidden = from === 'hidden';
+  const selectedAvatar = avatarIds[ordinalsAddress];
+  const isEmpty = !isLoading && !error && data?.pages?.[0]?.total === 0;
+  const collectionHeading = data?.pages?.[0].collection_name;
+  const estPortfolioValue =
+    data && data?.pages?.[0].portfolio_value !== 0
+      ? `${data?.pages?.[0].portfolio_value.toFixed(8)} BTC`
+      : EMPTY_LABEL;
+  const collectionFloorPrice = collectionMarketData?.floor_price
+    ? `${collectionMarketData?.floor_price?.toFixed(8)} BTC`
+    : EMPTY_LABEL;
+
+  const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
+  const collectionStarred: boolean = useMemo(
+    () => starredCollectibleIds[ordinalsAddress]?.some(({ id }) => id === collectionId),
+    [collectionId, ordinalsAddress, starredCollectibleIds],
+  );
+  const collectionHidden = useMemo(
+    () =>
+      Object.keys(hiddenCollectibleIds[ordinalsAddress] ?? {}).some((id) => id === collectionId),
+    [collectionId, ordinalsAddress, hiddenCollectibleIds],
+  );
 
   useResetUserFlow('/ordinals-collection');
-
-  const handleBackButtonClick = () =>
-    navigate(
-      `/nft-dashboard${comesFromHidden || collectionHidden ? '/hidden' : ''}?tab=inscriptions`,
-    );
 
   const openInGalleryView = async () => {
     await chrome.tabs.create({
@@ -103,13 +109,11 @@ function OrdinalsCollection() {
 
   const handleHideCollection = () => {
     dispatch(addToHideCollectiblesAction({ address: ordinalsAddress, id: collectionId ?? '' }));
-
     if (selectedAvatar?.type === 'inscription') {
       const shouldHideAvatar = data?.pages
         ?.map((page) => page?.data)
         .flat()
-        .some((inscription) => inscription.id === selectedAvatar.inscription.id);
-
+        .some((inscription) => inscription && inscription.id === selectedAvatar.inscription.id);
       if (shouldHideAvatar) {
         dispatch(removeAccountAvatarAction({ address: ordinalsAddress }));
       }
@@ -139,16 +143,6 @@ function OrdinalsCollection() {
     toast(t('COLLECTION_UNHIDDEN'));
     navigate(`/nft-dashboard/${isLastHiddenItem ? '' : 'hidden'}?tab=inscriptions`);
   };
-
-  const isEmpty = !isLoading && !error && data?.pages?.[0]?.total === 0;
-  const collectionHeading = data?.pages?.[0].collection_name;
-  const estPortfolioValue =
-    data && data?.pages?.[0].portfolio_value !== 0
-      ? `${data?.pages?.[0].portfolio_value.toFixed(8)} BTC`
-      : EMPTY_LABEL;
-  const collectionFloorPrice = collectionMarketData?.floor_price
-    ? `${collectionMarketData?.floor_price?.toFixed(8)} BTC`
-    : EMPTY_LABEL;
 
   const handleClickUndoStarring = (toastId: string) => {
     dispatch(
@@ -182,28 +176,20 @@ function OrdinalsCollection() {
 
   return (
     <>
-      {isGalleryOpen ? (
-        <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
-      ) : (
-        <TopRow
-          onClick={handleBackButtonClick}
-          onMenuClick={optionsSheet.open}
-          onStarClick={collectionHidden ? undefined : handleStarClick}
-          isStarred={collectionStarred}
-        />
-      )}
+      <TopRow
+        onClick={() =>
+          navigate(
+            `/nft-dashboard${
+              comesFromHidden || collectionHidden ? '/hidden' : ''
+            }?tab=inscriptions`,
+          )
+        }
+        onMenuClick={optionsSheet.open}
+        onStarClick={collectionHidden ? undefined : handleStarClick}
+        isStarred={collectionStarred}
+      />
       <Container>
-        <PageHeader $isGalleryOpen={isGalleryOpen}>
-          {isGalleryOpen && (
-            <BackButtonContainer>
-              <BackButton onClick={handleBackButtonClick}>
-                <ArrowLeft size={16} color="currentColor" />
-                <StyledP data-testid="back-to-gallery" typography="body_m" color="white_0">
-                  {t(collectionHidden ? 'BACK_TO_HIDDEN_COLLECTIBLES' : 'BACK_TO_GALLERY')}
-                </StyledP>
-              </BackButton>
-            </BackButtonContainer>
-          )}
+        <PageHeader>
           <PageHeaderContent $isGalleryOpen={isGalleryOpen}>
             <div>
               <StyledP typography="body_bold_m" color="white_400">
@@ -213,34 +199,6 @@ function OrdinalsCollection() {
                 <StyledHeading typography="headline_s" color="white_0">
                   {collectionHeading || <StyledBarLoader width={200} height={28} />}
                 </StyledHeading>
-                {isGalleryOpen && (
-                  <>
-                    {collectionHidden ? null : (
-                      <SquareButton
-                        icon={
-                          collectionStarred ? (
-                            <Star size={16} color={Theme.colors.tangerine} weight="fill" />
-                          ) : (
-                            <Star size={16} color={Theme.colors.white_0} weight="bold" />
-                          )
-                        }
-                        onPress={handleStarClick}
-                        isTransparent
-                        size={44}
-                        radiusSize={12}
-                      />
-                    )}
-                    <SquareButton
-                      icon={
-                        <DotsThreeVertical size={20} color={Theme.colors.white_0} weight="bold" />
-                      }
-                      onPress={optionsSheet.open}
-                      isTransparent
-                      size={44}
-                      radiusSize={12}
-                    />
-                  </>
-                )}
               </CollectionNameDiv>
               {!isGalleryOpen && <StyledWebGalleryButton onClick={openInGalleryView} />}
             </div>
@@ -260,15 +218,14 @@ function OrdinalsCollection() {
             </AttributesContainer>
           </PageHeaderContent>
         </PageHeader>
-        {isGalleryOpen && <StyledSeparator />}
-        <div>
+        <CollectiblesContainer>
           {isEmpty && <NoCollectiblesText>{t('NO_COLLECTIBLES')}</NoCollectiblesText>}
           {!!error && <StyledWrenchErrorMessage />}
-          <StyledGridContainer $isGalleryOpen={isGalleryOpen}>
+          <GridContainer $isGalleryOpen={isGalleryOpen}>
             {isLoading ? (
               <TilesSkeletonLoader
                 isGalleryOpen={isGalleryOpen}
-                tileSize={isGalleryOpen ? 276 : 151}
+                tileSize={isGalleryOpen ? 171 : 151}
               />
             ) : (
               data?.pages
@@ -287,7 +244,7 @@ function OrdinalsCollection() {
                   </CollectibleCollectionGridItem>
                 ))
             )}
-          </StyledGridContainer>
+          </GridContainer>
           {hasNextPage && (
             <LoadMoreButtonContainer>
               <Button
@@ -299,13 +256,11 @@ function OrdinalsCollection() {
               />
             </LoadMoreButtonContainer>
           )}
-        </div>
+        </CollectiblesContainer>
       </Container>
-      {!isGalleryOpen && (
-        <BottomBarContainer>
-          <BottomTabBar tab="nft" />
-        </BottomBarContainer>
-      )}
+      <BottomBarContainer>
+        <BottomTabBar tab="nft" />
+      </BottomBarContainer>
       {optionsSheet.isVisible && (
         <Sheet
           title={tCommon('OPTIONS')}
@@ -315,14 +270,14 @@ function OrdinalsCollection() {
           {collectionHidden ? (
             <StyledButton
               variant="tertiary"
-              icon={<ArchiveTray size={24} color={Theme.colors.white_200} />}
+              icon={<TrayArrowUp size={24} color={Theme.colors.white_200} />}
               title={t('UNHIDE_COLLECTION')}
               onClick={handleUnHideCollection}
             />
           ) : (
             <StyledButton
               variant="tertiary"
-              icon={<ArchiveTray size={24} color={Theme.colors.white_200} />}
+              icon={<TrayArrowDown size={24} color={Theme.colors.white_200} />}
               title={t('HIDE_COLLECTION')}
               onClick={handleHideCollection}
             />

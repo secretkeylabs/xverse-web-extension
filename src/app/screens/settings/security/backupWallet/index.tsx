@@ -2,10 +2,13 @@ import PasswordInput from '@components/passwordInput';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useSeedVault from '@hooks/useSeedVault';
+import useWalletSelector from '@hooks/useWalletSelector';
 import SeedCheck from '@screens/backupWalletSteps/seedCheck';
 import { Container } from '@screens/settings/index.styles';
+import { setWalletBackupStatusAction } from '@stores/wallet/actions/actionCreators';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 

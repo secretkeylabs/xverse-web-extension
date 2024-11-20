@@ -1,15 +1,6 @@
 import { BetterBarLoader } from '@components/barLoader';
 import styled from 'styled-components';
 
-const TilesLoaderContainer = styled.div<{
-  $isGalleryOpen?: boolean;
-}>((props) => ({
-  width: '100%',
-  display: 'flex',
-  justifyContent: 'flex-start',
-  columnGap: props.$isGalleryOpen ? props.theme.space.xl : props.theme.space.m,
-}));
-
 const TileLoaderContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
@@ -24,25 +15,29 @@ export const StyledBarLoader = styled(BetterBarLoader)<{
   marginBottom: props.$withMarginBottom ? props.theme.space.s : 0,
 }));
 
+const LOADER_COUNT = 9;
+
 export function TilesSkeletonLoader({
-  className,
   tileSize = 151,
   isGalleryOpen,
 }: {
-  className?: string;
   tileSize?: number;
   isGalleryOpen?: boolean;
 }) {
   return (
-    <TilesLoaderContainer className={className} $isGalleryOpen={isGalleryOpen}>
-      <TileLoaderContainer>
-        <StyledBarLoader width={tileSize} height={tileSize} $withMarginBottom />
-        <StyledBarLoader width={107} height={14} />
-      </TileLoaderContainer>
-      <TileLoaderContainer>
-        <StyledBarLoader width={tileSize} height={tileSize} $withMarginBottom />
-        <StyledBarLoader width={107} height={14} />
-      </TileLoaderContainer>
-    </TilesLoaderContainer>
+    <>
+      {[...Array(LOADER_COUNT)].map((_, index) => (
+        // eslint-disable-next-line react/no-array-index-key
+        <TileLoaderContainer key={index}>
+          <StyledBarLoader
+            width={tileSize}
+            height={tileSize}
+            $isGalleryOpen={isGalleryOpen}
+            $withMarginBottom
+          />
+          <StyledBarLoader width={107} height={14} />
+        </TileLoaderContainer>
+      ))}
+    </>
   );
 }

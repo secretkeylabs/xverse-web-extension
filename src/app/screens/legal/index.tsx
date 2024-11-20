@@ -46,6 +46,7 @@ const Link = styled.a((props) => ({
 
 const CustomizedLink = styled(Link)`
   transition: opacity 0.1s ease;
+  cursor: pointer;
   :hover,
   &:focus {
     opacity: 0.8;

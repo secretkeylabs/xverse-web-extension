@@ -7,7 +7,13 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import Theme from 'theme';
 
+const Container = styled.div`
+  width: 100%;
+`;
+
 const RouteItemButtonContainer = styled.button((props) => ({
+  width: '100%',
+  height: 56,
   display: 'flex',
   flexDirection: 'row',
   columnGap: props.theme.space.xs,
@@ -17,8 +23,7 @@ const RouteItemButtonContainer = styled.button((props) => ({
   borderRadius: props.theme.space.s,
   padding: `0 ${props.theme.space.m}`,
   marginTop: props.theme.space.xs,
-  width: 135,
-  height: 56,
+  transition: 'opacity 0.1s ease',
   ':hover': {
     opacity: 0.8,
   },
@@ -46,7 +51,7 @@ export default function RouteItem({ label, token, onClick }: Props) {
   const currency = mapFtToCurrencyType(token);
 
   return (
-    <div>
+    <Container>
       <StyledP typography="body_medium_m" color="white_400">
         {label}
       </StyledP>
@@ -79,6 +84,6 @@ export default function RouteItem({ label, token, onClick }: Props) {
           color={Theme.colors.white_0}
         />
       </RouteItemButtonContainer>
-    </div>
+    </Container>
   );
 }

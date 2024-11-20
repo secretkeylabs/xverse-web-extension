@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
-import type { Permission } from '@components/permissionsManager/schemas';
 import { type WalletEvent } from '@sats-connect/core';
+import type { Permissions } from '@secretkeylabs/xverse-core';
 import { contentScriptWalletEventMessageName } from '../schemas';
 import {
   sendMessageAuthorizedConnectedClients,
@@ -39,7 +39,7 @@ export async function dispatchEventConnectedClients(data: WalletEvent) {
  * @public
  */
 export async function dispatchEventAuthorizedConnectedClients(
-  permissions: Omit<Permission, 'clientId'>[],
+  permissions: Omit<Permissions.Store.Permission, 'clientId'>[],
   data: WalletEvent,
 ) {
   sendMessageAuthorizedConnectedClients(permissions, {

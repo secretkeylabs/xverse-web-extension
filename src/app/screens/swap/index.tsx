@@ -74,6 +74,7 @@ const RouteContainer = styled.div((props) => ({
   flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems: 'center',
+  gap: props.theme.space.s,
   margin: `${props.theme.space.l} 0`,
 }));
 
@@ -431,6 +432,16 @@ export default function SwapScreen() {
     navigate(RequestsRoutes.TransactionRequest, {
       state: {
         dataStxSignTransactionOverride,
+        mixpanelMetadata: {
+          provider: quote.provider,
+          fromToken,
+          toToken,
+          amount: amountForQuote,
+          quote,
+          btcUsdRate,
+          stxBtcRate,
+          fromTokenInfo: sip10FromTokenInfoUSD,
+        },
       },
     });
   }

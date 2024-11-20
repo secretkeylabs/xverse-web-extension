@@ -8,12 +8,13 @@ import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungib
 import useRuneUtxosQuery from '@hooks/queries/runes/useRuneUtxosQuery';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useSpamTokens from '@hooks/queries/useSpamTokens';
+import useHasFeature from '@hooks/useHasFeature';
 import { broadcastResetUserFlow, useResetUserFlow } from '@hooks/useResetUserFlow';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import { Flag } from '@phosphor-icons/react';
 import RuneBundleRow from '@screens/coinDashboard/runes/bundleRow';
 import type { FungibleToken } from '@secretkeylabs/xverse-core';
-import { mapRareSatsAPIResponseToBundle } from '@secretkeylabs/xverse-core';
+import { FeatureId, mapRareSatsAPIResponseToBundle } from '@secretkeylabs/xverse-core';
 import {
   setBrc20ManageTokensAction,
   setRunesManageTokensAction,
@@ -29,6 +30,7 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useParams, useSearchParams } from 'react-router-dom';
 import Theme from 'theme';
+import type { Tab } from '..';
 import CoinHeader from '../coinHeader';
 import {
   Button,
@@ -44,6 +46,7 @@ import {
   TokenContractAddress,
   TokenText,
 } from '../index.styled';
+import TokenPrice from '../tokenPrice';
 import TransactionsHistoryList from '../transactionsHistoryList';
 
 // TODO: This should be refactored into separate components for each protocol/coin as needed
@@ -54,8 +57,8 @@ export default function CoinDashboard() {
   const ftKey = searchParams.get('ftKey') ?? '';
   const protocol = searchParams.get('protocol') ?? '';
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
-  const fromSecondaryTab = searchParams.get('secondaryTab') === 'true' ? 'secondary' : 'primary';
-  const [currentTab, setCurrentTab] = useState<'primary' | 'secondary'>(fromSecondaryTab);
+  const defaultTab: Tab = searchParams.get('secondaryTab') === 'true' ? 'third' : 'first';
+  const [currentTab, setCurrentTab] = useState<Tab>(defaultTab);
   const [showOptionsDialog, setShowOptionsDialog] = useState(false);
   const [optionsDialogIndents, setOptionsDialogIndents] = useState<
     { top: string; left: string } | undefined
@@ -88,10 +91,10 @@ export default function CoinDashboard() {
     selectedFt?.protocol === 'runes' ? selectedFt?.name : '',
   );
 
-  const showTxHistory = currentTab === 'primary';
-  const displayTabs = ['stacks', 'runes'].includes(protocol);
-  const showStxContract = currentTab === 'secondary' && selectedFt && protocol === 'stacks';
-  const showRuneBundles = currentTab === 'secondary' && selectedFt && protocol === 'runes';
+  const showData = currentTab === 'second';
+  const showTxHistory = currentTab === 'first';
+  const showStxContract = currentTab === 'third' && selectedFt && protocol === 'stacks';
+  const showRuneBundles = currentTab === 'third' && selectedFt && protocol === 'runes';
 
   useResetUserFlow('/coinDashboard');
 
@@ -114,7 +117,7 @@ export default function CoinDashboard() {
   };
 
   const closeOptionsDialog = () => setShowOptionsDialog(false);
-
+  const showDataTab = useHasFeature(FeatureId.PORTFOLIO_TRACKING);
   return (
     <>
       <TopRow
@@ -162,26 +165,42 @@ export default function CoinDashboard() {
       <Container>
         <CoinHeader currency={currency as CurrencyTypes} fungibleToken={selectedFt} />
         {/* TODO: import { Tabs } from ui-library/tabs.tsx */}
-        {displayTabs && (
-          <FtInfoContainer>
+
+        <FtInfoContainer>
+          <Button
+            disabled={currentTab === 'first'}
+            isSelected={currentTab === 'first'}
+            onClick={() => setCurrentTab('first')}
+          >
+            {t('TRANSACTIONS')}
+          </Button>
+          {showDataTab && (
             <Button
-              disabled={currentTab === 'primary'}
-              isSelected={currentTab === 'primary'}
-              onClick={() => setCurrentTab('primary')}
+              disabled={currentTab === 'second'}
+              isSelected={currentTab === 'second'}
+              onClick={() => setCurrentTab('second')}
             >
-              {t('TRANSACTIONS')}
+              {t('MARKET')}
             </Button>
-            <Button
-              data-testid="coin-secondary-button"
-              disabled={currentTab === 'secondary'}
-              isSelected={currentTab === 'secondary'}
-              onClick={() => setCurrentTab('secondary')}
-            >
-              {protocol === 'stacks' && t('CONTRACT')}
-              {protocol === 'runes' && t('BUNDLES')}
-            </Button>
-          </FtInfoContainer>
+          )}
+          <Button
+            data-testid="coin-secondary-button"
+            disabled={currentTab === 'third'}
+            isSelected={currentTab === 'third'}
+            onClick={() => setCurrentTab('third')}
+          >
+            {protocol === 'stacks' && t('CONTRACT')}
+            {protocol === 'runes' && t('BUNDLES')}
+          </Button>
+        </FtInfoContainer>
+
+        {showData && (
+          <TokenPrice
+            currency={currency as CurrencyTypes}
+            fungibleToken={selectedFt as FungibleToken}
+          />
         )}
+
         {showTxHistory && (
           <TransactionsHistoryList
             coin={currency as CurrencyTypes}
@@ -193,7 +212,7 @@ export default function CoinDashboard() {
             brc20Token={protocol === 'brc-20' ? selectedFt?.principal || null : null}
             runeToken={protocol === 'runes' ? selectedFt?.name || null : null}
             runeSymbol={protocol === 'runes' ? selectedFt?.runeSymbol || null : null}
-            withTitle={!displayTabs}
+            withTitle={false}
           />
         )}
         {showStxContract && (

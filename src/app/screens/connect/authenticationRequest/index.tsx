@@ -24,6 +24,7 @@ import Callout from '@ui-library/callout';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
 import { isHardwareAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
+import RoutePaths from 'app/routes/paths';
 import { decodeToken } from 'jsontokens';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -105,7 +106,7 @@ function AuthenticationRequest() {
   const [isTxRejected, setIsTxRejected] = useState(false);
   const { t } = useTranslation('translation', { keyPrefix: 'AUTH_REQUEST_SCREEN' });
   const navigate = useNavigate();
-  const { search, pathname } = useLocation();
+  const { search } = useLocation();
   const params = new URLSearchParams(search);
   const authRequestToken = params.get('authRequest') ?? '';
   const authRequest = decodeToken(authRequestToken) as unknown as AuthRequest;
@@ -219,7 +220,7 @@ function AuthenticationRequest() {
       stxAddress: {
         mainnet: selectedAccount.stxAddress,
         testnet: publicKeyToAddress(AddressVersion.MainnetSingleSig, {
-          data: Buffer.from(selectedAccount.stxPublicKey, 'hex'),
+          data: Uint8Array.from(Buffer.from(selectedAccount.stxPublicKey, 'hex')),
           type: StacksMessageType.PublicKey,
         }),
       },
@@ -267,7 +268,7 @@ function AuthenticationRequest() {
   };
 
   const handleSwitchAccount = () => {
-    navigate('/account-list?hideListActions=true', { state: { from: pathname } });
+    navigate(`${RoutePaths.AccountList}?hideListActions=true`);
   };
 
   const handleAddStxLedgerAccount = async () => {

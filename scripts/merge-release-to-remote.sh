@@ -16,7 +16,8 @@ fi
 
 ORIGIN_BRANCH=${ORIGIN_BRANCH:-main} # defaults to main
 REMOTE_REPO=${REMOTE_REPO:-xverse-web-extension} # defaults to xverse-web-extension
-SYNC_NUMBER=${SYNC_NUMBER:1} # defaults to 1
+SYNC_NUMBER=${SYNC_NUMBER:-100} # defaults to 100
+PAGE=${PAGE:-1} # defaults to 1
 
 echo "Merging $ORIGIN_BRANCH to $REMOTE_REPO"
 
@@ -39,7 +40,7 @@ git remote -v
 gh api \
   -H "Accept: application/vnd.github+json" \
   -H "X-GitHub-Api-Version: 2022-11-28" \
-  '/repos/{owner}/{repo}/releases?per_page=100' > releases.json
+  "/repos/{owner}/{repo}/releases?per_page=100&page=$PAGE" > releases.json
 
 LENGTH=$(jq '. | length' releases.json)
 

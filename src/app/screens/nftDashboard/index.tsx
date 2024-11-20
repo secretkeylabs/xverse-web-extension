@@ -8,6 +8,7 @@ import { StyledHeading } from '@ui-library/common.styled';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import CollectiblesTabs from './collectiblesTabs';
+import { CollectiblesContainer } from './collectiblesTabs/index.styled';
 import ReceiveNftModal from './receiveNft';
 import useNftDashboard from './useNftDashboard';
 
@@ -29,15 +30,6 @@ const PageHeader = styled.div`
   width: 100%;
 `;
 
-const CollectiblesContainer = styled.div`
-  padding: 0 ${(props) => props.theme.space.s};
-  padding-bottom: ${(props) => props.theme.space.xl};
-  max-width: 1224px;
-  margin-left: auto;
-  margin-right: auto;
-  width: 100%;
-`;
-
 const StyledWebGalleryButton = styled(WebGalleryButton)`
   margin-top: ${(props) => props.theme.space.s};
 `;
@@ -49,6 +41,7 @@ const ReceiveNftContainer = styled.div((props) => ({
   zIndex: 2000,
   background: props.theme.colors.elevation2,
   borderRadius: 16,
+  maxWidth: 360,
 }));
 
 const CollectibleContainer = styled.div((props) => ({
@@ -61,7 +54,6 @@ const ButtonContainer = styled.div({
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'space-between',
-  maxWidth: 360,
 });
 
 const ReceiveButtonContainer = styled.div(() => ({
@@ -77,7 +69,6 @@ function NftDashboard() {
     openInGalleryView,
     onReceiveModalOpen,
     onReceiveModalClose,
-    onOrdinalReceiveAlertOpen,
     onOrdinalReceiveAlertClose,
     InscriptionListView,
     NftListView,
@@ -108,12 +99,7 @@ function NftDashboard() {
             </ReceiveButtonContainer>
             {openReceiveModal && (
               <ReceiveNftContainer>
-                <ReceiveNftModal
-                  visible={openReceiveModal}
-                  isGalleryOpen={isGalleryOpen}
-                  onClose={onReceiveModalClose}
-                  setOrdinalReceiveAlert={onOrdinalReceiveAlertOpen}
-                />
+                <ReceiveNftModal visible={openReceiveModal} onClose={onReceiveModalClose} />
               </ReceiveNftContainer>
             )}
           </ButtonContainer>
@@ -126,7 +112,7 @@ function NftDashboard() {
           />
         </CollectiblesContainer>
       </Container>
-      {!isGalleryOpen && <BottomTabBar tab="nft" />}
+      <BottomTabBar tab="nft" />
     </>
   );
 }

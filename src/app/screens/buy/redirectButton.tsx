@@ -6,20 +6,23 @@ const Button = styled.button((props) => ({
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
-  borderRadius: 8,
+  borderRadius: props.theme.radius(2),
   backgroundColor: 'transparent',
-  padding: props.theme.spacing(8),
-  marginBottom: props.theme.spacing(8),
-  border: `1px solid ${props.theme.colors.elevation3}`,
+  padding: props.theme.space.m,
+  marginBottom: props.theme.space.s,
+  border: `1px solid ${props.theme.colors.white_900}`,
+  transition: 'background-color 0.1s ease',
+  '&:hover': {
+    backgroundColor: props.theme.colors.white_900,
+  },
 }));
 
-const Text = styled.h1<{ marginTop?: boolean }>((props) => ({
+const Text = styled.p((props) => ({
   ...props.theme.typography.body_bold_l,
   color: props.theme.colors.white_0,
-  marginTop: props.marginTop ? props.theme.spacing(4) : 0,
 }));
 
-const SubText = styled.h2((props) => ({
+const SubText = styled.p((props) => ({
   ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_400,
 }));
@@ -27,8 +30,10 @@ const SubText = styled.h2((props) => ({
 const TextContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
+  justifyContent: 'center',
+  gap: props.theme.space.xxxs,
   flex: 1,
-  marginLeft: props.theme.spacing(8),
+  marginLeft: props.theme.space.m,
   textAlign: 'left',
 }));
 
@@ -38,12 +43,12 @@ const RowContainer = styled.div({
   flex: 1,
 });
 
-interface Props {
+type Props = {
   src: string;
   text: string;
   subText?: string;
   onClick: () => void;
-}
+};
 
 function RedirectButton({ src, text, subText, onClick }: Props) {
   return (
@@ -51,7 +56,7 @@ function RedirectButton({ src, text, subText, onClick }: Props) {
       <RowContainer>
         <img src={src} alt={text} />
         <TextContainer>
-          <Text marginTop={!subText}>{text}</Text>
+          <Text>{text}</Text>
           {subText && <SubText>{subText}</SubText>}
         </TextContainer>
       </RowContainer>

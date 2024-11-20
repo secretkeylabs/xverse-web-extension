@@ -1,48 +1,20 @@
-import { MESSAGE_SOURCE, type WebBtcMessage } from '@common/types/message-types';
-import { getTabIdFromPort, isUndefined, stringifyData } from '@common/utils';
+import { MESSAGE_SOURCE } from '@common/types/message-types';
+import { stringifyData } from '@common/utils';
 import {
   listenForPopupClose,
   makeSearchParamsWithDefaults,
   triggerRequestWindowOpen,
 } from '@common/utils/legacy-external-message-handler';
 import RequestsRoutes from '@common/utils/route-urls';
-import { RpcErrorCode } from '@sats-connect/core';
+import { RpcErrorCode, type StxCallContractRequestMessage } from '@sats-connect/core';
 import { makeRPCError } from '../../helpers';
-import {
-  sendInvalidParametersResponseMessage,
-  sendMissingParametersMessage,
-} from '../../responseMessages/errors';
-import { callContractParamsSchema } from './paramsSchema';
 
-async function callContract(message: WebBtcMessage<'stx_callContract'>, port: chrome.runtime.Port) {
-  if (isUndefined(message.params)) {
-    sendMissingParametersMessage({ tabId: getTabIdFromPort(port), messageId: message.id });
-    return;
-  }
-
-  const paramsParseResult = callContractParamsSchema.safeParse(message.params);
-  if (!paramsParseResult.success) {
-    sendInvalidParametersResponseMessage({
-      tabId: getTabIdFromPort(port),
-      messageId: message.id,
-      error: paramsParseResult.error,
-    });
-    return;
-  }
-
-  // TODO: Checks,
-  //
-  // 1. The contract name is valid
-  // 2. The params are valid Clarity values
-  //
-  // Assuming that the checks performed by the schema for the function name are
-  // good enough for now.
-
+async function callContract(message: StxCallContractRequestMessage, port: chrome.runtime.Port) {
   const popupParams = {
     // RPC params
-    contract: paramsParseResult.data.contract,
-    functionName: paramsParseResult.data.functionName,
-    arguments: stringifyData(paramsParseResult.data.arguments),
+    contract: message.params.contract,
+    functionName: message.params.functionName,
+    arguments: stringifyData(message.params.arguments),
 
     // Metadata
     rpcMethod: 'stx_callContract',

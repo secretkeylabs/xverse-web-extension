@@ -12,7 +12,6 @@ import {
   ChangeShowBtcReceiveAlertKey,
   ChangeShowDataCollectionAlertKey,
   ChangeShowOrdinalReceiveAlertKey,
-  EnableNestedSegWitAddressKey,
   RareSatsNoticeDismissedKey,
   RemoveAccountAvatarKey,
   RemoveAllFromHideCollectiblesKey,
@@ -28,10 +27,12 @@ import {
   SetHiddenCollectiblesKey,
   SetNotificationBannersKey,
   SetRunesManageTokensKey,
+  SetShowBalanceInBtcToggleKey,
   SetShowSpamTokensKey,
   SetSip10ManageTokensKey,
   SetSpamTokenKey,
   SetSpamTokensKey,
+  SetWalletBackupStatusKey,
   SetWalletHideStxKey,
   SetWalletLockPeriodKey,
   SetWalletUnlockedKey,
@@ -75,7 +76,6 @@ export const initialWalletState: WalletState = {
   selectedAccountIndex: 0,
   selectedAccountType: 'software',
   btcPaymentAddressType: 'native',
-  allowNestedSegWitAddress: false,
   encryptedSeed: '',
   fiatCurrency: 'USD',
   sip10ManageTokens: {},
@@ -102,6 +102,8 @@ export const initialWalletState: WalletState = {
   starredCollectibleIds: {},
   avatarIds: {},
   balanceHidden: false,
+  showBalanceInBtc: false,
+  hasBackedUpWallet: true,
 };
 
 /**
@@ -175,11 +177,6 @@ const walletReducer = (
         ],
         accountsList: [],
         accountBalances: {},
-      };
-    case EnableNestedSegWitAddressKey:
-      return {
-        ...state,
-        allowNestedSegWitAddress: true,
       };
     case ChangeBtcPaymentAddressTypeKey:
       return {
@@ -393,6 +390,16 @@ const walletReducer = (
         balanceHidden: action.toggle,
       };
     }
+    case SetShowBalanceInBtcToggleKey:
+      return {
+        ...state,
+        showBalanceInBtc: action.toggle,
+      };
+    case SetWalletBackupStatusKey:
+      return {
+        ...state,
+        hasBackedUpWallet: action.hasBackedUpWallet,
+      };
     default:
       return state;
   }

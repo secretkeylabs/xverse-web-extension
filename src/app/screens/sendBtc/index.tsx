@@ -1,4 +1,5 @@
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import useCancellableEffect from '@hooks/useCancellableEffect';
 import useCanUserSwitchPaymentType from '@hooks/useCanUserSwitchPaymentType';
 import useDebounce from '@hooks/useDebounce';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
@@ -68,53 +69,43 @@ function SendBtcScreen() {
         );
   };
 
-  useEffect(() => {
-    if (!debouncedRecipient || !feeRate) {
-      setTransaction(undefined);
-      setSummary(undefined);
-      return;
-    }
+  useCancellableEffect(
+    async (isEffectActive) => {
+      if (!debouncedRecipient || !feeRate) {
+        setTransaction(undefined);
+        setSummary(undefined);
+        return;
+      }
 
-    const isCancelled = {
-      current: false,
-    };
-    const generateTxnAndSummary = async () => {
       setIsLoading(true);
       try {
         const transactionDetails = await generateTransactionAndSummary();
-        if (isCancelled.current) return;
-        setTransaction(transactionDetails.transaction);
-        if (transactionDetails.summary) {
-          setSummary(transactionDetails.summary);
-          if (sendMax) {
-            setAmountSats(transactionDetails.summary.outputs[0].amount.toString());
+
+        if (isEffectActive()) {
+          setTransaction(transactionDetails.transaction);
+          if (transactionDetails.summary) {
+            setSummary(transactionDetails.summary);
+            if (sendMax) {
+              setAmountSats(transactionDetails.summary.outputs[0].amount.toString());
+            }
+          } else {
+            setTransaction(undefined);
+            setSummary(undefined);
           }
-        } else {
-          setTransaction(undefined);
-          setSummary(undefined);
         }
       } catch (e) {
-        if (isCancelled.current) return;
+        if (!isEffectActive()) return;
         if (!(e instanceof Error) || !e.message.includes('Insufficient funds')) {
-          // don't log the error if it's just an insufficient funds error
           console.error(e);
         }
         setTransaction(undefined);
         setSummary(undefined);
       } finally {
-        if (!isCancelled.current) {
-          setIsLoading(false);
-        }
+        if (isEffectActive()) setIsLoading(false);
       }
-    };
-
-    generateTxnAndSummary();
-
-    return () => {
-      isCancelled.current = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- don't care if generateTxnAndSummary changes
-  }, [transactionContext, debouncedRecipient, amountSats, feeRate, sendMax]);
+    },
+    [transactionContext, debouncedRecipient, amountSats, feeRate, sendMax],
+  );
 
   const handleCancel = () => {
     if (selectedAccountType === 'ledger' && isInOption) {
@@ -195,7 +186,7 @@ function SendBtcScreen() {
       setSendMax={setSendMax}
       onCancel={handleCancel}
       onConfirm={handleSubmit}
-      isLoading={isLoading}
+      isLoading={isLoading || recipientAddress !== debouncedRecipient}
       isSubmitting={isSubmitting}
       userCanSwitchPayType={userCanSwitchPayType}
     />

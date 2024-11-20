@@ -1,6 +1,6 @@
 import { ChartLineUp, Gear, Globe, SketchLogo, Wallet } from '@phosphor-icons/react';
-import { animated, easings, useSpring } from '@react-spring/web';
-import { isInOptions } from '@utils/helper';
+import { isInOptions, type TabType } from '@utils/helper';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
 
@@ -8,6 +8,7 @@ const BUTTON_WIDTH = 56;
 const BUTTON_HEIGHT = 32;
 
 const RowContainer = styled.div((props) => ({
+  position: 'relative',
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
@@ -18,7 +19,7 @@ const RowContainer = styled.div((props) => ({
   paddingRight: props.theme.space.xl,
 }));
 
-const MovingDiv = styled(animated.div)((props) => ({
+const MovingDiv = styled.div((props) => ({
   width: BUTTON_WIDTH,
   height: BUTTON_HEIGHT,
   backgroundColor: props.theme.colors.white_900,
@@ -38,19 +39,25 @@ const Button = styled.button({
   backgroundColor: 'transparent',
 });
 
-export type Tab = 'dashboard' | 'nft' | 'stacking' | 'explore' | 'settings';
-
 type Props = {
-  tab: Tab;
+  tab: TabType;
 };
 
 function BottomTabBar({ tab }: Props) {
   const navigate = useNavigate();
   const theme = useTheme();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const containerPadding = parseInt(theme.space.xl, 10);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      setContainerWidth(containerRef.current.clientWidth);
+    }
+  }, []);
 
   const getPosition = () => {
-    const containerPadding = parseInt(theme.space.xl, 10);
-    const gap = (window.innerWidth - 2 * containerPadding - 5 * BUTTON_WIDTH) / 4;
+    const gap = (containerWidth - 2 * containerPadding - 5 * BUTTON_WIDTH) / 4;
 
     switch (tab) {
       case 'nft':
@@ -66,13 +73,9 @@ function BottomTabBar({ tab }: Props) {
     }
   };
 
-  const styles = useSpring({
+  const styles = {
     left: getPosition(), // TODO: enable slide animation
-    config: {
-      duration: 200,
-      easing: easings.easeOutCirc,
-    },
-  });
+  };
 
   const handleDashboardButtonClick = () => {
     if (tab !== 'dashboard') {
@@ -107,7 +110,7 @@ function BottomTabBar({ tab }: Props) {
   const showBottomBar = !isInOptions();
 
   return showBottomBar ? (
-    <RowContainer>
+    <RowContainer ref={containerRef}>
       <MovingDiv style={styles} />
       <Button data-testid="nav-dashboard" onClick={handleDashboardButtonClick}>
         <Wallet

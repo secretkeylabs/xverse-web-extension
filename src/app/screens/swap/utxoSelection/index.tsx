@@ -22,97 +22,22 @@ import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
-import styled from 'styled-components';
 import Theme from 'theme';
 import QuoteSummaryTile from '../quoteSummary/quoteSummaryTile';
+import {
+  Arrow,
+  BtnView,
+  ButtonImage,
+  Heading,
+  ListContainer,
+  LoaderContainer,
+  RefreshView,
+  Row,
+  StickyButtonContainer,
+  StyledContainer,
+  TextsColumn,
+} from './index.styled';
 import UtxoItem from './utxoItem';
-
-const Heading = styled(StyledP)`
-  margin-bottom: ${(props) => props.theme.space.xxs};
-  font-style: normal;
-  font-weight: 700;
-  line-height: 140%;
-`;
-
-const StyledContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  margin-left: ${(props) => props.theme.space.m};
-  margin-right: ${(props) => props.theme.space.m};
-  padding-top: 60px;
-`;
-
-const RefreshView = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  flex: 1;
-  margin-top: ${(props) => props.theme.space.m};
-`;
-const ButtonImage = styled.button`
-  background-color: transparent;
-`;
-
-const ListContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: ${(props) => props.theme.space.s};
-  margin-top: ${(props) => props.theme.space.m};
-  padding-bottom: ${(props) => props.theme.space.s};
-`;
-
-const StickyButtonContainer = styled.div`
-  position: sticky;
-  bottom: 0;
-  padding-bottom: ${(props) => props.theme.space.l};
-  padding-top: ${(props) => props.theme.space.s};
-  background-color: ${(props) => props.theme.colors.elevation0};
-`;
-
-const Row = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-top: ${(props) => props.theme.space.s};
-`;
-
-const TextsColumn = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  flex: 1;
-`;
-
-const Arrow = styled.div`
-  flex-direction: column;
-  justify-content: center;
-  align-self: center;
-  align-items: 'flex-start';
-  padding: 0 ${(props) => props.theme.space.m};
-`;
-
-const BtnView = styled.div`
-  margin-top: ${(props) => props.theme.space.m};
-`;
-
-const TopRowContainer = styled.div`
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 1;
-  background-color: ${(props) => props.theme.colors.elevation0};
-`;
-
-const LoaderContainer = styled.div`
-  display: flex;
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-  padding-top: ${(props) => props.theme.space.l};
-`;
 
 type Props = {
   utxosRequest: GetUtxosRequest;
@@ -210,9 +135,7 @@ export default function UtxoSelection({
 
   return (
     <>
-      <TopRowContainer>
-        <TopRow onClick={onClose} />
-      </TopRowContainer>
+      <TopRow onClick={onClose} />
       <StyledContainer>
         <Heading typography="headline_s" color="white_0">
           {t('SWAP')}
@@ -230,7 +153,7 @@ export default function UtxoSelection({
             {t('SELECT_BUNDLES')}
           </StyledP>
           <ButtonImage onClick={() => refetchUtxos()}>
-            <ArrowClockwise color={Theme.colors.white_400} size="20" />
+            <ArrowClockwise size="20" />
           </ButtonImage>
         </RefreshView>
         {utxosLoading || isRefetching ? (

@@ -1,4 +1,5 @@
 import Button from '@ui-library/button';
+import { InputFeedback } from '@ui-library/inputFeedback';
 import { generateMnemonic } from 'bip39';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -63,10 +64,8 @@ const NthSpan = styled.span`
   color: ${(props) => props.theme.colors.white_0};
 `;
 
-const ErrorMessage = styled.p<{ visible: boolean }>`
-  ${(props) => props.theme.typography.body_s};
-  color: ${(props) => props.theme.colors.feedback.error};
-  visibility: ${(props) => (props.visible ? 'initial' : 'hidden')};
+const ErrorMessage = styled.div<{ $visible: boolean }>`
+  visibility: ${(props) => (props.$visible ? 'initial' : 'hidden')};
 `;
 
 const getOrdinal = (num: number): string => {
@@ -144,12 +143,19 @@ export default function VerifySeed({
       </Heading>
       <WordGrid>
         {quiz.words.map((word) => (
-          <WordButton key={word} onClick={handleClickWord} value={word} translate="no">
+          <WordButton
+            key={`${word}-${correctCounter}`}
+            onClick={handleClickWord}
+            value={word}
+            translate="no"
+          >
             {word}
           </WordButton>
         ))}
       </WordGrid>
-      <ErrorMessage visible={!!err}>{err}</ErrorMessage>
+      <ErrorMessage $visible={!!err}>
+        <InputFeedback message={err} variant="danger" />
+      </ErrorMessage>
       <ButtonsContainer>
         <TransparentButtonContainer>
           <Button onClick={onBack} variant="secondary" title={t('SEED_PHRASE_BACK_BUTTON')} />

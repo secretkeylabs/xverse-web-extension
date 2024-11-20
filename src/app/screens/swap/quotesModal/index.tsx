@@ -174,7 +174,7 @@ function QuotesModal({
             provider={stx.provider.name}
             price={stx.receiveAmount}
             image={stx.provider.logo}
-            onClick={() => ammProviderClicked && ammProviderClicked(stx)}
+            onClick={() => ammProviderClicked?.(stx)}
             subtitle={getReceiveAmountSubtitle(stx, stxProviders)}
             unit={stx.to.protocol === 'stx' ? 'STX' : toToken?.ticker || ''}
             fiatValue={
