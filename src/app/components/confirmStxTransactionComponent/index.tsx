@@ -1,8 +1,6 @@
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
 import { delay } from '@common/utils/promises';
-import BottomModal from '@components/bottomModal';
-import ActionButton from '@components/button';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import TransactionSettingAlert from '@components/transactionSetting';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
@@ -28,6 +26,7 @@ import { PostConditionMode } from '@stacks/transactions';
 import SelectFeeRate from '@ui-components/selectFeeRate';
 import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
+import Sheet from '@ui-library/sheet';
 import { isHardwareAccount } from '@utils/helper';
 import { modifyRecommendedStxFees } from '@utils/transactions/transactions';
 import BigNumber from 'bignumber.js';
@@ -418,7 +417,7 @@ function ConfirmStxTransactionComponent({
           onClick={onConfirmButtonClick}
         />
       </ButtonsContainer>
-      <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
+      <Sheet title="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
         {currentStepIndex === 0 && (
           <LedgerConnectionView
             title={signatureRequestTranslate('LEDGER.CONNECT.TITLE')}
@@ -442,17 +441,17 @@ function ConfirmStxTransactionComponent({
           />
         )}
         <SuccessActionsContainer>
-          <ActionButton
-            onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}
-            text={t(
+          <Button
+            onClick={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}
+            title={t(
               isTxRejected || isConnectFailed ? 'LEDGER.RETRY_BUTTON' : 'LEDGER.CONNECT_BUTTON',
             )}
             disabled={isButtonDisabled}
-            processing={isButtonDisabled}
+            loading={isButtonDisabled}
           />
-          <ActionButton onPress={onCancelClick} text={t('LEDGER.CANCEL_BUTTON')} transparent />
+          <Button onClick={onCancelClick} title={t('LEDGER.CANCEL_BUTTON')} variant="secondary" />
         </SuccessActionsContainer>
-      </BottomModal>
+      </Sheet>
     </>
   );
 }

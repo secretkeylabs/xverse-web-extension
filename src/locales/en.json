@@ -1175,12 +1175,17 @@
     "TRANSFER_OWN": "will keep"
   },
   "CONTRACT_CALL_REQUEST": {
-    "FUNCTION": "Function",
+    "TRANSACTION_DETAILS": "Transaction details",
+    "CONTRACT_CALL_DETAILS_TITLE": "Contract call",
+    "FUNCTION_NAME": "Name",
     "SHOW_MORE": "Show more ",
     "SHOW_LESS": "Show less",
+    "REQUEST_NETWORK": "Network",
+    "REQUEST_NETWORK_MAINNET": "Mainnet",
+    "REQUEST_NETWORK_TESTNET": "Testnet",
     "PLUS": "+",
     "MINUS": "-",
-    "CONTRACT_ADDRESS": "Contract ADDRESS",
+    "CONTRACT_ADDRESS": "Contract",
     "SPONSORED": "Sponsored",
     "POST_CONDITION_ALERT": "No transfers (beside fees) will be made from your account or the transaction will abort"
   },

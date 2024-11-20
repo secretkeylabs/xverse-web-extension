@@ -8,7 +8,6 @@ import {
 } from '@common/utils/rpc/responseMessages/stacks';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmStxTransactionComponent from '@components/confirmStxTransactionComponent';
-import InfoContainer from '@components/infoContainer';
 import FtPostConditionCard from '@components/postCondition/ftPostConditionCard';
 import NftPostConditionCard from '@components/postCondition/nftPostConditionCard';
 import StxPostConditionCard from '@components/postCondition/stxPostConditionCard';
@@ -23,27 +22,24 @@ import {
   isMultiSig,
   microstacksToStx,
   stxToMicrostacks,
-  type Args,
   type Coin,
   type ContractFunction,
   type ExecuteStxOrderRequest,
 } from '@secretkeylabs/xverse-core';
 import type { ContractCallPayload } from '@stacks/connect';
 import {
-  ClarityType,
-  cvToJSON,
-  cvToString,
   PostConditionMode,
   PostConditionType,
   StacksTransaction,
   type MultiSigSpendingCondition,
-  type SomeCV,
 } from '@stacks/transactions';
+import Callout from '@ui-library/callout';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import ContractDetails from './contractCallDetails';
 import finalizeTxSignature from './utils';
 
 const PostConditionContainer = styled.div((props) => ({
@@ -78,7 +74,7 @@ const SponosredText = styled.h1((props) => ({
 }));
 
 const PostConditionAlertText = styled.h1((props) => ({
-  ...props.theme.body_medium_l,
+  ...props.theme.typography.body_medium_l,
   color: props.theme.colors.white_0,
 }));
 
@@ -130,60 +126,6 @@ export default function ContractCallRequest({
     setHasTabClosed(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
-
-  type ArgToView = { name: string; value: string; type: any };
-  const getFunctionArgs = (): Array<ArgToView> => {
-    const { funcArgs } = extractFromPayload(request);
-    const args: Array<ArgToView> = funcMetaData?.args
-      ? funcMetaData?.args?.map((arg: Args, index: number) => {
-          const funcArg = cvToJSON(funcArgs[index]);
-
-          const argTypeIsOptionalSome = funcArgs[index].type === ClarityType.OptionalSome;
-
-          const funcArgType = argTypeIsOptionalSome
-            ? (funcArgs[index] as SomeCV).value?.type
-            : funcArgs[index]?.type;
-
-          const funcArgValString = argTypeIsOptionalSome
-            ? cvToString((funcArgs[index] as SomeCV).value, 'tryAscii')
-            : cvToString(funcArgs[index]);
-
-          const normalizedValue = (() => {
-            switch (funcArgType) {
-              case ClarityType.UInt:
-                return funcArgValString.split('u').join('');
-              case ClarityType.Buffer:
-                return funcArgValString.substring(1, funcArgValString.length - 1);
-              default:
-                return funcArgValString;
-            }
-          })();
-          const argToView: ArgToView = {
-            name: arg.name,
-            value: normalizedValue,
-            type: funcArg.type,
-          };
-
-          return argToView;
-        })
-      : [];
-    return args;
-  };
-
-  const truncateFunctionArgsView = (value: string) =>
-    `${value.substring(0, 12)}...${value.substring(value.length - 12, value.length)}`;
-
-  const functionArgsView = () => {
-    const args = getFunctionArgs();
-    return args.map((arg) => (
-      <TransactionDetailComponent
-        key={arg.name}
-        title={arg.name}
-        value={arg.value.length > 20 ? truncateFunctionArgsView(arg.value) : arg.value}
-        description={arg.type}
-      />
-    ));
-  };
 
   const showSponsoredTransactionTag = (
     <SponsoredContainer>
@@ -395,7 +337,6 @@ export default function ContractCallRequest({
         onConfirmClick={confirmCallback}
         onCancelClick={cancelCallback}
         loading={isLoading}
-        title={request.functionName}
         subTitle={request.appDetails?.name ? `Requested by ${request.appDetails.name}` : undefined}
         hasSignatures={hasSignatures}
         fee={fee ? microstacksToStx(fee).toString() : undefined}
@@ -403,22 +344,24 @@ export default function ContractCallRequest({
           setFee(stxToMicrostacks(new BigNumber(feeRate)));
         }}
       >
-        <>
-          {hasTabClosed && (
-            <InfoContainer
-              titleText={t('WINDOW_CLOSED_ALERT.TITLE')}
-              bodyText={t('WINDOW_CLOSED_ALERT.BODY')}
-            />
-          )}
-          {postConditionAlert}
-          {request.sponsored && showSponsoredTransactionTag}
-          {renderPostConditionsCard()}
-          <TransactionDetailComponent
-            title={t('CONTRACT_CALL_REQUEST.FUNCTION')}
-            value={request?.functionName}
+        {hasTabClosed && (
+          <Callout
+            titleText={t('WINDOW_CLOSED_ALERT.TITLE')}
+            bodyText={t('WINDOW_CLOSED_ALERT.BODY')}
           />
-          {functionArgsView()}
-        </>
+        )}
+        {postConditionAlert}
+        {request.sponsored && showSponsoredTransactionTag}
+        {renderPostConditionsCard()}
+        {funcMetaData && <ContractDetails contractCall={request} functionMetadata={funcMetaData} />}
+        <TransactionDetailComponent
+          title={t('CONTRACT_CALL_REQUEST.REQUEST_NETWORK')}
+          value={
+            selectedNetwork.isMainnet()
+              ? t('CONTRACT_CALL_REQUEST.REQUEST_NETWORK_MAINNET')
+              : t('CONTRACT_CALL_REQUEST.REQUEST_NETWORK_TESTNET')
+          }
+        />
       </ConfirmStxTransactionComponent>
     </>
   );
