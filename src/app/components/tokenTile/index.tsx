@@ -63,6 +63,7 @@ const CoinTickerText = styled.p((props) => ({
   color: props.theme.colors.white_0,
   lineHeight: '140%',
   minHeight: 20,
+  whiteSpace: 'nowrap',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
 }));
@@ -72,6 +73,7 @@ const CoinSubtitleText = styled.p((props) => ({
   color: props.theme.colors.white_200,
   lineHeight: '140%',
   minHeight: 20,
+  whiteSpace: 'nowrap',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
 }));
@@ -91,7 +93,6 @@ const TokenTitleContainer = styled.div((props) => ({
   flex: 1,
   justifyContent: 'flex-start',
   overflow: 'hidden',
-  textOverflow: 'ellipsis',
   marginBottom: props.theme.space.xxxs,
 }));
 

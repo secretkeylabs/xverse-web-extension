@@ -399,7 +399,7 @@ const useWalletReducer = () => {
   const restoreWallet = async (seedPhrase: string, password: string) => {
     await initialiseSeedVault(seedPhrase, password);
 
-    trackMixPanel(AnalyticsEvents.RestoreWallet);
+    trackMixPanel(AnalyticsEvents.RestoreWallet, { backupType: 'manual' });
   };
 
   const createWallet = async (seedPhrase: string, password: string, hasBackedUpWallet: boolean) => {

@@ -2,14 +2,14 @@ import TokenImage from '@components/tokenImage';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CaretRight } from '@phosphor-icons/react';
 import type { FungibleToken } from '@secretkeylabs/xverse-core';
+import { formatBalance } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import type { CurrencyTypes } from '@utils/constants';
-import { formatNumber } from '@utils/helper';
 import { NumericFormat } from 'react-number-format';
 import styled, { useTheme } from 'styled-components';
 import type { Color } from 'theme';
 
-const Container = styled.button<{ clickable: boolean }>`
+const MainContainer = styled.button<{ clickable: boolean }>`
   display: flex;
   flex-direction: row;
   border: 1px solid ${({ theme }) => theme.colors.elevation6};
@@ -23,20 +23,33 @@ const Container = styled.button<{ clickable: boolean }>`
   justify-content: center;
 `;
 
-const RowCenter = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  flex: 1;
-`;
-
-const InfoContainer = styled.div`
+const RowContainers = styled.div`
   display: flex;
   flex-direction: column;
-  flex: 1;
+  width: 100%;
   margin-left: ${({ theme }) => theme.space.m};
   margin-right: ${({ theme }) => theme.space.s};
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+
+const RowContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: ${({ theme }) => theme.space.m};
+`;
+
+const TruncatedP = styled(StyledP)`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const PriceUnitContainer = styled.div`
+  display: flex;
+  flex: 1;
+  justify-content: flex-end;
 `;
 
 const GreenEllipse = styled.div`
@@ -65,14 +78,6 @@ interface Props {
   unit?: string;
 }
 
-const TruncatedP = styled(StyledP)<{ $textAlign: string }>`
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  width: 120px;
-  text-align: ${({ $textAlign }) => $textAlign};
-`;
-
 function QuoteTile({
   provider,
   price,
@@ -96,35 +101,27 @@ function QuoteTile({
   const subtitleColor = subtitleColorOverride ?? getSubtitleColor();
 
   return (
-    <Container data-testid="swap-place-button" onClick={onClick} clickable={Boolean(onClick)}>
+    <MainContainer data-testid="swap-place-button" onClick={onClick} clickable={Boolean(onClick)}>
       <TokenImage fungibleToken={token} imageUrl={image} size={32} />
-      <InfoContainer>
-        <RowCenter>
-          <TruncatedP
-            $textAlign="left"
-            data-testid="place-name"
-            typography="body_bold_m"
-            color="white_0"
-          >
+      <RowContainers>
+        <RowContainer>
+          <TruncatedP data-testid="place-name" typography="body_bold_m" color="white_0">
             {provider}
           </TruncatedP>
-          <NumericFormat
-            value={price}
-            displayType="text"
-            thousandSeparator
-            renderText={() => (
-              <TruncatedP
-                $textAlign="right"
-                data-testid="quote-label"
-                typography="body_bold_m"
-                color="white_0"
-              >
-                {formatNumber(price)} {unit}
-              </TruncatedP>
-            )}
-          />
-        </RowCenter>
-        <RowCenter>
+          <PriceUnitContainer>
+            <NumericFormat
+              value={price}
+              displayType="text"
+              thousandSeparator
+              renderText={() => (
+                <TruncatedP data-testid="quote-label" typography="body_bold_m" color="white_0">
+                  {formatBalance(price)} {unit}
+                </TruncatedP>
+              )}
+            />
+          </PriceUnitContainer>
+        </RowContainer>
+        <RowContainer>
           {subtitle && subtitleColor && (
             <StyledP data-testid="info-message" typography="body_medium_s" color={subtitleColor}>
               <SubtitleContainer>
@@ -152,10 +149,10 @@ function QuoteTile({
               {floorText}
             </StyledP>
           )}
-        </RowCenter>
-      </InfoContainer>
+        </RowContainer>
+      </RowContainers>
       {onClick && <CaretRight size={theme.space.m} color={theme.colors.white_0} />}
-    </Container>
+    </MainContainer>
   );
 }
 
