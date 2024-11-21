@@ -1,4 +1,9 @@
-import { formatBalance, satsToBtc, type MarketUtxo, type Token } from '@secretkeylabs/xverse-core';
+import {
+  formatBalance,
+  satsToBtc,
+  type FungibleToken,
+  type MarketUtxo,
+} from '@secretkeylabs/xverse-core';
 import Checkbox from '@ui-library/checkbox';
 import { StyledP } from '@ui-library/common.styled';
 import { getTruncatedAddress } from '@utils/helper';
@@ -58,7 +63,7 @@ const Row = styled.div`
 type Props = {
   utxo: MarketUtxo;
   selected: boolean;
-  token?: Token;
+  token?: FungibleToken;
   onSelect: (utxo: MarketUtxo) => void;
 };
 
@@ -80,7 +85,7 @@ function UtxoItem({ utxo, selected, token, onSelect }: Props) {
       <Row>
         <LeftColumn>
           <RuneTitle data-testid="utxo-title" typography="body_medium_m" color="white_0">
-            {`${formatBalance(utxo.amount)} ${token?.symbol}`}
+            {`${formatBalance(utxo.amount)} ${token?.runeSymbol}`}
           </RuneTitle>
           <StyledP typography="body_medium_s" color="white_400">
             {`${getTruncatedAddress(utxo.identifier, 6)}`}
@@ -93,7 +98,7 @@ function UtxoItem({ utxo, selected, token, onSelect }: Props) {
           <NumericFormat
             value={satsPerRune.toFixed(2)}
             displayType="text"
-            suffix={` ${t('SATS')}/${token?.symbol}`}
+            suffix={` ${t('SATS')}/${token?.runeSymbol}`}
             thousandSeparator
             renderText={(value: string) => (
               <StyledP typography="body_medium_s" color="white_400">
