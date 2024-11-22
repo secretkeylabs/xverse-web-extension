@@ -1,14 +1,13 @@
 import BigNumber from 'bignumber.js';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 
 import PercentageChange from '@components/percentageChange';
 import useGetExchangeRate from '@hooks/queries/useGetExchangeRate';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { currencySymbolMap, type FungibleToken } from '@secretkeylabs/xverse-core';
+import { currencySymbolMap, formatBalance, type FungibleToken } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import type { CurrencyTypes } from '@utils/constants';
 
@@ -23,6 +22,10 @@ type Props = {
   currency: CurrencyTypes;
   fungibleToken: FungibleToken | undefined;
 };
+
+function formatSignificantDecimals(input: string) {
+  return input.replace(/(\.\d*?[1-9](?:[^0]*?[1-9]){0,3}).*/, '$1');
+}
 
 function TokenPrice({ currency, fungibleToken }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
@@ -42,23 +45,23 @@ function TokenPrice({ currency, fungibleToken }: Props) {
     return baseRate.multipliedBy(fungibleToken?.currentPrice ?? 0);
   }, [currency, stxBtcRate, btcUsdRate, fungibleToken, exchangeRate]);
 
+  const formattedPrice = [
+    currencySymbolMap[fiatCurrency],
+    currentPrice.isGreaterThan(1)
+      ? currentPrice.toFormat(2)
+      : formatBalance(formatSignificantDecimals(currentPrice.toString())),
+    ` ${fiatCurrency}`,
+  ].join('');
+
   return (
     <Container>
       <StyledP typography="body_medium_m" color="white_200">
         {currency === 'STX' || currency === 'BTC' ? currency : fungibleToken?.name} {t('PRICE')}
       </StyledP>
-      <NumericFormat
-        value={currentPrice.toFixed(2)}
-        displayType="text"
-        thousandSeparator
-        prefix={`${currencySymbolMap[fiatCurrency]}`}
-        suffix={` ${fiatCurrency}`}
-        renderText={(value) => (
-          <StyledP typography="headline_l" color="white_0">
-            {value}
-          </StyledP>
-        )}
-      />
+      {/* <NumericFormat> would not work here, due to the special unicode characters used by formatBalance */}
+      <StyledP typography="headline_l" color="white_0">
+        {formattedPrice}
+      </StyledP>
       <PercentageChange ftCurrencyPairs={[[fungibleToken, currency]]} displayAmountChange />
     </Container>
   );
