@@ -6,7 +6,6 @@ import {
   type FungibleToken,
   type Provider,
   type Quote,
-  type Token,
 } from '@secretkeylabs/xverse-core';
 import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
@@ -27,7 +26,7 @@ function trackSwapMixPanel(
   }: {
     provider?: Provider;
     fromToken?: FungibleToken;
-    toToken?: Token;
+    toToken?: FungibleToken;
     amount: string;
     quote?: Quote;
     btcUsdRate: string;
@@ -58,7 +57,7 @@ function trackSwapMixPanel(
     fromTokenAmount = amount;
   } else if (stxBtcRate) {
     fromPrincipal = fromToken?.principal;
-    toPrincipal = toToken?.ticker;
+    toPrincipal = toToken?.principal;
 
     fromTokenAmount = amount;
     fromTokenUsdValue =

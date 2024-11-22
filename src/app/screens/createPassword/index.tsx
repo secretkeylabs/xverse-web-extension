@@ -64,7 +64,7 @@ function CreatePassword(): JSX.Element {
         disableWalletExistsGuard?.();
         const seed = await getSeed();
 
-        await createWallet(seed, password);
+        await createWallet(seed, password, false);
 
         navigate('/wallet-success/create', { replace: true });
       } catch (err) {

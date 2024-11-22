@@ -50,8 +50,6 @@ import {
   isStxTx,
   mapFTNativeSwapTokenToTokenBasic,
   mapFTProtocolToSwapProtocol,
-  mapFtToSwapToken,
-  mapSwapProtocolToFTProtocol,
   mapSwapTokenToFT,
 } from './utils';
 import UtxoSelection from './utxoSelection';
@@ -113,7 +111,7 @@ export default function SwapScreen() {
   const [getQuotesModalVisible, setGetQuotesModalVisible] = useState(false);
   const [tokenSelectionBottomSheet, setTokenSelectionBottomSheet] = useState<Side | null>(null);
   const [fromToken, setFromToken] = useState<FungibleToken | undefined>();
-  const [toToken, setToToken] = useState<Token | undefined>();
+  const [toToken, setToToken] = useState<FungibleToken | undefined>();
   const [utxosRequest, setUtxosRequest] = useState<GetUtxosRequest | null>(null);
   const [inputError, setInputError] = useState('');
   const [hasQuoteError, setHasQuoteError] = useState(false);
@@ -138,7 +136,7 @@ export default function SwapScreen() {
   const { quotes, loading: quotesLoading, error: quotesError, fetchQuotes } = useGetQuotes();
   const coinsMasterList = useVisibleMasterCoinsList();
   const { tokenInfo: sip10FromTokenInfoUSD } = useGetSip10TokenInfo({
-    principal: toToken?.ticker,
+    principal: toToken?.principal,
     fiatCurrency: 'USD',
   });
 
@@ -196,23 +194,6 @@ export default function SwapScreen() {
   const onClickFrom = () => setTokenSelectionBottomSheet('from');
   const onClickTo = () => setTokenSelectionBottomSheet('to');
 
-  const getUserFTFromTokenTicker = (
-    protocol: Token['protocol'],
-    ticker: Token['ticker'],
-  ): FungibleToken | undefined => {
-    const ftProtocol = mapSwapProtocolToFTProtocol(protocol);
-
-    // add more protocols here when needed
-    switch (ftProtocol) {
-      case 'runes':
-        return coinsMasterList.find((coin) => coin.principal === ticker);
-      case 'stacks':
-        return coinsMasterList.find((coin) => coin.principal === ticker);
-      default:
-        return undefined;
-    }
-  };
-
   const isSwapRouteDisabled = !fromToken || !toToken;
 
   const onClickSwapRoute = () => {
@@ -222,16 +203,13 @@ export default function SwapScreen() {
     setInputError('');
     setAmount('');
     setHasQuoteError(false);
-    const newFrom =
-      getUserFTFromTokenTicker(toToken.protocol, toToken.ticker) ?? mapSwapTokenToFT(toToken);
-    const newTo = mapFtToSwapToken(fromToken);
-    setFromToken(newFrom);
-    setToToken(newTo);
+    setFromToken(toToken);
+    setToToken(fromToken);
   };
 
   const onChangeToToken = (token: Token) => {
     setHasQuoteError(false);
-    setToToken(token);
+    setToToken(mapSwapTokenToFT(token));
   };
 
   const onChangeFromToken = (token: FungibleToken) => {
@@ -340,7 +318,7 @@ export default function SwapScreen() {
   const isRunesToBtcRoute =
     fromToken?.principal !== 'BTC' &&
     fromToken?.protocol === 'runes' &&
-    toToken?.protocol === 'btc';
+    toToken?.principal === 'BTC';
 
   useEffect(() => {
     if (errorMessage) {

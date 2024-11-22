@@ -159,7 +159,7 @@ function PercentageChange({
           .multipliedBy(priceChangePercentage24h)
           .multipliedBy(exchangeRate)
           .absoluteValue()
-          .toFixed(2)
+          .toFormat(2)
       : null;
 
   const formattedAmountChange = amountChangeInUsd

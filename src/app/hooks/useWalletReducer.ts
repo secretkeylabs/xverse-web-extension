@@ -26,6 +26,7 @@ import {
   changeShowDataCollectionAlertAction,
   resetWalletAction,
   selectAccount,
+  setWalletBackupStatusAction,
   setWalletHideStxAction,
   setWalletUnlockedAction,
   storeEncryptedSeedAction,
@@ -398,13 +399,13 @@ const useWalletReducer = () => {
   const restoreWallet = async (seedPhrase: string, password: string) => {
     await initialiseSeedVault(seedPhrase, password);
 
-    trackMixPanel(AnalyticsEvents.RestoreWallet);
+    trackMixPanel(AnalyticsEvents.RestoreWallet, { backupType: 'manual' });
   };
 
-  const createWallet = async (seedPhrase: string, password: string) => {
+  const createWallet = async (seedPhrase: string, password: string, hasBackedUpWallet: boolean) => {
     await initialiseSeedVault(seedPhrase, password);
-
-    trackMixPanel(AnalyticsEvents.CreateNewWallet);
+    dispatch(setWalletBackupStatusAction(hasBackedUpWallet));
+    trackMixPanel(AnalyticsEvents.CreateNewWallet, { has_backed_up_wallet: hasBackedUpWallet });
   };
 
   const createAccount = async () => {

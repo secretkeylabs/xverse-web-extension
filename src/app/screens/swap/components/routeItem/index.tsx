@@ -1,7 +1,7 @@
 import TokenImage from '@components/tokenImage';
 import { CaretDown } from '@phosphor-icons/react';
-import { mapFtToCurrencyType, mapSwapTokenToFT, mapTokenToCurrencyType } from '@screens/swap/utils';
-import type { FungibleToken, Token } from '@secretkeylabs/xverse-core';
+import { mapFtToCurrencyType, mapSwapTokenToFT } from '@screens/swap/utils';
+import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -41,15 +41,14 @@ const TokenName = styled(StyledP)`
 
 type Props = {
   label: string;
-  token?: FungibleToken | Token;
+  token?: FungibleToken;
   onClick: () => void;
 };
 
 export default function RouteItem({ label, token, onClick }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
 
-  const currency =
-    token && 'principal' in token ? mapFtToCurrencyType(token) : mapTokenToCurrencyType(token);
+  const currency = mapFtToCurrencyType(token);
 
   return (
     <Container>
@@ -72,7 +71,11 @@ export default function RouteItem({ label, token, onClick }: Props) {
           />
         )}
         <TokenName data-testid="token-name" typography="body_medium_m" color="white_0">
-          {currency !== 'FT' ? currency : token?.name ?? t('SELECT_COIN')}
+          {currency !== 'FT'
+            ? currency
+            : token?.protocol === 'stacks'
+            ? token?.ticker
+            : token?.name ?? t('SELECT_COIN')}
         </TokenName>
         <CaretDown
           data-testid="down-arrow-button"

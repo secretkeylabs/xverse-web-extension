@@ -2,10 +2,10 @@ import TokenTile from '@components/tokenTile';
 import useDebounce from '@hooks/useDebounce';
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import {
+  getTrackingIdentifier,
   isStxTx,
   mapFTMotherProtocolToSwapProtocol,
   mapFTProtocolToSwapProtocol,
-  mapSwapProtocolToFTProtocol,
   mapSwapTokenToFT,
 } from '@screens/swap/utils';
 import {
@@ -213,8 +213,10 @@ export default function TokenToBottomSheet({
                   onPress={() => {
                     onSelectCoin(token);
                     trackMixPanel(AnalyticsEvents.SelectTokenToSwapTo, {
-                      selectedToken: token.name ?? token.ticker,
-                      principal: isStxTx({ toToken: token }) ? token.ticker : undefined,
+                      selectedToken: getTrackingIdentifier(mapSwapTokenToFT(token)),
+                      principal: isStxTx({ toToken: mapSwapTokenToFT(token) })
+                        ? token.ticker
+                        : undefined,
                     });
                     handleClose();
                   }}

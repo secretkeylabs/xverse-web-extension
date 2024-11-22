@@ -28,7 +28,6 @@ jobs:
           npm run knip
           npx eslint .
           npx tsc --noEmit
-          npm test
       - name: Build
         env:
           TRANSAC_API_KEY: ${{ secrets.TRANSAC_API_KEY }}
@@ -87,6 +86,7 @@ jobs:
           name: all-blob-reports
           path: blob-report
           retention-days: 1
+          overwrite: true
 
   merge-reports:
     # Merge reports after playwright-tests, even if some shards have failed

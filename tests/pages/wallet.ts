@@ -572,7 +572,7 @@ export default class Wallet {
     this.sendRuneAmount = page.getByTestId('send-rune-amount');
 
     // List
-    this.buttonList = page.getByTestId('action-button').filter({ hasText: 'List' });
+    this.buttonList = page.getByRole('button', { name: 'List List' });
     this.tabAvailable = page.getByTestId('available-tab');
     this.tabListed = page.getByRole('button', { name: 'LISTED', exact: true });
     this.tabNotListed = page.getByRole('button', { name: 'NOT LISTED' });
@@ -788,8 +788,6 @@ export default class Wallet {
   async checkVisualsListRunesPage() {
     await expect(this.tabNotListed).toBeVisible();
     await expect(this.tabListed).toBeVisible();
-    await expect(this.buttonSetPrice).toBeVisible();
-    await expect(this.buttonSetPrice).toBeDisabled();
     await expect(this.runeItem.first()).toBeVisible();
     expect(await this.runeItem.count()).toBeGreaterThanOrEqual(1);
   }

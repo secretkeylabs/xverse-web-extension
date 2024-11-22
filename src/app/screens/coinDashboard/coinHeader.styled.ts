@@ -7,12 +7,14 @@ export const Container = styled.div((props) => ({
   paddingRight: props.theme.space.m,
 }));
 
-export const RowContainer = styled.div({
+export const RowContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
   alignItems: 'center',
-});
+  marginTop: props.theme.space.m,
+  marginBottom: props.theme.space.xxs,
+}));
 
 export const ProtocolText = styled.p((props) => ({
   ...props.theme.headline_category_s,
@@ -38,12 +40,11 @@ export const BalanceValuesContainer = styled.div({
   flexDirection: 'column',
 });
 
-export const FiatContainer = styled.div((props) => ({
+export const FiatContainer = styled.div({
   display: 'flex',
   alignItems: 'center',
   alignSelf: 'center',
-  marginTop: props.theme.space.xxs,
-}));
+});
 
 export const CoinBalanceText = styled.p((props) => ({
   ...props.theme.typography.headline_l,
@@ -52,6 +53,10 @@ export const CoinBalanceText = styled.p((props) => ({
   textAlign: 'center',
   wordBreak: 'break-all',
   cursor: 'pointer',
+  transition: 'color 0.1s ease',
+  '&:hover': {
+    color: props.theme.colors.white_200,
+  },
 }));
 
 export const FiatAmountText = styled.p((props) => ({
@@ -61,13 +66,13 @@ export const FiatAmountText = styled.p((props) => ({
   textAlign: 'center',
   marginRight: props.theme.space.xxs,
   marginTop: props.theme.space.xxs,
+  cursor: 'pointer',
 }));
 
 export const BalanceTitleText = styled.p((props) => ({
   ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_400,
+  color: props.theme.colors.white_200,
   textAlign: 'center',
-  marginTop: props.theme.space.xs,
 }));
 
 export const RowButtonContainer = styled.div((props) => ({

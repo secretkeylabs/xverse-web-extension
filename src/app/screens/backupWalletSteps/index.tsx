@@ -85,7 +85,7 @@ export default function BackupWalletSteps(): JSX.Element {
       disableWalletExistsGuard?.();
       const seed = await seedVault.getSeed();
 
-      await createWallet(seed, password);
+      await createWallet(seed, password, true);
 
       navigate('/wallet-success/create', { replace: true });
     } else {

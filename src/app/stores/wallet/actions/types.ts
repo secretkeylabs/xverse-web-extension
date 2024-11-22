@@ -48,6 +48,8 @@ export const RemoveAllFromHideCollectiblesKey = 'RemoveAllFromHideCollectiblesKe
 export const SetAccountAvatarKey = 'SetAccountAvatarKey';
 export const RemoveAccountAvatarKey = 'RemoveAccountAvatarKey';
 export const SetBalanceHiddenToggleKey = 'SetBalanceHiddenToggleKey';
+export const SetShowBalanceInBtcToggleKey = 'SetShowBalanceInBtcToggleKey';
+export const SetWalletBackupStatusKey = 'SetWalletBackupStatusKey';
 
 export enum WalletSessionPeriods {
   LOW = 15,
@@ -94,6 +96,8 @@ export interface WalletState {
   starredCollectibleIds: Record<string, Array<{ id: string; collectionId: string }>>;
   avatarIds: Record<string, AvatarInfo>;
   balanceHidden: boolean;
+  showBalanceInBtc: boolean;
+  hasBackedUpWallet: boolean;
 }
 
 export interface StoreEncryptedSeed {
@@ -300,6 +304,16 @@ export interface SetBalanceHiddenToggle {
   toggle: boolean;
 }
 
+export interface SetShowBalanceInBtc {
+  type: typeof SetShowBalanceInBtcToggleKey;
+  toggle: boolean;
+}
+
+export interface SetWalletBackupStatus {
+  type: typeof SetWalletBackupStatusKey;
+  hasBackedUpWallet: boolean;
+}
+
 export type WalletActions =
   | ResetWallet
   | UpdateSoftwareAccounts
@@ -337,4 +351,6 @@ export type WalletActions =
   | SetHiddenCollectibles
   | SetAccountAvatar
   | RemoveAccountAvatar
-  | SetBalanceHiddenToggle;
+  | SetBalanceHiddenToggle
+  | SetShowBalanceInBtc
+  | SetWalletBackupStatus;

@@ -99,7 +99,7 @@ function ConfirmStxTransactionComponent({
   const { getSeed } = useSeedVault();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
   const selectedAccount = useSelectedAccount();
-  const { feeMultipliers, fiatCurrency, network } = useWalletSelector();
+  const { feeMultipliers, fiatCurrency } = useWalletSelector();
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(loading);
   const [isModalVisible, setIsModalVisible] = useState(false);

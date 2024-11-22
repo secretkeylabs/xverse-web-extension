@@ -30,7 +30,8 @@
     "SETTINGS": "Settings"
   },
   "INFORMATION": {
-    "ORDINALS_ADDRESS_TOOLTIP": "These sats are used for your ordinals and runes. They cannot be spent with Xverse wallet."
+    "ORDINALS_ADDRESS_TOOLTIP": "These sats are used for your ordinals and runes. They cannot be spent with Xverse wallet.",
+    "WALLET_NOT_BACKED_UP": "Wallet not backed up"
   },
   "UNITS": {
     "SATS_PER_VB": "sats/vB"
@@ -214,6 +215,7 @@
   },
   "DASHBOARD_SCREEN": {
     "TOTAL_BALANCE": "Total Balance",
+    "SHOW_BALANCE": "Show balance",
     "BITCOIN": "Bitcoin",
     "STACKS": "Stacks",
     "ACCOUNT_NAME": "Account",

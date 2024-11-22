@@ -1,8 +1,11 @@
 import SeedphraseView from '@components/seedPhraseView';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { Eye, EyeSlash } from '@phosphor-icons/react';
+import { setWalletBackupStatusAction } from '@stores/wallet/actions/actionCreators';
 import Button from '@ui-library/button';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 const Container = styled.div({
@@ -34,15 +37,27 @@ const ButtonContainer = styled.div((props) => ({
   gap: props.theme.space.s,
 }));
 
-interface SeedCheckPros {
+type Props = {
   onContinue: () => void;
   seedPhrase: string;
-}
+};
 
-export default function SeedCheck(props: SeedCheckPros): JSX.Element {
+export default function SeedCheck({ onContinue, seedPhrase }: Props): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'BACKUP_WALLET_SCREEN' });
-  const { onContinue, seedPhrase } = props;
-  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const dispatch = useDispatch();
+  const { hasBackedUpWallet } = useWalletSelector();
+
+  useEffect(() => {
+    if (!isVisible) {
+      return;
+    }
+
+    if (!hasBackedUpWallet) {
+      dispatch(setWalletBackupStatusAction(true));
+    }
+  }, [isVisible, hasBackedUpWallet, dispatch]);
+
   return (
     <Container>
       <Heading>{t('SEED_PHRASE_VIEW_HEADING')}</Heading>

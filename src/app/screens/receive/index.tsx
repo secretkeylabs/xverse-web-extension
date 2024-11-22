@@ -116,8 +116,13 @@ function Receive() {
   const navigate = useNavigate();
   const selectedAccount = useSelectedAccount();
   const { stxAddress, btcAddress, ordinalsAddress } = selectedAccount;
-  const { showBtcReceiveAlert, showOrdinalReceiveAlert, network, btcPaymentAddressType } =
-    useWalletSelector();
+  const {
+    showBtcReceiveAlert,
+    showOrdinalReceiveAlert,
+    network,
+    btcPaymentAddressType,
+    hasBackedUpWallet,
+  } = useWalletSelector();
   const userCanSwitchPaymentType = useCanUserSwitchPaymentType();
 
   const { t } = useTranslation('translation', { keyPrefix: 'RECEIVE' });
@@ -198,6 +203,7 @@ function Receive() {
   return (
     <>
       <TopRow
+        backupReminder={!hasBackedUpWallet}
         onClick={handleBackButtonClick}
         onSettingsClick={
           showBtcAddressTypeSelector ? () => setShowBtcAddressTypeSelectorSheet(true) : undefined
