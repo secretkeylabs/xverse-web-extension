@@ -23,6 +23,7 @@ type Props = {
   fungibleToken: FungibleToken | undefined;
 };
 
+// todo: move into xverse-core
 function formatSignificantDecimals(input: string) {
   return input.replace(/(\.\d*?[1-9](?:[^0]*?[1-9]){0,3}).*/, '$1');
 }
