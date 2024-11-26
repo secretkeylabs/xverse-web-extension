@@ -206,6 +206,7 @@ function TokenTile({
           {loading && <StyledBarLoader width="20%" height={20} />}
           {!loading && !hideSwapBalance && (
             <AmountContainer aria-label="CurrencyBalance Container">
+              {!balanceHidden && <PercentageChange ftCurrencyPairs={[[fungibleToken, currency]]} />}
               {showBalanceInBtc && currency !== 'BTC' && (
                 <BtcAmountText
                   btcAmount={
@@ -218,11 +219,8 @@ function TokenTile({
               {!showBalanceInBtc && balanceHidden && (
                 <FiatAmountContainer>{HIDDEN_BALANCE_LABEL}</FiatAmountContainer>
               )}
-              {(!showBalanceInBtc || currency === 'BTC') && !balanceHidden && (
-                <FiatCurrencyRow>
-                  <PercentageChange ftCurrencyPairs={[[fungibleToken, currency]]} />
-                  <StyledFiatAmountText fiatAmount={fiatAmount} fiatCurrency={fiatCurrency} />
-                </FiatCurrencyRow>
+              {!balanceHidden && !showBalanceInBtc && (
+                <StyledFiatAmountText fiatAmount={fiatAmount} fiatCurrency={fiatCurrency} />
               )}
             </AmountContainer>
           )}
