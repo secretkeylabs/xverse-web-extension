@@ -20,6 +20,7 @@ import {
   getBtcFiatEquivalent,
   satsToBtc,
   type FungibleToken,
+  type FungibleTokenWithStates,
   type GetListedUtxosResponseUtxo,
   type Marketplace,
 } from '@secretkeylabs/xverse-core';
@@ -72,7 +73,9 @@ export default function ListRuneScreen() {
   const navigate = useNavigate();
   const { runeId } = useParams();
   const { data: runesCoinsList } = useVisibleRuneFungibleTokens(false);
-  const selectedRune = runesCoinsList.find((ft) => ft.principal === runeId);
+  const selectedRune = runesCoinsList?.find(
+    (ft: FungibleTokenWithStates) => ft.principal === runeId,
+  );
   const { fiatCurrency } = useWalletSelector();
   const { btcFiatRate } = useSupportedCoinRates();
   const location = useLocation();

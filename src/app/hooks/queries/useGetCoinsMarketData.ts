@@ -10,13 +10,12 @@ const useGetCoinsMarketData = (searchId: string) => {
     return response;
   };
 
-  const { data } = useQuery({
+  return useQuery({
     queryKey: ['get-coins-market-data', ids.join(',')],
     staleTime: 5 * 60 * 1000, // 5 minutes
     queryFn,
+    select: (data) => data.find(({ id }) => searchId === id),
   });
-
-  return data ? data.find(({ id }) => searchId === id) : undefined;
 };
 
 export default useGetCoinsMarketData;

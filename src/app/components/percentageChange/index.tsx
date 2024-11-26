@@ -73,8 +73,8 @@ function PercentageChange({
   const { data: stxData } = useStxWalletData();
   const { data: btcBalance } = useBtcWalletData();
 
-  const btcMarketData = useGetCoinsMarketData('bitcoin');
-  const stxMarketData = useGetCoinsMarketData('blockstack');
+  const { data: btcMarketData } = useGetCoinsMarketData('bitcoin');
+  const { data: stxMarketData } = useGetCoinsMarketData('blockstack');
 
   const showPortfolioTracking = useHasFeature(FeatureId.PORTFOLIO_TRACKING);
   if (!showPortfolioTracking) {

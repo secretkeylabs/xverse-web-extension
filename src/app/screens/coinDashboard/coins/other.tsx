@@ -13,7 +13,7 @@ import { broadcastResetUserFlow, useResetUserFlow } from '@hooks/useResetUserFlo
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import { Flag } from '@phosphor-icons/react';
 import RuneBundleRow from '@screens/coinDashboard/runes/bundleRow';
-import type { FungibleToken } from '@secretkeylabs/xverse-core';
+import type { FungibleTokenWithStates } from '@secretkeylabs/xverse-core';
 import { FeatureId, mapRareSatsAPIResponseToBundle } from '@secretkeylabs/xverse-core';
 import {
   setBrc20ManageTokensAction,
@@ -70,18 +70,18 @@ export default function CoinDashboard() {
   const { data: sip10CoinsList } = useVisibleSip10FungibleTokens();
   const { data: brc20CoinsList } = useVisibleBrc20FungibleTokens();
 
-  let selectedFt: FungibleToken | undefined;
+  let selectedFt: FungibleTokenWithStates | undefined;
 
   if (ftKey && protocol) {
     switch (protocol) {
       case 'stacks':
-        selectedFt = sip10CoinsList.find((ft) => ft.principal === ftKey);
+        selectedFt = sip10CoinsList?.find((ft: FungibleTokenWithStates) => ft.principal === ftKey);
         break;
       case 'brc-20':
-        selectedFt = brc20CoinsList.find((ft) => ft.principal === ftKey);
+        selectedFt = brc20CoinsList?.find((ft: FungibleTokenWithStates) => ft.principal === ftKey);
         break;
       case 'runes':
-        selectedFt = runesCoinsList.find((ft) => ft.principal === ftKey);
+        selectedFt = runesCoinsList?.find((ft: FungibleTokenWithStates) => ft.principal === ftKey);
         break;
       default:
         selectedFt = undefined;
@@ -197,7 +197,7 @@ export default function CoinDashboard() {
         {showData && (
           <TokenPrice
             currency={currency as CurrencyTypes}
-            fungibleToken={selectedFt as FungibleToken}
+            fungibleToken={selectedFt as FungibleTokenWithStates}
           />
         )}
 
