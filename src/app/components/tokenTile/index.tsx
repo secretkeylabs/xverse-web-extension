@@ -168,6 +168,30 @@ function TokenTile({
 
   const fiatAmount = getFiatAmount();
 
+  const getAmountDisplay = () => {
+    if (balanceHidden) {
+      return <FiatAmountContainer>{HIDDEN_BALANCE_LABEL}</FiatAmountContainer>;
+    }
+
+    if (showBalanceInBtc) {
+      if (currency === 'BTC') {
+        return <StyledFiatAmountText fiatAmount={fiatAmount} fiatCurrency={fiatCurrency} />;
+      }
+
+      return (
+        <BtcAmountText
+          btcAmount={
+            fiatAmount
+              ? getFiatBtcEquivalent(fiatAmount, BigNumber(btcFiatRate)).toString()
+              : undefined
+          }
+        />
+      );
+    }
+
+    return <StyledFiatAmountText fiatAmount={fiatAmount} fiatCurrency={fiatCurrency} />;
+  };
+
   return (
     <TileContainer onClick={handleTokenPressed} className={className} aria-label="Token Row">
       <TokenImageContainer>
@@ -207,21 +231,7 @@ function TokenTile({
           {!loading && !hideSwapBalance && (
             <AmountContainer aria-label="CurrencyBalance Container">
               {!balanceHidden && <PercentageChange ftCurrencyPairs={[[fungibleToken, currency]]} />}
-              {showBalanceInBtc && currency !== 'BTC' && (
-                <BtcAmountText
-                  btcAmount={
-                    fiatAmount
-                      ? getFiatBtcEquivalent(fiatAmount, BigNumber(btcFiatRate)).toString()
-                      : undefined
-                  }
-                />
-              )}
-              {!showBalanceInBtc && balanceHidden && (
-                <FiatAmountContainer>{HIDDEN_BALANCE_LABEL}</FiatAmountContainer>
-              )}
-              {!balanceHidden && !showBalanceInBtc && (
-                <StyledFiatAmountText fiatAmount={fiatAmount} fiatCurrency={fiatCurrency} />
-              )}
+              {getAmountDisplay()}
             </AmountContainer>
           )}
         </RowContainer>
