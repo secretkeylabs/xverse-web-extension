@@ -133,6 +133,7 @@ export default function SwapScreen() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const defaultFrom = params.get('from');
+  const defaultTo = params.get('to');
   const { quotes, loading: quotesLoading, error: quotesError, fetchQuotes } = useGetQuotes();
   const coinsMasterList = useVisibleMasterCoinsList();
   const { tokenInfo: sip10FromTokenInfoUSD } = useGetSip10TokenInfo({
@@ -145,7 +146,11 @@ export default function SwapScreen() {
       const token = coinsMasterList.find((coin) => coin.principal === defaultFrom);
       setFromToken(token);
     }
-  }, [defaultFrom, coinsMasterList]);
+    if (defaultTo) {
+      const token = coinsMasterList.find((coin) => coin.principal === defaultTo);
+      setToToken(token);
+    }
+  }, [defaultFrom, defaultTo, coinsMasterList]);
 
   const handleGoBack = () => {
     navigate('/');

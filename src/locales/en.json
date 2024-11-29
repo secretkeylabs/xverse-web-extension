@@ -368,7 +368,9 @@
     "RATE_TOO_LOW": "Set fee is below minimum of {{minFee}} sats/vB",
     "RATE_TOO_HIGH": "Set fee is above maximum of {{maxFee}} sats/vB",
     "SPEND_DELEGATED_STX": "You are transferring some STX that is registered for the next stacking cycle. The amount transferred will be subtracted from your current stacking pool delegation, and will not be locked to generate rewards in the next cycle.",
-    "INVALID_FEE_RATE": "Invalid fee rate"
+    "INVALID_FEE_RATE": "Invalid fee rate",
+    "EMPTY_RUNE_BALANCE": "You don't have any {{symbol}} to send. You can swap BTC for {{symbol}} with Xverse.",
+    "SWAP_FROM_TO": "Swap {{from}} for {{to}}"
   },
   "CONFIRM_TRANSACTION": {
     "SEND": "Confirm Transaction",
