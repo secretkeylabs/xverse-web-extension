@@ -129,6 +129,7 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel }: BatchPsbtSigningProps) 
 
         const psbtBase64 = await enhancedPsbt.getSignedPsbtBase64({
           finalize: false,
+          selectedAccount,
         });
         signedPsbts.push(psbtBase64);
 

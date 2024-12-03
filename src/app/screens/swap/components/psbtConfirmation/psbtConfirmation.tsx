@@ -45,7 +45,8 @@ export default function PsbtConfirmation({
 
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey } = useSelectedAccount();
+  const selectedAccount = useSelectedAccount();
+  const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey } = selectedAccount;
   const txnContext = useTransactionContext();
   const { network } = useWalletSelector();
   const { executeOrder, error: executeOrderError } = useExecuteOrder();
@@ -135,6 +136,7 @@ export default function PsbtConfirmation({
         ...(accountType === 'keystone' && {
           keystoneTransport: transport as TransportWebUSB,
         }),
+        selectedAccount,
       });
 
       if (!signedPsbt) {

@@ -82,6 +82,7 @@ function SignPsbtRequest() {
         ...(accountType === 'keystone' && {
           keystoneTransport: transport as TransportWebUSB,
         }),
+        selectedAccount,
       });
       const response = await confirmSignPsbt(signedPsbt);
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
