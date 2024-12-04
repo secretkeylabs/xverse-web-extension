@@ -621,13 +621,9 @@ export default class Wallet {
   }
 
   async checkVisualsStartpage() {
-    // Wait for the balance element to be present in the DOM
-    await this.page.waitForSelector('[data-testid="total-balance-value"]', { state: 'attached' });
-
-    // Wait for a short duration to allow the animation to complete
-    await this.page.waitForTimeout(400);
-
-    await expect(this.balance).toBeVisible();
+    // to-do fix the element itself, after the native-segwit update it resolves to 2 elements
+    // data-testid="total-balance-value"
+    await expect(this.balance.first()).toBeVisible();
     await expect(this.manageTokenButton).toBeVisible();
 
     // Deny data collection --> modal window is not always appearing so when it does we deny the data collection
@@ -737,8 +733,8 @@ export default class Wallet {
 
     // Not all TX Screens show a total amount
     if (totalAmountShown) {
-      await expect(this.confirmTotalAmount).toBeVisible();
-      await expect(this.confirmCurrencyAmount).toBeVisible();
+      await expect(this.confirmTotalAmount.first()).toBeVisible();
+      await expect(this.confirmCurrencyAmount.first()).toBeVisible();
     }
 
     if (tokenImageShown) {

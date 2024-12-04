@@ -43,6 +43,7 @@ jobs:
           path: ./build
           retention-days: 4
           if-no-files-found: error
+          overwrite: true
   UItest:
     needs: [build]
     name: E2E Test ${{ matrix.shardIndex }} of ${{ matrix.shardTotal }}
@@ -122,3 +123,4 @@ jobs:
           name: html-report--attempt-${{ github.run_attempt }}
           path: playwright-report
           retention-days: 4
+          overwrite: true
