@@ -4,7 +4,6 @@ import { CaretRight } from '@phosphor-icons/react';
 import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import { formatBalance } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
-import type { CurrencyTypes } from '@utils/constants';
 import { NumericFormat } from 'react-number-format';
 import styled, { useTheme } from 'styled-components';
 import type { Color } from 'theme';
@@ -38,6 +37,7 @@ const RowContainer = styled.div`
   flex-direction: row;
   justify-content: space-between;
   gap: ${({ theme }) => theme.space.m};
+  white-space: nowrap;
 `;
 
 const TruncatedP = styled(StyledP)`
@@ -123,12 +123,12 @@ function QuoteTile({
         </RowContainer>
         <RowContainer>
           {subtitle && subtitleColor && (
-            <StyledP data-testid="info-message" typography="body_medium_s" color={subtitleColor}>
+            <TruncatedP data-testid="info-message" typography="body_medium_s" color={subtitleColor}>
               <SubtitleContainer>
                 {subtitleColor === 'success_light' && <GreenEllipse />}
                 {subtitle}
               </SubtitleContainer>
-            </StyledP>
+            </TruncatedP>
           )}
           {fiatValue && (
             <NumericFormat

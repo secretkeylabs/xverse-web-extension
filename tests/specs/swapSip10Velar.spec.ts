@@ -48,7 +48,8 @@ test.describe('Swap sip-10 token to STX', () => {
     page.getByRole('button', { name: /get quotes/i }).click();
 
     await expect(page.getByText('Rates', { exact: true })).toBeVisible();
-    await page.getByText(/^\d+\.\d+\s+STX$/i).click();
+    
+    await page.getByText('Velar', { exact: true }).click();
 
     // Quotes page velar -> stacks
     await expect(page.getByText(/quote/i)).toBeVisible();
