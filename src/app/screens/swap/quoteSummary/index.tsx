@@ -13,6 +13,7 @@ import {
   AnalyticsEvents,
   RUNE_DISPLAY_DEFAULTS,
   capStxFeeAtThreshold,
+  formatBalance,
   getBtcFiatEquivalent,
   getStxFiatEquivalent,
   stxToMicrostacks,
@@ -477,7 +478,7 @@ export default function QuoteSummary({
                 {t('SWAP_SCREEN.MIN_RECEIVE')}
               </StyledP>
               <StyledP data-testid="min-received-amount" typography="body_medium_m" color="white_0">
-                {formatNumber(quote.receiveAmount)} {toUnit}
+                {formatBalance(quote.receiveAmount)} {toUnit}
               </StyledP>
             </ListingDescriptionRow>
             {Boolean(quote.feePercentage) && (

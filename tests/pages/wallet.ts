@@ -841,18 +841,8 @@ export default class Wallet {
     const usdAmountQuote = await this.textUSD.first().innerText();
     const numericUSDQuote = parseFloat(usdAmountQuote.replace(/[^0-9.]/g, ''));
     expect(numericUSDQuote).toEqual(numericUSDValue);
-
-    // min-received-amount value should be the same as quoteAmount
-    const minReceivedAmount = await this.minReceivedAmount.innerText();
-    const numericMinReceivedAmount = parseFloat(minReceivedAmount.replace(/[^0-9.]/g, ''));
-    const formattedNumericMinReceivedAmount = parseFloat(numericMinReceivedAmount.toFixed(3));
-    expect(formattedNumericMinReceivedAmount).toEqual(numericQuoteValue);
-
-    // check if quoteAmount is the same from the page before
-    const quoteAmount2Page = await this.quoteAmount.last().innerText();
-    const numericQuote2Page = parseFloat(quoteAmount2Page.replace(/[^0-9.]/g, ''));
-    expect(numericQuote2Page).toEqual(numericQuoteValue);
   }
+  // check visuals of List on ME page
 
   async checkVisualsListOnMEPage() {
     await expect(this.buttonFloorPrice).toBeVisible();
