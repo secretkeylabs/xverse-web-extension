@@ -1,4 +1,5 @@
 import RequestsRoutes from '@common/utils/route-urls';
+import FormattedNumber from '@components/formattedNumber';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useRuneFloorPricePerMarketplaceQuery from '@hooks/queries/runes/useRuneFloorPricePerMarketplaceQuery';
@@ -17,6 +18,7 @@ import SetRunePriceItem from '@screens/listRune/setRunePriceItem';
 import {
   FeatureId,
   currencySymbolMap,
+  formatBalance,
   getBtcFiatEquivalent,
   satsToBtc,
   type FungibleToken,
@@ -533,13 +535,17 @@ export default function ListRuneScreen() {
                       />
                     </SetRunePricesButtonsContainer>
                     <StyledP typography="body_medium_s" color="white_200">
-                      {noFloorPrice
-                        ? t('NO_FLOOR_PRICE', { symbol: selectedRune?.runeSymbol })
-                        : t('MARKETPLACE_FLOOR_PRICE', {
-                            sats: formatToXDecimalPlaces(runeFloorPrice, 5),
-                            symbol: selectedRune?.runeSymbol,
+                      {noFloorPrice ? (
+                        t('NO_FLOOR_PRICE', { symbol: selectedRune?.runeSymbol })
+                      ) : (
+                        <>
+                          {t('MARKETPLACE_FLOOR_PRICE', {
                             marketplaces: joinedSelectedMarketplaces([...selectedMarketplaces]),
                           })}
+                          <FormattedNumber number={formatBalance(runeFloorPrice.toString())} />
+                          {` Sats/${selectedRune?.runeSymbol}`}
+                        </>
+                      )}
                     </StyledP>
                   </SetRunePricesContainer>
                 </PaddingContainer>
