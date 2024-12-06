@@ -131,9 +131,8 @@ function PercentageChange({
       [BigNumber(0), BigNumber(0)],
     );
 
-  if (currentBalance.eq(0) || oldBalance.eq(0)) {
-    return <NoDataText />;
-  }
+  if (currentBalance.eq(0) && oldBalance.eq(0) && displayTimeInterval) return null;
+  if (currentBalance.eq(0) || oldBalance.eq(0)) return <NoDataText />;
 
   const priceChangePercentage24h = currentBalance.dividedBy(oldBalance).minus(1);
   const formattedPercentageChange = priceChangePercentage24h
