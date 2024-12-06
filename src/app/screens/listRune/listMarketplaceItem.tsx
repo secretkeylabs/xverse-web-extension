@@ -1,8 +1,9 @@
+import FormattedNumber from '@components/formattedNumber';
 import TokenImage from '@components/tokenImage';
 import type { FungibleToken, ListingProvider } from '@secretkeylabs/xverse-core';
+import { formatBalance } from '@secretkeylabs/xverse-core';
 import Checkbox from '@ui-library/checkbox';
 import { StyledP } from '@ui-library/common.styled';
-import { formatNumber } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import theme from 'theme';
@@ -58,7 +59,6 @@ type Props = {
 function ListMarketplaceItem({ runeMarketInfo, rune, selected, onToggle }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'LIST_RUNE_SCREEN' });
   const { floorPrice: rawFloorPrice, marketplace } = runeMarketInfo;
-  const floorPrice = formatNumber(rawFloorPrice);
 
   return (
     <Container data-testid="rune-item" $selected={selected}>
@@ -77,10 +77,9 @@ function ListMarketplaceItem({ runeMarketInfo, rune, selected, onToggle }: Props
         <RowCenter>
           <SubtitleContainer>
             <StyledP typography="body_medium_s" color="white_200">
-              {t('FLOOR_PRICE', {
-                floor_price: floorPrice,
-                symbol: rune.runeSymbol || rune.name,
-              })}
+              {t('FLOOR_PRICE')}
+              <FormattedNumber number={formatBalance(rawFloorPrice.toString())} />
+              {` Sats/${rune.runeSymbol || rune.name}`}
             </StyledP>
           </SubtitleContainer>
         </RowCenter>

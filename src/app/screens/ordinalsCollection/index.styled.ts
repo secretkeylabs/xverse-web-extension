@@ -1,5 +1,4 @@
 import { BetterBarLoader } from '@components/barLoader';
-import Separator from '@components/separator';
 import WebGalleryButton from '@components/webGalleryButton';
 import WrenchErrorMessage from '@components/wrenchErrorMessage';
 import Button from '@ui-library/button';

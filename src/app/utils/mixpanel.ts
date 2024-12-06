@@ -4,6 +4,8 @@ import { AnalyticsEvents, type AnalyticsEventProperties } from '@secretkeylabs/x
 import type { Callback, RequestOptions } from 'mixpanel-browser';
 import { getMixpanelInstance, mixpanelInstances } from '../mixpanelSetup';
 
+declare const VERSION: string;
+
 // Overload definitions
 export function trackMixPanel<E extends keyof AnalyticsEventProperties>(
   event: E,
@@ -28,7 +30,15 @@ export function trackMixPanel(
   callback?: Callback,
   instanceKey: keyof typeof mixpanelInstances = 'web-extension',
 ) {
-  getMixpanelInstance(instanceKey).track(event, properties, options, callback);
+  getMixpanelInstance(instanceKey).track(
+    event,
+    {
+      client_version: VERSION,
+      ...properties,
+    },
+    options,
+    callback,
+  );
 }
 
 export const optOutMixPanel = () => {

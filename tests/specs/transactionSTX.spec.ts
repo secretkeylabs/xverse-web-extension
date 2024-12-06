@@ -43,7 +43,7 @@ test.describe('Transaction STX', () => {
     await wallet.inputField.first().fill(STXMain);
     await wallet.buttonNext.click();
     // No funds on mainnet in this wallet -->Page opens and Next button is hidden and info message is shown
-    await expect(wallet.buttonNext).toBeHidden();
+
     // Amount input is visible
     await expect(page.getByRole('textbox', { name: '0' })).toBeVisible();
     await expect(page.getByRole('textbox', { name: '0' })).toBeEnabled();

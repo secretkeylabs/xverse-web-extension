@@ -1,5 +1,4 @@
 import PlaceholderImage from '@assets/img/nftDashboard/nft_fallback.svg';
-import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import { BetterBarLoader } from '@components/barLoader';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -12,6 +11,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
 import { getFetchableUrl } from '@utils/helper';
+import { isThumbnailInscription } from '@utils/inscriptions';
 import Image from 'rc-image';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -40,40 +40,6 @@ const ImageContainer = styled.div<ContainerProps>((props) => ({
   '> img': {
     width: '100%',
   },
-}));
-
-const FillImg = styled.img(() => ({
-  width: '100%',
-  height: '100%',
-}));
-
-const ButtonIcon = styled.img({
-  width: 12,
-  height: 12,
-});
-
-const OrdinalsTag = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  background: props.theme.colors.elevation1,
-  borderRadius: 40,
-  width: 79,
-  height: 22,
-  left: 12,
-  bottom: 12,
-  zIndex: 1000,
-  position: 'absolute',
-  padding: '3px 6px',
-}));
-
-const Text = styled.h1((props) => ({
-  ...props.theme.typography.body_bold_m,
-  textTransform: 'uppercase',
-  color: props.theme.colors.white_0,
-  fontSize: 10,
-  marginLeft: props.theme.spacing(4),
 }));
 
 const LoaderContainer = styled.div<ContainerProps>({
@@ -141,7 +107,6 @@ const StyledBarLoader = styled(BetterBarLoader)((props) => ({
 
 type Props = {
   ordinal: Inscription | CondensedInscription;
-  isNftDashboard?: boolean;
   inNftDetail?: boolean;
   inNftSend?: boolean;
   isSmallImage?: boolean;
@@ -149,11 +114,11 @@ type Props = {
   withoutTitles?: boolean;
   placeholderIcon?: string;
   showContentTypeThumbnail?: boolean;
+  thumbnailTimestamp?: number;
 };
 
 function OrdinalImage({
   ordinal,
-  isNftDashboard = false,
   inNftDetail = false,
   inNftSend = false,
   isSmallImage = false,
@@ -161,6 +126,7 @@ function OrdinalImage({
   withoutTitles = false,
   placeholderIcon,
   showContentTypeThumbnail = false,
+  thumbnailTimestamp = Date.now(),
 }: Props) {
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360 && !withoutSizeIncrease;
   const textContent = useTextOrdinalContent(ordinal);
@@ -206,7 +172,7 @@ function OrdinalImage({
   }
 
   const renderImage = (tag: string, src?: string) => (
-    <ImageContainer>
+    <ImageContainer key={thumbnailTimestamp}>
       <StyledImage
         data-testid="token-image"
         width="100%"
@@ -219,12 +185,6 @@ function OrdinalImage({
         src={src}
         preview={false}
       />
-      {isNftDashboard && (
-        <OrdinalsTag>
-          <ButtonIcon src={OrdinalsIcon} />
-          <Text>{tag}</Text>
-        </OrdinalsTag>
-      )}
     </ImageContainer>
   );
 
@@ -235,7 +195,7 @@ function OrdinalImage({
     [textContent, contentType],
   );
 
-  if (contentType.includes('image/svg')) {
+  if (isThumbnailInscription(ordinal)) {
     return renderImage(
       t('ORDINAL'),
       `${XVERSE_ORDIVIEW_URL(network.type)}/thumbnail/${ordinal.id}`,
@@ -244,14 +204,6 @@ function OrdinalImage({
 
   if (contentType.includes('image')) {
     return renderImage(t('ORDINAL'), `${XVERSE_ORDIVIEW_URL(network.type)}/content/${ordinal.id}`);
-  }
-
-  // if content type is undefined or "", we fall back to ordiview thumbnail
-  if (!contentType) {
-    return renderImage(
-      t('ORDINAL'),
-      `${XVERSE_ORDIVIEW_URL(network.type)}/thumbnail/${ordinal.id}`,
-    );
   }
 
   if (textContent?.includes('brc-721e')) {
@@ -264,7 +216,6 @@ function OrdinalImage({
         <Brc20Tile
           brcContent={brc20Details}
           isGalleryOpen={isGalleryOpen}
-          isNftDashboard={isNftDashboard}
           inNftDetail={inNftDetail}
           isSmallImage={isSmallImage}
           withoutSizeIncrease={withoutSizeIncrease}
@@ -277,23 +228,6 @@ function OrdinalImage({
   if (contentType.includes('text') || contentType === 'application/json') {
     if (!textContent) {
       return <StyledBarLoader width={loaderSize} height={loaderSize} />;
-    }
-
-    if (contentType.includes('html')) {
-      return (
-        <ImageContainer data-testid="token-image" inNftDetail={inNftDetail}>
-          <FillImg
-            src={`${XVERSE_ORDIVIEW_URL(network.type)}/thumbnail/${ordinal.id}`}
-            alt="/html/"
-          />
-          {isNftDashboard && (
-            <OrdinalsTag>
-              <ButtonIcon src={OrdinalsIcon} />
-              <Text>{t('ORDINAL')}</Text>
-            </OrdinalsTag>
-          )}
-        </ImageContainer>
-      );
     }
 
     if (showContentTypeThumbnail) {
@@ -316,12 +250,6 @@ function OrdinalImage({
         >
           {textContent}
         </OrdinalContentText>
-        {isNftDashboard && (
-          <OrdinalsTag>
-            <ButtonIcon src={OrdinalsIcon} />
-            <Text>{t('ORDINAL')}</Text>
-          </OrdinalsTag>
-        )}
       </ImageContainer>
     );
   }

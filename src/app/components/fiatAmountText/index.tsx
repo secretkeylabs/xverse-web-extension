@@ -34,7 +34,7 @@ function FiatAmountText({ className, fiatAmount, fiatCurrency, dataTestId }: Pro
       value={fiatAmount.toFixed(2).toString()}
       displayType="text"
       thousandSeparator
-      prefix={`~ ${currencySymbolMap[fiatCurrency]}`}
+      prefix={` ${currencySymbolMap[fiatCurrency]}`}
       suffix={` ${fiatCurrency}`}
       data-testid={dataTestId}
     />
@@ -48,6 +48,7 @@ export const StyledFiatAmountText = styled(FiatAmountText)`
 
 export const RightAlignedStyledFiatAmountText = styled(StyledFiatAmountText)`
   text-align: right;
+  flex: 1 0 auto;
 `;
 
 export default FiatAmountText;

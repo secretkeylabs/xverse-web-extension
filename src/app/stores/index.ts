@@ -154,6 +154,11 @@ const migrations = {
     const { allowNestedSegWitAddress, ...migratedState } = state;
     return migratedState as WalletState;
   },
+  7: (state: WalletStateV6): WalletState => ({
+    ...state,
+    showBalanceInBtc: false,
+    hasBackedUpWallet: true,
+  }),
   /* *
    * When adding a new migration, add the new wallet state type to the migrationTypes file
    * and add the migration here.

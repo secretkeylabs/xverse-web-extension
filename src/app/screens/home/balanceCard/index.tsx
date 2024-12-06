@@ -7,18 +7,18 @@ import useSelectedAccountBtcBalance from '@hooks/queries/useSelectedAccountBtcBa
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useSelectedAccount from '@hooks/useSelectedAccount';
+import useToggleBalanceView from '@hooks/useToggleBalanceView';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { Eye } from '@phosphor-icons/react';
 import { animated, useTransition } from '@react-spring/web';
-import { currencySymbolMap } from '@secretkeylabs/xverse-core';
-import { setBalanceHiddenToggleAction } from '@stores/wallet/actions/actionCreators';
+import { currencySymbolMap, getFiatBtcEquivalent } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
-import { ANIMATION_EASING, HIDDEN_BALANCE_LABEL } from '@utils/constants';
+import { ANIMATION_EASING, BTC_SYMBOL, HIDDEN_BALANCE_LABEL } from '@utils/constants';
 import { calculateTotalBalance, getAccountBalanceKey } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
-import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 
 const Container = styled.div`
@@ -42,28 +42,33 @@ const BalanceHeadingText = styled.p((props) => ({
   lineHeight: '140%',
 }));
 
-const CurrencyText = styled.label((props) => ({
+const ShowBalanceButton = styled.button((props) => ({
   ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_0,
+  color: props.theme.colors.white_200,
+  lineHeight: '140%',
+  display: 'flex',
+  alignItems: 'center',
+  gap: 6,
+  backgroundColor: 'transparent',
+  transition: 'color 0.1s ease',
+  '&:hover': {
+    color: props.theme.colors.white_0,
+  },
 }));
 
 const BalanceAmountText = styled.p((props) => ({
   ...props.theme.typography.headline_l,
   lineHeight: '1',
   color: props.theme.colors.white_0,
+  transition: 'color 0.1s ease',
+  '&:hover': {
+    color: props.theme.colors.white_200,
+  },
 }));
 
 const BarLoaderContainer = styled.div({
   display: 'flex',
 });
-
-const CurrencyCard = styled.div((props) => ({
-  display: 'flex',
-  justifyContent: 'center',
-  backgroundColor: props.theme.colors.elevation3,
-  width: 45,
-  borderRadius: 30,
-}));
 
 const BalanceContainer = styled.div((props) => ({
   display: 'flex',
@@ -90,9 +95,10 @@ type Props = {
 
 function BalanceCard({ isLoading, isRefetching }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
+  const { t: commonT } = useTranslation('translation', { keyPrefix: 'COMMON' });
   const selectedAccount = useSelectedAccount();
-  const dispatch = useDispatch();
-  const { fiatCurrency, hideStx, accountBalances, balanceHidden } = useWalletSelector();
+  const { fiatCurrency, hideStx, accountBalances, balanceHidden, showBalanceInBtc } =
+    useWalletSelector();
   const { confirmedPaymentBalance: btcBalance, isLoading: btcBalanceLoading } =
     useSelectedAccountBtcBalance();
   const { data: stxData } = useStxWalletData();
@@ -103,6 +109,7 @@ function BalanceCard({ isLoading, isRefetching }: Props) {
   const { data: sip10CoinsList } = useVisibleSip10FungibleTokens();
   const { data: brc20CoinsList } = useVisibleBrc20FungibleTokens();
   const { data: runesCoinList } = useVisibleRuneFungibleTokens();
+  const { toggleBalanceView, balanceDisplayState } = useToggleBalanceView();
 
   const balance = calculateTotalBalance({
     stxBalance: BigNumber(stxData?.balance ?? 0).toString(),
@@ -145,10 +152,8 @@ function BalanceCard({ isLoading, isRefetching }: Props) {
     })();
   });
 
-  const onClickBalance = () => dispatch(setBalanceHiddenToggleAction({ toggle: !balanceHidden }));
-
   const onKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter') onClickBalance();
+    if (event.key === 'Enter') toggleBalanceView();
   };
 
   const isInitialMount = useRef(true);
@@ -187,42 +192,75 @@ function BalanceCard({ isLoading, isRefetching }: Props) {
             ) : (
               <>
                 <RowContainer>
-                  <BalanceHeadingText>{t('TOTAL_BALANCE')}</BalanceHeadingText>
-                  <CurrencyCard>
-                    <CurrencyText data-testid="currency-text">{fiatCurrency}</CurrencyText>
-                  </CurrencyCard>
+                  {balanceHidden ? (
+                    <ShowBalanceButton onClick={toggleBalanceView}>
+                      <Eye size={20} weight="fill" />
+                      {t('SHOW_BALANCE')}
+                    </ShowBalanceButton>
+                  ) : (
+                    <BalanceHeadingText>
+                      {t('TOTAL_BALANCE')}{' '}
+                      <span data-testid="currency-text">
+                        {showBalanceInBtc ? commonT('BTC') : fiatCurrency}
+                      </span>
+                    </BalanceHeadingText>
+                  )}
                 </RowContainer>
                 <BalanceContainer
-                  onClick={onClickBalance}
+                  onClick={toggleBalanceView}
                   role="button"
                   tabIndex={0}
                   onKeyDown={onKeyDown}
                 >
-                  {balanceHidden && (
-                    <BalanceAmountText data-testid="total-balance-value">
-                      {HIDDEN_BALANCE_LABEL}
-                    </BalanceAmountText>
-                  )}
-                  {!balanceHidden && (
-                    <>
-                      <NumericFormat
-                        value={balance}
-                        displayType="text"
-                        prefix={`${currencySymbolMap[fiatCurrency]}`}
-                        thousandSeparator
-                        renderText={(value: string) => (
+                  {(() => {
+                    switch (balanceDisplayState) {
+                      case 'btc':
+                        return (
+                          <NumericFormat
+                            value={getFiatBtcEquivalent(
+                              BigNumber(balance),
+                              BigNumber(btcFiatRate),
+                            ).toString()}
+                            displayType="text"
+                            prefix={BTC_SYMBOL}
+                            thousandSeparator
+                            renderText={(value: string) => (
+                              <BalanceAmountText data-testid="total-balance-value">
+                                {value}
+                              </BalanceAmountText>
+                            )}
+                          />
+                        );
+                      case 'hidden':
+                        return (
                           <BalanceAmountText data-testid="total-balance-value">
-                            {value}
+                            {HIDDEN_BALANCE_LABEL}
                           </BalanceAmountText>
-                        )}
-                      />
-                      {isRefetching && (
-                        <div>
-                          <Spinner color="white" size={16} />
-                        </div>
-                      )}
-                    </>
-                  )}
+                        );
+                      case 'unmodified':
+                      default:
+                        return (
+                          <>
+                            <NumericFormat
+                              value={balance}
+                              displayType="text"
+                              prefix={`${currencySymbolMap[fiatCurrency]}`}
+                              thousandSeparator
+                              renderText={(value: string) => (
+                                <BalanceAmountText data-testid="total-balance-value">
+                                  {value}
+                                </BalanceAmountText>
+                              )}
+                            />
+                            {isRefetching && (
+                              <div>
+                                <Spinner color="white" size={16} />
+                              </div>
+                            )}
+                          </>
+                        );
+                    }
+                  })()}
                 </BalanceContainer>
               </>
             )}

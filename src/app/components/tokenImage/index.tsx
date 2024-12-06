@@ -67,6 +67,7 @@ const ProtocolImage = styled.img({
 type Props = {
   currency?: CurrencyTypes;
   fungibleToken?: FungibleToken;
+  imageUrl?: string;
   loading?: boolean;
   size?: number;
   round?: boolean;
@@ -77,6 +78,7 @@ type Props = {
 export default function TokenImage({
   currency,
   fungibleToken,
+  imageUrl,
   loading,
   size,
   round,
@@ -88,13 +90,13 @@ export default function TokenImage({
   const [imageError, setImageError] = useState(false);
 
   const getCurrencyIcon = useCallback(() => {
-    if (currency === 'STX') {
+    if (currency === 'STX' || fungibleToken?.principal === 'STX') {
       return IconStacks;
     }
-    if (currency === 'BTC') {
+    if (currency === 'BTC' || fungibleToken?.principal === 'BTC') {
       return IconBitcoin;
     }
-  }, [currency]);
+  }, [currency, fungibleToken]);
 
   const ticker =
     fungibleToken?.ticker ||
@@ -125,7 +127,17 @@ export default function TokenImage({
   }, [ftProtocol, customProtocolIcon]);
 
   const renderIcon = () => {
-    if (!fungibleToken) {
+    if (imageUrl) {
+      return (
+        <TickerImage
+          data-testid="token-image"
+          $size={size}
+          src={imageUrl}
+          onError={() => setImageError(true)}
+        />
+      );
+    }
+    if (!fungibleToken || fungibleToken.principal === 'BTC' || fungibleToken.principal === 'STX') {
       return (
         <TickerImage
           data-testid="token-image"
@@ -149,8 +161,7 @@ export default function TokenImage({
           />
         );
       }
-
-      if (fungibleToken?.runeSymbol) {
+      if (fungibleToken.runeSymbol) {
         return (
           <TickerIconContainer $size={size} $round={round}>
             <TickerIconText data-testid="token-image">{fungibleToken.runeSymbol}</TickerIconText>
@@ -159,7 +170,7 @@ export default function TokenImage({
       }
     }
 
-    if (fungibleToken?.image) {
+    if (fungibleToken.image) {
       return (
         <TickerImage
           data-testid="token-image"

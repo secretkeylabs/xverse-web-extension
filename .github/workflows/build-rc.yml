@@ -44,12 +44,13 @@ jobs:
 
         run: npm run build
       - name: Upload Archive
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: web-extension1
           path: ./build
           retention-days: 5
           if-no-files-found: error
+          overwrite: true
   UItest:
     needs: [build]
     name: E2E Test ${{ matrix.shardIndex }} of ${{ matrix.shardTotal }}
@@ -63,7 +64,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: web-extension1
           path: ./build
@@ -88,11 +89,15 @@ jobs:
         run: xvfb-run --auto-servernum --server-args="-screen 0 360x360x24" npx playwright test --grep-invert "#localexecution" --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
       - name: Upload Playwright report
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: all-blob-reports
+          name: blob-report-${{ matrix.shardIndex }}-of-${{ matrix.shardTotal }}
           path: blob-report
           retention-days: 1
+          if-no-files-found: warn
+          compression-level: 6
+          overwrite: true
+          include-hidden-files: false
 
   merge-reports:
     # Merge reports after playwright-tests, even if some shards have failed but not if the job was skipped
@@ -114,20 +119,22 @@ jobs:
         run: npm install playwright
 
       - name: Download blob reports from GitHub Actions Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: all-blob-reports
+          pattern: blob-report-*
           path: all-blob-reports
+          merge-multiple: true
 
       - name: Merge into HTML Report
         run: npx playwright merge-reports --reporter html ./all-blob-reports
 
       - name: Upload HTML report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: html-report--attempt-${{ github.run_attempt }}
           path: playwright-report
           retention-days: 4
+          overwrite: true
 
   publish-rc:
     # TODO also keep the develop PR description up to date
@@ -198,7 +205,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: web-extension1
           path: ./build
@@ -206,7 +213,7 @@ jobs:
       - name: zip
         run: zip -rj build.zip ./build
       - name: Upload release asset
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@v1 # TODO: use softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           UPLOAD_URL: ${{needs.publish-rc.outputs.upload_url}}

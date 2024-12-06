@@ -115,6 +115,12 @@ export const CollectibleText = styled.h1((props) => ({
   textAlign: 'center',
 }));
 
+export const OrdinalTitleContainer = styled.div((props) => ({
+  display: 'flex',
+  alignItems: 'center',
+  gap: props.theme.space.s,
+}));
+
 export const RowButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',

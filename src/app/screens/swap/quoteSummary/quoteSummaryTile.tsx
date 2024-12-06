@@ -1,5 +1,6 @@
+import FormattedNumber from '@components/formattedNumber';
+import { formatBalance } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
-import { formatNumber } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -64,7 +65,7 @@ function QuoteSummaryTile({ fromUnit, toUnit, rate, provider, image, onClick }: 
             {t('SWAP_SCREEN.RATE')}
           </StyledP>
           <StyledP typography="body_medium_m" color="white_0">
-            1 {fromUnit} ≈ {formatNumber(rate)} {toUnit}
+            1 {fromUnit} ≈ <FormattedNumber number={formatBalance(rate)} tokenSymbol={toUnit} />
           </StyledP>
         </RowCenter>
       </InfoContainer>

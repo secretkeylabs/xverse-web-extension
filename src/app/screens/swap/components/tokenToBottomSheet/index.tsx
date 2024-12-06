@@ -2,10 +2,10 @@ import TokenTile from '@components/tokenTile';
 import useDebounce from '@hooks/useDebounce';
 import { MagnifyingGlass } from '@phosphor-icons/react';
 import {
+  getTrackingIdentifier,
   isStxTx,
   mapFTMotherProtocolToSwapProtocol,
   mapFTProtocolToSwapProtocol,
-  mapSwapProtocolToFTProtocol,
   mapSwapTokenToFT,
 } from '@screens/swap/utils';
 import {
@@ -27,7 +27,6 @@ import Theme from 'theme';
 import useToTokens from './useToTokens';
 
 const Container = styled.div`
-  margin-top: ${(props) => props.theme.space.xs};
   margin-bottom: ${(props) => props.theme.space.xxl};
   display: flex;
   flex-direction: column;
@@ -52,44 +51,45 @@ const ProtocolList = styled.div`
   -ms-overflow-style: none; /* Internet Explorer 10+ */
   scrollbar-width: none; /* Firefox */
   gap: ${(props) => props.theme.space.xxs};
+  margin-top: ${(props) => props.theme.space.m};
   &::-webkit-scrollbar {
     display: none; /* Safari and Chrome */
   }
 `;
 
-const ProtocolItem = styled.button<{ selected: boolean }>`
+const ProtocolItem = styled.button<{ $selected: boolean }>`
   ${(props) => props.theme.typography.body_bold_s}
   padding: ${(props) => props.theme.space.xs} ${(props) => props.theme.space.s};
   display: inline-block;
-  background-color: ${({ selected, theme }) =>
-    selected ? theme.colors.elevation6 : 'transparent'};
+  background-color: ${({ $selected, theme }) =>
+    $selected ? theme.colors.elevation6 : 'transparent'};
   color: ${(props) => props.theme.colors.white_0};
   border: none;
   border-radius: ${(props) => props.theme.space.s};
-  cursor: ${({ selected }) => (selected ? 'default' : 'pointer')};
+  cursor: ${({ $selected }) => ($selected ? 'default' : 'pointer')};
   white-space: nowrap;
   flex: 0 0 auto;
   text-transform: uppercase;
   &:hover {
-    background-color: ${({ selected, theme }) =>
-      selected ? theme.colors.elevation6 : theme.colors.elevation2};
+    background-color: ${({ $selected, theme }) =>
+      $selected ? theme.colors.elevation6 : theme.colors.elevation2};
   }
 `;
-
-interface Props {
-  visible: boolean;
-  title: string;
-  from?: FungibleToken;
-  onSelectCoin: (token: Token) => void;
-  onClose: () => void;
-  resetFrom: () => void;
-}
 
 const supportedProtocols: Protocol[] = ['runes', 'sip10']; // add more protocols here
 
 const mapProtocolName = (protocol: Protocol) => {
   if (protocol === 'sip10') return 'SIP-10';
   return protocol.toUpperCase();
+};
+
+type Props = {
+  visible: boolean;
+  title: string;
+  from?: FungibleToken;
+  onSelectCoin: (token: Token) => void;
+  onClose: () => void;
+  resetFrom: () => void;
 };
 
 export default function TokenToBottomSheet({
@@ -153,7 +153,7 @@ export default function TokenToBottomSheet({
               {supportedProtocols.map((key) => (
                 <ProtocolItem
                   key={key}
-                  selected={key === selectedProtocol}
+                  $selected={key === selectedProtocol}
                   onClick={onChangeProtocol(key)}
                 >
                   {mapProtocolName(key)}
@@ -213,8 +213,10 @@ export default function TokenToBottomSheet({
                   onPress={() => {
                     onSelectCoin(token);
                     trackMixPanel(AnalyticsEvents.SelectTokenToSwapTo, {
-                      selectedToken: token.name ?? token.ticker,
-                      principal: isStxTx({ toToken: token }) ? token.ticker : undefined,
+                      selectedToken: getTrackingIdentifier(mapSwapTokenToFT(token)),
+                      principal: isStxTx({ toToken: mapSwapTokenToFT(token) })
+                        ? token.ticker
+                        : undefined,
                     });
                     handleClose();
                   }}

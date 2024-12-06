@@ -8,15 +8,18 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Plus } from '@phosphor-icons/react';
 import Button from '@ui-library/button';
+import { InputFeedback } from '@ui-library/inputFeedback';
 import Sheet from '@ui-library/sheet';
 import { markAlertSeen, shouldShowAlert } from '@utils/alertTracker';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
+import RoutePaths from 'app/routes/paths';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Icon,
   IconBackground,
+  InfoMessageContainer,
   MergedIcon,
   MergedOrdinalsIcon,
   ReceiveContainer,
@@ -35,10 +38,13 @@ function ReceiveSheet({ visible, onClose }: Props) {
   const { t } = useTranslation('translation', {
     keyPrefix: 'DASHBOARD_SCREEN',
   });
+  const { t: informationT } = useTranslation('translation', {
+    keyPrefix: 'INFORMATION',
+  });
 
   const selectedAccount = useSelectedAccount();
   const { stxAddress, btcAddress, ordinalsAddress } = selectedAccount;
-  const { showBtcReceiveAlert, showOrdinalReceiveAlert, btcPaymentAddressType } =
+  const { showBtcReceiveAlert, showOrdinalReceiveAlert, btcPaymentAddressType, hasBackedUpWallet } =
     useWalletSelector();
   const navigate = useNavigate();
 
@@ -195,6 +201,13 @@ function ReceiveSheet({ visible, onClose }: Props) {
         <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose} />
       )}
       <Sheet visible={visible} title={t('RECEIVE')} onClose={onReceiveModalClose}>
+        {!hasBackedUpWallet && (
+          <InfoMessageContainer>
+            <Link to={RoutePaths.BackupWallet}>
+              <InputFeedback message={informationT('WALLET_NOT_BACKED_UP')} variant="warning" />
+            </Link>
+          </InfoMessageContainer>
+        )}
         {areReceivingAddressesVisible ? receiveContent : verifyOrViewAddresses}
       </Sheet>
     </>

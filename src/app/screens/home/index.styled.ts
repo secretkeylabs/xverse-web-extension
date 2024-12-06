@@ -175,3 +175,7 @@ export const StyledDivider = styled(Divider)<{
 export const SpacedCallout = styled(Callout)((props) => ({
   marginTop: props.theme.space.s,
 }));
+
+export const InfoMessageContainer = styled.div((props) => ({
+  marginBottom: props.theme.space.m,
+}));

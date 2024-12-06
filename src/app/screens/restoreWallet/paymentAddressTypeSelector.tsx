@@ -30,10 +30,9 @@ const Container = styled.div({
 
 const Title = styled.h1((props) => ({
   ...props.theme.typography.headline_xs,
-  color: props.theme.colors.white_200,
-  marginTop: props.theme.spacing(21),
-  marginBottom: props.theme.spacing(16),
-  textAlign: 'center',
+  color: props.theme.colors.white_0,
+  marginTop: props.theme.space.m,
+  marginBottom: props.theme.space.m,
 }));
 
 const BodyContainer = styled.div({
@@ -52,17 +51,25 @@ const SummaryContainer = styled.div({
 const TypesContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  margin: '4px 0',
   gap: props.theme.space.s,
+  marginTop: props.theme.space.s,
+  marginBottom: props.theme.space.m,
 }));
 
 const ButtonContainer = styled.div((props) => ({
   width: '100%',
-  marginBottom: props.theme.spacing(15),
+  marginBottom: props.theme.space.xxl,
 }));
 
 const LearnMoreLink = styled.a((props) => ({
   marginTop: props.theme.space.xs,
+  cursor: 'pointer',
+  div: {
+    transition: 'color 0.1s ease',
+    '&:hover': {
+      color: props.theme.colors.white_0,
+    },
+  },
 }));
 
 type Props = {

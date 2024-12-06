@@ -26,6 +26,10 @@ export default class Onboarding {
 
   readonly inputPassword: Locator;
 
+  readonly createPasswordInput: Locator;
+
+  readonly confirmPasswordInput: Locator;
+
   readonly errorMessage2: Locator;
 
   readonly errorMessageSeedPhrase: Locator;
@@ -87,8 +91,12 @@ export default class Onboarding {
     this.buttonSeedWords = page.locator('button[value]:not([value=""])');
     this.header = page.locator('#app h3');
     this.inputPassword = page.locator('input[type="password"]');
+    this.createPasswordInput = page.getByPlaceholder('Type your password', { exact: true });
+    this.confirmPasswordInput = page.getByPlaceholder('Type your password again');
     this.errorMessage2 = page.locator('p').filter({ hasText: 'Please make sure your' });
-    this.errorMessageSeedPhrase = page.locator('p').filter({ hasText: 'Invalid seed phrase' });
+    this.errorMessageSeedPhrase = page
+      .locator('p')
+      .filter({ hasText: 'Seed phrase does not match' });
     this.labelSecurityLevelWeak = page.locator('p').filter({ hasText: 'Weak' });
     this.labelSecurityLevelMedium = page.locator('p').filter({ hasText: 'Medium' });
     this.labelSecurityLevelStrong = page.locator('p').filter({ hasText: 'Strong' });
@@ -99,7 +107,7 @@ export default class Onboarding {
     this.instruction = page.getByRole('heading', { name: 'Locate Xverse' });
     this.headingWalletRestored = page.getByRole('heading', { name: 'Wallet restored' });
     this.buttonCloseTab = page.getByRole('button', { name: 'Close this tab' });
-    this.headingRestoreWallet = page.getByRole('heading', { name: 'restore your wallet' });
+    this.headingRestoreWallet = page.getByRole('heading', { name: 'Restore Wallet' });
     this.button24SeedPhrase = page.getByRole('button', { name: '24 words' });
     this.button12SeedPhrase = page.getByRole('button', { name: '12 words' });
     this.inputSeedPhraseWord = page.locator('input');
@@ -170,14 +178,14 @@ export default class Onboarding {
   }
 
   async checkRestoreWalletSeedPhrasePage() {
-    await expect(this.buttonContinue).toBeDisabled();
+    await expect(this.buttonContinue).toBeVisible();
     await expect(this.headingRestoreWallet).toBeVisible();
     await expect(this.button24SeedPhrase).toBeVisible();
     await expect(this.inputSeedPhraseWordDisabled).toHaveCount(12);
     await expect(this.inputSeedPhraseWord).toHaveCount(24);
   }
 
-  // Check the viuals on the first password page before inputing any values in the input field
+  // Check the visuals on the password page before inputting any values in the input field
   async checkPasswordPage() {
     await expect(this.buttonBack).toBeVisible();
     await expect(this.inputPassword).toBeVisible();
@@ -186,6 +194,7 @@ export default class Onboarding {
     await expect(this.labelSecurityLevelWeak).toBeHidden();
     await expect(this.labelSecurityLevelMedium).toBeHidden();
     await expect(this.labelSecurityLevelStrong).toBeHidden();
+    // to-do note to self add the remaining locators
   }
 
   static async multipleClickCheck(button: Locator) {
@@ -218,16 +227,17 @@ export default class Onboarding {
     for (let i = 0; i < seedWords.length; i++) {
       await this.inputWord(i).fill(seedWords[i]);
     }
-    await expect(this.buttonContinue).toBeEnabled();
+    await expect(this.buttonContinue).toBeVisible();
     await this.buttonContinue.click();
     // choose the default address type between native and nested segwit
     // will be the one with the most funds
-    await expect(this.buttonContinue).toBeEnabled();
+    await expect(this.createPasswordInput).toBeVisible();
+    await this.createPasswordInput.fill(password);
+    await expect(this.confirmPasswordInput).toBeVisible();
+    await this.confirmPasswordInput.fill(password);
     await this.buttonContinue.click();
-    await this.inputPassword.fill(password);
-    await this.buttonContinue.click();
-    await this.inputPassword.fill(password);
-    await this.buttonContinue.click();
+    await expect(this.page.getByText('Preferred Address Type')).toBeVisible();
+    await this.page.getByRole('button', { name: 'Continue' }).click();
     await expect(this.imageSuccess).toBeVisible();
     await expect(this.headingWalletRestored).toBeVisible();
     await expect(this.buttonCloseTab).toBeVisible();

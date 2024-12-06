@@ -2,7 +2,6 @@ import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import RequestsRoutes from '@common/utils/route-urls';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery';
 import useGetSip10TokenInfo from '@hooks/queries/stx/useGetSip10TokenInfo';
 import useGetQuotes from '@hooks/queries/swaps/useGetQuotes';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
@@ -51,8 +50,6 @@ import {
   isStxTx,
   mapFTNativeSwapTokenToTokenBasic,
   mapFTProtocolToSwapProtocol,
-  mapFtToSwapToken,
-  mapSwapProtocolToFTProtocol,
   mapSwapTokenToFT,
 } from './utils';
 import UtxoSelection from './utxoSelection';
@@ -114,7 +111,7 @@ export default function SwapScreen() {
   const [getQuotesModalVisible, setGetQuotesModalVisible] = useState(false);
   const [tokenSelectionBottomSheet, setTokenSelectionBottomSheet] = useState<Side | null>(null);
   const [fromToken, setFromToken] = useState<FungibleToken | undefined>();
-  const [toToken, setToToken] = useState<Token | undefined>();
+  const [toToken, setToToken] = useState<FungibleToken | undefined>();
   const [utxosRequest, setUtxosRequest] = useState<GetUtxosRequest | null>(null);
   const [inputError, setInputError] = useState('');
   const [hasQuoteError, setHasQuoteError] = useState(false);
@@ -136,11 +133,11 @@ export default function SwapScreen() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const defaultFrom = params.get('from');
+  const defaultTo = params.get('to');
   const { quotes, loading: quotesLoading, error: quotesError, fetchQuotes } = useGetQuotes();
-  const { data: runeFloorPrice } = useRuneFloorPriceQuery(toToken?.name ?? '');
   const coinsMasterList = useVisibleMasterCoinsList();
   const { tokenInfo: sip10FromTokenInfoUSD } = useGetSip10TokenInfo({
-    principal: toToken?.ticker,
+    principal: toToken?.principal,
     fiatCurrency: 'USD',
   });
 
@@ -149,7 +146,11 @@ export default function SwapScreen() {
       const token = coinsMasterList.find((coin) => coin.principal === defaultFrom);
       setFromToken(token);
     }
-  }, [defaultFrom, coinsMasterList]);
+    if (defaultTo) {
+      const token = coinsMasterList.find((coin) => coin.principal === defaultTo);
+      setToToken(token);
+    }
+  }, [defaultFrom, defaultTo, coinsMasterList]);
 
   const handleGoBack = () => {
     navigate('/');
@@ -184,7 +185,6 @@ export default function SwapScreen() {
       amount: amountForQuote,
       quote,
       btcUsdRate,
-      runeFloorPrice,
       stxBtcRate,
       fromTokenInfo: sip10FromTokenInfoUSD,
     });
@@ -199,23 +199,6 @@ export default function SwapScreen() {
   const onClickFrom = () => setTokenSelectionBottomSheet('from');
   const onClickTo = () => setTokenSelectionBottomSheet('to');
 
-  const getUserFTFromTokenTicker = (
-    protocol: Token['protocol'],
-    ticker: Token['ticker'],
-  ): FungibleToken | undefined => {
-    const ftProtocol = mapSwapProtocolToFTProtocol(protocol);
-
-    // add more protocols here when needed
-    switch (ftProtocol) {
-      case 'runes':
-        return coinsMasterList.find((coin) => coin.principal === ticker);
-      case 'stacks':
-        return coinsMasterList.find((coin) => coin.principal === ticker);
-      default:
-        return undefined;
-    }
-  };
-
   const isSwapRouteDisabled = !fromToken || !toToken;
 
   const onClickSwapRoute = () => {
@@ -225,16 +208,13 @@ export default function SwapScreen() {
     setInputError('');
     setAmount('');
     setHasQuoteError(false);
-    const newFrom =
-      getUserFTFromTokenTicker(toToken.protocol, toToken.ticker) ?? mapSwapTokenToFT(toToken);
-    const newTo = mapFtToSwapToken(fromToken);
-    setFromToken(newFrom);
-    setToToken(newTo);
+    setFromToken(toToken);
+    setToToken(fromToken);
   };
 
   const onChangeToToken = (token: Token) => {
     setHasQuoteError(false);
-    setToToken(token);
+    setToToken(mapSwapTokenToFT(token));
   };
 
   const onChangeFromToken = (token: FungibleToken) => {
@@ -343,7 +323,7 @@ export default function SwapScreen() {
   const isRunesToBtcRoute =
     fromToken?.principal !== 'BTC' &&
     fromToken?.protocol === 'runes' &&
-    toToken?.protocol === 'btc';
+    toToken?.principal === 'BTC';
 
   useEffect(() => {
     if (errorMessage) {
@@ -399,7 +379,6 @@ export default function SwapScreen() {
       amount: amountForQuote,
       quote,
       btcUsdRate,
-      runeFloorPrice,
       stxBtcRate,
       fromTokenInfo: sip10FromTokenInfoUSD,
     });
@@ -458,6 +437,16 @@ export default function SwapScreen() {
     navigate(RequestsRoutes.TransactionRequest, {
       state: {
         dataStxSignTransactionOverride,
+        mixpanelMetadata: {
+          provider: quote.provider,
+          fromToken,
+          toToken,
+          amount: amountForQuote,
+          quote,
+          btcUsdRate,
+          stxBtcRate,
+          fromTokenInfo: sip10FromTokenInfoUSD,
+        },
       },
     });
   }

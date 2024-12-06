@@ -1,4 +1,10 @@
-import { satsToBtc, type MarketUtxo, type Token } from '@secretkeylabs/xverse-core';
+import FormattedNumber from '@components/formattedNumber';
+import {
+  formatBalance,
+  satsToBtc,
+  type FungibleToken,
+  type MarketUtxo,
+} from '@secretkeylabs/xverse-core';
 import Checkbox from '@ui-library/checkbox';
 import { StyledP } from '@ui-library/common.styled';
 import { getTruncatedAddress } from '@utils/helper';
@@ -27,11 +33,7 @@ const RuneTitle = styled(StyledP)`
   text-overflow: ellipsis;
   width: 100%;
   text-align: left;
-`;
-
-const StyledBundleSub = styled(StyledP)`
-  width: 100%;
-  text-align: left;
+  line-height: 2;
 `;
 
 const CheckBoxContainer = styled.div((props) => ({
@@ -62,7 +64,7 @@ const Row = styled.div`
 type Props = {
   utxo: MarketUtxo;
   selected: boolean;
-  token?: Token;
+  token?: FungibleToken;
   onSelect: (utxo: MarketUtxo) => void;
 };
 
@@ -83,38 +85,27 @@ function UtxoItem({ utxo, selected, token, onSelect }: Props) {
       </CheckBoxContainer>
       <Row>
         <LeftColumn>
-          <NumericFormat
-            value={utxo.amount}
-            displayType="text"
-            suffix={` ${token?.symbol}`}
-            thousandSeparator
-            renderText={(value: string) => (
-              <RuneTitle data-testid="utxo-title" typography="body_medium_m" color="white_0">
-                {value}
-              </RuneTitle>
-            )}
-          />
-
+          <RuneTitle data-testid="utxo-title" typography="body_medium_m" color="white_0">
+            <FormattedNumber
+              number={formatBalance(utxo.amount)}
+              tokenSymbol={token?.runeSymbol ?? ''}
+            />
+          </RuneTitle>
           <StyledP typography="body_medium_s" color="white_400">
             {`${getTruncatedAddress(utxo.identifier, 6)}`}
           </StyledP>
         </LeftColumn>
         <RightColumn>
-          <NumericFormat
-            value={satsToBtc(new BigNumber(utxo.price)).toString()}
-            displayType="text"
-            suffix=" BTC"
-            thousandSeparator
-            renderText={(value: string) => (
-              <StyledP typography="body_medium_m" color="white_0">
-                {value}
-              </StyledP>
-            )}
-          />
+          <StyledP typography="body_medium_m" color="white_0">
+            <FormattedNumber
+              number={formatBalance(satsToBtc(new BigNumber(utxo.price)).toString())}
+              tokenSymbol="BTC"
+            />
+          </StyledP>
           <NumericFormat
             value={satsPerRune.toFixed(2)}
             displayType="text"
-            suffix={` ${t('SATS')}/${token?.symbol}`}
+            suffix={` ${t('SATS')}/${token?.runeSymbol}`}
             thousandSeparator
             renderText={(value: string) => (
               <StyledP typography="body_medium_s" color="white_400">

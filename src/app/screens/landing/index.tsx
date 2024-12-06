@@ -203,9 +203,7 @@ function Landing() {
             <Dots
               numDots={onboardingViews.length}
               activeIndex={currentStepIndex}
-              dotStrategy="selection"
               handleClickDot={handleClickDot}
-              size={6}
             />
             <CreateButton onClick={() => proceedToWallet()} title={t('CREATE_WALLET_BUTTON')} />
             <RestoreButton

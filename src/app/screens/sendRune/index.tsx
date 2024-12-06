@@ -1,5 +1,6 @@
 import { useRuneFungibleTokensQuery } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import useCancellableEffect from '@hooks/useCancellableEffect';
 import useHasFeature from '@hooks/useHasFeature';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
@@ -87,51 +88,39 @@ function SendRuneScreen() {
     );
   };
 
-  useEffect(() => {
-    const bigAmount = BigNumber(amountToSend);
+  useCancellableEffect(
+    async (isEffectActive) => {
+      const bigAmount = BigNumber(amountToSend);
 
-    if (!recipientAddress || !feeRate || bigAmount.isNaN() || bigAmount.isLessThanOrEqualTo(0)) {
-      setTransaction(undefined);
-      setSummary(undefined);
-      return;
-    }
+      if (!recipientAddress || !feeRate || bigAmount.isNaN() || bigAmount.isLessThanOrEqualTo(0)) {
+        setTransaction(undefined);
+        setSummary(undefined);
+        return;
+      }
 
-    // This effect can be slow to compute as it signs transactions, but
-    // it can also be very fast if there is not enough rune balance
-    // this can lead to a race condition where entering an amount to send
-    // with enough balance followed by a high balance will cause the first
-    // event to finish after the one with insufficient funds, and it will inject the
-    // incorrect state. This boolean will prevent the effect from setting the state
-    // if it finishes after the value has changed
-    let isActiveEffect = true;
-    const generateTxnAndSummary = async () => {
       setIsLoading(true);
+
       try {
         const transactionDetails = await generateTransactionAndSummary();
-        if (!isActiveEffect) return;
-        if (!transactionDetails) return;
-        setTransaction(transactionDetails.transaction);
-        if (transactionDetails.summary) {
-          setSummary(transactionDetails.summary);
+        if (isEffectActive() && transactionDetails) {
+          setTransaction(transactionDetails.transaction);
+          if (transactionDetails.summary) {
+            setSummary(transactionDetails.summary);
+          }
         }
       } catch (e) {
+        if (!isEffectActive()) return;
         if (!(e instanceof Error) || !e.message.includes('Insufficient funds')) {
-          // don't log the error if it's just an insufficient funds error
           console.error(e);
         }
         setTransaction(undefined);
         setSummary(undefined);
       } finally {
-        if (isActiveEffect) {
-          setIsLoading(false);
-        }
+        if (isEffectActive()) setIsLoading(false);
       }
-    };
-    generateTxnAndSummary();
-    return () => {
-      isActiveEffect = false;
-    };
-  }, [transactionContext, recipientAddress, amountToSend, feeRate, sendMax]);
+    },
+    [transactionContext, recipientAddress, amountToSend, feeRate, sendMax],
+  );
 
   if (!fungibleToken) {
     navigate('/');

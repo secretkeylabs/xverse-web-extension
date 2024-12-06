@@ -55,7 +55,7 @@ const ContinueButton = styled.button((props) => ({
 const Icon = styled.img((props) => ({
   width: 88,
   height: 88,
-  stroke: props.theme.colors.feedback.caution,
+  stroke: props.theme.colors.caution,
 }));
 
 const CheckBoxContainer = styled.div((props) => ({

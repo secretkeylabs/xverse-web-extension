@@ -33,8 +33,11 @@ test.describe('Transaction', () => {
     await expect(wallet.textCoinTitle).toBeVisible();
     await expect(wallet.textCoinTitle).toContainText(tokenName);
   });
-
-  test('Visual Check STX Transaction history testnet', async ({ page, extensionId }) => {
+  // added the #localexecution cause the test is flaky due to rate limiting
+  test('Visual Check STX Transaction history testnet #localexecution', async ({
+    page,
+    extensionId,
+  }) => {
     // Restore wallet and setup Testnet network
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
@@ -79,9 +82,9 @@ test.describe('Transaction', () => {
     await wallet.checkAndClickOnSpecificRune('SKIBIDI•OHIO•RIZZ');
     const originalBalanceAmount = await wallet.checkVisualsRunesDashboard('SKIBIDI•OHIO•RIZZ');
     await expect(originalBalanceAmount).toBeGreaterThan(0);
-    await expect(wallet.containerTransactionHistory.first()).toBeHidden();
+
     // There should be at least one transaction visible
-    await expect(await wallet.containerTransactionHistory.count()).toBeGreaterThanOrEqual(1);
+    await expect(page.getByRole('button', { name: 'sent Sent -2,323,232.3 🌀' })).toBeVisible();
     // check able to see rune bundles
     await wallet.coinSecondaryButton.click();
     await expect(wallet.coinSecondaryButton).toBeVisible();
