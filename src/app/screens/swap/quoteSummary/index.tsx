@@ -1,4 +1,5 @@
 import SlippageEditIcon from '@assets/img/swap/slippageEdit.svg';
+import FormattedNumber from '@components/formattedNumber';
 import TopRow from '@components/topRow';
 import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery';
 import useGetSip10TokenInfo from '@hooks/queries/stx/useGetSip10TokenInfo';
@@ -478,7 +479,7 @@ export default function QuoteSummary({
                 {t('SWAP_SCREEN.MIN_RECEIVE')}
               </StyledP>
               <StyledP data-testid="min-received-amount" typography="body_medium_m" color="white_0">
-                {formatBalance(quote.receiveAmount)} {toUnit}
+                <FormattedNumber number={formatBalance(quote.receiveAmount)} tokenSymbol={toUnit} />
               </StyledP>
             </ListingDescriptionRow>
             {Boolean(quote.feePercentage) && (

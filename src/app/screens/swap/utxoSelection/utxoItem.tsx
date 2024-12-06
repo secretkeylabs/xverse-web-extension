@@ -1,3 +1,4 @@
+import FormattedNumber from '@components/formattedNumber';
 import {
   formatBalance,
   satsToBtc,
@@ -85,7 +86,10 @@ function UtxoItem({ utxo, selected, token, onSelect }: Props) {
       <Row>
         <LeftColumn>
           <RuneTitle data-testid="utxo-title" typography="body_medium_m" color="white_0">
-            {`${formatBalance(utxo.amount)} ${token?.runeSymbol}`}
+            <FormattedNumber
+              number={formatBalance(utxo.amount)}
+              tokenSymbol={token?.runeSymbol ?? ''}
+            />
           </RuneTitle>
           <StyledP typography="body_medium_s" color="white_400">
             {`${getTruncatedAddress(utxo.identifier, 6)}`}
@@ -93,7 +97,10 @@ function UtxoItem({ utxo, selected, token, onSelect }: Props) {
         </LeftColumn>
         <RightColumn>
           <StyledP typography="body_medium_m" color="white_0">
-            {formatBalance(satsToBtc(new BigNumber(utxo.price)).toString())} BTC
+            <FormattedNumber
+              number={formatBalance(satsToBtc(new BigNumber(utxo.price)).toString())}
+              tokenSymbol="BTC"
+            />
           </StyledP>
           <NumericFormat
             value={satsPerRune.toFixed(2)}

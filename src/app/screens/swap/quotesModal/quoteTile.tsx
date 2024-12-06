@@ -1,3 +1,4 @@
+import FormattedNumber from '@components/formattedNumber';
 import TokenImage from '@components/tokenImage';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CaretRight } from '@phosphor-icons/react';
@@ -115,7 +116,7 @@ function QuoteTile({
               thousandSeparator
               renderText={() => (
                 <TruncatedP data-testid="quote-label" typography="body_bold_m" color="white_0">
-                  {formatBalance(price)} {unit}
+                  <FormattedNumber number={formatBalance(price)} tokenSymbol={unit} />
                 </TruncatedP>
               )}
             />

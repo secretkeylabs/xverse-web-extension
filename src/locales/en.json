@@ -1031,7 +1031,7 @@
   },
   "LIST_RUNE_SCREEN": {
     "LISTING_STATUS": "Listing status",
-    "FLOOR_PRICE": "Floor Price: {{floor_price}} Sats/{{symbol}}",
+    "FLOOR_PRICE": "Floor Price: ",
     "LISTED_FOR": "Listed for {{floor_price}} Sats/{{symbol}}",
     "FAILED_TO_LIST": "Failed to list",
     "SELECT_RUNES": "Select Runes",
@@ -1049,7 +1049,7 @@
     "SET_PRICES": "Set price",
     "EDIT_PRICE": "Edit price",
     "MAGIC_EDEN_FLOOR_PRICE": "The Magic Eden floor price is currently {{sats}} sats/{{symbol}}",
-    "MARKETPLACE_FLOOR_PRICE": "The floor price for {{marketplaces}} is currently {{sats}} Sats/{{symbol}}",
+    "MARKETPLACE_FLOOR_PRICE": "The floor price for {{marketplaces}} is currently ",
     "NO_FLOOR_PRICE": "There is no floor price for {{symbol}}",
     "TOTAL_LISTED": "Total listed",
     "TOTAL_RECEIVED_IF_SOLD": "Total received if sold",
