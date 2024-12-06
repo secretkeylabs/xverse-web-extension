@@ -39,6 +39,7 @@ import AmountInput from './components/amountInput';
 import PsbtConfirmation from './components/psbtConfirmation/psbtConfirmation';
 import RouteItem from './components/routeItem';
 import TokenFromBottomSheet from './components/tokenFromBottomSheet';
+import useFromTokens from './components/tokenFromBottomSheet/useFromTokens';
 import TokenToBottomSheet from './components/tokenToBottomSheet';
 import trackSwapMixPanel from './mixpanel';
 import QuoteSummary from './quoteSummary';
@@ -117,6 +118,7 @@ export default function SwapScreen() {
   const [hasQuoteError, setHasQuoteError] = useState(false);
   const [orderInfo, setOrderInfo] = useState<OrderInfo | undefined>();
   const [stxOrderInfo, setStxOrderInfo] = useState<StxOrderInfo | undefined>();
+  const fromTokens = useFromTokens();
 
   const [selectedUtxos, setSelectedUtxos] = useState<Omit<MarketUtxo, 'token'>[]>();
   const [utxoProviderSendAmount, setUtxoProviderSendAmount] = useState<string | undefined>();
@@ -205,11 +207,24 @@ export default function SwapScreen() {
     if (isSwapRouteDisabled) {
       return;
     }
+
     setInputError('');
     setAmount('');
     setHasQuoteError(false);
-    setFromToken(toToken);
-    setToToken(fromToken);
+    const newFrom = toToken;
+    const newTo = fromToken;
+    setFromToken(newFrom);
+    setToToken(newTo);
+
+    if (newFrom?.principal !== 'BTC') {
+      const matchingToken = fromTokens.find(
+        (token) => token.principal !== 'BTC' && token.principal === newFrom?.principal,
+      );
+
+      if (matchingToken) {
+        setFromToken(matchingToken);
+      }
+    }
   };
 
   const onChangeToToken = (token: Token) => {
