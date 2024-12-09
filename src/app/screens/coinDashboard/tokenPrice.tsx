@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
+import FormattedNumber from '@components/formattedNumber';
 import PercentageChange from '@components/percentageChange';
 import useGetExchangeRate from '@hooks/queries/useGetExchangeRate';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
@@ -46,22 +47,23 @@ function TokenPrice({ currency, fungibleToken }: Props) {
     return baseRate.multipliedBy(fungibleToken?.currentPrice ?? 0);
   }, [currency, stxBtcRate, btcUsdRate, fungibleToken, exchangeRate]);
 
-  const formattedPrice = [
-    currencySymbolMap[fiatCurrency],
-    currentPrice.isGreaterThan(1)
-      ? currentPrice.toFormat(2)
-      : formatBalance(formatSignificantDecimals(currentPrice.toString())),
-    ` ${fiatCurrency}`,
-  ].join('');
-
   return (
     <Container>
       <StyledP typography="body_medium_m" color="white_200">
         {currency === 'STX' || currency === 'BTC' ? currency : fungibleToken?.name} {t('PRICE')}
       </StyledP>
-      {/* <NumericFormat> would not work here, due to the special unicode characters used by formatBalance */}
       <StyledP typography="headline_l" color="white_0">
-        {formattedPrice}
+        {currentPrice.isGreaterThan(1) ? (
+          `${currencySymbolMap[fiatCurrency]}${currentPrice.toFormat(2)} ${fiatCurrency}`
+        ) : (
+          <>
+            {currencySymbolMap[fiatCurrency]}
+            <FormattedNumber
+              number={formatBalance(formatSignificantDecimals(currentPrice.toString()))}
+              tokenSymbol={fiatCurrency}
+            />
+          </>
+        )}
       </StyledP>
       <PercentageChange ftCurrencyPairs={[[fungibleToken, currency]]} displayAmountChange />
     </Container>
