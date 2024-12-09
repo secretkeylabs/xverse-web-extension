@@ -1,7 +1,7 @@
 {
   "name": "xverse-web-extension",
   "description": "A Bitcoin wallet for Web3",
-  "version": "0.46.0",
+  "version": "0.46.1",
   "private": true,
   "engines": {
     "node": "^18.18.2"
