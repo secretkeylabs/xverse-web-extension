@@ -62,12 +62,12 @@ const Container = styled.div((props) => ({
   padding: `0 ${props.theme.space.m} ${props.theme.space.l} ${props.theme.space.m}`,
 }));
 
-const Flex1 = styled.div<{ center?: boolean }>`
+const Flex1 = styled.div<{ $center?: boolean }>`
   display: flex;
   flex-direction: column;
   flex: 1;
-  justify-content: ${(props) => (props.center ? 'center' : 'flex-start')};
-  align-items: ${(props) => (props.center ? 'center' : 'normal')};
+  justify-content: ${(props) => (props.$center ? 'center' : 'flex-start')};
+  align-items: ${(props) => (props.$center ? 'center' : 'normal')};
 `;
 
 const RouteContainer = styled.div((props) => ({
@@ -570,7 +570,7 @@ export default function SwapScreen() {
             balance={getFromBalance()}
           />
           {hasQuoteError && (
-            <Flex1 center>
+            <Flex1 $center>
               <StyledP typography="body_m" color="white_200">
                 {t('SWAP_SCREEN.ERRORS.NO_PAIR_LIQUIDITY')}
               </StyledP>
