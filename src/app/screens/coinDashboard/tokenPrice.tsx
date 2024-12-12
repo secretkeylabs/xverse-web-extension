@@ -66,6 +66,7 @@ function TokenPrice({ currency, fungibleToken }: Props) {
         )}
       </StyledP>
       <PercentageChange ftCurrencyPairs={[[fungibleToken, currency]]} displayAmountChange />
+      {/* <TokenHistoricalData currency={currency} fungibleToken={fungibleToken} /> */}
     </Container>
   );
 }
