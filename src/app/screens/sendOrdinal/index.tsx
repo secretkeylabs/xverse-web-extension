@@ -13,7 +13,7 @@ import {
   type Transport,
 } from '@secretkeylabs/xverse-core';
 import { removeAccountAvatarAction } from '@stores/wallet/actions/actionCreators';
-import { isInOptions, isLedgerAccount } from '@utils/helper';
+import { isInOptions, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import RoutePaths from 'app/routes/paths';
 import { useEffect, useState } from 'react';
@@ -124,7 +124,7 @@ function SendOrdinalScreen() {
   }
 
   const handleCancel = () => {
-    if (isLedgerAccount(selectedAccount) && isInOption) {
+    if ((isLedgerAccount(selectedAccount) || isKeystoneAccount(selectedAccount)) && isInOption) {
       window.close();
       return;
     }

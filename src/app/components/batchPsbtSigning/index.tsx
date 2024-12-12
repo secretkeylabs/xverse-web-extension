@@ -9,6 +9,7 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { createKeystoneTransport } from '@keystonehq/hw-transport-webusb';
 import { ArrowLeft, ArrowRight } from '@phosphor-icons/react';
 import type { SignMultiplePsbtPayload } from '@sats-connect/core';
 import {
@@ -117,6 +118,7 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel }: BatchPsbtSigningProps) 
       }
       setIsSigning(true);
 
+      const keystoneTransport = await createKeystoneTransport();
       const signedPsbts: string[] = [];
 
       for (let i = 0; i < psbts.length; i++) {
@@ -129,6 +131,7 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel }: BatchPsbtSigningProps) 
 
         const psbtBase64 = await enhancedPsbt.getSignedPsbtBase64({
           finalize: false,
+          keystoneTransport,
           selectedAccount,
         });
         signedPsbts.push(psbtBase64);
@@ -281,6 +284,7 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel }: BatchPsbtSigningProps) 
     : singlePsbt
     ? t('CONFIRM')
     : t('DONE');
+
   const onReviewDone =
     hasDuplicateInputs || singlePsbt
       ? onSignPsbtConfirmed
