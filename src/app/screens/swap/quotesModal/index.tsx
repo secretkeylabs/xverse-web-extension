@@ -88,10 +88,6 @@ function QuotesModal({
       ...quotes.map((q) => new BigNumber(q.receiveAmount)),
     );
 
-    if (quote.provider.code === 'dotswap') {
-      return t('RECOMMENDED');
-    }
-
     if (new BigNumber(quote.receiveAmount).eq(highestReceiveAmount)) {
       return t('BEST');
     }
