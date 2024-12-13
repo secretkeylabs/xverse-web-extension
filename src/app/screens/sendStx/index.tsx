@@ -8,25 +8,24 @@ import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  buf2hex,
   estimateStacksTransactionWithFallback,
-  generateUnsignedStxTokenTransferTransaction,
-  generateUnsignedTransaction,
+  generateUnsignedTokenTransferTransaction,
+  generateUnsignedTx,
   microstacksToStx,
+  nextBestNonce,
   stxToMicrostacks,
-  type StacksTransaction,
 } from '@secretkeylabs/xverse-core';
-import { deserializeTransaction } from '@stacks/transactions';
+import { TransactionTypes } from '@stacks/connect';
+import { deserializeTransaction, StacksTransactionWire } from '@stacks/transactions';
 import type { FeeRates } from '@ui-components/selectFeeRate';
 import { convertAmountToFtDecimalPlaces } from '@utils/helper';
-import { modifyRecommendedStxFees } from '@utils/transactions/transactions';
 import SendLayout from 'app/layouts/sendLayout';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { Step, getNextStep, getPreviousStep } from './stepResolver';
+import { getNextStep, getPreviousStep, Step } from './stepResolver';
 import Step1SelectRecipientAndMemo from './steps/Step1SelectRecipient';
 import Step2SelectAmount from './steps/Step2SelectAmount';
 import Step3Confirm from './steps/Step3Confirm';
@@ -133,7 +132,7 @@ function SendStxScreen() {
               fungibleToken.decimals,
             ).toString();
           }
-          const rawUnsignedSendFtTx = await generateUnsignedTransaction({
+          const rawUnsignedSendFtTx = await generateUnsignedTokenTransferTransaction({
             amount: convertedAmount,
             senderAddress: stxAddress,
             recipientAddress: debouncedRecipient,
@@ -147,22 +146,29 @@ function SendStxScreen() {
           });
 
           if (isEffectActive()) {
-            setUnsignedSendStxTx(buf2hex(rawUnsignedSendFtTx.serialize()));
+            setUnsignedSendStxTx(rawUnsignedSendFtTx.serialize());
           }
           return;
         }
-
-        const rawUnsignedSendStxTx = await generateUnsignedStxTokenTransferTransaction(
-          debouncedRecipient,
-          debouncedAmount,
-          memo,
-          stxPendingTxData?.pendingTransactions ?? [],
-          stxPublicKey,
-          selectedNetwork,
-        );
+        const nonce = await nextBestNonce(stxAddress, selectedNetwork);
+        console.log(debouncedRecipient, debouncedAmount);
+        const rawUnsignedSendStxTx = await generateUnsignedTx({
+          publicKey: stxPublicKey,
+          payload: {
+            txType: TransactionTypes.STXTransfer,
+            recipient: debouncedRecipient,
+            memo,
+            amount: debouncedAmount,
+            network: selectedNetwork,
+            publicKey: stxPublicKey,
+          },
+          fee,
+          nonce,
+        });
+        console.log('🚀 ~ rawUnsignedSendStxTx:', rawUnsignedSendStxTx);
 
         if (isEffectActive()) {
-          setUnsignedSendStxTx(buf2hex(rawUnsignedSendStxTx.serialize()));
+          setUnsignedSendStxTx(rawUnsignedSendStxTx.serialize());
         }
       } catch (e) {
         console.error(e);
@@ -188,23 +194,16 @@ function SendStxScreen() {
   useEffect(() => {
     const fetchStxFees = async () => {
       try {
-        const unsignedTx: StacksTransaction = deserializeTransaction(unsignedSendStxTx);
+        const unsignedTx: StacksTransactionWire = deserializeTransaction(unsignedSendStxTx);
         const [low, medium, high] = await estimateStacksTransactionWithFallback(
           unsignedTx,
           selectedNetwork,
         );
-        let stxFees = {
+        const stxFees = {
           low: low.fee,
           medium: medium.fee,
           high: high.fee,
         };
-        if (feeMultipliers?.thresholdHighStacksFee) {
-          stxFees = modifyRecommendedStxFees(
-            stxFees,
-            feeMultipliers,
-            unsignedTx.payload.payloadType,
-          );
-        }
         setFeeRates({
           low: Number(microstacksToStx(new BigNumber(stxFees.low))),
           medium: Number(microstacksToStx(new BigNumber(stxFees.medium))),
