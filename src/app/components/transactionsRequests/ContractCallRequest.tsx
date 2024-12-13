@@ -17,7 +17,6 @@ import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import useExecuteOrder from '@screens/swap/components/psbtConfirmation/useExecuteOrder';
 import {
-  addressToString,
   broadcastSignedTransaction,
   extractFromPayload,
   isMultiSig,
@@ -30,14 +29,15 @@ import {
 } from '@secretkeylabs/xverse-core';
 import type { ContractCallPayload } from '@stacks/connect';
 import {
+  addressToString,
   ClarityType,
   cvToJSON,
   cvToString,
   PostConditionMode,
   PostConditionType,
-  StacksTransaction,
   type MultiSigSpendingCondition,
   type SomeCV,
+  type StacksTransactionWire,
 } from '@stacks/transactions';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
@@ -84,7 +84,7 @@ const PostConditionAlertText = styled.h1((props) => ({
 
 type Props = {
   request: ContractCallPayload;
-  unsignedTx: StacksTransaction;
+  unsignedTx: StacksTransactionWire;
   funcMetaData: ContractFunction | undefined;
   coinsMetaData: Coin[] | null;
   tabId: number;
@@ -203,7 +203,7 @@ export default function ContractCallRequest({
     );
   const navigate = useNavigate();
   const broadcastTx = async (
-    tx: StacksTransaction[],
+    tx: StacksTransactionWire[],
     txAttachment: Buffer | undefined = undefined,
   ) => {
     const txId = tx[0].txid();
@@ -271,7 +271,7 @@ export default function ContractCallRequest({
     }
   };
 
-  const confirmCallback = async (transactions: StacksTransaction[]) => {
+  const confirmCallback = async (transactions: StacksTransactionWire[]) => {
     if (isStxSwap) {
       const order: ExecuteStxOrderRequest = {
         providerCode: messageId,
@@ -360,8 +360,8 @@ export default function ContractCallRequest({
   };
 
   const renderPostConditionsCard = () => {
-    const { postConds } = extractFromPayload(request);
-    return postConds?.map((postCondition, i) => {
+    const { postConds: postConditions } = extractFromPayload(request);
+    return postConditions?.map((postCondition, i) => {
       const key = `${postCondition.conditionType}-${i}`;
 
       switch (postCondition.conditionType) {
@@ -371,8 +371,8 @@ export default function ContractCallRequest({
           const coinInfo = coinsMetaData?.find(
             (coin: Coin) =>
               coin.contract ===
-              `${addressToString(postCondition.assetInfo.address)}.${
-                postCondition.assetInfo.contractName.content
+              `${addressToString(postCondition.asset.address)}.${
+                postCondition.asset.contractName.content
               }`,
           );
           return (

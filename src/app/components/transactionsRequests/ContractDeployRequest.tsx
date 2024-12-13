@@ -17,19 +17,18 @@ import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import {
   broadcastSignedTransaction,
-  buf2hex,
+  extractFromPayload,
   isMultiSig,
   microstacksToStx,
   stxToMicrostacks,
 } from '@secretkeylabs/xverse-core';
 import {
   type MultiSigSpendingCondition,
-  type PostCondition,
   PostConditionMode,
-  type StacksTransaction,
+  type StacksTransactionWire,
 } from '@stacks/transactions';
 import BigNumber from 'bignumber.js';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -116,7 +115,7 @@ const Button = styled.button((props) => ({
 }));
 
 type Props = {
-  unsignedTx: StacksTransaction;
+  unsignedTx: StacksTransactionWire;
   codeBody: string;
   contractName: string;
   sponsored: boolean;
@@ -156,7 +155,7 @@ export default function ContractDeployRequest({
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 
-  const broadcastTx = async (tx: StacksTransaction[]) => {
+  const broadcastTx = async (tx: StacksTransactionWire[]) => {
     const txId = tx[0].txid();
     try {
       if (broadcastAfterSigning) {
@@ -169,7 +168,7 @@ export default function ContractDeployRequest({
             sendSignTransactionSuccessResponseMessage({
               tabId,
               messageId,
-              result: { transaction: buf2hex(tx[0].serialize()) },
+              result: { transaction: tx[0].serialize() },
             });
             break;
           }
@@ -177,7 +176,7 @@ export default function ContractDeployRequest({
             sendDeployContractSuccessResponseMessage({
               tabId,
               messageId,
-              result: { txid: txId, transaction: buf2hex(tx[0].serialize()) },
+              result: { txid: txId, transaction: tx[0].serialize() },
             });
             break;
           }
@@ -190,7 +189,7 @@ export default function ContractDeployRequest({
         finalizeTxSignature({
           requestPayload: requestToken,
           tabId,
-          data: { txId, txRaw: buf2hex(tx[0].serialize()) },
+          data: { txId, txRaw: tx[0].serialize() },
         });
       }
 
@@ -220,7 +219,7 @@ export default function ContractDeployRequest({
     }
   };
 
-  const confirmCallback = (txs: StacksTransaction[]) => {
+  const confirmCallback = (txs: StacksTransactionWire[]) => {
     if (sponsored) {
       if (rpcMethod && messageId && tabId) {
         switch (rpcMethod) {
@@ -228,7 +227,7 @@ export default function ContractDeployRequest({
             sendSignTransactionSuccessResponseMessage({
               tabId,
               messageId,
-              result: { transaction: buf2hex(unsignedTx.serialize()) },
+              result: { transaction: unsignedTx.serialize() },
             });
             break;
           default:
@@ -238,7 +237,7 @@ export default function ContractDeployRequest({
         sendSignTransactionSuccessResponseMessage({
           tabId,
           messageId,
-          result: { transaction: buf2hex(unsignedTx.serialize()) },
+          result: { transaction: unsignedTx.serialize() },
         });
       }
       navigate('/tx-status', {
@@ -254,7 +253,7 @@ export default function ContractDeployRequest({
             sendSignTransactionSuccessResponseMessage({
               tabId,
               messageId,
-              result: { transaction: buf2hex(unsignedTx.serialize()) },
+              result: { transaction: unsignedTx.serialize() },
             });
             break;
           default:
@@ -265,7 +264,7 @@ export default function ContractDeployRequest({
         finalizeTxSignature({
           requestPayload: requestToken,
           tabId,
-          data: { txId: '', txRaw: buf2hex(unsignedTx.serialize()) },
+          data: { txId: '', txRaw: unsignedTx.serialize() },
         });
       }
       window.close();
@@ -308,6 +307,17 @@ export default function ContractDeployRequest({
       </PostConditionContainer>
     );
 
+  const PostConditions = useCallback(() => {
+    const { postConds: postConditions } = extractFromPayload(unsignedTx.payload);
+    return (
+      <>
+        {postConditions.map((postCondition) => (
+          <StxPostConditionCard key={postCondition.type} postCondition={postCondition} />
+        ))}
+      </>
+    );
+  }, [unsignedTx]);
+
   return (
     <>
       <AccountHeaderComponent disableMenuOption disableAccountSwitch />
@@ -332,9 +342,7 @@ export default function ContractDeployRequest({
         )}
         {postConditionAlert}
         {sponsored && showSponsoredTransactionTag}
-        {unsignedTx?.postConditions?.values?.map((postCondition) => (
-          <StxPostConditionCard postCondition={postCondition as PostCondition} />
-        ))}
+        <PostConditions />
         <TransactionDetailComponent
           title={t('DEPLOY_CONTRACT_REQUEST.CONTRACT_NAME')}
           value={contractName}

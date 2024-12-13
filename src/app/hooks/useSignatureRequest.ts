@@ -1,20 +1,12 @@
 import { getStxAddressKeyChain, signStacksMessage } from '@secretkeylabs/xverse-core';
 import type { SignaturePayload, StructuredDataSignatureRequestOptions } from '@stacks/connect';
-import {
-  ChainID,
-  createStacksPrivateKey,
-  deserializeCV,
-  hexToCV,
-  signStructuredData,
-  type TupleCV,
-} from '@stacks/transactions';
+import { deserializeCV, hexToCV, signStructuredData, type TupleCV } from '@stacks/transactions';
 import { decodeToken } from 'jsontokens';
 import { useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import useNetworkSelector from './useNetwork';
 import useSeedVault from './useSeedVault';
 import useSelectedAccount from './useSelectedAccount';
-import useWalletSelector from './useWalletSelector';
 
 type SignatureMessageType = 'utf8' | 'structured';
 
@@ -52,7 +44,7 @@ function useSignatureRequest() {
     const message = params.get('message') || '';
     const requestDomain = params.get('domain') || '';
 
-    const innerDomain = requestDomain ? (hexToCV(requestDomain) as TupleCV) : undefined;
+    const innerDomain = hexToCV(requestDomain) as TupleCV;
 
     const rpcPayload: SignaturePayload | StructuredDataSignatureRequestOptions = {
       message,
@@ -81,7 +73,7 @@ function useSignatureRequest() {
 
 export function useSignMessage(messageType: SignatureMessageType) {
   const selectedAccount = useSelectedAccount();
-  const { network } = useWalletSelector();
+  const CurrentNetwork = useNetworkSelector();
   const { getSeed } = useSeedVault();
   return useCallback(
     async ({ message, domain }: { message: string; domain?: TupleCV }) => {
@@ -89,20 +81,19 @@ export function useSignMessage(messageType: SignatureMessageType) {
       if (!selectedAccount) return null;
       const { privateKey } = await getStxAddressKeyChain(
         seedPhrase,
-        network.type === 'Mainnet' ? ChainID.Mainnet : ChainID.Testnet,
+        CurrentNetwork,
         selectedAccount.id,
       );
       if (messageType === 'utf8') {
         return signStacksMessage(message, privateKey);
       }
       if (!domain) throw new Error('Domain is required for structured messages');
-      const sk = createStacksPrivateKey(privateKey);
       const messageDeserialize = hexToCV(message);
       const signature = signStructuredData({
         domain,
         message: messageDeserialize,
-        privateKey: sk,
-      }).data;
+        privateKey,
+      });
       return {
         signature,
         publicKey: selectedAccount.stxPublicKey,

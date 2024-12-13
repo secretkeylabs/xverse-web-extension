@@ -1,10 +1,5 @@
-import { buf2hex } from '@secretkeylabs/xverse-core';
-import {
-  ClarityType,
-  cvToString,
-  principalToString,
-  type ClarityValue,
-} from '@stacks/transactions';
+import { hexToBytes } from '@noble/hashes/utils';
+import { ClarityType, cvToString, type ClarityValue } from '@stacks/transactions';
 import styled from 'styled-components';
 
 const Container = styled.div<{ isRoot: boolean }>((props) => ({
@@ -58,10 +53,12 @@ export default function ClarityMessageView(props: ClarityMessageViewProps) {
       return wrapText(`u${val.value.toString()}`);
     case ClarityType.Buffer:
       if (encoding === 'tryAscii') {
-        const str = bytesToAscii(val.buffer);
-        if (/[ -~]/.test(str)) return wrapText(JSON.stringify(str));
+        const str = bytesToAscii(hexToBytes(val.value));
+        if (/[ -~]/.test(str)) {
+          return JSON.stringify(str);
+        }
       }
-      return wrapText(`0x${buf2hex(val.buffer)}`);
+      return wrapText(`0x${val.value}`);
     case ClarityType.OptionalNone:
       return wrapText('none');
     case ClarityType.OptionalSome:
@@ -72,14 +69,14 @@ export default function ClarityMessageView(props: ClarityMessageViewProps) {
       return wrapText(`ok ${cvToString(val.value, encoding)}`);
     case ClarityType.PrincipalStandard:
     case ClarityType.PrincipalContract:
-      return wrapText(principalToString(val));
+      return wrapText(cvToString(val));
     case ClarityType.List:
-      return wrapText(`[${val.list.map((v) => cvToString(v, encoding)).join(', ')}]`);
+      return wrapText(`[${val.value.map((v) => cvToString(v, encoding)).join(', ')}]`);
     case ClarityType.Tuple:
       return (
         <Container isRoot={isRoot}>
-          {Object.entries(val.data).map(([key, value]) => (
-            <ContentContainer>
+          {Object.entries(val.value).map(([key, value]) => (
+            <ContentContainer key={key}>
               <ClarityValueKey>{key}:</ClarityValueKey>
               <ClarityValueText>
                 <ClarityMessageView val={value} encoding="tryAscii" isRoot={false} />
@@ -89,9 +86,9 @@ export default function ClarityMessageView(props: ClarityMessageViewProps) {
         </Container>
       );
     case ClarityType.StringASCII:
-      return wrapText(`"${val.data}"`);
+      return wrapText(`"${val.value}"`);
     case ClarityType.StringUTF8:
-      return wrapText(`u"${val.data}"`);
+      return wrapText(`u"${val.value}"`);
     default:
       return <> </>;
   }
