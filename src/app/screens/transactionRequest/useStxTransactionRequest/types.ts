@@ -1,4 +1,4 @@
-import { StacksTransaction } from '@stacks/transactions';
+import { StacksTransactionWire } from '@stacks/transactions';
 
 interface Broadcast {
   broadcast: boolean;
@@ -6,7 +6,7 @@ interface Broadcast {
 
 interface TLegacyReturn extends Broadcast {
   payload: any;
-  transaction?: StacksTransaction;
+  transaction?: StacksTransactionWire;
   tabId: number;
   requestToken: string;
 }

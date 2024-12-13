@@ -7,10 +7,9 @@ import {
   type BtcTransactionData,
   type RecommendedFeeResponse,
   type SettingsNetwork,
-  type StacksTransaction,
   type StxTransactionData,
 } from '@secretkeylabs/xverse-core';
-import { deserializeTransaction } from '@stacks/transactions';
+import { deserializeTransaction, StacksTransactionWire } from '@stacks/transactions';
 import { isLedgerAccount } from '@utils/helper';
 import axios from 'axios';
 import BigNumber from 'bignumber.js';
@@ -136,7 +135,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
 
       const { fee } = transaction;
       const txRaw: string = await getRawTransaction(transaction.txid, network);
-      const unsignedTx: StacksTransaction = deserializeTransaction(txRaw);
+      const unsignedTx: StacksTransactionWire = deserializeTransaction(txRaw);
 
       const [slow, medium, high] = await estimateStacksTransactionWithFallback(
         unsignedTx,

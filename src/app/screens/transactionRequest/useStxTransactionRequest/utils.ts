@@ -1,10 +1,10 @@
 /* eslint-disable import/prefer-default-export */
 import { txPayloadToRequest } from '@secretkeylabs/xverse-core';
-import { PayloadType, StacksTransaction } from '@stacks/transactions';
+import { PayloadType, StacksTransactionWire } from '@stacks/transactions';
 
 interface GetPayloadArgs {
   decodedToken: Record<string, any>;
-  transaction?: StacksTransaction;
+  transaction?: StacksTransactionWire;
 }
 
 export const getPayload = ({ decodedToken, transaction: stacksTransaction }: GetPayloadArgs) => {
