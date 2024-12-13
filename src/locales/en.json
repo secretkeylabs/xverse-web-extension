@@ -1022,6 +1022,8 @@
   "BUY_SCREEN": {
     "BUY": "Buy",
     "PURCHASE_CRYPTO": "Purchase crypto quickly and deposit directly into your Xverse wallet.",
+    "XVERSE_SWAPS": "Xverse Swaps",
+    "XVERSE_SWAPS_DESC": "Swap Crypto for Bitcoin. Fast, Easy, and No KYC!",
     "MOONPAY": "Moonpay",
     "TRANSAK": "Transak",
     "PAYPAL": "Paypal",
