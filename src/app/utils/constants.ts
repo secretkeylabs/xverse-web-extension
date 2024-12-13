@@ -22,6 +22,7 @@ const ordiViewSuffixMap: Record<NetworkType, string> = {
   Mainnet: '',
   Testnet: '-testnet',
   Signet: '-signet',
+  Regtest: '-signet',
 };
 export const XVERSE_ORDIVIEW_URL = (network: NetworkType) =>
   `https://ord${ordiViewSuffixMap[network]}.xverse.app`;
