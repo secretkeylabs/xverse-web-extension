@@ -8,8 +8,18 @@ const useNetworkSelector = () => {
   const selectedNetwork = useMemo(
     () =>
       network.type === 'Mainnet'
-        ? new StacksMainnet({ url: network.address })
-        : new StacksTestnet({ url: network.address }),
+        ? {
+            ...StacksMainnet,
+            client: {
+              baseUrl: network.address,
+            },
+          }
+        : {
+            ...StacksTestnet,
+            client: {
+              baseUrl: network.address,
+            },
+          },
     [network.type, network.address],
   );
   return selectedNetwork;

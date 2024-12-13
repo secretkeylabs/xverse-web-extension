@@ -1,11 +1,11 @@
 import {
   API_TIMEOUT_MILLI,
-  StacksNetwork,
   type APIGetRunesActivityForAddressResponse,
   type AppInfo,
   type Brc20HistoryTransactionData,
   type BtcTransactionData,
   type GetRunesActivityForAddressEvent,
+  type StacksNetwork,
   type StxTransactionData,
 } from '@secretkeylabs/xverse-core';
 import {
@@ -31,7 +31,7 @@ async function getTransferTransactions(reqParams: {
   offset: number;
 }): Promise<AddressTransactionWithTransfers[]> {
   const { stxAddress, limit, network, offset } = reqParams;
-  const apiUrl = `${network.coreApiUrl}/extended/v1/address/${stxAddress}/transactions_with_transfers`;
+  const apiUrl = `${network.client.baseUrl}/extended/v1/address/${stxAddress}/transactions_with_transfers`;
   const response = await axios.get<PaginatedResults<AddressTransactionWithTransfers>>(apiUrl, {
     params: {
       limit,
@@ -53,7 +53,7 @@ async function getMempoolTransactions({
   offset: number;
   limit: number;
 }): Promise<MempoolTransactionListResponse> {
-  const apiUrl = `${network.coreApiUrl}/extended/v1/tx/mempool?address=${stxAddress}`;
+  const apiUrl = `${network.client.baseUrl}/extended/v1/tx/mempool?address=${stxAddress}`;
   const results = await axios.get<MempoolTransactionListResponse>(apiUrl, {
     timeout: API_TIMEOUT_MILLI,
     params: {
