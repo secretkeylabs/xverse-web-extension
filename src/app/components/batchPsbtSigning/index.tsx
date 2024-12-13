@@ -80,39 +80,62 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: Props) 
   );
 
   useEffect(() => {
-    const handlePsbtParsing = async (psbt: SignMultiplePsbtPayload): Promise<ParsedPsbt> => {
-      try {
-        const parsedPsbt = new btcTransaction.EnhancedPsbt(txnContext, psbt.psbtBase64);
-        const summary = await parsedPsbt.getSummary();
-        const extractedSummary = await extractViewSummary(txnContext, summary, network.type);
-        return { extractedSummary, summary };
-      } catch (err) {
-        throw new Error('PSBT parsing failed');
-      }
+    const handlePsbtParsing = async (psbt: SignMultiplePsbtPayload) =>
+      new btcTransaction.EnhancedPsbt(txnContext, psbt.psbtBase64);
+
+    const handlePsbtSummaryGeneration = async (
+      parsedPsbt: btcTransaction.EnhancedPsbt,
+      knownEmptyTxids: string[],
+    ): Promise<ParsedPsbt> => {
+      const summary = await parsedPsbt.getSummary({ knownEmptyTxids });
+      const extractedSummary = await extractViewSummary(txnContext, summary, network.type);
+      return { extractedSummary, summary };
     };
 
     (async () => {
       const parsedPsbtsRes = await Promise.allSettled(psbts.map(handlePsbtParsing));
-      setIsLoading(false);
+      let failedIndex = parsedPsbtsRes.findIndex((item) => item.status === 'rejected');
 
-      const index = parsedPsbtsRes.findIndex((item) => item.status === 'rejected');
-      if (index !== -1) {
+      if (failedIndex === -1) {
+        const parsedEnhancedPsbts =
+          // we can safely cast to PromiseFulfilledResult since we've already checked for rejected
+          (parsedPsbtsRes as PromiseFulfilledResult<btcTransaction.EnhancedPsbt>[]).map(
+            (item) => item.value,
+          );
+        // this is a list of txids for the txns in this PSBT batch
+        // since we know that these haven't been signed and broadcast yet, we can safely
+        // assume that these txns won't exist in electrs and ord, so there is no need to
+        // fetch their details if their outputs are used as inputs in other txns in the batch
+        const knownEmptyTxids = parsedEnhancedPsbts
+          .map((parsedPsbt) => parsedPsbt.getTxId())
+          .filter((id): id is string => id !== undefined);
+
+        const parsedPsbtSummaries = await Promise.allSettled(
+          parsedEnhancedPsbts.map((item) => handlePsbtSummaryGeneration(item, knownEmptyTxids)),
+        );
+        setIsLoading(false);
+
+        failedIndex = parsedPsbtSummaries.findIndex((item) => item.status === 'rejected');
+
+        if (failedIndex === -1) {
+          const validParsedPsbts = parsedPsbtSummaries.map(
+            (item) => (item.status === 'fulfilled' && item.value) as ParsedPsbt,
+          );
+          setParsedPsbts(validParsedPsbts);
+        }
+      }
+
+      if (failedIndex !== -1) {
         navigate('/tx-status', {
           state: {
             txid: '',
             currency: 'BTC',
             errorTitle: t('PSBT_CANT_PARSE_ERROR_TITLE'),
-            error: t('PSBT_INDEX_CANT_PARSE_ERROR_DESCRIPTION', { index }),
+            error: t('PSBT_INDEX_CANT_PARSE_ERROR_DESCRIPTION', { index: failedIndex }),
             browserTx: true,
           },
         });
-        return;
       }
-
-      const validParsedPsbts = parsedPsbtsRes.map(
-        (item) => (item.status === 'fulfilled' && item.value) as ParsedPsbt,
-      );
-      setParsedPsbts(validParsedPsbts);
     })();
   }, [psbts, txnContext, network, navigate, t]);
 
