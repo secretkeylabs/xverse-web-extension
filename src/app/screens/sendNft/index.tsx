@@ -9,14 +9,13 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   applyFeeMultiplier,
-  buf2hex,
   cvToHex,
-  generateUnsignedTransaction,
+  generateUnsignedTokenTransferTransaction,
   uintCV,
   validateStxAddress,
-  type StacksTransaction,
   type UnsignedStacksTransation,
 } from '@secretkeylabs/xverse-core';
+import { StacksTransactionWire } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import { StickyButtonContainer, StyledHeading, StyledP } from '@ui-library/common.styled';
 import {
@@ -114,7 +113,7 @@ function SendNft() {
   const associatedAddress = useBnsResolver(debouncedSearchTerm, stxAddress);
 
   const { isLoading, data, mutate } = useMutation<
-    StacksTransaction,
+    StacksTransactionWire,
     Error,
     { tokenId: string; address: string }
   >({
@@ -135,7 +134,7 @@ function SendNft() {
         memo: '',
         isNFT: true,
       };
-      const unsignedTx = await generateUnsignedTransaction(unsginedTx);
+      const unsignedTx = await generateUnsignedTokenTransferTransaction(unsginedTx);
       applyFeeMultiplier(unsignedTx, feeMultipliers);
       setRecipientAddress(address);
       return unsignedTx;
@@ -146,7 +145,7 @@ function SendNft() {
     if (data) {
       navigate(`/confirm-nft-tx/${id}`, {
         state: {
-          unsignedTx: buf2hex(data.serialize()),
+          unsignedTx: data.serialize(),
           recipientAddress,
         },
       });

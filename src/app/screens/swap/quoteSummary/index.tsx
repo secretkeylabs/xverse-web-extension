@@ -13,7 +13,7 @@ import { ArrowDown, ArrowRight, WarningOctagon } from '@phosphor-icons/react';
 import {
   AnalyticsEvents,
   RUNE_DISPLAY_DEFAULTS,
-  capStxFeeAtThreshold,
+  applyMultiplierAndCapFeeAtThreshold,
   formatBalance,
   getBtcFiatEquivalent,
   getStxFiatEquivalent,
@@ -238,7 +238,7 @@ export default function QuoteSummary({
 
       if (placeOrderResponse?.unsignedTransaction) {
         const swapTx = deserializeTransaction(placeOrderResponse.unsignedTransaction);
-        await capStxFeeAtThreshold(swapTx, network);
+        await applyMultiplierAndCapFeeAtThreshold(swapTx, network);
         placeOrderResponse.unsignedTransaction = Buffer.from(swapTx.serialize()).toString('hex');
         onStxOrderPlaced({ order: placeOrderResponse, providerCode: quote.provider.code });
       }

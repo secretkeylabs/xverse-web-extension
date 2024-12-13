@@ -28,10 +28,9 @@ import {
   signLedgerStxTransaction,
   signTransaction,
   stxToMicrostacks,
-  type StacksTransaction,
   type Transport as TransportType,
 } from '@secretkeylabs/xverse-core';
-import { deserializeTransaction } from '@stacks/transactions';
+import { deserializeTransaction, StacksTransactionWire } from '@stacks/transactions';
 import Spinner from '@ui-library/spinner';
 import { EMPTY_LABEL } from '@utils/constants';
 import { isLedgerAccount } from '@utils/helper';
@@ -155,7 +154,7 @@ function SpeedUpTransactionScreen() {
       setIsBroadcasting(true);
       const fee = stxToMicrostacks(BigNumber(feeRateInput)).toString();
       const txRaw: string = await getRawTransaction(stxTransaction.txid, network);
-      const unsignedTx: StacksTransaction = deserializeTransaction(txRaw);
+      const unsignedTx: StacksTransactionWire = deserializeTransaction(txRaw);
 
       // check if the transaction exists in microblock
       const latestNonceData = await getLatestNonce(selectedAccount.stxAddress, network);
@@ -178,7 +177,7 @@ function SpeedUpTransactionScreen() {
           await delay(1500);
           await broadcastSignedTransaction(result, selectedStacksNetwork);
         } else {
-          const signedTx: StacksTransaction = await signTransaction(
+          const signedTx: StacksTransactionWire = await signTransaction(
             unsignedTx,
             seedPhrase,
             selectedAccount.id,
