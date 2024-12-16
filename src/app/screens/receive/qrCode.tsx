@@ -4,6 +4,8 @@ import styled from 'styled-components';
 
 const QRCodeContainer = styled.div({
   display: 'flex',
+  width: 154,
+  height: 154,
 });
 
 type Props = {
@@ -15,8 +17,8 @@ type Props = {
 function QrCode({ image, data, gradientColor }: Props) {
   const options: Options = useMemo(
     () => ({
-      width: 154,
-      height: 154,
+      width: 770,
+      height: 770,
       data,
       image,
       dotsOptions: {
@@ -54,6 +56,7 @@ function QrCode({ image, data, gradientColor }: Props) {
   );
   const [qrCode] = useState<QRCodeStyling>(new QRCodeStyling(options));
   const ref = useRef(null);
+
   useEffect(() => {
     if (ref.current) {
       qrCode.append(ref.current);

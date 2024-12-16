@@ -288,7 +288,7 @@
     "STX_ADDRESS": "Stacks address",
     "STX_ADDRESS_DESC": "Only send SIP-010 tokens to this address",
     "COPY_ADDRESS": "Copy address",
-    "COPIED_ADDRESS": "Address copied to clipboard",
+    "COPIED_ADDRESS": "Copied to clipboard",
     "BTC_ADDRESS": "Bitcoin address",
     "ORDINAL_ADDRESS": "Ordinal, Runes & BRC-20 address",
     "ORDINALS_RECEIVE_MESSAGE": "Only use this address to receive Ordinals, Runes, and BRC-20 tokens.",
