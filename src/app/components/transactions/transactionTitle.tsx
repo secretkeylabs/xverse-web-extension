@@ -28,7 +28,7 @@ type Props = {
 
 export default function TransactionTitle({ transaction }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
-  const { data: sip10CoinsList } = useVisibleSip10FungibleTokens();
+  const { data: sip10CoinsList = [] } = useVisibleSip10FungibleTokens();
 
   const getTokenTransferTitle = (
     tx: StxTransactionData | BtcTransactionData | Brc20HistoryTransactionData,

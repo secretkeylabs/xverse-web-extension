@@ -20,11 +20,11 @@ test.describe('Token Management', () => {
     await expect(wallet.buttonRunes).toBeVisible();
     await expect(wallet.headingTokens).toBeVisible();
 
-    // Check SIP10 token tab - only Stacks should be showing when user has no sip10 balances
+    // Check SIP10 token tab - only Stacks and sBTC should be showing when user has no sip10 balances
     await wallet.buttonSip10.click();
-    await expect(wallet.labelCoinTitle).toHaveCount(1);
-    await expect(wallet.checkboxToken).toHaveCount(1);
-    await expect(wallet.checkboxTokenActive).toHaveCount(1);
+    await expect(wallet.labelCoinTitle).toHaveCount(2);
+    await expect(wallet.checkboxToken).toHaveCount(2);
+    await expect(wallet.checkboxTokenActive).toHaveCount(2);
     await expect(wallet.checkboxTokenInactive).toHaveCount(0);
 
     // Check BRC20 token tab - nothing shows when user has no brc20 balances
