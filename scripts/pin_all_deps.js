@@ -1,26 +1,27 @@
-const fs = require('fs');
+/*
+ * This script is used to pin all dependencies in package.json to the exact
+ * versions declared in package-lock.json.
+ *
+ * It assumes lockfileVersion >= 2
+ *
+ * Usage: node pin_all_deps.js
+ */
 
+const fs = require('fs');
 const packageLock = require('../package-lock.json');
 const packageJson = require('../package.json');
 
-const dependencies = packageLock.dependencies;
-const devDependencies = packageLock.packages;
-
 for (const packageName in packageJson.dependencies) {
-  if (packageJson.dependencies.hasOwnProperty(packageName) && dependencies[packageName]) {
-    const installedVersion = dependencies[packageName].version;
-    packageJson.dependencies[packageName] = installedVersion;
+  const installedPathKey = `node_modules/${packageName}`;
+  if (packageJson.dependencies.hasOwnProperty(packageName) && packageLock.packages[installedPathKey]) {
+    packageJson.dependencies[packageName] = packageLock.packages[installedPathKey].version;
   }
 }
 
 for (const packageName in packageJson.devDependencies) {
-  const auxDevPackageName = `../node_modules/${packageName}`;
-  if (
-    packageJson.devDependencies.hasOwnProperty(packageName) &&
-    devDependencies[auxDevPackageName]
-  ) {
-    const installedVersion = devDependencies[auxDevPackageName].version;
-    packageJson.devDependencies[packageName] = installedVersion;
+  const installedPathKey = `node_modules/${packageName}`;
+  if (packageJson.devDependencies.hasOwnProperty(packageName) && packageLock.packages[installedPathKey]) {
+    packageJson.devDependencies[packageName] = packageLock.packages[installedPathKey].version;
   }
 }
 
