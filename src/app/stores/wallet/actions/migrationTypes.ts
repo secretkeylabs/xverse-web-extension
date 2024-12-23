@@ -164,8 +164,10 @@ export type WalletStateV5 = Omit<
 
 export type WalletStateV6 = Omit<WalletStateV5, 'allowNestedSegWitAddress'>;
 
-type WalletStateV7 = WalletStateV6 & {
-  // should be exported and used when we add next migration
+export type WalletStateV7 = WalletStateV6 & {
   showBalanceInBtc: boolean;
   hasBackedUpWallet: boolean;
 };
+
+// should be exported and used when we add next migration
+type WalletStateV8 = WalletStateV7; // no changes. just a data migration

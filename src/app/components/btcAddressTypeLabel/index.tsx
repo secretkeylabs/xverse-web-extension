@@ -1,5 +1,6 @@
 import * as btc from '@scure/btc-signer';
 import type { BtcAddressType, NetworkType } from '@secretkeylabs/xverse-core';
+import { getBtcNetworkDefinition } from '@secretkeylabs/xverse-core';
 import { useTranslation } from 'react-i18next';
 import { Tooltip } from 'react-tooltip';
 import styled from 'styled-components';
@@ -57,9 +58,7 @@ export function BtcAddressTypeForAddressLabel({
   network,
 }: BtcAddressTypeForAddressLabelProps) {
   try {
-    const addressMetadata = btc
-      .Address(network === 'Mainnet' ? btc.NETWORK : btc.TEST_NETWORK)
-      .decode(address);
+    const addressMetadata = btc.Address(getBtcNetworkDefinition(network)).decode(address);
 
     let addressType: BtcAddressType;
 

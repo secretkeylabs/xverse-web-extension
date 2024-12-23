@@ -19,7 +19,7 @@ import {
 import type { ContractCallPayload, ContractDeployPayload } from '@stacks/connect';
 import { StacksTransactionWire } from '@stacks/transactions';
 import Spinner from '@ui-library/spinner';
-import { getNetworkType, isHardwareAccount } from '@utils/helper';
+import { getNetworkType, getStxNetworkForBtcNetwork, isHardwareAccount } from '@utils/helper';
 import RoutePaths from 'app/routes/paths';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -195,7 +195,10 @@ function TransactionRequest() {
   };
 
   const handleRequest = async () => {
-    if (payload.network && getNetworkType(payload.network) !== network.type) {
+    if (
+      payload.network &&
+      getNetworkType(payload.network) !== getStxNetworkForBtcNetwork(network.type)
+    ) {
       navigate('/tx-status', {
         state: {
           txid: '',

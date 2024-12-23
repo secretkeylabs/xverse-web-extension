@@ -17,6 +17,7 @@ import RoutePaths from 'app/routes/paths';
 import BigNumber from 'bignumber.js';
 import type { TFunction } from 'react-i18next';
 import {
+  BTC_TRANSACTION_REGTEST_STATUS_URL,
   BTC_TRANSACTION_SIGNET_STATUS_URL,
   BTC_TRANSACTION_STATUS_URL,
   BTC_TRANSACTION_TESTNET_STATUS_URL,
@@ -106,6 +107,9 @@ export const getBtcTxStatusUrl = (txId: string, network: SettingsNetwork) => {
   if (network.type === 'Signet') {
     return `${BTC_TRANSACTION_SIGNET_STATUS_URL}${txId}`;
   }
+  if (network.type === 'Regtest') {
+    return `${BTC_TRANSACTION_REGTEST_STATUS_URL}${txId}`;
+  }
   return `${BTC_TRANSACTION_STATUS_URL}${txId}`;
 };
 
@@ -192,6 +196,9 @@ export const isValidBtcApi = async (url: string, network: NetworkType) => {
 
 export const getNetworkType = (stxNetwork) =>
   stxNetwork.chainId === StacksMainnet.chainId ? 'Mainnet' : 'Testnet';
+
+export const getStxNetworkForBtcNetwork = (network: NetworkType) =>
+  network === 'Mainnet' ? 'Mainnet' : 'Testnet';
 
 export const isHardwareAccount = (account: Account | null): boolean =>
   !!account?.accountType && account?.accountType !== 'software';

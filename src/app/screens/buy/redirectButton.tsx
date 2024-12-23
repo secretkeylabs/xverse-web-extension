@@ -43,6 +43,12 @@ const RowContainer = styled.div({
   flex: 1,
 });
 
+const ImageContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
+});
+
 type Props = {
   src: string;
   text: string;
@@ -54,7 +60,9 @@ function RedirectButton({ src, text, subText, onClick }: Props) {
   return (
     <Button onClick={onClick}>
       <RowContainer>
-        <img src={src} alt={text} />
+        <ImageContainer>
+          <img src={src} height={40} width={40} alt={text} />
+        </ImageContainer>
         <TextContainer>
           <Text>{text}</Text>
           {subText && <SubText>{subText}</SubText>}

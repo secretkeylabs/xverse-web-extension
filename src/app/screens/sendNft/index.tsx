@@ -8,7 +8,7 @@ import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  applyFeeMultiplier,
+  applyMultiplierAndCapFeeAtThreshold,
   cvToHex,
   generateUnsignedTokenTransferTransaction,
   uintCV,
@@ -107,7 +107,7 @@ function SendNft() {
   const selectedNetwork = useNetworkSelector();
   const { data: stxPendingTxData } = useStxPendingTxData();
   const { stxAddress, stxPublicKey } = useSelectedAccount();
-  const { network, feeMultipliers } = useWalletSelector();
+  const { network } = useWalletSelector();
   const debouncedSearchTerm = useDebounce(recipientAddress, 300);
   const associatedBnsName = useBnsName(debouncedSearchTerm);
   const associatedAddress = useBnsResolver(debouncedSearchTerm, stxAddress);
@@ -135,7 +135,7 @@ function SendNft() {
         isNFT: true,
       };
       const unsignedTx = await generateUnsignedTokenTransferTransaction(unsginedTx);
-      applyFeeMultiplier(unsignedTx, feeMultipliers);
+      await applyMultiplierAndCapFeeAtThreshold(unsignedTx, selectedNetwork);
       setRecipientAddress(address);
       return unsignedTx;
     },

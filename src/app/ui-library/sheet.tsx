@@ -34,9 +34,10 @@ const CustomisedModal = styled(Modal)`
 const BodyContainer = styled.div`
   position: relative;
   flex: 1;
-  overflow-y: auto;
-  margin: ${(props) => props.theme.space.m};
-  margin-top: 0;
+  margin: ${(props) => `0 0 ${props.theme.space.m} ${props.theme.space.m}`};
+  padding-right: ${(props) => props.theme.space.m};
+  scrollbar: ${(props) => props.theme.scrollbar};
+  scrollbar-gutter: stable;
 `;
 
 type Props = {
