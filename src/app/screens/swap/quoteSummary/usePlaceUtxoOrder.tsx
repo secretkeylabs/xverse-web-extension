@@ -8,7 +8,7 @@ import { useState } from 'react';
 
 const usePlaceUtxoOrder = () => {
   const [order, setOrder] = useState<PlaceUtxoOrderResponse>();
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { network } = useWalletSelector();
 

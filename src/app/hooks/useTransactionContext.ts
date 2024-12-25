@@ -1,5 +1,5 @@
 import { btcTransaction, UtxoCache, type BtcPaymentType } from '@secretkeylabs/xverse-core';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import useBtcClient from './apiClients/useBtcClient';
 import useSeedVault from './useSeedVault';
 import useSelectedAccount from './useSelectedAccount';
@@ -11,25 +11,51 @@ const useTransactionContext = (overridePayAddressType?: BtcPaymentType) => {
   const seedVault = useSeedVault();
   const btcClient = useBtcClient();
 
+  // TODO: we can remove this useEffect after a while once the localstorage cache clearance has propagated
+  useEffect(() => {
+    // we run this once to clean out the old cache that used localStorage
+    const localStorageCache = new UtxoCache({
+      cacheStorageController: {
+        getAllKeys: async () => Object.keys(localStorage),
+        get: async () => null,
+        set: async () => {},
+        remove: async (key: string) => {
+          localStorage.removeItem(key);
+        },
+      },
+      network: network.type,
+      electrsApi: btcClient,
+    });
+    localStorageCache.clearAllCaches();
+  }, []);
+
   const utxoCache = useMemo(
     () =>
       new UtxoCache({
         cacheStorageController: {
-          getAllKeys: async () => Object.keys(localStorage),
+          getAllKeys: async () => {
+            const allItems = await chrome.storage.local.get();
+            return Object.keys(allItems);
+          },
           get: async (key: string) => {
-            const value = localStorage.getItem(key);
-            return value;
+            const value = await chrome.storage.local.get(key);
+            return value[key];
           },
           set: async (key: string, value: string) => {
-            localStorage.setItem(key, value);
+            await chrome.storage.local.set({
+              [key]: value,
+            });
           },
           remove: async (key: string) => {
-            localStorage.removeItem(key);
+            await chrome.storage.local.remove(key);
           },
+          isErrorQuotaExceeded: (error: unknown) =>
+            error instanceof Error && error.message.includes('QUOTA_BYTES'),
         },
         network: network.type,
+        electrsApi: btcClient,
       }),
-    [network.type],
+    [network.type, btcClient],
   );
 
   const transactionContext = useMemo(() => {

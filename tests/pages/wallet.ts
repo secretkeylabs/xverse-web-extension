@@ -486,7 +486,8 @@ export default class Wallet {
     this.itemCollection = page.getByTestId('collection-item');
     this.buttonSend = page.locator('button').filter({ hasText: 'Send' });
     this.buttonShare = page.locator('button').filter({ hasText: 'Share' });
-    this.buttonReceive = page.locator('button').filter({ hasText: 'Receive' });
+    this.buttonReceive = page.getByRole('button', { name: /^Receive/i });
+
     this.buttonOpenOrdinalViewer = page.getByRole('button', { name: 'Open in Ordinal Viewer' });
     this.labelBundle = page.locator('h1').filter({ hasText: 'Bundle' });
     this.labelSatsValue = page.locator('h1').filter({ hasText: 'Sats value' });

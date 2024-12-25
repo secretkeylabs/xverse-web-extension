@@ -39,14 +39,14 @@ const Image = styled.img`
   border-radius: 50%;
 `;
 
-interface Props {
+type Props = {
   fromUnit?: string;
   toUnit?: string;
   rate: string;
   provider: string;
   image: string;
   onClick: () => void;
-}
+};
 
 function QuoteSummaryTile({ fromUnit, toUnit, rate, provider, image, onClick }: Props) {
   const { t } = useTranslation('translation');

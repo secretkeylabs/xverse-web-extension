@@ -288,7 +288,7 @@
     "STX_ADDRESS": "Stacks address",
     "STX_ADDRESS_DESC": "Only send SIP-010 tokens to this address",
     "COPY_ADDRESS": "Copy address",
-    "COPIED_ADDRESS": "Address copied to clipboard",
+    "COPIED_ADDRESS": "Copied to clipboard",
     "BTC_ADDRESS": "Bitcoin address",
     "ORDINAL_ADDRESS": "Ordinal, Runes & BRC-20 address",
     "ORDINALS_RECEIVE_MESSAGE": "Only use this address to receive Ordinals, Runes, and BRC-20 tokens.",
@@ -949,6 +949,7 @@
     "INCORRECT_PASSWORD_ERROR": "Incorrect password",
     "TESTNET": "Testnet",
     "SIGNET": "Signet",
+    "REGTEST": "Regtest",
     "ORDINALS": "Ordinals",
     "ACTIVATE_ORDINAL_NFTS": "Display ordinals",
     "RECOVER_ASSETS": "Recover assets",
@@ -1022,6 +1023,8 @@
   "BUY_SCREEN": {
     "BUY": "Buy",
     "PURCHASE_CRYPTO": "Purchase crypto quickly and deposit directly into your Xverse wallet.",
+    "XVERSE_SWAPS": "Xverse Swaps",
+    "XVERSE_SWAPS_DESC": "Swap Crypto for Bitcoin. Fast, Easy, and No KYC!",
     "MOONPAY": "Moonpay",
     "TRANSAK": "Transak",
     "PAYPAL": "Paypal",
@@ -1186,6 +1189,7 @@
     "MINUS": "-",
     "CONTRACT_ADDRESS": "Contract ADDRESS",
     "SPONSORED": "Sponsored",
+    "SPONSORED_VALUE_YES": "Yes",
     "POST_CONDITION_ALERT": "No transfers (beside fees) will be made from your account or the transaction will abort"
   },
   "DEPLOY_CONTRACT_REQUEST": {
@@ -1194,6 +1198,7 @@
     "SOURCE_CODE": "Source code",
     "VIEW_SOURCE_CODE": "View contract code",
     "SPONSORED": "Sponsored",
+    "SPONSORED_VALUE_YES": "Yes",
     "FUNCTION": "Source Code",
     "DOWNLOAD": "Download contract code",
     "POST_CONDITION_ALERT": "No transfers (beside fees) will be made from your account or the transaction will abort"

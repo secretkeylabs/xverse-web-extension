@@ -17,18 +17,6 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import QuoteTile from './quoteTile';
 
-interface Props {
-  visible: boolean;
-  onClose: () => void;
-  ammProviders: Quote[];
-  utxoProviders: UtxoQuote[];
-  stxProviders: StxQuote[];
-  amount: string;
-  toToken?: FungibleToken;
-  ammProviderClicked?: (amm: Quote) => void;
-  utxoProviderClicked?: (utxoProvider: UtxoQuote) => void;
-}
-
 const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -53,6 +41,18 @@ const SecondHeading = styled(StyledP)`
   letter-spacing: 0.22px;
   text-transform: uppercase;
 `;
+
+type Props = {
+  visible: boolean;
+  onClose: () => void;
+  ammProviders: Quote[];
+  utxoProviders: UtxoQuote[];
+  stxProviders: StxQuote[];
+  amount: string;
+  toToken?: FungibleToken;
+  ammProviderClicked?: (amm: Quote) => void;
+  utxoProviderClicked?: (utxoProvider: UtxoQuote) => void;
+};
 
 function QuotesModal({
   visible,
@@ -87,10 +87,6 @@ function QuotesModal({
     const highestReceiveAmount = BigNumber.max(
       ...quotes.map((q) => new BigNumber(q.receiveAmount)),
     );
-
-    if (quote.provider.code === 'dotswap') {
-      return t('RECOMMENDED');
-    }
 
     if (new BigNumber(quote.receiveAmount).eq(highestReceiveAmount)) {
       return t('BEST');

@@ -39,7 +39,7 @@ export default function TransactionAmount({
   protocol,
   tokenSymbol,
 }: Props): JSX.Element | null {
-  const { data: sip10CoinsList } = useVisibleSip10FungibleTokens();
+  const { data: sip10CoinsList = [] } = useVisibleSip10FungibleTokens();
   const { balanceHidden } = useWalletSelector();
 
   if (currency === 'STX' || (currency === 'FT' && protocol === 'stacks')) {

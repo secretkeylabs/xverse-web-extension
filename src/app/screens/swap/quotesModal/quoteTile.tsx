@@ -9,7 +9,7 @@ import { NumericFormat } from 'react-number-format';
 import styled, { useTheme } from 'styled-components';
 import type { Color } from 'theme';
 
-const MainContainer = styled.button<{ clickable: boolean }>`
+const MainContainer = styled.button<{ $clickable: boolean }>`
   display: flex;
   flex-direction: row;
   border: 1px solid ${({ theme }) => theme.colors.elevation6};
@@ -18,7 +18,7 @@ const MainContainer = styled.button<{ clickable: boolean }>`
   margin-top: ${({ theme }) => theme.space.xs};
   background: transparent;
   width: 100%;
-  cursor: ${({ clickable }) => (clickable ? 'pointer' : 'default')};
+  cursor: ${({ $clickable }) => ($clickable ? 'pointer' : 'default')};
   align-items: center;
   justify-content: center;
 `;
@@ -66,7 +66,7 @@ const SubtitleContainer = styled.div`
   gap: ${({ theme }) => theme.space.xxs};
 `;
 
-interface Props {
+type Props = {
   provider: string;
   price: string;
   image?: string;
@@ -77,7 +77,7 @@ interface Props {
   floorText?: string;
   onClick?: () => void;
   unit?: string;
-}
+};
 
 function QuoteTile({
   provider,
@@ -102,7 +102,7 @@ function QuoteTile({
   const subtitleColor = subtitleColorOverride ?? getSubtitleColor();
 
   return (
-    <MainContainer data-testid="swap-place-button" onClick={onClick} clickable={Boolean(onClick)}>
+    <MainContainer data-testid="swap-place-button" onClick={onClick} $clickable={Boolean(onClick)}>
       <TokenImage fungibleToken={token} imageUrl={image} size={32} />
       <RowContainers>
         <RowContainer>

@@ -1,12 +1,9 @@
 import useRunesApi from '@hooks/apiClients/useRunesApi';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import {
-  getFungibleTokenStates,
-  type FungibleToken,
-  type FungibleTokenWithStates,
-} from '@secretkeylabs/xverse-core';
+import { type FungibleToken, type FungibleTokenWithStates } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
+import { selectWithDerivedState } from '@utils/tokens';
 import useGetTopTokens from '../useGetTopTokens';
 
 export const fetchRuneBalances =
@@ -48,45 +45,18 @@ export const useRuneFungibleTokensQuery = (
   const { data: topTokensData } = useGetTopTokens();
 
   const queryFn = fetchRuneBalances(runesApi, ordinalsAddress, fiatCurrency);
-  const selectWithDerivedState = (data: FungibleToken[]) => {
-    const topTokens = { ...topTokensData?.runes };
-    const tokensWithDerivedState = data.map((ft: FungibleToken) => {
-      let token = ft;
-      if (topTokens[token.principal]) {
-        delete topTokens[token.principal];
-        token = { ...token, isTopToken: true };
-      }
-      return {
-        ...token,
-        ...getFungibleTokenStates({
-          fungibleToken: token,
-          manageTokens: runesManageTokens,
-          spamTokens,
-          showSpamTokens,
-        }),
-      } as FungibleTokenWithStates;
-    });
-    const topTokensWithDerivedState = Object.values(topTokens).map((ft) => {
-      const token = { ...ft, isTopToken: true };
-      return {
-        ...token,
-        ...getFungibleTokenStates({
-          fungibleToken: token,
-          manageTokens: runesManageTokens,
-          spamTokens,
-          showSpamTokens,
-        }),
-      };
-    });
-    const withDerivedState = tokensWithDerivedState.concat(topTokensWithDerivedState);
-    return select ? select(withDerivedState) : withDerivedState;
-  };
 
   return useQuery({
     queryKey: ['get-rune-fungible-tokens', network.type, ordinalsAddress, fiatCurrency],
     queryFn,
     enabled: Boolean(network && ordinalsAddress),
-    select: selectWithDerivedState,
+    select: selectWithDerivedState({
+      manageTokens: runesManageTokens,
+      spamTokens,
+      showSpamTokens,
+      topTokensData: topTokensData?.runes,
+      select,
+    }),
     refetchOnWindowFocus: !!backgroundRefetch,
     refetchOnReconnect: !!backgroundRefetch,
     keepPreviousData: true,
