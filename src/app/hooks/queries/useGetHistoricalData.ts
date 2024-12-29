@@ -1,5 +1,3 @@
-/**
-
 import useXverseApi from '@hooks/apiClients/useXverseApi';
 import useWalletSelector from '@hooks/useWalletSelector';
 import type { HistoricalDataParamsPeriod } from '@secretkeylabs/xverse-core';
@@ -26,4 +24,3 @@ const useGetHistoricalData = (id: string, period: HistoricalDataParamsPeriod) =>
 };
 
 export default useGetHistoricalData;
- */
