@@ -172,6 +172,7 @@ function ContractCallDetails({
                   )}
                 </ValueText>
                 <CopyButton
+                  removePadding
                   text={`${contractCall.contractAddress}${
                     contractCall.contractName ? `.${contractCall.contractName}` : ''
                   }`}
