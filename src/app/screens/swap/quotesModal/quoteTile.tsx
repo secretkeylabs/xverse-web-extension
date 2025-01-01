@@ -1,15 +1,15 @@
+import FormattedNumber from '@components/formattedNumber';
 import TokenImage from '@components/tokenImage';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CaretRight } from '@phosphor-icons/react';
 import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import { formatBalance } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
-import type { CurrencyTypes } from '@utils/constants';
 import { NumericFormat } from 'react-number-format';
 import styled, { useTheme } from 'styled-components';
 import type { Color } from 'theme';
 
-const MainContainer = styled.button<{ clickable: boolean }>`
+const MainContainer = styled.button<{ $clickable: boolean }>`
   display: flex;
   flex-direction: row;
   border: 1px solid ${({ theme }) => theme.colors.elevation6};
@@ -18,7 +18,7 @@ const MainContainer = styled.button<{ clickable: boolean }>`
   margin-top: ${({ theme }) => theme.space.xs};
   background: transparent;
   width: 100%;
-  cursor: ${({ clickable }) => (clickable ? 'pointer' : 'default')};
+  cursor: ${({ $clickable }) => ($clickable ? 'pointer' : 'default')};
   align-items: center;
   justify-content: center;
 `;
@@ -38,6 +38,7 @@ const RowContainer = styled.div`
   flex-direction: row;
   justify-content: space-between;
   gap: ${({ theme }) => theme.space.m};
+  white-space: nowrap;
 `;
 
 const TruncatedP = styled(StyledP)`
@@ -65,7 +66,7 @@ const SubtitleContainer = styled.div`
   gap: ${({ theme }) => theme.space.xxs};
 `;
 
-interface Props {
+type Props = {
   provider: string;
   price: string;
   image?: string;
@@ -76,7 +77,7 @@ interface Props {
   floorText?: string;
   onClick?: () => void;
   unit?: string;
-}
+};
 
 function QuoteTile({
   provider,
@@ -101,7 +102,7 @@ function QuoteTile({
   const subtitleColor = subtitleColorOverride ?? getSubtitleColor();
 
   return (
-    <MainContainer data-testid="swap-place-button" onClick={onClick} clickable={Boolean(onClick)}>
+    <MainContainer data-testid="swap-place-button" onClick={onClick} $clickable={Boolean(onClick)}>
       <TokenImage fungibleToken={token} imageUrl={image} size={32} />
       <RowContainers>
         <RowContainer>
@@ -115,7 +116,7 @@ function QuoteTile({
               thousandSeparator
               renderText={() => (
                 <TruncatedP data-testid="quote-label" typography="body_bold_m" color="white_0">
-                  {formatBalance(price)} {unit}
+                  <FormattedNumber number={formatBalance(price)} tokenSymbol={unit} />
                 </TruncatedP>
               )}
             />
@@ -123,12 +124,12 @@ function QuoteTile({
         </RowContainer>
         <RowContainer>
           {subtitle && subtitleColor && (
-            <StyledP data-testid="info-message" typography="body_medium_s" color={subtitleColor}>
+            <TruncatedP data-testid="info-message" typography="body_medium_s" color={subtitleColor}>
               <SubtitleContainer>
                 {subtitleColor === 'success_light' && <GreenEllipse />}
                 {subtitle}
               </SubtitleContainer>
-            </StyledP>
+            </TruncatedP>
           )}
           {fiatValue && (
             <NumericFormat

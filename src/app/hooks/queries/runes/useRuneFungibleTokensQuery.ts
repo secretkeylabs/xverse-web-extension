@@ -7,6 +7,7 @@ import {
   type FungibleTokenWithStates,
 } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
+import useGetTopTokens from '../useGetTopTokens';
 
 export const fetchRuneBalances =
   (
@@ -44,21 +45,40 @@ export const useRuneFungibleTokensQuery = (
   const { runesManageTokens, network, fiatCurrency, spamTokens, showSpamTokens } =
     useWalletSelector();
   const runesApi = useRunesApi();
+  const { data: topTokensData } = useGetTopTokens();
 
   const queryFn = fetchRuneBalances(runesApi, ordinalsAddress, fiatCurrency);
   const selectWithDerivedState = (data: FungibleToken[]) => {
-    const withDerivedState = data.map(
-      (ft: FungibleToken) =>
-        ({
-          ...ft,
-          ...getFungibleTokenStates({
-            fungibleToken: ft,
-            manageTokens: runesManageTokens,
-            spamTokens,
-            showSpamTokens,
-          }),
-        } as FungibleTokenWithStates),
-    );
+    const topTokens = { ...topTokensData?.runes };
+    const tokensWithDerivedState = data.map((ft: FungibleToken) => {
+      let token = ft;
+      if (topTokens[token.principal]) {
+        delete topTokens[token.principal];
+        token = { ...token, isTopToken: true };
+      }
+      return {
+        ...token,
+        ...getFungibleTokenStates({
+          fungibleToken: token,
+          manageTokens: runesManageTokens,
+          spamTokens,
+          showSpamTokens,
+        }),
+      } as FungibleTokenWithStates;
+    });
+    const topTokensWithDerivedState = Object.values(topTokens).map((ft) => {
+      const token = { ...ft, isTopToken: true };
+      return {
+        ...token,
+        ...getFungibleTokenStates({
+          fungibleToken: token,
+          manageTokens: runesManageTokens,
+          spamTokens,
+          showSpamTokens,
+        }),
+      };
+    });
+    const withDerivedState = tokensWithDerivedState.concat(topTokensWithDerivedState);
     return select ? select(withDerivedState) : withDerivedState;
   };
 

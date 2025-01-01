@@ -1,4 +1,5 @@
 import SlippageEditIcon from '@assets/img/swap/slippageEdit.svg';
+import FormattedNumber from '@components/formattedNumber';
 import TopRow from '@components/topRow';
 import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery';
 import useGetSip10TokenInfo from '@hooks/queries/stx/useGetSip10TokenInfo';
@@ -13,6 +14,7 @@ import {
   AnalyticsEvents,
   RUNE_DISPLAY_DEFAULTS,
   capStxFeeAtThreshold,
+  formatBalance,
   getBtcFiatEquivalent,
   getStxFiatEquivalent,
   stxToMicrostacks,
@@ -30,117 +32,33 @@ import { formatNumber } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { useTheme } from 'styled-components';
+import { useTheme } from 'styled-components';
 import trackSwapMixPanel from '../mixpanel';
 import QuoteTile from '../quotesModal/quoteTile';
 import SlippageModalContent from '../slippageModal';
 import type { OrderInfo, StxOrderInfo } from '../types';
 import { BAD_QUOTE_PERCENTAGE, isRunesTx, mapFTNativeSwapTokenToTokenBasic } from '../utils';
 import EditFee from './EditFee';
+import {
+  ArrowInnerContainer,
+  ArrowOuterContainer,
+  CalloutContainer,
+  Container,
+  EditFeeRateContainer,
+  FeeRate,
+  Flex1,
+  ListingDescContainer,
+  ListingDescriptionRow,
+  QuoteToBaseContainer,
+  RouteContainer,
+  SendButtonContainer,
+  SlippageButton,
+} from './index.styled';
 import QuoteSummaryTile from './quoteSummaryTile';
 import usePlaceOrder from './usePlaceOrder';
 import usePlaceUtxoOrder from './usePlaceUtxoOrder';
 
-const SlippageButton = styled.button<{ showWarning: boolean }>`
-  display: flex;
-  flex-direction: row;
-  column-gap: ${(props) => props.theme.space.xxs};
-  background: transparent;
-  align-items: center;
-  ${(props) => props.theme.typography.body_medium_m};
-  border-radius: 24px;
-  border: 1px solid ${(props) => props.theme.colors.white_800};
-  padding: ${(props) => props.theme.space.xxs} ${(props) => props.theme.space.s};
-  color: ${(props) =>
-    props.showWarning ? props.theme.colors.caution : props.theme.colors.white_0};
-`;
-const Container = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-  padding: `0 ${props.theme.space.m} ${props.theme.space.l} ${props.theme.space.m}`,
-  zIndex: 1,
-  backgroundColor: props.theme.colors.elevation0,
-}));
-
-const CalloutContainer = styled.div`
-  margin-bottom: ${(props) => props.theme.space.m};
-`;
-
-const Flex1 = styled.div`
-  flex: 1;
-  margin-top: 12px;
-`;
-
-const SendButtonContainer = styled.div((props) => ({
-  marginBottom: props.theme.space.s,
-}));
-
-const ListingDescContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: props.theme.space.s,
-  marginTop: props.theme.space.m,
-  marginBottom: props.theme.space.m,
-}));
-
-const ListingDescriptionRow = styled.div`
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-  flex: 1;
-  justify-content: space-between;
-  min-height: 24px;
-`;
-
-const RouteContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  flex: 1;
-  gap: 4px;
-`;
-
-const QuoteToBaseContainer = styled.div`
-  margin-top: 4px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const ArrowOuterContainer = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-`;
-
-const ArrowInnerContainer = styled.div`
-  position: relative;
-  z-index: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 50%;
-  border: 1px solid ${(props) => props.theme.colors.white_850};
-  background-color: ${(props) => props.theme.colors.background.elevation0};
-  padding: 8px;
-`;
-
-const EditFeeRateContainer = styled.div`
-  margin-top: ${(props) => props.theme.space.xxs};
-`;
-
-const FeeRate = styled.div`
-  ${(props) => props.theme.typography.body_medium_m};
-  color: ${(props) => props.theme.colors.white_0};
-  display: flex;
-  flex-direction: row;
-  align-self: flex-start;
-`;
-
-type QuoteSummaryProps = {
+type Props = {
   amount: string;
   fromToken?: FungibleToken;
   toToken?: FungibleToken;
@@ -164,7 +82,7 @@ export default function QuoteSummary({
   onStxOrderPlaced,
   onError,
   selectedIdentifiers,
-}: QuoteSummaryProps) {
+}: Props) {
   const { t } = useTranslation('translation');
 
   const { tokenInfo: sip10ToTokenInfo } = useGetSip10TokenInfo({
@@ -462,7 +380,7 @@ export default function QuoteSummary({
                 <SlippageButton
                   data-testid="slippage-button"
                   onClick={() => setShowSlippageModal(true)}
-                  showWarning={showSlippageWarning}
+                  $showWarning={showSlippageWarning}
                 >
                   {showSlippageWarning && (
                     <WarningOctagon weight="fill" color={theme.colors.caution} size={16} />
@@ -477,7 +395,7 @@ export default function QuoteSummary({
                 {t('SWAP_SCREEN.MIN_RECEIVE')}
               </StyledP>
               <StyledP data-testid="min-received-amount" typography="body_medium_m" color="white_0">
-                {formatNumber(quote.receiveAmount)} {toUnit}
+                <FormattedNumber number={formatBalance(quote.receiveAmount)} tokenSymbol={toUnit} />
               </StyledP>
             </ListingDescriptionRow>
             {Boolean(quote.feePercentage) && (

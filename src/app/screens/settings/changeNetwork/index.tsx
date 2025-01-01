@@ -4,6 +4,7 @@ import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   defaultMainnet,
+  defaultRegtest,
   defaultSignet,
   defaultTestnet,
   initialNetworksList,
@@ -169,6 +170,7 @@ function ChangeNetworkScreen() {
 
   const savedMainnet = savedNetworks.find((n) => n.type === 'Mainnet');
   const savedTestnet = savedNetworks.find((n) => n.type === 'Testnet');
+  const savedRegtest = savedNetworks.find((n) => n.type === 'Regtest');
   const savedSignet = savedNetworks.find((n) => n.type === 'Signet');
 
   return (
@@ -193,6 +195,13 @@ function ChangeNetworkScreen() {
         <NetworkRow
           network={savedSignet || defaultSignet}
           isSelected={formInputs.type === 'Signet'}
+          onNetworkSelected={onNetworkSelected}
+          disabled={isChangingNetwork}
+          showDivider={false}
+        />
+        <NetworkRow
+          network={savedRegtest || defaultRegtest}
+          isSelected={formInputs.type === 'Regtest'}
           onNetworkSelected={onNetworkSelected}
           disabled={isChangingNetwork}
           showDivider={false}

@@ -39,6 +39,7 @@ import AmountInput from './components/amountInput';
 import PsbtConfirmation from './components/psbtConfirmation/psbtConfirmation';
 import RouteItem from './components/routeItem';
 import TokenFromBottomSheet from './components/tokenFromBottomSheet';
+import useFromTokens from './components/tokenFromBottomSheet/useFromTokens';
 import TokenToBottomSheet from './components/tokenToBottomSheet';
 import trackSwapMixPanel from './mixpanel';
 import QuoteSummary from './quoteSummary';
@@ -61,12 +62,12 @@ const Container = styled.div((props) => ({
   padding: `0 ${props.theme.space.m} ${props.theme.space.l} ${props.theme.space.m}`,
 }));
 
-const Flex1 = styled.div<{ center?: boolean }>`
+const Flex1 = styled.div<{ $center?: boolean }>`
   display: flex;
   flex-direction: column;
   flex: 1;
-  justify-content: ${(props) => (props.center ? 'center' : 'flex-start')};
-  align-items: ${(props) => (props.center ? 'center' : 'normal')};
+  justify-content: ${(props) => (props.$center ? 'center' : 'flex-start')};
+  align-items: ${(props) => (props.$center ? 'center' : 'normal')};
 `;
 
 const RouteContainer = styled.div((props) => ({
@@ -117,6 +118,7 @@ export default function SwapScreen() {
   const [hasQuoteError, setHasQuoteError] = useState(false);
   const [orderInfo, setOrderInfo] = useState<OrderInfo | undefined>();
   const [stxOrderInfo, setStxOrderInfo] = useState<StxOrderInfo | undefined>();
+  const fromTokens = useFromTokens();
 
   const [selectedUtxos, setSelectedUtxos] = useState<Omit<MarketUtxo, 'token'>[]>();
   const [utxoProviderSendAmount, setUtxoProviderSendAmount] = useState<string | undefined>();
@@ -133,6 +135,7 @@ export default function SwapScreen() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const defaultFrom = params.get('from');
+  const defaultTo = params.get('to');
   const { quotes, loading: quotesLoading, error: quotesError, fetchQuotes } = useGetQuotes();
   const coinsMasterList = useVisibleMasterCoinsList();
   const { tokenInfo: sip10FromTokenInfoUSD } = useGetSip10TokenInfo({
@@ -145,7 +148,11 @@ export default function SwapScreen() {
       const token = coinsMasterList.find((coin) => coin.principal === defaultFrom);
       setFromToken(token);
     }
-  }, [defaultFrom, coinsMasterList]);
+    if (defaultTo) {
+      const token = coinsMasterList.find((coin) => coin.principal === defaultTo);
+      setToToken(token);
+    }
+  }, [defaultFrom, defaultTo, coinsMasterList]);
 
   const handleGoBack = () => {
     navigate('/');
@@ -200,11 +207,24 @@ export default function SwapScreen() {
     if (isSwapRouteDisabled) {
       return;
     }
+
     setInputError('');
     setAmount('');
     setHasQuoteError(false);
-    setFromToken(toToken);
-    setToToken(fromToken);
+    const newFrom = toToken;
+    const newTo = fromToken;
+    setFromToken(newFrom);
+    setToToken(newTo);
+
+    if (newFrom?.principal !== 'BTC') {
+      const matchingToken = fromTokens.find(
+        (token) => token.principal !== 'BTC' && token.principal === newFrom?.principal,
+      );
+
+      if (matchingToken) {
+        setFromToken(matchingToken);
+      }
+    }
   };
 
   const onChangeToToken = (token: Token) => {
@@ -550,7 +570,7 @@ export default function SwapScreen() {
             balance={getFromBalance()}
           />
           {hasQuoteError && (
-            <Flex1 center>
+            <Flex1 $center>
               <StyledP typography="body_m" color="white_200">
                 {t('SWAP_SCREEN.ERRORS.NO_PAIR_LIQUIDITY')}
               </StyledP>

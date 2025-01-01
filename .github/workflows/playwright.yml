@@ -43,6 +43,7 @@ jobs:
           path: ./build
           retention-days: 4
           if-no-files-found: error
+          overwrite: true
   UItest:
     needs: [build]
     name: E2E Test ${{ matrix.shardIndex }} of ${{ matrix.shardTotal }}
@@ -83,7 +84,7 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: all-blob-reports
+          name: blob-report-${{ matrix.shardIndex }}-of-${{ matrix.shardTotal }}
           path: blob-report
           retention-days: 1
           overwrite: true
@@ -110,8 +111,9 @@ jobs:
       - name: Download blob reports from GitHub Actions Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: all-blob-reports
+          pattern: blob-report-*
           path: all-blob-reports
+          merge-multiple: true
 
       - name: Merge into HTML Report
         run: npx playwright merge-reports --reporter html ./all-blob-reports
@@ -122,3 +124,4 @@ jobs:
           name: html-report--attempt-${{ github.run_attempt }}
           path: playwright-report
           retention-days: 4
+          overwrite: true

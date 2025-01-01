@@ -2,7 +2,9 @@ import type { Account, NetworkType } from '@secretkeylabs/xverse-core';
 
 export const filterLedgerAccountsByNetwork = (accounts: Account[], network: NetworkType) =>
   accounts.filter((account) =>
-    account.btcAddresses.taproot.address.startsWith(network === 'Mainnet' ? 'bc1' : 'tb1'),
+    account.btcAddresses.taproot.address.startsWith(
+      network === 'Mainnet' ? 'bc1' : network === 'Regtest' ? 'bcrt' : 'tb1',
+    ),
   );
 
 // this is used for migrating the old ledger accounts to the new format

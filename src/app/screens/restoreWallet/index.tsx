@@ -65,6 +65,7 @@ function RestoreWallet(): JSX.Element {
       await restoreWallet(seed, password);
       setIsRestoring(false);
 
+      // restoreWallet clears chrome storage, so we call this for react-persist to persist the state again
       changeBtcPaymentAddressType(btcPayAddressType);
 
       setCurrentStepIndex(2);
@@ -72,6 +73,11 @@ function RestoreWallet(): JSX.Element {
       setIsRestoring(false);
       setError(t('CREATE_PASSWORD_SCREEN.CONFIRM_PASSWORD_MATCH_ERROR'));
     }
+  };
+
+  const handleSelectedTypeChange = (addressType: BtcPaymentType) => {
+    changeBtcPaymentAddressType(addressType);
+    setBtcPayAddressType(addressType);
   };
 
   const onAccountTypeContinue = () => {
@@ -103,7 +109,7 @@ function RestoreWallet(): JSX.Element {
       key="addressType"
       seedPhrase={seedPhrase}
       selectedType={btcPayAddressType}
-      onSelectedTypeChange={setBtcPayAddressType}
+      onSelectedTypeChange={handleSelectedTypeChange}
       onContinue={onAccountTypeContinue}
     />,
   ];

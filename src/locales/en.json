@@ -288,7 +288,7 @@
     "STX_ADDRESS": "Stacks address",
     "STX_ADDRESS_DESC": "Only send SIP-010 tokens to this address",
     "COPY_ADDRESS": "Copy address",
-    "COPIED_ADDRESS": "Address copied to clipboard",
+    "COPIED_ADDRESS": "Copied to clipboard",
     "BTC_ADDRESS": "Bitcoin address",
     "ORDINAL_ADDRESS": "Ordinal, Runes & BRC-20 address",
     "ORDINALS_RECEIVE_MESSAGE": "Only use this address to receive Ordinals, Runes, and BRC-20 tokens.",
@@ -368,7 +368,9 @@
     "RATE_TOO_LOW": "Set fee is below minimum of {{minFee}} sats/vB",
     "RATE_TOO_HIGH": "Set fee is above maximum of {{maxFee}} sats/vB",
     "SPEND_DELEGATED_STX": "You are transferring some STX that is registered for the next stacking cycle. The amount transferred will be subtracted from your current stacking pool delegation, and will not be locked to generate rewards in the next cycle.",
-    "INVALID_FEE_RATE": "Invalid fee rate"
+    "INVALID_FEE_RATE": "Invalid fee rate",
+    "EMPTY_RUNE_BALANCE": "You don't have any {{symbol}} to send. You can swap BTC for {{symbol}} with Xverse.",
+    "SWAP_FROM_TO": "Swap {{from}} for {{to}}"
   },
   "CONFIRM_TRANSACTION": {
     "SEND": "Confirm Transaction",
@@ -947,6 +949,7 @@
     "INCORRECT_PASSWORD_ERROR": "Incorrect password",
     "TESTNET": "Testnet",
     "SIGNET": "Signet",
+    "REGTEST": "Regtest",
     "ORDINALS": "Ordinals",
     "ACTIVATE_ORDINAL_NFTS": "Display ordinals",
     "RECOVER_ASSETS": "Recover assets",
@@ -1020,6 +1023,8 @@
   "BUY_SCREEN": {
     "BUY": "Buy",
     "PURCHASE_CRYPTO": "Purchase crypto quickly and deposit directly into your Xverse wallet.",
+    "XVERSE_SWAPS": "Xverse Swaps",
+    "XVERSE_SWAPS_DESC": "Swap Crypto for Bitcoin. Fast, Easy, and No KYC!",
     "MOONPAY": "Moonpay",
     "TRANSAK": "Transak",
     "PAYPAL": "Paypal",
@@ -1029,7 +1034,7 @@
   },
   "LIST_RUNE_SCREEN": {
     "LISTING_STATUS": "Listing status",
-    "FLOOR_PRICE": "Floor Price: {{floor_price}} Sats/{{symbol}}",
+    "FLOOR_PRICE": "Floor Price: ",
     "LISTED_FOR": "Listed for {{floor_price}} Sats/{{symbol}}",
     "FAILED_TO_LIST": "Failed to list",
     "SELECT_RUNES": "Select Runes",
@@ -1047,7 +1052,7 @@
     "SET_PRICES": "Set price",
     "EDIT_PRICE": "Edit price",
     "MAGIC_EDEN_FLOOR_PRICE": "The Magic Eden floor price is currently {{sats}} sats/{{symbol}}",
-    "MARKETPLACE_FLOOR_PRICE": "The floor price for {{marketplaces}} is currently {{sats}} Sats/{{symbol}}",
+    "MARKETPLACE_FLOOR_PRICE": "The floor price for {{marketplaces}} is currently ",
     "NO_FLOOR_PRICE": "There is no floor price for {{symbol}}",
     "TOTAL_LISTED": "Total listed",
     "TOTAL_RECEIVED_IF_SOLD": "Total received if sold",

@@ -9,6 +9,7 @@ import SelectAccount from '@screens/connect/selectAccount';
 import { getAppIconFromWebManifest } from '@secretkeylabs/xverse-core';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
+import { getStxNetworkForBtcNetwork } from '@utils/helper';
 import RoutePaths from 'app/routes/paths';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -57,7 +58,7 @@ function StxSelectAddressScreen() {
 
   useEffect(() => {
     // Handle address requests to a network that's not currently active
-    if (payload.network.type !== network.type) {
+    if (payload.network.type !== getStxNetworkForBtcNetwork(network.type)) {
       navigate('/tx-status', {
         state: {
           txid: '',

@@ -29,7 +29,7 @@ function BtcAmountText({ className, btcAmount }: Props) {
     <NumericFormat
       value={btcAmount}
       displayType="text"
-      prefix={`~ ${BTC_SYMBOL}`}
+      prefix={BTC_SYMBOL}
       thousandSeparator
       renderText={(value: string) => <AmountText>{value}</AmountText>}
     />

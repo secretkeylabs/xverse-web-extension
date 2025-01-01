@@ -4,6 +4,7 @@ import logo from '@assets/img/xverse_logo.svg';
 import useSeedVault from '@hooks/useSeedVault';
 import useSeedVaultMigration from '@hooks/useSeedVaultMigration';
 import useWalletReducer from '@hooks/useWalletReducer';
+import useWalletSession from '@hooks/useWalletSession';
 import { useSpring } from '@react-spring/web';
 import MigrationConfirmation from '@screens/migrationConfirmation';
 import { AnalyticsEvents } from '@secretkeylabs/xverse-core';
@@ -39,6 +40,7 @@ function Login(): JSX.Element {
   const [error, setError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [showMigration, setShowMigration] = useState(false);
+  const { setSessionStartTime } = useWalletSession();
 
   const styles = useSpring({
     from: {
@@ -99,6 +101,7 @@ function Login(): JSX.Element {
   const handleVerifyPassword = async () => {
     setIsVerifying(true);
     try {
+      await setSessionStartTime();
       await unlockWallet(password);
       await onPasswordVerify();
     } catch (err) {

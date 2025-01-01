@@ -43,6 +43,8 @@ export const fetchBrc20FungibleTokens =
         }
         return {
           ...ft,
+          priceChangePercentage24h: found.priceChangePercentage24h,
+          currentPrice: found.currentPrice,
           tokenFiatRate: Number(found.tokenFiatRate),
           name: found.name,
         };

@@ -132,6 +132,11 @@ function ScreenContainer({
               <TestnetText>{t('SETTING_SCREEN.SIGNET')}</TestnetText>
             </TestnetContainer>
           )}
+          {network.type === 'Regtest' && (
+            <TestnetContainer>
+              <TestnetText>{t('SETTING_SCREEN.REGTEST')}</TestnetText>
+            </TestnetContainer>
+          )}
           <Outlet />
         </RouteContainer>
         {isInOption && (
