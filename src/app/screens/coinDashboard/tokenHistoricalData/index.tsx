@@ -9,7 +9,10 @@ import { useState, type Dispatch, type SetStateAction } from 'react';
 import styled from 'styled-components';
 import { Button } from '../index.styled';
 import type { ChartPriceStats } from '../tokenPrice';
-import HistoricalDataChart, { HistoricalDataChartLoader } from './HistoricalDataChart';
+import HistoricalDataChart, {
+  EmptyHistoricalDataChart,
+  LoadingHistoricalDataChart,
+} from './HistoricalDataChart';
 
 const TabContainer = styled.div((props) => ({
   display: 'flex',
@@ -48,10 +51,12 @@ export default function TokenHistoricalData({
         ))}
       </TabContainer>
       {isLoading ? (
-        <HistoricalDataChartLoader />
+        <LoadingHistoricalDataChart />
       ) : data?.length ? (
         <HistoricalDataChart data={data} setChartPriceStats={setChartPriceStats} />
-      ) : null}
+      ) : (
+        <EmptyHistoricalDataChart />
+      )}
     </>
   );
 }

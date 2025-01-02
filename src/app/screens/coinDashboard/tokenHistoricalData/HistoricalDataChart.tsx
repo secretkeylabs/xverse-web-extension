@@ -1,4 +1,5 @@
 import { BetterBarLoader } from '@components/barLoader';
+import { Selection } from '@phosphor-icons/react';
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
 import { Area, AreaChart, Tooltip, XAxis, YAxis } from 'recharts';
 import styled from 'styled-components';
@@ -19,9 +20,38 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: any })
 const StyledBetterBarLoader = styled(BetterBarLoader)<{}>({
   marginLeft: '-21px',
 });
-
-export function HistoricalDataChartLoader() {
+export function LoadingHistoricalDataChart() {
   return <StyledBetterBarLoader width={370} height={215} />;
+}
+
+const EmptyHistoricalDataChartContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: Theme.space.xxs,
+  marginRight: Theme.space.m,
+});
+const StyledSelection = styled(Selection)({
+  marginBottom: '20px',
+});
+const Title = styled.h1({
+  ...Theme.typography.body_medium_l,
+  textAlign: 'center',
+});
+const Text = styled.p({
+  ...Theme.typography.body_m,
+  color: Theme.colors.white_400,
+  textAlign: 'center',
+});
+export function EmptyHistoricalDataChart() {
+  return (
+    <EmptyHistoricalDataChartContainer>
+      <StyledSelection color={Theme.colors.white_600} size="40" />
+
+      <Title>No Market Data Yet</Title>
+      <Text>When market data is available for this token, it will appear here.</Text>
+    </EmptyHistoricalDataChartContainer>
+  );
 }
 
 export default function HistoricalDataChart({
