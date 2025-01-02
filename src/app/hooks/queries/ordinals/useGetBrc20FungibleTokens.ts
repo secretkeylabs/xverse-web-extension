@@ -2,7 +2,6 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   getBrc20Tokens,
-  getFungibleTokenStates,
   getOrdinalsFtBalance,
   type Brc20Token,
   type FungibleToken,
@@ -10,6 +9,8 @@ import {
   type SettingsNetwork,
 } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
+import { selectWithDerivedState } from '@utils/tokens';
+import useGetTopTokens from '../useGetTopTokens';
 
 const brc20TokenToFungibleToken = (coin: Brc20Token): FungibleToken => ({
   name: coin.name,
@@ -60,30 +61,22 @@ export const useGetBrc20FungibleTokens = (select?: (data: FungibleTokenWithState
   const { ordinalsAddress } = useSelectedAccount();
   const { brc20ManageTokens, fiatCurrency, network, spamTokens, showSpamTokens } =
     useWalletSelector();
+  const { data: topTokensData } = useGetTopTokens();
 
   const queryFn = fetchBrc20FungibleTokens(ordinalsAddress, fiatCurrency, network);
-  const selectWithDerivedState = (data: FungibleToken[]) => {
-    const withDerivedState = data.map(
-      (ft: FungibleToken) =>
-        ({
-          ...ft,
-          ...getFungibleTokenStates({
-            fungibleToken: ft,
-            manageTokens: brc20ManageTokens,
-            spamTokens,
-            showSpamTokens,
-          }),
-        } as FungibleTokenWithStates),
-    );
-    return select ? select(withDerivedState) : withDerivedState;
-  };
 
   return useQuery({
     queryKey: ['brc20-fungible-tokens', ordinalsAddress, network.type, fiatCurrency],
     queryFn,
     enabled: Boolean(network && ordinalsAddress),
     keepPreviousData: true,
-    select: selectWithDerivedState,
+    select: selectWithDerivedState({
+      manageTokens: brc20ManageTokens,
+      spamTokens,
+      showSpamTokens,
+      topTokensData: topTokensData?.['brc-20'],
+      select,
+    }),
   });
 };
 
