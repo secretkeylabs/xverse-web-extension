@@ -4,13 +4,12 @@ import {
   type FungibleToken,
   type HistoricalDataParamsPeriod,
 } from '@secretkeylabs/xverse-core';
-import Spinner from '@ui-library/spinner';
 import type { CurrencyTypes } from '@utils/constants';
 import { useState, type Dispatch, type SetStateAction } from 'react';
 import styled from 'styled-components';
 import { Button } from '../index.styled';
 import type { ChartPriceStats } from '../tokenPrice';
-import HistoricalDataChart from './HistoricalDataChart';
+import HistoricalDataChart, { HistoricalDataChartLoader } from './HistoricalDataChart';
 
 const TabContainer = styled.div((props) => ({
   display: 'flex',
@@ -18,13 +17,6 @@ const TabContainer = styled.div((props) => ({
   marginTop: props.theme.space.m,
   marginBottom: props.theme.space.xl,
 }));
-
-const LoadingContainer = styled.div({
-  display: 'flex',
-  flex: 1,
-  justifyContent: 'left',
-  alignItems: 'center',
-});
 
 type TokenHistoricalDataProps = {
   currency: CurrencyTypes;
@@ -56,9 +48,7 @@ export default function TokenHistoricalData({
         ))}
       </TabContainer>
       {isLoading ? (
-        <LoadingContainer>
-          <Spinner color="white" size={20} />
-        </LoadingContainer>
+        <HistoricalDataChartLoader />
       ) : data?.length ? (
         <HistoricalDataChart data={data} setChartPriceStats={setChartPriceStats} />
       ) : null}

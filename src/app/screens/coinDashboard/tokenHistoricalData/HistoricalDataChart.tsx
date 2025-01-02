@@ -1,5 +1,7 @@
+import { BetterBarLoader } from '@components/barLoader';
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
 import { Area, AreaChart, Tooltip, XAxis, YAxis } from 'recharts';
+import styled from 'styled-components';
 import Theme from 'theme';
 import type { ChartPriceStats } from '../tokenPrice';
 
@@ -12,6 +14,14 @@ function CustomTooltip({ active, payload }: { active?: boolean; payload?: any })
   return active && payload && payload.length ? (
     <span>{payload[0].payload.tooltipLabel}</span>
   ) : null;
+}
+
+const StyledBetterBarLoader = styled(BetterBarLoader)<{}>({
+  marginLeft: '-21px',
+});
+
+export function HistoricalDataChartLoader() {
+  return <StyledBetterBarLoader width={370} height={215} />;
 }
 
 export default function HistoricalDataChart({
