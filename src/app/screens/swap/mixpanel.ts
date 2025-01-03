@@ -2,86 +2,92 @@ import {
   getBtcFiatEquivalent,
   getStxFiatEquivalent,
   stxToMicrostacks,
-  type Coin,
   type FungibleToken,
   type Provider,
   type Quote,
 } from '@secretkeylabs/xverse-core';
-import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
-import { getTrackingIdentifier, isRunesTx } from './utils';
 
-// TODO add typing to this. the properties actually sent to mixpanel no longer match what's defined in xverse-core
-function trackSwapMixPanel(
-  eventName,
-  {
-    provider,
+const getFiatEquivalent = (
+  token: FungibleToken | undefined,
+  amount: BigNumber,
+  btcUsdRate: BigNumber,
+  runeFloorPrice?: BigNumber,
+  stxBtcRate?: BigNumber,
+  stxTokenFiatValue?: BigNumber,
+) => {
+  if (!token || amount.isZero()) {
+    return undefined;
+  }
+
+  if (token.principal === 'BTC') {
+    return getBtcFiatEquivalent(amount, btcUsdRate).toFixed(2);
+  }
+
+  if (token.protocol === 'runes' && runeFloorPrice) {
+    return getBtcFiatEquivalent(runeFloorPrice.multipliedBy(amount), btcUsdRate).toFixed(2);
+  }
+
+  if (token.principal === 'STX' && stxBtcRate) {
+    return getStxFiatEquivalent(stxToMicrostacks(amount), stxBtcRate, btcUsdRate).toFixed(2);
+  }
+
+  return amount.multipliedBy(stxTokenFiatValue ?? 0).toFixed(2);
+};
+
+export type SwapTrackingProperties = {
+  provider?: Provider;
+  fromToken?: FungibleToken;
+  toToken?: FungibleToken;
+  amount: string;
+  quote?: Quote;
+  btcUsdRate: BigNumber;
+  fromRuneFloorPrice?: BigNumber;
+  fromStxTokenFiatValue?: BigNumber;
+  stxBtcRate?: BigNumber;
+};
+
+export const getSwapsMixpanelProperties = ({
+  provider,
+  fromToken,
+  toToken,
+  amount,
+  quote,
+  btcUsdRate,
+  fromRuneFloorPrice,
+  fromStxTokenFiatValue,
+  stxBtcRate,
+}: SwapTrackingProperties) => {
+  const from =
+    fromToken?.principal === 'BTC' || fromToken?.principal === 'STX'
+      ? fromToken?.principal
+      : fromToken?.name;
+  const to = toToken?.principal === 'BTC' ? 'BTC' : toToken?.name ?? toToken?.ticker;
+
+  const fromTokenAmount = amount;
+
+  const fromTokenUsdValue = getFiatEquivalent(
     fromToken,
-    toToken,
-    amount,
-    quote,
+    new BigNumber(amount),
     btcUsdRate,
+    fromRuneFloorPrice,
     stxBtcRate,
-    fromTokenInfo,
-  }: {
-    provider?: Provider;
-    fromToken?: FungibleToken;
-    toToken?: FungibleToken;
-    amount: string;
-    quote?: Quote;
-    btcUsdRate: string;
-    stxBtcRate?: string;
-    fromTokenInfo?: Coin;
-  },
-) {
-  let fromTokenAmount;
-  let toTokenAmount;
-  let fromTokenUsdValue;
-  let fromPrincipal;
-  let toPrincipal;
+    fromStxTokenFiatValue,
+  );
 
-  const from = getTrackingIdentifier(fromToken);
-  const to = getTrackingIdentifier(toToken);
+  const toTokenAmount = quote?.receiveAmount;
 
-  const receiveAmount = quote?.receiveAmount ? new BigNumber(quote?.receiveAmount) : undefined;
+  const fromPrincipal = fromToken?.protocol === 'stacks' ? fromToken?.principal : undefined;
+  const toPrincipal = toToken?.protocol === 'stacks' ? toToken?.principal : undefined;
 
-  if (receiveAmount) {
-    toTokenAmount = receiveAmount.toFixed(2);
-  }
-
-  if (fromToken && toToken && isRunesTx({ fromToken, toToken })) {
-    fromTokenUsdValue =
-      fromToken?.principal === 'BTC'
-        ? getBtcFiatEquivalent(new BigNumber(amount), new BigNumber(btcUsdRate)).toFixed(2)
-        : new BigNumber(fromToken?.tokenFiatRate ?? 0).multipliedBy(amount).toFixed(2);
-    fromTokenAmount = amount;
-  } else if (stxBtcRate) {
-    fromPrincipal = fromToken?.principal;
-    toPrincipal = toToken?.principal;
-
-    fromTokenAmount = amount;
-    fromTokenUsdValue =
-      fromToken?.principal === 'STX'
-        ? getStxFiatEquivalent(
-            stxToMicrostacks(new BigNumber(amount)),
-            new BigNumber(stxBtcRate),
-            new BigNumber(btcUsdRate),
-          ).toFixed(2)
-        : fromTokenInfo?.tokenFiatRate
-        ? new BigNumber(fromTokenInfo?.tokenFiatRate).multipliedBy(amount).toFixed(2)
-        : 0;
-  }
-
-  trackMixPanel(eventName, {
-    ...(provider ? { provider: provider?.name } : {}),
-    ...(from ? { from } : {}),
-    ...(to ? { to } : {}),
-    ...(fromPrincipal ? { fromPrincipal } : {}),
-    ...(toPrincipal ? { toPrincipal } : {}),
+  return {
+    ...(provider && { provider: provider.name }),
+    ...(from && { from }),
+    ...(to && { to }),
+    ...(fromPrincipal && { fromPrincipal }),
+    ...(toPrincipal && { toPrincipal }),
     ...(fromTokenAmount ? { fromTokenAmount } : {}),
-    ...(fromTokenUsdValue ? { fromTokenUsdValue } : {}),
+    ...{ fromTokenUsdValue: fromTokenUsdValue ?? 0 },
     ...(toTokenAmount ? { toTokenAmount } : {}),
-  });
-}
-
-export default trackSwapMixPanel;
+  };
+};
