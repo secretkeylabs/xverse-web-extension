@@ -12,6 +12,7 @@ import type { ChartPriceStats } from '../tokenPrice';
 import HistoricalDataChart, {
   EmptyHistoricalDataChart,
   LoadingHistoricalDataChart,
+  MissingPeriodHistoricalDataChart,
 } from './HistoricalDataChart';
 
 const TabContainer = styled.div((props) => ({
@@ -36,6 +37,9 @@ export default function TokenHistoricalData({
   const [currentTab, setCurrentTab] = useState<HistoricalDataParamsPeriod>('1d');
   const { data, isLoading } = useGetHistoricalData(fungibleToken?.name || currency, currentTab);
 
+  const noDataAtAll = !isLoading && !data?.length && currentTab === '1d';
+  if (noDataAtAll) return <EmptyHistoricalDataChart />;
+
   return (
     <>
       <TabContainer>
@@ -55,7 +59,7 @@ export default function TokenHistoricalData({
       ) : data?.length ? (
         <HistoricalDataChart data={data} setChartPriceStats={setChartPriceStats} />
       ) : (
-        <EmptyHistoricalDataChart />
+        <MissingPeriodHistoricalDataChart />
       )}
     </>
   );

@@ -1,5 +1,5 @@
 import { BetterBarLoader } from '@components/barLoader';
-import { Selection } from '@phosphor-icons/react';
+import { ChartLine } from '@phosphor-icons/react';
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
 import { Area, AreaChart, Tooltip, XAxis, YAxis } from 'recharts';
 import styled from 'styled-components';
@@ -30,8 +30,10 @@ const EmptyHistoricalDataChartContainer = styled.div({
   alignItems: 'center',
   gap: Theme.space.xxs,
   marginRight: Theme.space.m,
+  marginTop: Theme.space.xxl,
+  height: '130px',
 });
-const StyledSelection = styled(Selection)({
+const StyledChartLine = styled(ChartLine)({
   marginBottom: '20px',
 });
 const Title = styled.h1({
@@ -46,11 +48,23 @@ const Text = styled.p({
 export function EmptyHistoricalDataChart() {
   return (
     <EmptyHistoricalDataChartContainer>
-      <StyledSelection color={Theme.colors.white_600} size="40" />
+      <StyledChartLine color={Theme.colors.white_600} size="40" />
 
       <Title>No Market Data Yet</Title>
       <Text>When market data is available for this token, it will appear here.</Text>
     </EmptyHistoricalDataChartContainer>
+  );
+}
+
+const MissingPeriodHistoricalDataChartContainer = styled.div({
+  marginTop: '104px',
+  marginBottom: '154px',
+});
+export function MissingPeriodHistoricalDataChart() {
+  return (
+    <MissingPeriodHistoricalDataChartContainer>
+      <Text>No data for this time period.</Text>
+    </MissingPeriodHistoricalDataChartContainer>
   );
 }
 
