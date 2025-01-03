@@ -35,7 +35,7 @@ const getFiatEquivalent = (
   return amount.multipliedBy(stxTokenFiatValue ?? 0).toFixed(2);
 };
 
-export type SwapTrackingProperties = {
+type SwapTrackingProperties = {
   provider?: Provider;
   fromToken?: FungibleToken;
   toToken?: FungibleToken;
@@ -47,7 +47,7 @@ export type SwapTrackingProperties = {
   stxBtcRate?: BigNumber;
 };
 
-export const getSwapsMixpanelProperties = ({
+const getSwapsMixpanelProperties = ({
   provider,
   fromToken,
   toToken,
@@ -91,3 +91,6 @@ export const getSwapsMixpanelProperties = ({
     ...(toTokenAmount ? { toTokenAmount } : {}),
   };
 };
+
+// eslint-disable-next-line import/prefer-default-export
+export { getSwapsMixpanelProperties };
