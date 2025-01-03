@@ -41,7 +41,7 @@
     "SCREEN_TITLE": "The Bitcoin wallet for everyone",
     "CREATE_WALLET_BUTTON": "Create a new wallet",
     "RESTORE_WALLET_BUTTON": "Restore an existing wallet",
-    "ONBOARDING_1_TITLE": "Store BTC, Runes, Ordinals, BRC20, Rare Sats, STX and more!",
+    "ONBOARDING_1_TITLE": "Store BTC, Runes, Ordinals, BRC-20, Rare Sats, STX and more!",
     "ONBOARDING_2_TITLE": "Connect to your favorite Bitcoin apps"
   },
   "LEDGER_IMPORT_SCREEN": {
@@ -228,7 +228,7 @@
     "SAVE": "Save",
     "CONFIRM": "Confirm",
     "MANAGE_TOKEN": "Manage token list",
-    "STACKS_AND_TOKEN": "Stacks NFTs & SIP-10 tokens",
+    "STACKS_AND_TOKEN": "STX, Stacks SIP-10 & NFTs",
     "ORDINALS_AND_BRC20": "Ordinals, BRC-20 & Runes",
     "VERIFY_ADDRESSES_ON_LEDGER": "Verify addresses on Ledger",
     "VIEW_ADDRESSES": "View addresses",
@@ -247,8 +247,8 @@
     "ERRORS": {
       "BTC_BALANCE": "Failed to load Bitcoin balance",
       "STX_BALANCE": "Failed to load Stacks balance",
-      "SIP10_BALANCE": "Failed to load SIP10 token balances",
-      "BRC20_BALANCE": "Failed to load BRC20 token balances",
+      "SIP10_BALANCE": "Failed to load SIP-10 token balances",
+      "BRC20_BALANCE": "Failed to load BRC-20 token balances",
       "RUNES_BALANCE": "Failed to load Rune balances"
     },
     "ANNOUNCEMENTS": {
@@ -290,9 +290,9 @@
     "COPY_ADDRESS": "Copy address",
     "COPIED_ADDRESS": "Copied to clipboard",
     "BTC_ADDRESS": "Bitcoin address",
-    "ORDINAL_ADDRESS": "Ordinal, Runes & BRC-20 address",
+    "ORDINAL_ADDRESS": "Ordinals, Runes & BRC-20 address",
     "ORDINALS_RECEIVE_MESSAGE": "Only use this address to receive Ordinals, Runes, and BRC-20 tokens.",
-    "STX_RECEIVE_MESSAGE": "Only use this address to receive SIP-10 tokens.",
+    "STX_RECEIVE_MESSAGE": "Only use this address to receive STX, SIP-10 tokens & Stacks NFTs",
     "BTC_RECEIVE_MESSAGE": "Only use this address to receive Bitcoin.",
     "CALLOUTS": {
       "NATIVE_SEGWIT": {
@@ -1391,7 +1391,7 @@
       "ADDRESS_REQUIRED": "Recipient address is required",
       "AMOUNT_REQUIRED": "Amount is required",
       "ADDRESS_INVALID": "Recipient address invalid",
-      "INSUFFICIENT_BALANCE": "Insufficient BRC20 balance",
+      "INSUFFICIENT_BALANCE": "Insufficient BRC-20 balance",
       "INSUFFICIENT_BALANCE_FEES": "Insufficient BTC balance for transaction fees",
       "SERVER_ERROR": "Unexpected error"
     },
@@ -1409,7 +1409,7 @@
   "CONFIRM_BRC20": {
     "BITCOIN_VALUE": "Bundle size",
     "ERROR_CODES": {
-      "INSUFFICIENT_BALANCE": "Insufficient BRC20 balance",
+      "INSUFFICIENT_BALANCE": "Insufficient BRC-20 balance",
       "INSUFFICIENT_FUNDS": "Insufficient BTC balance for transaction fees",
       "FAILED_TO_FINALIZE": "Failed to finalize",
       "UTXOS_MISSING": "UTXOs missing",
