@@ -11,15 +11,11 @@ const useGetHistoricalData = (id: string, period: HistoricalDataParamsPeriod) =>
   const { data: exchangeRates } = useGetExchangeRate('USD');
   const exchangeRate = exchangeRates ? Number(exchangeRates[fiatCurrency]) : 1;
 
-  const queryFn = async () => {
-    const response = await xverseApi.getHistoricalData(id, period, exchangeRate);
-    return response;
-  };
-
   return useQuery({
+    // eslint-disable-next-line
     queryKey: ['get-historical-data', id, period, fiatCurrency],
-    staleTime: 60 * 60 * 1000, // 1 hour
-    queryFn,
+    queryFn: () => xverseApi.getHistoricalData(id, period, exchangeRate),
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 };
 

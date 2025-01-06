@@ -134,10 +134,7 @@ function PercentageChange({
       [BigNumber(0), BigNumber(0)],
     );
 
-  if (!chartPriceStats) {
-    if (currentBalance.eq(0) && oldBalance.eq(0) && displayTimeInterval) return null;
-    if (currentBalance.eq(0) || oldBalance.eq(0)) return null;
-  }
+  if (!chartPriceStats && (currentBalance.eq(0) || oldBalance.eq(0))) return null;
 
   const priceChangePercentage24h = chartPriceStats?.change
     ? BigNumber(chartPriceStats.change).minus(1)

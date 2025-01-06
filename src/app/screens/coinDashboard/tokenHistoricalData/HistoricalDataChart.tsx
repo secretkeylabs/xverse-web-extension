@@ -1,17 +1,28 @@
 import { BetterBarLoader } from '@components/barLoader';
 import { ChartLine } from '@phosphor-icons/react';
+import type {
+  HistoricalDataResponsePrice,
+  HistoricalDataResponsePrices,
+} from '@secretkeylabs/xverse-core';
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Area, AreaChart, Tooltip, XAxis, YAxis } from 'recharts';
 import styled from 'styled-components';
 import Theme from 'theme';
 import type { ChartPriceStats } from '../tokenPrice';
 
 type HistoricalDataChartProps = {
-  data: { x: number; y: number; tooltipLabel: string }[];
+  data: HistoricalDataResponsePrices;
   setChartPriceStats: Dispatch<SetStateAction<ChartPriceStats | undefined>>;
 };
 
-function CustomTooltip({ active, payload }: { active?: boolean; payload?: any }) {
+function CustomTooltip({
+  active,
+  payload,
+}: {
+  active?: boolean;
+  payload?: undefined | [{ payload: HistoricalDataResponsePrice }];
+}) {
   return active && payload && payload.length ? (
     <span>{payload[0].payload.tooltipLabel}</span>
   ) : null;
@@ -46,12 +57,14 @@ const Text = styled.p({
   textAlign: 'center',
 });
 export function EmptyHistoricalDataChart() {
+  const { t } = useTranslation('translation', { keyPrefix: 'COIN_PRICE_CHART.EMPTY_CHART' });
+
   return (
     <EmptyHistoricalDataChartContainer>
       <StyledChartLine color={Theme.colors.white_600} size="40" />
 
-      <Title>No Market Data Yet</Title>
-      <Text>When market data is available for this token, it will appear here.</Text>
+      <Title>{t('TITLE')}</Title>
+      <Text>{t('TEXT')}</Text>
     </EmptyHistoricalDataChartContainer>
   );
 }
@@ -61,9 +74,11 @@ const MissingPeriodHistoricalDataChartContainer = styled.div({
   marginBottom: '154px',
 });
 export function MissingPeriodHistoricalDataChart() {
+  const { t } = useTranslation('translation', { keyPrefix: 'COIN_PRICE_CHART.MISSING_PERIOD' });
+
   return (
     <MissingPeriodHistoricalDataChartContainer>
-      <Text>No data for this time period.</Text>
+      <Text>{t('TEXT')}</Text>
     </MissingPeriodHistoricalDataChartContainer>
   );
 }
@@ -79,7 +94,7 @@ export default function HistoricalDataChart({
   const { colors } = Theme;
   const increased = last > first;
   const strokeColor = increased ? colors.success_medium : colors.danger_medium;
-  const fillColor = increased ? colors.emerald : '#F00';
+  const fillColor = increased ? colors.emerald : colors.red_0;
 
   const onMouseLeave = () => setChartPriceStats(defaultChartPriceStats);
   const onMouseMove = (e) => {

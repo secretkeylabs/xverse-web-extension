@@ -28,16 +28,17 @@ type TokenHistoricalDataProps = {
   setChartPriceStats: Dispatch<SetStateAction<ChartPriceStats | undefined>>;
 };
 
+const FIRST_TAB: HistoricalDataParamsPeriod = '1d';
+
 export default function TokenHistoricalData({
   currency,
   fungibleToken,
   setChartPriceStats,
 }: TokenHistoricalDataProps) {
-  // const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
-  const [currentTab, setCurrentTab] = useState<HistoricalDataParamsPeriod>('1d');
+  const [currentTab, setCurrentTab] = useState<HistoricalDataParamsPeriod>(FIRST_TAB);
   const { data, isLoading } = useGetHistoricalData(fungibleToken?.name || currency, currentTab);
 
-  const noDataAtAll = !isLoading && !data?.length && currentTab === '1d';
+  const noDataAtAll = !isLoading && !data?.length && currentTab === FIRST_TAB;
   if (noDataAtAll) return <EmptyHistoricalDataChart />;
 
   return (
