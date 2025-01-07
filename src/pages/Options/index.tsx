@@ -7,7 +7,6 @@ import './index.css';
 
 declare const VERSION: string;
 
-
 const renderApp = async () => {
   persistQueryClient({
     queryClient,

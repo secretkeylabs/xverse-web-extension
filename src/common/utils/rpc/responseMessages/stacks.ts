@@ -67,3 +67,14 @@ export function sendDeployContractSuccessResponseMessage({
 }: DeployContractSuccessArgs) {
   sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
 }
+
+type SignTransactionsSuccessArgs = BaseArgs & {
+  result: Return<'stx_signTransactions'>;
+};
+export function sendSignTransactionsSuccessResponseMessage({
+  tabId,
+  messageId,
+  result,
+}: SignTransactionsSuccessArgs) {
+  sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
+}

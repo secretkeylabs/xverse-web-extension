@@ -14,6 +14,8 @@ import {
   stxSignStructuredMessageRequestMessageSchema,
   stxSignTransactionMethodName,
   stxSignTransactionRequestMessageSchema,
+  stxSignTransactionsMethodName,
+  stxSignTransactionsRequestMessageSchema,
   stxTransferStxMethodName,
   stxTransferStxRequestMessageSchema,
 } from '@sats-connect/core';
@@ -26,6 +28,7 @@ import handleGetStxAddresses from '../stx/getAddresses';
 import handleStacksSignMessage from '../stx/signMessage';
 import handleStacksSignStructuredMessage from '../stx/signStructuredMessage';
 import { signTransaction } from '../stx/signTransaction';
+import { signTransactions } from '../stx/signTransactions';
 import transferStx from '../stx/transferStx';
 import { getCurrentAccountResourceId } from './common';
 
@@ -65,6 +68,10 @@ export const router: Record<string, Handler> = {
   [stxSignTransactionMethodName]: validateMessageSchema(
     stxSignTransactionRequestMessageSchema,
     signTransaction,
+  ),
+  [stxSignTransactionsMethodName]: validateMessageSchema(
+    stxSignTransactionsRequestMessageSchema,
+    signTransactions,
   ),
   [stxTransferStxMethodName]: validateMessageSchema(
     stxTransferStxRequestMessageSchema,

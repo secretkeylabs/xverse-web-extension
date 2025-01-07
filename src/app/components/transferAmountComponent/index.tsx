@@ -96,7 +96,6 @@ const Button = styled.button((props) => ({
 
 interface Props {
   title: string;
-  description?: string;
   value: string;
   address?: string;
   subTitle?: string;
@@ -104,15 +103,7 @@ interface Props {
   icon?: string;
 }
 
-function TransferAmountComponent({
-  title,
-  address,
-  value,
-  subValue,
-  description,
-  icon,
-  subTitle,
-}: Props) {
+function TransferAmountComponent({ title, address, value, subValue, icon, subTitle }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -157,7 +148,6 @@ function TransferAmountComponent({
 
       {isExpanded && (
         <ExpandedContainer style={slideInStyles}>
-          {description && <DescriptionText>{description}</DescriptionText>}
           <RowContainer>
             {icon && <Icon src={icon} />}
             <TitleText>{subValue === '' ? t('AMOUNT') : t('ASSET')}</TitleText>

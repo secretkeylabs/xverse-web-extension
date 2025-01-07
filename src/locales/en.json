@@ -27,7 +27,8 @@
     "COLLECTIBLES": "Collectibles",
     "EARN": "Earn",
     "EXPLORE": "Explore",
-    "SETTINGS": "Settings"
+    "SETTINGS": "Settings",
+    "TRANSACTION": "Transaction"
   },
   "INFORMATION": {
     "ORDINALS_ADDRESS_TOOLTIP": "These sats are used for your ordinals and runes. They cannot be spent with Xverse wallet.",
@@ -64,7 +65,13 @@
       "STX_SUBTITLE": "To continue, connect your Ledger device, make sure it's unlocked, and open the Stacks app.",
       "TITLE_FAILED": "Connection failed",
       "BTC_SUBTITLE_FAILED": "Make sure your Ledger device is connected, unlocked, authorised by your browser and the Bitcoin app is open.",
-      "STX_SUBTITLE_FAILED": "Make sure your Ledger device is connected, unlocked, authorised by your browser and the Stacks app is open."
+      "STX_SUBTITLE_FAILED": "Make sure your Ledger device is connected, unlocked, authorised by your browser and the Stacks app is open.",
+      "ALT": {
+        "CONNECT_STX_ALT": "Initiate Stacks connection",
+        "CONNECT_ERROR_ALT": "Connection error",
+        "CONNECT_SUCCESS_ALT": "Connection success",
+        "DEFAULT_ALT": "Use Ledger device"
+      }
     },
     "LEDGER_ADD_ADDRESS": {
       "TITLE_BTC": "Add a Bitcoin wallet",
@@ -431,7 +438,9 @@
     "THIS_MAY_TAKE_A_FEW_MINUTES": "This may take a few minutes, please keep this window open.",
     "TRANSACTIONS_BROADCASTED": "Transactions broadcasted",
     "TRANSACTIONS_FAILED_TO_BROADCAST": "{{failed}}/{{total}} transactions failed to broadcast",
+    "SOME_TRANSACTIONS_FAILED_TO_BROADCAST": "Some transactions failed to broadcast",
     "CHECK_THE_APP_YOU_USE": "Please check the app you are using.",
+    "TRANSACTION_SIGNED": "Transaction signed",
     "TRANSACTIONS_SIGNED": "Transactions signed",
     "PSBT_NO_BROADCAST_DISCLAIMER": "This transaction will not be broadcasted from your wallet. It may be broadcasted later by a third party.",
     "PSBTS_NO_BROADCAST_DISCLAIMER": "These transactions will not be broadcasted from your wallet. They may be broadcasted later by a third party.",
@@ -477,6 +486,7 @@
       },
       "CONFIRM": {
         "TITLE": "Confirm the transaction",
+        "TITLE_MULTIPLE": "Confirm transaction {{current}}/{{total}}",
         "SUBTITLE": "Authorise the transaction on your device to continue.",
         "ERROR_TITLE": "Transaction denied",
         "ERROR_SUBTITLE": "The transaction have been rejected. You can try again or close this tab."
@@ -519,7 +529,8 @@
     "POST_CONDITION_MODE_WARNING_TEXT": "This transaction might be unsafe. Be sure you trust the source of this transaction before confirming it. (Unsafe post condition mode)",
     "QUOTE_EXPIRES_IN": "Note that this swap quote will expire after {{seconds}} seconds",
     "INSCRIPTION_SERVICE_FEE": "Inscription Service Fee",
-    "TOTAL_FEES": "Total fees"
+    "TOTAL_FEES": "Total fees",
+    "FAILED_TO_SIGN": "Failed to sign"
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "The requested transaction cannot be created due to insufficient balance",
@@ -1195,7 +1206,7 @@
     "CONTRACT_ADDRESS": "Contract",
     "SPONSORED": "Sponsored",
     "SPONSORED_VALUE_YES": "Yes",
-    "POST_CONDITION_ALERT": "No transfers (beside fees) will be made from your account or the transaction will abort"
+    "POST_CONDITION_ALERT": "No transfers (beside fees) will be made from your account"
   },
   "DEPLOY_CONTRACT_REQUEST": {
     "DEPLOY_CONTRACT": "deploy-contract",
@@ -1206,7 +1217,7 @@
     "SPONSORED_VALUE_YES": "Yes",
     "FUNCTION": "Source Code",
     "DOWNLOAD": "Download contract code",
-    "POST_CONDITION_ALERT": "No transfers (beside fees) will be made from your account or the transaction will abort"
+    "POST_CONDITION_ALERT": "No transfers (beside fees) will be made from your account"
   },
   "SIGNATURE_REQUEST": {
     "TITLE": "Sign Message",
