@@ -9,7 +9,7 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   estimateStacksTransactionWithFallback,
-  generateUnsignedTokenTransferTransaction,
+  generateUnsignedSip10TransferTransaction,
   generateUnsignedTx,
   microstacksToStx,
   nextBestNonce,
@@ -87,11 +87,18 @@ function SendStxScreen() {
   const fungibleToken = sip10CoinsList?.find((coin) => coin.principal === principal);
 
   // Step 2 states
-  const [amount, setAmount] = useState(
-    (amountToSend &&
-      (fungibleToken ? amountToSend : stxToMicrostacks(new BigNumber(amountToSend)).toString())) ??
-      '',
-  );
+  const [amount, setAmount] = useState(() => {
+    if (!amountToSend) return '0';
+
+    try {
+      const value = fungibleToken
+        ? amountToSend
+        : stxToMicrostacks(new BigNumber(amountToSend)).toString();
+      return value || '0';
+    } catch (e) {
+      return '0';
+    }
+  });
   const [sendMax, setSendMax] = useState(false);
   const [fee, setFee] = useState(
     previousFee ? microstacksToStx(new BigNumber(previousFee)).toString() : '',
@@ -99,7 +106,7 @@ function SendStxScreen() {
 
   // Debounced values
   const debouncedRecipient = useDebounce(recipientAddress, 300);
-  const debouncedAmount = useDebounce(amount, 300);
+  const debouncedAmount = useDebounce(amount, 300, true);
 
   const handleCancel = () => {
     if (fungibleToken) {
@@ -123,7 +130,6 @@ function SendStxScreen() {
     async (isEffectActive) => {
       try {
         setIsLoadingTx(true);
-
         if (fungibleToken) {
           let convertedAmount = debouncedAmount;
           if (debouncedAmount && fungibleToken.decimals) {
@@ -132,7 +138,7 @@ function SendStxScreen() {
               fungibleToken.decimals,
             ).toString();
           }
-          const rawUnsignedSendFtTx = await generateUnsignedTokenTransferTransaction({
+          const rawUnsignedSendFtTx = await generateUnsignedSip10TransferTransaction({
             amount: convertedAmount,
             senderAddress: stxAddress,
             recipientAddress: debouncedRecipient,
@@ -141,7 +147,6 @@ function SendStxScreen() {
             assetName: fungibleToken?.assetName ?? '',
             publicKey: stxPublicKey,
             network: selectedNetwork,
-            pendingTxs: stxPendingTxData?.pendingTransactions ?? [],
             memo,
           });
 
@@ -151,7 +156,8 @@ function SendStxScreen() {
           return;
         }
         const nonce = await nextBestNonce(stxAddress, selectedNetwork);
-        console.log(debouncedRecipient, debouncedAmount);
+        const feeInMicrostacks = fee ? stxToMicrostacks(new BigNumber(fee)).toString() : '0';
+
         const rawUnsignedSendStxTx = await generateUnsignedTx({
           publicKey: stxPublicKey,
           payload: {
@@ -162,11 +168,9 @@ function SendStxScreen() {
             network: selectedNetwork,
             publicKey: stxPublicKey,
           },
-          fee,
+          fee: feeInMicrostacks,
           nonce,
         });
-        console.log('🚀 ~ rawUnsignedSendStxTx:', rawUnsignedSendStxTx);
-
         if (isEffectActive()) {
           setUnsignedSendStxTx(rawUnsignedSendStxTx.serialize());
         }
@@ -187,6 +191,7 @@ function SendStxScreen() {
       setIsLoadingTx,
       setUnsignedSendStxTx,
       fungibleToken,
+      fee,
     ],
   );
 
@@ -194,21 +199,28 @@ function SendStxScreen() {
   useEffect(() => {
     const fetchStxFees = async () => {
       try {
+        if (unsignedSendStxTx.length === 0) {
+          return;
+        }
+
         const unsignedTx: StacksTransactionWire = deserializeTransaction(unsignedSendStxTx);
         const [low, medium, high] = await estimateStacksTransactionWithFallback(
           unsignedTx,
           selectedNetwork,
         );
+
         const stxFees = {
           low: low.fee,
           medium: medium.fee,
           high: high.fee,
         };
+
         setFeeRates({
           low: Number(microstacksToStx(new BigNumber(stxFees.low))),
           medium: Number(microstacksToStx(new BigNumber(stxFees.medium))),
           high: Number(microstacksToStx(new BigNumber(stxFees.high))),
         });
+
         if (!fee || Number(fee) <= 0) {
           setFee(Number(microstacksToStx(new BigNumber(stxFees.medium))).toString());
         }
@@ -216,6 +228,7 @@ function SendStxScreen() {
         console.error(e);
       }
     };
+
     if (unsignedSendStxTx.length > 0) {
       fetchStxFees();
     }

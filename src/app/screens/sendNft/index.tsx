@@ -8,12 +8,10 @@ import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  applyMultiplierAndCapFeeAtThreshold,
   cvToHex,
-  generateUnsignedTokenTransferTransaction,
+  generateUnsignedNftTransferTransaction,
   uintCV,
   validateStxAddress,
-  type UnsignedStacksTransation,
 } from '@secretkeylabs/xverse-core';
 import { StacksTransactionWire } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
@@ -121,7 +119,7 @@ function SendNft() {
       const principal = nft?.fully_qualified_token_id?.split('::')!;
       const name = principal[1].split(':')[0];
       const contractInfo: string[] = principal[0].split('.');
-      const unsginedTx: UnsignedStacksTransation = {
+      const options = {
         amount: tokenId,
         senderAddress: stxAddress,
         recipientAddress: address,
@@ -130,12 +128,9 @@ function SendNft() {
         assetName: name,
         publicKey: stxPublicKey,
         network: selectedNetwork,
-        pendingTxs: stxPendingTxData?.pendingTransactions ?? [],
         memo: '',
-        isNFT: true,
       };
-      const unsignedTx = await generateUnsignedTokenTransferTransaction(unsginedTx);
-      await applyMultiplierAndCapFeeAtThreshold(unsignedTx, selectedNetwork);
+      const unsignedTx = await generateUnsignedNftTransferTransaction(options);
       setRecipientAddress(address);
       return unsignedTx;
     },
