@@ -239,7 +239,7 @@ export default function QuoteSummary({
       if (placeOrderResponse?.unsignedTransaction) {
         const swapTx = deserializeTransaction(placeOrderResponse.unsignedTransaction);
         await applyMultiplierAndCapFeeAtThreshold(swapTx, network);
-        placeOrderResponse.unsignedTransaction = Buffer.from(swapTx.serialize()).toString('hex');
+        placeOrderResponse.unsignedTransaction = swapTx.serialize();
         onStxOrderPlaced({ order: placeOrderResponse, providerCode: quote.provider.code });
       }
     }

@@ -16,6 +16,7 @@ import {
   getNonce,
   getStxFiatEquivalent,
   microstacksToStx,
+  modifyRecommendedStxFees,
   signLedgerStxTransaction,
   signMultiStxTransactions,
   signTransaction,
@@ -27,7 +28,6 @@ import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
 import Sheet from '@ui-library/sheet';
 import { isHardwareAccount } from '@utils/helper';
-import { modifyRecommendedStxFees } from '@utils/transactions/transactions';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
