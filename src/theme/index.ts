@@ -56,7 +56,7 @@ const Theme = {
     white_850: 'rgba(255, 255, 255, 0.15)',
     white_900: 'rgba(255, 255, 255, 0.1)',
 
-    red_0: 'F00',
+    red_0: '#F00',
 
     elevation_n1: '#0C0C0C',
     elevation0: '#181818',
