@@ -1094,6 +1094,15 @@
       "CALLOUT": "This transaction will perform on-chain delisting for your runes on all marketplaces and has to confirm before you can list again."
     }
   },
+  "COIN_PRICE_CHART": {
+    "EMPTY_CHART": {
+      "TITLE": "No Market Data Yet",
+      "TEXT": "When market data is available for this token, it will appear here."
+    },
+    "MISSING_PERIOD": {
+      "TEXT": "No data for this time period."
+    }
+  },
   "COIN_DASHBOARD_SCREEN": {
     "SEND": "Send",
     "RECEIVE": "Receive",
