@@ -79,7 +79,10 @@ function TransactionRequest() {
   const handleTokenTransferRequest = async (tokenTransferPayload: any, requestAccount: Account) => {
     const nonce = await nextBestNonce(requestAccount.stxAddress, selectedNetwork);
     const unsignedSendStxTx = await generateUnsignedTx({
-      payload: tokenTransferPayload,
+      payload: {
+        ...tokenTransferPayload,
+        network: selectedNetwork,
+      },
       publicKey: requestAccount.stxPublicKey,
       nonce: transaction?.auth?.spendingCondition.nonce || nonce,
       fee: transaction?.auth?.spendingCondition.fee.toString() || '0',
@@ -141,7 +144,10 @@ function TransactionRequest() {
   ) => {
     const nonce = await nextBestNonce(requestAccount.stxAddress, selectedNetwork);
     const unsignedContractDeployTx = await generateUnsignedTx({
-      payload: contractDeployPayload,
+      payload: {
+        ...contractDeployPayload,
+        network: selectedNetwork,
+      },
       publicKey: requestAccount.stxPublicKey,
       nonce: transaction?.auth?.spendingCondition.nonce || nonce,
       fee: transaction?.auth?.spendingCondition.fee.toString() || '0',
