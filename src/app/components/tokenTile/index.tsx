@@ -163,7 +163,7 @@ function TokenTile({
       fungibleToken,
     );
 
-    return fiatAmount ? BigNumber(fiatAmount) : undefined;
+    return fiatAmount ? BigNumber(fiatAmount) : BigNumber(0);
   };
 
   const fiatAmount = getFiatAmount();

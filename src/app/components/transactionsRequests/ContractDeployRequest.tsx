@@ -68,7 +68,7 @@ const DownloadButtonContainer = styled.div({
 });
 
 const ButtonText = styled.div((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_0,
   marginRight: props.theme.spacing(2),
   textAlign: 'center',
@@ -79,29 +79,8 @@ const ButtonImage = styled.img({
   transform: 'all',
 });
 
-const SponsoredContainer = styled.div({
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-});
-
-const SponsoredTag = styled.div((props) => ({
-  background: props.theme.colors.elevation3,
-  marginTop: props.theme.spacing(7.5),
-  paddingTop: props.theme.spacing(4),
-  paddingBottom: props.theme.spacing(4),
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-  borderRadius: 30,
-}));
-
-const SponosredText = styled.h1((props) => ({
-  ...props.theme.body_m,
-  color: props.theme.colors.white_0,
-}));
-
 const PostConditionAlertText = styled.h1((props) => ({
-  ...props.theme.body_l,
+  ...props.theme.typography.body_l,
   color: props.theme.colors.white_0,
 }));
 
@@ -240,12 +219,14 @@ export default function ContractDeployRequest({
           result: { transaction: unsignedTx.serialize() },
         });
       }
-      navigate('/tx-status', {
-        state: {
-          sponsored: true,
-          browserTx: true,
-        },
-      });
+      if (requestToken) {
+        finalizeTxSignature({
+          requestPayload: requestToken,
+          tabId,
+          data: { txId: '', txRaw: unsignedTx.serialize() },
+        });
+      }
+      window.close();
     } else if (isMultiSigTx) {
       if (rpcMethod && messageId && tabId) {
         switch (rpcMethod) {
@@ -290,14 +271,6 @@ export default function ContractDeployRequest({
     window.close();
   };
 
-  const showSponsoredTransactionTag = (
-    <SponsoredContainer>
-      <SponsoredTag>
-        <SponosredText>{t('DEPLOY_CONTRACT_REQUEST.SPONSORED')}</SponosredText>
-      </SponsoredTag>
-    </SponsoredContainer>
-  );
-
   const postConditionAlert = unsignedTx?.postConditionMode === PostConditionMode.Deny &&
     unsignedTx?.postConditions.values.length <= 0 && (
       <PostConditionContainer>
@@ -341,7 +314,6 @@ export default function ContractDeployRequest({
           />
         )}
         {postConditionAlert}
-        {sponsored && showSponsoredTransactionTag}
         <PostConditions />
         <TransactionDetailComponent
           title={t('DEPLOY_CONTRACT_REQUEST.CONTRACT_NAME')}
@@ -358,6 +330,12 @@ export default function ContractDeployRequest({
             </Button>
           </DownloadButtonContainer>
         </DownloadContainer>
+        {sponsored && (
+          <TransactionDetailComponent
+            title={t('DEPLOY_CONTRACT_REQUEST.SPONSORED')}
+            value={t('DEPLOY_CONTRACT_REQUEST.SPONSORED_VALUE_YES')}
+          />
+        )}
       </ConfirmStxTransactionComponent>
     </>
   );

@@ -34,6 +34,7 @@ const Theme = {
     xs: '8px',
     s: '12px',
     m: '16px',
+    ml: '20px',
     l: '24px',
     xl: '32px',
     xxl: '40px',
@@ -54,6 +55,8 @@ const Theme = {
     white_800: 'rgba(255, 255, 255, 0.2)',
     white_850: 'rgba(255, 255, 255, 0.15)',
     white_900: 'rgba(255, 255, 255, 0.1)',
+
+    red_0: '#F00',
 
     elevation_n1: '#0C0C0C',
     elevation0: '#181818',

@@ -106,9 +106,9 @@ function BalanceCard({ isLoading, isRefetching }: Props) {
   const { setAccountBalance } = useAccountBalance();
   // TODO: refactor this into a hook
   const oldTotalBalance = accountBalances[getAccountBalanceKey(selectedAccount)];
-  const { data: sip10CoinsList } = useVisibleSip10FungibleTokens();
-  const { data: brc20CoinsList } = useVisibleBrc20FungibleTokens();
-  const { data: runesCoinList } = useVisibleRuneFungibleTokens();
+  const { data: sip10CoinsList = [] } = useVisibleSip10FungibleTokens();
+  const { data: brc20CoinsList = [] } = useVisibleBrc20FungibleTokens();
+  const { data: runesCoinList = [] } = useVisibleRuneFungibleTokens();
   const { toggleBalanceView, balanceDisplayState } = useToggleBalanceView();
 
   const balance = calculateTotalBalance({

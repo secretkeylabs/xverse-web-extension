@@ -63,7 +63,7 @@ export default function TxTransfers(props: TxTransfersProps) {
   const { transaction, coin, txFilter } = props;
   const { balanceHidden } = useWalletSelector();
   const selectedAccount = useSelectedAccount();
-  const { data: sip10CoinsList } = useVisibleSip10FungibleTokens();
+  const { data: sip10CoinsList = [] } = useVisibleSip10FungibleTokens();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
 
   function formatAddress(addr: string): string {
