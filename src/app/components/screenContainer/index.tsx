@@ -127,6 +127,11 @@ function ScreenContainer({
               <TestnetText>{t('SETTING_SCREEN.TESTNET')}</TestnetText>
             </TestnetContainer>
           )}
+          {network.type === 'Testnet4' && (
+            <TestnetContainer>
+              <TestnetText>{t('SETTING_SCREEN.TESTNET4')}</TestnetText>
+            </TestnetContainer>
+          )}
           {network.type === 'Signet' && (
             <TestnetContainer>
               <TestnetText>{t('SETTING_SCREEN.SIGNET')}</TestnetText>

@@ -959,6 +959,7 @@
     "BACK": "Back",
     "INCORRECT_PASSWORD_ERROR": "Incorrect password",
     "TESTNET": "Testnet",
+    "TESTNET4": "Testnet4",
     "SIGNET": "Signet",
     "REGTEST": "Regtest",
     "ORDINALS": "Ordinals",

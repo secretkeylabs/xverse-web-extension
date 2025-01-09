@@ -10,6 +10,7 @@ import {
   initialNetworksList,
   type SettingsNetwork,
 } from '@secretkeylabs/xverse-core';
+import { defaultTestnet4 } from '@secretkeylabs/xverse-core/dist/constant';
 import Button from '@ui-library/button';
 import { isValidBtcApi, isValidStacksApi } from '@utils/helper';
 import { useState } from 'react';
@@ -170,6 +171,7 @@ function ChangeNetworkScreen() {
 
   const savedMainnet = savedNetworks.find((n) => n.type === 'Mainnet');
   const savedTestnet = savedNetworks.find((n) => n.type === 'Testnet');
+  const savedTestnet4 = savedNetworks.find((n) => n.type === 'Testnet4');
   const savedRegtest = savedNetworks.find((n) => n.type === 'Regtest');
   const savedSignet = savedNetworks.find((n) => n.type === 'Signet');
 
@@ -188,6 +190,13 @@ function ChangeNetworkScreen() {
         <NetworkRow
           network={savedTestnet || defaultTestnet}
           isSelected={formInputs.type === 'Testnet'}
+          onNetworkSelected={onNetworkSelected}
+          disabled={isChangingNetwork}
+          showDivider
+        />
+        <NetworkRow
+          network={savedTestnet4 || defaultTestnet4}
+          isSelected={formInputs.type === 'Testnet4'}
           onNetworkSelected={onNetworkSelected}
           disabled={isChangingNetwork}
           showDivider
