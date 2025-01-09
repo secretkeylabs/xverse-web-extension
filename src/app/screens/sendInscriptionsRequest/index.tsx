@@ -1,6 +1,7 @@
 import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RequestError from '@components/requests/requestError';
-import { type Transport } from '@secretkeylabs/xverse-core';
+import { TransportWebUSB } from '@keystonehq/hw-transport-webusb';
+import { type AccountType, type Transport } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -35,8 +36,8 @@ function SendInscriptionsRequest() {
     window.close();
   };
 
-  const onClickConfirm = async (ledgerTransport?: Transport) => {
-    const txid = await confirmOrdinalsTransferRequest(ledgerTransport);
+  const onClickConfirm = async (type?: AccountType, transport?: Transport | TransportWebUSB) => {
+    const txid = await confirmOrdinalsTransferRequest(type, transport);
     if (txid) {
       navigate('/tx-status', {
         state: {

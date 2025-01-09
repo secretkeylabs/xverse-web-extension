@@ -11,6 +11,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { Plus } from '@phosphor-icons/react';
 import type { Account } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
+import { filterKeystoneAccounts } from '@utils/account';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -60,7 +61,7 @@ function AccountList(): JSX.Element {
   const { search } = useLocation();
   const params = new URLSearchParams(search);
   const selectedAccount = useSelectedAccount();
-  const { network, accountsList, ledgerAccountsList } = useWalletSelector();
+  const { network, accountsList, ledgerAccountsList, keystoneAccountsList } = useWalletSelector();
   const { createAccount, switchAccount } = useWalletReducer();
   const { enqueueFetchBalances } = useAccountBalance();
 
@@ -68,8 +69,9 @@ function AccountList(): JSX.Element {
 
   const displayedAccountsList = useMemo(() => {
     const networkLedgerAccounts = filterLedgerAccounts(ledgerAccountsList, network.type);
-    return [...networkLedgerAccounts, ...accountsList];
-  }, [accountsList, ledgerAccountsList, network]);
+    const networkKeystoneAccounts = filterKeystoneAccounts(keystoneAccountsList, network.type);
+    return [...networkLedgerAccounts, ...networkKeystoneAccounts, ...accountsList];
+  }, [accountsList, ledgerAccountsList, keystoneAccountsList, network]);
 
   const handleBackButtonClick = () => {
     navigate(-1);
@@ -94,6 +96,12 @@ function AccountList(): JSX.Element {
   const onImportLedgerAccount = async () => {
     await chrome.tabs.create({
       url: chrome.runtime.getURL('options.html#/import-ledger'),
+    });
+  };
+
+  const onImportKeystoneAccount = async () => {
+    await chrome.tabs.create({
+      url: chrome.runtime.getURL('options.html#/import-keystone'),
     });
   };
 
@@ -130,6 +138,12 @@ function AccountList(): JSX.Element {
               icon={<img src={ConnectLedger} width={16} height={16} alt="" />}
               onClick={onImportLedgerAccount}
               title={t('LEDGER_ACCOUNT')}
+              variant="secondary"
+            />
+            <Button
+              icon={<img src={ConnectLedger} width={16} height={16} alt="" />}
+              onClick={onImportKeystoneAccount}
+              title={t('KEYSTONE_ACCOUNT')}
               variant="secondary"
             />
           </ButtonsWrapper>

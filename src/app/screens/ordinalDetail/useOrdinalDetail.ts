@@ -8,7 +8,7 @@ import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getBrc20Details } from '@secretkeylabs/xverse-core';
 import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
-import { getBtcTxStatusUrl, isInOptions, isLedgerAccount } from '@utils/helper';
+import { getBtcTxStatusUrl, isInOptions, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import {
   getInscriptionsCollectionGridItemSubText,
   getInscriptionsCollectionGridItemSubTextColor,
@@ -96,7 +96,10 @@ export default function useOrdinalDetail() {
       showAlert();
       return;
     }
-    if (isLedgerAccount(selectedAccount) && !isInOptions()) {
+    if (
+      (isLedgerAccount(selectedAccount) || isKeystoneAccount(selectedAccount)) &&
+      !isInOptions()
+    ) {
       await chrome.tabs.create({
         url: chrome.runtime.getURL(`options.html#/nft-dashboard/ordinal-detail/${id}/send-ordinal`),
       });

@@ -1,5 +1,6 @@
 import RecipientSelector from '@components/recipientSelector';
 import TokenImage from '@components/tokenImage';
+import type { btcTransaction } from '@secretkeylabs/xverse-core';
 import ConfirmBtcTransaction from 'app/components/confirmBtcTransaction';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';

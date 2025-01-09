@@ -12,7 +12,9 @@ export default class Wallet {
 
   readonly buttonGenerateAccount: Locator;
 
-  readonly buttonConnectHardwareWallet: Locator;
+  readonly buttonConnectLedgerWallet: Locator;
+
+  readonly buttonConnectKeystoneWallet: Locator;
 
   readonly inputName: Locator;
 
@@ -403,8 +405,11 @@ export default class Wallet {
       .locator('form div')
       .filter({ hasText: 'name can only include alphabetical and numerical' });
     this.buttonGenerateAccount = page.getByRole('button', { name: 'Generate account' });
-    this.buttonConnectHardwareWallet = page.getByRole('button', {
-      name: 'Connect hardware wallet',
+    this.buttonConnectLedgerWallet = page.getByRole('button', {
+      name: 'Connect Ledger',
+    });
+    this.buttonConnectKeystoneWallet = page.getByRole('button', {
+      name: 'Connect keystone',
     });
     this.inputName = page.locator('input[type="text"]');
     this.errorMessageRenameAccount = page

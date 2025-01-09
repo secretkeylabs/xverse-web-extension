@@ -3,10 +3,17 @@ import useDebounce from '@hooks/useDebounce';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
-import { AnalyticsEvents, btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
-import { isInOptions, isLedgerAccount } from '@utils/helper';
+import { TransportWebUSB } from '@keystonehq/hw-transport-webusb';
+import {
+  AnalyticsEvents,
+  btcTransaction,
+  type AccountType,
+  type Transport,
+} from '@secretkeylabs/xverse-core';
+import { isInOptions, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import {
   generateSendMaxTransaction,
@@ -18,6 +25,7 @@ import { getPreviousStep, Step } from './steps';
 
 function SendBtcScreen() {
   const navigate = useNavigate();
+  const { t } = useTranslation('translation');
 
   const isInOption = isInOptions();
 
@@ -42,24 +50,26 @@ function SendBtcScreen() {
 
   useEffect(() => {
     if (!feeRate && btcFeeRate && !feeRatesLoading) {
-      setFeeRate(btcFeeRate.regular.toString());
+      setFeeRate(feeRate || btcFeeRate.regular.toString());
     }
   }, [btcFeeRate, feeRatesLoading]);
 
   const generateTransactionAndSummary = async (feeRateOverride?: number) => {
     const amountBigInt = Number.isNaN(Number(amountSats)) ? 0n : BigInt(amountSats);
-    return sendMax && currentStep !== Step.Confirm
-      ? generateSendMaxTransaction(
-          transactionContext,
-          debouncedRecipient,
-          feeRateOverride ?? +feeRate,
-        )
-      : generateTransaction(
-          transactionContext,
-          debouncedRecipient,
-          amountBigInt,
-          feeRateOverride ?? +feeRate,
-        );
+    const result =
+      sendMax && currentStep !== Step.Confirm
+        ? await generateSendMaxTransaction(
+            transactionContext,
+            debouncedRecipient,
+            feeRateOverride ?? +feeRate,
+          )
+        : await generateTransaction(
+            transactionContext,
+            debouncedRecipient,
+            amountBigInt,
+            feeRateOverride ?? +feeRate,
+          );
+    return result;
   };
 
   useEffect(() => {
@@ -110,7 +120,7 @@ function SendBtcScreen() {
   }, [transactionContext, debouncedRecipient, amountSats, feeRate, sendMax]);
 
   const handleCancel = () => {
-    if (isLedgerAccount(selectedAccount) && isInOption) {
+    if ((isLedgerAccount(selectedAccount) || isKeystoneAccount(selectedAccount)) && isInOption) {
       window.close();
       return;
     }
@@ -131,10 +141,19 @@ function SendBtcScreen() {
     return undefined;
   };
 
-  const handleSubmit = async (ledgerTransport?: Transport) => {
+  const handleSubmit = async (type?: AccountType, transport?: Transport | TransportWebUSB) => {
     try {
       setIsSubmitting(true);
-      const txnId = await transaction?.broadcast({ ledgerTransport, rbfEnabled: true });
+      const txnId = await transaction?.broadcast({
+        ...(type === 'ledger' && {
+          ledgerTransport: transport as Transport,
+        }),
+        ...(type === 'keystone' && {
+          keystoneTransport: transport as TransportWebUSB,
+        }),
+        selectedAccount,
+        rbfEnabled: true,
+      });
 
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
         protocol: 'bitcoin',
@@ -151,12 +170,20 @@ function SendBtcScreen() {
         },
       });
     } catch (e) {
-      console.error(e);
+      let msg = e;
+      if (e instanceof Error) {
+        if (e.message.includes('Export address is just allowed on specific pages')) {
+          msg = t('SIGNATURE_REQUEST.KEYSTONE.CONFIRM.ERROR_SUBTITLE');
+        }
+        if (e.message.includes('UR parsing rejected')) {
+          msg = t('SIGNATURE_REQUEST.KEYSTONE.CONFIRM.DENIED.ERROR_SUBTITLE');
+        }
+      }
       navigate('/tx-status', {
         state: {
           txid: '',
           currency: 'BTC',
-          error: `${e}`,
+          error: `${msg}`,
           browserTx: isInOption,
         },
       });

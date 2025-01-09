@@ -3,9 +3,11 @@ import RequestError from '@components/requests/requestError';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { TransportWebUSB } from '@keystonehq/hw-transport-webusb';
 import type { OrderInfo } from '@screens/swap/types';
 import {
   btcTransaction,
+  type AccountType,
   type ExecuteUtxoOrderRequest,
   type Transport,
 } from '@secretkeylabs/xverse-core';
@@ -43,7 +45,8 @@ export default function PsbtConfirmation({
 
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey } = useSelectedAccount();
+  const selectedAccount = useSelectedAccount();
+  const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey } = selectedAccount;
   const txnContext = useTransactionContext();
   const { network } = useWalletSelector();
   const { executeOrder, error: executeOrderError } = useExecuteOrder();
@@ -119,12 +122,21 @@ export default function PsbtConfirmation({
     return executeOrderResponse;
   };
 
-  const handleConfirm = async (ledgerTransport?: Transport) => {
+  const handleConfirm = async (
+    accountType?: AccountType,
+    transport?: Transport | TransportWebUSB,
+  ) => {
     setIsSigning(true);
     try {
       const signedPsbt = await parsedPsbt?.getSignedPsbtBase64({
         finalize: false,
-        ledgerTransport,
+        ...(accountType === 'ledger' && {
+          ledgerTransport: transport as Transport,
+        }),
+        ...(accountType === 'keystone' && {
+          keystoneTransport: transport as TransportWebUSB,
+        }),
+        selectedAccount,
       });
 
       if (!signedPsbt) {
@@ -140,8 +152,8 @@ export default function PsbtConfirmation({
           return setIsSigning(false);
         }
 
-        if (ledgerTransport) {
-          await ledgerTransport.close();
+        if (transport) {
+          await transport.close();
         }
 
         onConfirm();

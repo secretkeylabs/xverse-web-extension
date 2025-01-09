@@ -12,14 +12,14 @@ import {
 } from '@screens/ledger/confirmLedgerStxTransaction/index.styled';
 import type { TFunction } from 'react-i18next';
 
-export enum Steps {
+export enum LedgerSteps {
   ConnectLedger = 0,
   ExternalInputs = 1,
   ConfirmTransaction = 2,
 }
 
 type Props = {
-  currentStep: Steps;
+  currentStep: LedgerSteps;
   isConnectSuccess: boolean;
   isConnectFailed: boolean;
   isTxRejected: boolean;
@@ -36,7 +36,7 @@ function LedgerStepView({
   signatureRequestTranslate,
 }: Props) {
   switch (currentStep) {
-    case Steps.ConnectLedger:
+    case LedgerSteps.ConnectLedger:
       return (
         <LedgerConnectionView
           title={signatureRequestTranslate('LEDGER.CONNECT.TITLE')}
@@ -48,7 +48,7 @@ function LedgerStepView({
           isConnectFailed={isConnectFailed}
         />
       );
-    case Steps.ExternalInputs:
+    case LedgerSteps.ExternalInputs:
       if (isTxRejected || isConnectFailed) {
         return (
           <LedgerFailView title={t('CONFIRM.ERROR_TITLE')} text={t('CONFIRM.ERROR_SUBTITLE')} />
@@ -67,7 +67,7 @@ function LedgerStepView({
           </ConnectLedgerContainer>
         </div>
       );
-    case Steps.ConfirmTransaction:
+    case LedgerSteps.ConfirmTransaction:
       return (
         <LedgerConnectionView
           title={signatureRequestTranslate('LEDGER.CONFIRM.TITLE')}

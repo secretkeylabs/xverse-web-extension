@@ -1,7 +1,8 @@
 import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RequestError from '@components/requests/requestError';
 import useSelectedAccount from '@hooks/useSelectedAccount';
-import type { Transport } from '@secretkeylabs/xverse-core';
+import { TransportWebUSB } from '@keystonehq/hw-transport-webusb';
+import type { AccountType, Transport } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
 import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -44,8 +45,8 @@ function EtchRune() {
     window.close();
   };
 
-  const onClickConfirm = async (ledgerTransport?: Transport) => {
-    const txid = await payAndConfirmEtchRequest(ledgerTransport);
+  const onClickConfirm = async (type?: AccountType, transport?: Transport | TransportWebUSB) => {
+    const txid = await payAndConfirmEtchRequest(type, transport);
     navigate('/tx-status', {
       state: {
         txid,

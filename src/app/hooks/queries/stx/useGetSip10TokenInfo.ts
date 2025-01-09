@@ -1,5 +1,9 @@
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getXverseApiClient, type SupportedCurrency } from '@secretkeylabs/xverse-core';
+import {
+  getCoinsInfo,
+  getXverseApiClient,
+  type SupportedCurrency,
+} from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 
 const useGetSip10TokenInfo = ({
@@ -15,6 +19,7 @@ const useGetSip10TokenInfo = ({
 
   const fetchTokensInfo = async () => {
     if (principal) {
+      // @ts-ignore
       const coinsInfo = await xverseApiClient.getCoinsInfo(
         [principal],
         fiatCurrency ?? defaultFiatCurrency,

@@ -1,10 +1,12 @@
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import useOrdinalsServiceApi from '@hooks/apiClients/useOrdinalsServiceApi';
 import useRunesApi from '@hooks/apiClients/useRunesApi';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
+import { TransportWebUSB } from '@keystonehq/hw-transport-webusb';
 import { RpcErrorCode, type MintRunesParams, type Params } from '@sats-connect/core';
 import { generateTransaction, type TransactionBuildPayload } from '@screens/sendBtc/helpers';
-import { type Rune, type Transport } from '@secretkeylabs/xverse-core';
+import { type AccountType, type Rune, type Transport } from '@secretkeylabs/xverse-core';
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import SuperJSON from 'superjson';
@@ -33,10 +35,14 @@ const useMintRequest = (): {
   feeRate: string;
   isExecuting: boolean;
   handleMint: () => Promise<void>;
-  payAndConfirmMintRequest: (ledgerTransport?: Transport) => Promise<any>;
+  payAndConfirmMintRequest: (
+    type?: AccountType,
+    transport?: Transport | TransportWebUSB,
+  ) => Promise<any>;
   cancelMintRequest: () => Promise<void>;
 } => {
   const { mintRequest, requestId, tabId } = useRuneMintRequestParams();
+  const selectedAccount = useSelectedAccount();
   const txContext = useTransactionContext();
   const ordinalsServiceApi = useOrdinalsServiceApi();
   const runesApi = useRunesApi();
@@ -136,11 +142,20 @@ const useMintRequest = (): {
     }
   };
 
-  const payAndConfirmMintRequest = async (ledgerTransport?: Transport) => {
+  const payAndConfirmMintRequest = async (
+    type?: AccountType,
+    transport?: Transport | TransportWebUSB,
+  ) => {
     try {
       setIsExecuting(true);
       const txid = await orderTx?.transaction.broadcast({
-        ledgerTransport,
+        ...(type === 'ledger' && {
+          ledgerTransport: transport as Transport,
+        }),
+        ...(type === 'keystone' && {
+          keystoneTransport: transport as TransportWebUSB,
+        }),
+        selectedAccount,
         rbfEnabled: false,
       });
       if (!txid) {

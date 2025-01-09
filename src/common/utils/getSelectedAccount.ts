@@ -4,18 +4,26 @@ type GetSelectedAccountProps = {
   selectedAccountType: AccountType;
   selectedAccountIndex: number;
   ledgerAccountsList: Account[];
+  keystoneAccountsList: Account[];
   softwareAccountsList: Account[];
 };
 
 const getSelectedAccount = (props: GetSelectedAccountProps) => {
-  const { selectedAccountType, selectedAccountIndex, ledgerAccountsList, softwareAccountsList } =
-    props;
+  const {
+    selectedAccountType,
+    selectedAccountIndex,
+    ledgerAccountsList,
+    keystoneAccountsList,
+    softwareAccountsList,
+  } = props;
 
   const accountList =
     selectedAccountType === 'software'
       ? softwareAccountsList
       : selectedAccountType === 'ledger'
       ? ledgerAccountsList
+      : selectedAccountType === 'keystone'
+      ? keystoneAccountsList
       : undefined;
 
   if (!accountList) {

@@ -50,6 +50,7 @@ export const handleGetAddresses = async (message: RpcRequestMessage, port: chrom
     selectedAccountType,
     accountsList: softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
   } = rootStore.store.getState().walletState;
 
   const account = getSelectedAccount({
@@ -57,6 +58,7 @@ export const handleGetAddresses = async (message: RpcRequestMessage, port: chrom
     selectedAccountType,
     softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
   });
 
   if (!account) {

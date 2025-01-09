@@ -1,4 +1,4 @@
-import { btcTransaction } from '@secretkeylabs/xverse-core';
+import { btcTransaction, type Account, type Transport } from '@secretkeylabs/xverse-core';
 
 export type TransactionSummary = btcTransaction.TransactionSummary & {
   dustFiltered?: boolean;
