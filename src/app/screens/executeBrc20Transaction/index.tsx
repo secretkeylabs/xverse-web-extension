@@ -151,14 +151,14 @@ function ExecuteBrc20Transaction() {
 
       setIsConnectSuccess(true);
 
-      executeTransfer({ keystoneTransport });
+      executeTransfer({ keystoneTransport, selectedAccount });
     } catch (error) {
       setIsConnectSuccess(false);
       setIsConnectFailed(true);
     } finally {
       setIsConnecting(false);
     }
-  }, [executeTransfer]);
+  }, [executeTransfer, selectedAccount]);
 
   const resultTexts = {
     SUCCESS: {
