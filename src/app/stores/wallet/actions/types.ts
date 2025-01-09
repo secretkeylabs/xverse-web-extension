@@ -19,7 +19,6 @@ export const SetFeeMultiplierKey = 'SetFeeMultiplierKey';
 export const ChangeFiatCurrencyKey = 'ChangeFiatCurrency';
 export const ChangeNetworkKey = 'ChangeNetwork';
 export const ChangeBtcPaymentAddressTypeKey = 'ChangeBtcPaymentAddressTypeKey';
-export const EnableNestedSegWitAddressKey = 'EnableNestedSegWitAddressKey';
 export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
 export const RareSatsNoticeDismissedKey = 'RareSatsNoticeDismissedKey';
 export const ChangeHasActivatedRareSatsKey = 'ChangeHasActivatedRareSatsKey';
@@ -49,6 +48,8 @@ export const RemoveAllFromHideCollectiblesKey = 'RemoveAllFromHideCollectiblesKe
 export const SetAccountAvatarKey = 'SetAccountAvatarKey';
 export const RemoveAccountAvatarKey = 'RemoveAccountAvatarKey';
 export const SetBalanceHiddenToggleKey = 'SetBalanceHiddenToggleKey';
+export const SetShowBalanceInBtcToggleKey = 'SetShowBalanceInBtcToggleKey';
+export const SetWalletBackupStatusKey = 'SetWalletBackupStatusKey';
 
 export enum WalletSessionPeriods {
   LOW = 15,
@@ -63,7 +64,6 @@ export interface WalletState {
   selectedAccountIndex: number;
   selectedAccountType: AccountType;
   btcPaymentAddressType: BtcPaymentType;
-  allowNestedSegWitAddress: boolean;
   network: SettingsNetwork; // currently selected network urls and type
   savedNetworks: SettingsNetwork[]; // previously set network urls for type
   encryptedSeed: string;
@@ -96,6 +96,8 @@ export interface WalletState {
   starredCollectibleIds: Record<string, Array<{ id: string; collectionId: string }>>;
   avatarIds: Record<string, AvatarInfo>;
   balanceHidden: boolean;
+  showBalanceInBtc: boolean;
+  hasBackedUpWallet: boolean;
 }
 
 export interface StoreEncryptedSeed {
@@ -132,10 +134,6 @@ export interface ChangeFiatCurrency {
 export interface ChangeNetwork {
   type: typeof ChangeNetworkKey;
   network: SettingsNetwork;
-}
-
-export interface EnableNestedSegWitAddress {
-  type: typeof EnableNestedSegWitAddressKey;
 }
 
 export interface ChangeBtcPaymentAddressType {
@@ -306,6 +304,16 @@ export interface SetBalanceHiddenToggle {
   toggle: boolean;
 }
 
+export interface SetShowBalanceInBtc {
+  type: typeof SetShowBalanceInBtcToggleKey;
+  toggle: boolean;
+}
+
+export interface SetWalletBackupStatus {
+  type: typeof SetWalletBackupStatusKey;
+  hasBackedUpWallet: boolean;
+}
+
 export type WalletActions =
   | ResetWallet
   | UpdateSoftwareAccounts
@@ -315,7 +323,6 @@ export type WalletActions =
   | SetFeeMultiplier
   | ChangeFiatCurrency
   | ChangeNetwork
-  | EnableNestedSegWitAddress
   | ChangeBtcPaymentAddressType
   | ChangeActivateOrdinals
   | ChangeActivateRareSats
@@ -344,4 +351,6 @@ export type WalletActions =
   | SetHiddenCollectibles
   | SetAccountAvatar
   | RemoveAccountAvatar
-  | SetBalanceHiddenToggle;
+  | SetBalanceHiddenToggle
+  | SetShowBalanceInBtc
+  | SetWalletBackupStatus;

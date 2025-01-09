@@ -24,6 +24,7 @@ import Callout from '@ui-library/callout';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
 import { isHardwareAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
+import RoutePaths from 'app/routes/paths';
 import { decodeToken } from 'jsontokens';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -219,7 +220,7 @@ function AuthenticationRequest() {
       stxAddress: {
         mainnet: selectedAccount.stxAddress,
         testnet: publicKeyToAddress(AddressVersion.MainnetSingleSig, {
-          data: Buffer.from(selectedAccount.stxPublicKey, 'hex'),
+          data: Uint8Array.from(Buffer.from(selectedAccount.stxPublicKey, 'hex')),
           type: StacksMessageType.PublicKey,
         }),
       },
@@ -267,7 +268,7 @@ function AuthenticationRequest() {
   };
 
   const handleSwitchAccount = () => {
-    navigate('/account-list?hideListActions=true');
+    navigate(`${RoutePaths.AccountList}?hideListActions=true`);
   };
 
   const handleAddStxLedgerAccount = async () => {

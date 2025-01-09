@@ -17,7 +17,6 @@ import useNetworkSelector from '@hooks/useNetwork';
 import useOnOriginTabClose from '@hooks/useOnTabClosed';
 import {
   broadcastSignedTransaction,
-  buf2hex,
   isMultiSig,
   microstacksToStx,
   stxToMicrostacks,
@@ -69,7 +68,7 @@ const DownloadButtonContainer = styled.div({
 });
 
 const ButtonText = styled.div((props) => ({
-  ...props.theme.body_medium_m,
+  ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_0,
   marginRight: props.theme.spacing(2),
   textAlign: 'center',
@@ -80,29 +79,8 @@ const ButtonImage = styled.img({
   transform: 'all',
 });
 
-const SponsoredContainer = styled.div({
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-});
-
-const SponsoredTag = styled.div((props) => ({
-  background: props.theme.colors.elevation3,
-  marginTop: props.theme.spacing(7.5),
-  paddingTop: props.theme.spacing(4),
-  paddingBottom: props.theme.spacing(4),
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-  borderRadius: 30,
-}));
-
-const SponosredText = styled.h1((props) => ({
-  ...props.theme.body_m,
-  color: props.theme.colors.white_0,
-}));
-
 const PostConditionAlertText = styled.h1((props) => ({
-  ...props.theme.body_l,
+  ...props.theme.typography.body_l,
   color: props.theme.colors.white_0,
 }));
 
@@ -169,7 +147,7 @@ export default function ContractDeployRequest({
             sendSignTransactionSuccessResponseMessage({
               tabId,
               messageId,
-              result: { transaction: buf2hex(tx[0].serialize()) },
+              result: { transaction: Buffer.from(tx[0].serialize()).toString('hex') },
             });
             break;
           }
@@ -177,7 +155,7 @@ export default function ContractDeployRequest({
             sendDeployContractSuccessResponseMessage({
               tabId,
               messageId,
-              result: { txid: txId, transaction: buf2hex(tx[0].serialize()) },
+              result: { txid: txId, transaction: Buffer.from(tx[0].serialize()).toString('hex') },
             });
             break;
           }
@@ -190,7 +168,7 @@ export default function ContractDeployRequest({
         finalizeTxSignature({
           requestPayload: requestToken,
           tabId,
-          data: { txId, txRaw: buf2hex(tx[0].serialize()) },
+          data: { txId, txRaw: Buffer.from(tx[0].serialize()).toString('hex') },
         });
       }
 
@@ -228,7 +206,7 @@ export default function ContractDeployRequest({
             sendSignTransactionSuccessResponseMessage({
               tabId,
               messageId,
-              result: { transaction: buf2hex(unsignedTx.serialize()) },
+              result: { transaction: Buffer.from(unsignedTx.serialize()).toString('hex') },
             });
             break;
           default:
@@ -238,15 +216,17 @@ export default function ContractDeployRequest({
         sendSignTransactionSuccessResponseMessage({
           tabId,
           messageId,
-          result: { transaction: buf2hex(unsignedTx.serialize()) },
+          result: { transaction: Buffer.from(unsignedTx.serialize()).toString('hex') },
         });
       }
-      navigate('/tx-status', {
-        state: {
-          sponsored: true,
-          browserTx: true,
-        },
-      });
+      if (requestToken) {
+        finalizeTxSignature({
+          requestPayload: requestToken,
+          tabId,
+          data: { txId: '', txRaw: Buffer.from(unsignedTx.serialize()).toString('hex') },
+        });
+      }
+      window.close();
     } else if (isMultiSigTx) {
       if (rpcMethod && messageId && tabId) {
         switch (rpcMethod) {
@@ -254,7 +234,7 @@ export default function ContractDeployRequest({
             sendSignTransactionSuccessResponseMessage({
               tabId,
               messageId,
-              result: { transaction: buf2hex(unsignedTx.serialize()) },
+              result: { transaction: Buffer.from(unsignedTx.serialize()).toString('hex') },
             });
             break;
           default:
@@ -265,7 +245,7 @@ export default function ContractDeployRequest({
         finalizeTxSignature({
           requestPayload: requestToken,
           tabId,
-          data: { txId: '', txRaw: buf2hex(unsignedTx.serialize()) },
+          data: { txId: '', txRaw: Buffer.from(unsignedTx.serialize()).toString('hex') },
         });
       }
       window.close();
@@ -290,14 +270,6 @@ export default function ContractDeployRequest({
     finalizeTxSignature({ requestPayload: requestToken, tabId, data: 'cancel' });
     window.close();
   };
-
-  const showSponsoredTransactionTag = (
-    <SponsoredContainer>
-      <SponsoredTag>
-        <SponosredText>{t('DEPLOY_CONTRACT_REQUEST.SPONSORED')}</SponosredText>
-      </SponsoredTag>
-    </SponsoredContainer>
-  );
 
   const postConditionAlert = unsignedTx?.postConditionMode === PostConditionMode.Deny &&
     unsignedTx?.postConditions.values.length <= 0 && (
@@ -331,7 +303,6 @@ export default function ContractDeployRequest({
           />
         )}
         {postConditionAlert}
-        {sponsored && showSponsoredTransactionTag}
         {unsignedTx?.postConditions?.values?.map((postCondition) => (
           <StxPostConditionCard postCondition={postCondition as PostCondition} />
         ))}
@@ -350,6 +321,12 @@ export default function ContractDeployRequest({
             </Button>
           </DownloadButtonContainer>
         </DownloadContainer>
+        {sponsored && (
+          <TransactionDetailComponent
+            title={t('DEPLOY_CONTRACT_REQUEST.SPONSORED')}
+            value={t('DEPLOY_CONTRACT_REQUEST.SPONSORED_VALUE_YES')}
+          />
+        )}
       </ConfirmStxTransactionComponent>
     </>
   );

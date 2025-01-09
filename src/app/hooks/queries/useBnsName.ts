@@ -36,7 +36,6 @@ export const useBnsResolver = (
         if (!validateStxAddress({ stxAddress: recipientAddress, network: network.type })) {
           const address = await fetchAddressOfBnsName(
             recipientAddress.toLocaleLowerCase(),
-            walletAddress.toLocaleLowerCase(),
             selectedNetwork,
           );
           setAssociatedAddress(address ?? '');

@@ -1,4 +1,5 @@
-import { LoaderSize } from '@utils/constants';
+import { animated, useSpring } from '@react-spring/web';
+import { ANIMATION_EASING, LoaderSize } from '@utils/constants';
 import ContentLoader from 'react-content-loader';
 import styled from 'styled-components';
 import Theme from 'theme';
@@ -70,8 +71,9 @@ function BarLoader({ loaderSize }: { loaderSize?: LoaderSize }) {
 export default BarLoader;
 
 const StyledContentLoader = styled(ContentLoader)`
-  padding: ${(props) => props.theme.spacing(1)}px;
+  padding: ${(props) => props.theme.space.xxxs}px;
 `;
+
 export function BetterBarLoader({
   width,
   height,
@@ -95,4 +97,30 @@ export function BetterBarLoader({
       <rect y="0" x="0" rx="2" ry="2" width={width} height={height} />
     </StyledContentLoader>
   );
+}
+
+export function BestBarLoader({
+  width,
+  height,
+  className,
+}: {
+  width: number | string;
+  height: number | string;
+  className?: string;
+}) {
+  const styles = useSpring({
+    from: {
+      backgroundColor: Theme.colors.white_850,
+    },
+    to: {
+      backgroundColor: Theme.colors.white_800,
+    },
+    loop: { reverse: true },
+    config: {
+      duration: 400,
+      easing: ANIMATION_EASING,
+    },
+  });
+
+  return <animated.div style={{ ...styles, width, height }} className={className} />;
 }

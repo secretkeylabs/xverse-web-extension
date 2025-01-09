@@ -1,6 +1,6 @@
+import CreatePassword from '@components/createPassword';
 import Dots from '@components/dots';
 import { useWalletExistsContext } from '@components/guards/onboarding';
-import PasswordInput from '@components/passwordInput';
 import useWalletReducer from '@hooks/useWalletReducer';
 import type { BtcPaymentType } from '@secretkeylabs/xverse-core';
 import * as bip39 from 'bip39';
@@ -11,36 +11,25 @@ import styled from 'styled-components';
 import EnterSeedPhrase from './enterSeedphrase';
 import PaymentAddressTypeSelector from './paymentAddressTypeSelector';
 
-const Body = styled.div(() => ({
-  display: 'flex',
-  height: '100%',
-  justifyContent: 'center',
-  alignItems: 'flex-start',
-  margin: '60px 0',
-}));
-
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  height: 'auto',
-  backgroundColor: props.theme.colors.elevation0,
-  padding: `${props.theme.spacing(12)}px`,
-  border: `1px solid ${props.theme.colors.elevation2}`,
-  borderRadius: props.theme.radius(2),
+  flex: 1,
+  padding: `${props.theme.space.l} ${props.theme.space.m} 0`,
+  overflowY: 'auto',
 }));
 
 const PasswordContainer = styled.div((props) => ({
   display: 'flex',
+  width: '100%',
   height: '100%',
-  width: '312px',
-  marginBottom: props.theme.spacing(32),
-  marginTop: props.theme.spacing(32),
+  marginTop: props.theme.space.xs,
+  flex: '1 0 auto',
 }));
 
 function RestoreWallet(): JSX.Element {
   const { t } = useTranslation('translation');
-  const { restoreWallet, enableNestedSegWitAddress, changeBtcPaymentAddressType } =
-    useWalletReducer();
+  const { restoreWallet, changeBtcPaymentAddressType } = useWalletReducer();
   const [isRestoring, setIsRestoring] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [password, setPassword] = useState('');
@@ -65,22 +54,6 @@ function RestoreWallet(): JSX.Element {
     }
   };
 
-  const onAccountTypeContinue = () => {
-    setCurrentStepIndex(2);
-  };
-
-  const onNewPasswordBack = () => {
-    setCurrentStepIndex(1);
-  };
-
-  const onNewPasswordContinue = () => {
-    setCurrentStepIndex(3);
-  };
-
-  const handleConfirmPasswordBack = () => {
-    setCurrentStepIndex(2);
-  };
-
   const onConfirmPasswordContinue = async () => {
     setIsRestoring(true);
     if (confirmPassword === password) {
@@ -92,16 +65,23 @@ function RestoreWallet(): JSX.Element {
       await restoreWallet(seed, password);
       setIsRestoring(false);
 
-      // we allow the user to switch between address types if restoring the wallet
-      // this disabled by default for new wallets
-      enableNestedSegWitAddress();
+      // restoreWallet clears chrome storage, so we call this for react-persist to persist the state again
       changeBtcPaymentAddressType(btcPayAddressType);
 
-      navigate('/wallet-success/restore', { replace: true });
+      setCurrentStepIndex(2);
     } else {
       setIsRestoring(false);
       setError(t('CREATE_PASSWORD_SCREEN.CONFIRM_PASSWORD_MATCH_ERROR'));
     }
+  };
+
+  const handleSelectedTypeChange = (addressType: BtcPaymentType) => {
+    changeBtcPaymentAddressType(addressType);
+    setBtcPayAddressType(addressType);
+  };
+
+  const onAccountTypeContinue = () => {
+    navigate('/wallet-success/restore', { replace: true });
   };
 
   const restoreSteps = [
@@ -113,47 +93,32 @@ function RestoreWallet(): JSX.Element {
       seedError={seedError}
       setSeedError={setSeedError}
     />,
+    <PasswordContainer key="password">
+      <CreatePassword
+        password={password}
+        setPassword={setPassword}
+        confirmPassword={confirmPassword}
+        setConfirmPassword={setConfirmPassword}
+        handleContinue={onConfirmPasswordContinue}
+        loading={isRestoring}
+        confirmPasswordError={error}
+        checkPasswordStrength
+      />
+    </PasswordContainer>,
     <PaymentAddressTypeSelector
       key="addressType"
       seedPhrase={seedPhrase}
       selectedType={btcPayAddressType}
-      onSelectedTypeChange={setBtcPayAddressType}
+      onSelectedTypeChange={handleSelectedTypeChange}
       onContinue={onAccountTypeContinue}
     />,
-    <PasswordContainer key="password">
-      <PasswordInput
-        title={t('CREATE_PASSWORD_SCREEN.CREATE_PASSWORD_TITLE')}
-        inputLabel={t('CREATE_PASSWORD_SCREEN.TEXT_INPUT_NEW_PASSWORD_LABEL')}
-        enteredPassword={password}
-        setEnteredPassword={setPassword}
-        handleContinue={onNewPasswordContinue}
-        handleBack={onNewPasswordBack}
-        checkPasswordStrength
-        autoFocus
-      />
-    </PasswordContainer>,
-    <PasswordContainer key="confirmPassword">
-      <PasswordInput
-        title={t('CREATE_PASSWORD_SCREEN.CONFIRM_PASSWORD_TITLE')}
-        inputLabel={t('CREATE_PASSWORD_SCREEN.TEXT_INPUT_NEW_PASSWORD_LABEL')}
-        enteredPassword={confirmPassword}
-        setEnteredPassword={setConfirmPassword}
-        handleContinue={onConfirmPasswordContinue}
-        handleBack={handleConfirmPasswordBack}
-        passwordError={error}
-        loading={isRestoring}
-        autoFocus
-      />
-    </PasswordContainer>,
   ];
 
   return (
-    <Body>
-      <Container>
-        <Dots numDots={restoreSteps.length} activeIndex={currentStepIndex} />
-        {restoreSteps[currentStepIndex]}
-      </Container>
-    </Body>
+    <Container>
+      <Dots numDots={restoreSteps.length} activeIndex={currentStepIndex} />
+      {restoreSteps[currentStepIndex]}
+    </Container>
   );
 }
 

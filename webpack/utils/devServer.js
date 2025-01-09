@@ -13,7 +13,7 @@ const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin'
 
 const excludeEntriesFromHotModuleReload = ['content-script', 'inpage', 'background'];
 
-Object.keys(config.entry).forEach(entryName => {
+Object.keys(config.entry).forEach((entryName) => {
   if (!excludeEntriesFromHotModuleReload.includes(entryName) && config.entry) {
     config.entry[entryName] = [
       `webpack-dev-server/client?hot=true&live-reload=true&hostname=localhost&port=${env.PORT}`,
@@ -31,7 +31,6 @@ var compiler = webpack(config);
 
 var server = new WebpackDevServer(
   {
-    https: false,
     webSocketServer: 'ws',
     hot: false,
     client: false,
@@ -49,7 +48,7 @@ var server = new WebpackDevServer(
     },
     allowedHosts: 'all',
   },
-  compiler
+  compiler,
 );
 
 if (process.env.NODE_ENV === 'development' && module.hot) {

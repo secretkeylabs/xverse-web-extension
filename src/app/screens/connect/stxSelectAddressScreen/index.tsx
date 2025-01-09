@@ -9,6 +9,8 @@ import SelectAccount from '@screens/connect/selectAccount';
 import { getAppIconFromWebManifest } from '@secretkeylabs/xverse-core';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
+import { getStxNetworkForBtcNetwork } from '@utils/helper';
+import RoutePaths from 'app/routes/paths';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -32,7 +34,7 @@ function StxSelectAddressScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SELECT_BTC_ADDRESS_SCREEN' });
   const selectedAccount = useSelectedAccount();
   const { network } = useWalletSelector();
-  const [appIcon, setAppIcon] = useState<string>('');
+  const [appIcon, setAppIcon] = useState('');
   const [isLoadingIcon, setIsLoadingIcon] = useState(false);
   const { payload, origin, approveStxAddressRequest, cancelAddressRequest } =
     useStxAddressRequest();
@@ -56,7 +58,7 @@ function StxSelectAddressScreen() {
 
   useEffect(() => {
     // Handle address requests to a network that's not currently active
-    if (payload.network.type !== network.type) {
+    if (payload.network.type !== getStxNetworkForBtcNetwork(network.type)) {
       navigate('/tx-status', {
         state: {
           txid: '',
@@ -85,7 +87,7 @@ function StxSelectAddressScreen() {
   }, [origin]);
 
   const handleSwitchAccount = () => {
-    navigate('/account-list?hideListActions=true');
+    navigate(`${RoutePaths.AccountList}?hideListActions=true`);
   };
 
   if (isLoadingIcon) {

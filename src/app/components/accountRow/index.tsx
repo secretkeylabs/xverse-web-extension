@@ -1,19 +1,20 @@
 import LedgerBadge from '@assets/img/ledger/ledger_badge.svg';
 import BarLoader from '@components/barLoader';
 import OptionsDialog from '@components/optionsDialog/optionsDialog';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useOptionsDialog from '@hooks/useOptionsDialog';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CaretDown, DotsThreeVertical } from '@phosphor-icons/react';
-import { currencySymbolMap, type Account } from '@secretkeylabs/xverse-core';
+import { currencySymbolMap, getFiatBtcEquivalent, type Account } from '@secretkeylabs/xverse-core';
 import { removeAccountAvatarAction } from '@stores/wallet/actions/actionCreators';
 import Button from '@ui-library/button';
 import Input from '@ui-library/input';
 import Sheet from '@ui-library/sheet';
-import SnackBar from '@ui-library/snackBar';
 import Spinner from '@ui-library/spinner';
-import { EMPTY_LABEL, HIDDEN_BALANCE_LABEL, LoaderSize } from '@utils/constants';
+import { BTC_SYMBOL, EMPTY_LABEL, HIDDEN_BALANCE_LABEL, LoaderSize } from '@utils/constants';
 import { getAccountBalanceKey, isLedgerAccount, validateAccountName } from '@utils/helper';
+import BigNumber from 'bignumber.js';
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -67,6 +68,7 @@ function AccountRow({
     accountBalances,
     avatarIds,
     balanceHidden,
+    showBalanceInBtc,
   } = useWalletSelector();
   const accountAvatar = avatarIds[account?.btcAddresses.taproot.address ?? ''];
   // TODO: refactor this into a hook
@@ -79,6 +81,7 @@ function AccountRow({
   const [accountNameError, setAccountNameError] = useState<string | null>(null);
   const [isAccountNameChangeLoading, setIsAccountNameChangeLoading] = useState(false);
   const { removeLedgerAccount, renameSoftwareAccount, updateLedgerAccounts } = useWalletReducer();
+  const { btcFiatRate } = useSupportedCoinRates();
 
   useEffect(
     () => () => {
@@ -125,9 +128,7 @@ function AccountRow({
   const handleRemoveAvatar = () => {
     if (!account) return;
     dispatch(removeAccountAvatarAction({ address: account?.btcAddresses.taproot.address }));
-    toast.custom(
-      <SnackBar text={optionsDialogTranslation('NFT_AVATAR.REMOVE_TOAST')} type="neutral" />,
-    );
+    toast(optionsDialogTranslation('NFT_AVATAR.REMOVE_TOAST'));
   };
 
   const handleRemoveLedgerAccount = async () => {
@@ -219,7 +220,23 @@ function AccountRow({
                   <CaretDown color={Theme.colors.white_0} weight="bold" size={16} />
                 )}
               </CurrentAccountTextContainer>
-              {isAccountListView && totalBalance && (
+              {showBalanceInBtc && isAccountListView && totalBalance && (
+                <NumericFormat
+                  value={getFiatBtcEquivalent(
+                    BigNumber(totalBalance),
+                    BigNumber(btcFiatRate),
+                  ).toString()}
+                  displayType="text"
+                  prefix={BTC_SYMBOL}
+                  thousandSeparator
+                  renderText={(value: string) => (
+                    <Balance data-testid="account-balance" $isSelected={isSelected}>
+                      {value}
+                    </Balance>
+                  )}
+                />
+              )}
+              {!showBalanceInBtc && isAccountListView && totalBalance && (
                 <NumericFormat
                   value={totalBalance}
                   displayType="text"
@@ -227,7 +244,8 @@ function AccountRow({
                   thousandSeparator
                   renderText={(value: string) => (
                     <Balance data-testid="account-balance" $isSelected={isSelected}>
-                      {balanceHidden ? HIDDEN_BALANCE_LABEL : value}
+                      {!showBalanceInBtc && balanceHidden && HIDDEN_BALANCE_LABEL}
+                      {!showBalanceInBtc && !balanceHidden && value}
                     </Balance>
                   )}
                 />

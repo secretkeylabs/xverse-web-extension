@@ -26,12 +26,12 @@ const OuterContainer = styled.div({
   zIndex: 2,
 });
 
-interface Props {
+type Props = {
   children: React.ReactNode;
   closeDialog: () => void;
   optionsDialogIndents?: { top: string; left: string };
   width?: number;
-}
+};
 
 function OptionsDialog({
   closeDialog,

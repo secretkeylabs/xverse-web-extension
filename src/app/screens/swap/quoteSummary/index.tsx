@@ -1,9 +1,11 @@
 import SlippageEditIcon from '@assets/img/swap/slippageEdit.svg';
+import FormattedNumber from '@components/formattedNumber';
 import TopRow from '@components/topRow';
 import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery';
 import useGetSip10TokenInfo from '@hooks/queries/stx/useGetSip10TokenInfo';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import useNetworkSelector from '@hooks/useNetwork';
 import useSearchParamsState from '@hooks/useSearchParamsState';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -11,6 +13,8 @@ import { ArrowDown, ArrowRight, WarningOctagon } from '@phosphor-icons/react';
 import {
   AnalyticsEvents,
   RUNE_DISPLAY_DEFAULTS,
+  capStxFeeAtThreshold,
+  formatBalance,
   getBtcFiatEquivalent,
   getStxFiatEquivalent,
   stxToMicrostacks,
@@ -18,8 +22,8 @@ import {
   type MarketUtxo,
   type PlaceUtxoOrderRequest,
   type Quote,
-  type Token,
 } from '@secretkeylabs/xverse-core';
+import { deserializeTransaction } from '@stacks/transactions';
 import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
 import { StyledP } from '@ui-library/common.styled';
@@ -28,127 +32,36 @@ import { formatNumber } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled, { useTheme } from 'styled-components';
+import { useTheme } from 'styled-components';
 import trackSwapMixPanel from '../mixpanel';
 import QuoteTile from '../quotesModal/quoteTile';
 import SlippageModalContent from '../slippageModal';
 import type { OrderInfo, StxOrderInfo } from '../types';
-import {
-  BAD_QUOTE_PERCENTAGE,
-  isRunesTx,
-  mapFTNativeSwapTokenToTokenBasic,
-  mapFtToCurrencyType,
-  mapSwapTokenToFT,
-  mapTokenToCurrencyType,
-} from '../utils';
+import { BAD_QUOTE_PERCENTAGE, isRunesTx, mapFTNativeSwapTokenToTokenBasic } from '../utils';
 import EditFee from './EditFee';
+import {
+  ArrowInnerContainer,
+  ArrowOuterContainer,
+  CalloutContainer,
+  Container,
+  EditFeeRateContainer,
+  FeeRate,
+  Flex1,
+  ListingDescContainer,
+  ListingDescriptionRow,
+  QuoteToBaseContainer,
+  RouteContainer,
+  SendButtonContainer,
+  SlippageButton,
+} from './index.styled';
 import QuoteSummaryTile from './quoteSummaryTile';
 import usePlaceOrder from './usePlaceOrder';
 import usePlaceUtxoOrder from './usePlaceUtxoOrder';
 
-const SlippageButton = styled.button<{ showWarning: boolean }>`
-  display: flex;
-  flex-direction: row;
-  column-gap: ${(props) => props.theme.space.xxs};
-  background: transparent;
-  align-items: center;
-  ${(props) => props.theme.typography.body_medium_m};
-  border-radius: 24px;
-  border: 1px solid ${(props) => props.theme.colors.white_800};
-  padding: ${(props) => props.theme.space.xxs} ${(props) => props.theme.space.s};
-  color: ${(props) =>
-    props.showWarning ? props.theme.colors.caution : props.theme.colors.white_0};
-`;
-const Container = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-  padding: `0 ${props.theme.space.m} ${props.theme.space.l} ${props.theme.space.m}`,
-  zIndex: 1,
-  backgroundColor: props.theme.colors.elevation0,
-}));
-
-const CalloutContainer = styled.div`
-  margin-bottom: ${(props) => props.theme.space.m};
-`;
-
-const Flex1 = styled.div`
-  flex: 1;
-  margin-top: 12px;
-`;
-
-const SendButtonContainer = styled.div((props) => ({
-  marginBottom: props.theme.space.s,
-}));
-
-const ListingDescContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: props.theme.space.s,
-  marginTop: props.theme.space.m,
-  marginBottom: props.theme.space.m,
-}));
-
-const ListingDescriptionRow = styled.div`
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-  flex: 1;
-  justify-content: space-between;
-  min-height: 24px;
-`;
-
-const RouteContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  flex: 1;
-  gap: 4px;
-`;
-
-const QuoteToBaseContainer = styled.div`
-  margin-top: 4px;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const ArrowOuterContainer = styled.div`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-`;
-
-const ArrowInnerContainer = styled.div`
-  position: relative;
-  z-index: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 50%;
-  border: 1px solid ${(props) => props.theme.colors.white_850};
-  background-color: ${(props) => props.theme.colors.background.elevation0};
-  padding: 8px;
-`;
-
-const EditFeeRateContainer = styled.div`
-  margin-top: ${(props) => props.theme.space.xxs};
-`;
-
-const FeeRate = styled.div`
-  ${(props) => props.theme.typography.body_medium_m};
-  color: ${(props) => props.theme.colors.white_0};
-  display: flex;
-  flex-direction: row;
-  align-self: flex-start;
-`;
-
-type QuoteSummaryProps = {
+type Props = {
   amount: string;
   fromToken?: FungibleToken;
-  toToken?: Token;
+  toToken?: FungibleToken;
   quote: Quote;
   onClose: () => void;
   onChangeProvider: () => void;
@@ -169,15 +82,11 @@ export default function QuoteSummary({
   onStxOrderPlaced,
   onError,
   selectedIdentifiers,
-}: QuoteSummaryProps) {
+}: Props) {
   const { t } = useTranslation('translation');
-  const { tokenInfo: sip10ToTokenInfoUSD } = useGetSip10TokenInfo({
-    principal: toToken?.ticker,
-    fiatCurrency: 'USD',
-  });
 
   const { tokenInfo: sip10ToTokenInfo } = useGetSip10TokenInfo({
-    principal: toToken?.ticker,
+    principal: toToken?.principal,
   });
 
   const { tokenInfo: sip10FromTokenInfoUSD } = useGetSip10TokenInfo({
@@ -189,7 +98,7 @@ export default function QuoteSummary({
   const { btcFiatRate, btcUsdRate, stxBtcRate } = useSupportedCoinRates();
   const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey, stxAddress, stxPublicKey } =
     useSelectedAccount();
-
+  const network = useNetworkSelector();
   const {
     loading: isPlaceOrderLoading,
     error: placeOrderError,
@@ -203,7 +112,7 @@ export default function QuoteSummary({
   } = usePlaceUtxoOrder();
 
   useEffect(() => {
-    if (placeOrderError || placeUtxoOrderError) {
+    if (true) {
       onError(placeOrderError ?? placeUtxoOrderError ?? '');
     }
   }, [placeOrderError, placeUtxoOrderError]);
@@ -235,23 +144,23 @@ export default function QuoteSummary({
   })();
 
   const toUnit = (() => {
-    if (toToken?.protocol === 'btc') {
+    if (toToken?.principal === 'BTC') {
       return 'Sats';
     }
-    if (toToken?.symbol) {
-      return toToken.symbol;
+    if (toToken?.runeSymbol) {
+      return toToken.runeSymbol;
     }
     if (toToken?.protocol === 'runes') {
       return RUNE_DISPLAY_DEFAULTS.symbol;
     }
-    if (toToken?.ticker === 'STX') {
+    if (toToken?.principal === 'STX') {
       return 'STX';
     }
     return toToken?.name;
   })();
 
   const isRunesSwap = fromToken?.protocol === 'runes' || toToken?.protocol === 'runes';
-  const isSip10Swap = fromToken?.protocol === 'stacks' || toToken?.protocol === 'sip10';
+  const isSip10Swap = fromToken?.protocol === 'stacks' || toToken?.protocol === 'stacks';
 
   const [showSlippageModal, setShowSlippageModal] = useState(false);
   const DEFAULT_SLIPPAGE = quote.slippageThreshold ?? 0.05;
@@ -269,7 +178,6 @@ export default function QuoteSummary({
       amount,
       quote,
       btcUsdRate,
-      runeFloorPrice,
       stxBtcRate,
       fromTokenInfo: sip10FromTokenInfoUSD,
     });
@@ -329,12 +237,15 @@ export default function QuoteSummary({
       const placeOrderResponse = await placeStxOrder(placeStxOrderRequest);
 
       if (placeOrderResponse?.unsignedTransaction) {
+        const swapTx = deserializeTransaction(placeOrderResponse.unsignedTransaction);
+        await capStxFeeAtThreshold(swapTx, network);
+        placeOrderResponse.unsignedTransaction = Buffer.from(swapTx.serialize()).toString('hex');
         onStxOrderPlaced({ order: placeOrderResponse, providerCode: quote.provider.code });
       }
     }
   };
 
-  const feeUnits = toToken?.protocol === 'sip10' || toToken?.protocol === 'stx' ? 'STX' : 'Sats';
+  const feeUnits = toToken?.protocol === 'stacks' || toToken?.principal === 'STX' ? 'STX' : 'Sats';
 
   const showSlippageWarning = Boolean(
     quote.slippageSupported && quote.slippageThreshold && slippage > quote.slippageThreshold,
@@ -357,7 +268,7 @@ export default function QuoteSummary({
   })();
 
   const toTokenFiatValue = (() => {
-    if (toToken?.protocol === 'btc') {
+    if (toToken?.principal === 'BTC') {
       return getBtcFiatEquivalent(
         new BigNumber(quote.receiveAmount),
         new BigNumber(btcFiatRate),
@@ -369,7 +280,7 @@ export default function QuoteSummary({
         new BigNumber(btcFiatRate),
       ).toFixed(2);
     }
-    if (toToken?.protocol === 'stx') {
+    if (toToken?.principal === 'STX') {
       return getStxFiatEquivalent(
         stxToMicrostacks(new BigNumber(quote.receiveAmount)),
         new BigNumber(stxBtcRate),
@@ -396,7 +307,7 @@ export default function QuoteSummary({
     .toFixed(0);
 
   const getTokenRate = (): string => {
-    if (toToken?.protocol === 'btc') {
+    if (toToken?.principal === 'BTC') {
       return new BigNumber(quote.receiveAmount)
         .dividedBy(new BigNumber(amount))
         .decimalPlaces(2)
@@ -438,20 +349,8 @@ export default function QuoteSummary({
             <QuoteTile
               provider="Amount"
               price={amount}
-              image={{
-                currency: mapFtToCurrencyType(fromToken),
-                ft:
-                  fromToken?.principal === 'BTC' || fromToken?.principal === 'STX'
-                    ? undefined
-                    : fromToken,
-              }}
-              subtitle={
-                fromToken?.principal === 'BTC'
-                  ? 'Bitcoin'
-                  : fromToken?.assetName !== ''
-                  ? fromToken?.assetName
-                  : fromToken?.name
-              }
+              token={fromToken}
+              subtitle={fromToken?.name}
               subtitleColorOverride="white_400"
               unit={fromUnit}
               fiatValue={fromTokenFiatValue}
@@ -464,21 +363,8 @@ export default function QuoteSummary({
             <QuoteTile
               provider="Amount"
               price={quote.receiveAmount}
-              image={{
-                currency: mapTokenToCurrencyType(toToken),
-                ft:
-                  toToken?.protocol === 'runes'
-                    ? ({
-                        runeSymbol: toToken?.symbol,
-                        runeInscriptionId: toToken?.logo,
-                        ticker: toToken?.name,
-                        protocol: 'runes',
-                      } as FungibleToken)
-                    : toToken?.protocol === 'sip10'
-                    ? mapSwapTokenToFT(toToken)
-                    : undefined,
-              }}
-              subtitle={toToken?.protocol === 'btc' ? 'Bitcoin' : toToken?.name}
+              token={toToken}
+              subtitle={toToken?.name}
               subtitleColorOverride="white_400"
               unit={toUnit}
               fiatValue={toTokenFiatValue}
@@ -494,7 +380,7 @@ export default function QuoteSummary({
                 <SlippageButton
                   data-testid="slippage-button"
                   onClick={() => setShowSlippageModal(true)}
-                  showWarning={showSlippageWarning}
+                  $showWarning={showSlippageWarning}
                 >
                   {showSlippageWarning && (
                     <WarningOctagon weight="fill" color={theme.colors.caution} size={16} />
@@ -509,7 +395,7 @@ export default function QuoteSummary({
                 {t('SWAP_SCREEN.MIN_RECEIVE')}
               </StyledP>
               <StyledP data-testid="min-received-amount" typography="body_medium_m" color="white_0">
-                {formatNumber(quote.receiveAmount)} {toUnit}
+                <FormattedNumber number={formatBalance(quote.receiveAmount)} tokenSymbol={toUnit} />
               </StyledP>
             </ListingDescriptionRow>
             {Boolean(quote.feePercentage) && (

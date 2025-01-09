@@ -1,9 +1,8 @@
-import AccountHeaderComponent from '@components/accountHeader';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { ArrowLeft, TrayArrowUp } from '@phosphor-icons/react';
+import { TrayArrowUp } from '@phosphor-icons/react';
 import {
   removeAllFromHideCollectiblesAction,
   setHiddenCollectiblesAction,
@@ -22,8 +21,8 @@ import { TabPanel, Tabs } from 'react-tabs';
 import styled from 'styled-components';
 import Theme from 'theme';
 import {
+  CollectiblesContainer,
   StickyStyledTabList,
-  StyledButton,
   StyledSheetButton,
 } from '../collectiblesTabs/index.styled';
 import SkeletonLoader from '../collectiblesTabs/skeletonLoader';
@@ -47,15 +46,6 @@ const PageHeader = styled.div`
   width: 100%;
 `;
 
-const CollectiblesContainer = styled.div`
-  padding: 0 ${(props) => props.theme.space.s};
-  padding-bottom: ${(props) => props.theme.space.xl};
-  max-width: 1224px;
-  margin-left: auto;
-  margin-right: auto;
-  width: 100%;
-`;
-
 const RowCenterSpaceBetween = styled.div<{ addMarginBottom?: boolean }>`
   display: flex;
   flex-direction: row;
@@ -64,18 +54,8 @@ const RowCenterSpaceBetween = styled.div<{ addMarginBottom?: boolean }>`
   margin-bottom: ${(props) => (props.addMarginBottom ? props.theme.space.m : 0)};
 `;
 
-const BackButton = styled.button`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: ${(props) => props.theme.space.xxs};
-  background: transparent;
-  margin-bottom: ${(props) => props.theme.space.xl};
-  color: ${(props) => props.theme.colors.white_0};
-`;
-
-const ItemCountContainer = styled.div<{ $isGalleryOpen: boolean }>`
-  margin-top: ${(props) => (props.$isGalleryOpen ? props.theme.space.l : props.theme.space.m)};
+const ItemCountContainer = styled.div`
+  margin-top: ${(props) => props.theme.space.m};
 `;
 
 type TabButton = {
@@ -94,17 +74,14 @@ const tabs: TabButton[] = [
   },
 ];
 
-const tabKeyToIndex = (key?: string | null) => {
+const tabKeyToIndex = (visibleTabButtons: TabButton[], key?: string | null) => {
   if (!key) return 0;
-  return tabs.findIndex((tab) => tab.key === key);
+  return visibleTabButtons.findIndex((tab) => tab.key === key);
 };
 
 function NftDashboardHidden() {
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const { t: tCommon } = useTranslation('translation', { keyPrefix: 'COMMON' });
-  const { t: tCollectibles } = useTranslation('translation', {
-    keyPrefix: 'COLLECTIBLE_COLLECTION_SCREEN',
-  });
   const [searchParams] = useSearchParams();
   const tab = searchParams?.get('tab');
   const {
@@ -122,14 +99,13 @@ function NftDashboardHidden() {
   const dispatch = useDispatch();
   const { hiddenCollectibleIds } = useWalletSelector();
   const [isOptionsModalVisible, setIsOptionsModalVisible] = useState(false);
-  const [tabIndex, setTabIndex] = useState(tabKeyToIndex(tab));
-
   const visibleTabButtons = tabs.filter((tabItem: TabButton) => {
     if (tabItem.key === 'inscriptions' && !hasActivatedOrdinalsKey) {
       return false;
     }
     return true;
   });
+  const [tabIndex, setTabIndex] = useState(tabKeyToIndex(visibleTabButtons, tab));
 
   const handleBackButtonClick = () => {
     navigate(`/nft-dashboard?tab=${tab}`);
@@ -153,7 +129,7 @@ function NftDashboardHidden() {
       }),
     );
     toast.remove(toastId);
-    toast.custom(<SnackBar text={t('ITEMS_RETURNED_TO_HIDDEN')} type="neutral" />, {
+    toast(t('ITEMS_RETURNED_TO_HIDDEN'), {
       duration: LONG_TOAST_DURATION,
     });
   };
@@ -170,7 +146,7 @@ function NftDashboardHidden() {
     dispatch(removeAllFromHideCollectiblesAction({ address: stxAddress }));
     handleBackButtonClick();
 
-    const toastId = toast.custom(
+    const toastId = toast(
       <SnackBar
         text={t('HIDDEN_ITEMS_RESTORED')}
         type="neutral"
@@ -200,38 +176,18 @@ function NftDashboardHidden() {
 
   return (
     <>
-      {isGalleryOpen ? (
-        <AccountHeaderComponent disableMenuOption={isGalleryOpen} showBorderBottom={false} />
-      ) : (
-        <TopRow
-          onClick={handleBackButtonClick}
-          onMenuClick={
-            totalHiddenInscriptions > 0 || totalHiddenNfts > 0 ? openOptionsDialog : undefined
-          }
-        />
-      )}
+      <TopRow
+        onClick={handleBackButtonClick}
+        onMenuClick={
+          totalHiddenInscriptions > 0 || totalHiddenNfts > 0 ? openOptionsDialog : undefined
+        }
+      />
       <Container>
         <PageHeader>
-          {isGalleryOpen && (
-            <BackButton onClick={handleBackButtonClick}>
-              <ArrowLeft size={16} color="currentColor" />
-              <StyledP data-testid="back-to-gallery" typography="body_m" color="white_0">
-                {tCollectibles('BACK_TO_GALLERY')}
-              </StyledP>
-            </BackButton>
-          )}
           <RowCenterSpaceBetween addMarginBottom={isGalleryOpen}>
             <StyledHeading typography={isGalleryOpen ? 'headline_xl' : 'headline_s'}>
               {t('HIDDEN_COLLECTIBLES')}
             </StyledHeading>
-            {isGalleryOpen && (totalHiddenInscriptions > 0 || totalHiddenNfts > 0) ? (
-              <StyledButton
-                variant="tertiary"
-                icon={<TrayArrowUp size={20} color={Theme.colors.white_200} />}
-                title={t('UNHIDE_ALL')}
-                onClick={handleUnHideAll}
-              />
-            ) : null}
           </RowCenterSpaceBetween>
         </PageHeader>
         <CollectiblesContainer>
@@ -242,8 +198,8 @@ function NftDashboardHidden() {
                 {visibleTabButtons.map(({ key, label }) => (
                   <TabItem
                     key={key}
-                    $active={tabIndex === tabKeyToIndex(key)}
-                    onClick={() => handleSelectTab(tabKeyToIndex(key))}
+                    $active={tabIndex === tabKeyToIndex(visibleTabButtons, key)}
+                    onClick={() => handleSelectTab(tabKeyToIndex(visibleTabButtons, key))}
                   >
                     {t(label)}
                   </TabItem>
@@ -258,7 +214,7 @@ function NftDashboardHidden() {
                       <SkeletonLoader isGalleryOpen={isGalleryOpen} />
                     ) : (
                       <>
-                        <ItemCountContainer $isGalleryOpen={isGalleryOpen}>
+                        <ItemCountContainer>
                           {totalHiddenInscriptions > 0 ? (
                             <StyledP
                               data-testid="total-items"
@@ -285,7 +241,7 @@ function NftDashboardHidden() {
                 <SkeletonLoader isGalleryOpen={isGalleryOpen} />
               ) : (
                 <>
-                  <ItemCountContainer $isGalleryOpen={isGalleryOpen}>
+                  <ItemCountContainer>
                     {totalHiddenNfts > 0 ? (
                       <StyledP
                         data-testid="total-items"
@@ -307,7 +263,7 @@ function NftDashboardHidden() {
           </Tabs>
         </CollectiblesContainer>
       </Container>
-      {!isGalleryOpen && <BottomTabBar tab="nft" />}
+      <BottomTabBar tab="nft" />
       {isOptionsModalVisible && (
         <Sheet
           title={tCommon('OPTIONS')}

@@ -1,5 +1,9 @@
 import { ArrowLeft, DotsThreeVertical, FadersHorizontal, Star } from '@phosphor-icons/react';
+import { InputFeedback } from '@ui-library/inputFeedback';
+import RoutePaths from 'app/routes/paths';
 import type { MutableRefObject } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import Theme from 'theme';
 
@@ -61,6 +65,7 @@ type Props = {
   settingsRef?: MutableRefObject<HTMLButtonElement | null>;
   onStarClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   isStarred?: boolean;
+  backupReminder?: boolean;
 };
 
 function TopRow({
@@ -73,13 +78,21 @@ function TopRow({
   settingsRef,
   onStarClick,
   isStarred,
+  backupReminder = false,
 }: Props) {
+  const { t } = useTranslation();
+
   return (
     <TopSectionContainer className={className}>
       {showBackButton && (
         <BackButton onClick={onClick} data-testid="back-button">
           <ArrowLeft size={20} color={Theme.colors.white_0} alt="back button" />
         </BackButton>
+      )}
+      {backupReminder && (
+        <Link to={RoutePaths.BackupWallet}>
+          <InputFeedback message={t('INFORMATION.WALLET_NOT_BACKED_UP')} variant="warning" />
+        </Link>
       )}
       {title && <HeaderText>{title}</HeaderText>}
       {onStarClick && (

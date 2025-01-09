@@ -11,35 +11,45 @@ const Container = styled.div({
 });
 
 const Title = styled.h1((props) => ({
-  ...props.theme.body_m,
+  ...props.theme.typography.headline_s,
+  color: props.theme.colors.white_0,
+  marginTop: props.theme.space.xxl,
+  marginBottom: props.theme.space.m,
+}));
+
+const Description = styled.p((props) => ({
+  ...props.theme.typography.body_m,
   color: props.theme.colors.white_200,
-  marginTop: props.theme.spacing(21),
-  marginBottom: props.theme.spacing(16),
-  textAlign: 'center',
+  marginBottom: props.theme.space.xxl,
 }));
 
 const ButtonContainer = styled.div((props) => ({
   width: '100%',
-  marginTop: 'auto',
-  marginBottom: props.theme.spacing(15),
+  margin: '0 auto',
+  marginBottom: props.theme.space.xxxl,
 }));
 
-interface Props {
+type Props = {
   seed: string;
   setSeed: (seed: string) => void;
   onContinue: () => void;
   seedError: string;
   setSeedError: (err: string) => void;
-}
+};
 
-function EnterSeedPhrase(props: Props): JSX.Element {
-  const { onContinue, seed, setSeed, seedError, setSeedError } = props;
-
+function EnterSeedPhrase({
+  seed,
+  setSeed,
+  onContinue,
+  seedError,
+  setSeedError,
+}: Props): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_WALLET_SCREEN' });
 
   return (
     <Container>
-      <Title>{t('ENTER_SEED_HEADER')}</Title>
+      <Title>{t('ENTER_SEED_TITLE')}</Title>
+      <Description>{t('ENTER_SEED_DESCRIPTION')}</Description>
       <SeedPhraseInput onSeedChange={setSeed} seedError={seedError} setSeedError={setSeedError} />
       <ButtonContainer>
         <Button onClick={onContinue} disabled={seed === ''} title={t('CONTINUE_BUTTON')} />

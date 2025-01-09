@@ -11,6 +11,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { Plus } from '@phosphor-icons/react';
 import type { Account } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
+import { isInOptions } from '@utils/helper';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -57,7 +58,7 @@ const Title = styled.div((props) => ({
 function AccountList(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'ACCOUNT_SCREEN' });
   const navigate = useNavigate();
-  const { search } = useLocation();
+  const { search, state } = useLocation();
   const params = new URLSearchParams(search);
   const selectedAccount = useSelectedAccount();
   const { network, accountsList, ledgerAccountsList } = useWalletSelector();
@@ -72,7 +73,7 @@ function AccountList(): JSX.Element {
   }, [accountsList, ledgerAccountsList, network]);
 
   const handleBackButtonClick = () => {
-    navigate(-1);
+    navigate(state?.from || -1);
   };
 
   const handleAccountSelect = async (account: Account, goBack = true) => {
@@ -92,9 +93,13 @@ function AccountList(): JSX.Element {
   };
 
   const onImportLedgerAccount = async () => {
-    await chrome.tabs.create({
-      url: chrome.runtime.getURL('options.html#/import-ledger'),
-    });
+    if (isInOptions()) {
+      navigate('/import-ledger');
+    } else {
+      await chrome.tabs.create({
+        url: chrome.runtime.getURL('options.html#/import-ledger'),
+      });
+    }
   };
 
   return (

@@ -59,7 +59,7 @@ jobs:
           GIT_SHA_SHORT=$(git rev-parse --short ${{ github.event.pull_request.head.sha }})
           echo "FILENAME=xverse-extension.$BRANCH_NAME.$GIT_SHA_SHORT" >> $GITHUB_ENV
       - name: Upload Archive
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.FILENAME }}
           path: ./build

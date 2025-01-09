@@ -1,5 +1,5 @@
-import type { Permission } from '@components/permissionsManager/schemas';
 import { getPermissionsStore } from '@components/permissionsManager/utils';
+import type { Permissions } from '@secretkeylabs/xverse-core';
 import { type ContentScriptMessage } from '../schemas';
 
 /**
@@ -108,7 +108,7 @@ export async function sendMessageConnectedClients(message: ContentScriptMessage)
  * @public
  */
 export async function sendMessageAuthorizedConnectedClients(
-  permissions: Omit<Permission, 'clientId'>[],
+  targetPermissions: Omit<Permissions.Store.Permission, 'clientId'>[],
   message: ContentScriptMessage,
 ) {
   const [error, store] = await getPermissionsStore();
@@ -124,19 +124,22 @@ export async function sendMessageAuthorizedConnectedClients(
     return;
   }
 
-  const authorizedClientIds = [...store.permissions]
-    .filter((p) =>
-      permissions.some(
-        (permission) =>
-          p.resourceId === permission.resourceId &&
-          [...permission.actions].every((action) => p.actions.has(action)),
+  const authorizedClientIds = store.permissions
+    .filter((storePermission) =>
+      targetPermissions.some(
+        (targetPermission) =>
+          storePermission.type === targetPermission.type &&
+          storePermission.resourceId === targetPermission.resourceId &&
+          Object.entries(targetPermission.actions).every(
+            ([action]) => storePermission.actions[action],
+          ),
       ),
     )
     .map((p) => p.clientId);
 
   const origins = authorizedClientIds
     .map((id) => {
-      const client = [...store.clients].find((c) => c.id === id);
+      const client = store.clients.find((c) => c.id === id);
       return client?.origin;
     })
     .filter((origin) => typeof origin === 'string');

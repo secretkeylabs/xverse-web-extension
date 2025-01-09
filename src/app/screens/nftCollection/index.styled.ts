@@ -61,37 +61,6 @@ export const NftContainer = styled.div<Props>`
   column-gap: ${(props) => props.theme.space.m};
 `;
 
-export const BackButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  marginBottom: props.theme.space.xxl,
-}));
-
-export const BackButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'flex-start',
-  alignItems: 'center',
-  background: 'transparent',
-  marginBottom: props.theme.space.l,
-}));
-
-export const AssetDetailButtonText = styled.div((props) => ({
-  ...props.theme.typography.body_m,
-  marginLeft: props.theme.space.xxxs,
-  color: props.theme.colors.white_0,
-  textAlign: 'center',
-}));
-
-export const StyledGridContainer = styled(GridContainer)`
-  margin-top: ${(props) => props.theme.space.s};
-  padding: 0 ${(props) => props.theme.space.xs};
-  padding-bottom: ${(props) => props.theme.space.xl};
-  max-width: 1224px;
-  margin-left: auto;
-  margin-right: auto;
-  width: 100%;
-`;
-
 export const CollectionNameDiv = styled.div`
   display: flex;
   align-items: center;

@@ -6,12 +6,12 @@ import {
   type FungibleToken,
   type Provider,
   type Quote,
-  type Token,
 } from '@secretkeylabs/xverse-core';
 import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
 import { getTrackingIdentifier, isRunesTx } from './utils';
 
+// TODO add typing to this. the properties actually sent to mixpanel no longer match what's defined in xverse-core
 function trackSwapMixPanel(
   eventName,
   {
@@ -21,17 +21,15 @@ function trackSwapMixPanel(
     amount,
     quote,
     btcUsdRate,
-    runeFloorPrice,
     stxBtcRate,
     fromTokenInfo,
   }: {
     provider?: Provider;
     fromToken?: FungibleToken;
-    toToken?: Token;
+    toToken?: FungibleToken;
     amount: string;
     quote?: Quote;
     btcUsdRate: string;
-    runeFloorPrice?: number;
     stxBtcRate?: string;
     fromTokenInfo?: Coin;
   },
@@ -59,7 +57,7 @@ function trackSwapMixPanel(
     fromTokenAmount = amount;
   } else if (stxBtcRate) {
     fromPrincipal = fromToken?.principal;
-    toPrincipal = toToken?.ticker;
+    toPrincipal = toToken?.principal;
 
     fromTokenAmount = amount;
     fromTokenUsdValue =

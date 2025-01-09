@@ -1,4 +1,3 @@
-import FeatureIcon from '@assets/img/nftDashboard/rareSats/NewFeature.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import BottomTabBar from '@components/tabBar';
@@ -6,10 +5,10 @@ import WebGalleryButton from '@components/webGalleryButton';
 import { ArrowDown } from '@phosphor-icons/react';
 import Button from '@ui-library/button';
 import { StyledHeading } from '@ui-library/common.styled';
-import Dialog from '@ui-library/dialog';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import CollectiblesTabs from './collectiblesTabs';
+import { CollectiblesContainer } from './collectiblesTabs/index.styled';
 import ReceiveNftModal from './receiveNft';
 import useNftDashboard from './useNftDashboard';
 
@@ -31,15 +30,6 @@ const PageHeader = styled.div`
   width: 100%;
 `;
 
-const CollectiblesContainer = styled.div`
-  padding: 0 ${(props) => props.theme.space.s};
-  padding-bottom: ${(props) => props.theme.space.xl};
-  max-width: 1224px;
-  margin-left: auto;
-  margin-right: auto;
-  width: 100%;
-`;
-
 const StyledWebGalleryButton = styled(WebGalleryButton)`
   margin-top: ${(props) => props.theme.space.s};
 `;
@@ -51,6 +41,7 @@ const ReceiveNftContainer = styled.div((props) => ({
   zIndex: 2000,
   background: props.theme.colors.elevation2,
   borderRadius: 16,
+  maxWidth: 360,
 }));
 
 const CollectibleContainer = styled.div((props) => ({
@@ -63,7 +54,6 @@ const ButtonContainer = styled.div({
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'space-between',
-  maxWidth: 360,
 });
 
 const ReceiveButtonContainer = styled.div(() => ({
@@ -75,44 +65,22 @@ function NftDashboard() {
   const nftDashboard = useNftDashboard();
   const {
     openReceiveModal,
-    showNewFeatureAlert,
-    hasActivatedOrdinalsKey,
     isOrdinalReceiveAlertVisible,
     openInGalleryView,
     onReceiveModalOpen,
     onReceiveModalClose,
-    onOrdinalReceiveAlertOpen,
     onOrdinalReceiveAlertClose,
     InscriptionListView,
     NftListView,
-    onActivateRareSatsAlertCrossPress,
-    onActivateRareSatsAlertDenyPress,
-    onActivateRareSatsAlertEnablePress,
     isGalleryOpen,
   } = nftDashboard;
+
   return (
     <>
       {isOrdinalReceiveAlertVisible && (
         <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose} />
       )}
-      {showNewFeatureAlert && (
-        <Dialog
-          title={t('NEW_FEATURE')}
-          description={
-            hasActivatedOrdinalsKey
-              ? t('NEW_FEAT_RARE_SATS_ORDINALS_ENABLE')
-              : t('NEW_FEAT_RARE_SATS_DESCRIPTION')
-          }
-          rightButtonText={t('ENABLE')}
-          leftButtonText={t('MAYBE_LATER')}
-          onRightButtonClick={onActivateRareSatsAlertEnablePress}
-          onLeftButtonClick={onActivateRareSatsAlertDenyPress}
-          onClose={onActivateRareSatsAlertCrossPress}
-          type="feedback"
-          icon={<img src={FeatureIcon} width="60" height="60" alt="new feature" />}
-        />
-      )}
-      <AccountHeaderComponent disableMenuOption={isGalleryOpen} showBorderBottom={false} />
+      <AccountHeaderComponent disableMenuOption={isGalleryOpen} />
       <Container>
         <PageHeader>
           <CollectibleContainer>
@@ -131,12 +99,7 @@ function NftDashboard() {
             </ReceiveButtonContainer>
             {openReceiveModal && (
               <ReceiveNftContainer>
-                <ReceiveNftModal
-                  visible={openReceiveModal}
-                  isGalleryOpen={isGalleryOpen}
-                  onClose={onReceiveModalClose}
-                  setOrdinalReceiveAlert={onOrdinalReceiveAlertOpen}
-                />
+                <ReceiveNftModal visible={openReceiveModal} onClose={onReceiveModalClose} />
               </ReceiveNftContainer>
             )}
           </ButtonContainer>
@@ -149,8 +112,9 @@ function NftDashboard() {
           />
         </CollectiblesContainer>
       </Container>
-      {!isGalleryOpen && <BottomTabBar tab="nft" />}
+      <BottomTabBar tab="nft" />
     </>
   );
 }
+
 export default NftDashboard;

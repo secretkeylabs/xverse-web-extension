@@ -19,7 +19,7 @@ export const PageHeader = styled.div<DetailSectionProps>`
   padding: ${(props) => (props.isGalleryOpen ? props.theme.space.m : 0)};
   padding-top: 0;
   max-width: 1224px;
-  margin-top: ${(props) => (props.isGalleryOpen ? props.theme.space.xxl : props.theme.space.l)};
+  margin-top: ${(props) => props.theme.space.xs};
   margin-left: auto;
   margin-right: auto;
   width: 100%;
@@ -52,60 +52,10 @@ export const SendButtonContainer = styled.div<DetailSectionProps>`
   width: ${(props) => (props.isGalleryOpen ? '222px' : '100%')};
 `;
 
-export const BundleRarityLinkContainer = styled.button`
-  margin-top: ${(props) => props.theme.space.l};
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  gap: ${(props) => props.theme.space.xxs};
-  background-color: transparent;
-  color: ${(props) => props.theme.colors.white_200};
-  :hover:enabled {
-    color: ${(props) => props.theme.colors.white_200};
-  }
-  :active ;
-  :disabled {
-    color: ${(props) => props.theme.colors.white_400};
-  }
-  svg {
-    flex-grow: 0;
-    flex-shrink: 0;
-  }
-`;
-
-export const BackButtonContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  margin-bottom: ${(props) => props.theme.space.xxl};
-`;
-
-export const ButtonImage = styled.img((props) => ({
-  marginRight: props.theme.spacing(3),
-  alignSelf: 'center',
-  transform: 'all',
-}));
-
-export const BackButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'flex-start',
-  alignItems: 'center',
-  background: 'transparent',
-  marginBottom: props.theme.spacing(12),
-}));
-
-export const AssetDetailButtonText = styled.div((props) => ({
-  ...props.theme.body_xs,
-  fontWeight: 400,
-  fontSize: 14,
-  color: props.theme.colors.white['0'],
-  textAlign: 'center',
-}));
-
 export const NoCollectiblesText = styled.p((props) => ({
-  ...props.theme.body_bold_m,
+  ...props.theme.typography.body_bold_m,
   color: props.theme.colors.white_200,
-  marginTop: props.theme.spacing(16),
+  marginTop: props.theme.space.xl,
   marginBottom: 'auto',
   textAlign: 'center',
 }));
@@ -132,11 +82,12 @@ export const DetailSection = styled.div<DetailSectionProps>((props) => ({
   width: '100%',
 }));
 
-export const SeeRarityContainer = styled.div`
-  padding: ${(props) => props.theme.space.l} ${(props) => props.theme.space.m};
+export const SeeRarityContainer = styled.div<DetailSectionProps>`
+  padding: ${(props) => props.theme.space.l}
+    ${(props) => (props.isGalleryOpen ? props.theme.space.m : 0)};
 `;
 
-export const RuneAmountContainer = styled.div<{ isGalleryOpen?: boolean }>((props) => ({
+export const RuneAmountContainer = styled.div<DetailSectionProps>((props) => ({
   padding: props.isGalleryOpen ? `0 ${props.theme.space.m}` : 0,
   marginBottom: props.theme.space.s,
 }));

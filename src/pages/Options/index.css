@@ -2,10 +2,15 @@ body {
   margin: 0;
   padding: 0;
   color: #ffffff;
-  background-color: #0c0c0c;
+  background-color: #181818;
   position: relative;
   overflow-x: hidden;
 }
+
+a {
+  cursor: pointer;
+}
+
 header {
   display: flex;
   justify-content: space-between;
@@ -33,6 +38,7 @@ header h2 {
 }
 
 #app {
+  width: 100%;
   min-height: 600px;
 }
 

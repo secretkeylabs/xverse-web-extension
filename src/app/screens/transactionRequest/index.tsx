@@ -6,7 +6,9 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
+import trackSwapMixPanel from '@screens/swap/mixpanel';
 import {
+  AnalyticsEvents,
   createDeployContractRequest,
   extractFromPayload,
   fetchStxPendingTxData,
@@ -19,7 +21,7 @@ import {
 import type { ContractCallPayload, ContractDeployPayload } from '@stacks/connect';
 import { StacksTransaction } from '@stacks/transactions';
 import Spinner from '@ui-library/spinner';
-import { getNetworkType, isHardwareAccount } from '@utils/helper';
+import { getNetworkType, getStxNetworkForBtcNetwork, isHardwareAccount } from '@utils/helper';
 import RoutePaths from 'app/routes/paths';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -33,15 +35,16 @@ const LoaderContainer = styled.div((props) => ({
   flex: 1,
   justifyContent: 'center',
   alignItems: 'center',
-  marginTop: props.theme.spacing(12),
+  marginTop: props.theme.space.s,
 }));
 
 function TransactionRequest() {
   const selectedAccount = useSelectedAccount();
   const { network, feeMultipliers, accountsList } = useWalletSelector();
   const location = useLocation();
-  const { dataStxSignTransactionOverride } = (location.state || {}) as {
+  const { dataStxSignTransactionOverride, mixpanelMetadata } = (location.state || {}) as {
     dataStxSignTransactionOverride?: DataStxSignTransaction;
+    mixpanelMetadata: any;
   };
   const txReq = useStxTransactionRequest(dataStxSignTransactionOverride);
   const navigate = useNavigate();
@@ -70,6 +73,10 @@ function TransactionRequest() {
     protocol: 'stacks',
     action,
   });
+
+  const onSignTransaction = () => {
+    trackSwapMixPanel(AnalyticsEvents.SignSwap, mixpanelMetadata);
+  };
 
   const handleTokenTransferRequest = async (tokenTransferPayload: any, requestAccount: Account) => {
     const stxPendingTxData = await fetchStxPendingTxData(
@@ -204,7 +211,10 @@ function TransactionRequest() {
   };
 
   const handleRequest = async () => {
-    if (payload.network && getNetworkType(payload.network) !== network.type) {
+    if (
+      payload.network &&
+      getNetworkType(payload.network) !== getStxNetworkForBtcNetwork(network.type)
+    ) {
       navigate('/tx-status', {
         state: {
           txid: '',
@@ -267,6 +277,7 @@ function TransactionRequest() {
           requestToken={requestToken}
           messageId={messageId}
           rpcMethod={rpcMethod}
+          onSignTransaction={onSignTransaction}
         />
       ) : null}
       {payload && payload.txType === 'smart_contract' && unsignedTx ? (

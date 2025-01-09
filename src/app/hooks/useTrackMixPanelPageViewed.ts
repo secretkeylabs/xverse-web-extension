@@ -4,6 +4,8 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import useSelectedAccount from './useSelectedAccount';
 
+declare const VERSION: string;
+
 const useTrackMixPanelPageViewed = (properties?: any, deps: any[] = []) => {
   const selectedAccount = useSelectedAccount();
   const location = useLocation();
@@ -12,6 +14,7 @@ const useTrackMixPanelPageViewed = (properties?: any, deps: any[] = []) => {
     getMixpanelInstance('web-extension').track_pageview({
       path: location.pathname,
       wallet_type: isLedgerAccount(selectedAccount) ? 'ledger' : 'software',
+      client_version: VERSION,
       ...properties,
     });
   }, deps); // eslint-disable-line react-hooks/exhaustive-deps

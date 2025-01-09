@@ -1,4 +1,5 @@
 /* eslint-disable no-underscore-dangle */
+import { defaultMainnet, type SettingsNetwork } from '@secretkeylabs/xverse-core';
 import { markAlertsForShow } from '@utils/alertTracker';
 import chromeStorage from '@utils/chromeStorage';
 import { applyMiddleware, combineReducers, createStore } from 'redux';
@@ -14,6 +15,8 @@ import type {
   WalletStateV3,
   WalletStateV4,
   WalletStateV5,
+  WalletStateV6,
+  WalletStateV7,
 } from './wallet/actions/migrationTypes';
 import { type AvatarInfo, type WalletState } from './wallet/actions/types';
 import walletReducer, { initialWalletState, rehydrateError } from './wallet/reducer';
@@ -67,7 +70,7 @@ const migrations = {
       state.selectedAccount?.deviceAccountIndex ?? state.selectedAccount?.id ?? 0,
     selectedAccountType: state.selectedAccount?.accountType ?? 'software',
   }),
-  5: (state: WalletStateV4): WalletState => {
+  5: (state: WalletStateV4): WalletStateV5 => {
     const migrateAccount =
       (accountType: 'software' | 'ledger') =>
       (account: AccountV1 & { btcAddresses?: AccountBtcAddressesV5 }): AccountV5 => {
@@ -149,24 +152,75 @@ const migrations = {
       balanceHidden: false,
     };
   },
+  6: (state: WalletStateV5): WalletStateV6 => {
+    const { allowNestedSegWitAddress, ...migratedState } = state;
+    return migratedState as WalletState;
+  },
+  7: (
+    // NOTE: because we forgot to bump the store version on L222, need to be defensive here
+    // and only initialise if not defined
+    state: WalletStateV6 & { showBalanceInBtc: boolean; hasBackedUpWallet: boolean },
+  ): WalletStateV7 => ({
+    ...state,
+    showBalanceInBtc: state.showBalanceInBtc ?? false,
+    hasBackedUpWallet: state.hasBackedUpWallet ?? true,
+  }),
+  8: (state: WalletStateV7): WalletState => {
+    const migrateMainnetNetwork = (currentNetwork: SettingsNetwork) => ({
+      ...currentNetwork,
+      btcApiUrl:
+        currentNetwork.btcApiUrl === 'https://mempool.space/api'
+          ? defaultMainnet.btcApiUrl
+          : currentNetwork.btcApiUrl,
+      fallbackBtcApiUrl:
+        !currentNetwork.fallbackBtcApiUrl ||
+        currentNetwork.fallbackBtcApiUrl === 'https://btc-1.xverse.app'
+          ? defaultMainnet.fallbackBtcApiUrl
+          : currentNetwork.fallbackBtcApiUrl,
+    });
+    return {
+      ...state,
+      savedNetworks:
+        state.savedNetworks?.map((network: SettingsNetwork) =>
+          network.type === 'Mainnet' ? migrateMainnetNetwork(network) : network,
+        ) ?? initialWalletState.savedNetworks,
+      network:
+        (state.network?.type === 'Mainnet'
+          ? migrateMainnetNetwork(state.network)
+          : state.network) ?? initialWalletState.network,
+    };
+  },
+
   /* *
    * When adding a new migration, add the new wallet state type to the migrationTypes file
-   * and add the migration here. Update the previous head migration's output type to be the versioned wallet state.
+   * and add the migration here.
    * The last migration should be a function that takes the previous state and returns the current WalletState type.
    *
    * e.g. if the current head is this:
-   * 6: (state: WalletStateV5): WalletState => ({
+   * 6: (state: WalletStateV5): WalletStateV6 => {
+   *   const newState = { ...state };
+   *   // migrate state here
+   *   return newState as WalletState;
+   * }
    *
    * Then update it to this:
-   * 6: (state: WalletStateV5): WalletStateV6 => ({
+   * 6: (state: WalletStateV5): WalletStateV6 => {
+   *   const newState = { ...state };
+   *   // migrate state here
+   *   return newState;
+   * }
    *
    * And add this:
-   * 7: (state: WalletStateV6): WalletState => ({
+   * 7: (state: WalletStateV6): WalletStateV7 => {
+   *   const newState = { ...state };
+   *   // migrate state here
+   *   return newState as WalletState;  // << ensure this cast is done on the last migration
+   * }
    * */
 };
 
 const WalletPersistConfig: PersistConfig<WalletState> = {
-  version: 5,
+  version: 8,
   key: 'walletState',
   storage: chromeStorage.local,
   migrate: createMigrate(migrations as any, { debug: false }),

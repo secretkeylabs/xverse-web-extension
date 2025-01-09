@@ -48,37 +48,16 @@ import finalizeTxSignature from './utils';
 
 const PostConditionContainer = styled.div((props) => ({
   display: 'flex',
-  paddingTop: props.theme.spacing(12),
-  paddingBottom: props.theme.spacing(12),
-  marginBottom: props.theme.spacing(12),
+  paddingTop: props.theme.space.l,
+  paddingBottom: props.theme.space.l,
+  marginBottom: props.theme.space.l,
   borderTop: `0.5px solid ${props.theme.colors.elevation3}`,
   borderBottom: `0.5px solid ${props.theme.colors.elevation3}`,
   flexDirection: 'column',
 }));
 
-const SponsoredContainer = styled.div({
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-});
-
-const SponsoredTag = styled.div((props) => ({
-  background: props.theme.colors.elevation3,
-  marginTop: props.theme.spacing(7.5),
-  paddingTop: props.theme.spacing(4),
-  paddingBottom: props.theme.spacing(4),
-  paddingLeft: props.theme.spacing(8),
-  paddingRight: props.theme.spacing(8),
-  borderRadius: 30,
-}));
-
-const SponosredText = styled.h1((props) => ({
-  ...props.theme.body_m,
-  color: props.theme.colors.white_0,
-}));
-
 const PostConditionAlertText = styled.h1((props) => ({
-  ...props.theme.body_medium_l,
+  ...props.theme.typography.body_medium_l,
   color: props.theme.colors.white_0,
 }));
 
@@ -93,6 +72,7 @@ type Props = {
   requestToken: string;
   attachment: Buffer | undefined;
   broadcastAfterSigning: boolean;
+  onSignTransaction?: () => void;
 };
 
 export default function ContractCallRequest({
@@ -106,6 +86,7 @@ export default function ContractCallRequest({
   messageId,
   rpcMethod,
   broadcastAfterSigning,
+  onSignTransaction,
 }: Props) {
   const selectedNetwork = useNetworkSelector();
   const [hasTabClosed, setHasTabClosed] = useState(false);
@@ -115,7 +96,8 @@ export default function ContractCallRequest({
   );
   const { executeStxOrder } = useExecuteOrder();
   const [isLoading, setIsLoading] = useState(false);
-  const isStxSwap = messageId === 'velar' || messageId === 'alex';
+  // TODO fix this to be less hacky
+  const isStxSwap = messageId === 'velar' || messageId === 'alex' || messageId === 'bitflow';
 
   // SignTransaction Params
   const isMultiSigTx = isMultiSig(unsignedTx);
@@ -181,14 +163,6 @@ export default function ContractCallRequest({
       />
     ));
   };
-
-  const showSponsoredTransactionTag = (
-    <SponsoredContainer>
-      <SponsoredTag>
-        <SponosredText>{t('CONTRACT_CALL_REQUEST.SPONSORED')}</SponosredText>
-      </SponsoredTag>
-    </SponsoredContainer>
-  );
 
   const postConditionAlert = unsignedTx?.postConditionMode === PostConditionMode.Deny &&
     unsignedTx?.postConditions.values.length <= 0 && (
@@ -279,6 +253,7 @@ export default function ContractCallRequest({
       setIsLoading(false);
 
       if (response) {
+        if (onSignTransaction) onSignTransaction();
         navigate('/tx-status', {
           state: {
             txid: response.txid,
@@ -310,12 +285,14 @@ export default function ContractCallRequest({
           }
         }
       }
-      navigate('/tx-status', {
-        state: {
-          sponsored: true,
-          browserTx: true,
-        },
-      });
+      if (requestToken) {
+        finalizeTxSignature({
+          requestPayload: requestToken,
+          tabId,
+          data: { txId: '', txRaw: Buffer.from(unsignedTx.serialize()).toString('hex') },
+        });
+      }
+      window.close();
     } else if (isMultiSigTx) {
       if (rpcMethod && tabId && messageId) {
         switch (rpcMethod) {
@@ -392,6 +369,7 @@ export default function ContractCallRequest({
         onCancelClick={cancelCallback}
         loading={isLoading}
         title={request.functionName}
+        isSponsored={request.sponsored}
         subTitle={request.appDetails?.name ? `Requested by ${request.appDetails.name}` : undefined}
         hasSignatures={hasSignatures}
         fee={fee ? microstacksToStx(fee).toString() : undefined}
@@ -407,13 +385,19 @@ export default function ContractCallRequest({
             />
           )}
           {postConditionAlert}
-          {request.sponsored && showSponsoredTransactionTag}
+
           {renderPostConditionsCard()}
           <TransactionDetailComponent
             title={t('CONTRACT_CALL_REQUEST.FUNCTION')}
             value={request?.functionName}
           />
           {functionArgsView()}
+          {request.sponsored && (
+            <TransactionDetailComponent
+              title={t('CONTRACT_CALL_REQUEST.SPONSORED')}
+              value={t('CONTRACT_CALL_REQUEST.SPONSORED_VALUE_YES')}
+            />
+          )}
         </>
       </ConfirmStxTransactionComponent>
     </>

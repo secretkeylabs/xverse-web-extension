@@ -3,16 +3,6 @@ import { RpcErrorCode } from '@sats-connect/core';
 import { makeRPCError, sendRpcResponse } from '../helpers';
 import type { BaseArgs } from './types';
 
-export function sendMissingParametersMessage({ tabId, messageId }: BaseArgs) {
-  sendRpcResponse(
-    tabId,
-    makeRPCError(messageId, {
-      code: RpcErrorCode.INVALID_REQUEST,
-      message: 'Missing parameters.',
-    }),
-  );
-}
-
 type InvalidParametersMessageArgs = BaseArgs & {
   error?: unknown;
 };
@@ -65,12 +55,14 @@ export function sendInternalErrorMessage({
   tabId,
   messageId,
   message,
-}: BaseArgs & { message?: string }) {
+  data,
+}: BaseArgs & { message?: string; data?: unknown }) {
   sendRpcResponse(
     tabId,
     makeRPCError(messageId, {
       code: RpcErrorCode.INTERNAL_ERROR,
       message: message ?? 'Internal error.',
+      data,
     }),
   );
 }

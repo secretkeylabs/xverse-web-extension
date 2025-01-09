@@ -1,5 +1,4 @@
 /* eslint-disable prefer-destructuring */
-/* eslint-disable prefer-destructuring */
 import type { Provider } from '@sats-connect/core';
 import type { NetworkType } from '@secretkeylabs/xverse-core';
 
@@ -14,6 +13,7 @@ export const SUPPORT_EMAIL = 'support@xverse.app';
 export const BTC_TRANSACTION_STATUS_URL = 'https://mempool.space/tx/';
 export const BTC_TRANSACTION_TESTNET_STATUS_URL = 'https://mempool.space/testnet/tx/';
 export const BTC_TRANSACTION_SIGNET_STATUS_URL = 'https://mempool.space/signet/tx/';
+export const BTC_TRANSACTION_REGTEST_STATUS_URL = 'https://mempool.bitcoin.regtest.hiro.so/tx/';
 export const TRANSACTION_STATUS_URL = 'https://explorer.stacks.co/txid/';
 export const XVERSE_WEB_POOL_URL = 'https://pool.xverse.app';
 export const XVERSE_EXPLORE_URL = 'https://wallet.xverse.app/explore';
@@ -23,6 +23,7 @@ const ordiViewSuffixMap: Record<NetworkType, string> = {
   Mainnet: '',
   Testnet: '-testnet',
   Signet: '-signet',
+  Regtest: '-signet',
 };
 export const XVERSE_ORDIVIEW_URL = (network: NetworkType) =>
   `https://ord${ordiViewSuffixMap[network]}.xverse.app`;
@@ -66,8 +67,10 @@ export const DEFAULT_TRANSITION_OPTIONS = {
 
 export const MAX_ACC_NAME_LENGTH = 20;
 // UI
+export const ANIMATION_EASING = (progress: number) => 1 - (1 - progress) ** 3; // ease out (0, 0, 0.58, 1)
 export const EMPTY_LABEL = '--';
 export const HIDDEN_BALANCE_LABEL = '●●●●●●';
+export const BTC_SYMBOL = '₿';
 export const OPTIONS_DIALOG_WIDTH = 179;
 export const SPAM_OPTIONS_WIDTH = 244;
 export const LONG_TOAST_DURATION = 4000;

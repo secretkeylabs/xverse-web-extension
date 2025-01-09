@@ -151,13 +151,23 @@ export type WalletStateV5 = Omit<
   | 'accountsList'
   | 'ledgerAccountsList'
 > & {
+  allowNestedSegWitAddress: boolean;
   accountsList: AccountV5[];
   ledgerAccountsList: AccountV5[];
   btcPaymentAddressType: BtcPaymentType;
-  switchPaymentAddressTypeEnabled: boolean;
 
   hiddenCollectibleIds: Record<string, Record<string, string>>;
   starredCollectibleIds: Record<string, Array<{ id: string; collectionId: string }>>;
   avatarIds: Record<string, AvatarInfo>;
   balanceHidden: boolean;
 };
+
+export type WalletStateV6 = Omit<WalletStateV5, 'allowNestedSegWitAddress'>;
+
+export type WalletStateV7 = WalletStateV6 & {
+  showBalanceInBtc: boolean;
+  hasBackedUpWallet: boolean;
+};
+
+// should be exported and used when we add next migration
+type WalletStateV8 = WalletStateV7; // no changes. just a data migration

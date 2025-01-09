@@ -8,16 +8,22 @@ export default function useSelectedAccountBtcBalance() {
     data: nativeBalance,
     isLoading: nativeLoading,
     isRefetching: nativeRefetching,
+    failureCount: nativeFailureCount,
+    errorUpdateCount: nativeErrorUpdateCount,
   } = useBtcAddressBalance(selectedAccount.btcAddresses.native?.address ?? '');
   const {
     data: nestedBalance,
     isLoading: nestedLoading,
     isRefetching: nestedRefetching,
+    failureCount: nestedFailureCount,
+    errorUpdateCount: nestedErrorUpdateCount,
   } = useBtcAddressBalance(selectedAccount.btcAddresses.nested?.address ?? '');
   const {
     data: taprootBalance,
     isLoading: taprootLoading,
     isRefetching: taprootRefetching,
+    failureCount: taprootFailureCount,
+    errorUpdateCount: taprootErrorUpdateCount,
   } = useBtcAddressBalance(selectedAccount.btcAddresses.taproot.address ?? '');
 
   if (nativeLoading || nestedLoading || taprootLoading) {
@@ -40,5 +46,7 @@ export default function useSelectedAccountBtcBalance() {
     taprootBalance,
     isLoading: false,
     isRefetching: nativeRefetching || nestedRefetching || taprootRefetching,
+    failureCount: nativeFailureCount || nestedFailureCount || taprootFailureCount,
+    errorUpdateCount: nativeErrorUpdateCount || nestedErrorUpdateCount || taprootErrorUpdateCount,
   };
 }

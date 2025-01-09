@@ -319,18 +319,18 @@ function SpeedUpTransactionScreen() {
     }
 
     if (feeRate < mempoolFees.hourFee) {
-      return t('TIME.SEVERAL_HOURS_OR_MORE');
+      return isBtc ? t('TIME.SEVERAL_HOURS_OR_MORE') : `10+ ${t('TIME.MINUTES')}`;
     }
 
     if (feeRate === mempoolFees.hourFee) {
-      return `~1 ${t('TIME.HOUR')}`;
+      return isBtc ? `~1 ${t('TIME.HOUR')}` : `10+ ${t('TIME.MINUTES')}`;
     }
 
     if (feeRate > mempoolFees.hourFee && feeRate <= mempoolFees.halfHourFee) {
-      return `~30 ${t('TIME.MINUTES')}`;
+      return isBtc ? `~30 ${t('TIME.MINUTES')}` : `~5 ${t('TIME.MINUTES')}`;
     }
 
-    return `~10 ${t('TIME.MINUTES')}`;
+    return isBtc ? `~10 ${t('TIME.MINUTES')}` : `~30 ${t('TIME.SECONDS')}`;
   };
 
   const iconProps = {

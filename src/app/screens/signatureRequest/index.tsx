@@ -21,7 +21,12 @@ import Transport from '@ledgerhq/hw-transport-webusb';
 import type { Return } from '@sats-connect/core';
 import { buf2hex, hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
 import type { SignaturePayload, StructuredDataSignaturePayload } from '@stacks/connect';
-import { getNetworkType, getTruncatedAddress, isHardwareAccount } from '@utils/helper';
+import {
+  getNetworkType,
+  getStxNetworkForBtcNetwork,
+  getTruncatedAddress,
+  isHardwareAccount,
+} from '@utils/helper';
 import { signatureVrsToRsv } from '@utils/ledger';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -83,7 +88,7 @@ function SignatureRequest(): JSX.Element {
   };
 
   const switchAccountBasedOnRequest = () => {
-    if (getNetworkType(payload.network) !== network.type) {
+    if (getNetworkType(payload.network) !== getStxNetworkForBtcNetwork(network.type)) {
       navigate('/tx-status', {
         state: {
           txid: '',

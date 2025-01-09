@@ -5,7 +5,6 @@ import styled from 'styled-components';
 const Container = styled.div`
   position: relative;
   width: 100%;
-  color: ${({ theme }) => theme.colors.white_0};
 `;
 
 const BannerContent = styled.button`
@@ -17,7 +16,6 @@ const BannerContent = styled.button`
   column-gap: ${({ theme }) => theme.space.s};
   padding-left: ${({ theme }) => theme.space.m};
   padding-right: ${({ theme }) => theme.space.m};
-  color: ${({ theme }) => theme.colors.white_0};
   background-color: transparent;
   text-align: left;
   transition: opacity 0.1s ease;
@@ -37,11 +35,16 @@ const BannerImage = styled.img`
   border-radius: 8px;
 `;
 
-const BannerTitle = styled.div`
-  ${({ theme }) => theme.typography.body_bold_m};
+const BannerTextWrapper = styled.div`
+  padding-right: ${({ theme }) => theme.space.xl};
 `;
 
-const BannerText = styled.div`
+const BannerTitle = styled.div`
+  ${({ theme }) => theme.typography.body_bold_m};
+  color: ${({ theme }) => theme.colors.white_0};
+`;
+
+const BannerDescription = styled.div`
   ${({ theme }) => theme.typography.body_medium_m};
   color: ${({ theme }) => theme.colors.white_200};
   display: -webkit-box;
@@ -70,10 +73,10 @@ function Banner({ name, url, icon, description }: NotificationBanner) {
         }}
       >
         <BannerImage src={icon} />
-        <div>
+        <BannerTextWrapper>
           <BannerTitle>{name}</BannerTitle>
-          <BannerText>{description}</BannerText>
-        </div>
+          <BannerDescription>{description}</BannerDescription>
+        </BannerTextWrapper>
       </BannerContent>
     </Container>
   );

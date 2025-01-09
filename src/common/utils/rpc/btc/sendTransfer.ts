@@ -1,8 +1,5 @@
 /* eslint-disable import/prefer-default-export */
-import type { WebBtcMessage } from '@common/types/message-types';
-import { getTabIdFromPort } from '@common/utils';
-import { RpcErrorCode } from '@sats-connect/core';
-import { z } from 'zod';
+import { RpcErrorCode, type SendTransferRequestMessage } from '@sats-connect/core';
 import {
   listenForOriginTabClose,
   listenForPopupClose,
@@ -11,33 +8,14 @@ import {
   type ParamsKeyValueArray,
 } from '../../legacy-external-message-handler';
 import RequestsRoutes from '../../route-urls';
-import { makeRPCError, sendRpcResponse } from '../helpers';
-
-const TransferRecipientSchema = z.object({
-  address: z.string(),
-  amount: z.number(),
-});
-
-const SendTransferParamsSchema = z.object({
-  recipients: z.array(TransferRecipientSchema),
-});
+import { makeRPCError } from '../helpers';
 
 export const handleSendTransfer = async (
-  message: WebBtcMessage<'sendTransfer'>,
+  message: SendTransferRequestMessage,
   port: chrome.runtime.Port,
 ) => {
-  const paramsParseResult = SendTransferParamsSchema.safeParse(message.params);
-
-  if (!paramsParseResult.success) {
-    const invalidParamsError = makeRPCError(message.id, {
-      code: RpcErrorCode.INVALID_PARAMS,
-      message: 'Invalid params',
-    });
-    sendRpcResponse(getTabIdFromPort(port), invalidParamsError);
-    return;
-  }
   const requestParams: ParamsKeyValueArray = [
-    ['recipients', JSON.stringify(paramsParseResult.data.recipients)],
+    ['recipients', JSON.stringify(message.params.recipients)],
     ['requestId', message.id as string],
   ];
 

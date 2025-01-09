@@ -2,9 +2,6 @@ import type {
   CreateInscriptionResponse,
   CreateRepeatInscriptionsResponse,
   GetAddressResponse,
-  Params,
-  Requests,
-  RpcId,
   SignMultipleTransactionsResponse,
   SignTransactionResponse,
 } from '@sats-connect/core';
@@ -197,14 +194,6 @@ export type CreateRepeatInscriptionsResponseMessage = Message<
     createRepeatInscriptionsResponse: CreateRepeatInscriptionsResponse | string;
   }
 >;
-
-type BaseWebBtcMessage = {
-  id: RpcId;
-  method: string;
-};
-export type WebBtcMessage<Method extends keyof Requests> = BaseWebBtcMessage & {
-  params: Params<Method>;
-};
 
 export type SatsConnectMessageFromContentScript =
   | GetAddressRequestMessage

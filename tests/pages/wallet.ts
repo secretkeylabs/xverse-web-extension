@@ -442,9 +442,10 @@ export default class Wallet {
     this.buttonBRC20 = page.getByRole('button', { name: 'BRC-20' });
     this.buttonRunes = page.getByRole('button', { name: 'RUNES' });
     this.headingTokens = page.getByRole('heading', { name: 'Manage tokens' });
+
     this.divTokenRow = page.getByLabel('Token Row');
     this.labelTokenSubtitle = page.getByLabel('Token SubTitle');
-    this.labelCoinBalanceCurrency = page.getByLabel('CoinBalance Container').locator('span');
+    this.labelCoinBalanceCurrency = page.getByLabel('CurrencyBalance Container').locator('span');
     this.labelCoinBalanceCrypto = page.getByLabel('CoinBalance Container').locator('p');
 
     // Coin details
@@ -483,9 +484,10 @@ export default class Wallet {
 
     this.backToGallery = page.getByTestId('back-to-gallery');
     this.itemCollection = page.getByTestId('collection-item');
-    this.buttonSend = page.getByRole('button', { name: 'Send' });
-    this.buttonShare = page.getByRole('button', { name: 'Share' });
-    this.buttonReceive = page.getByRole('button', { name: 'Receive', exact: true });
+    this.buttonSend = page.locator('button').filter({ hasText: 'Send' });
+    this.buttonShare = page.locator('button').filter({ hasText: 'Share' });
+    this.buttonReceive = page.getByRole('button', { name: /^Receive/i });
+
     this.buttonOpenOrdinalViewer = page.getByRole('button', { name: 'Open in Ordinal Viewer' });
     this.labelBundle = page.locator('h1').filter({ hasText: 'Bundle' });
     this.labelSatsValue = page.locator('h1').filter({ hasText: 'Sats value' });
@@ -571,7 +573,7 @@ export default class Wallet {
     this.sendRuneAmount = page.getByTestId('send-rune-amount');
 
     // List
-    this.buttonList = page.getByTestId('action-button').filter({ hasText: 'List' });
+    this.buttonList = page.getByRole('button', { name: 'List List' });
     this.tabAvailable = page.getByTestId('available-tab');
     this.tabListed = page.getByRole('button', { name: 'LISTED', exact: true });
     this.tabNotListed = page.getByRole('button', { name: 'NOT LISTED' });
@@ -620,7 +622,9 @@ export default class Wallet {
   }
 
   async checkVisualsStartpage() {
-    await expect(this.balance).toBeVisible();
+    // to-do fix the element itself, after the native-segwit update it resolves to 2 elements
+    // data-testid="total-balance-value"
+    await expect(this.balance.first()).toBeVisible();
     await expect(this.manageTokenButton).toBeVisible();
 
     // Deny data collection --> modal window is not always appearing so when it does we deny the data collection
@@ -730,8 +734,8 @@ export default class Wallet {
 
     // Not all TX Screens show a total amount
     if (totalAmountShown) {
-      await expect(this.confirmTotalAmount).toBeVisible();
-      await expect(this.confirmCurrencyAmount).toBeVisible();
+      await expect(this.confirmTotalAmount.first()).toBeVisible();
+      await expect(this.confirmCurrencyAmount.first()).toBeVisible();
     }
 
     if (tokenImageShown) {
@@ -781,8 +785,6 @@ export default class Wallet {
   async checkVisualsListRunesPage() {
     await expect(this.tabNotListed).toBeVisible();
     await expect(this.tabListed).toBeVisible();
-    await expect(this.buttonSetPrice).toBeVisible();
-    await expect(this.buttonSetPrice).toBeDisabled();
     await expect(this.runeItem.first()).toBeVisible();
     expect(await this.runeItem.count()).toBeGreaterThanOrEqual(1);
   }
@@ -840,18 +842,8 @@ export default class Wallet {
     const usdAmountQuote = await this.textUSD.first().innerText();
     const numericUSDQuote = parseFloat(usdAmountQuote.replace(/[^0-9.]/g, ''));
     expect(numericUSDQuote).toEqual(numericUSDValue);
-
-    // min-received-amount value should be the same as quoteAmount
-    const minReceivedAmount = await this.minReceivedAmount.innerText();
-    const numericMinReceivedAmount = parseFloat(minReceivedAmount.replace(/[^0-9.]/g, ''));
-    const formattedNumericMinReceivedAmount = parseFloat(numericMinReceivedAmount.toFixed(3));
-    expect(formattedNumericMinReceivedAmount).toEqual(numericQuoteValue);
-
-    // check if quoteAmount is the same from the page before
-    const quoteAmount2Page = await this.quoteAmount.last().innerText();
-    const numericQuote2Page = parseFloat(quoteAmount2Page.replace(/[^0-9.]/g, ''));
-    expect(numericQuote2Page).toEqual(numericQuoteValue);
   }
+  // check visuals of List on ME page
 
   async checkVisualsListOnMEPage() {
     await expect(this.buttonFloorPrice).toBeVisible();

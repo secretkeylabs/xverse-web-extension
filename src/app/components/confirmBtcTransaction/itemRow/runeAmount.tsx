@@ -39,6 +39,13 @@ const Column = styled.div`
   overflow: hidden;
 `;
 
+const RuneName = styled(StyledP)`
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 170px;
+  white-space: nowrap;
+`;
+
 type Props = {
   rune: RuneBase;
   hasSufficientBalance?: boolean;
@@ -88,9 +95,9 @@ export default function RuneAmount({
           />
         </Row>
         <Row>
-          <StyledP data-testid="rune-name" typography="body_medium_s" color="white_400">
+          <RuneName data-testid="rune-name" typography="body_medium_s" color="white_400">
             {runeName}
-          </StyledP>
+          </RuneName>
           {runeFiatRate !== undefined && runeFiatRate > 0 && (
             <RightAlignedStyledFiatAmountText
               fiatAmount={BigNumber(amountWithDecimals).multipliedBy(runeFiatRate)}

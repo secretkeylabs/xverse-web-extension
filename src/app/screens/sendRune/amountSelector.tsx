@@ -1,5 +1,7 @@
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
+import useBtcAddressBalance from '@hooks/useBtcAddressBalance';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import RuneAmountSelector from '@screens/sendRune/runeAmountSelector';
 import { getBtcFiatEquivalent, type FungibleToken } from '@secretkeylabs/xverse-core';
@@ -9,6 +11,7 @@ import Callout from '@ui-library/callout';
 import { getFtBalance } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 const Container = styled.div`
@@ -68,9 +71,13 @@ function AmountSelector({
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
   const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
+  const { t: tCommon } = useTranslation('translation', { keyPrefix: 'COMMON' });
   const { fiatCurrency } = useWalletSelector();
   const { btcFiatRate } = useSupportedCoinRates();
   const { data: recommendedFees } = useBtcFeeRate();
+  const { btcAddress } = useSelectedAccount();
+  const { data: btcBalance, isLoading: btcBalanceLoading } = useBtcAddressBalance(btcAddress);
+  const navigate = useNavigate();
 
   const balance = getFtBalance(token);
 
@@ -81,6 +88,11 @@ function AmountSelector({
     amountToSend !== '' && !Number.isNaN(Number(amountToSend)) && +amountToSend > 0;
 
   const isSendButtonEnabled = amountIsPositiveNumber && +amountToSend <= +balance;
+
+  const hasBtc = (btcBalance?.confirmedBalance ?? 0) > 0;
+  const canSwapFromBtc = hasBtc && !btcBalanceLoading;
+
+  const hasRune = +balance > 0;
 
   return (
     <Container>
@@ -117,15 +129,34 @@ function AmountSelector({
         {sendMax && dustFiltered && <Callout bodyText={t('BTC.MAX_IGNORING_DUST_UTXO_MSG')} />}
       </div>
       <Buttons>
-        <Button
-          title={
-            !hasSufficientFunds && amountIsPositiveNumber ? t('INSUFFICIENT_FUNDS') : t('NEXT')
-          }
-          onClick={onNext}
-          loading={isLoading}
-          disabled={!hasSufficientFunds || !isSendButtonEnabled}
-          variant={!hasSufficientFunds && amountIsPositiveNumber ? 'danger' : undefined}
-        />
+        {hasRune ? (
+          <Button
+            title={
+              !hasSufficientFunds && amountIsPositiveNumber ? t('INSUFFICIENT_FUNDS') : t('NEXT')
+            }
+            onClick={onNext}
+            loading={isLoading}
+            disabled={!hasSufficientFunds || !isSendButtonEnabled}
+            variant={!hasSufficientFunds && amountIsPositiveNumber ? 'danger' : undefined}
+          />
+        ) : (
+          canSwapFromBtc && (
+            <Callout
+              dataTestID="no-funds-message"
+              titleText={t('BTC.NO_FUNDS_TITLE')}
+              bodyText={t('EMPTY_RUNE_BALANCE', {
+                symbol: token.runeSymbol,
+              })}
+              redirectText={t('SWAP_FROM_TO', {
+                from: tCommon('BTC'),
+                to: token.runeSymbol,
+              })}
+              onClickRedirect={() => {
+                navigate(`/swap?from=BTC&to=${token.principal}`);
+              }}
+            />
+          )
+        )}
       </Buttons>
     </Container>
   );

@@ -100,7 +100,7 @@ function ConfirmStxTransactionComponent({
   const { getSeed } = useSeedVault();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
   const selectedAccount = useSelectedAccount();
-  const { feeMultipliers, fiatCurrency, network } = useWalletSelector();
+  const { feeMultipliers, fiatCurrency } = useWalletSelector();
   const [openTransactionSettingModal, setOpenTransactionSettingModal] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(loading);
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -364,22 +364,26 @@ function ConfirmStxTransactionComponent({
 
         {children}
 
-        <Subtitle>{t('FEES')}</Subtitle>
-        <FeeRateContainer>
-          <SelectFeeRate
-            fee={fee}
-            feeUnits="STX"
-            feeRate={fee ?? '0'}
-            setFeeRate={setTxFee}
-            baseToFiat={stxToFiat}
-            fiatUnit={fiatCurrency}
-            getFeeForFeeRate={checkIfEnoughBalance}
-            feeRates={feeRates}
-            feeRateLimits={{ min: 0.000001, max: feeMultipliers?.thresholdHighStacksFee }}
-            isLoading={feesLoading}
-            absoluteBalance={Number(microstacksToStx(BigNumber(stxBalance)))}
-          />
-        </FeeRateContainer>
+        {!isSponsored && (
+          <>
+            <Subtitle>{t('FEES')}</Subtitle>
+            <FeeRateContainer>
+              <SelectFeeRate
+                fee={fee}
+                feeUnits="STX"
+                feeRate={fee ?? '0'}
+                setFeeRate={setTxFee}
+                baseToFiat={stxToFiat}
+                fiatUnit={fiatCurrency}
+                getFeeForFeeRate={checkIfEnoughBalance}
+                feeRates={feeRates}
+                feeRateLimits={{ min: 0.000001, max: feeMultipliers?.thresholdHighStacksFee }}
+                isLoading={feesLoading}
+                absoluteBalance={Number(microstacksToStx(BigNumber(stxBalance)))}
+              />
+            </FeeRateContainer>
+          </>
+        )}
 
         {isSponsored ? (
           <SponsoredInfoText>{t('SPONSORED_TX_INFO')}</SponsoredInfoText>

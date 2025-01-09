@@ -1,9 +1,10 @@
 import dashboardIcon from '@assets/img/dashboard-icon.svg';
-import ListDashes from '@assets/img/dashboard/list_dashes.svg';
 import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
+import PercentageChange from '@components/percentageChange';
 import BottomBar from '@components/tabBar';
+import TokenTileLoader from '@components/tokenTile/loader';
 import {
   useGetBrc20FungibleTokens,
   useVisibleBrc20FungibleTokens,
@@ -28,7 +29,7 @@ import useNotificationBanners from '@hooks/useNotificationBanners';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { ArrowDown, ArrowUp, Plus } from '@phosphor-icons/react';
+import { ArrowDown, ArrowUp, ListDashes, Plus } from '@phosphor-icons/react';
 import { animated, useTransition } from '@react-spring/web';
 import CoinSelectModal from '@screens/home/coinSelectModal';
 import {
@@ -46,23 +47,21 @@ import {
 } from '@stores/wallet/actions/actionCreators';
 import Button from '@ui-library/button';
 import SnackBar from '@ui-library/snackBar';
-import type { CurrencyTypes } from '@utils/constants';
+import { ANIMATION_EASING, type CurrencyTypes } from '@utils/constants';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { optInMixPanel, optOutMixPanel, trackMixPanel } from '@utils/mixpanel';
 import { sortFtByFiatBalance } from '@utils/tokens';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useTheme } from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import SquareButton from '../../components/squareButton';
 import AnnouncementModal from './announcementModal';
 import BalanceCard from './balanceCard';
 import BannerCarousel from './bannerCarousel';
 import {
-  ButtonImage,
-  ButtonText,
   ColumnContainer,
   Container,
   ModalButtonContainer,
@@ -73,12 +72,16 @@ import {
   ModalTitle,
   RowButtonContainer,
   StyledDivider,
-  StyledDividerSingle,
   StyledTokenTile,
   TokenListButton,
   TokenListButtonContainer,
 } from './index.styled';
 import ReceiveSheet from './receiveSheet';
+
+const PercentageChangeContainer = styled.div((props) => ({
+  marginTop: props.theme.space.s,
+  marginBottom: props.theme.space.xxxs,
+}));
 
 function Home() {
   const { t } = useTranslation('translation', {
@@ -93,32 +96,107 @@ function Home() {
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openBuyModal, setOpenBuyModal] = useState(false);
-  const { isLoading: loadingBtcWalletData, isRefetching: refetchingBtcWalletData } =
-    useSelectedAccountBtcBalance();
-  const { isInitialLoading: loadingStxWalletData, isRefetching: refetchingStxWalletData } =
-    useStxWalletData();
+  const {
+    isLoading: isInitialLoadingBtc,
+    isRefetching: refetchingBtcWalletData,
+    failureCount: failureCountBtc,
+    errorUpdateCount: errorUpdateCountBtc,
+  } = useSelectedAccountBtcBalance();
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const { data: notificationBannersArr, isFetching: isFetchingNotificationBannersArr } =
     useNotificationBanners();
 
+  // Fetching balances
   const { data: fullSip10CoinsList } = useGetSip10FungibleTokens();
   const { data: fullBrc20CoinsList } = useGetBrc20FungibleTokens();
   const { data: fullRunesCoinsList } = useRuneFungibleTokensQuery();
   const {
+    isInitialLoading: isInitialLoadingStx,
+    isRefetching: refetchingStxWalletData,
+    failureCount: failureCountStx,
+    errorUpdateCount: errorUpdateCountStx,
+  } = useStxWalletData();
+  const {
     data: sip10CoinsList,
-    isInitialLoading: loadingStxCoinData,
+    isInitialLoading: isInitialLoadingSip10,
     isRefetching: refetchingStxCoinData,
+    failureCount: failureCountSip10,
+    errorUpdateCount: errorUpdateCountSip10,
   } = useVisibleSip10FungibleTokens();
   const {
     data: brc20CoinsList,
-    isInitialLoading: loadingBrcCoinData,
+    isInitialLoading: isInitialLoadingBrc20,
     isRefetching: refetchingBrcCoinData,
+    failureCount: failureCountBrc20,
+    errorUpdateCount: errorUpdateCountBrc20,
   } = useVisibleBrc20FungibleTokens();
   const {
     data: runesCoinsList,
-    isInitialLoading: loadingRunesData,
+    isInitialLoading: isInitialLoadingRunes,
     isRefetching: refetchingRunesData,
+    errorUpdateCount: errorUpdateCountRunes,
+    failureCount: failureCountRunes,
   } = useVisibleRuneFungibleTokens();
+
+  const isInitialLoadingTokens =
+    (isInitialLoadingSip10 && failureCountSip10 === 0 && errorUpdateCountSip10 === 0) ||
+    (isInitialLoadingBrc20 && failureCountBrc20 === 0 && errorUpdateCountBrc20 === 0) ||
+    (isInitialLoadingRunes && failureCountRunes === 0 && errorUpdateCountRunes === 0);
+
+  const isInitialLoading =
+    (isInitialLoadingBtc && failureCountBtc === 0 && errorUpdateCountBtc === 0) ||
+    (isInitialLoadingStx && failureCountStx === 0 && errorUpdateCountStx === 0) ||
+    isInitialLoadingTokens;
+
+  const isRefetching =
+    refetchingBtcWalletData ||
+    refetchingStxWalletData ||
+    refetchingStxCoinData ||
+    refetchingBrcCoinData ||
+    refetchingRunesData;
+
+  useEffect(() => {
+    const errorChecks = [
+      {
+        condition: failureCountBtc === 1 && errorUpdateCountBtc === 0,
+        message: 'ERRORS.BTC_BALANCE',
+      },
+      {
+        condition: failureCountStx === 1 && errorUpdateCountStx === 0,
+        message: 'ERRORS.STX_BALANCE',
+      },
+      {
+        condition: failureCountSip10 === 1 && errorUpdateCountSip10 === 0,
+        message: 'ERRORS.SIP10_BALANCE',
+      },
+      {
+        condition: failureCountBrc20 === 1 && errorUpdateCountBrc20 === 0,
+        message: 'ERRORS.BRC20_BALANCE',
+      },
+      {
+        condition: failureCountRunes === 1 && errorUpdateCountRunes === 0,
+        message: 'ERRORS.RUNES_BALANCE',
+      },
+    ];
+
+    errorChecks.forEach(({ condition, message }) => {
+      if (condition) {
+        toast.error(t(message));
+      }
+    });
+  }, [
+    t,
+    failureCountBtc,
+    errorUpdateCountBtc,
+    failureCountStx,
+    errorUpdateCountStx,
+    failureCountSip10,
+    errorUpdateCountSip10,
+    failureCountBrc20,
+    errorUpdateCountBrc20,
+    failureCountRunes,
+    errorUpdateCountRunes,
+  ]);
 
   useFeeMultipliers();
   useAppConfig();
@@ -135,7 +213,7 @@ function Home() {
 
   useEffect(() => {
     if (spamToken) {
-      const toastId = toast.custom(
+      const toastId = toast(
         <SnackBar
           text={t('TOKEN_HIDDEN')}
           type="neutral"
@@ -296,38 +374,54 @@ function Home() {
     dispatch(changeShowDataCollectionAlertAction(false));
   };
 
+  const isInitialMount = useRef(true);
+
+  useEffect(() => {
+    isInitialMount.current = false;
+  }, []);
+
   const isCrossChainSwapsEnabled = useHasFeature(FeatureId.CROSS_CHAIN_SWAPS);
   const showSwaps = isCrossChainSwapsEnabled;
 
-  const transitions = useTransition(showBannerCarousel, {
-    from: { maxHeight: '1000px', opacity: 0.5 },
-    enter: { maxHeight: '1000px', opacity: 1 },
+  const loaderTransitions = useTransition(isInitialLoading, {
+    from: { opacity: isInitialMount.current ? 1 : 0 },
+    enter: { opacity: 1 },
+    leave: { opacity: 0 },
+    config: {
+      duration: 400,
+      easing: ANIMATION_EASING,
+    },
+    exitBeforeEnter: true, // This ensures the leave animation completes before the enter animation starts
+  });
+
+  const bannerTransitions = useTransition(showBannerCarousel && !isInitialLoading, {
+    from: { maxHeight: '102px', opacity: isInitialMount.current ? 1 : 0 },
+    enter: { maxHeight: '102px', opacity: 1 },
     leave: { maxHeight: '0px', opacity: 0 },
-    config: (item, index, phase) =>
-      phase === 'leave'
-        ? {
-            duration: 300,
-            easing: (progress) => 1 - (1 - progress) ** 4,
-          }
-        : {
-            duration: 200,
-          },
+    config: {
+      duration: 400,
+      easing: ANIMATION_EASING,
+    },
+    exitBeforeEnter: true, // This ensures the leave animation completes before the enter animation starts
   });
 
   return (
     <>
       <AccountHeaderComponent />
       <Container>
-        <BalanceCard
-          isLoading={loadingStxWalletData || loadingBtcWalletData}
-          isRefetching={
-            refetchingBtcWalletData ||
-            refetchingStxWalletData ||
-            refetchingStxCoinData ||
-            refetchingBrcCoinData ||
-            refetchingRunesData
-          }
-        />
+        <BalanceCard isLoading={isInitialLoading} isRefetching={isRefetching} />
+        <PercentageChangeContainer>
+          <PercentageChange
+            displayTimeInterval
+            ftCurrencyPairs={[
+              [undefined, 'BTC'],
+              [undefined, 'STX'],
+              ...combinedFtList.map(
+                (ft) => [ft, 'FT'] as [FungibleToken | undefined, CurrencyTypes],
+              ),
+            ]}
+          />
+        </PercentageChangeContainer>
         <RowButtonContainer data-testid="transaction-buttons-row">
           <SquareButton
             icon={<ArrowUp weight="regular" size="20" />}
@@ -347,62 +441,69 @@ function Home() {
           />
         </RowButtonContainer>
 
-        {transitions((style, item) =>
+        {bannerTransitions((style, item) =>
           item ? (
             <animated.div style={style}>
-              <br />
-              <StyledDivider color="white_850" verticalMargin="m" />
+              <StyledDivider color="white_850" $verticalMargin="m" $noMarginTop />
               <BannerCarousel items={filteredNotificationBannersArr} />
               <StyledDivider
                 color="white_850"
-                verticalMargin="m"
+                $verticalMargin="m"
                 $noMarginBottom={filteredNotificationBannersArr.length === 1}
               />
             </animated.div>
           ) : (
             <animated.div style={style}>
-              <StyledDividerSingle color="elevation3" verticalMargin="xl" />
+              <StyledDivider color="elevation3" />
             </animated.div>
           ),
         )}
 
         <ColumnContainer>
-          {btcAddress && (
-            <StyledTokenTile
-              title={t('BITCOIN')}
-              currency="BTC"
-              loading={loadingBtcWalletData}
-              onPress={handleTokenPressed}
-            />
+          {loaderTransitions((style, loading) =>
+            loading ? (
+              <animated.div style={style}>
+                <TokenTileLoader />
+                <TokenTileLoader />
+                <TokenTileLoader />
+                <TokenTileLoader />
+              </animated.div>
+            ) : (
+              <animated.div style={style}>
+                {btcAddress && (
+                  <StyledTokenTile
+                    title={t('BITCOIN')}
+                    currency="BTC"
+                    loading={isInitialLoadingBtc}
+                    onPress={handleTokenPressed}
+                  />
+                )}
+                {stxAddress && !hideStx && (
+                  <StyledTokenTile
+                    title={t('STACKS')}
+                    currency="STX"
+                    loading={isInitialLoadingStx}
+                    onPress={handleTokenPressed}
+                  />
+                )}
+                {combinedFtList.map((coin) => (
+                  <StyledTokenTile
+                    key={coin.principal}
+                    title={coin.name}
+                    currency="FT"
+                    loading={isInitialLoadingTokens}
+                    fungibleToken={coin}
+                    onPress={handleTokenPressed}
+                  />
+                ))}
+              </animated.div>
+            ),
           )}
-          {stxAddress && !hideStx && (
-            <StyledTokenTile
-              title={t('STACKS')}
-              currency="STX"
-              loading={loadingStxWalletData}
-              onPress={handleTokenPressed}
-            />
-          )}
-          {combinedFtList.map((coin: FungibleTokenWithStates) => {
-            const isLoading = loadingStxCoinData || loadingBrcCoinData || loadingRunesData;
-            return (
-              <StyledTokenTile
-                key={coin.principal}
-                title={coin.name}
-                currency="FT"
-                loading={isLoading}
-                fungibleToken={coin}
-                onPress={handleTokenPressed}
-              />
-            );
-          })}
         </ColumnContainer>
         <TokenListButtonContainer>
           <TokenListButton onClick={handleManageTokenListOnClick}>
-            <>
-              <ButtonImage src={ListDashes} />
-              <ButtonText>{t('MANAGE_TOKEN')}</ButtonText>
-            </>
+            <ListDashes size={20} />
+            {t('MANAGE_TOKEN')}
           </TokenListButton>
         </TokenListButtonContainer>
 
@@ -416,7 +517,7 @@ function Home() {
           visible={openSendModal}
           coins={combinedFtList}
           title={t('SEND')}
-          loadingWalletData={loadingStxWalletData || loadingBtcWalletData}
+          loadingWalletData={isInitialLoadingStx || isInitialLoadingBtc}
         />
         <CoinSelectModal
           onSelectBitcoin={onBuyBtcClick}
@@ -426,7 +527,7 @@ function Home() {
           visible={openBuyModal}
           coins={[]}
           title={t('BUY')}
-          loadingWalletData={loadingStxWalletData || loadingBtcWalletData}
+          loadingWalletData={isInitialLoadingStx || isInitialLoadingBtc}
         />
         <AnnouncementModal />
       </Container>

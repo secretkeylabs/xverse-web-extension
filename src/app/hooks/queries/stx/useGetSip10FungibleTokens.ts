@@ -4,13 +4,14 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import {
   StacksNetwork,
   getFtData,
-  getFungibleTokenStates,
   getXverseApiClient,
   type FungibleToken,
   type FungibleTokenWithStates,
   type SettingsNetwork,
 } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
+import { selectWithDerivedState } from '@utils/tokens';
+import useGetTopTokens from '../useGetTopTokens';
 
 export const fetchSip10FungibleTokens =
   (
@@ -45,6 +46,7 @@ export const useGetSip10FungibleTokens = (select?: (data: FungibleTokenWithState
   const { sip10ManageTokens, fiatCurrency, network, spamTokens, showSpamTokens } =
     useWalletSelector();
   const currentNetworkInstance = useNetworkSelector();
+  const { data: topTokensData } = useGetTopTokens();
 
   const queryFn = fetchSip10FungibleTokens(
     stxAddress,
@@ -52,27 +54,19 @@ export const useGetSip10FungibleTokens = (select?: (data: FungibleTokenWithState
     network,
     currentNetworkInstance,
   );
-  const selectWithDerivedState = (data: FungibleToken[]) => {
-    const withDerivedState = data.map(
-      (ft: FungibleToken) =>
-        ({
-          ...ft,
-          ...getFungibleTokenStates({
-            fungibleToken: ft,
-            manageTokens: sip10ManageTokens,
-            spamTokens,
-            showSpamTokens,
-          }),
-        } as FungibleTokenWithStates),
-    );
-    return select ? select(withDerivedState) : withDerivedState;
-  };
 
   return useQuery({
     queryKey: ['sip10-fungible-tokens', network.type, stxAddress, fiatCurrency],
     queryFn,
     enabled: Boolean(network && stxAddress),
-    select: selectWithDerivedState,
+    keepPreviousData: true,
+    select: selectWithDerivedState({
+      manageTokens: sip10ManageTokens,
+      spamTokens,
+      showSpamTokens,
+      topTokensData: topTokensData?.stacks,
+      select,
+    }),
   });
 };
 

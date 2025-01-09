@@ -6,6 +6,10 @@ body {
   background-color: #181818;
 }
 
+a {
+  cursor: pointer;
+}
+
 #app {
   height: 600px;
   width: 360px;

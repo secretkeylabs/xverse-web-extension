@@ -30,6 +30,14 @@ const StyledIcon = styled.div`
   justify-content: center;
 `;
 
+const commonToastStyles = {
+  ...Theme.typography.body_medium_m,
+  position: 'relative' as const,
+  bottom: Theme.space.xxxxl,
+  borderRadius: Theme.radius(2),
+  padding: Theme.space.s,
+};
+
 function App(): React.ReactNode {
   return (
     <>
@@ -46,7 +54,6 @@ function App(): React.ReactNode {
                     <Toaster
                       max={1}
                       position="bottom-center"
-                      containerStyle={{ bottom: 32 }}
                       toastOptions={{
                         duration: 2000,
                         success: {
@@ -56,10 +63,8 @@ function App(): React.ReactNode {
                             </StyledIcon>
                           ),
                           style: {
-                            ...Theme.typography.body_medium_m,
+                            ...commonToastStyles,
                             backgroundColor: Theme.colors.success_medium,
-                            borderRadius: Theme.radius(2),
-                            padding: Theme.space.s,
                             color: Theme.colors.elevation0,
                           },
                         },
@@ -70,19 +75,15 @@ function App(): React.ReactNode {
                             </StyledIcon>
                           ),
                           style: {
-                            ...Theme.typography.body_medium_m,
+                            ...commonToastStyles,
                             backgroundColor: Theme.colors.danger_dark,
-                            borderRadius: Theme.radius(2),
-                            padding: Theme.space.s,
                             color: Theme.colors.white_0,
                           },
                         },
                         blank: {
                           style: {
-                            ...Theme.typography.body_medium_m,
+                            ...commonToastStyles,
                             backgroundColor: Theme.colors.white_0,
-                            borderRadius: Theme.radius(2),
-                            padding: Theme.space.s,
                             color: Theme.colors.elevation0,
                           },
                         },

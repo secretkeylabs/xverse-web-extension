@@ -17,7 +17,12 @@ import BigNumber from 'bignumber.js';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 
-interface TransactionAmountProps {
+const TransactionValue = styled.p((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors.white_0,
+}));
+
+type Props = {
   transaction:
     | StxTransactionData
     | BtcTransactionData
@@ -26,22 +31,22 @@ interface TransactionAmountProps {
   currency: CurrencyTypes;
   protocol?: FungibleTokenProtocol;
   tokenSymbol?: string;
-}
+};
 
-const TransactionValue = styled.p((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_0,
-}));
-
-export default function TransactionAmount(props: TransactionAmountProps): JSX.Element | null {
-  const { transaction, currency, protocol, tokenSymbol } = props;
-  const { data: sip10CoinsList } = useVisibleSip10FungibleTokens();
+export default function TransactionAmount({
+  transaction,
+  currency,
+  protocol,
+  tokenSymbol,
+}: Props): JSX.Element | null {
+  const { data: sip10CoinsList = [] } = useVisibleSip10FungibleTokens();
   const { balanceHidden } = useWalletSelector();
-  if (balanceHidden) {
-    return <TransactionValue>{HIDDEN_BALANCE_LABEL}</TransactionValue>;
-  }
+
   if (currency === 'STX' || (currency === 'FT' && protocol === 'stacks')) {
     const stxTransaction = transaction as StxTransactionData;
+    if (stxTransaction.amount.gt(0) && balanceHidden) {
+      return <TransactionValue>{HIDDEN_BALANCE_LABEL}</TransactionValue>;
+    }
     if (stxTransaction.txType === 'token_transfer') {
       const prefix = stxTransaction.incoming ? '' : '-';
       return (
@@ -82,6 +87,9 @@ export default function TransactionAmount(props: TransactionAmountProps): JSX.El
   } else if (currency === 'BTC') {
     const btcTransaction = transaction as BtcTransactionData;
     const prefix = btcTransaction.incoming ? '' : '-';
+    if (balanceHidden) {
+      return <TransactionValue>{HIDDEN_BALANCE_LABEL}</TransactionValue>;
+    }
     if (btcTransaction.isOrdinal && btcTransaction.txStatus === 'pending') {
       return null;
     }
@@ -100,6 +108,9 @@ export default function TransactionAmount(props: TransactionAmountProps): JSX.El
   } else if (currency === 'FT' && protocol === 'brc-20') {
     const brc20Transaction = transaction as Brc20HistoryTransactionData;
     const prefix = brc20Transaction.incoming ? '' : '-';
+    if (balanceHidden) {
+      return <TransactionValue>{HIDDEN_BALANCE_LABEL}</TransactionValue>;
+    }
     if (!new BigNumber(brc20Transaction.amount).isEqualTo(0)) {
       return (
         <NumericFormat
@@ -116,6 +127,9 @@ export default function TransactionAmount(props: TransactionAmountProps): JSX.El
     }
   } else if (currency === 'FT' && protocol === 'runes') {
     const runeTransaction = transaction as GetRunesActivityForAddressEvent;
+    if (balanceHidden) {
+      return <TransactionValue>{HIDDEN_BALANCE_LABEL}</TransactionValue>;
+    }
     return (
       <NumericFormat
         value={BigNumber(runeTransaction.amount).toString()}

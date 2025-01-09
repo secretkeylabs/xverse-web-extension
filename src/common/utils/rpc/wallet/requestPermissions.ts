@@ -1,44 +1,29 @@
 /* eslint-disable import/prefer-default-export */
 import { getTabIdFromPort } from '@common/utils';
-import { makeContext, openPopup } from '@common/utils/popup';
-import * as utils from '@components/permissionsManager/utils';
-import { requestPermissionsRequestMessageSchema, type RpcRequestMessage } from '@sats-connect/core';
-import * as v from 'valibot';
-import RequestsRoutes from '../../route-urls';
-import { handleInvalidMessage } from '../handle-invalid-message';
-import { hasAccountReadPermissions, makeSendPopupClosedUserRejectionMessage } from '../helpers';
-import { sendRequestPermissionsSuccessResponseMessage } from '../responseMessages/wallet';
+import { type RequestPermissionsRequestMessage } from '@sats-connect/core';
+import { sendInternalErrorMessage } from '../responseMessages/errors';
+import { handleConnect } from './connect';
 
 export const handleRequestPermissions = async (
-  message: RpcRequestMessage,
+  message: RequestPermissionsRequestMessage,
   port: chrome.runtime.Port,
 ) => {
-  const parseResult = v.safeParse(requestPermissionsRequestMessageSchema, message);
-
-  if (!parseResult.success) {
-    handleInvalidMessage(message, getTabIdFromPort(port), parseResult.issues);
-    return;
+  if (!message.params) {
+    // Legacy support. Previously, `wallet_requestPermissions` was being used as
+    // `wallet_connect` is being used now: when no params are provided, it
+    // grants read perms to the account. Although `wallet_requestPermissions` is
+    // meant to be used to request specific permissions, we default to granting
+    // account read permissions if none are provided to maintain backwards
+    // compatibility by using the `wallet_connect` handler.
+    return handleConnect({ ...message, method: 'wallet_connect', params: undefined }, port);
   }
 
-  const requestContext = makeContext(port);
-
-  const [error, store] = await utils.getPermissionsStore();
-  if (!error && hasAccountReadPermissions(requestContext.origin, store)) {
-    sendRequestPermissionsSuccessResponseMessage({
-      messageId: parseResult.output.id,
-      tabId: requestContext.tabId,
-      result: true,
-    });
-    return;
-  }
-
-  await openPopup({
-    path: RequestsRoutes.ConnectionRequest,
-    data: parseResult.output,
-    context: requestContext,
-    onClose: makeSendPopupClosedUserRejectionMessage({
-      tabId: getTabIdFromPort(port),
-      messageId: parseResult.output.id,
-    }),
+  // Handling requests for specific permissions has not yet been implemented.
+  sendInternalErrorMessage({
+    tabId: getTabIdFromPort(port),
+    messageId: message.id,
+    message:
+      'The wallet does not yet support requesting individual permissions. ' +
+      'Use `request("wallet_connect", undefined)` to get account read permissions.',
   });
 };
