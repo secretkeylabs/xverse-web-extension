@@ -2,8 +2,6 @@ import BitcoinToken from '@assets/img/dashboard/bitcoin_token.svg';
 import ordinalsIcon from '@assets/img/dashboard/ordinalBRC20.svg';
 import stacksIcon from '@assets/img/dashboard/stx_icon.svg';
 import ReceiveCardComponent from '@components/receiveCardComponent';
-import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
-import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Plus } from '@phosphor-icons/react';
@@ -44,12 +42,9 @@ function ReceiveSheet({ visible, onClose }: Props) {
 
   const selectedAccount = useSelectedAccount();
   const { stxAddress, btcAddress, ordinalsAddress } = selectedAccount;
-  const { showBtcReceiveAlert, showOrdinalReceiveAlert, btcPaymentAddressType, hasBackedUpWallet } =
-    useWalletSelector();
+  const { btcPaymentAddressType, hasBackedUpWallet } = useWalletSelector();
   const navigate = useNavigate();
 
-  const [isBtcReceiveAlertVisible, setIsBtcReceiveAlertVisible] = useState(false);
-  const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible] = useState(false);
   const [areReceivingAddressesVisible, setAreReceivingAddressesVisible] = useState(
     !isLedgerAccount(selectedAccount),
   );
@@ -75,22 +70,6 @@ function ReceiveSheet({ visible, onClose }: Props) {
     navigate('/receive/STX');
   };
 
-  const onOrdinalReceiveAlertOpen = () => {
-    if (showOrdinalReceiveAlert) setIsOrdinalReceiveAlertVisible(true);
-  };
-
-  const onOrdinalReceiveAlertClose = () => {
-    setIsOrdinalReceiveAlertVisible(false);
-  };
-
-  const onReceiveAlertClose = () => {
-    setIsBtcReceiveAlertVisible(false);
-  };
-
-  const onReceiveAlertOpen = () => {
-    if (showBtcReceiveAlert) setIsBtcReceiveAlertVisible(true);
-  };
-
   const onOrdinalsReceivePress = () => {
     navigate('/receive/ORD');
   };
@@ -106,7 +85,7 @@ function ReceiveSheet({ visible, onClose }: Props) {
         title={t('BITCOIN')}
         address={btcAddress}
         onQrAddressClick={onBTCReceiveSelect}
-        onCopyAddressClick={onReceiveAlertOpen}
+        receiveModalClose={onReceiveModalClose}
         showVerifyButton={choseToVerifyAddresses}
         currency="BTC"
         icon={<Icon src={BitcoinToken} />}
@@ -125,7 +104,7 @@ function ReceiveSheet({ visible, onClose }: Props) {
         title={t('ORDINALS_AND_BRC20')}
         address={ordinalsAddress}
         onQrAddressClick={onOrdinalsReceivePress}
-        onCopyAddressClick={onOrdinalReceiveAlertOpen}
+        receiveModalClose={onReceiveModalClose}
         showVerifyButton={choseToVerifyAddresses}
         currency="ORD"
         icon={<MergedOrdinalsIcon src={ordinalsIcon} />}
@@ -136,6 +115,7 @@ function ReceiveSheet({ visible, onClose }: Props) {
           title={t('STACKS_AND_TOKEN')}
           address={stxAddress}
           onQrAddressClick={onSTXReceiveSelect}
+          receiveModalClose={onReceiveModalClose}
           showVerifyButton={choseToVerifyAddresses}
           currency="STX"
           icon={
@@ -193,24 +173,16 @@ function ReceiveSheet({ visible, onClose }: Props) {
   );
 
   return (
-    <>
-      {isBtcReceiveAlertVisible && (
-        <ShowBtcReceiveAlert onReceiveAlertClose={onReceiveAlertClose} />
+    <Sheet visible={visible} title={t('RECEIVE')} onClose={onReceiveModalClose}>
+      {!hasBackedUpWallet && (
+        <InfoMessageContainer>
+          <Link to={RoutePaths.BackupWallet}>
+            <InputFeedback message={informationT('WALLET_NOT_BACKED_UP')} variant="warning" />
+          </Link>
+        </InfoMessageContainer>
       )}
-      {isOrdinalReceiveAlertVisible && (
-        <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose} />
-      )}
-      <Sheet visible={visible} title={t('RECEIVE')} onClose={onReceiveModalClose}>
-        {!hasBackedUpWallet && (
-          <InfoMessageContainer>
-            <Link to={RoutePaths.BackupWallet}>
-              <InputFeedback message={informationT('WALLET_NOT_BACKED_UP')} variant="warning" />
-            </Link>
-          </InfoMessageContainer>
-        )}
-        {areReceivingAddressesVisible ? receiveContent : verifyOrViewAddresses}
-      </Sheet>
-    </>
+      {areReceivingAddressesVisible ? receiveContent : verifyOrViewAddresses}
+    </Sheet>
   );
 }
 

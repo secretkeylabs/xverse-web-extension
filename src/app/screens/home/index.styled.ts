@@ -24,6 +24,7 @@ export const ReceiveContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   gap: props.theme.space.m,
+  padding: `${props.theme.space.m} 0`,
 }));
 
 export const TokenListButtonContainer = styled.div((props) => ({

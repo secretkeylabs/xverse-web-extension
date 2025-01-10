@@ -28,6 +28,7 @@
     "EARN": "Earn",
     "EXPLORE": "Explore",
     "SETTINGS": "Settings",
+    "COPIED_TO_CLIPBOARD": "Copied to clipboard",
     "TRANSACTION": "Transaction"
   },
   "INFORMATION": {
@@ -295,7 +296,6 @@
     "STX_ADDRESS": "Stacks address",
     "STX_ADDRESS_DESC": "Only send SIP-010 tokens to this address",
     "COPY_ADDRESS": "Copy address",
-    "COPIED_ADDRESS": "Copied to clipboard",
     "BTC_ADDRESS": "Bitcoin address",
     "ORDINAL_ADDRESS": "Ordinals, Runes & BRC-20 address",
     "ORDINALS_RECEIVE_MESSAGE": "Only use this address to receive Ordinals, Runes, and BRC-20 tokens.",
@@ -771,7 +771,7 @@
     "COPY": "Copy link",
     "NFT_DETAIL": "Item detail",
     "RECEIVE_NFT": "Receive",
-    "STACKS_NFT": "Stacks NFT",
+    "STACKS_NFT": "Stacks NFTs",
     "ORDINALS": "Ordinals",
     "ORDINAL": "Ordinal",
     "INSCRIPTION": "Inscription",

@@ -15,7 +15,7 @@ export const AddressContainer = styled.div({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'flex-start',
-  alignItems: 'flex-start',
+  alignItems: 'center',
   columnGap: 16,
 });
 
