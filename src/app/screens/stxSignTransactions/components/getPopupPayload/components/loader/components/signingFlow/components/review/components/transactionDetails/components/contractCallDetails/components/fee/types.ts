@@ -1,6 +1,6 @@
-import type { StacksTransaction } from '@stacks/transactions';
+import type { StacksTransactionWire } from '@stacks/transactions';
 
 export type Props = {
-  transaction: StacksTransaction;
-  onEdit?: (transaction: StacksTransaction) => void;
+  transaction: StacksTransactionWire;
+  onEdit?: (transaction: StacksTransactionWire) => void;
 };

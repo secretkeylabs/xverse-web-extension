@@ -1,18 +1,20 @@
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { estimateStacksTransactionWithFallback } from '@secretkeylabs/xverse-core';
-import type { StacksTransaction } from '@stacks/transactions';
+import {
+  estimateStacksTransactionWithFallback,
+  modifyRecommendedStxFees,
+} from '@secretkeylabs/xverse-core';
+import type { StacksTransactionWire } from '@stacks/transactions';
 import { useQuery } from '@tanstack/react-query';
 import FeeSelectPopup from '@ui-components/selectFeeRate/feeSelectPopup';
-import { modifyRecommendedStxFees } from '@utils/transactions/transactions';
 import { bigIntReplacer } from '../../../../../../../../../utils';
 import { MICROSTX_IN_STX } from './transactionDetails/utils';
 import { mapObjectValues, microStxToStx } from './utils';
 
 type FeeEditorProps = {
   isOpen: boolean;
-  transaction: StacksTransaction;
+  transaction: StacksTransactionWire;
   onClose: () => void;
   onSetFee: (fee: number) => void;
 };

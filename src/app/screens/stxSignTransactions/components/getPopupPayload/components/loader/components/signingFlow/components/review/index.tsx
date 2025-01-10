@@ -1,4 +1,4 @@
-import { type StacksTransaction } from '@secretkeylabs/xverse-core';
+import { type StacksTransactionWire } from '@stacks/transactions';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Container, ContentBodyContainer, ContentContainer } from '../../../../../../../../styles';
@@ -9,7 +9,7 @@ import { TransactionDetails } from './components/transactionDetails';
 import { useRender } from './hooks';
 
 type ReviewProps = {
-  transactions: StacksTransaction[];
+  transactions: StacksTransactionWire[];
   onSuccess: () => void;
   onCancel: () => void;
 };

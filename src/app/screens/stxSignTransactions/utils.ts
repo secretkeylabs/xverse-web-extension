@@ -1,12 +1,7 @@
 import type { AccountWithDetails } from '@common/utils/getSelectedAccount';
 import { type StxSignTransactionsRequestMessage } from '@sats-connect/core';
-import {
-  safePromise,
-  signTransaction,
-  StacksMainnet,
-  StacksTestnet,
-} from '@secretkeylabs/xverse-core';
-import { deserializeTransaction, type StacksTransaction } from '@stacks/transactions';
+import { safePromise, signTransaction, type StacksNetwork } from '@secretkeylabs/xverse-core';
+import { deserializeTransaction, type StacksTransactionWire } from '@stacks/transactions';
 
 export function getTransactionsFromRpcMessage(data: StxSignTransactionsRequestMessage) {
   const transactionsData = data.params.transactions;
@@ -15,8 +10,8 @@ export function getTransactionsFromRpcMessage(data: StxSignTransactionsRequestMe
 
 type SignTransactionsArgs = {
   seed: string;
-  transactions: StacksTransaction[];
-  network: StacksMainnet | StacksTestnet;
+  transactions: StacksTransactionWire[];
+  network: StacksNetwork;
   accountId: AccountWithDetails['id'];
 };
 export async function signTransactions({

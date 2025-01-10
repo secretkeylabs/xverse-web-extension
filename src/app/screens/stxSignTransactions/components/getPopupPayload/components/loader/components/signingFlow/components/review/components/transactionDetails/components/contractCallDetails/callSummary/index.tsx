@@ -1,11 +1,11 @@
-import { isContractCallPayload, StacksTransaction } from '@stacks/transactions';
+import { isContractCallPayload, type StacksTransactionWire } from '@stacks/transactions';
 import { TransactionDetailsLayout } from './callSummaryLoader';
 
 type CallSummaryProps = {
   /**
    * Expectes a contract call transaction.
    */
-  transaction: StacksTransaction;
+  transaction: StacksTransactionWire;
 };
 
 function TransactionDetailsCheckPayloadType({ transaction }: CallSummaryProps) {

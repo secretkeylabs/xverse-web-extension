@@ -4,13 +4,11 @@ import useNetworkSelector from '@hooks/useNetwork';
 import useSeedVault from '@hooks/useSeedVault';
 import type { StxSignTransactionsRequestMessage } from '@sats-connect/core';
 import {
-  buf2hex,
   estimateStacksTransactionWithFallback,
   safePromise,
-  StacksMainnet,
-  StacksTestnet,
-  type StacksTransaction,
+  type StacksNetwork,
 } from '@secretkeylabs/xverse-core';
+import { type StacksTransactionWire } from '@stacks/transactions';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -18,12 +16,12 @@ import { bigIntReplacer, getTransactionsFromRpcMessage, signTransactions } from 
 
 type UseSignTransactionsSoftwareArgs = {
   account: AccountWithDetails;
-  network: StacksMainnet | StacksTestnet;
-  transactions: StacksTransaction[];
+  network: StacksNetwork;
+  transactions: StacksTransactionWire[];
 };
 type CallbackArgs = {
   onError: (e: unknown) => void;
-  onSuccess: (transactions: StacksTransaction[]) => Promise<void> | void;
+  onSuccess: (transactions: StacksTransactionWire[]) => Promise<void> | void;
 };
 export function useSignTransactionsSoftware(args: UseSignTransactionsSoftwareArgs) {
   const { account, network, transactions } = args;
@@ -65,12 +63,12 @@ export function useGetTransactionsFromRpcMessage() {
 export function useGetMakeSendRpcSuccessResponse() {
   return useCallback(
     ({ tabId, messageId }) =>
-      (transactions: StacksTransaction[]) => {
+      (transactions: StacksTransactionWire[]) => {
         sendSignTransactionsSuccessResponseMessage({
           tabId,
           messageId,
           result: {
-            transactions: transactions.map((transaction) => buf2hex(transaction.serialize())),
+            transactions: transactions.map((transaction) => transaction.serialize()),
           },
         });
       },
@@ -81,7 +79,7 @@ export function useGetMakeSendRpcSuccessResponse() {
 /**
  * Estimates the transaction's fee priority.
  */
-export function useGetTransactionFeePriority(transaction: StacksTransaction) {
+export function useGetTransactionFeePriority(transaction: StacksTransactionWire) {
   const { t } = useTranslation();
   const lowLabel = t('TRANSACTION_SETTING.PRIORITIES.LOW');
   const mediumLabel = t('TRANSACTION_SETTING.PRIORITIES.MEDIUM');

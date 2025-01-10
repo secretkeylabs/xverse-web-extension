@@ -1,7 +1,7 @@
-import type { StacksTransaction } from '@stacks/transactions';
+import type { StacksTransactionWire } from '@stacks/transactions';
 
 export type TransactionInfoProps = {
-  transaction: StacksTransaction;
+  transaction: StacksTransactionWire;
   onEditNonce?: () => void;
-  onEditFee?: (transaction: StacksTransaction) => void;
+  onEditFee?: (transaction: StacksTransactionWire) => void;
 };

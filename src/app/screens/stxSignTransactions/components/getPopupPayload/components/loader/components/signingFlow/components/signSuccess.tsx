@@ -1,10 +1,10 @@
 import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
-import type { StacksTransaction } from '@stacks/transactions';
+import type { StacksTransactionWire } from '@stacks/transactions';
 import { useTranslation } from 'react-i18next';
 import { Final } from './shared/final';
 
 type Props = {
-  transactions: StacksTransaction[];
+  transactions: StacksTransactionWire[];
   isBroadcastRequested: boolean;
 };
 export function SignSuccess({ transactions, isBroadcastRequested }: Props) {

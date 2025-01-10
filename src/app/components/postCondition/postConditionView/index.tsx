@@ -1,9 +1,11 @@
 /* eslint-disable no-nested-ternary */
 import {
   addressToString,
+  deserializeAddress,
   FungibleConditionCode,
   NonFungibleConditionCode,
-  type PostCondition,
+  serializePrincipal,
+  type PostConditionWire,
 } from '@stacks/transactions';
 import { useTranslation } from 'react-i18next';
 
@@ -12,7 +14,7 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import { getNameFromPostCondition, getSymbolFromPostCondition } from './helper';
 
 type Props = {
-  postCondition: PostCondition;
+  postCondition: PostConditionWire;
   amount: string;
   icon?: string;
 };
@@ -46,7 +48,7 @@ function PostConditionsView({ postCondition, amount, icon }: Props) {
   const name = getNameFromPostCondition(postCondition);
   const contractName =
     'contractName' in postCondition.principal && postCondition.principal.contractName.content;
-  const address = addressToString(postCondition?.principal?.address!);
+  const address = addressToString(deserializeAddress(serializePrincipal(postCondition?.principal)));
   const isSending = address === stxAddress;
   const isContractPrincipal = !!contractName || address.includes('.');
   return (

@@ -1,4 +1,4 @@
-import { PostConditionMode, type StacksTransaction } from '@stacks/transactions';
+import { PostConditionMode, type StacksTransactionWire } from '@stacks/transactions';
 
 // TODO: Possibly this needs to be moved into common or xverse-core?
 /**
@@ -8,7 +8,7 @@ import { PostConditionMode, type StacksTransaction } from '@stacks/transactions'
  * transfers. From inspecting the transaction alone, it is not possible to
  * determine if transfers are allowed since they depend on on-chain data.
  */
-export function isNotAllowingTransfers(transaction: StacksTransaction) {
+export function isNotAllowingTransfers(transaction: StacksTransactionWire) {
   const { postConditionMode } = transaction;
   const { postConditions } = transaction;
   return postConditionMode === PostConditionMode.Deny && postConditions.values.length === 0;

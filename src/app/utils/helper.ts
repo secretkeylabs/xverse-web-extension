@@ -3,6 +3,8 @@ import {
   getStacksInfo,
   microstacksToStx,
   satsToBtc,
+  StacksMainnet,
+  StacksTestnet,
   type Account,
   type FungibleTokenWithStates,
   type NetworkType,
@@ -10,7 +12,6 @@ import {
   type SettingsNetwork,
   type StxMempoolTransactionData,
 } from '@secretkeylabs/xverse-core';
-import { ChainID } from '@stacks/transactions';
 import { getFtBalance } from '@utils/tokens';
 import RoutePaths from 'app/routes/paths';
 import BigNumber from 'bignumber.js';
@@ -180,7 +181,7 @@ export const checkNftExists = (
 };
 
 export const isValidStacksApi = async (url: string, type: NetworkType): Promise<boolean> => {
-  const networkChainId = type === 'Mainnet' ? ChainID.Mainnet : ChainID.Testnet;
+  const networkChainId = type === 'Mainnet' ? StacksMainnet.chainId : StacksTestnet.chainId;
 
   if (!validUrl.isUri(url)) {
     return false;
@@ -232,7 +233,7 @@ export const isValidBtcApi = async (url: string, network: NetworkType) => {
 };
 
 export const getNetworkType = (stxNetwork) =>
-  stxNetwork.chainId === ChainID.Mainnet ? 'Mainnet' : 'Testnet';
+  stxNetwork.chainId === StacksMainnet.chainId ? 'Mainnet' : 'Testnet';
 
 export const getStxNetworkForBtcNetwork = (network: NetworkType) =>
   network === 'Mainnet' ? 'Mainnet' : 'Testnet';

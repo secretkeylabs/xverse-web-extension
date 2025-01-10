@@ -11,24 +11,23 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { FadersHorizontal } from '@phosphor-icons/react';
-import type { StacksTransaction } from '@secretkeylabs/xverse-core';
 import {
   estimateStacksTransactionWithFallback,
   getNonce,
   getStxFiatEquivalent,
   microstacksToStx,
+  modifyRecommendedStxFees,
   signLedgerStxTransaction,
   signMultiStxTransactions,
   signTransaction,
   stxToMicrostacks,
 } from '@secretkeylabs/xverse-core';
-import { PostConditionMode } from '@stacks/transactions';
+import { PostConditionMode, StacksTransactionWire } from '@stacks/transactions';
 import SelectFeeRate from '@ui-components/selectFeeRate';
 import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
 import Sheet from '@ui-library/sheet';
 import { isHardwareAccount } from '@utils/helper';
-import { modifyRecommendedStxFees } from '@utils/transactions/transactions';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -56,10 +55,10 @@ const Subtitle = styled.p`
 
 // todo: make fee non option - that'll require change in all components using it
 type Props = {
-  initialStxTransactions: StacksTransaction[];
+  initialStxTransactions: StacksTransactionWire[];
   loading: boolean;
   onCancelClick: () => void;
-  onConfirmClick: (transactions: StacksTransaction[]) => void;
+  onConfirmClick: (transactions: StacksTransactionWire[]) => void;
   children: ReactNode;
   isSponsored?: boolean;
   skipModal?: boolean;
@@ -212,7 +211,7 @@ function ConfirmStxTransactionComponent({
     }
 
     const seed = await getSeed();
-    let signedTxs: StacksTransaction[] = [];
+    let signedTxs: StacksTransactionWire[] = [];
 
     if (fee) {
       for (let i = 0; i < initialStxTransactions.length; i++) {

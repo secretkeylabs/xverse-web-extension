@@ -2,8 +2,9 @@ import stacksIcon from '@assets/img/dashboard/stx_icon.svg';
 import {
   addressToString,
   isContractCallPayload,
-  StacksTransaction,
-  type STXPostCondition,
+  type AddressWire,
+  type StacksTransactionWire,
+  type STXPostConditionWire,
 } from '@stacks/transactions';
 import { useTranslation } from 'react-i18next';
 import { useGetPostConditionCodeDescription } from '../../../hooks';
@@ -66,8 +67,8 @@ export function StxPostConditionLayout({
 }
 
 type StxPostConditionProps = {
-  postCondition: STXPostCondition;
-  transaction: StacksTransaction;
+  postCondition: STXPostConditionWire;
+  transaction: StacksTransactionWire;
 };
 
 export function StxPostCondition({ postCondition: pc, transaction }: StxPostConditionProps) {
@@ -77,7 +78,9 @@ export function StxPostCondition({ postCondition: pc, transaction }: StxPostCond
     ? contractPrincipalFromContractCallPayload(transaction.payload)
     : null;
   const amount = stxAmountFromPostCondition(pc);
-  const postConditionOriginatingPrincipal = addressToString(pc.principal.address);
+  const postConditionOriginatingPrincipal = addressToString(
+    'address' in pc.principal ? pc.principal.address : (pc.principal as unknown as AddressWire),
+  );
   const pcCodeDescription = getPostConditionCodeDescription(pc);
   const pcOriginatingAccountDescription = getOriginatingAccountDescription({
     postConditionOriginatingPrincipal,

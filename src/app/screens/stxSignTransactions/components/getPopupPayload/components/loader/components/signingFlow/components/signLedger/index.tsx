@@ -1,13 +1,13 @@
-import type { StacksTransaction } from '@stacks/transactions';
+import type { StacksTransactionWire } from '@stacks/transactions';
 import { useState } from 'react';
 import { ConnectingLedger } from './components/connectLedger';
 import { SigningTransactions } from './components/signingTransactions';
 import type { Transport } from './types';
 
 type Props = {
-  transactions: StacksTransaction[];
+  transactions: StacksTransactionWire[];
   deviceAccountIndex: number;
-  onSuccess: (signedTransactions: StacksTransaction[]) => void;
+  onSuccess: (signedTransactions: StacksTransactionWire[]) => void;
   onError: (error: Error) => void;
   onCancel: () => void;
 };

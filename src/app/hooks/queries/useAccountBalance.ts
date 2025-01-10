@@ -90,7 +90,7 @@ const useAccountBalance = () => {
           .filter((ft) => ft.isEnabled);
       }
       if (account.stxAddress) {
-        const apiUrl = `${stacksNetwork.coreApiUrl}/extended/v1/address/${account.stxAddress}/balances`;
+        const apiUrl = `${stacksNetwork.client.baseUrl}/extended/v1/address/${account.stxAddress}/balances`;
 
         const response = await axios.get<TokensResponse>(apiUrl, {
           timeout: API_TIMEOUT_MILLI,

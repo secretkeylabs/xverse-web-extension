@@ -1,11 +1,12 @@
-import { ChainID, type ContractCallPayload, type StacksTransaction } from '@stacks/transactions';
+import { StacksMainnet, StacksTestnet } from '@secretkeylabs/xverse-core';
+import { type ContractCallPayload, type StacksTransactionWire } from '@stacks/transactions';
 import { useTranslation } from 'react-i18next';
 import * as TDStyles from '../../../../styles';
 import { Card, CardRowContainer, CardRowPrimary } from '../../../card';
 import { CallSummaryLoader } from '../callSummaryLayout';
 
 type TransactionDetailsProps = {
-  transaction: StacksTransaction;
+  transaction: StacksTransactionWire;
 
   // Although it seems redundant to pass the `payload` separately, which is
   // contained within the transaction, it is necessary to preserve its type
@@ -15,8 +16,8 @@ type TransactionDetailsProps = {
   payload: ContractCallPayload;
 };
 const chainIdToNetworkName = {
-  [ChainID.Mainnet]: 'Mainnet',
-  [ChainID.Testnet]: 'Testnet',
+  [StacksMainnet.chainId]: 'Mainnet',
+  [StacksTestnet.chainId]: 'Testnet',
 };
 
 export function TransactionDetailsLayout({ payload, transaction }: TransactionDetailsProps) {

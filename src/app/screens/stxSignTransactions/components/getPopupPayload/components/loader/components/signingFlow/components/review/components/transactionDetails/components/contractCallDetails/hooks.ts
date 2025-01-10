@@ -1,5 +1,5 @@
 import {
-  type PostCondition,
+  type PostConditionWire,
   FungibleConditionCode,
   NonFungibleConditionCode,
 } from '@stacks/transactions';
@@ -10,7 +10,7 @@ export function useGetPostConditionCodeDescription() {
   const { t } = useTranslation('translation', { keyPrefix: 'POST_CONDITION_MESSAGE' });
 
   const getPostConditionCodeDescription = useCallback(
-    (postCondition: PostCondition) => {
+    (postCondition: PostConditionWire) => {
       switch (postCondition.conditionCode) {
         case FungibleConditionCode.Equal:
           return t('TRANSFER_EQUAL');

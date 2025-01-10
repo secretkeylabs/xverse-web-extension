@@ -9,17 +9,15 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { getSwapsMixpanelProperties } from '@screens/swap/mixpanel';
 import {
   AnalyticsEvents,
-  createDeployContractRequest,
-  extractFromPayload,
-  fetchStxPendingTxData,
-  getContractCallPromises,
-  getTokenTransferRequest,
+  createContractCallPromises,
+  generateUnsignedTx,
+  nextBestNonce,
   type Account,
   type Coin,
   type ContractFunction,
 } from '@secretkeylabs/xverse-core';
 import type { ContractCallPayload, ContractDeployPayload } from '@stacks/connect';
-import { StacksTransaction } from '@stacks/transactions';
+import { StacksTransactionWire } from '@stacks/transactions';
 import Spinner from '@ui-library/spinner';
 import { getNetworkType, getStxNetworkForBtcNetwork, isHardwareAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
@@ -41,7 +39,7 @@ const LoaderContainer = styled.div((props) => ({
 
 function TransactionRequest() {
   const selectedAccount = useSelectedAccount();
-  const { network, feeMultipliers, accountsList } = useWalletSelector();
+  const { network, accountsList } = useWalletSelector();
   const location = useLocation();
   const { dataStxSignTransactionOverride, mixpanelMetadata } = (location.state || {}) as {
     dataStxSignTransactionOverride?: DataStxSignTransaction;
@@ -51,11 +49,11 @@ function TransactionRequest() {
   const navigate = useNavigate();
   const selectedNetwork = useNetworkSelector();
   const { switchAccount } = useWalletReducer();
-  const [unsignedTx, setUnsignedTx] = useState<StacksTransaction | null>(null);
+  const [unsignedTx, setUnsignedTx] = useState<StacksTransactionWire | null>(null);
   const [funcMetaData, setFuncMetaData] = useState<ContractFunction | undefined>(undefined);
   const [coinsMetaData, setCoinsMetaData] = useState<Coin[] | null>(null);
-  const [codeBody, setCodeBody] = useState(undefined);
-  const [contractName, setContractName] = useState(undefined);
+  const [codeBody, setCodeBody] = useState<string | undefined>(undefined);
+  const [contractName, setContractName] = useState<string | undefined>(undefined);
   const [attachment, setAttachment] = useState<Buffer | undefined>(undefined);
   const { t } = useTranslation('translation', { keyPrefix: 'REQUEST_ERRORS' });
   const { payload, tabId, requestToken, transaction } = txReq;
@@ -81,25 +79,21 @@ function TransactionRequest() {
   };
 
   const handleTokenTransferRequest = async (tokenTransferPayload: any, requestAccount: Account) => {
-    const stxPendingTxData = await fetchStxPendingTxData(
-      requestAccount.stxAddress,
-      selectedNetwork,
-    );
-    const unsignedSendStxTx = await getTokenTransferRequest(
-      tokenTransferPayload.recipient,
-      tokenTransferPayload.amount,
-      tokenTransferPayload.memo ?? '',
-      requestAccount.stxPublicKey,
-      feeMultipliers,
-      selectedNetwork,
-      stxPendingTxData || [],
-      transaction?.auth,
-    );
+    const nonce = await nextBestNonce(requestAccount.stxAddress, selectedNetwork);
+    const unsignedSendStxTx = await generateUnsignedTx({
+      payload: {
+        ...tokenTransferPayload,
+        network: selectedNetwork,
+      },
+      publicKey: requestAccount.stxPublicKey,
+      nonce: transaction?.auth?.spendingCondition.nonce || nonce,
+      fee: transaction?.auth?.spendingCondition.fee.toString() || '0',
+    });
     setUnsignedTx(unsignedSendStxTx);
 
     navigate(RoutePaths.ConfirmStacksTransaction, {
       state: {
-        unsignedTx: Buffer.from(unsignedSendStxTx.serialize()).toString('hex'),
+        unsignedTx: unsignedSendStxTx.serialize(),
         sponsored: tokenTransferPayload.sponsored,
         isBrowserTx: !dataStxSignTransactionOverride,
         tabId,
@@ -115,13 +109,8 @@ function TransactionRequest() {
     contractCallPayload: ContractCallPayload,
     requestAccount: Account,
   ) => {
-    const {
-      unSignedContractCall,
-      contractInterface,
-      coinsMetaData: coinMeta,
-    } = await getContractCallPromises(
+    const [unSignedContractCall, contractInterface, coinMeta] = await createContractCallPromises(
       contractCallPayload,
-      requestAccount.stxAddress,
       selectedNetwork,
       requestAccount.stxPublicKey,
       transaction?.auth,
@@ -135,8 +124,7 @@ function TransactionRequest() {
     if (txAttachment) setAttachment(Buffer.from(txAttachment));
     if (invokedFuncMetaData) {
       setFuncMetaData(invokedFuncMetaData);
-      const { funcArgs } = extractFromPayload(contractCallPayload);
-      if (invokedFuncMetaData?.args.length !== funcArgs.length) {
+      if (invokedFuncMetaData?.args.length !== contractCallPayload.functionArgs.length) {
         navigate('/tx-status', {
           state: {
             txid: '',
@@ -156,17 +144,19 @@ function TransactionRequest() {
     contractDeployPayload: ContractDeployPayload,
     requestAccount: Account,
   ) => {
-    const response = await createDeployContractRequest(
-      contractDeployPayload,
-      selectedNetwork,
-      requestAccount.stxPublicKey,
-      feeMultipliers!,
-      requestAccount.stxAddress,
-      transaction?.auth,
-    );
-    setUnsignedTx(response.contractDeployTx);
-    setCodeBody(response.codeBody);
-    setContractName(response.contractName);
+    const nonce = await nextBestNonce(requestAccount.stxAddress, selectedNetwork);
+    const unsignedContractDeployTx = await generateUnsignedTx({
+      payload: {
+        ...contractDeployPayload,
+        network: selectedNetwork,
+      },
+      publicKey: requestAccount.stxPublicKey,
+      nonce: transaction?.auth?.spendingCondition.nonce || nonce,
+      fee: transaction?.auth?.spendingCondition.fee.toString() || '0',
+    });
+    setUnsignedTx(unsignedContractDeployTx);
+    setCodeBody(contractDeployPayload.codeBody);
+    setContractName(contractDeployPayload.contractName);
   };
 
   const handleTxSigningRequest = async (requestAccount: Account) => {

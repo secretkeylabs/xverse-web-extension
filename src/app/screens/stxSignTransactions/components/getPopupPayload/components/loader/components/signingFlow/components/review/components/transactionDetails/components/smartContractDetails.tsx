@@ -1,7 +1,7 @@
-import { type SmartContractPayload, type StacksTransaction } from '@stacks/transactions';
+import { type SmartContractPayloadWire, type StacksTransactionWire } from '@stacks/transactions';
 
-export function SmartContractDetails({ transaction }: { transaction: StacksTransaction }) {
-  const payload = transaction.payload as SmartContractPayload;
+export function SmartContractDetails({ transaction }: { transaction: StacksTransactionWire }) {
+  const payload = transaction.payload as SmartContractPayloadWire;
 
   return (
     <div>

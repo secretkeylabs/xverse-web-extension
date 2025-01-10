@@ -3,7 +3,7 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import {
   addressToString,
   type ContractCallPayload,
-  type STXPostCondition,
+  type STXPostConditionWire,
 } from '@stacks/transactions';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +12,7 @@ export function contractPrincipalFromContractCallPayload(payload: ContractCallPa
   return `${addressToString(payload.contractAddress)}.${payload.contractName.content}`;
 }
 
-export function stxAmountFromPostCondition(pc: STXPostCondition) {
+export function stxAmountFromPostCondition(pc: STXPostConditionWire) {
   return stacksValue({ value: pc.amount.toString(), withTicker: false });
 }
 

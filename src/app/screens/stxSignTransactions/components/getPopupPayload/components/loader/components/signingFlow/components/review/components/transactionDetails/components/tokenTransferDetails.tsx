@@ -1,7 +1,11 @@
-import { cvToValue, type StacksTransaction, type TokenTransferPayload } from '@stacks/transactions';
+import {
+  cvToValue,
+  type StacksTransactionWire,
+  type TokenTransferPayloadWire,
+} from '@stacks/transactions';
 
-export function TokenTransferDetails({ transaction }: { transaction: StacksTransaction }) {
-  const payload = transaction.payload as TokenTransferPayload;
+export function TokenTransferDetails({ transaction }: { transaction: StacksTransactionWire }) {
+  const payload = transaction.payload as TokenTransferPayloadWire;
 
   return (
     <div>

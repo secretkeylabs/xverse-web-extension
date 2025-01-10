@@ -2,12 +2,11 @@ import type { AccountWithDetails } from '@common/utils/getSelectedAccount';
 import { SignLedger } from '@screens/stxSignTransactions/components/getPopupPayload/components/loader/components/signingFlow/components/signLedger';
 import { useSignTransactionsSoftware } from '@screens/stxSignTransactions/hooks';
 import {
-  StacksMainnet,
-  StacksTestnet,
   broadcastSignedTransaction,
   safePromise,
+  type StacksNetwork,
 } from '@secretkeylabs/xverse-core';
-import type { StacksTransaction } from '@stacks/transactions';
+import type { StacksTransactionWire } from '@stacks/transactions';
 import { isLedgerAccount } from '@utils/helper';
 import { useCallback, useState } from 'react';
 import { BroadcastError } from './components/broadcastError';
@@ -16,11 +15,11 @@ import { SignSuccess } from './components/signSuccess';
 import { SigningError } from './components/signingError';
 
 type StepsProps = {
-  transactions: StacksTransaction[];
+  transactions: StacksTransactionWire[];
   account: AccountWithDetails;
-  network: StacksMainnet | StacksTestnet;
+  network: StacksNetwork;
   isBroadcastRequested: boolean;
-  onSignSuccess: (transactions: StacksTransaction[]) => void;
+  onSignSuccess: (transactions: StacksTransactionWire[]) => void;
   onReviewCancel: () => void;
 };
 
@@ -79,7 +78,7 @@ export function SigningFlow(props: StepsProps) {
           onError={() => {
             setState({ name: 'error' });
           }}
-          onSuccess={async (signedTransactions: StacksTransaction[]) => {
+          onSuccess={async (signedTransactions: StacksTransactionWire[]) => {
             if (isBroadcastRequested) {
               const [error] = await safePromise(
                 Promise.all(

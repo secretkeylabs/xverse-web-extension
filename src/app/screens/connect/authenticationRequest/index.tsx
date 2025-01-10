@@ -19,7 +19,7 @@ import {
   handleLedgerStxJWTAuth,
   type AuthRequest,
 } from '@secretkeylabs/xverse-core';
-import { AddressVersion, StacksMessageType, publicKeyToAddress } from '@stacks/transactions';
+import { Address } from '@stacks/transactions';
 import Callout from '@ui-library/callout';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
 import { isHardwareAccount } from '@utils/helper';
@@ -219,10 +219,7 @@ function AuthenticationRequest() {
     const profile = {
       stxAddress: {
         mainnet: selectedAccount.stxAddress,
-        testnet: publicKeyToAddress(AddressVersion.MainnetSingleSig, {
-          data: Uint8Array.from(Buffer.from(selectedAccount.stxPublicKey, 'hex')),
-          type: StacksMessageType.PublicKey,
-        }),
+        testnet: Address.fromPublicKey(selectedAccount.stxPublicKey, 'testnet'),
       },
     };
 

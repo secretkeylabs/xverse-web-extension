@@ -2,12 +2,12 @@ import useNetworkSelector from '@hooks/useNetwork';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  StacksNetwork,
   getFtData,
   getXverseApiClient,
   type FungibleToken,
   type FungibleTokenWithStates,
   type SettingsNetwork,
+  type StacksNetwork,
 } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import { selectWithDerivedState } from '@utils/tokens';

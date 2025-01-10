@@ -2,7 +2,7 @@
 /* eslint-disable no-restricted-syntax */
 import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
 import { signLedgerStxTransaction } from '@secretkeylabs/xverse-core';
-import type { StacksTransaction } from '@stacks/transactions';
+import type { StacksTransactionWire } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,10 +10,10 @@ import type { Transport } from '../types';
 import { Layout } from './connectLedger/components/shared/layout';
 
 type SigningTransactionsProps = {
-  transactions: StacksTransaction[];
+  transactions: StacksTransactionWire[];
   accountIndex: number;
   transport: Transport;
-  onSuccess: (signedTransactions: StacksTransaction[]) => void;
+  onSuccess: (signedTransactions: StacksTransactionWire[]) => void;
   onError: (error: Error) => void;
 };
 export function SigningTransactions({
@@ -26,7 +26,7 @@ export function SigningTransactions({
   const [currentTransactionIndex, setCurrentTransactionIndex] = useState(0);
   const signTransactionsMutation = useMutation({
     mutationFn: async ({ transport }: { transport: Transport }) => {
-      const signedTransactions: StacksTransaction[] = [];
+      const signedTransactions: StacksTransactionWire[] = [];
       for (const [index, transaction] of transactions.entries()) {
         setCurrentTransactionIndex(index);
         const signedTransaction = await signLedgerStxTransaction({
