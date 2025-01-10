@@ -7,9 +7,7 @@ interface Props {
   postCondition: PostConditionWire;
 }
 function StxPostConditionCard({ postCondition }: Props) {
-  console.log('🚀 ~ StxPostConditionCard ~ postCondition:', postCondition);
   const amount = getAmountFromPostCondition(postCondition) ?? '';
-  console.log('🚀 ~ StxPostConditionCard ~ amount:', amount);
 
   return <PostConditionsView postCondition={postCondition} amount={amount} icon={IconStacks} />;
 }
