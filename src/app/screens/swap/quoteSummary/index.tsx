@@ -29,11 +29,12 @@ import Callout from '@ui-library/callout';
 import { StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import { formatNumber } from '@utils/helper';
+import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
-import trackSwapMixPanel from '../mixpanel';
+import { getSwapsMixpanelProperties } from '../mixpanel';
 import QuoteTile from '../quotesModal/quoteTile';
 import SlippageModalContent from '../slippageModal';
 import type { OrderInfo, StxOrderInfo } from '../types';
@@ -171,16 +172,19 @@ export default function QuoteSummary({
       return;
     }
 
-    trackSwapMixPanel(AnalyticsEvents.ConfirmSwap, {
+    const trackingPayload = getSwapsMixpanelProperties({
       provider: quote.provider,
       fromToken,
       toToken,
       amount,
       quote,
-      btcUsdRate,
-      stxBtcRate,
-      fromTokenInfo: sip10FromTokenInfoUSD,
+      btcUsdRate: BigNumber(btcUsdRate),
+      stxBtcRate: BigNumber(stxBtcRate),
+      fromRuneFloorPrice: new BigNumber(runeFloorPrice ?? 0),
+      fromStxTokenFiatValue: new BigNumber(sip10FromTokenInfoUSD?.tokenFiatRate ?? 0),
     });
+
+    trackMixPanel(AnalyticsEvents.ConfirmSwap, trackingPayload);
 
     if (selectedIdentifiers) {
       const placeUtxoOrderRequest: PlaceUtxoOrderRequest = {

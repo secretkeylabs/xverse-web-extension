@@ -6,7 +6,7 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
-import trackSwapMixPanel from '@screens/swap/mixpanel';
+import { getSwapsMixpanelProperties } from '@screens/swap/mixpanel';
 import {
   AnalyticsEvents,
   createContractCallPromises,
@@ -20,6 +20,7 @@ import type { ContractCallPayload, ContractDeployPayload } from '@stacks/connect
 import { StacksTransactionWire } from '@stacks/transactions';
 import Spinner from '@ui-library/spinner';
 import { getNetworkType, getStxNetworkForBtcNetwork, isHardwareAccount } from '@utils/helper';
+import { trackMixPanel } from '@utils/mixpanel';
 import RoutePaths from 'app/routes/paths';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -73,7 +74,8 @@ function TransactionRequest() {
   });
 
   const onSignTransaction = () => {
-    trackSwapMixPanel(AnalyticsEvents.SignSwap, mixpanelMetadata);
+    const trackingPayload = getSwapsMixpanelProperties(mixpanelMetadata);
+    trackMixPanel(AnalyticsEvents.SignSwap, trackingPayload);
   };
 
   const handleTokenTransferRequest = async (tokenTransferPayload: any, requestAccount: Account) => {
