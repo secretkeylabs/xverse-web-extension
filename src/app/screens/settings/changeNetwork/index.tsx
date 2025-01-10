@@ -7,10 +7,10 @@ import {
   defaultRegtest,
   defaultSignet,
   defaultTestnet,
+  defaultTestnet4,
   initialNetworksList,
   type SettingsNetwork,
 } from '@secretkeylabs/xverse-core';
-import { defaultTestnet4 } from '@secretkeylabs/xverse-core/dist/constant';
 import Button from '@ui-library/button';
 import { isValidBtcApi, isValidStacksApi } from '@utils/helper';
 import { useState } from 'react';
