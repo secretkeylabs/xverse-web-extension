@@ -71,7 +71,7 @@ export const MAX_ACC_NAME_LENGTH = 20;
 // UI
 export const ANIMATION_EASING = (progress: number) => 1 - (1 - progress) ** 3; // ease out (0, 0, 0.58, 1)
 export const EMPTY_LABEL = '--';
-export const HIDDEN_BALANCE_LABEL = '●●●●●●';
+export const HIDDEN_BALANCE_LABEL = '••••••';
 export const BTC_SYMBOL = '₿';
 export const OPTIONS_DIALOG_WIDTH = 179;
 export const SPAM_OPTIONS_WIDTH = 244;

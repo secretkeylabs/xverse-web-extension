@@ -9,13 +9,25 @@ const Button = styled.button<{
   flexDirection: 'column',
   alignItems: 'center',
   borderRadius: props.$radiusSize ? props.$radiusSize : '16px',
+  borderColor: 'transparent',
   rowGap: props.$hasText ? '8px' : '0px',
   backgroundColor: 'transparent',
-  ':hover > div': {
+  ':not(:disabled):hover > div': {
     backgroundColor: props.$isTransparent
       ? props.theme.colors.background.elevation6_800
       : props.theme.colors.action.classicLight,
     opacity: 0.6,
+  },
+  ':disabled': {
+    cursor: 'not-allowed',
+    '& > div': {
+      backgroundColor: props.theme.colors.white_600,
+      borderColor: 'transparent',
+      color: props.theme.colors.elevation0,
+    },
+    '& > span': {
+      color: props.theme.colors.white_600,
+    },
   },
 }));
 
@@ -60,6 +72,7 @@ type Props = {
   hoverDialogId?: string;
   size?: number;
   radiusSize?: number;
+  disabled?: boolean;
 };
 
 function SquareButton({
@@ -71,11 +84,12 @@ function SquareButton({
   hoverDialogId,
   size,
   radiusSize,
+  disabled,
 }: Props) {
   return (
     <Button
-      onClick={onPress}
-      $isTransparent={isTransparent}
+      disabled={disabled}
+      onClick={disabled ? undefined : onPress}
       $hasText={!!text}
       $radiusSize={radiusSize}
     >

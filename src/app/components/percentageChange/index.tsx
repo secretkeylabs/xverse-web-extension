@@ -13,7 +13,7 @@ import {
   getFiatEquivalent,
   type FungibleToken,
 } from '@secretkeylabs/xverse-core';
-import type { CurrencyTypes } from '@utils/constants';
+import { EMPTY_LABEL, type CurrencyTypes } from '@utils/constants';
 import { getBalanceAmount } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import styled from 'styled-components';
@@ -21,25 +21,18 @@ import Theme from 'theme';
 
 const NoDataTextContainer = styled.p((props) => ({
   ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_600,
+  color: props.theme.colors.white_200,
   marginRight: props.theme.space.xxs,
 }));
 
-function NoDataText() {
-  return <NoDataTextContainer>--</NoDataTextContainer>;
-}
-
-const RowContainer = styled.div((props) => ({
+const RowContainer = styled.div({
   display: 'flex',
   alignItems: 'center',
-  marginRight: props.theme.space.xxs,
-}));
+});
 
-interface PercentageChangeTextProps {
+const PercentageChangeText = styled.p<{
   themeColor: string;
-}
-
-const PercentageChangeText = styled.p<PercentageChangeTextProps>((props) => ({
+}>((props) => ({
   ...props.theme.typography.body_medium_m,
   color: props.themeColor,
   marginLeft: props.theme.space.xxxs,
@@ -52,6 +45,7 @@ const IntervalText = styled.p((props) => ({
 }));
 
 type Props = {
+  isHidden?: boolean;
   ftCurrencyPairs: [FungibleToken | undefined, CurrencyTypes][];
   decimals?: number;
   displayTimeInterval?: boolean;
@@ -61,6 +55,7 @@ type Props = {
 };
 
 function PercentageChange({
+  isHidden = false,
   ftCurrencyPairs,
   decimals = 2,
   displayTimeInterval = false,
@@ -135,6 +130,15 @@ function PercentageChange({
     );
 
   if (!chartPriceStats && (currentBalance.eq(0) || oldBalance.eq(0))) return null;
+
+  if (isHidden) {
+    return (
+      <RowContainer>
+        <NoDataTextContainer>{EMPTY_LABEL}</NoDataTextContainer>
+        {displayTimeInterval && <IntervalText>24h</IntervalText>}
+      </RowContainer>
+    );
+  }
 
   const priceChangePercentage24h = chartPriceStats?.change
     ? BigNumber(chartPriceStats.change).minus(1)

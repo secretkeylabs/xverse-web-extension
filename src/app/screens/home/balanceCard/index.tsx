@@ -1,4 +1,5 @@
 import { BestBarLoader } from '@components/barLoader';
+import PercentageChange from '@components/percentageChange';
 import { useVisibleBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
 import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
@@ -11,89 +12,43 @@ import useToggleBalanceView from '@hooks/useToggleBalanceView';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Eye } from '@phosphor-icons/react';
 import { animated, useTransition } from '@react-spring/web';
-import { currencySymbolMap, getFiatBtcEquivalent } from '@secretkeylabs/xverse-core';
+import {
+  currencySymbolMap,
+  getFiatBtcEquivalent,
+  type FungibleToken,
+} from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
-import { ANIMATION_EASING, BTC_SYMBOL, HIDDEN_BALANCE_LABEL } from '@utils/constants';
+import {
+  ANIMATION_EASING,
+  BTC_SYMBOL,
+  HIDDEN_BALANCE_LABEL,
+  type CurrencyTypes,
+} from '@utils/constants';
 import { calculateTotalBalance, getAccountBalanceKey } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
-import styled from 'styled-components';
-
-const Container = styled.div`
-  position: relative;
-  min-height: 62px; // it's the height of RowContainer + BalanceContainer + indent between them
-  margin-top: ${({ theme }) => theme.space.m};
-`;
-
-const RowContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginBottom: props.theme.space.xs,
-  columnGap: props.theme.space.xxs,
-  minHeight: 20,
-}));
-
-const BalanceHeadingText = styled.p((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_200,
-  lineHeight: '140%',
-}));
-
-const ShowBalanceButton = styled.button((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_200,
-  lineHeight: '140%',
-  display: 'flex',
-  alignItems: 'center',
-  gap: 6,
-  backgroundColor: 'transparent',
-  transition: 'color 0.1s ease',
-  '&:hover': {
-    color: props.theme.colors.white_0,
-  },
-}));
-
-const BalanceAmountText = styled.p((props) => ({
-  ...props.theme.typography.headline_l,
-  lineHeight: '1',
-  color: props.theme.colors.white_0,
-  transition: 'color 0.1s ease',
-  '&:hover': {
-    color: props.theme.colors.white_200,
-  },
-}));
-
-const BarLoaderContainer = styled.div({
-  display: 'flex',
-});
-
-const BalanceContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'flex-start',
-  width: 'fit-content',
-  alignItems: 'center',
-  gap: props.theme.spacing(5),
-  minHeight: 34,
-  cursor: 'pointer',
-}));
-
-const ContentWrapper = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-`;
+import {
+  BalanceAmountText,
+  BalanceContainer,
+  BalanceHeadingText,
+  BarLoaderContainer,
+  Container,
+  ContentWrapper,
+  LoaderContainer,
+  PercentageChangeContainer,
+  RowContainer,
+  ShowBalanceButton,
+} from './index.styled';
 
 type Props = {
   isLoading: boolean;
   isRefetching: boolean;
+  combinedFtList: FungibleToken[];
 };
 
-function BalanceCard({ isLoading, isRefetching }: Props) {
+function BalanceCard({ isLoading, isRefetching, combinedFtList }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const { t: commonT } = useTranslation('translation', { keyPrefix: 'COMMON' });
   const selectedAccount = useSelectedAccount();
@@ -179,16 +134,17 @@ function BalanceCard({ isLoading, isRefetching }: Props) {
         <ContentWrapper>
           <animated.div style={style}>
             {loading ? (
-              <>
-                <RowContainer>
-                  <BarLoaderContainer>
-                    <BestBarLoader width={76.5} height={20} />
-                  </BarLoaderContainer>
-                </RowContainer>
+              <LoaderContainer>
+                <BarLoaderContainer>
+                  <BestBarLoader width={96} height={20} />
+                </BarLoaderContainer>
                 <BarLoaderContainer>
                   <BestBarLoader width={244} height={34} />
                 </BarLoaderContainer>
-              </>
+                <BarLoaderContainer>
+                  <BestBarLoader width={96} height={20} />
+                </BarLoaderContainer>
+              </LoaderContainer>
             ) : (
               <>
                 <RowContainer>
@@ -262,6 +218,19 @@ function BalanceCard({ isLoading, isRefetching }: Props) {
                     }
                   })()}
                 </BalanceContainer>
+                <PercentageChangeContainer>
+                  <PercentageChange
+                    isHidden={balanceHidden}
+                    displayTimeInterval
+                    ftCurrencyPairs={[
+                      [undefined, 'BTC'],
+                      [undefined, 'STX'],
+                      ...combinedFtList.map(
+                        (ft) => [ft, 'FT'] as [FungibleToken | undefined, CurrencyTypes],
+                      ),
+                    ]}
+                  />
+                </PercentageChangeContainer>
               </>
             )}
           </animated.div>

@@ -8,24 +8,27 @@ type Props = {
   fiatAmount?: BigNumber;
   fiatCurrency: SupportedCurrency;
   dataTestId?: string;
+  withoutSuffix?: boolean;
 };
 
-function FiatAmountText({ className, fiatAmount, fiatCurrency, dataTestId }: Props) {
+function FiatAmountText({ className, fiatAmount, fiatCurrency, dataTestId, withoutSuffix }: Props) {
   if (!fiatAmount || !fiatCurrency) {
     return null;
   }
 
   if (fiatAmount.isEqualTo(0)) {
     return (
-      <span className={className}>{`${currencySymbolMap[fiatCurrency]}0.00 ${fiatCurrency}`}</span>
+      <span className={className}>{`${currencySymbolMap[fiatCurrency]}0.00${
+        withoutSuffix ? '' : ` ${fiatCurrency}`
+      }`}</span>
     );
   }
 
   if (fiatAmount.isLessThan(0.01)) {
     return (
-      <span
-        className={className}
-      >{`< ${currencySymbolMap[fiatCurrency]}0.01 ${fiatCurrency}`}</span>
+      <span className={className}>{`< ${currencySymbolMap[fiatCurrency]}0.01${
+        withoutSuffix ? '' : ` ${fiatCurrency}`
+      }`}</span>
     );
   }
   return (
@@ -35,7 +38,7 @@ function FiatAmountText({ className, fiatAmount, fiatCurrency, dataTestId }: Pro
       displayType="text"
       thousandSeparator
       prefix={` ${currencySymbolMap[fiatCurrency]}`}
-      suffix={` ${fiatCurrency}`}
+      suffix={withoutSuffix ? '' : ` ${fiatCurrency}`}
       data-testid={dataTestId}
     />
   );
