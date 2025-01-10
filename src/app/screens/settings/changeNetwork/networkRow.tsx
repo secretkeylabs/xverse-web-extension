@@ -51,7 +51,7 @@ function NetworkRow({ network, isSelected, onNetworkSelected, showDivider, disab
         isActive={isSelected}
         variant={isSelected ? theme.typography.body_bold_m : theme.typography.body_m}
       >
-        {network.type}
+        {network.type === 'Testnet' ? 'Testnet3' : network.type}
       </Text>
       {isSelected && <img src={TickIcon} alt="tick" />}
     </Button>

@@ -19,6 +19,7 @@ import {
   BTC_TRANSACTION_REGTEST_STATUS_URL,
   BTC_TRANSACTION_SIGNET_STATUS_URL,
   BTC_TRANSACTION_STATUS_URL,
+  BTC_TRANSACTION_TESTNET4_STATUS_URL,
   BTC_TRANSACTION_TESTNET_STATUS_URL,
   MAX_ACC_NAME_LENGTH,
   TRANSACTION_STATUS_URL,
@@ -136,6 +137,9 @@ export const getStxTxStatusUrl = (transactionId: string, currentNetwork: Setting
 export const getBtcTxStatusUrl = (txId: string, network: SettingsNetwork) => {
   if (network.type === 'Testnet') {
     return `${BTC_TRANSACTION_TESTNET_STATUS_URL}${txId}`;
+  }
+  if (network.type === 'Testnet4') {
+    return `${BTC_TRANSACTION_TESTNET4_STATUS_URL}${txId}`;
   }
   if (network.type === 'Signet') {
     return `${BTC_TRANSACTION_SIGNET_STATUS_URL}${txId}`;
