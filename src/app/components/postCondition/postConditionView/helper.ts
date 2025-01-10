@@ -21,7 +21,7 @@ export const microStxToStx = (mStx: number | string | BigNumber) => {
   return microStacks.shiftedBy(-6);
 };
 
-const stacksValue = ({
+export const stacksValue = ({
   value,
   fixedDecimals = true,
   withTicker = true,

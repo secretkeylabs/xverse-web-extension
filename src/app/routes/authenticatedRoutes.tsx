@@ -68,6 +68,7 @@ import SignRuneDelistingMessage from '@screens/signRuneDelistingMessage';
 import SignatureRequest from '@screens/signatureRequest';
 import SpeedUpTransactionScreen from '@screens/speedUpTransaction';
 import Stacking from '@screens/stacking';
+import { StxSignTransactions } from '@screens/stxSignTransactions';
 import SwapScreen from '@screens/swap';
 import TransactionRequest from '@screens/transactionRequest';
 import TransactionStatus from '@screens/transactionStatus';
@@ -173,6 +174,10 @@ const authedRoutesWithSidebar: RouteObject = {
     {
       path: RequestsRoutes.TransactionRequest,
       element: <TransactionRequest />,
+    },
+    {
+      path: RequestsRoutes.StxSignTransactions,
+      element: <StxSignTransactions />,
     },
     {
       path: 'authentication-request',

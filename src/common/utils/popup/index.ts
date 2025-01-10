@@ -1,6 +1,7 @@
 import { parse, stringify } from '@aryzing/superqs';
 import { InternalMethods } from '@common/types/message-types';
 import { sendMessage } from '@common/types/messages';
+import { error, success, type Result } from '@secretkeylabs/xverse-core';
 import * as v from 'valibot';
 import { getOriginFromPort, getTabIdFromPort } from '..';
 
@@ -17,13 +18,7 @@ const contextSchema = v.object({
 
 export type Context = v.InferOutput<typeof contextSchema>;
 
-/**
- * Options to configure a popup's behavior.
- */
-interface Options<TPopupData> {
-  /** The path the popup is opened to. */
-  path: string;
-
+type PopupPayload<TData = undefined> = {
   /**
    * Arbitrary data sent to the popup. It may be just about any JavaScript
    * value. The data is recoverable with {@linkcode getPopupPayload}.
@@ -31,10 +26,18 @@ interface Options<TPopupData> {
    * Check [`@aryzing/superqs`](https://github.com/aryzing/superqs) used under
    * the hood for all supported data types.
    */
-  data?: TPopupData;
+  data: TData;
   context: Context;
+};
+
+/**
+ * Options to configure a popup's behavior.
+ */
+type Options<TData> = {
+  /** The path the popup is opened to. */
+  path: string;
   onClose?: (popupWindow: chrome.windows.Window) => void;
-}
+} & PopupPayload<TData>;
 
 async function createCenteredPopupOptions(
   options: Pick<chrome.windows.CreateData, 'url' | 'height' | 'width'>,
@@ -133,41 +136,48 @@ const payloadSchema = v.object({
  */
 export function getPopupPayload<TData>(
   dataParser: (data: any) => TData,
-): [Error, null] | [null, { context: Context; data: TData }];
-export function getPopupPayload(): [Error, null] | [null, { context: Context; data?: unknown }];
-export function getPopupPayload<T>(
-  dataParser?: (data: any) => T,
-): [Error, null] | [null, { context: Context; data?: T }] {
+): Result<PopupPayload<TData>> {
   const params = new URLSearchParams(document.location.search);
   const payloadParam = params.get(popupPaylodUrlParamName);
 
   if (typeof payloadParam !== 'string') {
-    return [new Error('No payload parameter found in URL'), null];
+    return error({
+      name: 'NoPayloadParameterError',
+      message: 'No payload parameter found in URL',
+    });
   }
 
   let maybePayload: unknown;
   try {
     maybePayload = parse(payloadParam);
   } catch (e) {
-    return [new Error('Failed to parse popup payload', { cause: e }), null];
+    return error({
+      name: 'PopupPayloadParseError',
+      message: 'Failed to parse popup payload',
+      data: e,
+    });
   }
 
-  // const parseResult = payloadSchema.safeParse(maybePayload);
   const parseResult = v.safeParse(payloadSchema, maybePayload);
   if (!parseResult.success) {
-    return [new Error('Invalid payload schema.', { cause: parseResult.issues }), null];
+    return error({
+      name: 'InvalidPopupPayloadError',
+      message: 'Invalid payload payload.',
+      data: parseResult.issues,
+    });
   }
 
   const { context, data } = parseResult.output;
-
-  if (!dataParser) return [null, { context, data }];
-
-  let parsedData: T;
+  let parsedData: TData;
   try {
     parsedData = dataParser(data);
   } catch (e) {
-    return [new Error('Failed to parse data with provided data parser.', { cause: e }), null];
+    return error({
+      name: 'DataParserError',
+      message: 'Failed to parse data with provided data parser.',
+      data: e,
+    });
   }
 
-  return [null, { context, data: parsedData }];
+  return success({ context, data: parsedData });
 }

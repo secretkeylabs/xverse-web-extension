@@ -27,7 +27,8 @@
     "COLLECTIBLES": "Collectibles",
     "EARN": "Earn",
     "EXPLORE": "Explore",
-    "SETTINGS": "Settings"
+    "SETTINGS": "Settings",
+    "TRANSACTION": "Transaction"
   },
   "INFORMATION": {
     "ORDINALS_ADDRESS_TOOLTIP": "These sats are used for your ordinals and runes. They cannot be spent with Xverse wallet.",
@@ -41,7 +42,7 @@
     "SCREEN_TITLE": "The Bitcoin wallet for everyone",
     "CREATE_WALLET_BUTTON": "Create a new wallet",
     "RESTORE_WALLET_BUTTON": "Restore an existing wallet",
-    "ONBOARDING_1_TITLE": "Store BTC, Runes, Ordinals, BRC20, Rare Sats, STX and more!",
+    "ONBOARDING_1_TITLE": "Store BTC, Runes, Ordinals, BRC-20, Rare Sats, STX and more!",
     "ONBOARDING_2_TITLE": "Connect to your favorite Bitcoin apps"
   },
   "LEDGER_IMPORT_SCREEN": {
@@ -64,7 +65,13 @@
       "STX_SUBTITLE": "To continue, connect your Ledger device, make sure it's unlocked, and open the Stacks app.",
       "TITLE_FAILED": "Connection failed",
       "BTC_SUBTITLE_FAILED": "Make sure your Ledger device is connected, unlocked, authorised by your browser and the Bitcoin app is open.",
-      "STX_SUBTITLE_FAILED": "Make sure your Ledger device is connected, unlocked, authorised by your browser and the Stacks app is open."
+      "STX_SUBTITLE_FAILED": "Make sure your Ledger device is connected, unlocked, authorised by your browser and the Stacks app is open.",
+      "ALT": {
+        "CONNECT_STX_ALT": "Initiate Stacks connection",
+        "CONNECT_ERROR_ALT": "Connection error",
+        "CONNECT_SUCCESS_ALT": "Connection success",
+        "DEFAULT_ALT": "Use Ledger device"
+      }
     },
     "LEDGER_ADD_ADDRESS": {
       "TITLE_BTC": "Add a Bitcoin wallet",
@@ -228,7 +235,7 @@
     "SAVE": "Save",
     "CONFIRM": "Confirm",
     "MANAGE_TOKEN": "Manage token list",
-    "STACKS_AND_TOKEN": "Stacks NFTs & SIP-10 tokens",
+    "STACKS_AND_TOKEN": "STX, Stacks SIP-10 & NFTs",
     "ORDINALS_AND_BRC20": "Ordinals, BRC-20 & Runes",
     "VERIFY_ADDRESSES_ON_LEDGER": "Verify addresses on Ledger",
     "VIEW_ADDRESSES": "View addresses",
@@ -247,8 +254,8 @@
     "ERRORS": {
       "BTC_BALANCE": "Failed to load Bitcoin balance",
       "STX_BALANCE": "Failed to load Stacks balance",
-      "SIP10_BALANCE": "Failed to load SIP10 token balances",
-      "BRC20_BALANCE": "Failed to load BRC20 token balances",
+      "SIP10_BALANCE": "Failed to load SIP-10 token balances",
+      "BRC20_BALANCE": "Failed to load BRC-20 token balances",
       "RUNES_BALANCE": "Failed to load Rune balances"
     },
     "ANNOUNCEMENTS": {
@@ -290,9 +297,9 @@
     "COPY_ADDRESS": "Copy address",
     "COPIED_ADDRESS": "Copied to clipboard",
     "BTC_ADDRESS": "Bitcoin address",
-    "ORDINAL_ADDRESS": "Ordinal, Runes & BRC-20 address",
+    "ORDINAL_ADDRESS": "Ordinals, Runes & BRC-20 address",
     "ORDINALS_RECEIVE_MESSAGE": "Only use this address to receive Ordinals, Runes, and BRC-20 tokens.",
-    "STX_RECEIVE_MESSAGE": "Only use this address to receive SIP-10 tokens.",
+    "STX_RECEIVE_MESSAGE": "Only use this address to receive STX, SIP-10 tokens & Stacks NFTs",
     "BTC_RECEIVE_MESSAGE": "Only use this address to receive Bitcoin.",
     "CALLOUTS": {
       "NATIVE_SEGWIT": {
@@ -431,7 +438,9 @@
     "THIS_MAY_TAKE_A_FEW_MINUTES": "This may take a few minutes, please keep this window open.",
     "TRANSACTIONS_BROADCASTED": "Transactions broadcasted",
     "TRANSACTIONS_FAILED_TO_BROADCAST": "{{failed}}/{{total}} transactions failed to broadcast",
+    "SOME_TRANSACTIONS_FAILED_TO_BROADCAST": "Some transactions failed to broadcast",
     "CHECK_THE_APP_YOU_USE": "Please check the app you are using.",
+    "TRANSACTION_SIGNED": "Transaction signed",
     "TRANSACTIONS_SIGNED": "Transactions signed",
     "PSBT_NO_BROADCAST_DISCLAIMER": "This transaction will not be broadcasted from your wallet. It may be broadcasted later by a third party.",
     "PSBTS_NO_BROADCAST_DISCLAIMER": "These transactions will not be broadcasted from your wallet. They may be broadcasted later by a third party.",
@@ -477,6 +486,7 @@
       },
       "CONFIRM": {
         "TITLE": "Confirm the transaction",
+        "TITLE_MULTIPLE": "Confirm transaction {{current}}/{{total}}",
         "SUBTITLE": "Authorise the transaction on your device to continue.",
         "ERROR_TITLE": "Transaction denied",
         "ERROR_SUBTITLE": "The transaction have been rejected. You can try again or close this tab."
@@ -519,7 +529,8 @@
     "POST_CONDITION_MODE_WARNING_TEXT": "This transaction might be unsafe. Be sure you trust the source of this transaction before confirming it. (Unsafe post condition mode)",
     "QUOTE_EXPIRES_IN": "Note that this swap quote will expire after {{seconds}} seconds",
     "INSCRIPTION_SERVICE_FEE": "Inscription Service Fee",
-    "TOTAL_FEES": "Total fees"
+    "TOTAL_FEES": "Total fees",
+    "FAILED_TO_SIGN": "Failed to sign"
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "The requested transaction cannot be created due to insufficient balance",
@@ -1083,6 +1094,15 @@
       "CALLOUT": "This transaction will perform on-chain delisting for your runes on all marketplaces and has to confirm before you can list again."
     }
   },
+  "COIN_PRICE_CHART": {
+    "EMPTY_CHART": {
+      "TITLE": "No Market Data Yet",
+      "TEXT": "When market data is available for this token, it will appear here."
+    },
+    "MISSING_PERIOD": {
+      "TEXT": "No data for this time period."
+    }
+  },
   "COIN_DASHBOARD_SCREEN": {
     "SEND": "Send",
     "RECEIVE": "Receive",
@@ -1182,15 +1202,20 @@
     "TRANSFER_OWN": "will keep"
   },
   "CONTRACT_CALL_REQUEST": {
-    "FUNCTION": "Function",
+    "TRANSACTION_DETAILS": "Transaction details",
+    "CONTRACT_CALL_DETAILS_TITLE": "Contract call",
+    "FUNCTION_NAME": "Name",
     "SHOW_MORE": "Show more ",
     "SHOW_LESS": "Show less",
+    "REQUEST_NETWORK": "Network",
+    "REQUEST_NETWORK_MAINNET": "Mainnet",
+    "REQUEST_NETWORK_TESTNET": "Testnet",
     "PLUS": "+",
     "MINUS": "-",
-    "CONTRACT_ADDRESS": "Contract ADDRESS",
+    "CONTRACT_ADDRESS": "Contract",
     "SPONSORED": "Sponsored",
     "SPONSORED_VALUE_YES": "Yes",
-    "POST_CONDITION_ALERT": "No transfers (beside fees) will be made from your account or the transaction will abort"
+    "POST_CONDITION_ALERT": "No transfers (beside fees) will be made from your account"
   },
   "DEPLOY_CONTRACT_REQUEST": {
     "DEPLOY_CONTRACT": "deploy-contract",
@@ -1201,7 +1226,7 @@
     "SPONSORED_VALUE_YES": "Yes",
     "FUNCTION": "Source Code",
     "DOWNLOAD": "Download contract code",
-    "POST_CONDITION_ALERT": "No transfers (beside fees) will be made from your account or the transaction will abort"
+    "POST_CONDITION_ALERT": "No transfers (beside fees) will be made from your account"
   },
   "SIGNATURE_REQUEST": {
     "TITLE": "Sign Message",
@@ -1391,7 +1416,7 @@
       "ADDRESS_REQUIRED": "Recipient address is required",
       "AMOUNT_REQUIRED": "Amount is required",
       "ADDRESS_INVALID": "Recipient address invalid",
-      "INSUFFICIENT_BALANCE": "Insufficient BRC20 balance",
+      "INSUFFICIENT_BALANCE": "Insufficient BRC-20 balance",
       "INSUFFICIENT_BALANCE_FEES": "Insufficient BTC balance for transaction fees",
       "SERVER_ERROR": "Unexpected error"
     },
@@ -1409,7 +1434,7 @@
   "CONFIRM_BRC20": {
     "BITCOIN_VALUE": "Bundle size",
     "ERROR_CODES": {
-      "INSUFFICIENT_BALANCE": "Insufficient BRC20 balance",
+      "INSUFFICIENT_BALANCE": "Insufficient BRC-20 balance",
       "INSUFFICIENT_FUNDS": "Insufficient BTC balance for transaction fees",
       "FAILED_TO_FINALIZE": "Failed to finalize",
       "UTXOS_MISSING": "UTXOs missing",

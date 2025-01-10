@@ -6,6 +6,7 @@ import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useHasFeature from '@hooks/useHasFeature';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CaretDown, CaretUp } from '@phosphor-icons/react';
+import type { ChartPriceStats } from '@screens/coinDashboard/tokenPrice';
 import {
   currencySymbolMap,
   FeatureId,
@@ -56,6 +57,7 @@ type Props = {
   displayTimeInterval?: boolean;
   displayBalanceChange?: boolean;
   displayAmountChange?: boolean;
+  chartPriceStats?: ChartPriceStats;
 };
 
 function PercentageChange({
@@ -64,6 +66,7 @@ function PercentageChange({
   displayTimeInterval = false,
   displayBalanceChange = false,
   displayAmountChange = false,
+  chartPriceStats,
 }: Props) {
   const { fiatCurrency } = useWalletSelector();
   const { data: exchangeRates } = useGetExchangeRate('USD');
@@ -131,10 +134,11 @@ function PercentageChange({
       [BigNumber(0), BigNumber(0)],
     );
 
-  if (currentBalance.eq(0) && oldBalance.eq(0) && displayTimeInterval) return null;
-  if (currentBalance.eq(0) || oldBalance.eq(0)) return <NoDataText />;
+  if (!chartPriceStats && (currentBalance.eq(0) || oldBalance.eq(0))) return null;
 
-  const priceChangePercentage24h = currentBalance.dividedBy(oldBalance).minus(1);
+  const priceChangePercentage24h = chartPriceStats?.change
+    ? BigNumber(chartPriceStats.change).minus(1)
+    : currentBalance.dividedBy(oldBalance).minus(1);
   const formattedPercentageChange = priceChangePercentage24h
     .multipliedBy(100)
     .absoluteValue()
