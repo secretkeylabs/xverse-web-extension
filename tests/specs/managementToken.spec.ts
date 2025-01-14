@@ -21,11 +21,13 @@ test.describe('Token Management', () => {
     await expect(wallet.headingTokens).toBeVisible();
 
     // Check SIP10 token tab - only Stacks and sBTC should be showing when user has no sip10 balances
-    await wallet.buttonSip10.click();
-    await expect(wallet.labelCoinTitle).toHaveCount(2);
-    await expect(wallet.checkboxToken).toHaveCount(2);
-    await expect(wallet.checkboxTokenActive).toHaveCount(2);
-    await expect(wallet.checkboxTokenInactive).toHaveCount(0);
+    await test.step('Check SIP10 token tab', async () => {
+      await wallet.buttonSip10.click();
+      await expect(wallet.labelCoinTitle).toHaveCount(2);
+      await expect(wallet.checkboxToken).toHaveCount(2);
+      await expect(wallet.checkboxTokenActive).toHaveCount(2);
+      await expect(wallet.checkboxTokenInactive).toHaveCount(0);
+    });
 
     // Check BRC20 token tab - nothing shows when user has no brc20 balances
     await wallet.buttonBRC20.click();
@@ -63,7 +65,7 @@ test.describe('Token Management', () => {
       );
       await wallet.buttonBack.click();
       await fetchTokens;
-      await expect(wallet.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeHidden();
+      await expect(page.getByText(tokenName).first()).toBeHidden();
 
       // enable the token again
       await wallet.manageTokenButton.click();
@@ -76,7 +78,7 @@ test.describe('Token Management', () => {
       );
       await wallet.buttonBack.click();
       await fetchTokensAgain;
-      await expect(wallet.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeVisible();
+      await expect(page.getByText(tokenName).first()).toBeVisible();
     });
   });
 
@@ -100,7 +102,7 @@ test.describe('Token Management', () => {
       );
       await wallet.buttonBack.click();
       await fetchTokens;
-      await expect(wallet.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeHidden();
+      await expect(page.getByText(tokenName).first()).toBeHidden();
 
       // enable the token again
       await wallet.manageTokenButton.click();
@@ -113,7 +115,7 @@ test.describe('Token Management', () => {
       );
       await wallet.buttonBack.click();
       await fetchTokensAgain;
-      await expect(wallet.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeVisible();
+      await expect(page.getByText(tokenName).first()).toBeVisible();
     });
   });
 
@@ -137,7 +139,7 @@ test.describe('Token Management', () => {
       );
       await wallet.buttonBack.click();
       await fetchTokens;
-      await expect(wallet.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeHidden();
+      await expect(page.getByText(tokenName).first()).toBeHidden();
 
       // enable the token again
       await wallet.manageTokenButton.click();
@@ -150,7 +152,7 @@ test.describe('Token Management', () => {
       );
       await wallet.buttonBack.click();
       await fetchTokensAgain;
-      await expect(wallet.labelTokenSubtitle.getByText(tokenName, { exact: true })).toBeVisible();
+      await expect(page.getByText(tokenName).first()).toBeVisible();
     });
   });
 });
