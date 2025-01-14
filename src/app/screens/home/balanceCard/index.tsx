@@ -181,7 +181,7 @@ function BalanceCard({ isLoading, isRefetching, combinedFtList }: Props) {
                             prefix={BTC_SYMBOL}
                             thousandSeparator
                             renderText={(value: string) => (
-                              <BalanceAmountText data-testid="total-balance-value">
+                              <BalanceAmountText aria-label={`Total balance: ${value}`}>
                                 {value}
                               </BalanceAmountText>
                             )}
@@ -189,7 +189,7 @@ function BalanceCard({ isLoading, isRefetching, combinedFtList }: Props) {
                         );
                       case 'hidden':
                         return (
-                          <BalanceAmountText data-testid="total-balance-value">
+                          <BalanceAmountText aria-label={`Total balance: ${HIDDEN_BALANCE_LABEL}`}>
                             {HIDDEN_BALANCE_LABEL}
                           </BalanceAmountText>
                         );
@@ -203,7 +203,9 @@ function BalanceCard({ isLoading, isRefetching, combinedFtList }: Props) {
                               prefix={`${currencySymbolMap[fiatCurrency]}`}
                               thousandSeparator
                               renderText={(value: string) => (
-                                <BalanceAmountText data-testid="total-balance-value">
+                                <BalanceAmountText
+                                  aria-label={`Total balance: ${value} ${fiatCurrency}`}
+                                >
                                   {value}
                                 </BalanceAmountText>
                               )}

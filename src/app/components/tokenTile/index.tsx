@@ -121,11 +121,11 @@ function TokenTile({
         <RowContainer>
           <TokenTitleContainer>
             {loading && <StyledBarLoader width="25%" height={20} />}
-            {!loading && <TokenTitle>{title}</TokenTitle>}
+            {!loading && <TokenTitle aria-label={`Token Title: ${title}`}>{title}</TokenTitle>}
           </TokenTitleContainer>
           {loading && <StyledBarLoader width="20%" height={20} $withMarginBottom />}
           {!loading && !hideSwapBalance && (
-            <AmountContainer aria-label="CurrencyBalance Container">
+            <AmountContainer aria-label="Currency Balance Container">
               {getAmountDisplay()}
             </AmountContainer>
           )}
@@ -139,7 +139,9 @@ function TokenTile({
                 displayType="text"
                 thousandSeparator
                 renderText={(value: string) => (
-                  <TokenTicker>{`${value} ${getTickerTitle()}`}</TokenTicker>
+                  <TokenTicker aria-label={`Token Ticker: ${value} ${getTickerTitle()}`}>
+                    {`${value} ${getTickerTitle()}`}
+                  </TokenTicker>
                 )}
               />
             )}
