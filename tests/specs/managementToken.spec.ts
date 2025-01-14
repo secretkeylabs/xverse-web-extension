@@ -15,13 +15,13 @@ test.describe('Token Management', () => {
     await wallet.manageTokenButton.click();
     expect(page.url()).toContain('manage-tokens');
     await expect(wallet.buttonBack).toBeVisible();
-    await expect(wallet.buttonSip10).toBeVisible();
+    await expect(wallet.buttonStacks).toBeVisible();
     await expect(wallet.buttonBRC20).toBeVisible();
     await expect(wallet.buttonRunes).toBeVisible();
     await expect(wallet.headingTokens).toBeVisible();
 
     // Check SIP10 token tab - only Stacks and sBTC should be showing when user has no sip10 balances
-    await wallet.buttonSip10.click();
+    await wallet.buttonStacks.click();
     await expect(wallet.labelCoinTitle).toHaveCount(2);
     await expect(wallet.checkboxToken).toHaveCount(2);
     await expect(wallet.checkboxTokenActive).toHaveCount(2);
@@ -86,7 +86,7 @@ test.describe('Token Management', () => {
 
     await test.step('Toggle a random token', async () => {
       await wallet.manageTokenButton.click();
-      await wallet.buttonSip10.click();
+      await wallet.buttonStacks.click();
 
       // NOTE: requires an account with at least 1 sip10 token with balance
       await expect(wallet.checkboxTokenActive.first()).toBeVisible();
@@ -104,7 +104,7 @@ test.describe('Token Management', () => {
 
       // enable the token again
       await wallet.manageTokenButton.click();
-      await wallet.buttonSip10.click();
+      await wallet.buttonStacks.click();
       await page.getByTestId(tokenName).locator('label').click();
 
       // expect to be visible again on dashboard
