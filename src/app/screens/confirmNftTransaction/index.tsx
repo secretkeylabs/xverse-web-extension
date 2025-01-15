@@ -145,7 +145,7 @@ function ConfirmNftTransaction() {
   const handleOnConfirmClick = (txs: StacksTransactionWire[]) => {
     if (isLedgerAccount(selectedAccount)) {
       const state: ConfirmStxTransactionState = {
-        unsignedTx: Buffer.from(unsignedTx.serialize()),
+        unsignedTx: Buffer.from(unsignedTx.serializeBytes()),
         recipients: [
           {
             address: recipientAddress,
