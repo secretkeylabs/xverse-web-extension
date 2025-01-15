@@ -17,7 +17,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   margin-top: ${({ theme }) => theme.space.l};
-  margin-left: ${({ theme }) => theme.space.m};
+  padding: 0 ${({ theme }) => theme.space.m};
 `;
 
 type Props = {
