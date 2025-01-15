@@ -32,7 +32,7 @@ export function SigningTransactions({
         const signedTransaction = await signLedgerStxTransaction({
           transport,
           // TODO: Remove `Buffer` when xverse-core has been updated to `@stacks.js/*` v7
-          transactionBuffer: Buffer.from(transaction.serialize()),
+          transactionBuffer: Buffer.from(transaction.serializeBytes()),
           addressIndex: deviceAccountIndex,
         });
         signedTransactions.push(signedTransaction);
