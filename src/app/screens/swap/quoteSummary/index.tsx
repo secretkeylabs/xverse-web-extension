@@ -113,7 +113,7 @@ export default function QuoteSummary({
   } = usePlaceUtxoOrder();
 
   useEffect(() => {
-    if (true) {
+    if (placeOrderError || placeUtxoOrderError) {
       onError(placeOrderError ?? placeUtxoOrderError ?? '');
     }
   }, [placeOrderError, placeUtxoOrderError]);
@@ -299,11 +299,9 @@ export default function QuoteSummary({
       .toFixed(2);
   })();
 
-  const showBadQuoteWarning =
-    quote.slippageSupported &&
-    new BigNumber(toTokenFiatValue).isLessThan(
-      new BigNumber(fromTokenFiatValue).multipliedBy(BAD_QUOTE_PERCENTAGE),
-    );
+  const showBadQuoteWarning = new BigNumber(toTokenFiatValue).isLessThan(
+    new BigNumber(fromTokenFiatValue).multipliedBy(BAD_QUOTE_PERCENTAGE),
+  );
   const valueLossPercentage = new BigNumber(fromTokenFiatValue)
     .minus(new BigNumber(toTokenFiatValue))
     .dividedBy(new BigNumber(fromTokenFiatValue))
@@ -330,9 +328,13 @@ export default function QuoteSummary({
           <CalloutContainer>
             <Callout
               titleText={t('SWAP_SCREEN.BAD_QUOTE_WARNING_TITLE')}
-              bodyText={t('SWAP_SCREEN.BAD_QUOTE_WARNING_DESC', {
-                percentage: valueLossPercentage,
-              })}
+              bodyText={
+                quote.slippageSupported && BigNumber(toTokenFiatValue).isGreaterThan(0)
+                  ? t('SWAP_SCREEN.BAD_QUOTE_WARNING_DESC', {
+                      percentage: valueLossPercentage,
+                    })
+                  : t('SWAP_SCREEN.UNKNOWN_QUOTE_VALUE_WARNING_DESC')
+              }
               variant="warning"
             />
           </CalloutContainer>
