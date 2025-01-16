@@ -32,6 +32,7 @@
       "tsc-files --noEmit src/styled.d.ts src/react-app-env.d.ts"
     ],
     "*.json": [
+      "node scripts/pin_all_deps.js",
       "prettier --write"
     ]
   },
