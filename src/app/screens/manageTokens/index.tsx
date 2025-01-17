@@ -221,6 +221,7 @@ function ManageTokens() {
             disabled={false}
             toggled={toggled}
             enabled={coin.isEnabled}
+            protocol={selectedProtocol}
           />
         ))}
         {!coins.length && <ErrorsText>{t('NO_COINS')}</ErrorsText>}

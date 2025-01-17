@@ -1,6 +1,6 @@
 {
   "name": "xverse-web-extension",
-  "description": "A Bitcoin wallet for Web3",
+  "description": "The Bitcoin Wallet for everyone",
   "version": "0.48.0",
   "private": true,
   "engines": {
@@ -32,6 +32,7 @@
       "tsc-files --noEmit src/styled.d.ts src/react-app-env.d.ts"
     ],
     "*.json": [
+      "node scripts/pin_all_deps.js",
       "prettier --write"
     ]
   },
