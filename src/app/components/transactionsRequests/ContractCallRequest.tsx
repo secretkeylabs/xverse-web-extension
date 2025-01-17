@@ -189,7 +189,7 @@ export default function ContractCallRequest({
     if (isStxSwap) {
       const order: ExecuteStxOrderRequest = {
         providerCode: messageId,
-        signedTransaction: Buffer.from(transactions[0].serialize()).toString('hex'),
+        signedTransaction: transactions[0].serialize(),
       };
       setIsLoading(true);
       const response = await executeStxOrder(order);
@@ -219,7 +219,7 @@ export default function ContractCallRequest({
             sendSignTransactionSuccessResponseMessage({
               tabId,
               messageId,
-              result: { transaction: Buffer.from(unsignedTx.serialize()).toString('hex') },
+              result: { transaction: unsignedTx.serialize() },
             });
             break;
           }
@@ -232,7 +232,7 @@ export default function ContractCallRequest({
         finalizeTxSignature({
           requestPayload: requestToken,
           tabId,
-          data: { txId: '', txRaw: Buffer.from(unsignedTx.serialize()).toString('hex') },
+          data: { txId: '', txRaw: unsignedTx.serialize() },
         });
       }
       window.close();
@@ -243,7 +243,7 @@ export default function ContractCallRequest({
             sendSignTransactionSuccessResponseMessage({
               tabId,
               messageId,
-              result: { transaction: Buffer.from(unsignedTx.serialize()).toString('hex') },
+              result: { transaction: unsignedTx.serialize() },
             });
             break;
           }
@@ -255,7 +255,7 @@ export default function ContractCallRequest({
         finalizeTxSignature({
           requestPayload: requestToken,
           tabId,
-          data: { txId: '', txRaw: Buffer.from(unsignedTx.serialize()).toString('hex') },
+          data: { txId: '', txRaw: unsignedTx.serialize() },
         });
       }
       window.close();

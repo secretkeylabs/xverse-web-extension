@@ -221,7 +221,7 @@ function ConfirmStxTransaction() {
     if (isLedgerAccount(selectedAccount)) {
       const fee = new BigNumber(txs[0].auth.spendingCondition.fee.toString());
       const state: ConfirmStxTransactionState = {
-        unsignedTx: Buffer.from(unsignedTx.serialize()),
+        unsignedTx: Buffer.from(unsignedTx.serializeBytes()),
         recipients: [{ address: recipient, amountMicrostacks: amount }],
         fee,
       };

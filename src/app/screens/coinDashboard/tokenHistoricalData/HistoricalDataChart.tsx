@@ -6,7 +6,7 @@ import type {
 } from '@secretkeylabs/xverse-core';
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Area, AreaChart, Tooltip, XAxis, YAxis } from 'recharts';
+import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import styled from 'styled-components';
 import Theme from 'theme';
 import type { ChartPriceStats } from '../tokenPrice';
@@ -83,6 +83,12 @@ export function MissingPeriodHistoricalDataChart() {
   );
 }
 
+const ChartContainer = styled.div((props) => ({
+  width: `calc(100% + ${props.theme.space.xl})`,
+  height: '214px',
+  marginLeft: `-${props.theme.space.m}`,
+}));
+
 export default function HistoricalDataChart({
   data,
   setChartPriceStats,
@@ -109,33 +115,34 @@ export default function HistoricalDataChart({
   }, [data]);
 
   return (
-    <AreaChart
-      // eslint-disable-next-line
-      style={{ marginLeft: '-21px' }}
-      width={370}
-      height={215}
-      data={data}
-      onMouseMove={onMouseMove}
-      onMouseLeave={onMouseLeave}
-    >
-      <XAxis hide dataKey="x" />
-      <YAxis hide />
-      <Tooltip
-        content={<CustomTooltip />}
-        position={{ y: -20 }}
-        cursor={{
-          stroke: 'grey',
-          strokeWidth: '1',
-          strokeDasharray: '1.5',
-        }}
-      />
-      <defs>
-        <linearGradient id="gradientFill" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor={fillColor} stopOpacity={0.2} />
-          <stop offset="100%" stopColor={fillColor} stopOpacity={0} />
-        </linearGradient>
-      </defs>
-      <Area type="monotone" dataKey="y" stroke={strokeColor} fill="url(#gradientFill)" />
-    </AreaChart>
+    <ChartContainer>
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart
+          data={data}
+          onMouseMove={onMouseMove}
+          onMouseLeave={onMouseLeave}
+          margin={{ left: 0, right: 0, top: 0, bottom: 0 }}
+        >
+          <XAxis hide dataKey="x" />
+          <YAxis hide />
+          <Tooltip
+            content={<CustomTooltip />}
+            position={{ y: -20 }}
+            cursor={{
+              stroke: 'grey',
+              strokeWidth: '1',
+              strokeDasharray: '1.5',
+            }}
+          />
+          <defs>
+            <linearGradient id="gradientFill" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor={fillColor} stopOpacity={0.2} />
+              <stop offset="100%" stopColor={fillColor} stopOpacity={0} />
+            </linearGradient>
+          </defs>
+          <Area type="monotone" dataKey="y" stroke={strokeColor} fill="url(#gradientFill)" />
+        </AreaChart>
+      </ResponsiveContainer>
+    </ChartContainer>
   );
 }

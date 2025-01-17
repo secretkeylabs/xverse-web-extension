@@ -285,7 +285,7 @@ function ConfirmStxTransactionComponent({
 
       const signedTxs = await signLedgerStxTransaction({
         transport,
-        transactionBuffer: Buffer.from(initialStxTransactions[0].serialize()),
+        transactionBuffer: Buffer.from(initialStxTransactions[0].serializeBytes()),
         addressIndex: selectedAccount.deviceAccountIndex,
       });
       setIsTxApproved(true);

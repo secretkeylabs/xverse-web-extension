@@ -171,7 +171,7 @@ function SpeedUpTransactionScreen() {
 
           const result = await signLedgerStxTransaction({
             transport,
-            transactionBuffer: Buffer.from(unsignedTx.serialize()),
+            transactionBuffer: Buffer.from(unsignedTx.serializeBytes()),
             addressIndex: selectedAccount.deviceAccountIndex,
           });
           await delay(1500);
