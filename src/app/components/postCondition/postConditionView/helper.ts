@@ -1,8 +1,8 @@
 import {
+  type FungiblePostConditionWire,
+  type NonFungiblePostConditionWire,
+  type STXPostConditionWire,
   PostConditionType,
-  type FungiblePostCondition,
-  type NonFungiblePostCondition,
-  type STXPostCondition,
 } from '@stacks/transactions';
 import { initBigNumber } from '@utils/helper';
 import BigNumber from 'bignumber.js';
@@ -21,7 +21,7 @@ export const microStxToStx = (mStx: number | string | BigNumber) => {
   return microStacks.shiftedBy(-6);
 };
 
-const stacksValue = ({
+export const stacksValue = ({
   value,
   fixedDecimals = true,
   withTicker = true,
@@ -44,7 +44,7 @@ const stacksValue = ({
 };
 
 export const getAmountFromPostCondition = (
-  pc: STXPostCondition | FungiblePostCondition | NonFungiblePostCondition,
+  pc: STXPostConditionWire | FungiblePostConditionWire | NonFungiblePostConditionWire,
 ) => {
   if (pc.conditionType === PostConditionType.Fungible) {
     return pc.amount.toString();
@@ -55,19 +55,28 @@ export const getAmountFromPostCondition = (
   if (pc.conditionType === PostConditionType.NonFungible) return '1';
 };
 
+function hasAssetInfo(pc: any): pc is { assetInfo: { assetName: { content: string } } } {
+  return (
+    pc &&
+    pc.assetInfo &&
+    pc.assetInfo.assetName &&
+    typeof pc.assetInfo.assetName.content === 'string'
+  );
+}
+
 export const getSymbolFromPostCondition = (
-  pc: STXPostCondition | FungiblePostCondition | NonFungiblePostCondition,
+  pc: STXPostConditionWire | FungiblePostConditionWire | NonFungiblePostConditionWire,
 ) => {
-  if ('assetInfo' in pc) {
-    return pc?.assetInfo?.assetName?.content?.slice(0, 3).toUpperCase();
+  if (hasAssetInfo(pc)) {
+    return pc.assetInfo.assetName?.content?.slice(0, 3).toUpperCase();
   }
   return 'STX';
 };
 
 export const getNameFromPostCondition = (
-  pc: STXPostCondition | FungiblePostCondition | NonFungiblePostCondition,
+  pc: STXPostConditionWire | FungiblePostConditionWire | NonFungiblePostConditionWire,
 ) => {
-  if ('assetInfo' in pc) {
+  if (hasAssetInfo(pc)) {
     return pc.assetInfo.assetName.content;
   }
   return 'STX';

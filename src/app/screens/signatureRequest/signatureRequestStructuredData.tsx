@@ -1,5 +1,5 @@
 import type { StructuredDataSignaturePayload } from '@stacks/connect';
-import { deserializeCV } from '@stacks/transactions/dist/esm/clarity';
+import { deserializeCV } from '@stacks/transactions';
 import { useTranslation } from 'react-i18next';
 import ClarityMessageView from './clarityMessageView';
 import CollapsableContainer from './collapsableContainer';

@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -11,17 +11,23 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { currencySymbolMap, formatBalance, type FungibleToken } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import type { CurrencyTypes } from '@utils/constants';
+import TokenHistoricalData from './tokenHistoricalData';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   margin-top: ${({ theme }) => theme.space.l};
-  margin-left: ${({ theme }) => theme.space.m};
+  padding: 0 ${({ theme }) => theme.space.m};
 `;
 
 type Props = {
   currency: CurrencyTypes;
   fungibleToken: FungibleToken | undefined;
+};
+
+export type ChartPriceStats = {
+  amount?: number;
+  change?: number;
 };
 
 // todo: move into xverse-core
@@ -34,6 +40,7 @@ function TokenPrice({ currency, fungibleToken }: Props) {
   const { fiatCurrency } = useWalletSelector();
   const { data: exchangeRates } = useGetExchangeRate('USD');
   const { stxBtcRate, btcUsdRate } = useSupportedCoinRates();
+  const [chartPriceStats, setChartPriceStats] = useState<ChartPriceStats | undefined>();
 
   const exchangeRate = useMemo(
     () => (exchangeRates ? Number(exchangeRates[fiatCurrency]) : 1),
@@ -41,11 +48,13 @@ function TokenPrice({ currency, fungibleToken }: Props) {
   );
 
   const currentPrice = useMemo(() => {
+    if (chartPriceStats?.amount) return BigNumber(chartPriceStats?.amount);
+
     const baseRate = BigNumber(exchangeRate);
     if (currency === 'STX') return baseRate.multipliedBy(stxBtcRate).multipliedBy(btcUsdRate);
     if (currency === 'BTC') return baseRate.multipliedBy(btcUsdRate);
     return baseRate.multipliedBy(fungibleToken?.currentPrice ?? 0);
-  }, [currency, stxBtcRate, btcUsdRate, fungibleToken, exchangeRate]);
+  }, [chartPriceStats, currency, stxBtcRate, btcUsdRate, fungibleToken, exchangeRate]);
 
   return (
     <Container>
@@ -65,7 +74,16 @@ function TokenPrice({ currency, fungibleToken }: Props) {
           </>
         )}
       </StyledP>
-      <PercentageChange ftCurrencyPairs={[[fungibleToken, currency]]} displayAmountChange />
+      <PercentageChange
+        ftCurrencyPairs={[[fungibleToken, currency]]}
+        chartPriceStats={chartPriceStats}
+        displayAmountChange
+      />
+      <TokenHistoricalData
+        currency={currency}
+        fungibleToken={fungibleToken}
+        setChartPriceStats={setChartPriceStats}
+      />
     </Container>
   );
 }

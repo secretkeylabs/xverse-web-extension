@@ -6,13 +6,14 @@ import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useHasFeature from '@hooks/useHasFeature';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CaretDown, CaretUp } from '@phosphor-icons/react';
+import type { ChartPriceStats } from '@screens/coinDashboard/tokenPrice';
 import {
   currencySymbolMap,
   FeatureId,
   getFiatEquivalent,
   type FungibleToken,
 } from '@secretkeylabs/xverse-core';
-import type { CurrencyTypes } from '@utils/constants';
+import { EMPTY_LABEL, type CurrencyTypes } from '@utils/constants';
 import { getBalanceAmount } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import styled from 'styled-components';
@@ -20,25 +21,18 @@ import Theme from 'theme';
 
 const NoDataTextContainer = styled.p((props) => ({
   ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_600,
+  color: props.theme.colors.white_200,
   marginRight: props.theme.space.xxs,
 }));
 
-function NoDataText() {
-  return <NoDataTextContainer>--</NoDataTextContainer>;
-}
-
-const RowContainer = styled.div((props) => ({
+const RowContainer = styled.div({
   display: 'flex',
   alignItems: 'center',
-  marginRight: props.theme.space.xxs,
-}));
+});
 
-interface PercentageChangeTextProps {
+const PercentageChangeText = styled.p<{
   themeColor: string;
-}
-
-const PercentageChangeText = styled.p<PercentageChangeTextProps>((props) => ({
+}>((props) => ({
   ...props.theme.typography.body_medium_m,
   color: props.themeColor,
   marginLeft: props.theme.space.xxxs,
@@ -51,19 +45,23 @@ const IntervalText = styled.p((props) => ({
 }));
 
 type Props = {
+  isHidden?: boolean;
   ftCurrencyPairs: [FungibleToken | undefined, CurrencyTypes][];
   decimals?: number;
   displayTimeInterval?: boolean;
   displayBalanceChange?: boolean;
   displayAmountChange?: boolean;
+  chartPriceStats?: ChartPriceStats;
 };
 
 function PercentageChange({
+  isHidden = false,
   ftCurrencyPairs,
   decimals = 2,
   displayTimeInterval = false,
   displayBalanceChange = false,
   displayAmountChange = false,
+  chartPriceStats,
 }: Props) {
   const { fiatCurrency } = useWalletSelector();
   const { data: exchangeRates } = useGetExchangeRate('USD');
@@ -131,10 +129,20 @@ function PercentageChange({
       [BigNumber(0), BigNumber(0)],
     );
 
-  if (currentBalance.eq(0) && oldBalance.eq(0) && displayTimeInterval) return null;
-  if (currentBalance.eq(0) || oldBalance.eq(0)) return <NoDataText />;
+  if (!chartPriceStats && (currentBalance.eq(0) || oldBalance.eq(0))) return null;
 
-  const priceChangePercentage24h = currentBalance.dividedBy(oldBalance).minus(1);
+  if (isHidden) {
+    return (
+      <RowContainer>
+        <NoDataTextContainer>{EMPTY_LABEL}</NoDataTextContainer>
+        {displayTimeInterval && <IntervalText>24h</IntervalText>}
+      </RowContainer>
+    );
+  }
+
+  const priceChangePercentage24h = chartPriceStats?.change
+    ? BigNumber(chartPriceStats.change).minus(1)
+    : currentBalance.dividedBy(oldBalance).minus(1);
   const formattedPercentageChange = priceChangePercentage24h
     .multipliedBy(100)
     .absoluteValue()

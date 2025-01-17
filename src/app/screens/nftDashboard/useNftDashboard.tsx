@@ -68,7 +68,6 @@ function IsVisibleOrPlaceholder({ children }: PropsWithChildren) {
 
 export type NftDashboardState = {
   openReceiveModal: boolean;
-  isOrdinalReceiveAlertVisible: boolean;
   stacksNftsQuery: ReturnType<typeof useStacksCollectibles>;
   inscriptionsQuery: ReturnType<typeof useAddressInscriptions>;
   hiddenInscriptionsQuery: ReturnType<typeof useAddressInscriptions>;
@@ -77,8 +76,6 @@ export type NftDashboardState = {
   openInGalleryView: () => void;
   onReceiveModalOpen: () => void;
   onReceiveModalClose: () => void;
-  onOrdinalReceiveAlertOpen: () => void;
-  onOrdinalReceiveAlertClose: () => void;
   InscriptionListView: () => JSX.Element;
   HiddenInscriptionListView: () => JSX.Element;
   NftListView: () => JSX.Element;
@@ -101,7 +98,6 @@ const useNftDashboard = (): NftDashboardState => {
     useWalletSelector();
   const [openReceiveModal, setOpenReceiveModal] = useState(false);
   const [showNoticeAlert, setShowNoticeAlert] = useState(false);
-  const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible] = useState(false);
   const stacksNftsQuery = useStacksCollectibles();
   const hiddenStacksNftsQuery = useStacksCollectibles(true);
   const inscriptionsQuery = useAddressInscriptions();
@@ -132,14 +128,6 @@ const useNftDashboard = (): NftDashboardState => {
 
   const onReceiveModalClose = () => {
     setOpenReceiveModal(false);
-  };
-
-  const onOrdinalReceiveAlertOpen = () => {
-    setIsOrdinalReceiveAlertVisible(true);
-  };
-
-  const onOrdinalReceiveAlertClose = () => {
-    setIsOrdinalReceiveAlertVisible(false);
   };
 
   const InscriptionListView = useCallback(() => {
@@ -295,7 +283,6 @@ const useNftDashboard = (): NftDashboardState => {
 
   return {
     openReceiveModal,
-    isOrdinalReceiveAlertVisible,
     stacksNftsQuery,
     hiddenStacksNftsQuery,
     inscriptionsQuery,
@@ -303,8 +290,6 @@ const useNftDashboard = (): NftDashboardState => {
     openInGalleryView,
     onReceiveModalOpen,
     onReceiveModalClose,
-    onOrdinalReceiveAlertOpen,
-    onOrdinalReceiveAlertClose,
     InscriptionListView,
     HiddenInscriptionListView,
     NftListView,

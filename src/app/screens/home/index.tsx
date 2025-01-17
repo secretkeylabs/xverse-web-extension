@@ -2,7 +2,6 @@ import dashboardIcon from '@assets/img/dashboard-icon.svg';
 import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
-import PercentageChange from '@components/percentageChange';
 import BottomBar from '@components/tabBar';
 import TokenTileLoader from '@components/tokenTile/loader';
 import {
@@ -56,7 +55,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import styled, { useTheme } from 'styled-components';
+import { useTheme } from 'styled-components';
 import SquareButton from '../../components/squareButton';
 import AnnouncementModal from './announcementModal';
 import BalanceCard from './balanceCard';
@@ -78,18 +77,14 @@ import {
 } from './index.styled';
 import ReceiveSheet from './receiveSheet';
 
-const PercentageChangeContainer = styled.div((props) => ({
-  marginTop: props.theme.space.s,
-  marginBottom: props.theme.space.xxxs,
-}));
-
 function Home() {
   const { t } = useTranslation('translation', {
     keyPrefix: 'DASHBOARD_SCREEN',
   });
   const selectedAccount = useSelectedAccount();
   const { stxAddress, btcAddress } = selectedAccount;
-  const { showDataCollectionAlert, hideStx, spamToken, notificationBanners } = useWalletSelector();
+  const { showDataCollectionAlert, hideStx, spamToken, notificationBanners, balanceHidden } =
+    useWalletSelector();
   const theme = useTheme();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -409,35 +404,37 @@ function Home() {
     <>
       <AccountHeaderComponent />
       <Container>
-        <BalanceCard isLoading={isInitialLoading} isRefetching={isRefetching} />
-        <PercentageChangeContainer>
-          <PercentageChange
-            displayTimeInterval
-            ftCurrencyPairs={[
-              [undefined, 'BTC'],
-              [undefined, 'STX'],
-              ...combinedFtList.map(
-                (ft) => [ft, 'FT'] as [FungibleToken | undefined, CurrencyTypes],
-              ),
-            ]}
-          />
-        </PercentageChangeContainer>
+        <BalanceCard
+          isLoading={isInitialLoading}
+          isRefetching={isRefetching}
+          combinedFtList={combinedFtList}
+        />
         <RowButtonContainer data-testid="transaction-buttons-row">
           <SquareButton
             icon={<ArrowUp weight="regular" size="20" />}
             text={t('SEND')}
             onPress={onSendModalOpen}
+            disabled={isInitialLoading}
           />
           <SquareButton
             icon={<ArrowDown weight="regular" size="20" />}
             text={t('RECEIVE')}
             onPress={onReceiveModalOpen}
+            disabled={isInitialLoading}
           />
-          {showSwaps && <SquareButton src={ArrowSwap} text={t('SWAP')} onPress={onSwapPressed} />}
+          {showSwaps && (
+            <SquareButton
+              src={ArrowSwap}
+              text={t('SWAP')}
+              onPress={onSwapPressed}
+              disabled={isInitialLoading}
+            />
+          )}
           <SquareButton
             icon={<Plus weight="regular" size="20" />}
             text={t('BUY')}
             onPress={onBuyModalOpen}
+            disabled={isInitialLoading}
           />
         </RowButtonContainer>
 

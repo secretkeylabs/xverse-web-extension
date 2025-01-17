@@ -9,9 +9,7 @@ import {
   ChangeHasActivatedRareSatsKey,
   ChangeHasActivatedRBFKey,
   ChangeNetworkKey,
-  ChangeShowBtcReceiveAlertKey,
   ChangeShowDataCollectionAlertKey,
-  ChangeShowOrdinalReceiveAlertKey,
   RareSatsNoticeDismissedKey,
   RemoveAccountAvatarKey,
   RemoveAllFromHideCollectiblesKey,
@@ -87,8 +85,6 @@ export const initialWalletState: WalletState = {
   hasActivatedRareSatsKey: true,
   hasActivatedRBFKey: true,
   rareSatsNoticeDismissed: undefined,
-  showBtcReceiveAlert: true,
-  showOrdinalReceiveAlert: true,
   showDataCollectionAlert: true,
   walletLockPeriod: WalletSessionPeriods.STANDARD,
   isUnlocked: false,
@@ -202,16 +198,6 @@ const walletReducer = (
       return {
         ...state,
         rareSatsNoticeDismissed: action.rareSatsNoticeDismissed,
-      };
-    case ChangeShowBtcReceiveAlertKey:
-      return {
-        ...state,
-        showBtcReceiveAlert: action.showBtcReceiveAlert,
-      };
-    case ChangeShowOrdinalReceiveAlertKey:
-      return {
-        ...state,
-        showOrdinalReceiveAlert: action.showOrdinalReceiveAlert,
       };
     case ChangeShowDataCollectionAlertKey:
       return {

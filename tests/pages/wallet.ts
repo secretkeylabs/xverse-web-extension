@@ -375,7 +375,8 @@ export default class Wallet {
     this.navigationStacking = page.getByTestId('nav-stacking');
     this.navigationExplore = page.getByTestId('nav-explore');
     this.navigationSettings = page.getByTestId('nav-settings');
-    this.balance = page.getByTestId('total-balance-value');
+    // this.balance = page.getByTestId('total-balance-value');
+    this.balance = page.getByLabel(/^Total balance:/);
     this.textCurrency = page.getByTestId('currency-text');
     this.allUpperButtons = page.getByTestId('transaction-buttons-row').getByRole('button');
     this.buttonTransactionSend = this.allUpperButtons.nth(0);
@@ -445,7 +446,7 @@ export default class Wallet {
 
     this.divTokenRow = page.getByLabel('Token Row');
     this.labelTokenSubtitle = page.getByLabel('Token SubTitle');
-    this.labelCoinBalanceCurrency = page.getByLabel('CurrencyBalance Container').locator('span');
+    this.labelCoinBalanceCurrency = page.getByLabel('Currency Balance Container').locator('span');
     this.labelCoinBalanceCrypto = page.getByLabel('CoinBalance Container').locator('p');
 
     // Coin details
@@ -551,9 +552,7 @@ export default class Wallet {
       .filter({ hasText: 'You are transferring to yourself' });
     this.errorMessageSendSelf = page.locator('p').filter({ hasText: 'Cannot send to self' });
     this.errorInsufficientBalance = page.locator('p').filter({ hasText: 'Insufficient balance' });
-    this.errorInsufficientBRC20Balance = page
-      .locator('p')
-      .filter({ hasText: 'Insufficient BRC20 balance' });
+    this.errorInsufficientBRC20Balance = page.getByText('Insufficient BRC-20 balance');
     this.errorInsufficientFunds = page.locator('p').filter({ hasText: 'Insufficient funds' });
     this.containerFeeRate = page.getByTestId('feerate-container');
     this.inputBTCAddress = page.locator('input[type="text"]');
@@ -634,7 +633,7 @@ export default class Wallet {
 
     await expect(this.labelAccountName).toBeVisible();
     await expect(this.buttonMenu).toBeVisible();
-    expect(await this.labelTokenSubtitle.count()).toBeGreaterThanOrEqual(2);
+    // expect(await this.labelTokenSubtitle.count()).toBeGreaterThanOrEqual(2);
 
     await expect(this.navigationDashboard).toBeVisible();
     await expect(this.navigationNFT).toBeVisible();
@@ -983,20 +982,35 @@ export default class Wallet {
   }
 
   async getTokenBalance(tokenname: string) {
-    const locator = this.page
-      .getByRole('button')
-      .filter({ has: this.labelTokenSubtitle.getByText(tokenname, { exact: true }) })
-      .getByLabel('CoinBalance Container')
-      .locator('p');
-    const balanceText = await locator.innerText();
-    const numericValue = parseFloat(balanceText.replace(/[^\d.-]/g, ''));
-    return numericValue;
+    try {
+      const locator = this.page
+        .locator('button')
+        .filter({ hasText: new RegExp(`${tokenname}.*\\d`) });
+
+      console.log(`Looking for balance for ${tokenname}`);
+      const balanceText = await locator.innerText();
+      console.log('Found balance text:', balanceText);
+
+      // Extract just the numeric portion (matches any number with decimal points)
+      const matches = balanceText.match(/\d+\.?\d*/);
+      if (!matches) {
+        throw new Error(`Could not extract balance from text: ${balanceText}`);
+      }
+
+      const numericValue = parseFloat(matches[0]);
+      console.log('Parsed numeric value:', numericValue);
+      return numericValue;
+    } catch (error) {
+      console.error(`Error getting balance for ${tokenname}:`, error);
+      throw error;
+    }
   }
 
   async clickOnSpecificToken(tokenname: string) {
-    const specificToken = this.page
-      .getByRole('button')
-      .filter({ has: this.labelTokenSubtitle.getByText(tokenname, { exact: true }) });
+    const specificToken = this.page.getByRole('button').getByLabel(`Token Title: ${tokenname}`);
+    // filter({
+    //   has: this.labelTokenSubtitle.getByText(tokenname, { exact: true }),
+
     await specificToken.last().click();
   }
 

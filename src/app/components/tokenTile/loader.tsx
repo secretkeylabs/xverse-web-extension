@@ -48,11 +48,11 @@ function TokenTileLoader() {
       <ContentContainer>
         <LeftColumn>
           <StyledBarLoader width={56} height={20} />
-          <StyledBarLoader width={70} height={20} />
+          <StyledBarLoader width={151} height={20} />
         </LeftColumn>
         <RightColumn>
           <StyledBarLoader width={53} height={20} />
-          <StyledBarLoader width={151} height={20} />
+          <StyledBarLoader width={70} height={20} />
         </RightColumn>
       </ContentContainer>
     </LoaderContainer>

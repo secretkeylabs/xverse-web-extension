@@ -1,5 +1,4 @@
 import AccountHeaderComponent from '@components/accountHeader';
-import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import BottomTabBar from '@components/tabBar';
 import WebGalleryButton from '@components/webGalleryButton';
 import { ArrowDown } from '@phosphor-icons/react';
@@ -34,16 +33,6 @@ const StyledWebGalleryButton = styled(WebGalleryButton)`
   margin-top: ${(props) => props.theme.space.s};
 `;
 
-const ReceiveNftContainer = styled.div((props) => ({
-  position: 'absolute',
-  top: 0,
-  right: 0,
-  zIndex: 2000,
-  background: props.theme.colors.elevation2,
-  borderRadius: 16,
-  maxWidth: 360,
-}));
-
 const CollectibleContainer = styled.div((props) => ({
   marginBottom: props.theme.space.l,
 }));
@@ -65,11 +54,9 @@ function NftDashboard() {
   const nftDashboard = useNftDashboard();
   const {
     openReceiveModal,
-    isOrdinalReceiveAlertVisible,
     openInGalleryView,
     onReceiveModalOpen,
     onReceiveModalClose,
-    onOrdinalReceiveAlertClose,
     InscriptionListView,
     NftListView,
     isGalleryOpen,
@@ -77,9 +64,6 @@ function NftDashboard() {
 
   return (
     <>
-      {isOrdinalReceiveAlertVisible && (
-        <ShowOrdinalReceiveAlert onOrdinalReceiveAlertClose={onOrdinalReceiveAlertClose} />
-      )}
       <AccountHeaderComponent disableMenuOption={isGalleryOpen} />
       <Container>
         <PageHeader>
@@ -97,11 +81,7 @@ function NftDashboard() {
                 onClick={onReceiveModalOpen}
               />
             </ReceiveButtonContainer>
-            {openReceiveModal && (
-              <ReceiveNftContainer>
-                <ReceiveNftModal visible={openReceiveModal} onClose={onReceiveModalClose} />
-              </ReceiveNftContainer>
-            )}
+            <ReceiveNftModal visible={openReceiveModal} onClose={onReceiveModalClose} />
           </ButtonContainer>
         </PageHeader>
         <CollectiblesContainer>

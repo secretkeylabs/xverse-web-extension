@@ -125,12 +125,12 @@ function StxAmountSelector({ amount, setAmount, sendMax, setSendMax, disabled = 
     setSendMax(false);
 
     if (useStxValue) {
-      setAmount(stxToMicrostacks(BigNumber(newAmount)).toString());
+      setAmount(stxToMicrostacks(BigNumber(newAmount)).toFixed(0, BigNumber.ROUND_DOWN));
     } else {
       const stxAmount = stxToMicrostacks(
         getStxTokenEquivalent(BigNumber(newAmount), BigNumber(stxBtcRate), BigNumber(btcFiatRate)),
       );
-      setAmount(stxAmount.toString());
+      setAmount(stxAmount.toFixed(0, BigNumber.ROUND_DOWN));
     }
   };
 

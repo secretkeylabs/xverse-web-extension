@@ -3,8 +3,6 @@ import BtcIcon from '@assets/img/receive_btc_image.svg';
 import OrdinalIcon from '@assets/img/receive_ordinals_image.svg';
 import { BtcAddressTypeForAddressLabel } from '@components/btcAddressTypeLabel';
 import { GlobalPreferredBtcAddressSheet } from '@components/preferredBtcAddress';
-import ShowBtcReceiveAlert from '@components/showBtcReceiveAlert';
-import ShowOrdinalReceiveAlert from '@components/showOrdinalReceiveAlert';
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useCanUserSwitchPaymentType from '@hooks/useCanUserSwitchPaymentType';
@@ -13,7 +11,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { Check, Copy } from '@phosphor-icons/react';
 import QrCode from '@screens/receive/qrCode';
 import { markAlertSeen, shouldShowAlert } from '@utils/alertTracker';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -40,19 +38,13 @@ function Receive() {
   const navigate = useNavigate();
   const selectedAccount = useSelectedAccount();
   const { stxAddress, btcAddress, ordinalsAddress } = selectedAccount;
-  const {
-    showBtcReceiveAlert,
-    showOrdinalReceiveAlert,
-    network,
-    btcPaymentAddressType,
-    hasBackedUpWallet,
-  } = useWalletSelector();
+  const { network, btcPaymentAddressType, hasBackedUpWallet } = useWalletSelector();
   const userCanSwitchPaymentType = useCanUserSwitchPaymentType();
 
   const { t } = useTranslation('translation', { keyPrefix: 'RECEIVE' });
+  const { t: commonT } = useTranslation('translation', { keyPrefix: 'COMMON' });
+
   const [addressCopied, setAddressCopied] = useState(false);
-  const [isBtcReceiveAlertVisible, setIsBtcReceiveAlertVisible] = useState(false);
-  const [isOrdinalReceiveAlertVisible, setIsOrdinalReceiveAlertVisible] = useState(false);
   const [showBtcAddressTypeSelectorSheet, setShowBtcAddressTypeSelectorSheet] = useState(false);
   const [showNativeSegWitCallout, setShowNativeSegWitCallout] = useState(
     shouldShowAlert('co:receive:address_changed_to_native'),
@@ -101,13 +93,10 @@ function Receive() {
     navigator.clipboard.writeText(renderData[currency].address);
 
     setAddressCopied(true);
-    toast(t('COPIED_ADDRESS'));
+    toast(commonT('COPIED_TO_CLIPBOARD'));
     setTimeout(() => {
       setAddressCopied(false);
     }, 2000);
-
-    if (currency === 'BTC' && showBtcReceiveAlert) setIsBtcReceiveAlertVisible(true);
-    if (currency === 'ORD' && showOrdinalReceiveAlert) setIsOrdinalReceiveAlertVisible(true);
   };
 
   const onNativeSegWitCalloutClose = () => {
@@ -194,14 +183,6 @@ function Receive() {
       <BottomBarContainer>
         <BottomTabBar tab="dashboard" />
       </BottomBarContainer>
-      {isBtcReceiveAlertVisible && (
-        <ShowBtcReceiveAlert onReceiveAlertClose={() => setIsBtcReceiveAlertVisible(false)} />
-      )}
-      {isOrdinalReceiveAlertVisible && (
-        <ShowOrdinalReceiveAlert
-          onOrdinalReceiveAlertClose={() => setIsOrdinalReceiveAlertVisible(false)}
-        />
-      )}
       {showBtcAddressTypeSelector && (
         <GlobalPreferredBtcAddressSheet
           visible={showBtcAddressTypeSelectorSheet}
