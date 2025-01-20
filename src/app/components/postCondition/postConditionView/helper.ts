@@ -55,20 +55,14 @@ export const getAmountFromPostCondition = (
   if (pc.conditionType === PostConditionType.NonFungible) return '1';
 };
 
-function hasAssetInfo(pc: any): pc is { assetInfo: { assetName: { content: string } } } {
-  return (
-    pc &&
-    pc.assetInfo &&
-    pc.assetInfo.assetName &&
-    typeof pc.assetInfo.assetName.content === 'string'
-  );
-}
-
 export const getSymbolFromPostCondition = (
   pc: STXPostConditionWire | FungiblePostConditionWire | NonFungiblePostConditionWire,
 ) => {
-  if (hasAssetInfo(pc)) {
-    return pc.assetInfo.assetName?.content?.slice(0, 3).toUpperCase();
+  if (
+    pc.conditionType === PostConditionType.Fungible ||
+    pc.conditionType === PostConditionType.NonFungible
+  ) {
+    return pc.asset.assetName.content.slice(0, 3).toUpperCase();
   }
   return 'STX';
 };
@@ -76,8 +70,11 @@ export const getSymbolFromPostCondition = (
 export const getNameFromPostCondition = (
   pc: STXPostConditionWire | FungiblePostConditionWire | NonFungiblePostConditionWire,
 ) => {
-  if (hasAssetInfo(pc)) {
-    return pc.assetInfo.assetName.content;
+  if (
+    pc.conditionType === PostConditionType.Fungible ||
+    pc.conditionType === PostConditionType.NonFungible
+  ) {
+    return pc.asset.assetName.content;
   }
   return 'STX';
 };

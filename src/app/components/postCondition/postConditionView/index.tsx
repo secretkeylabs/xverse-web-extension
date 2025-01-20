@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import {
-  addressToString,
+  Address,
   deserializeAddress,
   FungibleConditionCode,
   NonFungibleConditionCode,
@@ -48,9 +48,10 @@ function PostConditionsView({ postCondition, amount, icon }: Props) {
   const name = getNameFromPostCondition(postCondition);
   const contractName =
     'contractName' in postCondition.principal && postCondition.principal.contractName.content;
-  const address = addressToString(deserializeAddress(serializePrincipal(postCondition?.principal)));
-  const isSending = address === stxAddress;
-  const isContractPrincipal = !!contractName || address.includes('.');
+  const address = deserializeAddress(serializePrincipal(postCondition?.principal));
+  const addressString = Address.stringify(address);
+  const isSending = addressString === stxAddress;
+  const isContractPrincipal = !!contractName || addressString.includes('.');
   return (
     <TransferAmountComponent
       title={`${
@@ -59,7 +60,7 @@ function PostConditionsView({ postCondition, amount, icon }: Props) {
       value={`${amount} ${ticker}`}
       subValue={name !== 'STX' ? name : ''}
       icon={icon}
-      address={`${address}${contractName ? `.${contractName}` : ''}`}
+      address={`${addressString}${contractName ? `.${contractName}` : ''}`}
       subTitle={`${
         isContractPrincipal
           ? t('CONTRACT_ADDRESS')
