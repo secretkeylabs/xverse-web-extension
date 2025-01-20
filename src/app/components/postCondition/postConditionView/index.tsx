@@ -1,10 +1,8 @@
 /* eslint-disable no-nested-ternary */
 import {
-  Address,
-  deserializeAddress,
   FungibleConditionCode,
   NonFungibleConditionCode,
-  serializePrincipal,
+  addressToString,
   type PostConditionWire,
 } from '@stacks/transactions';
 import { useTranslation } from 'react-i18next';
@@ -48,8 +46,8 @@ function PostConditionsView({ postCondition, amount, icon }: Props) {
   const name = getNameFromPostCondition(postCondition);
   const contractName =
     'contractName' in postCondition.principal && postCondition.principal.contractName.content;
-  const address = deserializeAddress(serializePrincipal(postCondition?.principal));
-  const addressString = Address.stringify(address);
+  const addressString =
+    'address' in postCondition.principal ? addressToString(postCondition.principal.address) : '';
   const isSending = addressString === stxAddress;
   const isContractPrincipal = !!contractName || addressString.includes('.');
   return (
