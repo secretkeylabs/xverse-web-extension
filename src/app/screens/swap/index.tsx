@@ -216,9 +216,10 @@ export default function SwapScreen() {
     setInputError('');
     setAmount('');
     setHasQuoteError(false);
+
     const newFrom = toToken;
     const newTo = fromToken;
-    setFromToken(newFrom);
+
     setToToken(newTo);
 
     if (newFrom?.principal !== 'BTC') {
@@ -228,6 +229,8 @@ export default function SwapScreen() {
 
       if (matchingToken) {
         setFromToken(matchingToken);
+      } else {
+        setFromToken(newFrom);
       }
     }
   };
