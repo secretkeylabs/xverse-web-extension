@@ -376,7 +376,7 @@ export default class Wallet {
     this.navigationExplore = page.getByTestId('nav-explore');
     this.navigationSettings = page.getByTestId('nav-settings');
     // this.balance = page.getByTestId('total-balance-value');
-    this.balance = page.getByLabel(/^Total balance:/);
+    this.balance = page.getByLabel(/^Total balance/);
     this.textCurrency = page.getByTestId('currency-text');
     this.allUpperButtons = page.getByTestId('transaction-buttons-row').getByRole('button');
     this.buttonTransactionSend = this.allUpperButtons.nth(0);
