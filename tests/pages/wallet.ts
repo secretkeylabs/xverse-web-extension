@@ -62,7 +62,7 @@ export default class Wallet {
 
   readonly checkboxTokenInactive: Locator;
 
-  readonly buttonSip10: Locator;
+  readonly buttonStacks: Locator;
 
   readonly buttonBRC20: Locator;
 
@@ -439,7 +439,7 @@ export default class Wallet {
     this.checkboxToken = page.locator('label[role="checkbox"]');
     this.checkboxTokenActive = page.locator('label[role="checkbox"][aria-checked="true"]');
     this.checkboxTokenInactive = page.locator('label[role="checkbox"][aria-checked="false"]');
-    this.buttonSip10 = page.getByRole('button', { name: 'SIP-10' });
+    this.buttonStacks = page.getByRole('button', { name: 'STACKS' });
     this.buttonBRC20 = page.getByRole('button', { name: 'BRC-20' });
     this.buttonRunes = page.getByRole('button', { name: 'RUNES' });
     this.headingTokens = page.getByRole('heading', { name: 'Manage tokens' });

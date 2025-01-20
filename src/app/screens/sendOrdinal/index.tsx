@@ -163,7 +163,7 @@ function SendOrdinalScreen() {
           txid: txnId,
           currency: 'BTC',
           error: '',
-          browserTx: isInOption,
+          browserTx: false,
         },
       });
 
@@ -180,7 +180,7 @@ function SendOrdinalScreen() {
           txid: '',
           currency: 'BTC',
           error: `${e}`,
-          browserTx: isInOption,
+          browserTx: false,
         },
       });
     } finally {
