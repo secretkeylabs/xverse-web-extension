@@ -46,7 +46,7 @@
     "@sats-connect/core": "0.5.2",
     "@scure/base": "1.1.9",
     "@scure/btc-signer": "1.2.1",
-    "@secretkeylabs/xverse-core": "36.0.1-909100",
+    "@secretkeylabs/xverse-core": "36.0.2",
     "@stacks/connect": "7.9.0",
     "@stacks/stacks-blockchain-api-types": "7.14.1",
     "@stacks/transactions": "7.0.2",
