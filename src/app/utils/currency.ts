@@ -39,38 +39,39 @@ export interface Currency {
   isoFlag: string;
 }
 
+// alphabetical order
 export const currencyList: Currency[] = [
-  { name: 'CAD', isoFlag: CAN }, // Canada
-  { name: 'CNY', isoFlag: CHN }, // China
-  { name: 'EUR', isoFlag: EU }, // Eurozone
-  { name: 'USD', isoFlag: USA }, // United States
   { name: 'ARS', isoFlag: ARG }, // Argentina
-  { name: 'KRW', isoFlag: KOR }, // South Korea
-  { name: 'HKD', isoFlag: HKG }, // Hong Kong
-  { name: 'JPY', isoFlag: JPN }, // Japan
-  { name: 'SGD', isoFlag: SGP }, // Singapore
-  { name: 'GBP', isoFlag: GBR }, // United Kingdom
-  { name: 'BRL', isoFlag: BRA }, // Brazil
-  { name: 'RUB', isoFlag: RUS }, // Russia
   { name: 'AUD', isoFlag: AUS }, // Australia
-  { name: 'NGN', isoFlag: NGA }, // Nigeria
-  { name: 'TRY', isoFlag: TUR }, // Turkey
-  { name: 'INR', isoFlag: IND }, // India
+  { name: 'BRL', isoFlag: BRA }, // Brazil
+  { name: 'CAD', isoFlag: CAN }, // Canada
   { name: 'CHF', isoFlag: CHE }, // Switzerland
-  { name: 'VND', isoFlag: VNM }, // Vietnam
-  { name: 'PLN', isoFlag: POL }, // Poland
-  { name: 'MYR', isoFlag: MYS }, // Malaysia
-  { name: 'TWD', isoFlag: TWN }, // Taiwan
-  { name: 'IDR', isoFlag: IDN }, // Indonesia
-  { name: 'HUF', isoFlag: HUN }, // Hungary
-  { name: 'THB', isoFlag: THA }, // Thailand
-  { name: 'PHP', isoFlag: PHL }, // Philippines
-  { name: 'PKR', isoFlag: PAK }, // Pakistan
-  { name: 'ZAR', isoFlag: ZAF }, // South Africa
-  { name: 'MXN', isoFlag: MEX }, // Mexico
-  { name: 'RON', isoFlag: RON }, // Romania
-  { name: 'GTQ', isoFlag: GTQ }, // Guatemala
+  { name: 'CNY', isoFlag: CHN }, // China
   { name: 'COP', isoFlag: COP }, // Colombia
   { name: 'DOP', isoFlag: DOP }, // Dominican Republic
+  { name: 'EUR', isoFlag: EU }, // Eurozone
+  { name: 'GBP', isoFlag: GBR }, // United Kingdom
+  { name: 'GTQ', isoFlag: GTQ }, // Guatemala
+  { name: 'HKD', isoFlag: HKG }, // Hong Kong
+  { name: 'HUF', isoFlag: HUN }, // Hungary
+  { name: 'IDR', isoFlag: IDN }, // Indonesia
+  { name: 'INR', isoFlag: IND }, // India
+  { name: 'JPY', isoFlag: JPN }, // Japan
+  { name: 'KRW', isoFlag: KOR }, // South Korea
+  { name: 'MXN', isoFlag: MEX }, // Mexico
+  { name: 'MYR', isoFlag: MYS }, // Malaysia
+  { name: 'NGN', isoFlag: NGA }, // Nigeria
   { name: 'PEN', isoFlag: PEN }, // Peru
-];
+  { name: 'PHP', isoFlag: PHL }, // Philippines
+  { name: 'PKR', isoFlag: PAK }, // Pakistan
+  { name: 'PLN', isoFlag: POL }, // Poland
+  { name: 'RON', isoFlag: RON }, // Romania
+  { name: 'RUB', isoFlag: RUS }, // Russia
+  { name: 'SGD', isoFlag: SGP }, // Singapore
+  { name: 'THB', isoFlag: THA }, // Thailand
+  { name: 'TRY', isoFlag: TUR }, // Turkey
+  { name: 'TWD', isoFlag: TWN }, // Taiwan
+  { name: 'USD', isoFlag: USA }, // United States
+  { name: 'VND', isoFlag: VNM }, // Vietnam
+  { name: 'ZAR', isoFlag: ZAF }, // South Africa
+].sort((a, b) => a.name.localeCompare(b.name)) as Currency[];
