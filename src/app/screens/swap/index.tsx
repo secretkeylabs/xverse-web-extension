@@ -146,11 +146,11 @@ export default function SwapScreen() {
   const { data: fromRuneFloorPrice } = useRuneFloorPriceQuery(fromToken?.name ?? '');
 
   useEffect(() => {
-    if (defaultFrom) {
+    if (defaultFrom && !fromToken) {
       const token = coinsMasterList.find((coin) => coin.principal === defaultFrom);
       setFromToken(token);
     }
-    if (defaultTo) {
+    if (defaultTo && !toToken) {
       const token = coinsMasterList.find((coin) => coin.principal === defaultTo);
       setToToken(token);
     }
