@@ -85,7 +85,7 @@ export function MissingPeriodHistoricalDataChart() {
 
 const ChartContainer = styled.div((props) => ({
   width: `calc(100% + ${props.theme.space.xl})`,
-  height: '214px',
+  height: '119px',
   marginLeft: `-${props.theme.space.m}`,
 }));
 
@@ -124,7 +124,7 @@ export default function HistoricalDataChart({
           margin={{ left: 0, right: 0, top: 0, bottom: 0 }}
         >
           <XAxis hide dataKey="x" />
-          <YAxis hide />
+          <YAxis hide domain={['dataMin', 'dataMax']} />
           <Tooltip
             content={<CustomTooltip />}
             position={{ y: -20 }}
