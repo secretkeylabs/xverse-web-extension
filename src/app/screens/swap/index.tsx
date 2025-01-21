@@ -221,6 +221,7 @@ export default function SwapScreen() {
     const newTo = fromToken;
 
     setToToken(newTo);
+    setFromToken(newFrom);
 
     if (newFrom?.principal !== 'BTC') {
       const matchingToken = fromTokens.find(
@@ -229,8 +230,6 @@ export default function SwapScreen() {
 
       if (matchingToken) {
         setFromToken(matchingToken);
-      } else {
-        setFromToken(newFrom);
       }
     }
   };
