@@ -21,7 +21,6 @@ export function useMakeHandleAccept({ context, data }: Args) {
   const account = useSelectedAccount();
   const { network } = useWalletSelector();
   const { addClient, addResource, setPermission } = usePermissionsUtils();
-  const addresses = accountPurposeAddresses(account, { type: 'all' });
 
   return useCallback(async () => {
     const [clientIdError, clientId] = permissions.utils.store.makeClientId({
@@ -72,7 +71,13 @@ export function useMakeHandleAccept({ context, data }: Args) {
         tabId: context.tabId,
         result: true,
       });
-    else
+    else {
+      const purposes = data.params?.addresses;
+      const addresses = accountPurposeAddresses(
+        account,
+        purposes ? { type: 'select', purposes } : { type: 'all' },
+      );
+
       sendConnectSuccessResponseMessage({
         messageId: data.id,
         tabId: context.tabId,
@@ -82,19 +87,18 @@ export function useMakeHandleAccept({ context, data }: Args) {
           addresses,
         },
       });
+    }
 
     window.close();
   }, [
-    account.accountType,
-    account.id,
-    account.masterPubKey,
+    account,
     addClient,
     addResource,
-    addresses,
     context.origin,
     context.tabId,
     data.id,
     data.method,
+    data.params,
     network.type,
     setPermission,
   ]);
