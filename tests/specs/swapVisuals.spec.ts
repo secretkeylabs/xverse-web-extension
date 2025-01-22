@@ -43,7 +43,7 @@ test.describe('Swap Flow Visuals', () => {
 
     // Select the second Coin
     await wallet.buttonDownArrow.nth(1).click();
-    
+
     // Had problems with loading of all tokens so I check that a 'DOG' is loaded
     await expect(page.getByText('DOG').first()).toBeVisible();
     await expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
@@ -87,7 +87,7 @@ test.describe('Swap Flow Visuals', () => {
 
     // Select the second Coin
     await wallet.buttonDownArrow.nth(1).click();
-    
+
     // Had problems with loading of all tokens so I check that a 'DOG' is loaded
     await expect(page.getByText('DOG').first()).toBeVisible();
     await expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);

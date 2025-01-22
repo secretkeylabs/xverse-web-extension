@@ -86,6 +86,7 @@ export default function ContractCallRequest({
   onSignTransaction,
 }: Props) {
   const selectedNetwork = useNetworkSelector();
+  const navigate = useNavigate();
   const [hasTabClosed, setHasTabClosed] = useState(false);
   const { t } = useTranslation('translation');
   const [fee, setFee] = useState<BigNumber | undefined>(
@@ -115,7 +116,7 @@ export default function ContractCallRequest({
         </PostConditionAlertText>
       </PostConditionContainer>
     );
-  const navigate = useNavigate();
+
   const broadcastTx = async (
     tx: StacksTransactionWire[],
     txAttachment: Buffer | undefined = undefined,
@@ -202,7 +203,7 @@ export default function ContractCallRequest({
             txid: response.txid,
             currency: 'STX',
             error: '',
-            browserTx: false,
+            browserTx: true,
             tabId,
             messageId,
             rpcMethod,

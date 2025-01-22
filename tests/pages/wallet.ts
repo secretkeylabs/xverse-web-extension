@@ -62,7 +62,7 @@ export default class Wallet {
 
   readonly checkboxTokenInactive: Locator;
 
-  readonly buttonSip10: Locator;
+  readonly buttonStacks: Locator;
 
   readonly buttonBRC20: Locator;
 
@@ -376,7 +376,7 @@ export default class Wallet {
     this.navigationExplore = page.getByTestId('nav-explore');
     this.navigationSettings = page.getByTestId('nav-settings');
     // this.balance = page.getByTestId('total-balance-value');
-    this.balance = page.getByLabel(/^Total balance:/);
+    this.balance = page.getByLabel(/^Total balance/);
     this.textCurrency = page.getByTestId('currency-text');
     this.allUpperButtons = page.getByTestId('transaction-buttons-row').getByRole('button');
     this.buttonTransactionSend = this.allUpperButtons.nth(0);
@@ -439,7 +439,7 @@ export default class Wallet {
     this.checkboxToken = page.locator('label[role="checkbox"]');
     this.checkboxTokenActive = page.locator('label[role="checkbox"][aria-checked="true"]');
     this.checkboxTokenInactive = page.locator('label[role="checkbox"][aria-checked="false"]');
-    this.buttonSip10 = page.getByRole('button', { name: 'SIP-10' });
+    this.buttonStacks = page.getByRole('button', { name: 'STACKS' });
     this.buttonBRC20 = page.getByRole('button', { name: 'BRC-20' });
     this.buttonRunes = page.getByRole('button', { name: 'RUNES' });
     this.headingTokens = page.getByRole('heading', { name: 'Manage tokens' });
@@ -1163,13 +1163,15 @@ export default class Wallet {
     return totalBalance;
   }
 
-  async selectLastToken(tokenType: 'BRC20' | 'SIP10'): Promise<string> {
+  async selectLastToken(tokenType: 'BRC20' | 'STACKS'): Promise<string> {
     await this.manageTokenButton.click();
     expect(this.page.url()).toContain('manage-tokens');
 
     // Click on the specific token type button if BRC20 is selected
     if (tokenType === 'BRC20') {
       await this.buttonBRC20.click();
+    } else if (tokenType === 'STACKS') {
+      await this.buttonStacks.click();
     }
 
     const chosenToken = this.divTokenRow.last();

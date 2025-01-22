@@ -206,7 +206,7 @@ function ChangeNetworkScreen() {
           isSelected={formInputs.type === 'Signet'}
           onNetworkSelected={onNetworkSelected}
           disabled={isChangingNetwork}
-          showDivider={false}
+          showDivider
         />
         <NetworkRow
           network={savedRegtest || defaultRegtest}

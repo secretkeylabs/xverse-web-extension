@@ -1,7 +1,7 @@
 {
   "name": "xverse-web-extension",
-  "description": "A Bitcoin wallet for Web3",
-  "version": "0.48.0",
+  "description": "The Bitcoin Wallet for everyone",
+  "version": "0.48.1",
   "private": true,
   "engines": {
     "node": "^18.18.2"
@@ -32,6 +32,7 @@
       "tsc-files --noEmit src/styled.d.ts src/react-app-env.d.ts"
     ],
     "*.json": [
+      "node scripts/pin_all_deps.js",
       "prettier --write"
     ]
   },
@@ -45,7 +46,7 @@
     "@sats-connect/core": "0.5.2",
     "@scure/base": "1.1.9",
     "@scure/btc-signer": "1.2.1",
-    "@secretkeylabs/xverse-core": "36.0.1",
+    "@secretkeylabs/xverse-core": "36.0.2",
     "@stacks/connect": "7.9.0",
     "@stacks/stacks-blockchain-api-types": "7.14.1",
     "@stacks/transactions": "7.0.2",

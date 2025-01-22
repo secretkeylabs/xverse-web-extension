@@ -58,6 +58,8 @@ const TestnetContainer = styled.div((props) => ({
   background: props.theme.colors.elevation1,
   paddingTop: props.theme.spacing(3),
   paddingBottom: props.theme.spacing(3),
+  borderTopLeftRadius: 'inherit',
+  borderTopRightRadius: 'inherit',
 }));
 
 const TestnetText = styled.p((props) => ({

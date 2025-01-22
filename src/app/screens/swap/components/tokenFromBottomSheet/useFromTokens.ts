@@ -18,7 +18,10 @@ const useFromTokens = (toToken?: FungibleToken) => {
 
   const filteredTokens = toToken
     ? sortedTokens.filter(
-        (token) => token.principal !== toToken.ticker && toToken.protocol === token.protocol,
+        (token) =>
+          token.principal !== toToken.ticker &&
+          token.principal !== toToken.principal &&
+          toToken.protocol === token.protocol,
       )
     : sortedTokens;
 

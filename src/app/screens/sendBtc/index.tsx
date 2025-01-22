@@ -32,10 +32,10 @@ function SendBtcScreen() {
   const transactionContext = useTransactionContext(overridePaymentType);
   const userCanSwitchPayType = useCanUserSwitchPaymentType();
 
-  const [recipientAddress, setRecipientAddress] = useState<string>('');
+  const [recipientAddress, setRecipientAddress] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [amountSats, setAmountSats] = useState<string>('');
+  const [amountSats, setAmountSats] = useState('');
   const [feeRate, setFeeRate] = useState('');
   const [sendMax, setSendMax] = useState(false);
 
@@ -137,7 +137,7 @@ function SendBtcScreen() {
           txid: txnId,
           currency: 'BTC',
           error: '',
-          browserTx: isInOption,
+          browserTx: false,
         },
       });
     } catch (e) {
@@ -147,7 +147,7 @@ function SendBtcScreen() {
           txid: '',
           currency: 'BTC',
           error: `${e}`,
-          browserTx: isInOption,
+          browserTx: false,
         },
       });
     } finally {
