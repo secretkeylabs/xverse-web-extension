@@ -5,7 +5,7 @@ test.describe('Transaction', () => {
   test('Visual Check SIP 10 Token Transaction history mainnet', async ({ page, extensionId }) => {
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
-    const tokenName = await wallet.selectLastToken('SIP10');
+    const tokenName = await wallet.selectLastToken('STACKS');
 
     await wallet.clickOnSpecificToken(tokenName);
 
