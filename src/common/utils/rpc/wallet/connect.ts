@@ -30,6 +30,7 @@ export const handleConnect = async (message: ConnectRequestMessage, port: chrome
     selectedAccountType,
     accountsList: softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
     network,
     btcPaymentAddressType,
   } = rootStore.store.getState().walletState;
@@ -39,6 +40,7 @@ export const handleConnect = async (message: ConnectRequestMessage, port: chrome
     selectedAccountType,
     softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
   });
 
   if (!account) {

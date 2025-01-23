@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 /* eslint-disable no-restricted-syntax */
-import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
+import ledgerConnectDefaultIcon from '@assets/img/hw/ledger/ledger_connect_default.svg';
 import { signLedgerStxTransaction } from '@secretkeylabs/xverse-core';
 import type { StacksTransactionWire } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';

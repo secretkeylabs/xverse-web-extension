@@ -1,9 +1,10 @@
-import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
-import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
-import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
+import keystoneConnectDefaultIcon from '@assets/img/hw/keystone/keystone_connect_default.svg';
+import keystoneConnectBtcIcon from '@assets/img/hw/keystone/keystone_import_connect_btc.svg';
+import ledgerConnectDefaultIcon from '@assets/img/hw/ledger/ledger_connect_default.svg';
+import ledgerConnectBtcIcon from '@assets/img/hw/ledger/ledger_import_connect_btc.svg';
+import ledgerConnectStxIcon from '@assets/img/hw/ledger/ledger_import_connect_stx.svg';
 import { delay } from '@common/utils/promises';
-import BottomModal from '@components/bottomModal';
-import ActionButton from '@components/button';
+import KeystoneConnectionView from '@components/keystone/connectKeystoneView';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import SpeedUpBtcTransaction from '@components/speedUpTransaction/btc';
 import SpeedUpStxTransaction from '@components/speedUpTransaction/stx';
@@ -21,6 +22,7 @@ import useSeedVault from '@hooks/useSeedVault';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { createKeystoneTransport } from '@keystonehq/hw-transport-webusb';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { CarProfile, Lightning, RocketLaunch, ShootingStar } from '@phosphor-icons/react';
 import {
@@ -28,12 +30,15 @@ import {
   signLedgerStxTransaction,
   signTransaction,
   stxToMicrostacks,
-  type Transport as TransportType,
+  type KeystoneTransport,
+  type LedgerTransport,
 } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction, StacksTransactionWire } from '@stacks/transactions';
+import Button from '@ui-library/button';
+import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
 import { EMPTY_LABEL } from '@utils/constants';
-import { isLedgerAccount } from '@utils/helper';
+import { isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -64,9 +69,11 @@ function SpeedUpTransactionScreen() {
   const { t: signatureRequestTranslate } = useTranslation('translation', {
     keyPrefix: 'SIGNATURE_REQUEST',
   });
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isLedgerModalVisible, setIsLedgerModalVisible] = useState(false);
+  const [isKeystoneModalVisible, setIsKeystoneModalVisible] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
-  const [isLedgerConnectButtonDisabled, setIsLedgerConnectButtonDisabled] = useState(false);
+  const [isHardwareWalletConnectButtonDisabled, setIsHardwareWalletConnectButtonDisabled] =
+    useState(false);
   const [isConnectSuccess, setIsConnectSuccess] = useState(false);
   const [isConnectFailed, setIsConnectFailed] = useState(false);
   const [isTxRejected, setIsTxRejected] = useState(false);
@@ -145,7 +152,7 @@ function SpeedUpTransactionScreen() {
     return feeSummary.fee;
   };
 
-  const signAndBroadcastStxTx = async (transport?: TransportType) => {
+  const signAndBroadcastStxTx = async (transport?: LedgerTransport) => {
     if (!feeRateInput) {
       return;
     }
@@ -154,7 +161,7 @@ function SpeedUpTransactionScreen() {
       setIsBroadcasting(true);
       const fee = stxToMicrostacks(BigNumber(feeRateInput)).toString();
       const txRaw: string = await getRawTransaction(stxTransaction.txid, network);
-      const unsignedTx: StacksTransactionWire = deserializeTransaction(txRaw);
+      const unsignedTx = deserializeTransaction(txRaw);
 
       // check if the transaction exists in microblock
       const latestNonceData = await getLatestNonce(selectedAccount.stxAddress, network);
@@ -201,24 +208,27 @@ function SpeedUpTransactionScreen() {
     }
   };
 
-  const signAndBroadcastTx = async (transport?: TransportType) => {
+  const signAndBroadcastTx = async (options?: {
+    ledgerTransport?: LedgerTransport;
+    keystoneTransport?: KeystoneTransport;
+  }) => {
     if (!isBtc) {
-      return signAndBroadcastStxTx(transport);
+      return signAndBroadcastStxTx(options?.ledgerTransport);
     }
 
     if (!rbfTransaction) {
       return;
     }
 
-    if (isLedgerAccount(selectedAccount) && !transport) {
+    if ((isLedgerAccount(selectedAccount) || isKeystoneAccount(selectedAccount)) && !options) {
       return;
     }
 
     try {
       setIsBroadcasting(true);
       const signedTx = await rbfTransaction.getReplacementTransaction({
+        ...options,
         feeRate: Number(feeRateInput),
-        ledgerTransport: transport,
         context: transactionContext,
       });
 
@@ -245,20 +255,26 @@ function SpeedUpTransactionScreen() {
     }
 
     if (isLedgerAccount(selectedAccount)) {
-      setIsModalVisible(true);
+      setIsLedgerModalVisible(true);
+      return;
+    }
+
+    if (isKeystoneAccount(selectedAccount)) {
+      setIsKeystoneModalVisible(true);
       return;
     }
 
     signAndBroadcastTx();
   };
 
-  const handleConnectAndConfirm = async () => {
-    setIsLedgerConnectButtonDisabled(true);
+  const handleLedgerConnectAndConfirm = async () => {
+    setIsHardwareWalletConnectButtonDisabled(true);
+
     const transport = await Transport.create();
     if (!transport) {
       setIsConnectSuccess(false);
       setIsConnectFailed(true);
-      setIsLedgerConnectButtonDisabled(false);
+      setIsHardwareWalletConnectButtonDisabled(false);
       return;
     }
 
@@ -266,13 +282,38 @@ function SpeedUpTransactionScreen() {
     await delay(1500);
     setCurrentStepIndex(1);
     try {
-      await signAndBroadcastTx(transport);
+      await signAndBroadcastTx({ ledgerTransport: transport });
     } catch (err) {
       console.error(err);
       setIsTxRejected(true);
     } finally {
+      setIsHardwareWalletConnectButtonDisabled(false);
       await transport.close();
-      setIsLedgerConnectButtonDisabled(false);
+    }
+  };
+
+  const handleKeystoneConnectAndConfirm = async () => {
+    setIsHardwareWalletConnectButtonDisabled(true);
+
+    const transport = await createKeystoneTransport();
+    if (!transport) {
+      setIsConnectSuccess(false);
+      setIsConnectFailed(true);
+      setIsHardwareWalletConnectButtonDisabled(false);
+      return;
+    }
+
+    setIsConnectSuccess(true);
+    await delay(1500);
+    setCurrentStepIndex(1);
+    try {
+      await signAndBroadcastTx({ keystoneTransport: transport });
+    } catch (err) {
+      console.error(err);
+      setIsTxRejected(true);
+    } finally {
+      setIsHardwareWalletConnectButtonDisabled(false);
+      await transport.close();
     }
   };
 
@@ -283,7 +324,10 @@ function SpeedUpTransactionScreen() {
   };
 
   const cancelCallback = () => {
-    setIsModalVisible(false);
+    setIsLedgerModalVisible(false);
+    setIsKeystoneModalVisible(false);
+    setIsConnectSuccess(false);
+    setIsHardwareWalletConnectButtonDisabled(false);
   };
 
   const handleApplyCustomFee = (feeRate: string, fee: string) => {
@@ -411,7 +455,7 @@ function SpeedUpTransactionScreen() {
             />
           )}
 
-          <BottomModal header="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
+          <Sheet visible={isLedgerModalVisible} onClose={() => setIsLedgerModalVisible(false)}>
             {currentStepIndex === 0 && (
               <LedgerConnectionView
                 title={signatureRequestTranslate('LEDGER.CONNECT.TITLE')}
@@ -437,21 +481,67 @@ function SpeedUpTransactionScreen() {
               />
             )}
             <SuccessActionsContainer>
-              <ActionButton
-                onPress={isTxRejected || isConnectFailed ? handleRetry : handleConnectAndConfirm}
-                text={signatureRequestTranslate(
+              <Button
+                onClick={
+                  isTxRejected || isConnectFailed ? handleRetry : handleLedgerConnectAndConfirm
+                }
+                title={signatureRequestTranslate(
                   isTxRejected || isConnectFailed ? 'LEDGER.RETRY_BUTTON' : 'LEDGER.CONNECT_BUTTON',
                 )}
-                disabled={isLedgerConnectButtonDisabled}
-                processing={isLedgerConnectButtonDisabled}
+                disabled={isHardwareWalletConnectButtonDisabled}
+                loading={isHardwareWalletConnectButtonDisabled}
               />
-              <ActionButton
-                onPress={cancelCallback}
-                text={signatureRequestTranslate('LEDGER.CANCEL_BUTTON')}
-                transparent
+              <Button
+                onClick={cancelCallback}
+                title={signatureRequestTranslate('LEDGER.CANCEL_BUTTON')}
+                variant="secondary"
               />
             </SuccessActionsContainer>
-          </BottomModal>
+          </Sheet>
+
+          <Sheet visible={isKeystoneModalVisible} onClose={() => setIsKeystoneModalVisible(false)}>
+            {currentStepIndex === 0 && (
+              <KeystoneConnectionView
+                title={signatureRequestTranslate('KEYSTONE.CONNECT.TITLE')}
+                text={signatureRequestTranslate('KEYSTONE.CONNECT.SUBTITLE')}
+                titleFailed={signatureRequestTranslate('KEYSTONE.CONNECT.ERROR_TITLE')}
+                textFailed={signatureRequestTranslate('KEYSTONE.CONNECT.ERROR_SUBTITLE')}
+                imageDefault={keystoneConnectBtcIcon}
+                isConnectSuccess={isConnectSuccess}
+                isConnectFailed={isConnectFailed}
+              />
+            )}
+            {currentStepIndex === 1 && (
+              <KeystoneConnectionView
+                title={signatureRequestTranslate('KEYSTONE.CONFIRM.TITLE')}
+                text={signatureRequestTranslate('KEYSTONE.CONFIRM.SUBTITLE')}
+                titleFailed={signatureRequestTranslate('KEYSTONE.CONFIRM.ERROR_TITLE')}
+                textFailed={signatureRequestTranslate('KEYSTONE.CONFIRM.ERROR_SUBTITLE')}
+                imageDefault={keystoneConnectDefaultIcon}
+                isConnectSuccess={false}
+                isConnectFailed={isTxRejected}
+              />
+            )}
+            <SuccessActionsContainer>
+              <Button
+                onClick={
+                  isTxRejected || isConnectFailed ? handleRetry : handleKeystoneConnectAndConfirm
+                }
+                title={signatureRequestTranslate(
+                  isTxRejected || isConnectFailed
+                    ? 'KEYSTONE.RETRY_BUTTON'
+                    : 'KEYSTONE.CONNECT_BUTTON',
+                )}
+                disabled={isHardwareWalletConnectButtonDisabled}
+                loading={isHardwareWalletConnectButtonDisabled}
+              />
+              <Button
+                onClick={cancelCallback}
+                title={signatureRequestTranslate('KEYSTONE.CANCEL_BUTTON')}
+                variant="secondary"
+              />
+            </SuccessActionsContainer>
+          </Sheet>
         </>
       )}
     </>

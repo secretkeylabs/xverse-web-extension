@@ -11,8 +11,9 @@ import {
   btcTransaction,
   parseSummaryForRunes,
   runesTransaction,
+  type KeystoneTransport,
+  type LedgerTransport,
   type RuneSummary,
-  type Transport,
 } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
@@ -136,10 +137,16 @@ function RecoverRunes() {
   const handleToggleConfirmTx = () => setIsConfirmTx(!isConfirmTx);
   const handleOnNavigateBack = () => navigate(-1);
 
-  const onClickTransfer = async (ledgerTransport?: Transport) => {
+  const onClickTransfer = async (options?: {
+    ledgerTransport?: LedgerTransport;
+    keystoneTransport?: KeystoneTransport;
+  }) => {
     setIsBroadcasting(true);
     try {
-      const txnId = await enhancedTxn?.broadcast({ ledgerTransport, rbfEnabled: true });
+      const txnId = await enhancedTxn?.broadcast({
+        ...options,
+        rbfEnabled: true,
+      });
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
         protocol: 'runes',
         action: 'transfer',

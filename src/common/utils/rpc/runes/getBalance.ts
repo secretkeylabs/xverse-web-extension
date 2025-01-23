@@ -16,6 +16,7 @@ const handleGetRunesBalance = async (
     selectedAccountType,
     accountsList: softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
     network,
   } = rootStore.store.getState().walletState;
 
@@ -24,6 +25,7 @@ const handleGetRunesBalance = async (
     selectedAccountType,
     softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
   });
 
   if (!existingAccount) {

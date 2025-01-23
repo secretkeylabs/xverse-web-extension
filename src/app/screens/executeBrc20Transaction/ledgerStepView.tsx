@@ -1,5 +1,5 @@
-import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
-import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
+import ledgerConnectDefaultIcon from '@assets/img/hw/ledger/ledger_connect_default.svg';
+import ledgerConnectBtcIcon from '@assets/img/hw/ledger/ledger_import_connect_btc.svg';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import { ExecuteTransferProgressCodes } from '@secretkeylabs/xverse-core';
 import { useTranslation } from 'react-i18next';

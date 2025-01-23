@@ -50,7 +50,7 @@ test.describe('Account Management', () => {
     await page.getByRole('button', { name: /reset name/i }).click();
     await expect(page.getByText('Account 1')).toBeVisible();
     await expect(page.getByRole('button', { name: /generate account/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /connect hardware wallet/i })).toBeVisible();
+    await expect(page.getByRole('button', { name: /add hardware wallet account/i })).toBeVisible();
   });
 
   test('Generate new account', async ({ page, extensionId }) => {

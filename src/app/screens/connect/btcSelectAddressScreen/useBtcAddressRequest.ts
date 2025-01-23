@@ -137,7 +137,10 @@ export default function useRequestHelper(): UseRequestHelperReturn {
         const addresses: GetAccountsResult = accountPurposeAddresses(account, {
           type: 'select',
           purposes: popupPayloadGetAccounts.data.params.purposes,
-        }).map((address) => ({ ...address, walletType: account.accountType ?? 'software' }));
+        }).map((address) => ({
+          ...address,
+          walletType: account.accountType ?? 'software',
+        }));
         sendRpcResponse(context.tabId, makeRpcSuccessResponse(data.id, addresses));
       },
       sendCancelledResponse() {
@@ -187,6 +190,7 @@ export default function useRequestHelper(): UseRequestHelperReturn {
       };
       chrome.tabs.sendMessage(tabId, addressMessage);
     };
+
     return {
       legacyRequestNetworkType,
       message,

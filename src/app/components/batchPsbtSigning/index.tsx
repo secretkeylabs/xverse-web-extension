@@ -2,6 +2,7 @@ import AccountHeaderComponent from '@components/accountHeader';
 import { TxSummaryContext } from '@components/confirmBtcTransaction/hooks/useTxSummaryContext';
 import ConfirmBatchBtcTransactions from '@components/confirmBtcTransaction/indexBatch';
 import TransactionSummary from '@components/confirmBtcTransaction/transactionSummary';
+import KeystoneSteps from '@components/keystoneSteps';
 import LedgerSteps from '@components/ledgerSteps';
 import LoadingTransactionStatus from '@components/loadingTransactionStatus';
 import type { ConfirmationStatus } from '@components/loadingTransactionStatus/circularSvgAnimation';
@@ -16,13 +17,14 @@ import {
   btcTransaction,
   extractViewSummary,
   type AggregatedSummary,
-  type Transport,
+  type KeystoneTransport,
+  type LedgerTransport,
   type UserTransactionSummary,
 } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
-import { isLedgerAccount } from '@utils/helper';
+import { isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -71,6 +73,7 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: Props) 
   const [isLoading, setIsLoading] = useState(true);
   const [parsedPsbts, setParsedPsbts] = useState<ParsedPsbt[]>([]);
   const [isLedgerModalVisible, setIsLedgerModalVisible] = useState(false);
+  const [isKeystoneModalVisible, setIsKeystoneModalVisible] = useState(false);
 
   const individualTxSummaryContext = useMemo(
     () => ({
@@ -139,10 +142,17 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: Props) 
     })();
   }, [psbts, txnContext, network, navigate, t]);
 
-  const onSignPsbtConfirmed = async (transport?: Transport) => {
+  const onSignPsbtConfirmed = async (options?: {
+    ledgerTransport?: LedgerTransport;
+    keystoneTransport?: KeystoneTransport;
+  }) => {
     try {
-      if (isLedgerAccount(selectedAccount) && !transport) {
+      if (isLedgerAccount(selectedAccount) && !options?.ledgerTransport) {
         setIsLedgerModalVisible(true);
+        return;
+      }
+      if (isKeystoneAccount(selectedAccount) && !options?.keystoneTransport) {
+        setIsKeystoneModalVisible(true);
         return;
       }
 
@@ -160,7 +170,7 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: Props) 
 
         const psbtBase64 = await enhancedPsbt.getSignedPsbtBase64({
           finalize: false,
-          ledgerTransport: transport,
+          ...options,
         });
         signedPsbts.push(psbtBase64);
 
@@ -380,13 +390,13 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: Props) 
     );
   };
 
-  const onLedgerCancel = () => {
+  const onHardwareCancel = () => {
     if (isSigning) {
       onCancel();
       return;
     }
-
     setIsLedgerModalVisible(false);
+    setIsKeystoneModalVisible(false);
   };
 
   return (
@@ -397,7 +407,17 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: Props) 
         {isLedgerModalVisible && (
           <LedgerSteps
             onConfirm={onSignPsbtConfirmed}
-            onCancel={onLedgerCancel}
+            onCancel={onHardwareCancel}
+            txnToSignCount={psbts.length}
+            txnSignIndex={signingPsbtIndex}
+          />
+        )}
+      </Sheet>
+      <Sheet visible={isKeystoneModalVisible} onClose={() => setIsKeystoneModalVisible(false)}>
+        {isKeystoneModalVisible && (
+          <KeystoneSteps
+            onConfirm={onSignPsbtConfirmed}
+            onCancel={onHardwareCancel}
             txnToSignCount={psbts.length}
             txnSignIndex={signingPsbtIndex}
           />

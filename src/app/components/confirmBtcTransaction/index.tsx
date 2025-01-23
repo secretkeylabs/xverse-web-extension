@@ -1,3 +1,4 @@
+import KeystoneSteps from '@components/keystoneSteps';
 import LedgerSteps from '@components/ledgerSteps';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -5,8 +6,9 @@ import {
   type Brc20Definition,
   type btcTransaction,
   type EtchActionDetails,
+  type KeystoneTransport,
+  type LedgerTransport,
   type MintActionDetails,
-  type Transport,
 } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import Callout, { type CalloutProps } from '@ui-library/callout';
@@ -14,7 +16,7 @@ import { StickyHorizontalSplitButtonContainer, StyledP } from '@ui-library/commo
 import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
 import type { TabType } from '@utils/helper';
-import { isLedgerAccount } from '@utils/helper';
+import { isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import ConfirmTxLayout from 'app/layouts/confirmTxLayout';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -53,7 +55,10 @@ type Props = {
   hideBottomBar?: boolean;
   cancelText: string;
   confirmText: string;
-  onConfirm: (ledgerTransport?: Transport) => void;
+  onConfirm: (options?: {
+    ledgerTransport?: LedgerTransport;
+    keystoneTransport?: KeystoneTransport;
+  }) => void;
   onCancel: () => void;
   onBackClick?: () => void;
   confirmDisabled?: boolean;
@@ -104,16 +109,21 @@ function ConfirmBtcTransaction({
     [extractedTxSummary, runeMintDetails, runeEtchDetails, brc20Summary],
   );
 
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isLedgerModalVisible, setIsLedgerModalVisible] = useState(false);
+  const [isKeystoneModalVisible, setIsKeystoneModalVisible] = useState(false);
 
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
 
   const onConfirmPress = async () => {
-    if (!isLedgerAccount(selectedAccount)) {
+    if (isLedgerAccount(selectedAccount)) {
+      // show ledger connection screens
+      setIsLedgerModalVisible(true);
+    } else if (isKeystoneAccount(selectedAccount)) {
+      // show keystone connection screens
+      setIsKeystoneModalVisible(true);
+    } else {
       return onConfirm();
     }
-    // show ledger connection screens
-    setIsModalVisible(true);
   };
 
   if (isLoading || extractTxSummaryLoading) {
@@ -168,8 +178,11 @@ function ConfirmBtcTransaction({
             </StickyHorizontalSplitButtonContainer>
           )}
         </ConfirmTxLayout>
-        <Sheet visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
-          {isModalVisible && <LedgerSteps onConfirm={onConfirm} onCancel={onCancel} />}
+        <Sheet visible={isLedgerModalVisible} onClose={() => setIsLedgerModalVisible(false)}>
+          {isLedgerModalVisible && <LedgerSteps onConfirm={onConfirm} onCancel={onCancel} />}
+        </Sheet>
+        <Sheet visible={isKeystoneModalVisible} onClose={() => setIsKeystoneModalVisible(false)}>
+          {isKeystoneModalVisible && <KeystoneSteps onConfirm={onConfirm} onCancel={onCancel} />}
         </Sheet>
       </TxSummaryContext.Provider>
     );

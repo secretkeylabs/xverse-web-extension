@@ -1,4 +1,5 @@
-import LedgerBadge from '@assets/img/ledger/ledger_badge.svg';
+import KeystoneBadge from '@assets/img/hw/keystone/keystone_badge.svg';
+import LedgerBadge from '@assets/img/hw/ledger/ledger_badge.svg';
 import BarLoader from '@components/barLoader';
 import OptionsDialog from '@components/optionsDialog/optionsDialog';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
@@ -13,7 +14,12 @@ import Input from '@ui-library/input';
 import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
 import { BTC_SYMBOL, EMPTY_LABEL, HIDDEN_BALANCE_LABEL, LoaderSize } from '@utils/constants';
-import { getAccountBalanceKey, isLedgerAccount, validateAccountName } from '@utils/helper';
+import {
+  getAccountBalanceKey,
+  isKeystoneAccount,
+  isLedgerAccount,
+  validateAccountName,
+} from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -80,7 +86,13 @@ function AccountRow({
   const [accountName, setAccountName] = useState('');
   const [accountNameError, setAccountNameError] = useState<string | null>(null);
   const [isAccountNameChangeLoading, setIsAccountNameChangeLoading] = useState(false);
-  const { removeLedgerAccount, renameSoftwareAccount, updateLedgerAccounts } = useWalletReducer();
+  const {
+    removeLedgerAccount,
+    removeKeystoneAccount,
+    renameSoftwareAccount,
+    updateLedgerAccounts,
+    updateKeystoneAccounts,
+  } = useWalletReducer();
   const { btcFiatRate } = useSupportedCoinRates();
 
   useEffect(
@@ -131,13 +143,17 @@ function AccountRow({
     toast(optionsDialogTranslation('NFT_AVATAR.REMOVE_TOAST'));
   };
 
-  const handleRemoveLedgerAccount = async () => {
+  const handleRemoveAccount = async () => {
     if (!account) {
       return;
     }
 
     try {
-      await removeLedgerAccount(account);
+      if (account.accountType === 'ledger') {
+        await removeLedgerAccount(account);
+      } else if (account.accountType === 'keystone') {
+        await removeKeystoneAccount(account);
+      }
       onAccountSelected(accountsList[0], false);
       handleRemoveAccountModalClose();
     } catch (err) {
@@ -165,6 +181,8 @@ function AccountRow({
       setIsAccountNameChangeLoading(true);
       if (isLedgerAccount(account)) {
         await updateLedgerAccounts({ ...account, accountName });
+      } else if (isKeystoneAccount(account)) {
+        await updateKeystoneAccounts({ ...account, accountName });
       } else {
         await renameSoftwareAccount({ ...account, accountName });
       }
@@ -185,6 +203,8 @@ function AccountRow({
       setIsAccountNameChangeLoading(true);
       if (isLedgerAccount(account)) {
         updateLedgerAccounts({ ...account, accountName: undefined });
+      } else if (isKeystoneAccount(account)) {
+        updateKeystoneAccounts({ ...account, accountName: undefined });
       } else {
         renameSoftwareAccount({ ...account, accountName: undefined });
       }
@@ -216,6 +236,7 @@ function AccountRow({
                     `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`}
                 </AccountName>
                 {isLedgerAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
+                {isKeystoneAccount(account) && <img src={KeystoneBadge} alt="Keystone icon" />}
                 {isSelected && !disabledAccountSelect && !isAccountListView && (
                   <CaretDown color={Theme.colors.white_0} weight="bold" size={16} />
                 )}
@@ -284,7 +305,7 @@ function AccountRow({
               {optionsDialogTranslation('NFT_AVATAR.REMOVE_ACTION')}
             </ButtonRow>
           )}
-          {isLedgerAccount(account) && (
+          {(isLedgerAccount(account) || isKeystoneAccount(account)) && (
             <ButtonRow onClick={handleRemoveAccountModalOpen}>
               {optionsDialogTranslation('REMOVE_FROM_LIST')}
             </ButtonRow>
@@ -309,11 +330,7 @@ function AccountRow({
                 />
               </ModalButtonContainer>
               <ModalButtonContainer>
-                <Button
-                  variant="danger"
-                  title={t('REMOVE_WALLET')}
-                  onClick={handleRemoveLedgerAccount}
-                />
+                <Button variant="danger" title={t('REMOVE_WALLET')} onClick={handleRemoveAccount} />
               </ModalButtonContainer>
             </ModalControlsContainer>
           </ModalContent>
