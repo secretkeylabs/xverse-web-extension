@@ -6,7 +6,7 @@ import {
   sendConnectSuccessResponseMessage,
   sendRequestPermissionsSuccessResponseMessage,
 } from '@common/utils/rpc/responseMessages/wallet';
-import { usePermissionsUtils } from '@components/permissionsManager';
+import { usePermissions } from '@components/permissionsManager';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import type { ConnectRequestMessage, RequestPermissionsRequestMessage } from '@sats-connect/core';
@@ -20,7 +20,7 @@ type Args = {
 export function useMakeHandleAccept({ context, data }: Args) {
   const account = useSelectedAccount();
   const { network } = useWalletSelector();
-  const { addClient, addResource, setPermission } = usePermissionsUtils();
+  const { addClient, addResource, setPermission } = usePermissions();
 
   return useCallback(async () => {
     const [clientIdError, clientId] = permissions.utils.store.makeClientId({
