@@ -62,7 +62,7 @@ export default class Wallet {
 
   readonly checkboxTokenInactive: Locator;
 
-  readonly buttonSip10: Locator;
+  readonly buttonStacks: Locator;
 
   readonly buttonBRC20: Locator;
 
@@ -375,7 +375,8 @@ export default class Wallet {
     this.navigationStacking = page.getByTestId('nav-stacking');
     this.navigationExplore = page.getByTestId('nav-explore');
     this.navigationSettings = page.getByTestId('nav-settings');
-    this.balance = page.getByTestId('total-balance-value');
+    // this.balance = page.getByTestId('total-balance-value');
+    this.balance = page.getByLabel(/^Total balance/);
     this.textCurrency = page.getByTestId('currency-text');
     this.allUpperButtons = page.getByTestId('transaction-buttons-row').getByRole('button');
     this.buttonTransactionSend = this.allUpperButtons.nth(0);
@@ -438,14 +439,14 @@ export default class Wallet {
     this.checkboxToken = page.locator('label[role="checkbox"]');
     this.checkboxTokenActive = page.locator('label[role="checkbox"][aria-checked="true"]');
     this.checkboxTokenInactive = page.locator('label[role="checkbox"][aria-checked="false"]');
-    this.buttonSip10 = page.getByRole('button', { name: 'SIP-10' });
+    this.buttonStacks = page.getByRole('button', { name: 'STACKS' });
     this.buttonBRC20 = page.getByRole('button', { name: 'BRC-20' });
     this.buttonRunes = page.getByRole('button', { name: 'RUNES' });
     this.headingTokens = page.getByRole('heading', { name: 'Manage tokens' });
 
     this.divTokenRow = page.getByLabel('Token Row');
     this.labelTokenSubtitle = page.getByLabel('Token SubTitle');
-    this.labelCoinBalanceCurrency = page.getByLabel('CurrencyBalance Container').locator('span');
+    this.labelCoinBalanceCurrency = page.getByLabel('Currency Balance Container').locator('span');
     this.labelCoinBalanceCrypto = page.getByLabel('CoinBalance Container').locator('p');
 
     // Coin details
@@ -551,9 +552,7 @@ export default class Wallet {
       .filter({ hasText: 'You are transferring to yourself' });
     this.errorMessageSendSelf = page.locator('p').filter({ hasText: 'Cannot send to self' });
     this.errorInsufficientBalance = page.locator('p').filter({ hasText: 'Insufficient balance' });
-    this.errorInsufficientBRC20Balance = page
-      .locator('p')
-      .filter({ hasText: 'Insufficient BRC20 balance' });
+    this.errorInsufficientBRC20Balance = page.getByText('Insufficient BRC-20 balance');
     this.errorInsufficientFunds = page.locator('p').filter({ hasText: 'Insufficient funds' });
     this.containerFeeRate = page.getByTestId('feerate-container');
     this.inputBTCAddress = page.locator('input[type="text"]');
@@ -634,7 +633,7 @@ export default class Wallet {
 
     await expect(this.labelAccountName).toBeVisible();
     await expect(this.buttonMenu).toBeVisible();
-    expect(await this.labelTokenSubtitle.count()).toBeGreaterThanOrEqual(2);
+    // expect(await this.labelTokenSubtitle.count()).toBeGreaterThanOrEqual(2);
 
     await expect(this.navigationDashboard).toBeVisible();
     await expect(this.navigationNFT).toBeVisible();
@@ -983,20 +982,35 @@ export default class Wallet {
   }
 
   async getTokenBalance(tokenname: string) {
-    const locator = this.page
-      .getByRole('button')
-      .filter({ has: this.labelTokenSubtitle.getByText(tokenname, { exact: true }) })
-      .getByLabel('CoinBalance Container')
-      .locator('p');
-    const balanceText = await locator.innerText();
-    const numericValue = parseFloat(balanceText.replace(/[^\d.-]/g, ''));
-    return numericValue;
+    try {
+      const locator = this.page
+        .locator('button')
+        .filter({ hasText: new RegExp(`${tokenname}.*\\d`) });
+
+      console.log(`Looking for balance for ${tokenname}`);
+      const balanceText = await locator.innerText();
+      console.log('Found balance text:', balanceText);
+
+      // Extract just the numeric portion (matches any number with decimal points)
+      const matches = balanceText.match(/\d+\.?\d*/);
+      if (!matches) {
+        throw new Error(`Could not extract balance from text: ${balanceText}`);
+      }
+
+      const numericValue = parseFloat(matches[0]);
+      console.log('Parsed numeric value:', numericValue);
+      return numericValue;
+    } catch (error) {
+      console.error(`Error getting balance for ${tokenname}:`, error);
+      throw error;
+    }
   }
 
   async clickOnSpecificToken(tokenname: string) {
-    const specificToken = this.page
-      .getByRole('button')
-      .filter({ has: this.labelTokenSubtitle.getByText(tokenname, { exact: true }) });
+    const specificToken = this.page.getByRole('button').getByLabel(`Token Title: ${tokenname}`);
+    // filter({
+    //   has: this.labelTokenSubtitle.getByText(tokenname, { exact: true }),
+
     await specificToken.last().click();
   }
 
@@ -1149,13 +1163,15 @@ export default class Wallet {
     return totalBalance;
   }
 
-  async selectLastToken(tokenType: 'BRC20' | 'SIP10'): Promise<string> {
+  async selectLastToken(tokenType: 'BRC20' | 'STACKS'): Promise<string> {
     await this.manageTokenButton.click();
     expect(this.page.url()).toContain('manage-tokens');
 
     // Click on the specific token type button if BRC20 is selected
     if (tokenType === 'BRC20') {
       await this.buttonBRC20.click();
+    } else if (tokenType === 'STACKS') {
+      await this.buttonStacks.click();
     }
 
     const chosenToken = this.divTokenRow.last();

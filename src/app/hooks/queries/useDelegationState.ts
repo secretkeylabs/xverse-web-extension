@@ -6,10 +6,9 @@ import { useQuery } from '@tanstack/react-query';
 const useDelegationState = () => {
   const { stxAddress } = useSelectedAccount();
   const selectedNetwork = useNetworkSelector();
-  const networkType = selectedNetwork.isMainnet() ? 'Mainnet' : 'Testnet';
 
   return useQuery({
-    queryKey: ['stacking-delegation-state', networkType, stxAddress],
+    queryKey: ['stacking-delegation-state', selectedNetwork, stxAddress],
     queryFn: () => fetchDelegationState(stxAddress, selectedNetwork),
     enabled: Boolean(stxAddress),
   });

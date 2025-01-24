@@ -17,6 +17,7 @@ import type {
   WalletStateV5,
   WalletStateV6,
   WalletStateV7,
+  WalletStateV8,
 } from './wallet/actions/migrationTypes';
 import { type AvatarInfo, type WalletState } from './wallet/actions/types';
 import walletReducer, { initialWalletState, rehydrateError } from './wallet/reducer';
@@ -154,7 +155,7 @@ const migrations = {
   },
   6: (state: WalletStateV5): WalletStateV6 => {
     const { allowNestedSegWitAddress, ...migratedState } = state;
-    return migratedState as WalletState;
+    return migratedState as WalletStateV6;
   },
   7: (
     // NOTE: because we forgot to bump the store version on L222, need to be defensive here
@@ -190,6 +191,11 @@ const migrations = {
           : state.network) ?? initialWalletState.network,
     };
   },
+  9: (state: WalletStateV8): WalletState => {
+    const { showBtcReceiveAlert, showOrdinalReceiveAlert, ...migratedState } = state;
+
+    return migratedState;
+  },
 
   /* *
    * When adding a new migration, add the new wallet state type to the migrationTypes file
@@ -220,7 +226,7 @@ const migrations = {
 };
 
 const WalletPersistConfig: PersistConfig<WalletState> = {
-  version: 8,
+  version: 9,
   key: 'walletState',
   storage: chromeStorage.local,
   migrate: createMigrate(migrations as any, { debug: false }),

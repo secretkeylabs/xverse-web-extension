@@ -23,8 +23,6 @@ export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
 export const RareSatsNoticeDismissedKey = 'RareSatsNoticeDismissedKey';
 export const ChangeHasActivatedRareSatsKey = 'ChangeHasActivatedRareSatsKey';
 export const ChangeHasActivatedRBFKey = 'ChangeHasActivatedRBFKey';
-export const ChangeShowBtcReceiveAlertKey = 'ChangeShowBtcReceiveAlertKey';
-export const ChangeShowOrdinalReceiveAlertKey = 'ChangeShowOrdinalReceiveAlertKey';
 export const ChangeShowDataCollectionAlertKey = 'ChangeShowDataCollectionAlertKey';
 export const UpdateLedgerAccountsKey = 'UpdateLedgerAccountsKey';
 export const SetSip10ManageTokensKey = 'SetSip10ManageTokensKey';
@@ -77,8 +75,6 @@ export interface WalletState {
   hasActivatedRareSatsKey: boolean | undefined;
   hasActivatedRBFKey: boolean | undefined;
   rareSatsNoticeDismissed: boolean | undefined;
-  showBtcReceiveAlert: boolean | null;
-  showOrdinalReceiveAlert: boolean | null;
   showDataCollectionAlert: boolean | null;
   walletLockPeriod: WalletSessionPeriods;
   isUnlocked: boolean;
@@ -159,16 +155,6 @@ export interface ChangeActivateRBF {
 export interface SetRareSatsNoticeDismissed {
   type: typeof RareSatsNoticeDismissedKey;
   rareSatsNoticeDismissed: boolean;
-}
-
-export interface ChangeShowBtcReceiveAlert {
-  type: typeof ChangeShowBtcReceiveAlertKey;
-  showBtcReceiveAlert: boolean | null;
-}
-
-export interface ChangeShowOrdinalReceiveAlert {
-  type: typeof ChangeShowOrdinalReceiveAlertKey;
-  showOrdinalReceiveAlert: boolean | null;
 }
 
 export interface ChangeShowDataCollectionAlert {
@@ -327,8 +313,6 @@ export type WalletActions =
   | ChangeActivateOrdinals
   | ChangeActivateRareSats
   | ChangeActivateRBF
-  | ChangeShowBtcReceiveAlert
-  | ChangeShowOrdinalReceiveAlert
   | ChangeShowDataCollectionAlert
   | SetSip10ManageTokens
   | SetBrc20ManageTokens

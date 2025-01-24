@@ -58,6 +58,8 @@ const TestnetContainer = styled.div((props) => ({
   background: props.theme.colors.elevation1,
   paddingTop: props.theme.spacing(3),
   paddingBottom: props.theme.spacing(3),
+  borderTopLeftRadius: 'inherit',
+  borderTopRightRadius: 'inherit',
 }));
 
 const TestnetText = styled.p((props) => ({
@@ -125,6 +127,11 @@ function ScreenContainer({
           {network.type === 'Testnet' && (
             <TestnetContainer>
               <TestnetText>{t('SETTING_SCREEN.TESTNET')}</TestnetText>
+            </TestnetContainer>
+          )}
+          {network.type === 'Testnet4' && (
+            <TestnetContainer>
+              <TestnetText>{t('SETTING_SCREEN.TESTNET4')}</TestnetText>
             </TestnetContainer>
           )}
           {network.type === 'Signet' && (

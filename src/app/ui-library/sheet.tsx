@@ -96,6 +96,7 @@ function Sheet({
   return (
     <CustomisedModal
       isOpen={visible}
+      closeTimeoutMS={200}
       appElement={document.getElementById('app') as HTMLElement}
       ariaHideApp={false}
       style={customStyles}

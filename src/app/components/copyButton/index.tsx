@@ -5,13 +5,13 @@ import { useTranslation } from 'react-i18next';
 import { Tooltip } from 'react-tooltip';
 import styled from 'styled-components';
 
-const Button = styled.button((props) => ({
+const Button = styled.button<{ removeMargin?: boolean; removePadding?: boolean }>((props) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
   background: 'transparent',
-  marginLeft: props.theme.spacing(3),
-  padding: 3,
+  marginLeft: props.removeMargin ? undefined : props.theme.spacing(3),
+  padding: props.removePadding ? undefined : 3,
   borderRadius: props.theme.radius(5),
   ':hover': {
     background: props.theme.colors.white_900,
@@ -32,9 +32,21 @@ const StyledTooltip = styled(Tooltip)`
 
 type Props = {
   text: string;
+
+  // NOTE: The following two properties have been added to make the button
+  // easier to position without having to refactor the component or its usage
+  // sites.
+  //
+  // When the padding and margin are set within the component, it's difficult to
+  // achieve the design spacing guidelines. The usage sites need to be aware of
+  // the spacing internals and offset accordingly.
+  //
+  // This component should probably be refactored.
+  removeMargin?: boolean;
+  removePadding?: boolean;
 };
 
-function CopyButton({ text }: Props) {
+function CopyButton({ text, removeMargin, removePadding }: Props) {
   const [isCopied, setIsCopied] = useState(false);
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
 
@@ -53,7 +65,12 @@ function CopyButton({ text }: Props) {
 
   return (
     <>
-      <Button id={`copy-${text}`} onClick={onCopyClick}>
+      <Button
+        id={`copy-${text}`}
+        onClick={onCopyClick}
+        removeMargin={removeMargin}
+        removePadding={removePadding}
+      >
         {isCopied ? <Img src={Tick} /> : <Img src={Copy} />}
       </Button>
       <StyledTooltip

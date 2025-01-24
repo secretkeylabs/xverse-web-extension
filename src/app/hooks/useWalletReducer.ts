@@ -13,12 +13,12 @@ import {
   permissions,
   restoreWalletWithAccounts,
   StacksMainnet,
-  StacksNetwork,
   StacksTestnet,
   type Account,
   type NetworkType,
   type Permissions,
   type SettingsNetwork,
+  type StacksNetwork,
 } from '@secretkeylabs/xverse-core';
 import {
   ChangeBtcPaymentAddressType,
@@ -505,10 +505,20 @@ const useWalletReducer = () => {
     }
 
     const seedPhrase = await seedVault.getSeed();
-    const changedStacksNetwork =
+    const changedStacksNetwork: StacksNetwork =
       changedNetwork.type === 'Mainnet'
-        ? new StacksMainnet({ url: changedNetwork.address })
-        : new StacksTestnet({ url: changedNetwork.address });
+        ? {
+            ...StacksMainnet,
+            client: {
+              baseUrl: changedNetwork.address,
+            },
+          }
+        : {
+            ...StacksTestnet,
+            client: {
+              baseUrl: changedNetwork.address,
+            },
+          };
 
     const nextAccounts: Account[] = [];
 

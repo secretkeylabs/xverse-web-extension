@@ -21,108 +21,24 @@ import {
   setShowSpamTokensAction,
   setSip10ManageTokensAction,
 } from '@stores/wallet/actions/actionCreators';
-import { StyledP } from '@ui-library/common.styled';
+import { TabItem } from '@ui-library/tabs';
 import { SPAM_OPTIONS_WIDTH } from '@utils/constants';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
 import Theme from 'theme';
-
-const TokenContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
-  margin-bottom: ${(props) => props.theme.space.xl};
-  > *:not(:last-child) {
-    border-bottom: 1px solid ${(props) => props.theme.colors.elevation3};
-  }
-`;
-
-const Container = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-  overflow: 'hidden',
-  paddingLeft: 16,
-  paddingRight: 16,
-  height: '100%',
-});
-
-const ScrollableContainer = styled.div`
-  flex: 1;
-  overflow-y: auto;
-`;
-
-const FtInfoContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  marginBottom: props.theme.spacing(8),
-}));
-
-const Button = styled.button<{
-  isSelected: boolean;
-}>((props) => ({
-  ...props.theme.typography.body_bold_l,
-  fontSize: 12,
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-  height: 31,
-  paddingLeft: props.theme.spacing(6),
-  paddingRight: props.theme.spacing(6),
-  marginRight: props.theme.spacing(2),
-  borderRadius: 44,
-  background: props.isSelected ? props.theme.colors.elevation3 : 'transparent',
-  color: props.theme.colors.white_0,
-  opacity: props.isSelected ? 1 : 0.6,
-  userSelect: 'none',
-}));
-
-const Header = styled.h1((props) => ({
-  ...props.theme.typography.headline_xs,
-  marginBottom: props.theme.spacing(8),
-}));
-
-const Description = styled.h1((props) => ({
-  ...props.theme.typography.body_m,
-  color: props.theme.colors.white_200,
-  marginBottom: props.theme.spacing(16),
-}));
-
-const ErrorsText = styled.p((props) => ({
-  ...props.theme.typography.body_bold_m,
-  color: props.theme.colors.white_200,
-  marginTop: props.theme.spacing(16),
-  marginBottom: 'auto',
-  textAlign: 'center',
-}));
-
-const ButtonRow = styled.button`
-  display: flex;
-  align-items: center;
-  background-color: transparent;
-  flex-direction: row;
-  padding-left: ${(props) => props.theme.space.m};
-  padding-right: ${(props) => props.theme.space.m};
-  padding-top: ${(props) => props.theme.space.s};
-  padding-bottom: ${(props) => props.theme.space.s};
-  transition: background-color 0.2s ease;
-  :hover {
-    background-color: ${(props) => props.theme.colors.elevation3};
-  }
-  :active {
-    background-color: ${(props) => props.theme.colors.elevation3};
-  }
-`;
-
-const TokenText = styled(StyledP)`
-  margin-left: ${(props) => props.theme.space.m};
-`;
+import {
+  ButtonRow,
+  Container,
+  Description,
+  ErrorsText,
+  FtInfoContainer,
+  Header,
+  ScrollableContainer,
+  TokenContainer,
+  TokenText,
+} from './index.styled';
 
 function Stacks() {
   const { hideStx } = useWalletSelector();
@@ -157,9 +73,7 @@ function ManageTokens() {
     data.filter((ft) => ft.showToggle),
   );
 
-  const [selectedProtocol, setSelectedProtocol] = useState<FungibleTokenProtocol>(
-    selectedAccount?.stxAddress ? 'stacks' : 'brc-20',
-  );
+  const [selectedProtocol, setSelectedProtocol] = useState<FungibleTokenProtocol>('runes');
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -221,6 +135,7 @@ function ManageTokens() {
             disabled={false}
             toggled={toggled}
             enabled={coin.isEnabled}
+            protocol={selectedProtocol}
           />
         ))}
         {!coins.length && <ErrorsText>{t('NO_COINS')}</ErrorsText>}
@@ -258,26 +173,26 @@ function ManageTokens() {
           <Header>{t('ADD_COINS')}</Header>
           <Description>{t('DESCRIPTION')}</Description>
           <FtInfoContainer>
-            {selectedAccount?.stxAddress && (
-              <Button
-                isSelected={selectedProtocol === 'stacks'}
-                onClick={() => setSelectedProtocol('stacks')}
-              >
-                SIP-10
-              </Button>
-            )}
-            <Button
-              isSelected={selectedProtocol === 'brc-20'}
-              onClick={() => setSelectedProtocol('brc-20')}
-            >
-              BRC-20
-            </Button>
-            <Button
-              isSelected={selectedProtocol === 'runes'}
+            <TabItem
+              $active={selectedProtocol === 'runes'}
               onClick={() => setSelectedProtocol('runes')}
             >
               RUNES
-            </Button>
+            </TabItem>
+            <TabItem
+              $active={selectedProtocol === 'brc-20'}
+              onClick={() => setSelectedProtocol('brc-20')}
+            >
+              BRC-20
+            </TabItem>
+            {selectedAccount?.stxAddress && (
+              <TabItem
+                $active={selectedProtocol === 'stacks'}
+                onClick={() => setSelectedProtocol('stacks')}
+              >
+                STACKS
+              </TabItem>
+            )}
           </FtInfoContainer>
           <TokenContainer>{getCoinsList()}</TokenContainer>
         </ScrollableContainer>

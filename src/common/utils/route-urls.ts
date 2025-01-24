@@ -1,6 +1,7 @@
 enum RequestsRoutes {
   Home = '/',
   TransactionRequest = '/transaction-request',
+  StxSignTransactions = '/stx-sign-transactions',
   AuthenticationRequest = '/authentication-request',
   SignatureRequest = '/signature-request',
   SignMessageRequest = '/sign-message-request',

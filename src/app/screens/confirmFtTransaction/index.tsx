@@ -14,9 +14,8 @@ import {
   broadcastSignedTransaction,
   microstacksToStx,
   stxToMicrostacks,
-  type StacksTransaction,
 } from '@secretkeylabs/xverse-core';
-import { deserializeTransaction } from '@stacks/transactions';
+import { deserializeTransaction, StacksTransactionWire } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
@@ -49,7 +48,7 @@ function ConfirmFtTransaction() {
     error: txError,
     data: stxTxBroadcastData,
     mutate,
-  } = useMutation<string, Error, { signedTx: StacksTransaction }>({
+  } = useMutation<string, Error, { signedTx: StacksTransactionWire }>({
     mutationFn: async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork),
   });
 
@@ -80,10 +79,10 @@ function ConfirmFtTransaction() {
     }
   }, [txError]);
 
-  const handleOnConfirmClick = (txs: StacksTransaction[]) => {
+  const handleOnConfirmClick = (txs: StacksTransactionWire[]) => {
     if (isLedgerAccount(selectedAccount)) {
       const state: ConfirmStxTransactionState = {
-        unsignedTx: Buffer.from(unsignedTx.serialize()),
+        unsignedTx: Buffer.from(unsignedTx.serializeBytes()),
         recipients: [{ address: recipientAddress, amountMicrostacks: new BigNumber(amount) }],
         fee: new BigNumber(unsignedTx.auth.spendingCondition.fee.toString()),
       };

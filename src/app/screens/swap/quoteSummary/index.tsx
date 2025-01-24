@@ -13,7 +13,7 @@ import { ArrowDown, ArrowRight, WarningOctagon } from '@phosphor-icons/react';
 import {
   AnalyticsEvents,
   RUNE_DISPLAY_DEFAULTS,
-  capStxFeeAtThreshold,
+  applyMultiplierAndCapFeeAtThreshold,
   formatBalance,
   getBtcFiatEquivalent,
   getStxFiatEquivalent,
@@ -29,11 +29,12 @@ import Callout from '@ui-library/callout';
 import { StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import { formatNumber } from '@utils/helper';
+import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
-import trackSwapMixPanel from '../mixpanel';
+import { getSwapsMixpanelProperties } from '../mixpanel';
 import QuoteTile from '../quotesModal/quoteTile';
 import SlippageModalContent from '../slippageModal';
 import type { OrderInfo, StxOrderInfo } from '../types';
@@ -112,7 +113,7 @@ export default function QuoteSummary({
   } = usePlaceUtxoOrder();
 
   useEffect(() => {
-    if (true) {
+    if (placeOrderError || placeUtxoOrderError) {
       onError(placeOrderError ?? placeUtxoOrderError ?? '');
     }
   }, [placeOrderError, placeUtxoOrderError]);
@@ -171,16 +172,19 @@ export default function QuoteSummary({
       return;
     }
 
-    trackSwapMixPanel(AnalyticsEvents.ConfirmSwap, {
+    const trackingPayload = getSwapsMixpanelProperties({
       provider: quote.provider,
       fromToken,
       toToken,
       amount,
       quote,
-      btcUsdRate,
-      stxBtcRate,
-      fromTokenInfo: sip10FromTokenInfoUSD,
+      btcUsdRate: BigNumber(btcUsdRate),
+      stxBtcRate: BigNumber(stxBtcRate),
+      fromRuneFloorPrice: new BigNumber(runeFloorPrice ?? 0),
+      fromStxTokenFiatValue: new BigNumber(sip10FromTokenInfoUSD?.tokenFiatRate ?? 0),
     });
+
+    trackMixPanel(AnalyticsEvents.ConfirmSwap, trackingPayload);
 
     if (selectedIdentifiers) {
       const placeUtxoOrderRequest: PlaceUtxoOrderRequest = {
@@ -238,8 +242,8 @@ export default function QuoteSummary({
 
       if (placeOrderResponse?.unsignedTransaction) {
         const swapTx = deserializeTransaction(placeOrderResponse.unsignedTransaction);
-        await capStxFeeAtThreshold(swapTx, network);
-        placeOrderResponse.unsignedTransaction = Buffer.from(swapTx.serialize()).toString('hex');
+        await applyMultiplierAndCapFeeAtThreshold(swapTx, network);
+        placeOrderResponse.unsignedTransaction = swapTx.serialize();
         onStxOrderPlaced({ order: placeOrderResponse, providerCode: quote.provider.code });
       }
     }
@@ -295,11 +299,9 @@ export default function QuoteSummary({
       .toFixed(2);
   })();
 
-  const showBadQuoteWarning =
-    quote.slippageSupported &&
-    new BigNumber(toTokenFiatValue).isLessThan(
-      new BigNumber(fromTokenFiatValue).multipliedBy(BAD_QUOTE_PERCENTAGE),
-    );
+  const showBadQuoteWarning = new BigNumber(toTokenFiatValue).isLessThan(
+    new BigNumber(fromTokenFiatValue).multipliedBy(BAD_QUOTE_PERCENTAGE),
+  );
   const valueLossPercentage = new BigNumber(fromTokenFiatValue)
     .minus(new BigNumber(toTokenFiatValue))
     .dividedBy(new BigNumber(fromTokenFiatValue))
@@ -326,9 +328,13 @@ export default function QuoteSummary({
           <CalloutContainer>
             <Callout
               titleText={t('SWAP_SCREEN.BAD_QUOTE_WARNING_TITLE')}
-              bodyText={t('SWAP_SCREEN.BAD_QUOTE_WARNING_DESC', {
-                percentage: valueLossPercentage,
-              })}
+              bodyText={
+                quote.slippageSupported && BigNumber(toTokenFiatValue).isGreaterThan(0)
+                  ? t('SWAP_SCREEN.BAD_QUOTE_WARNING_DESC', {
+                      percentage: valueLossPercentage,
+                    })
+                  : t('SWAP_SCREEN.UNKNOWN_QUOTE_VALUE_WARNING_DESC')
+              }
               variant="warning"
             />
           </CalloutContainer>

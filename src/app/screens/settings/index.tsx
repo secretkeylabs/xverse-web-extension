@@ -70,7 +70,7 @@ function Setting() {
         <SettingComponent
           text={t('NETWORK')}
           onClick={openChangeNetworkScreen}
-          textDetail={network.type}
+          textDetail={network.type === 'Testnet' ? 'Testnet3' : network.type}
           showDivider
         />
 

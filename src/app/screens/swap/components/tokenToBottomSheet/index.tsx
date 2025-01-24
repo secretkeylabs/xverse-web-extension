@@ -79,7 +79,8 @@ const ProtocolItem = styled.button<{ $selected: boolean }>`
 const supportedProtocols: Protocol[] = ['runes', 'sip10']; // add more protocols here
 
 const mapProtocolName = (protocol: Protocol) => {
-  if (protocol === 'sip10') return 'SIP-10';
+  if (protocol === 'runes') return 'Bitcoin';
+  if (protocol === 'sip10') return 'Stacks';
   return protocol.toUpperCase();
 };
 

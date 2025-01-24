@@ -33,7 +33,7 @@ test.describe('Swap Flow Visuals', () => {
     await wallet.buttonDownArrow.nth(0).click();
 
     // Had problems with loading of all tokens so I check that 'Bitcoin' is loaded
-    await expect(wallet.labelTokenSubtitle.getByText('Bitcoin').first()).toBeVisible();
+    await expect(page.getByText('Bitcoin').first()).toBeVisible();
     await expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
     await wallet.divTokenRow.first().click();
     await expect(wallet.nameToken.first()).not.toContainText('Select asset');
@@ -43,8 +43,9 @@ test.describe('Swap Flow Visuals', () => {
 
     // Select the second Coin
     await wallet.buttonDownArrow.nth(1).click();
+
     // Had problems with loading of all tokens so I check that a 'DOG' is loaded
-    await expect(wallet.labelTokenSubtitle.getByText('DOG').first()).toBeVisible();
+    await expect(page.getByText('DOG').first()).toBeVisible();
     await expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
     await wallet.divTokenRow.first().click();
     await expect(wallet.nameToken.last()).not.toContainText('Select asset');
@@ -80,14 +81,15 @@ test.describe('Swap Flow Visuals', () => {
     await wallet.buttonDownArrow.nth(0).click();
 
     // Had problems with loading of all tokens so I check that 'Bitcoin' is loaded
-    await expect(wallet.labelTokenSubtitle.getByText('Bitcoin').first()).toBeVisible();
+    await expect(page.getByText('Bitcoin').first()).toBeVisible();
     await expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
     await wallet.divTokenRow.first().click();
 
     // Select the second Coin
     await wallet.buttonDownArrow.nth(1).click();
+
     // Had problems with loading of all tokens so I check that a 'DOG' is loaded
-    await expect(wallet.labelTokenSubtitle.getByText('DOG').first()).toBeVisible();
+    await expect(page.getByText('DOG').first()).toBeVisible();
     await expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
     await wallet.divTokenRow.first().click();
     await expect(wallet.nameToken.last()).not.toContainText('Select asset');

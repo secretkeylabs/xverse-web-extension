@@ -4,8 +4,8 @@ import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 
 const AmountText = styled.div`
-  ${(props) => props.theme.typography.body_medium_m}
-  color: ${(props) => props.theme.colors.white_200};
+  ${(props) => props.theme.typography.body_bold_m}
+  color: ${(props) => props.theme.colors.white_0};
 `;
 
 type Props = {

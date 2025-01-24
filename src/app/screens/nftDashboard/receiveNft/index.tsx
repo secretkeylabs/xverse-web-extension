@@ -109,6 +109,7 @@ function ReceiveNftModal({ visible, onClose }: Props) {
           title={t('ORDINALS')}
           address={ordinalsAddress}
           onQrAddressClick={onOrdinalsReceivePress}
+          receiveModalClose={handleReceiveModalClose}
           showVerifyButton={choseToVerifyAddresses}
           currency="ORD"
           icon={
@@ -127,6 +128,7 @@ function ReceiveNftModal({ visible, onClose }: Props) {
           title={t('STACKS_NFT')}
           address={stxAddress}
           onQrAddressClick={onReceivePress}
+          receiveModalClose={handleReceiveModalClose}
           showVerifyButton={choseToVerifyAddresses}
           currency="STX"
           icon={

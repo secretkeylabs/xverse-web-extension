@@ -134,24 +134,6 @@ export function SetRareSatsNoticeDismissedAction(
   };
 }
 
-export function ChangeShowBtcReceiveAlertAction(
-  showBtcReceiveAlert: boolean | null,
-): actions.ChangeShowBtcReceiveAlert {
-  return {
-    type: actions.ChangeShowBtcReceiveAlertKey,
-    showBtcReceiveAlert,
-  };
-}
-
-export function ChangeShowOrdinalReceiveAlertAction(
-  showOrdinalReceiveAlert: boolean | null,
-): actions.ChangeShowOrdinalReceiveAlert {
-  return {
-    type: actions.ChangeShowOrdinalReceiveAlertKey,
-    showOrdinalReceiveAlert,
-  };
-}
-
 export function changeShowDataCollectionAlertAction(
   showDataCollectionAlert: boolean | null,
 ): actions.ChangeShowDataCollectionAlert {

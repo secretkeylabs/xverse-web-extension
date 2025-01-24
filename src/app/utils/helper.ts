@@ -3,6 +3,8 @@ import {
   getStacksInfo,
   microstacksToStx,
   satsToBtc,
+  StacksMainnet,
+  StacksTestnet,
   type Account,
   type FungibleTokenWithStates,
   type NetworkType,
@@ -10,7 +12,6 @@ import {
   type SettingsNetwork,
   type StxMempoolTransactionData,
 } from '@secretkeylabs/xverse-core';
-import { ChainID } from '@stacks/transactions';
 import { getFtBalance } from '@utils/tokens';
 import RoutePaths from 'app/routes/paths';
 import BigNumber from 'bignumber.js';
@@ -19,6 +20,7 @@ import {
   BTC_TRANSACTION_REGTEST_STATUS_URL,
   BTC_TRANSACTION_SIGNET_STATUS_URL,
   BTC_TRANSACTION_STATUS_URL,
+  BTC_TRANSACTION_TESTNET4_STATUS_URL,
   BTC_TRANSACTION_TESTNET_STATUS_URL,
   MAX_ACC_NAME_LENGTH,
   TRANSACTION_STATUS_URL,
@@ -93,6 +95,40 @@ export const getShortTruncatedAddress = (address: string, charCount = 8) => {
   }
 };
 
+export const truncateStandardPrincipal = (standardPrincipal: string, length = 6) => {
+  // Adding 2 because Stacks addresses always begin with two known characters.
+  const leadingSubstringLength = length + 2;
+
+  return `${standardPrincipal.substring(0, leadingSubstringLength)}...${standardPrincipal.substring(
+    standardPrincipal.length - length,
+  )}`;
+};
+
+export const truncateTextMiddle = (text: string, maxLength = 16) => {
+  if (text.length > maxLength) {
+    const partLength = Math.floor(maxLength / 2);
+
+    const beginning = text.substring(0, partLength);
+    const end = text.substring(text.length - partLength);
+
+    return `${beginning}...${end}`;
+  }
+  return text;
+};
+
+const truncateContractName = (contractName: string, maxLength = 10) =>
+  truncateTextMiddle(contractName, maxLength);
+
+export const truncateContractPrincipal = (contractPrincipal: string) => {
+  const [standardPrincipal, contractName] = contractPrincipal.split('.');
+
+  const abbreviatedStandardPrincipal = truncateStandardPrincipal(standardPrincipal, 4);
+  const abbreviatedContractName =
+    contractName.length > 8 ? truncateContractName(contractName) : contractName;
+
+  return `${abbreviatedStandardPrincipal}.${abbreviatedContractName}`;
+};
+
 export const getExplorerUrl = (stxAddress: string): string =>
   `https://explorer.stacks.co/address/${stxAddress}?chain=mainnet`;
 
@@ -102,6 +138,9 @@ export const getStxTxStatusUrl = (transactionId: string, currentNetwork: Setting
 export const getBtcTxStatusUrl = (txId: string, network: SettingsNetwork) => {
   if (network.type === 'Testnet') {
     return `${BTC_TRANSACTION_TESTNET_STATUS_URL}${txId}`;
+  }
+  if (network.type === 'Testnet4') {
+    return `${BTC_TRANSACTION_TESTNET4_STATUS_URL}${txId}`;
   }
   if (network.type === 'Signet') {
     return `${BTC_TRANSACTION_SIGNET_STATUS_URL}${txId}`;
@@ -142,7 +181,7 @@ export const checkNftExists = (
 };
 
 export const isValidStacksApi = async (url: string, type: NetworkType): Promise<boolean> => {
-  const networkChainId = type === 'Mainnet' ? ChainID.Mainnet : ChainID.Testnet;
+  const networkChainId = type === 'Mainnet' ? StacksMainnet.chainId : StacksTestnet.chainId;
 
   if (!validUrl.isUri(url)) {
     return false;
@@ -194,7 +233,7 @@ export const isValidBtcApi = async (url: string, network: NetworkType) => {
 };
 
 export const getNetworkType = (stxNetwork) =>
-  stxNetwork.chainId === ChainID.Mainnet ? 'Mainnet' : 'Testnet';
+  stxNetwork.chainId === StacksMainnet.chainId ? 'Mainnet' : 'Testnet';
 
 export const getStxNetworkForBtcNetwork = (network: NetworkType) =>
   network === 'Mainnet' ? 'Mainnet' : 'Testnet';
