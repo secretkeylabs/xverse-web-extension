@@ -18,6 +18,7 @@ export const handleGetAddresses = async (
     selectedAccountType,
     accountsList: softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
     btcPaymentAddressType,
   } = rootStore.store.getState().walletState;
 
@@ -26,6 +27,7 @@ export const handleGetAddresses = async (
     selectedAccountType,
     softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
   });
 
   if (!account) {

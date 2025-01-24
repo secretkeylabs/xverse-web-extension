@@ -27,7 +27,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import type { CurrencyTypes } from '@utils/constants';
 import { BTC_SYMBOL, HIDDEN_BALANCE_LABEL } from '@utils/constants';
-import { isInOptions, isLedgerAccount } from '@utils/helper';
+import { isInOptions, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { getBalanceAmount, getFtTicker } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
@@ -174,7 +174,10 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
       }
     }
 
-    if (isLedgerAccount(selectedAccount) && !isInOptions()) {
+    if (
+      (isLedgerAccount(selectedAccount) || isKeystoneAccount(selectedAccount)) &&
+      !isInOptions()
+    ) {
       await chrome.tabs.create({
         url: chrome.runtime.getURL(`options.html#${route}`),
       });

@@ -1,4 +1,4 @@
-import { isLedgerAccount } from '@utils/helper';
+import { isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import { getMixpanelInstance } from 'app/mixpanelSetup';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -13,7 +13,11 @@ const useTrackMixPanelPageViewed = (properties?: any, deps: any[] = []) => {
   useEffect(() => {
     getMixpanelInstance('web-extension').track_pageview({
       path: location.pathname,
-      wallet_type: isLedgerAccount(selectedAccount) ? 'ledger' : 'software',
+      wallet_type: isLedgerAccount(selectedAccount)
+        ? 'ledger'
+        : isKeystoneAccount(selectedAccount)
+        ? 'keystone'
+        : 'software',
       client_version: VERSION,
       ...properties,
     });

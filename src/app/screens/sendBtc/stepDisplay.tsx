@@ -1,6 +1,10 @@
+import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RecipientSelector from '@components/recipientSelector';
-import type { BtcPaymentType } from '@secretkeylabs/xverse-core';
-import ConfirmBtcTransaction from 'app/components/confirmBtcTransaction';
+import type {
+  BtcPaymentType,
+  KeystoneTransport,
+  LedgerTransport,
+} from '@secretkeylabs/xverse-core';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -32,7 +36,10 @@ type Props = {
   sendMax: boolean;
   setSendMax: (sendMax: boolean) => void;
   getFeeForFeeRate: (feeRate: number, useEffectiveFeeRate?: boolean) => Promise<number | undefined>;
-  onConfirm: () => void;
+  onConfirm: (options?: {
+    ledgerTransport?: LedgerTransport;
+    keystoneTransport?: KeystoneTransport;
+  }) => void;
   onCancel: () => void;
   isLoading: boolean;
   isSubmitting: boolean;

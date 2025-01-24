@@ -1,8 +1,8 @@
 /* eslint-disable import/prefer-default-export */
 import { getTabIdFromPort } from '@common/utils';
 import getSelectedAccount, { embellishAccountWithDetails } from '@common/utils/getSelectedAccount';
+import { initPermissionsStore } from '@common/utils/permissionsStore';
 import { makeContext, openPopup } from '@common/utils/popup';
-import * as utils from '@components/permissionsManager/utils';
 import { type ConnectRequestMessage, type ConnectResult } from '@sats-connect/core';
 import { permissions } from '@secretkeylabs/xverse-core';
 import rootStore from '@stores/index';
@@ -15,7 +15,7 @@ import { sendConnectSuccessResponseMessage } from '../responseMessages/wallet';
 export const handleConnect = async (message: ConnectRequestMessage, port: chrome.runtime.Port) => {
   // Check if the user already has account read permissions, and if so, return
   // the account data without opening the popup.
-  const [error, store] = await utils.getPermissionsStore();
+  const [error, store] = await initPermissionsStore();
   if (error) {
     sendInternalErrorMessage({
       tabId: getTabIdFromPort(port),
@@ -30,6 +30,7 @@ export const handleConnect = async (message: ConnectRequestMessage, port: chrome
     selectedAccountType,
     accountsList: softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
     network,
     btcPaymentAddressType,
   } = rootStore.store.getState().walletState;
@@ -39,6 +40,7 @@ export const handleConnect = async (message: ConnectRequestMessage, port: chrome
     selectedAccountType,
     softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
   });
 
   if (!account) {
@@ -67,7 +69,7 @@ export const handleConnect = async (message: ConnectRequestMessage, port: chrome
   });
   const resourceId = permissions.resources.account.makeAccountResourceId(accountId);
 
-  const hasAccountReadPermissions = permissions.utils.store.hasPermission(store.permissions, {
+  const hasAccountReadPermissions = permissions.utils.store.hasPermission(store, {
     type: 'account',
     clientId,
     resourceId,

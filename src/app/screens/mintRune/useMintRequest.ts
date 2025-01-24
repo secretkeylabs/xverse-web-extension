@@ -2,10 +2,15 @@ import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/u
 import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useOrdinalsServiceApi from '@hooks/apiClients/useOrdinalsServiceApi';
 import useRunesApi from '@hooks/apiClients/useRunesApi';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import { RpcErrorCode, type Params, type RunesMintParams } from '@sats-connect/core';
 import { generateTransaction, type TransactionBuildPayload } from '@screens/sendBtc/helpers';
-import { type Rune, type Transport } from '@secretkeylabs/xverse-core';
+import {
+  type KeystoneTransport,
+  type LedgerTransport,
+  type Rune,
+} from '@secretkeylabs/xverse-core';
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import SuperJSON from 'superjson';
@@ -34,10 +39,14 @@ const useMintRequest = (): {
   feeRate: string;
   isExecuting: boolean;
   handleMint: () => Promise<void>;
-  payAndConfirmMintRequest: (ledgerTransport?: Transport) => Promise<any>;
+  payAndConfirmMintRequest: (options?: {
+    ledgerTransport?: LedgerTransport;
+    keystoneTransport?: KeystoneTransport;
+  }) => Promise<any>;
   cancelMintRequest: () => Promise<void>;
 } => {
   const { mintRequest, requestId, tabId } = useRuneMintRequestParams();
+  const selectedAccount = useSelectedAccount();
   const txContext = useTransactionContext();
   const ordinalsServiceApi = useOrdinalsServiceApi();
   const runesApi = useRunesApi();
@@ -138,7 +147,10 @@ const useMintRequest = (): {
     }
   };
 
-  const payAndConfirmMintRequest = async (ledgerTransport?: Transport) => {
+  const payAndConfirmMintRequest = async (options?: {
+    ledgerTransport?: LedgerTransport;
+    keystoneTransport?: KeystoneTransport;
+  }) => {
     try {
       setIsExecuting(true);
 
@@ -160,7 +172,7 @@ const useMintRequest = (): {
       */
 
       const { hex: transactionHex, id: txid } = await orderTx.transaction.getTransactionHexAndId({
-        ledgerTransport,
+        ...options,
         rbfEnabled: false,
       });
       await btcClient.sendRawTransaction(transactionHex);

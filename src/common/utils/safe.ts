@@ -3,6 +3,9 @@
 // NOTE: The above rule is disabled due to the currently used version not
 // detecting modern Typescript syntax.
 
+/**
+ * @public
+ */
 export type SafeError<TName extends string = string, TData = unknown> = {
   readonly name: TName;
   readonly message: string;

@@ -1,4 +1,5 @@
-import ConnectLedger from '@assets/img/dashboard/connect_ledger.svg';
+import connectHwIcon from '@assets/img/hw/connect_hw.svg';
+import { filterKeystoneAccountsByNetwork } from '@common/utils/keystone';
 import { filterLedgerAccountsByNetwork } from '@common/utils/ledger';
 import LazyAccountRow from '@components/accountRow/lazyAccountRow';
 import Separator from '@components/separator';
@@ -11,7 +12,6 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { Plus } from '@phosphor-icons/react';
 import type { Account } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
-import { isInOptions } from '@utils/helper';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -61,7 +61,7 @@ function AccountList(): JSX.Element {
   const { search, state } = useLocation();
   const params = new URLSearchParams(search);
   const selectedAccount = useSelectedAccount();
-  const { network, accountsList, ledgerAccountsList } = useWalletSelector();
+  const { network, accountsList, ledgerAccountsList, keystoneAccountsList } = useWalletSelector();
   const { createAccount, switchAccount } = useWalletReducer();
   const { enqueueFetchBalances } = useAccountBalance();
 
@@ -69,8 +69,12 @@ function AccountList(): JSX.Element {
 
   const displayedAccountsList = useMemo(() => {
     const networkLedgerAccounts = filterLedgerAccountsByNetwork(ledgerAccountsList, network.type);
-    return [...networkLedgerAccounts, ...accountsList];
-  }, [accountsList, ledgerAccountsList, network]);
+    const networkKeystoneAccounts = filterKeystoneAccountsByNetwork(
+      keystoneAccountsList,
+      network.type,
+    );
+    return [...networkLedgerAccounts, ...networkKeystoneAccounts, ...accountsList];
+  }, [accountsList, ledgerAccountsList, keystoneAccountsList, network]);
 
   const handleBackButtonClick = () => {
     navigate(state?.from || -1);
@@ -92,16 +96,6 @@ function AccountList(): JSX.Element {
     await createAccount();
   };
 
-  const onImportLedgerAccount = async () => {
-    if (isInOptions()) {
-      navigate('/import-ledger');
-    } else {
-      await chrome.tabs.create({
-        url: chrome.runtime.getURL('options.html#/import-ledger'),
-      });
-    }
-  };
-
   return (
     <>
       <TopRow onClick={handleBackButtonClick} />
@@ -110,7 +104,9 @@ function AccountList(): JSX.Element {
           <AccountContainer>
             <Title>{t('TITLE')}</Title>
             {displayedAccountsList.map((account) => (
-              <div key={account.btcAddresses.taproot.address}>
+              <div
+                key={`${account.accountType}:${account.masterPubKey}:${account.id}:${account.deviceAccountIndex}`}
+              >
                 <LazyAccountRow
                   account={account}
                   isSelected={isAccountSelected(account)}
@@ -132,9 +128,11 @@ function AccountList(): JSX.Element {
               variant="secondary"
             />
             <Button
-              icon={<img src={ConnectLedger} width={16} height={16} alt="" />}
-              onClick={onImportLedgerAccount}
-              title={t('LEDGER_ACCOUNT')}
+              icon={
+                <img src={connectHwIcon} width={16} height={16} alt="hardware wallet connection" />
+              }
+              onClick={() => navigate('/connect-hardware-wallet')}
+              title={t('NEW_HARDWARE_WALLET')}
               variant="secondary"
             />
           </ButtonsWrapper>

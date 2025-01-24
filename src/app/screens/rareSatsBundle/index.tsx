@@ -16,6 +16,7 @@ import {
   getBtcTxStatusUrl,
   getTruncatedAddress,
   isInOptions,
+  isKeystoneAccount,
   isLedgerAccount,
 } from '@utils/helper';
 import { useMemo, useState } from 'react';
@@ -92,7 +93,10 @@ function RareSatsBundle() {
     const link = `/nft-dashboard/ordinal-detail/${bundle?.txid}/send-ordinal?isRareSat=true&vout=${
       bundle?.vout
     }${hasRune ? `&fromRune=${searchParams.get('fromRune') || runeId}` : ''}`;
-    if (isLedgerAccount(selectedAccount) && !isInOptions()) {
+    if (
+      (isLedgerAccount(selectedAccount) || isKeystoneAccount(selectedAccount)) &&
+      !isInOptions()
+    ) {
       await chrome.tabs.create({
         url: chrome.runtime.getURL(`options.html#${link}`),
       });

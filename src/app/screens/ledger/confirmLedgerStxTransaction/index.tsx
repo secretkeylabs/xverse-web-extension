@@ -1,6 +1,6 @@
-import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
-import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
-import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
+import checkCircleIcon from '@assets/img/hw/ledger/check_circle.svg';
+import ledgerConnectDefaultIcon from '@assets/img/hw/ledger/ledger_connect_default.svg';
+import ledgerConnectStxIcon from '@assets/img/hw/ledger/ledger_import_connect_stx.svg';
 import { delay } from '@common/utils/promises';
 import ActionButton from '@components/button';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
@@ -141,12 +141,6 @@ function ConfirmLedgerStxTransaction(): JSX.Element {
     } finally {
       setIsButtonDisabled(false);
     }
-  };
-
-  const goToConfirmationStep = () => {
-    setCurrentStep(Steps.ConfirmTransaction);
-
-    handleConnectAndConfirm();
   };
 
   const handleRetry = async () => {
