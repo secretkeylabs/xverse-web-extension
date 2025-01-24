@@ -44,7 +44,7 @@ function useSignatureRequest() {
     const message = params.get('message') || '';
     const requestDomain = params.get('domain') || '';
 
-    const innerDomain = hexToCV(requestDomain) as TupleCV;
+    const innerDomain = requestDomain ? (hexToCV(requestDomain) as TupleCV) : undefined;
 
     const rpcPayload: SignaturePayload | StructuredDataSignatureRequestOptions = {
       message,
