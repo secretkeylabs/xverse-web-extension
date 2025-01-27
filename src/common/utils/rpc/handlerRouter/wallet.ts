@@ -8,6 +8,8 @@ import {
   getAccountRequestMessageSchema,
   getCurrentPermissionsMethodName,
   getCurrentPermissionsRequestMessageSchema,
+  getNetworkMethodName,
+  getNetworkRequestMessageSchema,
   getWalletTypeMethodName,
   getWalletTypeRequestMessageSchema,
   renouncePermissionsMethodName,
@@ -21,6 +23,7 @@ import { handleConnect } from '../wallet/connect';
 import { handleDisconnect } from '../wallet/disconnect';
 import { handleGetAccount } from '../wallet/getAccount';
 import { handleGetPermissions } from '../wallet/getCurrentPermissions';
+import { handleGetNetwork } from '../wallet/getNetwork';
 import { handleGetWalletType } from '../wallet/getWalletType';
 import { handleRenouncePermissions } from '../wallet/renouncePermissions';
 import { handleRequestPermissions } from '../wallet/requestPermissions';
@@ -72,5 +75,9 @@ export const router: Record<string, Handler> = {
       }),
     ],
     validateMessageSchema(getAccountRequestMessageSchema, handleGetAccount),
+  ),
+  [getNetworkMethodName]: requirePermissions(
+    [{ type: 'wallet', resourceId: 'wallet', actions: { readNetwork: true } }],
+    validateMessageSchema(getNetworkRequestMessageSchema, handleGetNetwork),
   ),
 };

@@ -25,7 +25,7 @@ export function PermissionsProvider({ children }: PropsWithChildren) {
         throw new Error('Failed to initialize the permissions store', { cause: initError });
       }
 
-      saveStoreGlobal(newStore);
+      setStoreGlobal(newStore);
 
       return true;
     },

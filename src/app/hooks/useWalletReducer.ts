@@ -481,29 +481,22 @@ const useWalletReducer = () => {
       dispatchEventAuthorizedConnectedClients(
         [
           {
-            type: 'account',
-            resourceId: permissions.resources.account.makeAccountResourceId(
-              permissions.utils.account.makeAccountId({
-                accountId: currentlySelectedAccount.id,
-                masterPubKey: currentlySelectedAccount.masterPubKey,
-                networkType: network.type,
-              }),
-            ),
-            actions: { read: true },
-          },
-          {
-            type: 'account',
-            resourceId: permissions.resources.account.makeAccountResourceId(
-              permissions.utils.account.makeAccountId({
-                accountId: currentlySelectedAccount.id,
-                masterPubKey: currentlySelectedAccount.masterPubKey,
-                networkType: changedNetwork.type,
-              }),
-            ),
-            actions: { read: true },
+            type: 'wallet',
+            actions: {
+              readNetwork: true,
+            },
+            resourceId: 'wallet',
           },
         ],
-        { type: 'networkChange' },
+        {
+          type: 'networkChange',
+          bitcoin: {
+            name: changedNetwork.type,
+          },
+          stacks: {
+            name: changedNetwork.type,
+          },
+        },
       );
     }
 

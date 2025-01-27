@@ -13,8 +13,14 @@ import { sendInternalErrorMessage } from '../responseMessages/errors';
 import { sendConnectSuccessResponseMessage } from '../responseMessages/wallet';
 
 export const handleConnect = async (message: ConnectRequestMessage, port: chrome.runtime.Port) => {
-  // Check if the user already has account read permissions, and if so, return
-  // the account data without opening the popup.
+  // Check if the user already has account & network read permissions, and if
+  // so, return the account data without opening the popup.
+  //
+  // Note: the checks performed in this file for the default permissions that
+  // `wallet_connect` is expected to grant is decoupled from and needs to be
+  // manually kept in sync with those granted in
+  // `src/app/screens/connect/connectionRequest/hooks.ts`.
+
   const [error, store] = await initPermissionsStore();
   if (error) {
     sendInternalErrorMessage({
@@ -75,8 +81,14 @@ export const handleConnect = async (message: ConnectRequestMessage, port: chrome
     resourceId,
     actions: { read: true },
   });
+  const hasNetworkReadPermissions = permissions.utils.store.hasPermission(store, {
+    type: 'wallet',
+    clientId,
+    resourceId: 'wallet',
+    actions: { readNetwork: true },
+  });
 
-  if (!hasAccountReadPermissions) {
+  if (!hasAccountReadPermissions || !hasNetworkReadPermissions) {
     openPopup({
       path: RequestsRoutes.ConnectionRequest,
       data: message,
@@ -95,6 +107,14 @@ export const handleConnect = async (message: ConnectRequestMessage, port: chrome
     id: accountId,
     walletType: account.accountType ?? 'software',
     addresses,
+    network: {
+      bitcoin: {
+        name: network.type,
+      },
+      stacks: {
+        name: network.type,
+      },
+    },
   };
   sendConnectSuccessResponseMessage({
     tabId: getTabIdFromPort(port),

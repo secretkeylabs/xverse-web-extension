@@ -1,12 +1,12 @@
 /* eslint-disable import/prefer-default-export */
 import { getTabIdFromPort } from '@common/utils';
 import getSelectedAccount, { embellishAccountWithDetails } from '@common/utils/getSelectedAccount';
-import { type ConnectResult, type GetAccountRequestMessage } from '@sats-connect/core';
+import { type GetAccountRequestMessage, type GetAccountResult } from '@sats-connect/core';
 import { permissions } from '@secretkeylabs/xverse-core';
 import rootStore from '@stores/index';
 import { accountPurposeAddresses } from '../btc/getAddresses/utils';
 import { sendInternalErrorMessage } from '../responseMessages/errors';
-import { sendConnectSuccessResponseMessage } from '../responseMessages/wallet';
+import { sendGetAccountSuccessResponseMessage } from '../responseMessages/wallet';
 
 export async function handleGetAccount(
   message: GetAccountRequestMessage,
@@ -47,12 +47,12 @@ export async function handleGetAccount(
 
   const embellishedAccount = embellishAccountWithDetails(account, btcPaymentAddressType);
   const addresses = accountPurposeAddresses(embellishedAccount, { type: 'all' });
-  const result: ConnectResult = {
+  const result: GetAccountResult = {
     id: accountId,
     walletType: account.accountType ?? 'software',
     addresses,
   };
-  sendConnectSuccessResponseMessage({
+  sendGetAccountSuccessResponseMessage({
     tabId: getTabIdFromPort(port),
     messageId: message.id,
     result,

@@ -85,10 +85,10 @@ async function loadPermissionsStore(): Promise<
  * safely be called multiple times.
  */
 export async function initPermissionsStore(): Promise<Result<Permissions.Store.PermissionsStore>> {
-  const [getStoreError, loadedStore] = await loadPermissionsStore();
+  const [storeGetError, loadedStore] = await loadPermissionsStore();
 
-  if (getStoreError) {
-    if (getStoreError.name === 'SchemaParseError') {
+  if (storeGetError) {
+    if (storeGetError.name === 'SchemaParseError') {
       // The store is outdated and needs to be migrated. For now, the store is
       // migrated by creating a new store using the current schema and
       // overwriting the previous one. As the store becomes more complex, a more
@@ -98,7 +98,7 @@ export async function initPermissionsStore(): Promise<Result<Permissions.Store.P
       return success(newStore);
     }
 
-    if (getStoreError.name === 'StoreNotFoundError') {
+    if (storeGetError.name === 'StoreNotFoundError') {
       // The store doesn't exist yet, so we create a new one.
       const newStore = permissions.utils.store.makePermissionsStore();
       saveStore(newStore);
@@ -108,7 +108,7 @@ export async function initPermissionsStore(): Promise<Result<Permissions.Store.P
     return error({
       name: 'InitError',
       message: 'Failed to initialize permissions store.',
-      data: getStoreError,
+      data: storeGetError,
     });
   }
 

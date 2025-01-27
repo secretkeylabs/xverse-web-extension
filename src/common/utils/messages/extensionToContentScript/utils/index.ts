@@ -118,12 +118,6 @@ export async function sendMessageAuthorizedConnectedClients(
     return;
   }
 
-  if (!store) {
-    // eslint-disable-next-line no-console
-    console.warn('Unable to notify connected clients, no permissions store found.');
-    return;
-  }
-
   const authorizedClientIds = store.permissions
     .filter((storePermission) =>
       targetPermissions.some(

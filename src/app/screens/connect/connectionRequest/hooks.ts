@@ -41,6 +41,8 @@ export function useMakeHandleAccept({ context, data }: Args) {
       origin: context.origin,
     };
 
+    addClient(client);
+
     const accountId = permissions.utils.account.makeAccountId({
       accountId: account.id,
       networkType: network.type,
@@ -52,7 +54,7 @@ export function useMakeHandleAccept({ context, data }: Args) {
       networkType: network.type,
     });
 
-    const permission: TPermissions.Store.Permission = {
+    const accountPermission: TPermissions.Store.Permission = {
       type: 'account',
       clientId: client.id,
       resourceId: resource.id,
@@ -61,9 +63,26 @@ export function useMakeHandleAccept({ context, data }: Args) {
       },
     };
 
-    await addClient(client);
-    await addResource(resource);
-    await setPermission(permission);
+    addResource(resource);
+    setPermission(accountPermission);
+
+    const walletResource: TPermissions.Store.Resource = {
+      type: 'wallet',
+      id: 'wallet',
+      name: 'Wallet',
+    };
+
+    const walletPermission: TPermissions.Store.Permission = {
+      type: 'wallet',
+      clientId: client.id,
+      resourceId: 'wallet',
+      actions: {
+        readNetwork: true,
+      },
+    };
+
+    addResource(walletResource);
+    setPermission(walletPermission);
 
     if (data.method === 'wallet_requestPermissions')
       sendRequestPermissionsSuccessResponseMessage({
@@ -85,6 +104,14 @@ export function useMakeHandleAccept({ context, data }: Args) {
           id: accountId,
           walletType: account.accountType ?? 'software',
           addresses,
+          network: {
+            bitcoin: {
+              name: network.type,
+            },
+            stacks: {
+              name: network.type,
+            },
+          },
         },
       });
     }

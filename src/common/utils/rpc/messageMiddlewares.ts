@@ -102,6 +102,7 @@ export function requirePermissions(
 
     if (!hasRequiredPermissions) {
       sendAccessDeniedResponseMessage({ tabId, messageId: message.id });
+      return;
     }
 
     return handler(message, port);
@@ -112,7 +113,7 @@ export function validateMessageSchema<
   const TSchema extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>,
 >(
   schema: TSchema,
-  handler: (message: v.InferOutput<TSchema>, port: chrome.runtime.Port) => Promise<void>,
+  handler: (message: v.InferOutput<TSchema>, port: chrome.runtime.Port) => Promise<void> | void,
 ) {
   return async (message: RpcRequestMessage, port: chrome.runtime.Port) => {
     const parseResult = v.safeParse(schema, message);
