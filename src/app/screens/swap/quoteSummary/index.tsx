@@ -220,6 +220,7 @@ export default function QuoteSummary({
         btcPubKey: btcPublicKey,
         ordAddress: ordinalsAddress,
         ordPubKey: ordinalsPublicKey,
+        identifier: quote.identifier,
       };
       const placeOrderResponse = await placeOrder(placeOrderRequest);
 

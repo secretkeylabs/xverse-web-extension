@@ -115,6 +115,7 @@ export default function PsbtConfirmation({
       btcPubKey: btcPublicKey,
       ordAddress: ordinalsAddress,
       ordPubKey: ordinalsPublicKey,
+      identifier: orderInfo.order.identifier,
     };
 
     const executeOrderResponse = await executeOrder(executeOrderRequest);
