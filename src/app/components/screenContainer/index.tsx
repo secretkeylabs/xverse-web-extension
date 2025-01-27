@@ -103,11 +103,7 @@ const Sidebar = styled(VerticalTabBar)`
   }
 `;
 
-function ScreenContainer({
-  isSidebarVisible = false,
-}: {
-  isSidebarVisible?: boolean;
-}): JSX.Element {
+function ScreenContainer({ isSidebarVisible = false }: { isSidebarVisible?: boolean }) {
   const { network } = useWalletSelector();
   const { t } = useTranslation('translation');
   const year = new Date().getFullYear();

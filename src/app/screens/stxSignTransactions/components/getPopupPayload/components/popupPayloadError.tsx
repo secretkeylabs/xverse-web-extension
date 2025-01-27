@@ -8,5 +8,5 @@ export function PopupPayloadError({ error }: Props) {
   // eslint-disable-next-line no-console
   console.error(error);
 
-  return <ErrorDisplay error={{ message: 'Error getting popup payload' }} />;
+  return <ErrorDisplay error={{ status: 404, statusText: 'Error getting popup payload' }} />;
 }

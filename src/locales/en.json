@@ -1456,10 +1456,14 @@
     }
   },
   "ERROR_SCREEN": {
-    "TITLE": "Xverse crashed unexpectedly",
-    "ERROR_DESCRIPTION": "Xverse encountered a fatal error and crashed. You need to relaunch your wallet.",
-    "ERROR_PREFIX": "Error:",
-    "SUPPORT": "If the issue persists, you can contact the support at"
+    "ERROR_TITLE": "An error occurred",
+    "ERROR_CODE_MESSAGE": "Error code {{code}}: {{message}}",
+    "CONTACT_SUPPORT": "If the issue persists, you can contact support at",
+    "SHARING_WARNING": "The information below may contain sensitive data. Be cautious about sharing this information.",
+    "ERROR_REPORT_COPIED": "Error report copied",
+    "COPY_ERROR_REPORT": "Copy error report",
+    "RESTART_XVERSE": "Restart Xverse",
+    "COPIED": "Copied"
   },
   "WINDOW_CLOSED_ALERT": {
     "TITLE": "Requesting window closed",

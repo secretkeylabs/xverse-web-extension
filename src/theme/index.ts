@@ -61,8 +61,8 @@ const Theme = {
 
     elevation_n1: '#0C0C0C',
     elevation0: '#181818',
-    elevation1: '#1E2024',
-    elevation2: '#24282F',
+    elevation1: '#1A1A1A',
+    elevation2: '#1F1F1F',
     elevation3: '#2A2F39',
     elevation5: '#303643',
     elevation6: '#4C525F',
