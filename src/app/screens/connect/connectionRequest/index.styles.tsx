@@ -56,3 +56,15 @@ export const RequestMessage = styled.p((props) => ({
   wordWrap: 'break-word',
   marginTop: props.theme.space.l,
 }));
+
+export const DappInfoContainer = styled('div')((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  rowGap: props.theme.space.m,
+}));
+
+export const DappInfoTextContainer = styled('div')((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  rowGap: props.theme.space.xxs,
+}));
