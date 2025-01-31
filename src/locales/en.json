@@ -145,6 +145,51 @@
     "CLOSE_BUTTON": "Close",
     "TITLE_FAILED": "Connection failed"
   },
+  "KEYSTONE_IMPORT_SCREEN": {
+    "KEYSTONE_IMPORT_1_TITLE": "Secure Your Assets with Keystone",
+    "KEYSTONE_IMPORT_1_SUBTITLE": "Keystone supports up to 3 sets of seed phrases to store different assets. You can use one Keystone hardware wallet to manage your ordinals, rune, and BRC-20 assets separately.",
+    "KEYSTONE_IMPORT_1_BUTTON": "Get started",
+    "KEYSTONE_CONNECT": {
+      "BTC_TITLE": "Connect Your Keystone",
+      "BTC_SUBTITLE": "To continue, connect your Keystone device, make sure it's unlocked, and on the homepage.",
+      "TITLE_FAILED": "Connection failed",
+      "BTC_SUBTITLE_FAILED": "Unable to connect to device, missing browser permissions, please grant Keystone permissions.",
+      "BTC_SUBTITLE_REJECT_FAILED": "Keystone request was cancelled. To proceed, please reauthorize.",
+      "BTC_SUBTITLE_PAGE_FAILED": "Please reconnect the Keystone on home screen and reauthorize."
+    },
+    "KEYSTONE_ADDRESS_ADDED": {
+      "TITLE_BTC": "Bitcoin wallet added",
+      "SUBTITLE": "You can now receive & send Bitcoin, Ordinals and BRC-20 tokens using Xverse and Keystone."
+    },
+    "KEYSTONE_ADD_ACCOUNT_NAME": {
+      "TITLE": "Name your Keystone wallet",
+      "SUBTITLE": "You can give your wallet a custom name.",
+      "INPUT": "Wallet name",
+      "PLACEHOLDER": "My Keystone"
+    },
+    "KEYSTONE_IMPORT_END": {
+      "TITLE": "Your wallet is ready!",
+      "SUBTITLE": "You can switch to this wallet from the accounts selection drop-down."
+    },
+    "KEYSTONE_STX_WALLET_ADDED": {
+      "TITLE": "Stacks wallet added",
+      "SUBTITLE": "You can now receive & send STX, Stacks NFTs and SIP-10 tokens using this wallet."
+    },
+    "KEYSTONE_IMPORT_2_BUTTON": "Get started",
+    "KEYSTONE_IMPORT_CONTINUE_BUTTON": "Continue",
+    "KEYSTONE_IMPORT_CONNECT_BUTTON": "Connect",
+    "KEYSTONE_IMPORT_ADD_BUTTON": "Add",
+    "KEYSTONE_IMPORT_NEXT_BUTTON": "Next",
+    "KEYSTONE_IMPORT_CONFIRM_BUTTON": "Confirm",
+    "KEYSTONE_IMPORT_CLOSE_BUTTON": "Close",
+    "KEYSTONE_IMPORT_TRY_AGAIN_BUTTON": "Try again",
+    "KEYSTONE_IMPORT_YES_BUTTON": "Add a new account",
+    "KEYSTONE_IMPORT_CANCEL_BUTTON": "Cancel",
+    "LEARN_MORE": "Learn More",
+    "ADDRESS_MISMATCH": "There's a mismatch between your signing address and the address you're logged with.",
+    "CLOSE_BUTTON": "Close",
+    "TITLE_FAILED": "Connection failed"
+  },
   "LEDGER_VERIFY_SCREEN": {
     "TITLE_VERIFY_BTC": "Verify Bitcoin payment address",
     "TITLE_VERIFY_ORDINALS": "Verify Ordinals address",
@@ -289,7 +334,7 @@
   "ACCOUNT_SCREEN": {
     "TITLE": "Accounts",
     "NEW_ACCOUNT": "Generate account",
-    "LEDGER_ACCOUNT": "Connect hardware wallet"
+    "NEW_HARDWARE_WALLET": "Add hardware wallet account"
   },
   "RECEIVE": {
     "RECEIVE": "Receive",
@@ -568,6 +613,12 @@
       "HIGH": "High",
       "CUSTOM": "Custom"
     }
+  },
+  "CONNECT_HARDWARE_WALLET": {
+    "TITLE": "Add hardware wallet account",
+    "SUBTITLE": "Select which device you would like to connect to Xverse.",
+    "CONNECT_LEDGER": "Connect Ledger",
+    "CONNECT_KEYSTONE": "Connect Keystone"
   },
   "TRANSACTION_STATUS": {
     "BROADCASTED": "Transaction broadcasted",
@@ -1282,6 +1333,40 @@
       "CANCEL_BUTTON": "Cancel",
       "RETRY_BUTTON": "Try again"
     },
+    "KEYSTONE": {
+      "CONNECT": {
+        "TITLE": "Connect Your Keystone",
+        "SUBTITLE": "Connect your Keystone device, make sure it's unlocked, and on the homepage.",
+        "ERROR_TITLE": "Connection error",
+        "ERROR_SUBTITLE": "We weren't able to connect to your device.",
+        "ERROR_SUBTITLE_DEVICE_LOCKED": "Your Keystone device is locked. Please unlock it to continue."
+      },
+      "CONFIRM": {
+        "TITLE": "Confirm transaction",
+        "TITLE_WITH_COUNT": "Confirm the transaction ({{current}} of {{total}})",
+        "SUBTITLE": "Confirm the transaction on your device to continue.",
+        "ERROR_TITLE": "Transaction failed",
+        "ERROR_SUBTITLE": "Unable to connect to device, ensure your Keystone 3 Pro is connected and on the homepage.",
+        "DENIED": {
+          "ERROR_TITLE": "Signature denied",
+          "ERROR_SUBTITLE": "The signature has been rejected. You can try again or close this tab."
+        },
+        "INVALID": {
+          "ERROR_TITLE": "Data Invalid",
+          "ERROR_SUBTITLE": "Your Keystone device has rejected the message stating it is invalid."
+        },
+        "NOT_MATCH_MFP": "Message rejected. Please select the correct wallet."
+      },
+      "SUCCESS": {
+        "TITLE": "Signature confirmed",
+        "SUBTITLE": "This transaction will be broadcasted by the sponsor."
+      },
+      "CONFIRM_BUTTON": "Confirm",
+      "CONNECT_BUTTON": "Connect",
+      "CLOSE_BUTTON": "Close",
+      "CANCEL_BUTTON": "Cancel",
+      "RETRY_BUTTON": "Try again"
+    },
     "UNLISTED_SUCCESS": "Rune unlisted successfully",
     "UNLISTED_ERROR": "Rune unlisting failed"
   },
@@ -1326,7 +1411,7 @@
       "TRANSACTION": "Network fee",
       "TOTAL": "Total fees"
     },
-    "LEDGER": {
+    "HARDWARE_WALLET": {
       "CONNECT_BUTTON": "Connect",
       "RETRY_BUTTON": "Retry",
       "CANCEL_BUTTON": "Cancel"
@@ -1371,10 +1456,14 @@
     }
   },
   "ERROR_SCREEN": {
-    "TITLE": "Xverse crashed unexpectedly",
-    "ERROR_DESCRIPTION": "Xverse encountered a fatal error and crashed. You need to relaunch your wallet.",
-    "ERROR_PREFIX": "Error:",
-    "SUPPORT": "If the issue persists, you can contact the support at"
+    "ERROR_TITLE": "An error occurred",
+    "ERROR_CODE_MESSAGE": "Error code {{code}}: {{message}}",
+    "CONTACT_SUPPORT": "If the issue persists, you can contact support at",
+    "SHARING_WARNING": "The information below may contain sensitive data. Be cautious about sharing this information.",
+    "ERROR_REPORT_COPIED": "Error report copied",
+    "COPY_ERROR_REPORT": "Copy error report",
+    "RESTART_XVERSE": "Restart Xverse",
+    "COPIED": "Copied"
   },
   "WINDOW_CLOSED_ALERT": {
     "TITLE": "Requesting window closed",
@@ -1465,6 +1554,19 @@
         "TITLE": "Confirm the signature (2 of 2)",
         "SUBTITLE": "Sign the transfer of your BRC-20 token on your Ledger device to continue."
       }
+    },
+    "KEYSTONE": {
+      "CONNECT_BUTTON": "Connect",
+      "RETRY_BUTTON": "Retry",
+      "CANCEL_BUTTON": "Cancel",
+      "INSCRIPTION": {
+        "TITLE": "Confirm the signature (1 of 2)",
+        "SUBTITLE": "Sign the inscription of your BRC-20 token transfer on your Keystone device to continue."
+      },
+      "TRANSFER": {
+        "TITLE": "Confirm the signature (2 of 2)",
+        "SUBTITLE": "Sign the transfer of your BRC-20 token on your Keystone device to continue."
+      }
     }
   },
   "CACHE_MIGRATION_SCREEN": {
@@ -1528,7 +1630,7 @@
     "LIST_YOUR_RUNES": "List your Runes on a marketplace",
     "SLIPPAGE_WARNING": "Your transaction may be frontrun and result in an unfavorable trade",
     "BAD_QUOTE_WARNING_TITLE": "The quote you are receiving may result in significant value loss.",
-    "BAD_QUOTE_WARNING_DESC": "The minimum amount you will receive will result in a loss of over {{percentage}}% of your trade’s value. This is due to low liquidity in the pool, causing discrepancies in pricing. Please review the details carefully before proceeding with the swap.",
+    "BAD_QUOTE_WARNING_DESC": "The minimum amount you will receive will result in a loss of over {{percentage}}% of your trade’s value. This could be due to low liquidity in the pool or other provider issues. Please review the details carefully before proceeding with the swap.",
     "UNKNOWN_QUOTE_VALUE_WARNING_DESC": "The market value of the token you will receive is unknown. Review details carefully before proceeding with the swap."
   },
   "SWAP_CONFIRM_SCREEN": {

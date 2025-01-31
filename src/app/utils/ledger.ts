@@ -1,8 +1,8 @@
 import {
   MessageSigningProtocols,
   signMessageLedger,
+  type LedgerTransport,
   type NetworkType,
-  type Transport,
 } from '@secretkeylabs/xverse-core';
 
 export const handleLedgerMessageSigning = async ({
@@ -13,7 +13,7 @@ export const handleLedgerMessageSigning = async ({
   message,
   protocol,
 }: {
-  transport: Transport;
+  transport: LedgerTransport;
   addressIndex?: number;
   address: string;
   networkType: NetworkType;

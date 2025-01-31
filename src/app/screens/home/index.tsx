@@ -47,7 +47,7 @@ import {
 import Button from '@ui-library/button';
 import SnackBar from '@ui-library/snackBar';
 import { ANIMATION_EASING, type CurrencyTypes } from '@utils/constants';
-import { isInOptions, isLedgerAccount } from '@utils/helper';
+import { isInOptions, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import { optInMixPanel, optOutMixPanel, trackMixPanel } from '@utils/mixpanel';
 import { sortFtByFiatBalance } from '@utils/tokens';
 import { useEffect, useRef, useState } from 'react';
@@ -302,7 +302,10 @@ function Home() {
   };
 
   const onBtcSendClick = async () => {
-    if (isLedgerAccount(selectedAccount) && !isInOptions()) {
+    if (
+      (isLedgerAccount(selectedAccount) || isKeystoneAccount(selectedAccount)) &&
+      !isInOptions()
+    ) {
       await chrome.tabs.create({
         url: chrome.runtime.getURL('options.html#/send-btc'),
       });
@@ -327,7 +330,10 @@ function Home() {
         break;
     }
 
-    if (isLedgerAccount(selectedAccount) && !isInOptions()) {
+    if (
+      (isLedgerAccount(selectedAccount) || isKeystoneAccount(selectedAccount)) &&
+      !isInOptions()
+    ) {
       await chrome.tabs.create({
         url: chrome.runtime.getURL(`options.html#${route}`),
       });

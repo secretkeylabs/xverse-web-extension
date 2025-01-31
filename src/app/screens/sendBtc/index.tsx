@@ -3,12 +3,19 @@ import useCancellableEffect from '@hooks/useCancellableEffect';
 import useCanUserSwitchPaymentType from '@hooks/useCanUserSwitchPaymentType';
 import useDebounce from '@hooks/useDebounce';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { AnalyticsEvents, btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
+import {
+  AnalyticsEvents,
+  btcTransaction,
+  type KeystoneTransport,
+  type LedgerTransport,
+} from '@secretkeylabs/xverse-core';
 import { isInOptions } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import {
   generateSendMaxTransaction,
@@ -20,6 +27,7 @@ import { Step } from './steps';
 
 function SendBtcScreen() {
   const navigate = useNavigate();
+  const { t } = useTranslation('translation');
 
   const isInOption = isInOptions();
 
@@ -29,6 +37,7 @@ function SendBtcScreen() {
   const [overridePaymentType, setOverridePaymentType] = useState(btcPaymentAddressType);
 
   const { data: btcFeeRate, isLoading: feeRatesLoading } = useBtcFeeRate();
+  const selectedAccount = useSelectedAccount();
   const transactionContext = useTransactionContext(overridePaymentType);
   const userCanSwitchPayType = useCanUserSwitchPaymentType();
 
@@ -48,25 +57,27 @@ function SendBtcScreen() {
 
   useEffect(() => {
     if (!feeRate && btcFeeRate && !feeRatesLoading) {
-      setFeeRate(btcFeeRate.regular.toString());
+      setFeeRate(feeRate || btcFeeRate.regular.toString());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- specifically don't care if feeRate changes
   }, [btcFeeRate, feeRatesLoading]);
 
   const generateTransactionAndSummary = async (feeRateOverride?: number) => {
     const amountBigInt = Number.isNaN(Number(amountSats)) ? 0n : BigInt(amountSats);
-    return sendMax && currentStep !== Step.Confirm
-      ? generateSendMaxTransaction(
-          transactionContext,
-          debouncedRecipient,
-          feeRateOverride ?? +feeRate,
-        )
-      : generateTransaction(
-          transactionContext,
-          debouncedRecipient,
-          amountBigInt,
-          feeRateOverride ?? +feeRate,
-        );
+    const result =
+      sendMax && currentStep !== Step.Confirm
+        ? await generateSendMaxTransaction(
+            transactionContext,
+            debouncedRecipient,
+            feeRateOverride ?? +feeRate,
+          )
+        : await generateTransaction(
+            transactionContext,
+            debouncedRecipient,
+            amountBigInt,
+            feeRateOverride ?? +feeRate,
+          );
+    return result;
   };
 
   useCancellableEffect(
@@ -108,7 +119,7 @@ function SendBtcScreen() {
   );
 
   const handleCancel = () => {
-    if (selectedAccountType === 'ledger' && isInOption) {
+    if ((selectedAccountType === 'ledger' || selectedAccountType === 'keystone') && isInOption) {
       window.close();
       return;
     }
@@ -121,10 +132,16 @@ function SendBtcScreen() {
     return undefined;
   };
 
-  const handleSubmit = async (ledgerTransport?: Transport) => {
+  const handleSubmit = async (options?: {
+    ledgerTransport?: LedgerTransport;
+    keystoneTransport?: KeystoneTransport;
+  }) => {
     try {
       setIsSubmitting(true);
-      const txnId = await transaction?.broadcast({ ledgerTransport, rbfEnabled: true });
+      const txnId = await transaction?.broadcast({
+        ...options,
+        rbfEnabled: true,
+      });
 
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
         protocol: 'bitcoin',
@@ -141,12 +158,20 @@ function SendBtcScreen() {
         },
       });
     } catch (e) {
-      console.error(e);
+      let msg = e;
+      if (e instanceof Error) {
+        if (e.message.includes('Export address is just allowed on specific pages')) {
+          msg = t('SIGNATURE_REQUEST.KEYSTONE.CONFIRM.ERROR_SUBTITLE');
+        }
+        if (e.message.includes('UR parsing rejected')) {
+          msg = t('SIGNATURE_REQUEST.KEYSTONE.CONFIRM.DENIED.ERROR_SUBTITLE');
+        }
+      }
       navigate('/tx-status', {
         state: {
           txid: '',
           currency: 'BTC',
-          error: `${e}`,
+          error: `${msg}`,
           browserTx: false,
         },
       });

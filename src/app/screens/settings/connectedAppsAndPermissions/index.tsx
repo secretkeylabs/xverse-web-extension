@@ -1,9 +1,8 @@
 /* eslint-disable import/prefer-default-export */
 import { dispatchEventToOrigin } from '@common/utils/messages/extensionToContentScript/dispatchEvent';
-import { EnsureStoreLoaded, usePermissionsUtils } from '@components/permissionsManager';
+import { usePermissions } from '@components/permissionsManager';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import type { Permissions } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import { useCallback, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -13,12 +12,11 @@ import { AppListOrSelectedApp } from './components/selectedApp';
 import { ButtonContainer, Container } from './index.styles';
 import type { ConnectedApp } from './types';
 
-type ConnectedAppsAndPermissionsScreenProps = { store: Permissions.Store.PermissionsStore };
-function ConnectedAppsAndPermissionsScreen({ store }: ConnectedAppsAndPermissionsScreenProps) {
+export function ConnectedAppsAndPermissions() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONNECTED_APPS' });
   const [selectedApp, setSelectedApp] = useState<ConnectedApp | null>(null);
   const navigate = useNavigate();
-  const { removeClient, removeAllClients } = usePermissionsUtils();
+  const { removeClient, removeAllClients, getClients } = usePermissions();
 
   const handleBackButtonClick = useCallback(() => {
     if (selectedApp) {
@@ -28,10 +26,10 @@ function ConnectedAppsAndPermissionsScreen({ store }: ConnectedAppsAndPermission
     navigate('/settings');
   }, [navigate, selectedApp]);
 
-  const handleDisconnect = useCallback(async () => {
+  const handleDisconnect = useCallback(() => {
     // Only disconnect the selected app when an app is selected.
     if (selectedApp) {
-      await removeClient(selectedApp.client.id);
+      removeClient(selectedApp.client.id);
       dispatchEventToOrigin(selectedApp.client.origin, {
         type: 'disconnect',
       });
@@ -40,25 +38,25 @@ function ConnectedAppsAndPermissionsScreen({ store }: ConnectedAppsAndPermission
       return;
     }
 
-    store.clients.forEach((client) => {
+    // NOTE: Clients must be retrieved prior to their deletion so as to know
+    // which origins need to be notified once they've been deleted from the
+    // store.
+    const clients = getClients();
+    removeAllClients();
+    clients.forEach((client) => {
       dispatchEventToOrigin(client.origin, {
         type: 'disconnect',
       });
     });
-    await removeAllClients();
     toast.success(t('DISCONNECT_ALL_SUCCESS'));
-  }, [selectedApp, removeClient, removeAllClients, t, store]);
+  }, [selectedApp, getClients, removeAllClients, t, removeClient]);
 
   return (
     <>
       <TopRow onClick={handleBackButtonClick} />
       <Container>
-        <AppListOrSelectedApp
-          selectedApp={selectedApp}
-          setSelectedApp={setSelectedApp}
-          store={store}
-        />
-        {(store.clients?.length ?? 0) > 0 || selectedApp ? (
+        <AppListOrSelectedApp selectedApp={selectedApp} setSelectedApp={setSelectedApp} />
+        {getClients().length > 0 || selectedApp ? (
           <ButtonContainer>
             <Button
               title={selectedApp ? t('DISCONNECT') : t('DISCONNECT_ALL')}
@@ -70,13 +68,5 @@ function ConnectedAppsAndPermissionsScreen({ store }: ConnectedAppsAndPermission
       </Container>
       <BottomBar tab="settings" />
     </>
-  );
-}
-
-export function ConnectedAppsAndPermissions() {
-  return (
-    <EnsureStoreLoaded
-      renderChildren={(store) => <ConnectedAppsAndPermissionsScreen store={store} />}
-    />
   );
 }

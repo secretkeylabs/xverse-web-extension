@@ -32,7 +32,7 @@ function StartupLoadingScreen(): React.ReactNode {
   }, []);
 
   if (error) {
-    return <ErrorDisplay error={{ message: error }} />;
+    return <ErrorDisplay error={{ status: 404, statusText: error }} />;
   }
 
   return (

@@ -9,17 +9,23 @@
     "webpack/utils/build.js",
     "webpack/utils/devServer.js"
   ],
-  "project": ["src/**/*.{ts,tsx}", "webpack/**/*.js"],
+  "project": [
+    "src/**/*.{ts,tsx}",
+    "webpack/**/*.js"
+  ],
   "webpack": {
-    "config": ["webpack/webpack.config.js"]
+    "config": [
+      "webpack/webpack.config.js"
+    ]
   },
   "ignoreDependencies": [
     // Used by webpack to polyfill references to Node.js's `path` module, yet
     // not explicitly imported anywhere in the project.
     "path",
-
     // Used by the extension, yet not explicitly imported anywhere in the
     // project.
-    "@types/chrome"
+    "@types/chrome",
+    // Used for linking xverse core locally
+    "process"
   ]
 }

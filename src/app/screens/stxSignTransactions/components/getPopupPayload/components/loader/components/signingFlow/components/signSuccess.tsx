@@ -1,4 +1,4 @@
-import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
+import checkCircleIcon from '@assets/img/hw/ledger/check_circle.svg';
 import type { StacksTransactionWire } from '@stacks/transactions';
 import { useTranslation } from 'react-i18next';
 import { Final } from './shared/final';

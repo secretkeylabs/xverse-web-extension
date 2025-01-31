@@ -405,7 +405,7 @@ export default class Wallet {
       .filter({ hasText: 'name can only include alphabetical and numerical' });
     this.buttonGenerateAccount = page.getByRole('button', { name: 'Generate account' });
     this.buttonConnectHardwareWallet = page.getByRole('button', {
-      name: 'Connect hardware wallet',
+      name: 'Add hardware wallet account',
     });
     this.inputName = page.locator('input[type="text"]');
     this.errorMessageRenameAccount = page

@@ -10,7 +10,8 @@ import {
   AnalyticsEvents,
   type BtcOrdinal,
   btcTransaction,
-  type Transport,
+  type KeystoneTransport,
+  type LedgerTransport,
 } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import Spinner from '@ui-library/spinner';
@@ -138,10 +139,16 @@ function RecoverOrdinals() {
     setSummary(undefined);
   };
 
-  const handleSubmit = async (ledgerTransport?: Transport) => {
+  const handleSubmit = async (options?: {
+    ledgerTransport?: LedgerTransport;
+    keystoneTransport?: KeystoneTransport;
+  }) => {
     try {
       setIsSubmitting(true);
-      const txnId = await transaction?.broadcast({ ledgerTransport, rbfEnabled: true });
+      const txnId = await transaction?.broadcast({
+        ...options,
+        rbfEnabled: true,
+      });
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
         protocol: 'ordinals',
         action: 'transfer',

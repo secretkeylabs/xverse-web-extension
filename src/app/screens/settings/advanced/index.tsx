@@ -7,7 +7,7 @@ import {
   ChangeActivateRareSatsAction,
   ChangeActivateRBFAction,
 } from '@stores/wallet/actions/actionCreators';
-import { isInOptions, isLedgerAccount } from '@utils/helper';
+import { isInOptions, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import RoutePaths from 'app/routes/paths';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -28,8 +28,6 @@ function AdvancedSettings() {
   const selectedAccount = useSelectedAccount();
   const showBtcAddressTypeSelector = useCanUserSwitchPaymentType();
 
-  const isLedgerAccountSelected = isLedgerAccount(selectedAccount);
-
   const onPreferredAddressClick = () => {
     navigate(RoutePaths.PreferredAddress);
   };
@@ -49,7 +47,10 @@ function AdvancedSettings() {
   };
 
   const onRestoreFundClick = async () => {
-    if (isLedgerAccountSelected && !isInOptions()) {
+    if (
+      (isLedgerAccount(selectedAccount) || isKeystoneAccount(selectedAccount)) &&
+      !isInOptions()
+    ) {
       await chrome.tabs.create({
         url: chrome.runtime.getURL(`options.html#${RoutePaths.RecoverFunds}`),
       });

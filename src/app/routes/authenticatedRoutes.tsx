@@ -15,11 +15,13 @@ import BtcSelectAddressScreen from '@screens/connect/btcSelectAddressScreen';
 import { ConnectionRequest } from '@screens/connect/connectionRequest';
 import StxSelectAccountScreen from '@screens/connect/stxSelectAccountScreen';
 import StxSelectAddressScreen from '@screens/connect/stxSelectAddressScreen';
+import ConnectHardwareWallet from '@screens/connectHardwareWallet';
 import CreateInscription from '@screens/createInscription';
 import EtchRune from '@screens/etchRune';
 import ExecuteBrc20Transaction from '@screens/executeBrc20Transaction';
 import Explore from '@screens/explore';
 import Home from '@screens/home';
+import ImportKeystone from '@screens/keystone/importKeystoneAccount';
 import LedgerAddStxAddress from '@screens/ledger/addStxAddress';
 import ConfirmLedgerStxTransaction from '@screens/ledger/confirmLedgerStxTransaction';
 import ImportLedger from '@screens/ledger/importLedgerAccount';
@@ -123,6 +125,16 @@ const authedRoutes: RouteObject = {
     {
       path: 'add-stx-address-ledger',
       element: <LedgerAddStxAddress />,
+    },
+    {
+      path: 'import-keystone',
+      element: (
+        <AuthGuard>
+          <SingleTabGuard guardName="importKeystone">
+            <ImportKeystone />
+          </SingleTabGuard>
+        </AuthGuard>
+      ),
     },
   ],
 };
@@ -426,6 +438,10 @@ const authedRoutesWithSidebar: RouteObject = {
     {
       path: 'nft-dashboard/supported-rarity-scale',
       element: <SupportedRarities />,
+    },
+    {
+      path: 'connect-hardware-wallet',
+      element: <ConnectHardwareWallet />,
     },
   ],
 };

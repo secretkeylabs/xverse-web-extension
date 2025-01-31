@@ -9,6 +9,7 @@ export function getCurrentAccountResourceId() {
     selectedAccountType,
     accountsList: softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
     network,
   } = rootStore.store.getState().walletState;
 
@@ -17,6 +18,7 @@ export function getCurrentAccountResourceId() {
     selectedAccountType,
     softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
   });
 
   if (!existingAccount) {

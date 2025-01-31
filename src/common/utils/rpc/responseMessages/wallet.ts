@@ -46,13 +46,35 @@ export function sendGetCurrentPermissionsSuccessResponseMessage({
   sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
 }
 
+type GetAccountSuccessArgs = BaseArgs & {
+  result: Return<'wallet_getAccount'>;
+};
+export function sendGetAccountSuccessResponseMessage({
+  tabId,
+  messageId,
+  result,
+}: GetAccountSuccessArgs) {
+  sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
+}
+
 type ConnectSuccessArgs = BaseArgs & {
-  result: ConnectResult;
+  result: Return<'wallet_connect'>;
 };
 export function sendConnectSuccessResponseMessage({
   tabId,
   messageId,
   result,
 }: ConnectSuccessArgs) {
+  sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
+}
+
+type GetNetworkSuccessArgs = BaseArgs & {
+  result: Return<'wallet_getNetwork'>;
+};
+export function sendGetNetworkSuccessResponseMessage({
+  tabId,
+  messageId,
+  result,
+}: GetNetworkSuccessArgs) {
   sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
 }

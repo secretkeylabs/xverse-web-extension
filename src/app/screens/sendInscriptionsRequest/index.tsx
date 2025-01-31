@@ -1,6 +1,6 @@
 import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RequestError from '@components/requests/requestError';
-import { type Transport } from '@secretkeylabs/xverse-core';
+import type { KeystoneTransport, LedgerTransport } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -35,8 +35,11 @@ function SendInscriptionsRequest() {
     window.close();
   };
 
-  const onClickConfirm = async (ledgerTransport?: Transport) => {
-    const txid = await confirmOrdinalsTransferRequest(ledgerTransport);
+  const onClickConfirm = async (options?: {
+    ledgerTransport?: LedgerTransport;
+    keystoneTransport?: KeystoneTransport;
+  }) => {
+    const txid = await confirmOrdinalsTransferRequest(options);
     if (txid) {
       navigate('/tx-status', {
         state: {
