@@ -220,6 +220,7 @@ export default function QuoteSummary({
         btcPubKey: btcPublicKey,
         ordAddress: ordinalsAddress,
         ordPubKey: ordinalsPublicKey,
+        identifier: quote.identifier,
       };
       const placeOrderResponse = await placeOrder(placeOrderRequest);
 
@@ -329,7 +330,7 @@ export default function QuoteSummary({
             <Callout
               titleText={t('SWAP_SCREEN.BAD_QUOTE_WARNING_TITLE')}
               bodyText={
-                quote.slippageSupported && BigNumber(toTokenFiatValue).isGreaterThan(0)
+                BigNumber(toTokenFiatValue).isGreaterThan(0)
                   ? t('SWAP_SCREEN.BAD_QUOTE_WARNING_DESC', {
                       percentage: valueLossPercentage,
                     })

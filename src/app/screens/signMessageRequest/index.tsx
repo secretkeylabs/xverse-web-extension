@@ -7,9 +7,11 @@ import RequestError from '@components/requests/requestError';
 import { MessageSigningProtocols, type Return } from '@sats-connect/core';
 import { finalizeMessageSignature } from '@screens/signatureRequest/utils';
 import { bip0322Hash, legacyHash } from '@secretkeylabs/xverse-core';
+import { useTranslation } from 'react-i18next';
 import { useSignMessageRequestParams, useSignMessageValidation } from './useSignMessageRequest';
 
 function SignMessageRequest() {
+  const { t } = useTranslation('translation');
   const { payload, tabId, requestToken, requestId } = useSignMessageRequestParams();
   const { validationError, setValidationError } = useSignMessageValidation(payload);
 
@@ -56,7 +58,21 @@ function SignMessageRequest() {
   };
 
   const onSignedError = (err) => {
-    setValidationError({ error: (err as any).message });
+    let msg = err;
+    if (err instanceof Error) {
+      msg = err.message;
+      if (msg.includes('Export address is just allowed on specific pages')) {
+        msg = t('SIGNATURE_REQUEST.KEYSTONE.CONFIRM.ERROR_SUBTITLE');
+      }
+      if (msg.includes('UR parsing rejected')) {
+        msg = t('SIGNATURE_REQUEST.KEYSTONE.CONFIRM.DENIED.ERROR_SUBTITLE');
+      }
+      if (msg.includes('mfp does not match')) {
+        msg = t('SIGNATURE_REQUEST.KEYSTONE.CONFIRM.NOT_MATCH_MFP');
+      }
+    }
+
+    setValidationError({ error: msg });
   };
 
   if (validationError) {

@@ -1,333 +1,211 @@
-import { permissions, type Permissions } from '@secretkeylabs/xverse-core';
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { parse } from 'superjson';
-import * as v from 'valibot';
-import { permissionsPersistantStoreKeyName } from './constants';
-import type { TPermissionsStoreContext, TPermissionsUtilsContext } from './types';
-import * as utils from './utils';
-
-const PermissionsStoreContext = createContext<TPermissionsStoreContext>({
-  isLoading: true,
-  error: undefined,
-  store: undefined,
-});
-function PermissionsStoreProvider({ children }: { children: React.ReactNode }) {
-  const [value, setValue] = useState<TPermissionsStoreContext>({
-    isLoading: true,
-    error: undefined,
-    store: undefined,
-  });
-
-  useEffect(() => {
-    utils.permissionsStoreMutex.runExclusive(async () => {
-      const [e, store] = await utils.initPermissionsStore();
-
-      if (e) {
-        setValue({
-          isLoading: false,
-          error: e,
-          store: undefined,
-        });
-        // eslint-disable-next-line no-console
-        console.error('Failed to load permissions store', e);
-        return;
-      }
-
-      setValue({
-        isLoading: false,
-        error: undefined,
-        store,
-      });
-    });
-  }, []);
-
-  const callback = useCallback((changes: { [key: string]: chrome.storage.StorageChange }) => {
-    const permissionsStoreChanges = changes[permissionsPersistantStoreKeyName];
-    if (permissionsStoreChanges) {
-      const { newValue } = permissionsStoreChanges;
-      const hydrated = parse(newValue);
-      const parseResult = v.safeParse(permissions.store.permissionsStore, hydrated);
-      if (!parseResult.success) {
-        setValue({
-          isLoading: false,
-          error: parseResult.issues,
-          store: undefined,
-        });
-        return;
-      }
-
-      setValue({
-        isLoading: false,
-        error: undefined,
-        store: parseResult.output,
-      });
-    }
-  }, []);
-
-  useEffect(() => {
-    chrome.storage.onChanged.addListener(callback);
-
-    return () => {
-      chrome.storage.onChanged.removeListener(callback);
-    };
-  }, [callback]);
-
-  return (
-    <PermissionsStoreContext.Provider value={value}>{children}</PermissionsStoreContext.Provider>
-  );
-}
-const usePermissionsStore = () => useContext(PermissionsStoreContext);
-
-type EnsureStoreLoadedProps = {
-  renderChildren: (store: Permissions.Store.PermissionsStore) => React.ReactNode;
-};
-export function EnsureStoreLoaded({ renderChildren }: EnsureStoreLoadedProps): React.ReactElement {
-  const { isLoading, store, error } = usePermissionsStore();
-
-  if (error) {
-    // eslint-disable-next-line no-console
-    console.error(error);
-    return <>Error loading permissions store.</>;
-  }
-
-  if (isLoading) {
-    return <>Loading...</>;
-  }
-
-  if (!store) {
-    return <>Failed to load permissions store</>;
-  }
-
-  return <>{renderChildren(store)}</>;
-}
+import { hasStoreChanges, initPermissionsStore } from '@common/utils/permissionsStore';
+import { useRender } from '@screens/stxSignTransactions/components/getPopupPayload/components/loader/components/signingFlow/components/review/hooks';
+import { type Permissions, permissions, safeCall } from '@secretkeylabs/xverse-core';
+import { useMutation } from '@tanstack/react-query';
+import { createContext, type PropsWithChildren, useCallback, useContext, useEffect } from 'react';
+import { getStoreGlobal, saveStoreGlobal, setStoreGlobal } from './globalStore';
+import type { TPermissionsUtilsContext } from './types';
 
 const PermissionsUtilsContext = createContext<TPermissionsUtilsContext | undefined>(undefined);
-function PermissionsUtilsProvider({ children }: { children: React.ReactNode }) {
-  const { store } = usePermissionsStore();
+
+export function PermissionsProvider({ children }: PropsWithChildren) {
+  const {
+    mutate,
+    isLoading,
+    data: isStoreInitializationComplete,
+  } = useMutation({
+    async mutationFn() {
+      const [, storeGlobal] = safeCall(() => getStoreGlobal());
+      if (storeGlobal) return;
+
+      const [initError, newStore] = await initPermissionsStore();
+      if (initError) {
+        // eslint-disable-next-line no-console
+        console.error(initError);
+        throw new Error('Failed to initialize the permissions store', { cause: initError });
+      }
+
+      setStoreGlobal(newStore);
+
+      return true;
+    },
+  });
+  useEffect(() => {
+    // Only run the mutation once.
+    if (isStoreInitializationComplete) return;
+
+    // If it's already running, don't run it again.
+    if (isLoading) return;
+
+    mutate();
+  }, [isLoading, isStoreInitializationComplete, mutate]);
+
+  const render = useRender();
+  const renderCallback = useCallback(
+    (changes: { [key: string]: chrome.storage.StorageChange }) => {
+      const maybeStoreChanges = hasStoreChanges(changes);
+      if (maybeStoreChanges) {
+        setStoreGlobal(maybeStoreChanges);
+        render();
+      }
+    },
+    [render],
+  );
+  useEffect(() => {
+    // Using storage `onChanged` listener to re-render so any changes to the
+    // store, be they from within the React app or from the background script,
+    // are reflected in the UI.
+
+    chrome.storage.onChanged.addListener(renderCallback);
+    return () => {
+      chrome.storage.onChanged.removeListener(renderCallback);
+    };
+  }, [renderCallback]);
+
+  const saveStore = useCallback((nextStore: Permissions.Store.PermissionsStore) => {
+    saveStoreGlobal(nextStore);
+  }, []);
+  const getStore = useCallback(() => getStoreGlobal(), []);
 
   // Queries
 
+  const getClients = useCallback(() => {
+    const store = getStore();
+    return permissions.utils.store.getClients(store);
+  }, [getStore]);
+
   const getClientPermissions = useCallback(
     (clientId: Permissions.Store.Client['id']) => {
-      if (!store) {
-        // eslint-disable-next-line no-console
-        console.warn('[PermissionsUtilsProvider.getClientPermissions]: Store is not loaded yet.');
-        return [];
-      }
-
-      return permissions.utils.store.getClientPermissions(store.permissions, clientId);
+      const store = getStore();
+      return permissions.utils.store.getClientPermissions(store, clientId);
     },
-    [store],
+    [getStore],
   );
 
   const getClientMetadata = useCallback(
     (clientId: Permissions.Store.Client['id']) => {
-      if (!store) {
-        // eslint-disable-next-line no-console
-        console.warn('[PermissionsUtilsProvider.getClientMetadata]: Store is not loaded yet.');
-        return undefined;
-      }
-
+      const store = getStore();
       return permissions.utils.store.getClientMetadata(store, clientId);
     },
-    [store],
+    [getStore],
   );
+
   const getClientPermission = useCallback(
-    async (
+    (
       type: Permissions.Store.Permission['type'],
       clientId: Permissions.Store.Client['id'],
       resourceId: Permissions.Store.Resource['id'],
     ) => {
-      if (!store) {
-        // eslint-disable-next-line no-console
-        console.warn('[PermissionsUtilsProvider.getClientPermission]: Store is not loaded yet.');
-        return undefined;
-      }
-
-      return permissions.utils.store.getClientPermission(
-        store.permissions,
-        type,
-        clientId,
-        resourceId,
-      );
+      const store = getStore();
+      return permissions.utils.store.getClientPermission(store, type, clientId, resourceId);
     },
-    [store],
+    [getStore],
   );
+
   const getResource = useCallback(
     (resourceId: Permissions.Store.Resource['id']) => {
-      if (!store) {
-        // eslint-disable-next-line no-console
-        console.warn('[PermissionsUtilsProvider.getResource]: Store is not loaded yet.');
-        return undefined;
-      }
-
-      return permissions.utils.store.getResource(store.resources, resourceId);
+      const store = getStore();
+      return permissions.utils.store.getResource(store, resourceId);
     },
-    [store],
+    [getStore],
   );
 
   // Mutations
 
   const addClient = useCallback(
-    async (client: Permissions.Store.Client) => {
-      await utils.permissionsStoreMutex.runExclusive(async () => {
-        if (!store) {
-          // eslint-disable-next-line no-console
-          console.warn('[PermissionsUtilsProvider.addClient]: Store is not loaded yet.');
-          return;
-        }
-
-        permissions.utils.store.addClient(store.clients, client);
-        await utils.savePermissionsStore(store);
-      });
+    (client: Permissions.Store.Client) => {
+      const store = getStore();
+      const nextStore = permissions.utils.store.addClient(store, client);
+      saveStore(nextStore);
     },
-    [store],
+    [getStore, saveStore],
   );
+
   const addResource = useCallback(
-    async (resource: Permissions.Store.Resource) => {
-      await utils.permissionsStoreMutex.runExclusive(async () => {
-        if (!store) {
-          // eslint-disable-next-line no-console
-          console.warn('[PermissionsUtilsProvider.addResource]: Store is not loaded yet.');
-          return;
-        }
-
-        permissions.utils.store.addResource(store.resources, resource);
-        await utils.savePermissionsStore(store);
-      });
+    (resource: Permissions.Store.Resource) => {
+      const store = getStore();
+      const nextStore = permissions.utils.store.addResource(store, resource);
+      saveStore(nextStore);
     },
-    [store],
+    [getStore, saveStore],
   );
+
   const removeResource = useCallback(
-    async (resourceId: Permissions.Store.Resource['id']) => {
-      await utils.permissionsStoreMutex.runExclusive(async () => {
-        if (!store) {
-          // eslint-disable-next-line no-console
-          console.warn('[PermissionsUtilsProvider.removeResource]: Store is not loaded yet.');
-          return;
-        }
-
-        permissions.utils.store.removeResource(store.resources, resourceId);
-        await utils.savePermissionsStore(store);
-      });
+    (resourceId: Permissions.Store.Resource['id']) => {
+      const store = getStore();
+      const nextStore = permissions.utils.store.removeResource(store, resourceId);
+      saveStore(nextStore);
     },
-    [store],
+    [getStore, saveStore],
   );
+
   const setPermission = useCallback(
-    async (permission: Permissions.Store.Permission) => {
-      await utils.permissionsStoreMutex.runExclusive(async () => {
-        if (!store) {
-          // eslint-disable-next-line no-console
-          console.warn('[PermissionsUtilsProvider.setPermission]: Store is not loaded yet.');
-          return;
-        }
-
-        permissions.utils.store.setPermission(
-          store.clients,
-          store.resources,
-          store.permissions,
-          permission,
-        );
-        await utils.savePermissionsStore(store);
-      });
+    (permission: Permissions.Store.Permission) => {
+      const store = getStore();
+      const nextStore = permissions.utils.store.setPermission(store, permission);
+      saveStore(nextStore);
     },
-    [store],
+    [getStore, saveStore],
   );
+
   const removePermission = useCallback(
-    async (
+    (
       type: Permissions.Store.Permission['type'],
       clientId: Permissions.Store.Client['id'],
       resourceId: Permissions.Store.Resource['id'],
     ) => {
-      await utils.permissionsStoreMutex.runExclusive(async () => {
-        if (!store) {
-          // eslint-disable-next-line no-console
-          console.warn('[PermissionsUtilsProvider.removePermission]: Store is not loaded yet.');
-          return;
-        }
-
-        permissions.utils.store.removePermission(store.permissions, type, clientId, resourceId);
-        await utils.savePermissionsStore(store);
-      });
+      const store = getStore();
+      const nextStore = permissions.utils.store.removePermission(store, type, clientId, resourceId);
+      saveStore(nextStore);
     },
-    [store],
+    [getStore, saveStore],
   );
+
   const removeAllClientPermissions = useCallback(
-    async (clientId: Permissions.Store.Client['id']) => {
-      await utils.permissionsStoreMutex.runExclusive(async () => {
-        if (!store) {
-          // eslint-disable-next-line no-console
-          console.warn(
-            '[PermissionsUtilsProvider.removeAllClientPermissions]: Store is not loaded yet.',
-          );
-          return;
-        }
-
-        permissions.utils.store.removeAllClientPermissions(store.permissions, clientId);
-        await utils.savePermissionsStore(store);
-      });
+    (clientId: Permissions.Store.Client['id']) => {
+      const store = getStore();
+      const nextStore = permissions.utils.store.removeAllClientPermissions(store, clientId);
+      saveStore(nextStore);
     },
-    [store],
+    [getStore, saveStore],
   );
+
   const removeClient = useCallback(
-    async (clientId: Permissions.Store.Client['id']) => {
-      await utils.permissionsStoreMutex.runExclusive(async () => {
-        if (!store) {
-          // eslint-disable-next-line no-console
-          console.warn('[PermissionsUtilsProvider.removeClient]: Store is not loaded yet.');
-          return;
-        }
-
-        permissions.utils.store.removeClient(store, clientId);
-        await utils.savePermissionsStore(store);
-      });
+    (clientId: Permissions.Store.Client['id']) => {
+      const store = getStore();
+      const nextStore = permissions.utils.store.removeClient(store, clientId);
+      saveStore(nextStore);
     },
-    [store],
+    [getStore, saveStore],
   );
 
-  const removeAllClients = useCallback(async () => {
-    await utils.permissionsStoreMutex.runExclusive(async () => {
-      if (!store) {
-        // eslint-disable-next-line no-console
-        console.warn('[PermissionsUtilsProvider.removeAllClients]: Store is not loaded yet.');
-        return;
-      }
+  const removeAllClients = useCallback(() => {
+    const store = getStore();
+    const nextStore = permissions.utils.store.removeAllClients(store);
+    saveStore(nextStore);
+  }, [getStore, saveStore]);
 
-      permissions.utils.store.removeAllClients(store);
-      await utils.savePermissionsStore(store);
-    });
-  }, [store]);
+  // On purpose, this object needs to be a new object on every render so
+  // dependant components render each time the store is updated.
+  //
+  // eslint-disable-next-line react/jsx-no-constructed-context-values
+  const contextValue = {
+    getClients,
+    addClient,
+    addResource,
+    removeResource,
+    setPermission,
+    removePermission,
+    removeAllClientPermissions,
+    getClientPermissions,
+    getClientMetadata,
+    getClientPermission,
+    removeClient,
+    removeAllClients,
+    getResource,
+  };
 
-  const contextValue = useMemo(
-    () => ({
-      addClient,
-      addResource,
-      removeResource,
-      setPermission,
-      removePermission,
-      removeAllClientPermissions,
-      getClientPermissions,
-      getClientMetadata,
-      getClientPermission,
-      removeClient,
-      removeAllClients,
-      getResource,
-    }),
-    [
-      addClient,
-      addResource,
-      removeResource,
-      setPermission,
-      removePermission,
-      removeAllClientPermissions,
-      removeAllClients,
-      getClientPermissions,
-      getClientMetadata,
-      getClientPermission,
-      removeClient,
-      getResource,
-    ],
-  );
+  if (!isStoreInitializationComplete) return null;
 
   return (
     <PermissionsUtilsContext.Provider value={contextValue}>
@@ -336,18 +214,10 @@ function PermissionsUtilsProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export const usePermissionsUtils = () => {
+export const usePermissions = () => {
   const context = useContext(PermissionsUtilsContext);
   if (context === undefined) {
     throw new Error('usePermissions must be used within a PermissionsProvider');
   }
   return context;
 };
-
-export function PermissionsProvider({ children }: { children: React.ReactNode }) {
-  return (
-    <PermissionsStoreProvider>
-      <PermissionsUtilsProvider>{children}</PermissionsUtilsProvider>
-    </PermissionsStoreProvider>
-  );
-}

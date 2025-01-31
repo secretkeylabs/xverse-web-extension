@@ -4,7 +4,7 @@ import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { GAMMA_URL } from '@utils/constants';
-import { getExplorerUrl, isInOptions, isLedgerAccount } from '@utils/helper';
+import { getExplorerUrl, isInOptions, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -55,7 +55,10 @@ export default function useNftDetailScreen() {
   };
 
   const handleOnSendClick = async () => {
-    if (isLedgerAccount(selectedAccount) && !isInOptions()) {
+    if (
+      (isLedgerAccount(selectedAccount) || isKeystoneAccount(selectedAccount)) &&
+      !isInOptions()
+    ) {
       await chrome.tabs.create({
         url: chrome.runtime.getURL(`options.html#/nft-dashboard/nft-detail/${id}/send-nft`),
       });

@@ -1,4 +1,4 @@
-import ledgerConnectDoneIcon from '@assets/img/ledger/ledger_import_connect_done.svg';
+import ledgerConnectDoneIcon from '@assets/img/hw/ledger/ledger_import_connect_done.svg';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layout } from './shared/layout';

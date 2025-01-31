@@ -1,7 +1,6 @@
 import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RequestError from '@components/requests/requestError';
-import useSelectedAccount from '@hooks/useSelectedAccount';
-import type { Transport } from '@secretkeylabs/xverse-core';
+import type { KeystoneTransport, LedgerTransport } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
 import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,7 +18,6 @@ const LoaderContainer = styled.div(() => ({
 function EtchRune() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const navigate = useNavigate();
-  const { btcAddress, ordinalsAddress } = useSelectedAccount();
   const {
     etchRequest,
     orderTx,
@@ -44,8 +42,11 @@ function EtchRune() {
     window.close();
   };
 
-  const onClickConfirm = async (ledgerTransport?: Transport) => {
-    const txid = await payAndConfirmEtchRequest(ledgerTransport);
+  const onClickConfirm = async (options?: {
+    ledgerTransport?: LedgerTransport;
+    keystoneTransport?: KeystoneTransport;
+  }) => {
+    const txid = await payAndConfirmEtchRequest(options);
     navigate('/tx-status', {
       state: {
         txid,

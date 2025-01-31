@@ -1,7 +1,5 @@
-/* eslint-disable no-restricted-syntax */
-/* eslint-disable import/prefer-default-export */
+import { initPermissionsStore } from '@common/utils/permissionsStore';
 import { makeContext } from '@common/utils/popup';
-import * as utils from '@components/permissionsManager/utils';
 import { type GetCurrentPermissionsRequestMessage } from '@sats-connect/core';
 import { permissions } from '@secretkeylabs/xverse-core';
 import { sendInternalErrorMessage } from '../responseMessages/errors';
@@ -13,7 +11,7 @@ export async function handleGetPermissions(
 ) {
   const { origin, tabId } = makeContext(port);
 
-  const [error, store] = await utils.getPermissionsStore();
+  const [error, store] = await initPermissionsStore();
   if (error) {
     sendInternalErrorMessage({
       tabId,
@@ -36,6 +34,6 @@ export async function handleGetPermissions(
   sendGetCurrentPermissionsSuccessResponseMessage({
     tabId,
     messageId: message.id,
-    result: permissions.utils.store.getClientPermissions(store.permissions, clientId),
+    result: permissions.utils.store.getClientPermissions(store, clientId),
   });
 }

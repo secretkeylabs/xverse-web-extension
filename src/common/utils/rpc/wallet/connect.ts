@@ -1,8 +1,8 @@
 /* eslint-disable import/prefer-default-export */
 import { getTabIdFromPort } from '@common/utils';
 import getSelectedAccount, { embellishAccountWithDetails } from '@common/utils/getSelectedAccount';
+import { initPermissionsStore } from '@common/utils/permissionsStore';
 import { makeContext, openPopup } from '@common/utils/popup';
-import * as utils from '@components/permissionsManager/utils';
 import { type ConnectRequestMessage, type ConnectResult } from '@sats-connect/core';
 import { permissions } from '@secretkeylabs/xverse-core';
 import rootStore from '@stores/index';
@@ -13,9 +13,15 @@ import { sendInternalErrorMessage } from '../responseMessages/errors';
 import { sendConnectSuccessResponseMessage } from '../responseMessages/wallet';
 
 export const handleConnect = async (message: ConnectRequestMessage, port: chrome.runtime.Port) => {
-  // Check if the user already has account read permissions, and if so, return
-  // the account data without opening the popup.
-  const [error, store] = await utils.getPermissionsStore();
+  // Check if the user already has account & network read permissions, and if
+  // so, return the account data without opening the popup.
+  //
+  // Note: the checks performed in this file for the default permissions that
+  // `wallet_connect` is expected to grant is decoupled from and needs to be
+  // manually kept in sync with those granted in
+  // `src/app/screens/connect/connectionRequest/hooks.ts`.
+
+  const [error, store] = await initPermissionsStore();
   if (error) {
     sendInternalErrorMessage({
       tabId: getTabIdFromPort(port),
@@ -30,6 +36,7 @@ export const handleConnect = async (message: ConnectRequestMessage, port: chrome
     selectedAccountType,
     accountsList: softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
     network,
     btcPaymentAddressType,
   } = rootStore.store.getState().walletState;
@@ -39,6 +46,7 @@ export const handleConnect = async (message: ConnectRequestMessage, port: chrome
     selectedAccountType,
     softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
   });
 
   if (!account) {
@@ -67,14 +75,20 @@ export const handleConnect = async (message: ConnectRequestMessage, port: chrome
   });
   const resourceId = permissions.resources.account.makeAccountResourceId(accountId);
 
-  const hasAccountReadPermissions = permissions.utils.store.hasPermission(store.permissions, {
+  const hasAccountReadPermissions = permissions.utils.store.hasPermission(store, {
     type: 'account',
     clientId,
     resourceId,
     actions: { read: true },
   });
+  const hasNetworkReadPermissions = permissions.utils.store.hasPermission(store, {
+    type: 'wallet',
+    clientId,
+    resourceId: 'wallet',
+    actions: { readNetwork: true },
+  });
 
-  if (!hasAccountReadPermissions) {
+  if (!hasAccountReadPermissions || !hasNetworkReadPermissions) {
     openPopup({
       path: RequestsRoutes.ConnectionRequest,
       data: message,
@@ -93,6 +107,14 @@ export const handleConnect = async (message: ConnectRequestMessage, port: chrome
     id: accountId,
     walletType: account.accountType ?? 'software',
     addresses,
+    network: {
+      bitcoin: {
+        name: network.type,
+      },
+      stacks: {
+        name: network.type,
+      },
+    },
   };
   sendConnectSuccessResponseMessage({
     tabId: getTabIdFromPort(port),

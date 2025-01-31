@@ -14,6 +14,7 @@ const useSelectedAccount = (overridePayAddressType?: BtcPaymentType): AccountWit
     selectedAccountType,
     accountsList: softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
     btcPaymentAddressType,
   } = useWalletSelector();
 
@@ -23,6 +24,7 @@ const useSelectedAccount = (overridePayAddressType?: BtcPaymentType): AccountWit
       selectedAccountType,
       softwareAccountsList,
       ledgerAccountsList,
+      keystoneAccountsList,
     });
 
     if (!account) {
@@ -61,6 +63,7 @@ const useSelectedAccount = (overridePayAddressType?: BtcPaymentType): AccountWit
     selectedAccountType,
     softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
     switchAccount,
     btcPaymentAddressType,
     overridePayAddressType,

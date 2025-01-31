@@ -4,7 +4,8 @@ import { sendUserRejectionMessage } from '@common/utils/rpc/responseMessages/err
 import { sendGetAccountsSuccessResponseMessage } from '@common/utils/rpc/responseMessages/stacks';
 import useWalletSelector from '@hooks/useWalletSelector';
 import type { GetAddressOptions } from '@sats-connect/core';
-import { bip32, bip39, bs58 } from '@secretkeylabs/xverse-core';
+import { base58 } from '@scure/base';
+import { bip32, bip39 } from '@secretkeylabs/xverse-core';
 import { decodeToken } from 'jsontokens';
 import { useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -40,12 +41,12 @@ const useStxAccountRequest = () => {
   const approveStxAccountRequest = useCallback(async () => {
     const seedPhrase = await getSeed();
     const seed = await bip39.mnemonicToSeed(seedPhrase);
-    const rootNode = bip32.fromSeed(Buffer.from(seed));
+    const rootNode = bip32.fromSeed(seed);
     const identitiesKeychain = rootNode.derivePath(`m/888'/0'`);
 
     const identityKeychain = identitiesKeychain.deriveHardened(0);
     const appsKeyBase58 = identityKeychain.deriveHardened(0).toBase58();
-    const appsKeyUint8Array = bs58.decode(appsKeyBase58);
+    const appsKeyUint8Array = base58.decode(appsKeyBase58);
     const appsKeyHex = Buffer.from(appsKeyUint8Array).toString('hex');
 
     const addressesResponse = [

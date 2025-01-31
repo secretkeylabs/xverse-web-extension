@@ -16,6 +16,7 @@ const handleGetInscriptions = async (
     selectedAccountType,
     accountsList: softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
     network,
   } = rootStore.store.getState().walletState;
 
@@ -24,6 +25,7 @@ const handleGetInscriptions = async (
     selectedAccountType,
     softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
   });
 
   if (!existingAccount) {

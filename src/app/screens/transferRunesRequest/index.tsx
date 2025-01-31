@@ -5,7 +5,7 @@ import {
   runesTransferRequestMessageSchema,
   type RunesTransferRequestMessage,
 } from '@sats-connect/core';
-import { type Transport } from '@secretkeylabs/xverse-core';
+import { type KeystoneTransport, type LedgerTransport } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -49,8 +49,11 @@ function TransferRunesRequestInner({ data, context }: TransferRunesRequestInnerP
     window.close();
   };
 
-  const onClickConfirm = async (ledgerTransport?: Transport) => {
-    const txid = await confirmRunesTransferRequest(ledgerTransport);
+  const onClickConfirm = async (options?: {
+    ledgerTransport?: LedgerTransport;
+    keystoneTransport?: KeystoneTransport;
+  }) => {
+    const txid = await confirmRunesTransferRequest(options);
     if (txid) {
       navigate('/tx-status', {
         state: {

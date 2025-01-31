@@ -1,5 +1,5 @@
-import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
-import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
+import ledgerConnectDefaultIcon from '@assets/img/hw/ledger/ledger_connect_default.svg';
+import ledgerConnectStxIcon from '@assets/img/hw/ledger/ledger_import_connect_stx.svg';
 import { delay } from '@common/utils/promises';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import TransactionSettingAlert from '@components/transactionSetting';

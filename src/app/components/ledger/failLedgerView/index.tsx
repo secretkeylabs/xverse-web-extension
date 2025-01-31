@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import ledgerConnectFailIcon from '@assets/img/ledger/ledger_import_connect_fail.svg';
+import ledgerConnectFailIcon from '@assets/img/hw/ledger/ledger_import_connect_fail.svg';
 
 const Container = styled.div`
   display: flex;

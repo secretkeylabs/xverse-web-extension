@@ -1,6 +1,6 @@
 import { delay } from '@common/utils/promises';
 import TransportFactory from '@ledgerhq/hw-transport-webusb';
-import { type Transport } from '@secretkeylabs/xverse-core';
+import { type LedgerTransport } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,7 +19,7 @@ const SuccessActionsContainer = styled.div((props) => ({
 }));
 
 type Props = {
-  onConfirm: (ledgerTransport?: Transport) => void;
+  onConfirm: (options: { ledgerTransport: LedgerTransport }) => void;
   onCancel: () => void;
   txnToSignCount?: number;
   txnSignIndex?: number;
@@ -40,9 +40,9 @@ function LedgerSteps({ onConfirm, onCancel, txnToSignCount, txnSignIndex }: Prop
   const handleConnectAndConfirm = async () => {
     setIsButtonDisabled(true);
 
-    const transport = await TransportFactory.create();
+    const ledgerTransport = await TransportFactory.create();
 
-    if (!transport) {
+    if (!ledgerTransport) {
       setIsConnectSuccess(false);
       setIsConnectFailed(true);
       setIsButtonDisabled(false);
@@ -62,7 +62,7 @@ function LedgerSteps({ onConfirm, onCancel, txnToSignCount, txnSignIndex }: Prop
     }
 
     try {
-      onConfirm(transport);
+      onConfirm({ ledgerTransport });
     } catch (err) {
       console.error(err);
       setIsTxRejected(true);

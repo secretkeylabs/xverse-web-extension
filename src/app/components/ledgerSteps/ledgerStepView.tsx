@@ -1,6 +1,6 @@
+import ledgerConnectDefaultIcon from '@assets/img/hw/ledger/ledger_connect_default.svg';
+import ledgerConnectBtcIcon from '@assets/img/hw/ledger/ledger_import_connect_btc.svg';
 import InfoIcon from '@assets/img/info.svg';
-import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
-import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
 import LedgerConnectionView, {
   ConnectLedgerContainer,
   ConnectLedgerText,
