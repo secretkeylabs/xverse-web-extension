@@ -12,7 +12,6 @@ import {
   type KeystoneTransport,
   type LedgerTransport,
 } from '@secretkeylabs/xverse-core';
-import { isInOptions, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { getFtBalance } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
@@ -25,7 +24,6 @@ import { Step, getPreviousStep } from './steps';
 
 function SendRuneScreen() {
   const navigate = useNavigate();
-  const isInOption = isInOptions();
 
   useResetUserFlow('/send-rune');
 
@@ -129,10 +127,6 @@ function SendRuneScreen() {
   }
 
   const handleCancel = () => {
-    if ((isLedgerAccount(selectedAccount) || isKeystoneAccount(selectedAccount)) && isInOption) {
-      window.close();
-      return;
-    }
     navigate(
       `/coinDashboard/FT?ftKey=${fungibleToken.principal}&protocol=${fungibleToken.protocol}`,
     );

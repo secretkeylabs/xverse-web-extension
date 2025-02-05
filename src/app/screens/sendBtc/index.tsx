@@ -3,7 +3,6 @@ import useCancellableEffect from '@hooks/useCancellableEffect';
 import useCanUserSwitchPaymentType from '@hooks/useCanUserSwitchPaymentType';
 import useDebounce from '@hooks/useDebounce';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
-import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
@@ -12,7 +11,6 @@ import {
   type KeystoneTransport,
   type LedgerTransport,
 } from '@secretkeylabs/xverse-core';
-import { isInOptions } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -29,15 +27,12 @@ function SendBtcScreen() {
   const navigate = useNavigate();
   const { t } = useTranslation('translation');
 
-  const isInOption = isInOptions();
-
   useResetUserFlow('/send-btc');
 
   const { selectedAccountType, btcPaymentAddressType } = useWalletSelector();
   const [overridePaymentType, setOverridePaymentType] = useState(btcPaymentAddressType);
 
   const { data: btcFeeRate, isLoading: feeRatesLoading } = useBtcFeeRate();
-  const selectedAccount = useSelectedAccount();
   const transactionContext = useTransactionContext(overridePaymentType);
   const userCanSwitchPayType = useCanUserSwitchPaymentType();
 
@@ -119,10 +114,6 @@ function SendBtcScreen() {
   );
 
   const handleCancel = () => {
-    if ((selectedAccountType === 'ledger' || selectedAccountType === 'keystone') && isInOption) {
-      window.close();
-      return;
-    }
     navigate(`/coinDashboard/BTC`);
   };
 
