@@ -190,6 +190,7 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: Props) 
 
       onSigned(signedPsbts);
       setIsLedgerModalVisible(false);
+      setIsKeystoneModalVisible(false);
     } catch (err) {
       setIsSigning(false);
       setIsSigningComplete(false);

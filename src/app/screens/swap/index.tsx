@@ -409,7 +409,7 @@ export default function SwapScreen() {
       fromStxTokenFiatValue: new BigNumber(sip10FromTokenInfoUSD?.tokenFiatRate ?? 0),
     });
 
-    trackMixPanel(AnalyticsEvents.FetchSwapQuote, trackingPayload);
+    trackMixPanel(AnalyticsEvents.SignSwap, trackingPayload);
   };
 
   const QuoteModal = (

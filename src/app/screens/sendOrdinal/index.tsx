@@ -13,7 +13,7 @@ import {
   type LedgerTransport,
 } from '@secretkeylabs/xverse-core';
 import { removeAccountAvatarAction } from '@stores/wallet/actions/actionCreators';
-import { isInOptions, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
+import { isInOptions } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import RoutePaths from 'app/routes/paths';
 import { useEffect, useState } from 'react';
@@ -120,11 +120,15 @@ function SendOrdinalScreen() {
   }
 
   const handleCancel = () => {
-    if ((isLedgerAccount(selectedAccount) || isKeystoneAccount(selectedAccount)) && isInOption) {
-      window.close();
-      return;
+    if (isInOption) {
+      navigate(
+        isRareSat
+          ? `/nft-dashboard/rare-sats-bundle`
+          : `/nft-dashboard/ordinal-detail/${selectedOrdinal?.id}`,
+      );
+    } else {
+      navigate(-1);
     }
-    navigate(-1);
   };
 
   const handleBackButtonClick = () => {
