@@ -223,7 +223,6 @@ function ImportLedger(): JSX.Element {
         await addLedgerAccount(ledgerAccount);
         await delay(1000);
         setCurrentStep(ImportLedgerSteps.ADDRESS_ADDED);
-        setIsButtonDisabled(false);
         return;
       }
 
@@ -244,7 +243,6 @@ function ImportLedger(): JSX.Element {
         await updateLedgerAccounts(ledgerAccount);
         await delay(1000);
         setCurrentStep(ImportLedgerSteps.ADDRESS_ADDED);
-        setIsButtonDisabled(false);
         return;
       }
 
@@ -257,13 +255,12 @@ function ImportLedger(): JSX.Element {
         await updateLedgerAccounts(ledgerAccount);
         await delay(1000);
         setCurrentStep(ImportLedgerSteps.ADDRESS_ADDED);
-        setIsButtonDisabled(false);
       }
 
       await delay(500);
-      setIsButtonDisabled(false);
     } catch (err) {
       console.error(err);
+    } finally {
       setIsButtonDisabled(false);
     }
   };

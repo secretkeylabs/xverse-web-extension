@@ -49,6 +49,7 @@ export async function handleGetBalance(
     selectedAccountType,
     accountsList: softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
     network,
     btcPaymentAddressType,
   } = rootStore.store.getState().walletState;
@@ -58,6 +59,7 @@ export async function handleGetBalance(
     selectedAccountType,
     softwareAccountsList,
     ledgerAccountsList,
+    keystoneAccountsList,
   });
 
   if (!account) {

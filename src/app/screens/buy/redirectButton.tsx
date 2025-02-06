@@ -10,15 +10,15 @@ const Button = styled.button((props) => ({
   backgroundColor: 'transparent',
   padding: props.theme.space.m,
   marginBottom: props.theme.space.s,
-  border: `1px solid ${props.theme.colors.white_900}`,
+  border: `1px solid ${props.theme.colors.white_850}`,
   transition: 'background-color 0.1s ease',
   '&:hover': {
-    backgroundColor: props.theme.colors.white_900,
+    backgroundColor: props.theme.colors.white_950,
   },
 }));
 
-const Text = styled.p((props) => ({
-  ...props.theme.typography.body_bold_l,
+const Text = styled.p<{ $typography?: string }>((props) => ({
+  ...props.theme.typography[props.$typography || 'body_bold_l'],
   color: props.theme.colors.white_0,
 }));
 
@@ -54,9 +54,10 @@ type Props = {
   text: string;
   subText?: string;
   onClick: () => void;
+  titleTypography?: string;
 };
 
-function RedirectButton({ src, text, subText, onClick }: Props) {
+function RedirectButton({ src, text, subText, onClick, titleTypography }: Props) {
   return (
     <Button onClick={onClick}>
       <RowContainer>
@@ -64,7 +65,7 @@ function RedirectButton({ src, text, subText, onClick }: Props) {
           <img src={src} height={40} width={40} alt={text} />
         </ImageContainer>
         <TextContainer>
-          <Text>{text}</Text>
+          <Text $typography={titleTypography}>{text}</Text>
           {subText && <SubText>{subText}</SubText>}
         </TextContainer>
       </RowContainer>

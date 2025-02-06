@@ -44,6 +44,15 @@ export function updateLedgerAccountsAction(
   };
 }
 
+export function updateKeystoneAccountsAction(
+  keystoneAccountsList: Account[],
+): actions.UpdateKeystoneAccounts {
+  return {
+    type: actions.UpdateKeystoneAccountsKey,
+    keystoneAccountsList,
+  };
+}
+
 export function selectAccount(selectedAccount: Account): actions.SelectAccount;
 export function selectAccount(
   selectedAccountIdx: number,
@@ -54,6 +63,7 @@ export function selectAccount(
   accountType?: AccountType,
 ): actions.SelectAccount {
   let selectedAccountIndex = selectedAccountOrIdx;
+
   let selectedAccountType = accountType ?? 'software';
 
   if (typeof selectedAccountIndex === 'object') {

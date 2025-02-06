@@ -1,6 +1,10 @@
 import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RequestError from '@components/requests/requestError';
-import { RUNE_DISPLAY_DEFAULTS, type Transport } from '@secretkeylabs/xverse-core';
+import {
+  RUNE_DISPLAY_DEFAULTS,
+  type KeystoneTransport,
+  type LedgerTransport,
+} from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
 import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -43,8 +47,11 @@ function MintRune() {
     window.close();
   };
 
-  const onClickConfirm = async (ledgerTransport?: Transport) => {
-    const txid = await payAndConfirmMintRequest(ledgerTransport);
+  const onClickConfirm = async (options?: {
+    ledgerTransport?: LedgerTransport;
+    keystoneTransport?: KeystoneTransport;
+  }) => {
+    const txid = await payAndConfirmMintRequest(options);
     if (txid) {
       navigate('/tx-status', {
         state: {

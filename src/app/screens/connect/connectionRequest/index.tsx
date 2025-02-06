@@ -84,6 +84,7 @@ function ConnectionRequestInner({ data, context }: ConnectionRequestInnerProps) 
     },
     [selectedAccount, t],
   );
+
   return (
     <Container>
       <ContentContainer>
@@ -98,9 +99,15 @@ function ConnectionRequestInner({ data, context }: ConnectionRequestInnerProps) 
         <AccountSwitcherContainer>
           <SelectAccountPrompt />
         </AccountSwitcherContainer>
-        {data.method === 'wallet_connect' && (data as ConnectRequestMessage).params?.addresses && (
+        {data.method === 'wallet_connect' && (
           <AddressBoxContainer>
-            {(data as ConnectRequestMessage).params?.addresses?.map(AddressPurposeRow)}
+            {(
+              (data as ConnectRequestMessage).params?.addresses ?? [
+                AddressPurpose.Payment,
+                AddressPurpose.Ordinals,
+                AddressPurpose.Stacks,
+              ]
+            ).map(AddressPurposeRow)}
           </AddressBoxContainer>
         )}
         {

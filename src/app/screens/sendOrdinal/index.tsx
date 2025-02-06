@@ -6,12 +6,18 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import type { TransactionSummary } from '@screens/sendBtc/helpers';
-import { AnalyticsEvents, btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
+import {
+  AnalyticsEvents,
+  btcTransaction,
+  type KeystoneTransport,
+  type LedgerTransport,
+} from '@secretkeylabs/xverse-core';
 import { removeAccountAvatarAction } from '@stores/wallet/actions/actionCreators';
-import { isInOptions, isLedgerAccount } from '@utils/helper';
+import { isInOptions } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import RoutePaths from 'app/routes/paths';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import StepDisplay from './stepDisplay';
@@ -24,6 +30,7 @@ function SendOrdinalScreen() {
 
   const location = useLocation();
   const { id } = useParams();
+  const { t } = useTranslation('translation');
   const params = new URLSearchParams(location.search);
   const isRareSatParam = params.get('isRareSat');
   const vout = params.get('vout');
@@ -113,11 +120,15 @@ function SendOrdinalScreen() {
   }
 
   const handleCancel = () => {
-    if (isLedgerAccount(selectedAccount) && isInOption) {
-      window.close();
-      return;
+    if (isInOption) {
+      navigate(
+        isRareSat
+          ? `/nft-dashboard/rare-sats-bundle`
+          : `/nft-dashboard/ordinal-detail/${selectedOrdinal?.id}`,
+      );
+    } else {
+      navigate(-1);
     }
-    navigate(-1);
   };
 
   const handleBackButtonClick = () => {
@@ -147,10 +158,16 @@ function SendOrdinalScreen() {
     return undefined;
   };
 
-  const handleSubmit = async (ledgerTransport?: Transport) => {
+  const handleSubmit = async (options?: {
+    ledgerTransport?: LedgerTransport;
+    keystoneTransport?: KeystoneTransport;
+  }) => {
     try {
       setIsSubmitting(true);
-      const txnId = await transaction?.broadcast({ ledgerTransport, rbfEnabled: true });
+      const txnId = await transaction?.broadcast({
+        ...options,
+        rbfEnabled: true,
+      });
 
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
         protocol: 'ordinals',
@@ -175,11 +192,20 @@ function SendOrdinalScreen() {
       }
     } catch (e) {
       console.error(e);
+      let msg = e;
+      if (e instanceof Error) {
+        if (e.message.includes('Export address is just allowed on specific pages')) {
+          msg = t('SIGNATURE_REQUEST.KEYSTONE.CONFIRM.ERROR_SUBTITLE');
+        }
+        if (e.message.includes('UR parsing rejected')) {
+          msg = t('SIGNATURE_REQUEST.KEYSTONE.CONFIRM.DENIED.ERROR_SUBTITLE');
+        }
+      }
       navigate('/tx-status', {
         state: {
           txid: '',
           currency: 'BTC',
-          error: `${e}`,
+          error: `${msg}`,
           browserTx: false,
         },
       });

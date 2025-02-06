@@ -1,11 +1,11 @@
 /* eslint-disable import/prefer-default-export */
-import * as utils from '@components/permissionsManager/utils';
 import type { PermissionWithoutClientId, RpcRequestMessage } from '@sats-connect/core';
 import { permissions } from '@secretkeylabs/xverse-core';
 import rootStore from '@stores/index';
 import * as v from 'valibot';
 import { getTabIdFromPort } from '..';
 import getSelectedAccount from '../getSelectedAccount';
+import { initPermissionsStore } from '../permissionsStore';
 import { makeContext } from '../popup';
 import { handleInvalidMessage } from './handleInvalidMessage';
 import {
@@ -37,7 +37,7 @@ export function requirePermissions(
   return async (message: RpcRequestMessage, port: chrome.runtime.Port): Promise<void> => {
     const { origin, tabId } = makeContext(port);
 
-    const [error, store] = await utils.getPermissionsStore();
+    const [error, store] = await initPermissionsStore();
     if (error) {
       sendInternalErrorMessage({
         tabId,
@@ -52,6 +52,7 @@ export function requirePermissions(
       selectedAccountType,
       accountsList: softwareAccountsList,
       ledgerAccountsList,
+      keystoneAccountsList,
     } = rootStore.store.getState().walletState;
 
     const existingAccount = getSelectedAccount({
@@ -59,6 +60,7 @@ export function requirePermissions(
       selectedAccountType,
       softwareAccountsList,
       ledgerAccountsList,
+      keystoneAccountsList,
     });
 
     if (!existingAccount) {
@@ -80,10 +82,7 @@ export function requirePermissions(
       return;
     }
 
-    const currentPermissions = permissions.utils.store.getClientPermissions(
-      store.permissions,
-      clientId,
-    );
+    const currentPermissions = permissions.utils.store.getClientPermissions(store, clientId);
     const computedRequiredPermissions = requiredPermissions.map((permission) =>
       typeof permission === 'function' ? permission() : permission,
     );
@@ -103,6 +102,7 @@ export function requirePermissions(
 
     if (!hasRequiredPermissions) {
       sendAccessDeniedResponseMessage({ tabId, messageId: message.id });
+      return;
     }
 
     return handler(message, port);
@@ -113,7 +113,7 @@ export function validateMessageSchema<
   const TSchema extends v.BaseSchema<unknown, unknown, v.BaseIssue<unknown>>,
 >(
   schema: TSchema,
-  handler: (message: v.InferOutput<TSchema>, port: chrome.runtime.Port) => Promise<void>,
+  handler: (message: v.InferOutput<TSchema>, port: chrome.runtime.Port) => Promise<void> | void,
 ) {
   return async (message: RpcRequestMessage, port: chrome.runtime.Port) => {
     const parseResult = v.safeParse(schema, message);

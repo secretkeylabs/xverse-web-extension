@@ -19,7 +19,7 @@ import type {
 import Spinner from '@ui-library/spinner';
 import type { CurrencyTypes } from '@utils/constants';
 import { formatDate, formatDateKey } from '@utils/date';
-import { isLedgerAccount } from '@utils/helper';
+import { isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import {
   isAddressTransactionWithTransfers,
   isBrc20Transaction,
@@ -304,7 +304,8 @@ function TransactionsHistoryList({
         ...selectedAccount,
         accountType: selectedAccountType || 'software',
         accountId:
-          isLedgerAccount(selectedAccount) && selectedAccount.deviceAccountIndex
+          (isLedgerAccount(selectedAccount) || isKeystoneAccount(selectedAccount)) &&
+          selectedAccount.deviceAccountIndex !== undefined
             ? selectedAccount.deviceAccountIndex
             : selectedAccount.id,
         network: network.type,

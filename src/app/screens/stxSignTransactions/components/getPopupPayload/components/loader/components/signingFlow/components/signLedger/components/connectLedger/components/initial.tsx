@@ -1,4 +1,4 @@
-import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
+import ledgerConnectStxIcon from '@assets/img/hw/ledger/ledger_import_connect_stx.svg';
 import { useTranslation } from 'react-i18next';
 import { Layout } from './shared/layout';
 

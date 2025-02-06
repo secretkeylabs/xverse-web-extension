@@ -1,5 +1,6 @@
 /* eslint-disable import/prefer-default-export */
-import { permissions, type Permissions } from '@secretkeylabs/xverse-core';
+import { usePermissions } from '@components/permissionsManager';
+import { permissions } from '@secretkeylabs/xverse-core';
 import { formatDate } from '@utils/date';
 import type { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,26 +11,17 @@ import ClientApp, { ClientPermissions } from './client';
 
 const { nameFromOrigin } = permissions.utils.originName;
 
-function sortClientsByLastUsed(store: Permissions.Store.PermissionsStore): ConnectedApp[] {
-  const clientsWithLastUsed = store.clients.map((client) => {
-    const lastUsed = permissions.utils.store.getClientMetadata(store, client.id)?.lastUsed || 0;
-    return { client, lastUsed };
-  });
-
-  // Sort by last used and then by origin. Using origin as fallback for stable
-  // sorting since name may be undefined.
-  return clientsWithLastUsed.sort(
-    (a, b) => b.lastUsed - a.lastUsed || a.client.origin.localeCompare(b.client.origin),
-  );
-}
-
 type SelectedAppProps = {
   selectedApp: ConnectedApp | null;
   setSelectedApp: Dispatch<SetStateAction<ConnectedApp | null>>;
-  store: Permissions.Store.PermissionsStore;
 };
-export function AppListOrSelectedApp({ selectedApp, setSelectedApp, store }: SelectedAppProps) {
+export function AppListOrSelectedApp({ selectedApp, setSelectedApp }: SelectedAppProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONNECTED_APPS' });
+  const { getClients, getClientMetadata } = usePermissions();
+
+  const sortedClientsByLastUsed = getClients()
+    .map((c) => ({ client: c, lastUsed: getClientMetadata(c.id)?.lastUsed || 0 }))
+    .sort((a, b) => b.lastUsed - a.lastUsed || a.client.origin.localeCompare(b.client.origin));
 
   if (selectedApp) {
     return (
@@ -58,8 +50,8 @@ export function AppListOrSelectedApp({ selectedApp, setSelectedApp, store }: Sel
   return (
     <>
       <Title>{t('TITLE')}</Title>
-      <SubTitle>{store.clients.length === 0 ? t('EMPTY_MESSAGE') : t('SUBTITLE')}</SubTitle>
-      {sortClientsByLastUsed(store).map((connectedApp) => (
+      <SubTitle>{getClients().length === 0 ? t('EMPTY_MESSAGE') : t('SUBTITLE')}</SubTitle>
+      {sortedClientsByLastUsed.map((connectedApp) => (
         <ClientApp
           key={connectedApp.client.id}
           setSelectedApp={setSelectedApp}

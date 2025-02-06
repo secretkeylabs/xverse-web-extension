@@ -16,7 +16,7 @@ export const BTC_TRANSACTION_TESTNET4_STATUS_URL = 'https://mempool.space/testne
 export const BTC_TRANSACTION_SIGNET_STATUS_URL = 'https://mempool.space/signet/tx/';
 export const BTC_TRANSACTION_REGTEST_STATUS_URL = 'https://mempool.bitcoin.regtest.hiro.so/tx/';
 export const TRANSACTION_STATUS_URL = 'https://explorer.stacks.co/txid/';
-export const XVERSE_WEB_POOL_URL = 'https://pool.xverse.app';
+export const XVERSE_STACKING_URL = 'https://wallet.xverse.app/earn/stacking';
 export const XVERSE_EXPLORE_URL = 'https://wallet.xverse.app/explore';
 export const XVERSE_POOL_ADDRESS = 'SPXVRSEH2BKSXAEJ00F1BY562P45D5ERPSKR4Q33';
 

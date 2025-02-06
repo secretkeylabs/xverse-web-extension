@@ -5,15 +5,18 @@ type GetSelectedAccountProps = {
   selectedAccountType: AccountType;
   selectedAccountIndex: number;
   ledgerAccountsList: Account[];
+  keystoneAccountsList: Account[];
   softwareAccountsList: Account[];
 };
 
 export type AccountWithDetails = Account & {
   btcAddress: string;
   btcPublicKey: string;
+  btcXpub?: string;
   btcAddressType: BtcPaymentType;
   ordinalsAddress: string;
   ordinalsPublicKey: string;
+  ordinalsXpub?: string;
 };
 
 export function embellishAccountWithDetails(
@@ -32,8 +35,15 @@ export function embellishAccountWithDetails(
     return undefined;
   }
 
-  if (account.accountType === 'ledger') {
-    return { ...account, ...getAccountAddressDetails(account, 'native'), btcAddressType: 'native' };
+  if (account.accountType === 'ledger' || account.accountType === 'keystone') {
+    return {
+      ...account,
+      ...getAccountAddressDetails(account, 'native'),
+      btcAddressType: 'native',
+      // TODO vic: remove below 2 once we migrate to using Core which returns them in getAccountAddressDetails
+      btcXpub: account.btcAddresses.native?.xpub,
+      ordinalsXpub: account.btcAddresses.taproot.xpub,
+    };
   }
 
   return {
@@ -44,14 +54,21 @@ export function embellishAccountWithDetails(
 }
 
 const getSelectedAccount = (props: GetSelectedAccountProps): Account | undefined => {
-  const { selectedAccountType, selectedAccountIndex, ledgerAccountsList, softwareAccountsList } =
-    props;
+  const {
+    selectedAccountType,
+    selectedAccountIndex,
+    ledgerAccountsList,
+    keystoneAccountsList,
+    softwareAccountsList,
+  } = props;
 
   const accountList =
     selectedAccountType === 'software'
       ? softwareAccountsList
       : selectedAccountType === 'ledger'
       ? ledgerAccountsList
+      : selectedAccountType === 'keystone'
+      ? keystoneAccountsList
       : undefined;
 
   if (!accountList) {

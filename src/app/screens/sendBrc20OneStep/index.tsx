@@ -14,7 +14,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { isDangerFeedback, type InputFeedbackProps } from '@ui-library/inputFeedback';
 import type { Brc20TransferEstimateFeesParams, ConfirmBrc20TransferState } from '@utils/brc20';
-import { isInOptions, replaceCommaByDot } from '@utils/helper';
+import { replaceCommaByDot } from '@utils/helper';
 import { getFtTicker } from '@utils/tokens';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

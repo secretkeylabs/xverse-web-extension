@@ -172,4 +172,6 @@ export type WalletStateV7 = WalletStateV6 & {
 export type WalletStateV8 = WalletStateV7; // no changes. just a data migration
 
 // should be exported and used when we add next migration
-type WalletStateV9 = Omit<WalletStateV8, 'showBtcReceiveAlert' | 'showOrdinalReceiveAlert'>;
+type WalletStateV9 = Omit<WalletStateV8, 'showBtcReceiveAlert' | 'showOrdinalReceiveAlert'> & {
+  keystoneAccountsList: AccountV5[];
+};

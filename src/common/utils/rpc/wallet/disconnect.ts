@@ -1,7 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import { dispatchEventToOrigin } from '@common/utils/messages/extensionToContentScript/dispatchEvent';
+import { initPermissionsStore, saveStore } from '@common/utils/permissionsStore';
 import { makeContext } from '@common/utils/popup';
-import * as utils from '@components/permissionsManager/utils';
 import { type DisconnectRequestMessage } from '@sats-connect/core';
 import { permissions } from '@secretkeylabs/xverse-core';
 import { sendInternalErrorMessage } from '../responseMessages/errors';
@@ -12,7 +12,7 @@ export const handleDisconnect = async (
   port: chrome.runtime.Port,
 ) => {
   const { origin, tabId } = makeContext(port);
-  const [error, store] = await utils.getPermissionsStore();
+  const [error, store] = await initPermissionsStore();
 
   if (error) {
     sendInternalErrorMessage({
@@ -33,10 +33,7 @@ export const handleDisconnect = async (
     return;
   }
 
-  await utils.permissionsStoreMutex.runExclusive(async () => {
-    permissions.utils.store.removeClient(store, clientId);
-    utils.savePermissionsStore(store);
-  });
+  saveStore(permissions.utils.store.removeClient(store, clientId));
 
   dispatchEventToOrigin(origin, {
     type: 'disconnect',

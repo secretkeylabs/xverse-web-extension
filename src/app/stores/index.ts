@@ -166,7 +166,7 @@ const migrations = {
     showBalanceInBtc: state.showBalanceInBtc ?? false,
     hasBackedUpWallet: state.hasBackedUpWallet ?? true,
   }),
-  8: (state: WalletStateV7): WalletState => {
+  8: (state: WalletStateV7): WalletStateV8 => {
     const migrateMainnetNetwork = (currentNetwork: SettingsNetwork) => ({
       ...currentNetwork,
       btcApiUrl:
@@ -194,7 +194,10 @@ const migrations = {
   9: (state: WalletStateV8): WalletState => {
     const { showBtcReceiveAlert, showOrdinalReceiveAlert, ...migratedState } = state;
 
-    return migratedState;
+    return {
+      ...migratedState,
+      keystoneAccountsList: [],
+    };
   },
 
   /* *
