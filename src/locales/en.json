@@ -147,7 +147,7 @@
   },
   "KEYSTONE_IMPORT_SCREEN": {
     "KEYSTONE_IMPORT_1_TITLE": "Secure Your Assets with Keystone",
-    "KEYSTONE_IMPORT_1_SUBTITLE": "Keystone supports up to 3 sets of seed phrases to store different assets. You can use one Keystone hardware wallet to manage your ordinals, rune, and BRC-20 assets separately.",
+    "KEYSTONE_IMPORT_1_SUBTITLE": "Keystone supports up to 3 sets of seed phrases to store different assets. You can use one Keystone hardware wallet to manage your Ordinals, Runes, and BRC-20 assets separately.",
     "KEYSTONE_IMPORT_1_BUTTON": "Get started",
     "KEYSTONE_CONNECT": {
       "BTC_TITLE": "Connect Your Keystone",
