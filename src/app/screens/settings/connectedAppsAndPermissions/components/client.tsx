@@ -1,4 +1,4 @@
-import { usePermissionsUtils } from '@components/permissionsManager';
+import { usePermissions } from '@components/permissionsManager';
 import { CaretRight } from '@phosphor-icons/react';
 import {
   getAppIconFromWebManifest,
@@ -37,7 +37,7 @@ type PermissionsProps = {
   color?: string;
 };
 export function ClientPermissions({ clientId, color }: PermissionsProps) {
-  const utils = usePermissionsUtils();
+  const utils = usePermissions();
   const sortedPermissions = utils
     .getClientPermissions(clientId)
     .sort((p1, p2) => p1.resourceId.localeCompare(p2.resourceId));

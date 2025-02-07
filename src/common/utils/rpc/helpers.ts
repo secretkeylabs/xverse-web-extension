@@ -1,5 +1,4 @@
 import { MESSAGE_SOURCE } from '@common/types/message-types';
-import * as utils from '@components/permissionsManager/utils';
 import {
   RpcErrorCode,
   type Requests,
@@ -11,6 +10,7 @@ import {
 } from '@sats-connect/core';
 import { error, permissions, success, type Result } from '@secretkeylabs/xverse-core';
 import { getOriginFromPort } from '..';
+import { initPermissionsStore, saveStore } from '../permissionsStore';
 
 export const makeRPCError = (id: RpcId, e: RpcError): RpcErrorResponse => ({
   jsonrpc: '2.0',
@@ -58,7 +58,7 @@ export function makeSendPopupClosedUserRejectionMessage({
  * Update the last used time for the client. Must be run within the permissions store mutex.
  */
 export async function updateClientLastUsedTime(port: chrome.runtime.Port): Promise<Result<void>> {
-  const [storeError, store] = await utils.getPermissionsStore();
+  const [storeError, store] = await initPermissionsStore();
   if (storeError)
     return error({
       name: 'LoadStoreError',
@@ -73,11 +73,11 @@ export async function updateClientLastUsedTime(port: chrome.runtime.Port): Promi
       message: 'Failed to create client ID during permissions check.',
     });
 
-  permissions.utils.store.setClientMetadata(store.clientMetadata, {
+  const nextStore = permissions.utils.store.setClientMetadata(store, {
     clientId,
     lastUsed: new Date().getTime(),
   });
-  await utils.savePermissionsStore(store);
+  saveStore(nextStore);
 
   return success(undefined);
 }

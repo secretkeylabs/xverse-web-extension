@@ -132,7 +132,7 @@ export default function ContractCallRequest({
             sendSignTransactionSuccessResponseMessage({
               tabId,
               messageId,
-              result: { transaction: Buffer.from(tx[0].serialize()).toString('hex') },
+              result: { transaction: tx[0].serialize() },
             });
             break;
           }
@@ -141,7 +141,7 @@ export default function ContractCallRequest({
               tabId,
               messageId,
               result: {
-                transaction: Buffer.from(tx[0].serialize()).toString('hex'),
+                transaction: tx[0].serialize(),
                 txid: txId,
               },
             });
@@ -156,7 +156,7 @@ export default function ContractCallRequest({
         finalizeTxSignature({
           requestPayload: requestToken,
           tabId,
-          data: { txId, txRaw: Buffer.from(tx[0].serialize()).toString('hex') },
+          data: { txId, txRaw: tx[0].serialize() },
         });
       }
       navigate('/tx-status', {

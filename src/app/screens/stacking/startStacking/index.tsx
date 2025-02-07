@@ -2,7 +2,7 @@ import useStackingData from '@hooks/queries/useStackingData';
 import type { Pool } from '@secretkeylabs/xverse-core';
 import { microstacksToStx } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
-import { XVERSE_WEB_POOL_URL } from '@utils/constants';
+import { XVERSE_STACKING_URL } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
@@ -32,7 +32,7 @@ function StartStacking() {
   };
 
   const handleOnClick = () => {
-    window.open(XVERSE_WEB_POOL_URL);
+    window.open(XVERSE_STACKING_URL);
   };
 
   return (

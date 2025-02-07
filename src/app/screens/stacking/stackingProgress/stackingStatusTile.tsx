@@ -1,7 +1,7 @@
 import TokenTicker from '@assets/img/dashboard/stx_icon.svg';
 import useStackingData from '@hooks/queries/useStackingData';
 import { type StackingState } from '@secretkeylabs/xverse-core';
-import { XVERSE_WEB_POOL_URL } from '@utils/constants';
+import { XVERSE_STACKING_URL } from '@utils/constants';
 import { useTranslation } from 'react-i18next';
 import {
   BoldText,
@@ -34,7 +34,7 @@ function StackingStatusTile() {
   })();
 
   const handleOnClick = () => {
-    window.open(XVERSE_WEB_POOL_URL);
+    window.open(XVERSE_STACKING_URL);
   };
 
   return (

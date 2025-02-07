@@ -7,7 +7,8 @@ import type { OrderInfo } from '@screens/swap/types';
 import {
   btcTransaction,
   type ExecuteUtxoOrderRequest,
-  type Transport,
+  type KeystoneTransport,
+  type LedgerTransport,
 } from '@secretkeylabs/xverse-core';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -43,7 +44,8 @@ export default function PsbtConfirmation({
 
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey } = useSelectedAccount();
+  const selectedAccount = useSelectedAccount();
+  const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey } = selectedAccount;
   const txnContext = useTransactionContext();
   const { network } = useWalletSelector();
   const { executeOrder, error: executeOrderError } = useExecuteOrder();
@@ -113,18 +115,22 @@ export default function PsbtConfirmation({
       btcPubKey: btcPublicKey,
       ordAddress: ordinalsAddress,
       ordPubKey: ordinalsPublicKey,
+      identifier: orderInfo.order.identifier,
     };
 
     const executeOrderResponse = await executeOrder(executeOrderRequest);
     return executeOrderResponse;
   };
 
-  const handleConfirm = async (ledgerTransport?: Transport) => {
+  const handleConfirm = async (options?: {
+    ledgerTransport?: LedgerTransport;
+    keystoneTransport?: KeystoneTransport;
+  }) => {
     setIsSigning(true);
     try {
       const signedPsbt = await parsedPsbt?.getSignedPsbtBase64({
         finalize: false,
-        ledgerTransport,
+        ...options,
       });
 
       if (!signedPsbt) {
@@ -140,8 +146,9 @@ export default function PsbtConfirmation({
           return setIsSigning(false);
         }
 
-        if (ledgerTransport) {
-          await ledgerTransport.close();
+        const transport = options?.ledgerTransport ?? options?.keystoneTransport;
+        if (transport) {
+          await transport.close();
         }
 
         onConfirm();

@@ -9,9 +9,9 @@ import {
   AnalyticsEvents,
   FeatureId,
   btcTransaction,
-  type Transport,
+  type KeystoneTransport,
+  type LedgerTransport,
 } from '@secretkeylabs/xverse-core';
-import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { getFtBalance } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
@@ -24,7 +24,6 @@ import { Step, getPreviousStep } from './steps';
 
 function SendRuneScreen() {
   const navigate = useNavigate();
-  const isInOption = isInOptions();
 
   useResetUserFlow('/send-rune');
 
@@ -35,7 +34,7 @@ function SendRuneScreen() {
   const { data: runesCoinsList } = useRuneFungibleTokensQuery();
   // TODO: can we remove location.state here?
   const [recipientAddress, setRecipientAddress] = useState<string>(
-    location.state?.recipientAddress || '',
+    location.state?.recipientAddress,
   );
   const [amountError, setAmountError] = useState('');
   const [amountToSend, setAmountToSend] = useState<string>(location.state?.amount || '');
@@ -128,10 +127,6 @@ function SendRuneScreen() {
   }
 
   const handleCancel = () => {
-    if (isLedgerAccount(selectedAccount) && isInOption) {
-      window.close();
-      return;
-    }
     navigate(
       `/coinDashboard/FT?ftKey=${fungibleToken.principal}&protocol=${fungibleToken.protocol}`,
     );
@@ -155,10 +150,16 @@ function SendRuneScreen() {
     return undefined;
   };
 
-  const handleSubmit = async (ledgerTransport?: Transport) => {
+  const handleSubmit = async (options?: {
+    ledgerTransport?: LedgerTransport;
+    keystoneTransport?: KeystoneTransport;
+  }) => {
     try {
       setIsSubmitting(true);
-      const txnId = await transaction?.broadcast({ ledgerTransport, rbfEnabled: true });
+      const txnId = await transaction?.broadcast({
+        ...options,
+        rbfEnabled: true,
+      });
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
         protocol: 'runes',
         action: 'transfer',
@@ -175,11 +176,20 @@ function SendRuneScreen() {
       });
     } catch (e) {
       console.error(e);
+      let msg = e;
+      if (e instanceof Error) {
+        if (e.message.includes('Export address is just allowed on specific pages')) {
+          msg = t('SIGNATURE_REQUEST.KEYSTONE.CONFIRM.ERROR_SUBTITLE');
+        }
+        if (e.message.includes('UR parsing rejected')) {
+          msg = t('SIGNATURE_REQUEST.KEYSTONE.CONFIRM.DENIED.ERROR_SUBTITLE');
+        }
+      }
       navigate('/tx-status', {
         state: {
           txid: '',
           currency: 'BTC',
-          error: `${e}`,
+          error: `${msg}`,
           browserTx: false,
         },
       });

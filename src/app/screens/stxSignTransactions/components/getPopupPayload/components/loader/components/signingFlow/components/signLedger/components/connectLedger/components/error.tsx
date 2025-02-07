@@ -1,4 +1,4 @@
-import ledgerConnectFailIcon from '@assets/img/ledger/ledger_import_connect_fail.svg';
+import ledgerConnectFailIcon from '@assets/img/hw/ledger/ledger_import_connect_fail.svg';
 import { useTranslation } from 'react-i18next';
 import { Layout } from './shared/layout';
 

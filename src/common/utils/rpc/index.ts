@@ -1,4 +1,3 @@
-import * as utils from '@components/permissionsManager/utils';
 import { RpcErrorCode, type RpcRequestMessage } from '@sats-connect/core';
 import { safePromise } from '@secretkeylabs/xverse-core';
 import { getTabIdFromPort } from '..';
@@ -16,9 +15,7 @@ async function handleRPCRequest(message: RpcRequestMessage, port: chrome.runtime
       }),
     );
 
-  const [updateLastUsedTimeError] = await utils.permissionsStoreMutex.runExclusive(() =>
-    updateClientLastUsedTime(port),
-  );
+  const [updateLastUsedTimeError] = await updateClientLastUsedTime(port);
   if (updateLastUsedTimeError) {
     sendRpcResponse(
       getTabIdFromPort(port),

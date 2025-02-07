@@ -1,8 +1,9 @@
-import LedgerBadge from '@assets/img/ledger/ledger_badge.svg';
+import KeystoneBadge from '@assets/img/hw/keystone/keystone_badge.svg';
+import LedgerBadge from '@assets/img/hw/ledger/ledger_badge.svg';
 import { CaretRight } from '@phosphor-icons/react';
 import type { Account } from '@secretkeylabs/xverse-core';
 import { getAccountGradient } from '@utils/gradient';
-import { isHardwareAccount } from '@utils/helper';
+import { isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
 
@@ -94,7 +95,8 @@ function SelectAccount({ account, handlePressAccount }: Props) {
                   account?.bnsName ??
                   `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`}
               </CurrentAccountName>
-              {isHardwareAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
+              {isLedgerAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
+              {isKeystoneAccount(account) && <img src={KeystoneBadge} alt="Keystone icon" />}
             </CurrentAccountTextContainer>
           )}
         </AccountTag>

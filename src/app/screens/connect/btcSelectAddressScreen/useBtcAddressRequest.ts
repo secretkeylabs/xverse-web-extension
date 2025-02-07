@@ -2,7 +2,7 @@ import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types'
 import { getPopupPayload, type Context } from '@common/utils/popup';
 import { accountPurposeAddresses } from '@common/utils/rpc/btc/getAddresses/utils';
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
-import { usePermissionsUtils } from '@components/permissionsManager';
+import { usePermissions } from '@components/permissionsManager';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
@@ -40,7 +40,7 @@ interface UseRequestHelperReturn {
 function useMakeTransitionalGrantAccountReadPermissions() {
   const { network } = useWalletSelector();
   const account = useSelectedAccount();
-  const { addClient, addResource, setPermission } = usePermissionsUtils();
+  const { addClient, addResource, setPermission } = usePermissions();
   return useCallback(
     async (context: Context) => {
       const [clientIdError, clientId] = permissions.utils.store.makeClientId({
@@ -137,7 +137,10 @@ export default function useRequestHelper(): UseRequestHelperReturn {
         const addresses: GetAccountsResult = accountPurposeAddresses(account, {
           type: 'select',
           purposes: popupPayloadGetAccounts.data.params.purposes,
-        }).map((address) => ({ ...address, walletType: account.accountType ?? 'software' }));
+        }).map((address) => ({
+          ...address,
+          walletType: account.accountType ?? 'software',
+        }));
         sendRpcResponse(context.tabId, makeRpcSuccessResponse(data.id, addresses));
       },
       sendCancelledResponse() {
@@ -187,6 +190,7 @@ export default function useRequestHelper(): UseRequestHelperReturn {
       };
       chrome.tabs.sendMessage(tabId, addressMessage);
     };
+
     return {
       legacyRequestNetworkType,
       message,

@@ -63,6 +63,11 @@ const useTransactionContext = (overridePayAddressType?: BtcPaymentType) => {
       throw new Error('No account selected');
     }
 
+    // TODO: we currently store the master fingerprint in the masterPubKey field for hardware wallets
+    // we should not be doing this, but we need to refactor the account model to support this
+    const masterFingerprint =
+      selectedAccount.accountType === 'software' ? undefined : selectedAccount.masterPubKey;
+
     return btcTransaction.createTransactionContext({
       account: selectedAccount,
       seedVault,
@@ -70,6 +75,7 @@ const useTransactionContext = (overridePayAddressType?: BtcPaymentType) => {
       network: network.type,
       esploraApiProvider: btcClient,
       btcPaymentAddressType: selectedAccount.btcAddressType,
+      masterFingerprint,
     });
   }, [utxoCache, selectedAccount, network, seedVault, btcClient]);
 
