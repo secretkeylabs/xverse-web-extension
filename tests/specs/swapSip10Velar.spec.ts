@@ -45,7 +45,7 @@ test.describe('Swap sip-10 token to STX', () => {
     // assert presence of max button
     await expect(page.getByRole('button', { name: 'MAX' })).toBeVisible();
 
-    page.getByRole('button', { name: /get quotes/i }).click();
+    await page.getByRole('button', { name: /get quotes/i }).click();
 
     await expect(page.getByText('Rates', { exact: true })).toBeVisible();
 
@@ -54,15 +54,15 @@ test.describe('Swap sip-10 token to STX', () => {
     // Quotes page velar -> stacks
     await expect(page.getByText(/quote/i)).toBeVisible();
     await expect(page.getByText(/4%/i)).toBeVisible();
-    page.getByRole('button', { name: /4%/i }).click();
+    await page.getByRole('button', { name: /4%/i }).click();
 
     // edit slippage tolerance
     await page.getByRole('textbox', { name: '4' }).fill('1.22');
-    page.getByRole('button', { name: /apply/i }).click();
+    await page.getByRole('button', { name: /apply/i }).click();
     await expect(page.getByText('1.22')).toBeVisible();
     await expect(page.getByRole('img', { name: /velar logo/i })).toBeVisible();
 
-    page.getByRole('button', { name: /swap/i }).click();
+    await page.getByRole('button', { name: /swap/i }).click();
 
     // Arrive to the final step - swap contract page
     await expect(page.getByText(/swap-exact-tokens-for-tokens/i)).toHaveCount(2);
@@ -71,9 +71,9 @@ test.describe('Swap sip-10 token to STX', () => {
     await expect(page.getByRole('button', { name: /edit nonce/i })).toBeVisible();
 
     // User clicks confirm
-    page.getByRole('button', { name: /confirm/i }).click();
+    await page.getByRole('button', { name: /confirm/i }).click();
     await expect(page.getByText(/transaction broadcasted/i)).toBeVisible();
-    page.getByRole('button', { name: /close/i }).click();
+    await page.getByRole('button', { name: /close/i }).click();
 
     // After closing user should arrive to homepage
     await expect(page).toHaveURL(/popup\.html/);

@@ -20,14 +20,14 @@ test.describe('Velar sip-10 swap flow', () => {
       .first()
       .click();
     await page.getByText(/stacks/i).click();
-    page
+    await page
       .getByRole('button', { name: /select asset/i })
       .last()
       .click();
 
     await page.getByText(/velar/i).first().click();
-    page.getByRole('textbox', { name: '0' }).fill('0.1');
-    page.getByRole('button', { name: /get quotes/i }).click();
+    await page.getByRole('textbox', { name: '0' }).fill('0.1');
+    await page.getByRole('button', { name: /get quotes/i }).click();
     await expect(page.getByText('Rates', { exact: true })).toBeVisible();
     await page.getByText(/^\d+\.\d+\s+Velar$/i).click();
 
@@ -35,8 +35,8 @@ test.describe('Velar sip-10 swap flow', () => {
     await expect(page.getByText(/quote/i)).toBeVisible();
     await expect(page.getByText(/4%/i)).toBeVisible();
 
-    page.getByRole('img', { name: /velar logo/i }).isVisible();
-    page.getByRole('button', { name: /swap/i }).click();
+    await page.getByRole('img', { name: /velar logo/i }).isVisible();
+    await page.getByRole('button', { name: /swap/i }).click();
 
     // Arrive to the final step - swap contract page
     await expect(page.getByText(/swap-exact-tokens-for-tokens/i)).toHaveCount(2);
@@ -45,9 +45,9 @@ test.describe('Velar sip-10 swap flow', () => {
     await expect(page.getByRole('button', { name: /edit nonce/i })).toBeVisible();
 
     // User clicks confirm
-    page.getByRole('button', { name: /confirm/i }).click();
+    await page.getByRole('button', { name: /confirm/i }).click();
     await expect(page.getByText(/transaction broadcasted/i)).toBeVisible();
-    page.getByRole('button', { name: /close/i }).click();
+    await page.getByRole('button', { name: /close/i }).click();
 
     // After closing user should arrive to homepage
     await expect(page).toHaveURL(/popup\.html/);

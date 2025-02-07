@@ -52,7 +52,13 @@
     ],
     "no-plusplus": "off",
     "@tanstack/query/exhaustive-deps": 1,
-    "import/order": 0
+    "import/order": 0,
+    "@typescript-eslint/no-floating-promises": [
+      "warn",
+      {
+        "ignoreVoid": true
+      }
+    ]
   },
   "overrides": [
     {

@@ -49,7 +49,7 @@ test.describe('Transaction STX', () => {
     await expect(page.getByRole('textbox', { name: '0' })).toBeEnabled();
     await expect(wallet.labelBalanceAmountSelector).toBeVisible();
     await expect(wallet.imageToken).toBeVisible();
-    page.getByRole('textbox', { name: '0' }).fill('200000000');
+    await page.getByRole('textbox', { name: '0' }).fill('200000000');
     await expect(page.getByRole('button', { name: /insufficient funds/i })).toBeVisible();
   });
 
