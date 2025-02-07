@@ -4,7 +4,7 @@ import type { SupportedCurrency } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
 import BigNumber from 'bignumber.js';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
 
@@ -81,12 +81,6 @@ const StyledFiatAmountText = styled(FiatAmountText)<{ $color: string }>`
 
 type FeePriority = 'high' | 'medium' | 'low';
 
-const priorityTimeMap: Record<FeePriority, number> = {
-  high: 10,
-  medium: 30,
-  low: 60,
-};
-
 type Props = {
   priority: FeePriority;
   time?: string;
@@ -122,6 +116,15 @@ function FeeItem({
   const [totalFee, setTotalFee] = useState<number | undefined>(undefined);
   const [fiat, setFiat] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
+
+  const priorityTimeMap: Record<FeePriority, string> = useMemo(
+    () => ({
+      high: `~30 ${t('SPEED_UP_TRANSACTION.TIME.SECONDS')}`,
+      medium: `~5 ${t('SPEED_UP_TRANSACTION.TIME.MINUTES')}`,
+      low: `10+ ${t('SPEED_UP_TRANSACTION.TIME.MINUTES')}`,
+    }),
+    [t],
+  );
 
   useEffect(() => {
     setIsLoading(true);
@@ -174,6 +177,8 @@ function FeeItem({
   );
   const insufficientFunds = totalFee === undefined || feesExceedBalance;
 
+  const estimatedTime = time ?? priorityTimeMap[priority];
+
   return (
     <FeeItemContainer
       data-testid="fee-select-button"
@@ -189,7 +194,7 @@ function FeeItem({
             {getLabel()}
           </StyledHeading>
           <StyledP typography="body_medium_s" color={secondaryColor}>
-            {time ?? `~${priorityTimeMap[priority]} mins`}
+            {estimatedTime}
           </StyledP>
           {feeRateUnits && (
             <StyledP

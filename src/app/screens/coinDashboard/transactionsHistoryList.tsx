@@ -18,8 +18,8 @@ import type {
 } from '@stacks/stacks-blockchain-api-types';
 import Spinner from '@ui-library/spinner';
 import type { CurrencyTypes } from '@utils/constants';
-import { formatDate } from '@utils/date';
-import { isLedgerAccount } from '@utils/helper';
+import { formatDate, formatDateKey } from '@utils/date';
+import { isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import {
   isAddressTransactionWithTransfers,
   isBrc20Transaction,
@@ -89,76 +89,158 @@ const SectionTitle = styled.p((props) => ({
   marginRight: props.theme.space.xs,
 }));
 
-const sortTransactionsByBlockHeight = (transactions: BtcTransactionData[]) =>
-  transactions.sort((txA, txB) => {
-    if (txB.blockHeight > txA.blockHeight) {
-      return 1;
-    }
-    return -1;
-  });
-
 const groupBtcTxsByDate = (
   transactions: BtcTransactionData[],
-): { [x: string]: BtcTransactionData[] } => {
+): [Date, string, BtcTransactionData[]][] => {
   const pendingTransactions: BtcTransactionData[] = [];
   const processedTransactions: { [x: string]: BtcTransactionData[] } = {};
 
   transactions.forEach((transaction) => {
-    const txDate = formatDate(new Date(transaction.seenTime));
     if (transaction.txStatus === 'pending') {
       pendingTransactions.push(transaction);
     } else {
-      if (!processedTransactions[txDate]) processedTransactions[txDate] = [transaction];
-      else processedTransactions[txDate].push(transaction);
-
-      sortTransactionsByBlockHeight(processedTransactions[txDate]);
+      const txDateKey = formatDateKey(new Date(transaction.seenTime));
+      if (!processedTransactions[txDateKey]) {
+        processedTransactions[txDateKey] = [];
+      }
+      processedTransactions[txDateKey].push(transaction);
     }
   });
-  sortTransactionsByBlockHeight(pendingTransactions);
+
+  const result: [Date, string, BtcTransactionData[]][] = [];
+
   if (pendingTransactions.length > 0) {
-    const result = { Pending: pendingTransactions, ...processedTransactions };
-    return result;
+    result.push([new Date(), 'Pending', pendingTransactions]);
   }
-  return processedTransactions;
+
+  Object.values(processedTransactions).forEach((grp) => {
+    if (grp.length === 0) {
+      return;
+    }
+
+    grp.sort((txA, txB) => {
+      // sort by block height first
+      const blockHeightDiff = txB.blockHeight - txA.blockHeight;
+      if (blockHeightDiff !== 0) {
+        return blockHeightDiff;
+      }
+
+      // if block height is the same, sort by txid for consistency
+      return txB.txid.localeCompare(txA.txid);
+    });
+
+    result.push([new Date(grp[0].seenTime), formatDate(new Date(grp[0].seenTime)), grp]);
+  });
+
+  result.sort((a, b) => b[0].getTime() - a[0].getTime());
+
+  return result;
 };
 
 const groupRuneTxsByDate = (
   transactions: GetRunesActivityForAddressEvent[],
-): Record<string, GetRunesActivityForAddressEvent[]> => {
-  const mappedTransactions = {};
+): [Date, string, GetRunesActivityForAddressEvent[]][] => {
+  const processedTransactions: { [x: string]: GetRunesActivityForAddressEvent[] } = {};
+
   transactions.forEach((transaction) => {
-    const txDate = formatDate(new Date(transaction.blockTimestamp));
-    if (!mappedTransactions[txDate]) {
-      mappedTransactions[txDate] = [transaction];
-    } else {
-      mappedTransactions[txDate].push(transaction);
+    const txDateKey = formatDateKey(new Date(transaction.blockTimestamp));
+    if (!processedTransactions[txDateKey]) {
+      processedTransactions[txDateKey] = [];
     }
+    processedTransactions[txDateKey].push(transaction);
   });
-  return mappedTransactions;
+
+  const result: [Date, string, GetRunesActivityForAddressEvent[]][] = [];
+
+  Object.values(processedTransactions).forEach((grp) => {
+    if (grp.length === 0) {
+      return;
+    }
+
+    grp.sort((txA, txB) => {
+      // sort by block height first
+      const blockHeightDiff = txB.blockHeight - txA.blockHeight;
+      if (blockHeightDiff !== 0) {
+        return blockHeightDiff;
+      }
+
+      // if block height is the same, sort by txid for consistency
+      return txB.txid.localeCompare(txA.txid);
+    });
+
+    result.push([
+      new Date(grp[0].blockTimestamp),
+      formatDate(new Date(grp[0].blockTimestamp)),
+      grp,
+    ]);
+  });
+
+  result.sort((a, b) => b[0].getTime() - a[0].getTime());
+
+  return result;
 };
 
-const groupedTxsByDateMap = (txs: (AddressTransactionWithTransfers | MempoolTransaction)[]) =>
-  txs.reduce(
-    (
-      all: { [x: string]: (AddressTransactionWithTransfers | Tx)[] },
-      transaction: AddressTransactionWithTransfers | Tx,
-    ) => {
-      const date = formatDate(
-        new Date(
-          isAddressTransactionWithTransfers(transaction) && transaction.tx?.burn_block_time_iso
-            ? transaction.tx.burn_block_time_iso
-            : Date.now(),
-        ),
-      );
-      if (!all[date]) {
-        all[date] = [transaction];
-      } else {
-        all[date].push(transaction);
+const groupedTxsByDateMap = (
+  transactions: (AddressTransactionWithTransfers | MempoolTransaction)[],
+): [Date, string, (AddressTransactionWithTransfers | Tx)[]][] => {
+  const getBlockTimestamp = (tx: AddressTransactionWithTransfers | Tx): Date => {
+    let dateStr: string;
+
+    if (isAddressTransactionWithTransfers(tx)) {
+      dateStr = tx.tx.burn_block_time_iso;
+    } else if ('receipt_time_iso' in tx) {
+      dateStr = tx.receipt_time_iso;
+    } else {
+      dateStr = '';
+    }
+
+    return dateStr ? new Date(dateStr) : new Date();
+  };
+
+  const getTxid = (tx: AddressTransactionWithTransfers | Tx): string => {
+    if (isAddressTransactionWithTransfers(tx)) {
+      return tx.tx.tx_id;
+    }
+    return tx.tx_id;
+  };
+
+  const processedTransactions: { [x: string]: (AddressTransactionWithTransfers | Tx)[] } = {};
+
+  transactions.forEach((transaction) => {
+    const txDate = getBlockTimestamp(transaction);
+    const txDateKey = formatDateKey(txDate);
+
+    if (!processedTransactions[txDateKey]) {
+      processedTransactions[txDateKey] = [];
+    }
+    processedTransactions[txDateKey].push(transaction);
+  });
+
+  const result: [Date, string, (AddressTransactionWithTransfers | Tx)[]][] = [];
+
+  Object.values(processedTransactions).forEach((grp) => {
+    if (grp.length === 0) {
+      return;
+    }
+
+    grp.sort((txA, txB) => {
+      // sort by block height first
+      const blockHeightDiff = getBlockTimestamp(txB).getTime() - getBlockTimestamp(txA).getTime();
+      if (blockHeightDiff !== 0) {
+        return blockHeightDiff;
       }
-      return all;
-    },
-    {},
-  );
+
+      // if block height is the same, sort by txid for consistency
+      return getTxid(txB).localeCompare(getTxid(txA));
+    });
+
+    result.push([getBlockTimestamp(grp[0]), formatDate(new Date(getBlockTimestamp(grp[0]))), grp]);
+  });
+
+  result.sort((a, b) => b[0].getTime() - a[0].getTime());
+
+  return result;
+};
 
 const filterStxTxs = (
   txs: (AddressTransactionWithTransfers | MempoolTransaction)[],
@@ -203,7 +285,7 @@ function TransactionsHistoryList({
   const { network, selectedAccountType } = useWalletSelector();
   const btcClient = useBtcClient();
   const seedVault = useSeedVault();
-  const { data, isLoading, isFetching, error } = useTransactions(
+  const { data, isLoading, error } = useTransactions(
     (coin as CurrencyTypes) || 'STX',
     brc20Token,
     runeToken,
@@ -222,7 +304,8 @@ function TransactionsHistoryList({
         ...selectedAccount,
         accountType: selectedAccountType || 'software',
         accountId:
-          isLedgerAccount(selectedAccount) && selectedAccount.deviceAccountIndex
+          (isLedgerAccount(selectedAccount) || isKeystoneAccount(selectedAccount)) &&
+          selectedAccount.deviceAccountIndex !== undefined
             ? selectedAccount.deviceAccountIndex
             : selectedAccount.id,
         network: network.type,
@@ -252,20 +335,20 @@ function TransactionsHistoryList({
       return groupedTxsByDateMap(filteredTxs);
     }
     return groupedTxsByDateMap(data as (AddressTransactionWithTransfers | MempoolTransaction)[]);
-  }, [data, isLoading, isFetching]);
+  }, [data, coin, stxTxFilter]);
 
   return (
     <ListItemsContainer>
       {withTitle && <ListHeader>{t('TRANSACTION_HISTORY_TITLE')}</ListHeader>}
       {groupedTxs &&
         !isLoading &&
-        Object.keys(groupedTxs).map((group) => (
+        groupedTxs.map(([, group, items]) => (
           <GroupContainer key={group} style={styles}>
             <SectionHeader>
               <SectionTitle>{group}</SectionTitle>
               <SectionSeparator />
             </SectionHeader>
-            {groupedTxs[group].map((transaction) => {
+            {items.map((transaction) => {
               if (wallet && isRuneTransaction(transaction)) {
                 return (
                   <RuneTransactionHistoryItem

@@ -5,7 +5,12 @@ import useSubmitRuneSellPsbt from '@hooks/queries/runes/useSubmitRuneSellPsbt';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import { RpcErrorCode } from '@sats-connect/core';
-import { AnalyticsEvents, btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
+import {
+  AnalyticsEvents,
+  btcTransaction,
+  type KeystoneTransport,
+  type LedgerTransport,
+} from '@secretkeylabs/xverse-core';
 import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -63,14 +68,17 @@ function SignPsbtRequest() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [parsedPsbt]);
 
-  const onConfirm = async (ledgerTransport?: Transport) => {
+  const onConfirm = async (options?: {
+    ledgerTransport?: LedgerTransport;
+    keystoneTransport?: KeystoneTransport;
+  }) => {
     if (!parsedPsbt) return;
 
     setIsSigning(true);
     try {
       const signedPsbt = await parsedPsbt.getSignedPsbtBase64({
         finalize: payload.broadcast,
-        ledgerTransport,
+        ...options,
       });
       const response = await confirmSignPsbt(signedPsbt);
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
@@ -78,8 +86,9 @@ function SignPsbtRequest() {
         action: 'sign-psbt',
         wallet_type: selectedAccount?.accountType || 'software',
       });
-      if (ledgerTransport) {
-        await ledgerTransport.close();
+      const transport = options?.ledgerTransport ?? options?.keystoneTransport;
+      if (transport) {
+        await transport.close();
       }
       if (signedPsbt && magicEdenPsbt && runeId) {
         return await submitRuneSellPsbt(signedPsbt, location.state.selectedRune?.name ?? '')
@@ -151,6 +160,7 @@ function SignPsbtRequest() {
         error={validationError.error}
         errorTitle={validationError.errorTitle}
         onClose={onCloseClick}
+        textAlignment={validationError.alignment}
       />
     );
   }

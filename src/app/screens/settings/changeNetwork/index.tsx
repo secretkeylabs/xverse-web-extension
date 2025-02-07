@@ -4,8 +4,10 @@ import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   defaultMainnet,
+  defaultRegtest,
   defaultSignet,
   defaultTestnet,
+  defaultTestnet4,
   initialNetworksList,
   type SettingsNetwork,
 } from '@secretkeylabs/xverse-core';
@@ -169,6 +171,8 @@ function ChangeNetworkScreen() {
 
   const savedMainnet = savedNetworks.find((n) => n.type === 'Mainnet');
   const savedTestnet = savedNetworks.find((n) => n.type === 'Testnet');
+  const savedTestnet4 = savedNetworks.find((n) => n.type === 'Testnet4');
+  const savedRegtest = savedNetworks.find((n) => n.type === 'Regtest');
   const savedSignet = savedNetworks.find((n) => n.type === 'Signet');
 
   return (
@@ -180,18 +184,35 @@ function ChangeNetworkScreen() {
           network={savedMainnet || defaultMainnet}
           isSelected={formInputs.type === 'Mainnet'}
           onNetworkSelected={onNetworkSelected}
+          disabled={isChangingNetwork}
           showDivider
         />
         <NetworkRow
           network={savedTestnet || defaultTestnet}
           isSelected={formInputs.type === 'Testnet'}
           onNetworkSelected={onNetworkSelected}
+          disabled={isChangingNetwork}
+          showDivider
+        />
+        <NetworkRow
+          network={savedTestnet4 || defaultTestnet4}
+          isSelected={formInputs.type === 'Testnet4'}
+          onNetworkSelected={onNetworkSelected}
+          disabled={isChangingNetwork}
           showDivider
         />
         <NetworkRow
           network={savedSignet || defaultSignet}
           isSelected={formInputs.type === 'Signet'}
           onNetworkSelected={onNetworkSelected}
+          disabled={isChangingNetwork}
+          showDivider
+        />
+        <NetworkRow
+          network={savedRegtest || defaultRegtest}
+          isSelected={formInputs.type === 'Regtest'}
+          onNetworkSelected={onNetworkSelected}
+          disabled={isChangingNetwork}
           showDivider={false}
         />
         <NodeInputsContainer>
@@ -204,6 +225,7 @@ function ChangeNetworkScreen() {
               onClear={onClearCreator(key)}
               onReset={onResetCreator(key)}
               error={formErrors[key]}
+              disabled={isChangingNetwork}
             />
           ))}
         </NodeInputsContainer>

@@ -34,17 +34,24 @@ type Props = {
 };
 
 function TransactionOutput({ output, scriptOutputCount }: Props) {
-  const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey } = useSelectedAccount();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
+
+  const { btcAddresses, btcPublicKey, ordinalsPublicKey } = useSelectedAccount();
+
+  const userAddresses = Object.values(btcAddresses).map((address) => address.address);
+
   const isOutputWithScript = output.type === 'script';
   const isOutputWithAddress = output.type === 'address';
   const isOutputWithPubKey = !isOutputWithScript && !isOutputWithAddress;
 
+  const isOutputToOwnAddress =
+    isOutputWithScript || isOutputWithPubKey
+      ? false
+      : userAddresses.some((address) => address === output.address);
+
   const detailViewIcon = isOutputWithScript ? ScriptIcon : OutputIcon;
   const detailViewHideCopyButton =
-    isOutputWithScript || isOutputWithPubKey
-      ? true
-      : btcAddress === output.address || ordinalsAddress === output.address;
+    isOutputWithScript || isOutputWithPubKey ? true : isOutputToOwnAddress;
 
   const detailView = () => {
     if (isOutputWithScript) {
@@ -67,7 +74,7 @@ function TransactionOutput({ output, scriptOutputCount }: Props) {
       );
     }
 
-    if (output.address === btcAddress || output.address === ordinalsAddress) {
+    if (isOutputToOwnAddress) {
       return (
         <TxIdContainer>
           <SubValueText data-testid="address-receive" typography="body_medium_s">

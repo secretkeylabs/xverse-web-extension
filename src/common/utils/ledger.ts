@@ -1,13 +1,10 @@
 import type { Account, NetworkType } from '@secretkeylabs/xverse-core';
 
-export const delay = (ms: number) =>
-  new Promise((res) => {
-    setTimeout(res, ms);
-  });
-
-export const filterLedgerAccounts = (accounts: Account[], network: NetworkType) =>
+export const filterLedgerAccountsByNetwork = (accounts: Account[], network: NetworkType) =>
   accounts.filter((account) =>
-    account.ordinalsAddress?.startsWith(network === 'Mainnet' ? 'bc1' : 'tb1'),
+    account.btcAddresses.taproot.address.startsWith(
+      network === 'Mainnet' ? 'bc1' : network === 'Regtest' ? 'bcrt' : 'tb1',
+    ),
   );
 
 // this is used for migrating the old ledger accounts to the new format
@@ -43,7 +40,7 @@ export const getDeviceNewAccountIndex = (
   network: NetworkType,
   masterKey?: string,
 ) => {
-  const networkLedgerAccounts = filterLedgerAccounts(ledgerAccountsList, network);
+  const networkLedgerAccounts = filterLedgerAccountsByNetwork(ledgerAccountsList, network);
 
   const ledgerAccountsIndexList = networkLedgerAccounts
     .filter((account) => masterKey === account.masterPubKey)

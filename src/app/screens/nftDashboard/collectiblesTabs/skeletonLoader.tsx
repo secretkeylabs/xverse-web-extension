@@ -1,5 +1,5 @@
 import { StyledBarLoader, TilesSkeletonLoader } from '@components/tilesSkeletonLoader';
-import { CountLoaderContainer, LoaderContainer } from './index.styled';
+import { CountLoaderContainer, GridContainer, LoaderContainer } from './index.styled';
 
 function SkeletonLoader({ isGalleryOpen }: { isGalleryOpen: boolean }) {
   return (
@@ -7,7 +7,9 @@ function SkeletonLoader({ isGalleryOpen }: { isGalleryOpen: boolean }) {
       <CountLoaderContainer>
         <StyledBarLoader width={85} height={20} />
       </CountLoaderContainer>
-      <TilesSkeletonLoader isGalleryOpen={isGalleryOpen} tileSize={isGalleryOpen ? 276 : 151} />
+      <GridContainer $isGalleryOpen={isGalleryOpen}>
+        <TilesSkeletonLoader isGalleryOpen={isGalleryOpen} tileSize={isGalleryOpen ? 171 : 151} />
+      </GridContainer>
     </LoaderContainer>
   );
 }

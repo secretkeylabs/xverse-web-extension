@@ -3,6 +3,7 @@ import type {
   Account,
   AccountType,
   AppInfo,
+  BtcPaymentType,
   FungibleToken,
   NetworkType,
   SettingsNetwork,
@@ -43,6 +44,15 @@ export function updateLedgerAccountsAction(
   };
 }
 
+export function updateKeystoneAccountsAction(
+  keystoneAccountsList: Account[],
+): actions.UpdateKeystoneAccounts {
+  return {
+    type: actions.UpdateKeystoneAccountsKey,
+    keystoneAccountsList,
+  };
+}
+
 export function selectAccount(selectedAccount: Account): actions.SelectAccount;
 export function selectAccount(
   selectedAccountIdx: number,
@@ -53,6 +63,7 @@ export function selectAccount(
   accountType?: AccountType,
 ): actions.SelectAccount {
   let selectedAccountIndex = selectedAccountOrIdx;
+
   let selectedAccountType = accountType ?? 'software';
 
   if (typeof selectedAccountIndex === 'object') {
@@ -90,6 +101,15 @@ export function ChangeNetworkAction(network: SettingsNetwork): actions.ChangeNet
   };
 }
 
+export function ChangeBtcPaymentAddressType(
+  newType: BtcPaymentType,
+): actions.ChangeBtcPaymentAddressType {
+  return {
+    type: actions.ChangeBtcPaymentAddressTypeKey,
+    btcPaymentType: newType,
+  };
+}
+
 export function ChangeActivateOrdinalsAction(
   hasActivatedOrdinalsKey: boolean,
 ): actions.ChangeActivateOrdinals {
@@ -121,24 +141,6 @@ export function SetRareSatsNoticeDismissedAction(
   return {
     type: actions.RareSatsNoticeDismissedKey,
     rareSatsNoticeDismissed,
-  };
-}
-
-export function ChangeShowBtcReceiveAlertAction(
-  showBtcReceiveAlert: boolean | null,
-): actions.ChangeShowBtcReceiveAlert {
-  return {
-    type: actions.ChangeShowBtcReceiveAlertKey,
-    showBtcReceiveAlert,
-  };
-}
-
-export function ChangeShowOrdinalReceiveAlertAction(
-  showOrdinalReceiveAlert: boolean | null,
-): actions.ChangeShowOrdinalReceiveAlert {
-  return {
-    type: actions.ChangeShowOrdinalReceiveAlertKey,
-    showOrdinalReceiveAlert,
   };
 }
 
@@ -200,12 +202,12 @@ export function setWalletUnlockedAction(isUnlocked: boolean): actions.SetWalletU
 }
 
 export function setAccountBalanceAction(
-  btcAddress: string,
+  accountKey: string,
   totalBalance: string,
 ): actions.SetAccountBalance {
   return {
     type: actions.SetAccountBalanceKey,
-    btcAddress,
+    accountKey,
     totalBalance,
   };
 }
@@ -297,6 +299,15 @@ export function removeAllFromHideCollectiblesAction(params: {
   };
 }
 
+export function setHiddenCollectiblesAction(params: {
+  collectibleIds: Record<string, Record<string, string>>;
+}): actions.SetHiddenCollectibles {
+  return {
+    type: actions.SetHiddenCollectiblesKey,
+    ...params,
+  };
+}
+
 export function setAccountAvatarAction(params: {
   address: string;
   avatar: actions.AvatarInfo;
@@ -315,3 +326,28 @@ export function removeAccountAvatarAction(params: {
     ...params,
   };
 }
+
+export function setBalanceHiddenToggleAction(params: {
+  toggle: boolean;
+}): actions.SetBalanceHiddenToggle {
+  return {
+    type: actions.SetBalanceHiddenToggleKey,
+    ...params,
+  };
+}
+
+export function setShowBalanceInBtcAction(params: {
+  toggle: boolean;
+}): actions.SetShowBalanceInBtc {
+  return {
+    type: actions.SetShowBalanceInBtcToggleKey,
+    ...params,
+  };
+}
+
+export const setWalletBackupStatusAction = (
+  hasBackedUpWallet: boolean,
+): actions.SetWalletBackupStatus => ({
+  type: actions.SetWalletBackupStatusKey,
+  hasBackedUpWallet,
+});

@@ -26,16 +26,17 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import type { StxRequests } from '@sats-connect/core';
 import {
   AnalyticsEvents,
-  addressToString,
   broadcastSignedTransaction,
-  buf2hex,
   isMultiSig,
   microstacksToStx,
   stxToMicrostacks,
-  type StacksTransaction,
-  type TokenTransferPayload,
+  type TokenTransferPayloadWire,
 } from '@secretkeylabs/xverse-core';
-import { deserializeTransaction, type MultiSigSpendingCondition } from '@stacks/transactions';
+import {
+  deserializeTransaction,
+  type MultiSigSpendingCondition,
+  type StacksTransactionWire,
+} from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import Callout from '@ui-library/callout';
 import { XVERSE_POOL_ADDRESS } from '@utils/constants';
@@ -98,8 +99,8 @@ function ConfirmStxTransaction() {
     stateFee ? microstacksToStx(new BigNumber(stateFee)).toString() : '',
   );
 
-  const txPayload = unsignedTx.payload as TokenTransferPayload;
-  const recipient = addressToString(txPayload.recipient.address);
+  const txPayload = unsignedTx.payload as TokenTransferPayloadWire;
+  const recipient = txPayload.recipient.value;
   const amount = new BigNumber(txPayload.amount.toString(10));
   const memo = txPayload.memo.content.split('\u0000').join('');
   const delegatedAmount =
@@ -148,7 +149,7 @@ function ConfirmStxTransaction() {
     error: txError,
     data: stxTxBroadcastData,
     mutate: broadcastTransaction,
-  } = useMutation<string, Error, { signedTx: StacksTransaction }>({
+  } = useMutation<string, Error, { signedTx: StacksTransactionWire }>({
     mutationFn: async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork),
   });
 
@@ -216,11 +217,11 @@ function ConfirmStxTransaction() {
     }
   }, [txError]);
 
-  const handleConfirmClick = (txs: StacksTransaction[]) => {
+  const handleConfirmClick = (txs: StacksTransactionWire[]) => {
     if (isLedgerAccount(selectedAccount)) {
       const fee = new BigNumber(txs[0].auth.spendingCondition.fee.toString());
       const state: ConfirmStxTransactionState = {
-        unsignedTx: Buffer.from(unsignedTx.serialize()),
+        unsignedTx: Buffer.from(unsignedTx.serializeBytes()),
         recipients: [{ address: recipient, amountMicrostacks: amount }],
         fee,
       };
@@ -228,7 +229,7 @@ function ConfirmStxTransaction() {
       navigate('/confirm-ledger-stx-tx', { state });
       return;
     }
-    const rawTx = buf2hex(txs[0].serialize());
+    const rawTx = txs[0].serialize();
     setTxRaw(rawTx);
     if (isMultiSigTx && isBrowserTx) {
       // A quick way to infer whether the app is responding to an RPC request.

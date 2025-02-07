@@ -27,7 +27,8 @@ export default function UnlistRuneScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'LIST_RUNE_SCREEN' });
   const navigate = useNavigate();
   const { runeId } = useParams();
-  const { visible: runesCoinsList } = useVisibleRuneFungibleTokens();
+  const { data: runesCoinsList = [], isLoading: isLoadingRunesCoinsList } =
+    useVisibleRuneFungibleTokens();
   const selectedRune = runesCoinsList.find((ft) => ft.principal === runeId);
   const showRunesListing =
     useHasFeature(FeatureId.RUNES_LISTING) || process.env.NODE_ENV === 'development';
@@ -43,10 +44,10 @@ export default function UnlistRuneScreen() {
     isInitialLoading: isFetchingListedItems,
     isRefetching: isRefetchingListedItems,
     refetch,
-  } = useRuneUtxosQueryPerMarketplace(selectedRune as FungibleToken, false);
+  } = useRuneUtxosQueryPerMarketplace(selectedRune, false);
   const { listedItems } = data || {};
 
-  const isLoading = isFetchingListedItems || isRefetchingListedItems;
+  const isLoading = isFetchingListedItems || isRefetchingListedItems || isLoadingRunesCoinsList;
   const showContent = !isLoading && !!listedItems?.length;
 
   const handleGoBack = () =>

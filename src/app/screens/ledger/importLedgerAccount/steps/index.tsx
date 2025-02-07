@@ -1,13 +1,13 @@
 import warningIcon from '@assets/img/Warning_red.svg';
 import stxIcon from '@assets/img/dashboard/stx_icon.svg';
-import ledgerAccountSwitchIcon from '@assets/img/ledger/account_switch.svg';
-import btcIcon from '@assets/img/ledger/btc_icon.svg';
-import btcOrdinalsIcon from '@assets/img/ledger/btc_ordinals_icon.svg';
-import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
-import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
-import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
-import ledgerImportStartIcon from '@assets/img/ledger/ledger_import_start.svg';
-import ordinalsIcon from '@assets/img/ledger/ordinals_icon.svg';
+import ledgerAccountSwitchIcon from '@assets/img/hw/account_switch.svg';
+import btcIcon from '@assets/img/hw/ledger/btc_icon.svg';
+import btcOrdinalsIcon from '@assets/img/hw/ledger/btc_ordinals_icon.svg';
+import checkCircleIcon from '@assets/img/hw/ledger/check_circle.svg';
+import ledgerConnectBtcIcon from '@assets/img/hw/ledger/ledger_import_connect_btc.svg';
+import ledgerConnectStxIcon from '@assets/img/hw/ledger/ledger_import_connect_stx.svg';
+import ledgerImportStartIcon from '@assets/img/hw/ledger/ledger_import_start.svg';
+import ordinalsIcon from '@assets/img/hw/ledger/ordinals_icon.svg';
 import LedgerFailView from '@components/ledger/failLedgerView';
 import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
 import LedgerAssetSelectCard from '@components/ledger/ledgerAssetSelectCard';
@@ -52,7 +52,7 @@ import {
 } from './index.styled';
 
 const LINK_TO_LEDGER_ACCOUNT_ISSUE_GUIDE =
-  'https://support.xverse.app/hc/en-us/articles/17901278165773';
+  'https://support.xverse.app/hc/en-us/articles/17898446492557';
 const LINK_TO_LEDGER_PASSPHRASE_GUIDE =
   'https://support.xverse.app/hc/en-us/articles/17901278165773';
 
@@ -165,16 +165,16 @@ function Steps({
           <OptionsContainer>
             <Option
               onClick={() => setSelectedLedgerLiveOption(LedgerLiveOptions.USING)}
-              selected={selectedLedgerLiveOption === LedgerLiveOptions.USING}
+              $selected={selectedLedgerLiveOption === LedgerLiveOptions.USING}
             >
-              <OptionIcon selected={selectedLedgerLiveOption === LedgerLiveOptions.USING} />
+              <OptionIcon $selected={selectedLedgerLiveOption === LedgerLiveOptions.USING} />
               {t('LEDGER_BEFORE_GETTING_STARTED.OPTIONS.USE_LEDGER_LIVE')}
             </Option>
             <Option
               onClick={() => setSelectedLedgerLiveOption(LedgerLiveOptions.NOT_USING)}
-              selected={selectedLedgerLiveOption === LedgerLiveOptions.NOT_USING}
+              $selected={selectedLedgerLiveOption === LedgerLiveOptions.NOT_USING}
             >
-              <OptionIcon selected={selectedLedgerLiveOption === LedgerLiveOptions.NOT_USING} />
+              <OptionIcon $selected={selectedLedgerLiveOption === LedgerLiveOptions.NOT_USING} />
               {t('LEDGER_BEFORE_GETTING_STARTED.OPTIONS.DONT_USE_LEDGER_LIVE')}
             </Option>
           </OptionsContainer>
@@ -340,8 +340,8 @@ function Steps({
           <ConfirmationText>{t('LEDGER_ADD_ADDRESS.CONFIRM_TO_CONTINUE')}</ConfirmationText>
           {isBitcoinSelected && (
             <ConfirmationStepsContainer>
-              <ConfirmationStep isCompleted={isBtcAddressConfirmed} />
-              <ConfirmationStep isCompleted={isOrdinalsAddressConfirmed} />
+              <ConfirmationStep $isCompleted={isBtcAddressConfirmed} />
+              <ConfirmationStep $isCompleted={isOrdinalsAddressConfirmed} />
             </ConfirmationStepsContainer>
           )}
         </>
@@ -379,8 +379,8 @@ function Steps({
           </AddAddressDetailsContainer>
           <ConfirmationText>{t('LEDGER_ADD_ADDRESS.CONFIRM_TO_CONTINUE')}</ConfirmationText>
           <ConfirmationStepsContainer>
-            <ConfirmationStep isCompleted={isBtcAddressConfirmed} />
-            <ConfirmationStep isCompleted={isOrdinalsAddressConfirmed} />
+            <ConfirmationStep $isCompleted={isBtcAddressConfirmed} />
+            <ConfirmationStep $isCompleted={isOrdinalsAddressConfirmed} />
           </ConfirmationStepsContainer>
         </>
       );

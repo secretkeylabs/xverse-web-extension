@@ -14,7 +14,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { isDangerFeedback, type InputFeedbackProps } from '@ui-library/inputFeedback';
 import type { Brc20TransferEstimateFeesParams, ConfirmBrc20TransferState } from '@utils/brc20';
-import { isInOptions, replaceCommaByDot } from '@utils/helper';
+import { replaceCommaByDot } from '@utils/helper';
 import { getFtTicker } from '@utils/tokens';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -36,8 +36,6 @@ function SendBrc20Screen() {
   const [recipientError, setRecipientError] = useState<InputFeedbackProps | null>(null);
   const [processing, setProcessing] = useState(false);
   const transactionContext = useTransactionContext();
-
-  const isFullScreen = isInOptions();
 
   useResetUserFlow('/send-brc20-one-step');
 
@@ -165,7 +163,7 @@ function SendBrc20Screen() {
 
   return (
     <>
-      <TopRow title={t('SEND')} onClick={handleBackButtonClick} showBackButton={!isFullScreen} />
+      <TopRow title={t('SEND')} onClick={handleBackButtonClick} showBackButton />
       <Brc20TransferForm
         amountToSend={amountToSend}
         onAmountChange={onInputChange}

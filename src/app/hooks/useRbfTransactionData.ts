@@ -7,11 +7,10 @@ import {
   type BtcTransactionData,
   type RecommendedFeeResponse,
   type SettingsNetwork,
-  type StacksTransaction,
   type StxTransactionData,
 } from '@secretkeylabs/xverse-core';
 import { deserializeTransaction } from '@stacks/transactions';
-import { isLedgerAccount } from '@utils/helper';
+import { isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import axios from 'axios';
 import BigNumber from 'bignumber.js';
 import { useCallback, useEffect, useState } from 'react';
@@ -136,7 +135,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
 
       const { fee } = transaction;
       const txRaw: string = await getRawTransaction(transaction.txid, network);
-      const unsignedTx: StacksTransaction = deserializeTransaction(txRaw);
+      const unsignedTx = deserializeTransaction(txRaw);
 
       const [slow, medium, high] = await estimateStacksTransactionWithFallback(
         unsignedTx,
@@ -223,7 +222,8 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
         ...selectedAccount,
         accountType: selectedAccountType || 'software',
         accountId:
-          isLedgerAccount(selectedAccount) && selectedAccount.deviceAccountIndex
+          (isLedgerAccount(selectedAccount) || isKeystoneAccount(selectedAccount)) &&
+          selectedAccount.deviceAccountIndex !== undefined
             ? selectedAccount.deviceAccountIndex
             : selectedAccount.id,
         network: network.type,

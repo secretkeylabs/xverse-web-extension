@@ -18,9 +18,8 @@ import {
   broadcastSignedTransaction,
   microstacksToStx,
   stxToMicrostacks,
-  type StacksTransaction,
 } from '@secretkeylabs/xverse-core';
-import { deserializeTransaction } from '@stacks/transactions';
+import { deserializeTransaction, StacksTransactionWire } from '@stacks/transactions';
 import { removeAccountAvatarAction } from '@stores/wallet/actions/actionCreators';
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
@@ -77,8 +76,8 @@ function ConfirmNftTransaction() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
   const selectedAccount = useSelectedAccount();
-  const { avatarIds } = useWalletSelector();
-  const currentAvatar = avatarIds[selectedAccount.btcAddress];
+  const { avatarIds, network } = useWalletSelector();
+  const selectedAvatar = avatarIds[selectedAccount.ordinalsAddress];
   const [fee, setFee] = useState<BigNumber>();
   const navigate = useNavigate();
   const location = useLocation();
@@ -89,7 +88,6 @@ function ConfirmNftTransaction() {
 
   const { unsignedTx: unsignedTxHex, recipientAddress } = location.state;
   const unsignedTx = useMemo(() => deserializeTransaction(unsignedTxHex), [unsignedTxHex]);
-  const { network } = useWalletSelector();
   const { refetch } = useStxWalletData();
   const selectedNetwork = useNetworkSelector();
   const {
@@ -97,7 +95,7 @@ function ConfirmNftTransaction() {
     error: txError,
     data: stxTxBroadcastData,
     mutate,
-  } = useMutation<string, Error, { signedTx: StacksTransaction }>({
+  } = useMutation<string, Error, { signedTx: StacksTransactionWire }>({
     mutationFn: async ({ signedTx }) => broadcastSignedTransaction(signedTx, selectedNetwork),
   });
   const initialStxTransactions = [unsignedTx];
@@ -117,8 +115,8 @@ function ConfirmNftTransaction() {
         refetch();
       }, 1000);
 
-      if (currentAvatar?.type === 'stacks' && currentAvatar.nft?.token_id === nft?.token_id) {
-        dispatch(removeAccountAvatarAction({ address: selectedAccount.btcAddress }));
+      if (selectedAvatar?.type === 'stacks' && selectedAvatar.nft?.token_id === nft?.token_id) {
+        dispatch(removeAccountAvatarAction({ address: selectedAccount.ordinalsAddress }));
       }
     }
   }, [
@@ -126,9 +124,9 @@ function ConfirmNftTransaction() {
     navigate,
     refetch,
     stxTxBroadcastData,
-    selectedAccount.btcAddress,
+    selectedAccount.ordinalsAddress,
     nft,
-    currentAvatar,
+    selectedAvatar,
   ]);
 
   useEffect(() => {
@@ -144,10 +142,10 @@ function ConfirmNftTransaction() {
     }
   }, [txError]);
 
-  const handleOnConfirmClick = (txs: StacksTransaction[]) => {
+  const handleOnConfirmClick = (txs: StacksTransactionWire[]) => {
     if (isLedgerAccount(selectedAccount)) {
       const state: ConfirmStxTransactionState = {
-        unsignedTx: Buffer.from(unsignedTx.serialize()),
+        unsignedTx: Buffer.from(unsignedTx.serializeBytes()),
         recipients: [
           {
             address: recipientAddress,

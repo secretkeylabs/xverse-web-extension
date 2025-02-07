@@ -3,20 +3,24 @@ import {
   getStacksInfo,
   microstacksToStx,
   satsToBtc,
+  StacksMainnet,
+  StacksTestnet,
   type Account,
-  type FungibleToken,
+  type FungibleTokenWithStates,
   type NetworkType,
   type NftData,
   type SettingsNetwork,
   type StxMempoolTransactionData,
 } from '@secretkeylabs/xverse-core';
-import { ChainID } from '@stacks/transactions';
 import { getFtBalance } from '@utils/tokens';
+import RoutePaths from 'app/routes/paths';
 import BigNumber from 'bignumber.js';
 import type { TFunction } from 'react-i18next';
 import {
+  BTC_TRANSACTION_REGTEST_STATUS_URL,
   BTC_TRANSACTION_SIGNET_STATUS_URL,
   BTC_TRANSACTION_STATUS_URL,
+  BTC_TRANSACTION_TESTNET4_STATUS_URL,
   BTC_TRANSACTION_TESTNET_STATUS_URL,
   MAX_ACC_NAME_LENGTH,
   TRANSACTION_STATUS_URL,
@@ -82,10 +86,47 @@ export const getTruncatedAddress = (address: string, lengthToShow = 4) =>
     address.length,
   )}`;
 
-export const getShortTruncatedAddress = (address: string) => {
+export const getShortTruncatedAddress = (address: string, charCount = 8) => {
   if (address) {
-    return `${address.substring(0, 8)}...${address.substring(address.length - 8, address.length)}`;
+    return `${address.substring(0, charCount)}...${address.substring(
+      address.length - charCount,
+      address.length,
+    )}`;
   }
+};
+
+export const truncateStandardPrincipal = (standardPrincipal: string, length = 6) => {
+  // Adding 2 because Stacks addresses always begin with two known characters.
+  const leadingSubstringLength = length + 2;
+
+  return `${standardPrincipal.substring(0, leadingSubstringLength)}...${standardPrincipal.substring(
+    standardPrincipal.length - length,
+  )}`;
+};
+
+export const truncateTextMiddle = (text: string, maxLength = 16) => {
+  if (text.length > maxLength) {
+    const partLength = Math.floor(maxLength / 2);
+
+    const beginning = text.substring(0, partLength);
+    const end = text.substring(text.length - partLength);
+
+    return `${beginning}...${end}`;
+  }
+  return text;
+};
+
+const truncateContractName = (contractName: string, maxLength = 10) =>
+  truncateTextMiddle(contractName, maxLength);
+
+export const truncateContractPrincipal = (contractPrincipal: string) => {
+  const [standardPrincipal, contractName] = contractPrincipal.split('.');
+
+  const abbreviatedStandardPrincipal = truncateStandardPrincipal(standardPrincipal, 4);
+  const abbreviatedContractName =
+    contractName.length > 8 ? truncateContractName(contractName) : contractName;
+
+  return `${abbreviatedStandardPrincipal}.${abbreviatedContractName}`;
 };
 
 export const getExplorerUrl = (stxAddress: string): string =>
@@ -98,8 +139,14 @@ export const getBtcTxStatusUrl = (txId: string, network: SettingsNetwork) => {
   if (network.type === 'Testnet') {
     return `${BTC_TRANSACTION_TESTNET_STATUS_URL}${txId}`;
   }
+  if (network.type === 'Testnet4') {
+    return `${BTC_TRANSACTION_TESTNET4_STATUS_URL}${txId}`;
+  }
   if (network.type === 'Signet') {
     return `${BTC_TRANSACTION_SIGNET_STATUS_URL}${txId}`;
+  }
+  if (network.type === 'Regtest') {
+    return `${BTC_TRANSACTION_REGTEST_STATUS_URL}${txId}`;
   }
   return `${BTC_TRANSACTION_STATUS_URL}${txId}`;
 };
@@ -134,7 +181,7 @@ export const checkNftExists = (
 };
 
 export const isValidStacksApi = async (url: string, type: NetworkType): Promise<boolean> => {
-  const networkChainId = type === 'Mainnet' ? ChainID.Mainnet : ChainID.Testnet;
+  const networkChainId = type === 'Mainnet' ? StacksMainnet.chainId : StacksTestnet.chainId;
 
   if (!validUrl.isUri(url)) {
     return false;
@@ -186,13 +233,19 @@ export const isValidBtcApi = async (url: string, network: NetworkType) => {
 };
 
 export const getNetworkType = (stxNetwork) =>
-  stxNetwork.chainId === ChainID.Mainnet ? 'Mainnet' : 'Testnet';
+  stxNetwork.chainId === StacksMainnet.chainId ? 'Mainnet' : 'Testnet';
+
+export const getStxNetworkForBtcNetwork = (network: NetworkType) =>
+  network === 'Mainnet' ? 'Mainnet' : 'Testnet';
 
 export const isHardwareAccount = (account: Account | null): boolean =>
   !!account?.accountType && account?.accountType !== 'software';
 
 export const isLedgerAccount = (account: Account | null): boolean =>
   account?.accountType === 'ledger';
+
+export const isKeystoneAccount = (account: Account | null): boolean =>
+  account?.accountType === 'keystone';
 
 export const isInOptions = (): boolean => !!window.location?.pathname?.match(/options.html$/);
 
@@ -240,6 +293,11 @@ export const validateAccountName = (
   return null;
 };
 
+export const getAccountBalanceKey = (account: Account | null) => {
+  if (!account) return '';
+  return `${account.accountType}-${account.id}`;
+};
+
 export const calculateTotalBalance = ({
   stxBalance,
   btcBalance,
@@ -252,9 +310,9 @@ export const calculateTotalBalance = ({
 }: {
   stxBalance?: string;
   btcBalance?: string;
-  sipCoinsList: FungibleToken[];
-  brcCoinsList: FungibleToken[];
-  runesCoinList: FungibleToken[];
+  sipCoinsList: FungibleTokenWithStates[];
+  brcCoinsList: FungibleTokenWithStates[];
+  runesCoinList: FungibleTokenWithStates[];
   stxBtcRate: string;
   btcFiatRate: string;
   hideStx: boolean;
@@ -277,7 +335,7 @@ export const calculateTotalBalance = ({
 
   if (sipCoinsList) {
     totalBalance = sipCoinsList.reduce((acc, coin) => {
-      if (coin.visible && coin.tokenFiatRate && coin.decimals) {
+      if (coin.isEnabled && coin.tokenFiatRate && coin.decimals) {
         const tokenUnits = new BigNumber(10).exponentiatedBy(new BigNumber(coin.decimals));
         const coinFiatValue = new BigNumber(coin.balance)
           .dividedBy(tokenUnits)
@@ -291,7 +349,7 @@ export const calculateTotalBalance = ({
 
   if (brcCoinsList) {
     totalBalance = brcCoinsList.reduce((acc, coin) => {
-      if (coin.visible && coin.tokenFiatRate) {
+      if (coin.isEnabled && coin.tokenFiatRate) {
         const coinFiatValue = new BigNumber(coin.balance).multipliedBy(
           new BigNumber(coin.tokenFiatRate),
         );
@@ -304,7 +362,7 @@ export const calculateTotalBalance = ({
 
   if (runesCoinList) {
     totalBalance = runesCoinList.reduce((acc, coin) => {
-      if (coin.visible && coin.tokenFiatRate) {
+      if (coin.isEnabled && coin.tokenFiatRate) {
         const coinFiatValue = new BigNumber(getFtBalance(coin)).multipliedBy(
           new BigNumber(coin.tokenFiatRate),
         );
@@ -335,3 +393,31 @@ export const satsToBtcString = (num: BigNumber) =>
     .replace(/\.?0+$/, '');
 
 export const sanitizeRuneName = (runeName) => runeName.replace(/[^A-Za-z]+/g, '').toUpperCase();
+
+export type TabType = 'dashboard' | 'nft' | 'stacking' | 'explore' | 'settings';
+
+export const getActiveTab = (currentPath: string): TabType => {
+  if (
+    currentPath.includes('/nft-dashboard') ||
+    currentPath.includes('/ordinal-detail') ||
+    currentPath.includes('send-ordinal') ||
+    currentPath.includes('send-nft')
+  ) {
+    return 'nft';
+  }
+
+  if (currentPath.includes('/stacking')) {
+    return 'stacking';
+  }
+
+  if (currentPath.includes('/explore')) {
+    return 'explore';
+  }
+
+  if (currentPath.includes(RoutePaths.Settings)) {
+    return 'settings';
+  }
+
+  // Default to dashboard for all other routes
+  return 'dashboard';
+};

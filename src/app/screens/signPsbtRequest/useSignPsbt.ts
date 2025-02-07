@@ -9,12 +9,9 @@ import {
   type SignTransactionOptions,
   type SignTransactionPayload,
 } from '@sats-connect/core';
-import {
-  base64ToHex,
-  btcTransaction,
-  type InputToSign,
-  type SettingsNetwork,
-} from '@secretkeylabs/xverse-core';
+import { base64 } from '@scure/base';
+import * as btc from '@scure/btc-signer';
+import { btcTransaction, type InputToSign, type SettingsNetwork } from '@secretkeylabs/xverse-core';
 import { decodeToken } from 'jsontokens';
 import { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -89,7 +86,8 @@ const useSignPsbt = () => {
     let txId: string = '';
 
     if (payload.broadcast && signingResponse) {
-      const txHex = base64ToHex(signingResponse);
+      const txn = btc.Transaction.fromPSBT(base64.decode(signingResponse));
+      const txHex = txn.hex;
       const response = await btcClient.sendRawTransaction(txHex);
       txId = response.tx.hash;
     }

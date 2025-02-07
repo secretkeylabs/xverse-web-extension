@@ -5,15 +5,9 @@ import { isBnsContract } from '@utils/nfts';
 import styled from 'styled-components';
 import NftImage from './nftImage';
 
-interface Props {
-  asset: NonFungibleToken;
-  isGalleryOpen: boolean;
-}
-interface ContainerProps {
-  isGalleryView: boolean;
-}
-
-const NftImageContainer = styled.div<ContainerProps>((props) => ({
+const NftImageContainer = styled.div<{
+  $isGalleryView: boolean;
+}>((props) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'flex-start',
@@ -25,7 +19,7 @@ const NftImageContainer = styled.div<ContainerProps>((props) => ({
   '> img': {
     width: '100%',
   },
-  flexGrow: props.isGalleryView ? 1 : 'initial',
+  flexGrow: props.$isGalleryView ? 1 : 'initial',
 }));
 
 const GridItemContainer = styled.div((props) => ({
@@ -43,11 +37,17 @@ const BnsImage = styled.img({
   height: '100%',
 });
 
+type Props = {
+  asset: NonFungibleToken;
+  isGalleryOpen: boolean;
+};
+
 function Nft({ asset, isGalleryOpen }: Props) {
   const { data } = useNftDetail(asset.identifier);
+
   return (
     <GridItemContainer>
-      <NftImageContainer isGalleryView={isGalleryOpen}>
+      <NftImageContainer $isGalleryView={isGalleryOpen}>
         {isBnsContract(asset?.asset_identifier) ? (
           <BnsImage src={NftUser} alt="user" />
         ) : (
@@ -57,4 +57,5 @@ function Nft({ asset, isGalleryOpen }: Props) {
     </GridItemContainer>
   );
 }
+
 export default Nft;

@@ -2,6 +2,7 @@ import type {
   Account,
   AccountType,
   AppInfo,
+  BtcPaymentType,
   FungibleToken,
   Inscription,
   NetworkType,
@@ -17,14 +18,14 @@ export const UpdateSoftwareAccountsKey = 'UpdateSoftwareAccountsKey';
 export const SetFeeMultiplierKey = 'SetFeeMultiplierKey';
 export const ChangeFiatCurrencyKey = 'ChangeFiatCurrency';
 export const ChangeNetworkKey = 'ChangeNetwork';
+export const ChangeBtcPaymentAddressTypeKey = 'ChangeBtcPaymentAddressTypeKey';
 export const ChangeHasActivatedOrdinalsKey = 'ChangeHasActivatedOrdinalsKey';
 export const RareSatsNoticeDismissedKey = 'RareSatsNoticeDismissedKey';
 export const ChangeHasActivatedRareSatsKey = 'ChangeHasActivatedRareSatsKey';
 export const ChangeHasActivatedRBFKey = 'ChangeHasActivatedRBFKey';
-export const ChangeShowBtcReceiveAlertKey = 'ChangeShowBtcReceiveAlertKey';
-export const ChangeShowOrdinalReceiveAlertKey = 'ChangeShowOrdinalReceiveAlertKey';
 export const ChangeShowDataCollectionAlertKey = 'ChangeShowDataCollectionAlertKey';
 export const UpdateLedgerAccountsKey = 'UpdateLedgerAccountsKey';
+export const UpdateKeystoneAccountsKey = 'UpdateKeystoneAccountsKey';
 export const SetSip10ManageTokensKey = 'SetSip10ManageTokensKey';
 export const SetBrc20ManageTokensKey = 'SetBrc20ManageTokensKey';
 export const SetRunesManageTokensKey = 'SetRunesManageTokens';
@@ -40,10 +41,14 @@ export const UpdateSavedNamesKey = 'UpdateSavedNamesKey';
 export const AddToStarCollectiblesKey = 'AddToStarCollectiblesKey';
 export const RemoveFromStarCollectiblesKey = 'RemoveFromStarCollectiblesKey';
 export const AddToHideCollectiblesKey = 'AddToHideCollectiblesKey';
+export const SetHiddenCollectiblesKey = 'SetHiddenCollectiblesKey';
 export const RemoveFromHideCollectiblesKey = 'RemoveFromHideCollectiblesKey';
 export const RemoveAllFromHideCollectiblesKey = 'RemoveAllFromHideCollectiblesKey';
 export const SetAccountAvatarKey = 'SetAccountAvatarKey';
 export const RemoveAccountAvatarKey = 'RemoveAccountAvatarKey';
+export const SetBalanceHiddenToggleKey = 'SetBalanceHiddenToggleKey';
+export const SetShowBalanceInBtcToggleKey = 'SetShowBalanceInBtcToggleKey';
+export const SetWalletBackupStatusKey = 'SetWalletBackupStatusKey';
 
 export enum WalletSessionPeriods {
   LOW = 15,
@@ -55,8 +60,10 @@ export enum WalletSessionPeriods {
 export interface WalletState {
   accountsList: Account[];
   ledgerAccountsList: Account[];
+  keystoneAccountsList: Account[];
   selectedAccountIndex: number;
   selectedAccountType: AccountType;
+  btcPaymentAddressType: BtcPaymentType;
   network: SettingsNetwork; // currently selected network urls and type
   savedNetworks: SettingsNetwork[]; // previously set network urls for type
   encryptedSeed: string;
@@ -70,8 +77,6 @@ export interface WalletState {
   hasActivatedRareSatsKey: boolean | undefined;
   hasActivatedRBFKey: boolean | undefined;
   rareSatsNoticeDismissed: boolean | undefined;
-  showBtcReceiveAlert: boolean | null;
-  showOrdinalReceiveAlert: boolean | null;
   showDataCollectionAlert: boolean | null;
   walletLockPeriod: WalletSessionPeriods;
   isUnlocked: boolean;
@@ -87,7 +92,10 @@ export interface WalletState {
   };
   hiddenCollectibleIds: Record<string, Record<string, string>>;
   starredCollectibleIds: Record<string, Array<{ id: string; collectionId: string }>>;
-  avatarIds: Record<string, AvatarInfo | null>;
+  avatarIds: Record<string, AvatarInfo>;
+  balanceHidden: boolean;
+  showBalanceInBtc: boolean;
+  hasBackedUpWallet: boolean;
 }
 
 export interface StoreEncryptedSeed {
@@ -116,6 +124,10 @@ export interface SelectAccount {
   selectedAccountIndex: number;
   selectedAccountType: AccountType;
 }
+export interface UpdateKeystoneAccounts {
+  type: typeof UpdateKeystoneAccountsKey;
+  keystoneAccountsList: Account[];
+}
 
 export interface ChangeFiatCurrency {
   type: typeof ChangeFiatCurrencyKey;
@@ -124,6 +136,11 @@ export interface ChangeFiatCurrency {
 export interface ChangeNetwork {
   type: typeof ChangeNetworkKey;
   network: SettingsNetwork;
+}
+
+export interface ChangeBtcPaymentAddressType {
+  type: typeof ChangeBtcPaymentAddressTypeKey;
+  btcPaymentType: BtcPaymentType;
 }
 
 export interface ChangeActivateOrdinals {
@@ -144,16 +161,6 @@ export interface ChangeActivateRBF {
 export interface SetRareSatsNoticeDismissed {
   type: typeof RareSatsNoticeDismissedKey;
   rareSatsNoticeDismissed: boolean;
-}
-
-export interface ChangeShowBtcReceiveAlert {
-  type: typeof ChangeShowBtcReceiveAlertKey;
-  showBtcReceiveAlert: boolean | null;
-}
-
-export interface ChangeShowOrdinalReceiveAlert {
-  type: typeof ChangeShowOrdinalReceiveAlertKey;
-  showOrdinalReceiveAlert: boolean | null;
 }
 
 export interface ChangeShowDataCollectionAlert {
@@ -197,7 +204,7 @@ export interface SetWalletUnlocked {
 
 export interface SetAccountBalance {
   type: typeof SetAccountBalanceKey;
-  btcAddress: string;
+  accountKey: string;
   totalBalance: string;
 }
 
@@ -258,6 +265,11 @@ export interface RemoveAllFromHideCollectibles {
   address: string;
 }
 
+export interface SetHiddenCollectibles {
+  type: typeof SetHiddenCollectiblesKey;
+  collectibleIds: Record<string, Record<string, string>>;
+}
+
 export interface SetAccountAvatar {
   type: typeof SetAccountAvatarKey;
   address: string;
@@ -279,20 +291,35 @@ export type AvatarInfo =
       nft: NftData;
     };
 
+export interface SetBalanceHiddenToggle {
+  type: typeof SetBalanceHiddenToggleKey;
+  toggle: boolean;
+}
+
+export interface SetShowBalanceInBtc {
+  type: typeof SetShowBalanceInBtcToggleKey;
+  toggle: boolean;
+}
+
+export interface SetWalletBackupStatus {
+  type: typeof SetWalletBackupStatusKey;
+  hasBackedUpWallet: boolean;
+}
+
 export type WalletActions =
   | ResetWallet
   | UpdateSoftwareAccounts
   | UpdateLedgerAccounts
+  | UpdateKeystoneAccounts
   | SelectAccount
   | StoreEncryptedSeed
   | SetFeeMultiplier
   | ChangeFiatCurrency
   | ChangeNetwork
+  | ChangeBtcPaymentAddressType
   | ChangeActivateOrdinals
   | ChangeActivateRareSats
   | ChangeActivateRBF
-  | ChangeShowBtcReceiveAlert
-  | ChangeShowOrdinalReceiveAlert
   | ChangeShowDataCollectionAlert
   | SetSip10ManageTokens
   | SetBrc20ManageTokens
@@ -312,5 +339,9 @@ export type WalletActions =
   | AddToHideCollectibles
   | RemoveFromHideCollectibles
   | RemoveAllFromHideCollectibles
+  | SetHiddenCollectibles
   | SetAccountAvatar
-  | RemoveAccountAvatar;
+  | RemoveAccountAvatar
+  | SetBalanceHiddenToggle
+  | SetShowBalanceInBtc
+  | SetWalletBackupStatus;

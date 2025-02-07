@@ -6,7 +6,12 @@ import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { RpcErrorCode } from '@sats-connect/core';
 import type { TransactionSummary } from '@screens/sendBtc/helpers';
-import { AnalyticsEvents, btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
+import {
+  AnalyticsEvents,
+  btcTransaction,
+  type KeystoneTransport,
+  type LedgerTransport,
+} from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
 import { BITCOIN_DUST_AMOUNT_SATS } from '@utils/constants';
 import { trackMixPanel } from '@utils/mixpanel';
@@ -105,23 +110,35 @@ function BtcSendRequest() {
 
   useEffect(() => {
     const checkIfMismatch = () => {
+      let errorTitle = '';
+      let error = '';
+      let textAlignment = 'center';
+
       if (payload.senderAddress !== selectedAccount.btcAddress) {
-        navigate('/tx-status', {
-          state: {
-            txid: '',
-            currency: 'STX',
-            error: t('CONFIRM_TRANSACTION.ADDRESS_MISMATCH'),
-            browserTx: true,
-          },
-        });
+        if (
+          selectedAccount.btcAddresses.native?.address === payload.senderAddress ||
+          selectedAccount.btcAddresses.nested?.address === payload.senderAddress
+        ) {
+          errorTitle = t('REQUEST_ERRORS.ADDRESS_TYPE_MISMATCH_TITLE');
+          error = t('REQUEST_ERRORS.ADDRESS_TYPE_MISMATCH');
+        } else {
+          errorTitle = t('REQUEST_ERRORS.ADDRESS_MISMATCH_TITLE');
+          error = t('REQUEST_ERRORS.ADDRESS_MISMATCH');
+        }
+        textAlignment = 'left';
+      } else if (payload.network.type !== network.type) {
+        error = t('REQUEST_ERRORS.NETWORK_MISMATCH');
       }
-      if (payload.network.type !== network.type) {
+
+      if (error) {
         navigate('/tx-status', {
           state: {
             txid: '',
             currency: 'BTC',
-            error: t('CONFIRM_TRANSACTION.NETWORK_MISMATCH'),
+            errorTitle,
+            error,
             browserTx: true,
+            textAlignment,
           },
         });
       }
@@ -157,10 +174,17 @@ function BtcSendRequest() {
     window.close();
   };
 
-  const handleSubmit = async (ledgerTransport?: Transport) => {
+  const handleSubmit = async (options?: {
+    ledgerTransport?: LedgerTransport;
+    keystoneTransport?: KeystoneTransport;
+  }) => {
     try {
       setIsSubmitting(true);
-      const txnId = await transaction?.broadcast({ ledgerTransport, rbfEnabled: true });
+      const txnId = await transaction?.broadcast({
+        ...options,
+        rbfEnabled: true,
+      });
+
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
         protocol: 'bitcoin',
         action: 'transfer',

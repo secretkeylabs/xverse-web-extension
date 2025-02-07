@@ -1,92 +1,74 @@
-import BarLoader from '@components/barLoader';
+import { BestBarLoader } from '@components/barLoader';
+import PercentageChange from '@components/percentageChange';
 import { useVisibleBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
 import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useAccountBalance from '@hooks/queries/useAccountBalance';
-import useBtcWalletData from '@hooks/queries/useBtcWalletData';
+import useSelectedAccountBtcBalance from '@hooks/queries/useSelectedAccountBtcBalance';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useSelectedAccount from '@hooks/useSelectedAccount';
+import useToggleBalanceView from '@hooks/useToggleBalanceView';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { currencySymbolMap } from '@secretkeylabs/xverse-core';
+import { Eye } from '@phosphor-icons/react';
+import { animated, useTransition } from '@react-spring/web';
+import {
+  currencySymbolMap,
+  getFiatBtcEquivalent,
+  type FungibleToken,
+} from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
-import { LoaderSize } from '@utils/constants';
-import { calculateTotalBalance } from '@utils/helper';
-import { useEffect } from 'react';
+import {
+  ANIMATION_EASING,
+  BTC_SYMBOL,
+  HIDDEN_BALANCE_LABEL,
+  type CurrencyTypes,
+} from '@utils/constants';
+import { calculateTotalBalance, getAccountBalanceKey } from '@utils/helper';
+import BigNumber from 'bignumber.js';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
-import styled from 'styled-components';
+import {
+  BalanceAmountText,
+  BalanceContainer,
+  BalanceHeadingText,
+  BarLoaderContainer,
+  Container,
+  ContentWrapper,
+  LoaderContainer,
+  PercentageChangeContainer,
+  RowContainer,
+  ShowBalanceButton,
+} from './index.styled';
 
-const RowContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginTop: props.theme.spacing(11),
-}));
-
-const BalanceHeadingText = styled.h3((props) => ({
-  ...props.theme.headline_category_s,
-  color: props.theme.colors.white_200,
-  textTransform: 'uppercase',
-  opacity: 0.7,
-}));
-
-const CurrencyText = styled.label((props) => ({
-  ...props.theme.headline_category_s,
-  color: props.theme.colors.white_0,
-  fontSize: 13,
-}));
-
-const BalanceAmountText = styled.p((props) => ({
-  ...props.theme.headline_xl,
-  color: props.theme.colors.white_0,
-}));
-
-const BarLoaderContainer = styled.div((props) => ({
-  display: 'flex',
-  maxWidth: 300,
-  marginTop: props.theme.spacing(5),
-}));
-
-const CurrencyCard = styled.div((props) => ({
-  display: 'flex',
-  justifyContent: 'center',
-  backgroundColor: props.theme.colors.elevation3,
-  width: 45,
-  borderRadius: 30,
-  marginLeft: props.theme.spacing(4),
-}));
-
-const BalanceContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'flex-start',
-  alignItems: 'center',
-  gap: props.theme.spacing(5),
-}));
-
-interface BalanceCardProps {
+type Props = {
   isLoading: boolean;
   isRefetching: boolean;
-}
+  combinedFtList: FungibleToken[];
+};
 
-function BalanceCard(props: BalanceCardProps) {
+function BalanceCard({ isLoading, isRefetching, combinedFtList }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
+  const { t: commonT } = useTranslation('translation', { keyPrefix: 'COMMON' });
   const selectedAccount = useSelectedAccount();
-  const { fiatCurrency, hideStx, accountBalances } = useWalletSelector();
-  const { data: btcBalance } = useBtcWalletData();
+  const { fiatCurrency, hideStx, accountBalances, balanceHidden, showBalanceInBtc } =
+    useWalletSelector();
+  const { confirmedPaymentBalance: btcBalance, isLoading: btcBalanceLoading } =
+    useSelectedAccountBtcBalance();
   const { data: stxData } = useStxWalletData();
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const { setAccountBalance } = useAccountBalance();
-  const { isLoading, isRefetching } = props;
-  const oldTotalBalance = accountBalances[selectedAccount.btcAddress];
-  const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
-  const { visible: brc20CoinsList } = useVisibleBrc20FungibleTokens();
-  const { visible: runesCoinList } = useVisibleRuneFungibleTokens();
+  // TODO: refactor this into a hook
+  const oldTotalBalance = accountBalances[getAccountBalanceKey(selectedAccount)];
+  const { data: sip10CoinsList = [] } = useVisibleSip10FungibleTokens();
+  const { data: brc20CoinsList = [] } = useVisibleBrc20FungibleTokens();
+  const { data: runesCoinList = [] } = useVisibleRuneFungibleTokens();
+  const { toggleBalanceView, balanceDisplayState } = useToggleBalanceView();
 
   const balance = calculateTotalBalance({
-    stxBalance: stxData?.balance.toString() ?? '0',
-    btcBalance: btcBalance?.toString() ?? '0',
+    stxBalance: BigNumber(stxData?.balance ?? 0).toString(),
+    btcBalance: (btcBalance ?? 0).toString(),
     sipCoinsList: sip10CoinsList,
     brcCoinsList: brc20CoinsList,
     runesCoinList,
@@ -96,14 +78,14 @@ function BalanceCard(props: BalanceCardProps) {
   });
 
   useEffect(() => {
-    if (!balance || !selectedAccount || isLoading || isRefetching) {
+    if (!balance || !selectedAccount || isLoading || btcBalanceLoading || isRefetching) {
       return;
     }
 
     if (oldTotalBalance !== balance) {
       setAccountBalance(selectedAccount, balance);
     }
-  }, [balance, oldTotalBalance, selectedAccount, isLoading, isRefetching]);
+  }, [balance, oldTotalBalance, selectedAccount, isLoading, isRefetching, btcBalanceLoading]);
 
   useEffect(() => {
     (() => {
@@ -125,37 +107,138 @@ function BalanceCard(props: BalanceCardProps) {
     })();
   });
 
+  const onKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter') toggleBalanceView();
+  };
+
+  const isInitialMount = useRef(true);
+
+  useEffect(() => {
+    isInitialMount.current = false;
+  }, []);
+
+  const loaderTransitions = useTransition(isLoading, {
+    from: { opacity: isInitialMount.current ? 1 : 0 },
+    enter: { opacity: 1 },
+    leave: { opacity: 0 },
+    config: {
+      duration: 400,
+      easing: ANIMATION_EASING,
+    },
+    exitBeforeEnter: true, // This ensures the leave animation completes before the enter animation starts
+  });
+
   return (
-    <>
-      <RowContainer>
-        <BalanceHeadingText>{t('TOTAL_BALANCE')}</BalanceHeadingText>
-        <CurrencyCard>
-          <CurrencyText data-testid="currency-text">{fiatCurrency}</CurrencyText>
-        </CurrencyCard>
-      </RowContainer>
-      {isLoading ? (
-        <BarLoaderContainer>
-          <BarLoader loaderSize={LoaderSize.LARGE} />
-        </BarLoaderContainer>
-      ) : (
-        <BalanceContainer>
-          <NumericFormat
-            value={balance}
-            displayType="text"
-            prefix={`${currencySymbolMap[fiatCurrency]}`}
-            thousandSeparator
-            renderText={(value: string) => (
-              <BalanceAmountText data-testid="total-balance-value">{value}</BalanceAmountText>
+    <Container>
+      {loaderTransitions((style, loading) => (
+        <ContentWrapper>
+          <animated.div style={style}>
+            {loading ? (
+              <LoaderContainer>
+                <BarLoaderContainer>
+                  <BestBarLoader width={96} height={20} />
+                </BarLoaderContainer>
+                <BarLoaderContainer>
+                  <BestBarLoader width={244} height={34} />
+                </BarLoaderContainer>
+                <BarLoaderContainer>
+                  <BestBarLoader width={96} height={20} />
+                </BarLoaderContainer>
+              </LoaderContainer>
+            ) : (
+              <>
+                <RowContainer>
+                  {balanceHidden ? (
+                    <ShowBalanceButton onClick={toggleBalanceView}>
+                      <Eye size={20} weight="fill" />
+                      {t('SHOW_BALANCE')}
+                    </ShowBalanceButton>
+                  ) : (
+                    <BalanceHeadingText>
+                      {t('TOTAL_BALANCE')}{' '}
+                      <span data-testid="currency-text">
+                        {showBalanceInBtc ? commonT('BTC') : fiatCurrency}
+                      </span>
+                    </BalanceHeadingText>
+                  )}
+                </RowContainer>
+                <BalanceContainer
+                  onClick={toggleBalanceView}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={onKeyDown}
+                >
+                  {(() => {
+                    switch (balanceDisplayState) {
+                      case 'btc':
+                        return (
+                          <NumericFormat
+                            value={getFiatBtcEquivalent(
+                              BigNumber(balance),
+                              BigNumber(btcFiatRate),
+                            ).toString()}
+                            displayType="text"
+                            prefix={BTC_SYMBOL}
+                            thousandSeparator
+                            renderText={(value: string) => (
+                              <BalanceAmountText aria-label={`Total balance: ${value}`}>
+                                {value}
+                              </BalanceAmountText>
+                            )}
+                          />
+                        );
+                      case 'hidden':
+                        return (
+                          <BalanceAmountText aria-label={`Total balance: ${HIDDEN_BALANCE_LABEL}`}>
+                            {HIDDEN_BALANCE_LABEL}
+                          </BalanceAmountText>
+                        );
+                      case 'unmodified':
+                      default:
+                        return (
+                          <>
+                            <NumericFormat
+                              value={balance}
+                              displayType="text"
+                              prefix={`${currencySymbolMap[fiatCurrency]}`}
+                              thousandSeparator
+                              renderText={(value: string) => (
+                                <BalanceAmountText
+                                  aria-label={`Total balance: ${value} ${fiatCurrency}`}
+                                >
+                                  {value}
+                                </BalanceAmountText>
+                              )}
+                            />
+                            {isRefetching && (
+                              <div>
+                                <Spinner color="white" size={16} />
+                              </div>
+                            )}
+                          </>
+                        );
+                    }
+                  })()}
+                </BalanceContainer>
+                <PercentageChangeContainer>
+                  <PercentageChange
+                    isHidden={balanceHidden}
+                    displayTimeInterval
+                    ftCurrencyPairs={[
+                      [undefined, 'BTC'],
+                      [undefined, 'STX'],
+                      ...combinedFtList.map(
+                        (ft) => [ft, 'FT'] as [FungibleToken | undefined, CurrencyTypes],
+                      ),
+                    ]}
+                  />
+                </PercentageChangeContainer>
+              </>
             )}
-          />
-          {isRefetching && (
-            <div>
-              <Spinner color="white" size={16} />
-            </div>
-          )}
-        </BalanceContainer>
-      )}
-    </>
+          </animated.div>
+        </ContentWrapper>
+      ))}
+    </Container>
   );
 }
 

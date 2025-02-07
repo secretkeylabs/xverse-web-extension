@@ -11,7 +11,7 @@ interface ContainerProps {
   isGalleryOpen: boolean;
 }
 
-const ImageContainer = styled.div<ContainerProps>(() => ({
+const ImageContainer = styled.div<ContainerProps>((props) => ({
   display: 'flex',
   justifyContent: 'center',
   alignItems: 'center',
@@ -19,7 +19,7 @@ const ImageContainer = styled.div<ContainerProps>(() => ({
   height: '100%',
   overflow: 'hidden',
   position: 'relative',
-  borderRadius: 8,
+  borderRadius: props.theme.radius(2),
   aspectRatio: '1',
 }));
 
@@ -48,13 +48,14 @@ const Video = styled.video({
 });
 
 const StyledImg = styled(Image)`
-  border-radius: 8px;
+  border-radius: ${({ theme }) => theme.radius(2)}px;
   object-fit: contain;
 `;
-interface Props {
+
+type Props = {
   metadata?: TokenMetaData;
   isInCollage?: boolean;
-}
+};
 
 function ErrorStateImg() {
   return <SquareLogo width="40%" height="40%" weight="light" color={Theme.colors.elevation6} />;
@@ -63,6 +64,7 @@ function ErrorStateImg() {
 function NftImage({ metadata, isInCollage = false }: Props) {
   const [error, setError] = useState(false);
   const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+
   if (metadata?.image_protocol) {
     return (
       <ImageContainer isGalleryOpen={isGalleryOpen || isInCollage}>
@@ -86,6 +88,7 @@ function NftImage({ metadata, isInCollage = false }: Props) {
       </ImageContainer>
     );
   }
+
   if (metadata?.asset_protocol) {
     return (
       <Video

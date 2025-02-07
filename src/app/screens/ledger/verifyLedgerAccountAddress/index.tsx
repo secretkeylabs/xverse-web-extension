@@ -1,7 +1,6 @@
-import { delay } from '@common/utils/ledger';
+import { delay } from '@common/utils/promises';
 import ActionButton from '@components/button';
 import InfoContainer from '@components/infoContainer';
-import FullScreenHeader from '@components/ledger/fullScreenHeader';
 import LedgerAddressComponent from '@components/ledger/ledgerAddressComponent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
@@ -17,11 +16,11 @@ import QRCode from 'react-qr-code';
 import { useLocation } from 'react-router-dom';
 
 import stxIcon from '@assets/img/dashboard/stx_icon.svg';
-import btcIcon from '@assets/img/ledger/btc_icon.svg';
-import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
-import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
-import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
-import ordinalsIcon from '@assets/img/ledger/ordinals_icon.svg';
+import btcIcon from '@assets/img/hw/ledger/btc_icon.svg';
+import checkCircleIcon from '@assets/img/hw/ledger/check_circle.svg';
+import ledgerConnectBtcIcon from '@assets/img/hw/ledger/ledger_import_connect_btc.svg';
+import ledgerConnectStxIcon from '@assets/img/hw/ledger/ledger_import_connect_stx.svg';
+import ordinalsIcon from '@assets/img/hw/ledger/ordinals_icon.svg';
 import LedgerFailView from '@components/ledger/failLedgerView';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { DEFAULT_TRANSITION_OPTIONS } from '@utils/constants';
@@ -386,7 +385,6 @@ function VerifyLedger(): JSX.Element {
   if (mismatch) {
     return (
       <Container>
-        <FullScreenHeader />
         <LedgerFailViewContainer>
           <LedgerFailView title={t('TITLE_FAILED')} text={t('ADDRESS_MISMATCH')} />
           <LedgerFailButtonsContainer>
@@ -401,7 +399,6 @@ function VerifyLedger(): JSX.Element {
 
   return (
     <Container>
-      <FullScreenHeader />
       {transition((style) => (
         <>
           <OnBoardingContentContainer

@@ -29,7 +29,7 @@ test.describe('Swap Flow Exchange', () => {
     await wallet.buttonDownArrow.nth(0).click();
 
     // Had problems with loading of all tokens so I check that 'Bitcoin' is loaded
-    await expect(wallet.labelTokenSubtitle.getByText('Bitcoin').first()).toBeVisible();
+    await expect(page.getByText('Bitcoin').first()).toBeVisible();
     expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
     await wallet.divTokenRow.first().click();
     await expect(wallet.nameToken.first()).not.toContainText('Select asset');
@@ -39,7 +39,7 @@ test.describe('Swap Flow Exchange', () => {
     // Select the second Coin
     await wallet.buttonDownArrow.nth(1).click();
     // Had problems with loading of all tokens so I check that a 'DOG' is loaded
-    await expect(wallet.labelTokenSubtitle.getByText('DOG').first()).toBeVisible();
+    await expect(page.getByText('DOG').first()).toBeVisible();
     expect(await wallet.divTokenRow.count()).toBeGreaterThan(0);
     await wallet.divTokenRow.first().click();
     await expect(wallet.nameToken.last()).not.toContainText('Select asset');
@@ -101,7 +101,8 @@ test.describe('Swap Flow Exchange', () => {
     expect(initialBTCBalance).toEqual(balanceAfterCancel);
   });
 
-  test('Exchange token via DotSwap with standard fee testnet #localexecution', async ({
+  // TODO: Update this test to use testnet4 if applicable
+  test.skip('Exchange token via DotSwap with standard fee testnet #localexecution', async ({
     page,
     extensionId,
   }) => {

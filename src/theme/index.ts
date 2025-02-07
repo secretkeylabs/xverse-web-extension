@@ -34,6 +34,7 @@ const Theme = {
     xs: '8px',
     s: '12px',
     m: '16px',
+    ml: '20px',
     l: '24px',
     xl: '32px',
     xxl: '40px',
@@ -54,11 +55,14 @@ const Theme = {
     white_800: 'rgba(255, 255, 255, 0.2)',
     white_850: 'rgba(255, 255, 255, 0.15)',
     white_900: 'rgba(255, 255, 255, 0.1)',
+    white_950: 'rgba(255, 255, 255, 0.05)',
+
+    red_0: '#F00',
 
     elevation_n1: '#0C0C0C',
     elevation0: '#181818',
-    elevation1: '#1E2024',
-    elevation2: '#24282F',
+    elevation1: '#1A1A1A',
+    elevation2: '#1F1F1F',
     elevation3: '#2A2F39',
     elevation5: '#303643',
     elevation6: '#4C525F',
@@ -94,6 +98,9 @@ const Theme = {
     lilac_light: '#6E54CB',
     lilac: '#5E41C5',
     lilac_dark: '#4F34BA',
+
+    // utility
+    transparent: 'rgba(0, 0, 0, 0)',
 
     action: {
       /**
@@ -224,28 +231,6 @@ const Theme = {
      */
     border: {
       select: 'rgba(115, 131, 255, 0.4)',
-    },
-
-    feedback: {
-      /**
-       * @deprecated use theme.colors.success_medium
-       */
-      success: '#55B86E',
-
-      /**
-       * @deprecated use theme.colors.caution
-       */
-      caution: '#F2A900',
-
-      /**
-       * @deprecated use theme.colors.danger_medium
-       */
-      error: '#EA4848',
-
-      /**
-       * @deprecated use theme.colors.danger_dark_600
-       */
-      error_700: 'rgba(171, 48, 48, 0.4)',
     },
 
     /**

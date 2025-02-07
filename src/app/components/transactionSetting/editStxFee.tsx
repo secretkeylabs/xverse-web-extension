@@ -34,7 +34,7 @@ const InputContainer = styled.div<{
   marginTop: props.theme.spacing(4),
   marginBottom: props.theme.spacing(6),
   border: `1px solid ${
-    props.withError ? props.theme.colors.feedback.error : props.theme.colors.elevation6
+    props.withError ? props.theme.colors.danger_medium : props.theme.colors.elevation6
   }`,
   backgroundColor: props.theme.colors.elevation1,
   borderRadius: props.theme.radius(1),
@@ -99,7 +99,7 @@ const TickerContainer = styled.div({
 
 const ErrorText = styled.p((props) => ({
   ...props.theme.body_xs,
-  color: props.theme.colors.feedback.error,
+  color: props.theme.colors.danger_medium,
   marginBottom: props.theme.spacing(2),
 }));
 

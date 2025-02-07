@@ -1,12 +1,16 @@
-import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
-import ledgerConnectBtcIcon from '@assets/img/ledger/ledger_import_connect_btc.svg';
-import { delay } from '@common/utils/ledger';
+import keystoneConnectDefaultIcon from '@assets/img/hw/keystone/keystone_connect_default.svg';
+import keystoneConnectBtcIcon from '@assets/img/hw/keystone/keystone_import_connect_btc.svg';
+import ledgerConnectDefaultIcon from '@assets/img/hw/ledger/ledger_connect_default.svg';
+import ledgerConnectBtcIcon from '@assets/img/hw/ledger/ledger_import_connect_btc.svg';
+import { delay } from '@common/utils/promises';
 import ConfirmScreen from '@components/confirmScreen';
 import InfoContainer from '@components/infoContainer';
+import KeystoneConnectionView from '@components/keystone/connectKeystoneView';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
 import useSeedVault from '@hooks/useSeedVault';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { createKeystoneTransport } from '@keystonehq/hw-transport-webusb';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import CollapsibleContainer from '@screens/signatureRequest/collapsableContainer';
 import SignatureRequestMessage from '@screens/signatureRequest/signatureRequestMessage';
@@ -14,13 +18,20 @@ import {
   bip0322Hash,
   MessageSigningProtocols,
   signMessage,
+  type AccountType,
   type SignedMessage,
 } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import Sheet from '@ui-library/sheet';
-import { getTruncatedAddress, isHardwareAccount } from '@utils/helper';
+import {
+  getTruncatedAddress,
+  isHardwareAccount,
+  isKeystoneAccount,
+  isLedgerAccount,
+} from '@utils/helper';
+import { handleKeystoneMessageSigning } from '@utils/keystone';
 import { handleLedgerMessageSigning } from '@utils/ledger';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ActionDisclaimer,
@@ -70,6 +81,8 @@ function MessageSigning({
   const [isTxRejected, setIsTxRejected] = useState(false);
   const [isTxInvalid, setIsTxInvalid] = useState(false);
 
+  const [accountType, setAccountType] = useState<AccountType>('software');
+
   const getConfirmationError = (type: 'title' | 'subtitle') => {
     if (type === 'title') {
       if (isTxRejected) {
@@ -102,7 +115,7 @@ function MessageSigning({
     setCurrentStepIndex(0);
   };
 
-  const handleConnectAndConfirm = async () => {
+  const handleLedgerConnectAndConfirm = useCallback(async () => {
     if (!selectedAccount) {
       return;
     }
@@ -149,7 +162,69 @@ function MessageSigning({
       await transport.close();
       setIsButtonDisabled(false);
     }
-  };
+  }, [address, message, network.type, onSigned, onSignedError, protocol, selectedAccount]);
+
+  const handleKeystoneConnectAndConfirm = useCallback(async () => {
+    if (!selectedAccount) {
+      return;
+    }
+    setIsButtonDisabled(true);
+
+    const transport = await createKeystoneTransport();
+
+    if (!transport) {
+      setIsConnectSuccess(false);
+      setIsConnectFailed(true);
+      setIsButtonDisabled(false);
+      return;
+    }
+
+    setIsConnectSuccess(true);
+    await delay(1500);
+    setCurrentStepIndex(1);
+
+    try {
+      const signedMessage = await handleKeystoneMessageSigning({
+        transport,
+        addressIndex: selectedAccount.deviceAccountIndex,
+        address,
+        networkType: network.type,
+        message,
+        protocol,
+        mfp: selectedAccount.masterPubKey,
+        xpub: {
+          btc: selectedAccount.btcXpub,
+          ordinals: selectedAccount.ordinalsXpub,
+        },
+      });
+      await onSigned(signedMessage);
+    } catch (e: any) {
+      onSignedError?.(e);
+      if (e.name === 'LockedDeviceError') {
+        setCurrentStepIndex(0);
+        setIsConnectSuccess(false);
+        setIsConnectFailed(true);
+      } else if (e.statusCode === 28160) {
+        setIsConnectSuccess(false);
+        setIsConnectFailed(true);
+      } else if (e.cause === 27012) {
+        setIsTxInvalid(true);
+      } else {
+        setIsTxRejected(true);
+      }
+    } finally {
+      await transport.close();
+      setIsButtonDisabled(false);
+    }
+  }, [address, message, network.type, onSigned, onSignedError, protocol, selectedAccount]);
+
+  const handleConnectAndConfirm = useCallback(async () => {
+    if (accountType === 'ledger') {
+      handleLedgerConnectAndConfirm();
+    } else if (accountType === 'keystone') {
+      handleKeystoneConnectAndConfirm();
+    }
+  }, [accountType, handleKeystoneConnectAndConfirm, handleLedgerConnectAndConfirm]);
 
   const confirmSignMessage = async () => {
     const seedPhrase = await getSeed();
@@ -167,6 +242,11 @@ function MessageSigning({
     try {
       setIsSigning(true);
       if (isHardwareAccount(selectedAccount)) {
+        if (isLedgerAccount(selectedAccount)) {
+          setAccountType('ledger');
+        } else if (isKeystoneAccount(selectedAccount)) {
+          setAccountType('keystone');
+        }
         setIsModalVisible(true);
         return;
       }
@@ -220,31 +300,67 @@ function MessageSigning({
           <InfoContainer bodyText={t('SIGNATURE_REQUEST.SIGNING_WARNING')} type="Info" />
         </MainContainer>
       </ConfirmScreen>
-      <Sheet title="" visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
-        {currentStepIndex === 0 && (
-          <LedgerConnectionView
-            title={t('SIGNATURE_REQUEST.LEDGER.CONNECT.TITLE')}
-            text={t('SIGNATURE_REQUEST.LEDGER.CONNECT.SUBTITLE', {
-              name: 'Bitcoin',
-            })}
-            titleFailed={t('SIGNATURE_REQUEST.LEDGER.CONNECT.ERROR_TITLE')}
-            textFailed={t('SIGNATURE_REQUEST.LEDGER.CONNECT.ERROR_SUBTITLE')}
-            imageDefault={ledgerConnectBtcIcon}
-            isConnectSuccess={isConnectSuccess}
-            isConnectFailed={isConnectFailed}
-          />
-        )}
-        {currentStepIndex === 1 && (
-          <LedgerConnectionView
-            title={t('SIGNATURE_REQUEST.LEDGER.CONFIRM.TITLE')}
-            text={t('SIGNATURE_REQUEST.LEDGER.CONFIRM.SUBTITLE')}
-            titleFailed={getConfirmationError('title')}
-            textFailed={getConfirmationError('subtitle')}
-            imageDefault={ledgerConnectDefaultIcon}
-            isConnectSuccess={false}
-            isConnectFailed={isTxRejected || isTxInvalid || isConnectFailed}
-          />
-        )}
+      <Sheet visible={isModalVisible} onClose={() => setIsModalVisible(false)}>
+        {
+          {
+            ledger: (
+              <>
+                {currentStepIndex === 0 && (
+                  <LedgerConnectionView
+                    title={t('SIGNATURE_REQUEST.LEDGER.CONNECT.TITLE')}
+                    text={t('SIGNATURE_REQUEST.LEDGER.CONNECT.SUBTITLE', {
+                      name: 'Bitcoin',
+                    })}
+                    titleFailed={t('SIGNATURE_REQUEST.LEDGER.CONNECT.ERROR_TITLE')}
+                    textFailed={t('SIGNATURE_REQUEST.LEDGER.CONNECT.ERROR_SUBTITLE')}
+                    imageDefault={ledgerConnectBtcIcon}
+                    isConnectSuccess={isConnectSuccess}
+                    isConnectFailed={isConnectFailed}
+                  />
+                )}
+                {currentStepIndex === 1 && (
+                  <LedgerConnectionView
+                    title={t('SIGNATURE_REQUEST.LEDGER.CONFIRM.TITLE')}
+                    text={t('SIGNATURE_REQUEST.LEDGER.CONFIRM.SUBTITLE')}
+                    titleFailed={getConfirmationError('title')}
+                    textFailed={getConfirmationError('subtitle')}
+                    imageDefault={ledgerConnectDefaultIcon}
+                    isConnectSuccess={false}
+                    isConnectFailed={isTxRejected || isTxInvalid || isConnectFailed}
+                  />
+                )}
+              </>
+            ),
+            keystone: (
+              <>
+                {currentStepIndex === 0 && (
+                  <KeystoneConnectionView
+                    title={t('SIGNATURE_REQUEST.KEYSTONE.CONNECT.TITLE')}
+                    text={t('SIGNATURE_REQUEST.KEYSTONE.CONNECT.SUBTITLE', {
+                      name: 'Bitcoin',
+                    })}
+                    titleFailed={t('SIGNATURE_REQUEST.KEYSTONE.CONNECT.ERROR_TITLE')}
+                    textFailed={t('SIGNATURE_REQUEST.KEYSTONE.CONNECT.ERROR_SUBTITLE')}
+                    imageDefault={keystoneConnectBtcIcon}
+                    isConnectSuccess={isConnectSuccess}
+                    isConnectFailed={isConnectFailed}
+                  />
+                )}
+                {currentStepIndex === 1 && (
+                  <KeystoneConnectionView
+                    title={t('SIGNATURE_REQUEST.KEYSTONE.CONFIRM.TITLE')}
+                    text={t('SIGNATURE_REQUEST.KEYSTONE.CONFIRM.SUBTITLE')}
+                    titleFailed={getConfirmationError('title')}
+                    textFailed={getConfirmationError('subtitle')}
+                    imageDefault={keystoneConnectDefaultIcon}
+                    isConnectSuccess={false}
+                    isConnectFailed={isTxRejected || isTxInvalid || isConnectFailed}
+                  />
+                )}
+              </>
+            ),
+          }[accountType]
+        }
         <SuccessActionsContainer>
           <Button
             onClick={

@@ -3,6 +3,9 @@
 // NOTE: The above rule is disabled due to the currently used version not
 // detecting modern Typescript syntax.
 
+/**
+ * @public
+ */
 export type SafeError<TName extends string = string, TData = unknown> = {
   readonly name: TName;
   readonly message: string;
@@ -16,6 +19,7 @@ export type Result<Data = unknown, Error extends SafeError = SafeError> =
   | ErrorResult<Error>;
 
 /**
+ * @deprecated Use `success` from `xverse-core` instead.
  * @public
  */
 export function success<Data>(data: Data): Result<Data, never> {
@@ -23,12 +27,16 @@ export function success<Data>(data: Data): Result<Data, never> {
 }
 
 /**
+ * @deprecated Use `error` from `xverse-core` instead.
  * @public
  */
 export function error<const E extends SafeError>(error: E): Result<never, E> {
   return [error, null];
 }
 
+/**
+ * @deprecated Use `safePromise` from `xverse-core` instead.
+ */
 export async function safePromise<T>(
   promise: Promise<T>,
 ): Promise<Result<T, SafeError<'SafeError'>>> {

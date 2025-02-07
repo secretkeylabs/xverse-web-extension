@@ -1,35 +1,14 @@
-import { MESSAGE_SOURCE, type WebBtcMessage } from '@common/types/message-types';
-import { getTabIdFromPort, isUndefined } from '@common/utils';
+import { MESSAGE_SOURCE } from '@common/types/message-types';
 import {
   listenForPopupClose,
   makeSearchParamsWithDefaults,
   triggerRequestWindowOpen,
 } from '@common/utils/legacy-external-message-handler';
 import RequestsRoutes from '@common/utils/route-urls';
-import { RpcErrorCode } from '@sats-connect/core';
+import { RpcErrorCode, type StxTransferStxRequestMessage } from '@sats-connect/core';
 import { makeRPCError } from '../../helpers';
-import {
-  sendInvalidParametersResponseMessage,
-  sendMissingParametersMessage,
-} from '../../responseMessages/errors';
-import paramsSchema from './paramsSchema';
 
-async function transferStx(message: WebBtcMessage<'stx_transferStx'>, port: chrome.runtime.Port) {
-  if (isUndefined(message.params)) {
-    sendMissingParametersMessage({ tabId: getTabIdFromPort(port), messageId: message.id });
-    return;
-  }
-
-  const paramsParseResult = paramsSchema.safeParse(message.params);
-  if (!paramsParseResult.success) {
-    sendInvalidParametersResponseMessage({
-      tabId: getTabIdFromPort(port),
-      messageId: message.id,
-      error: paramsParseResult.error,
-    });
-    return;
-  }
-
+async function transferStx(message: StxTransferStxRequestMessage, port: chrome.runtime.Port) {
   const requestParams = {
     amount: message.params.amount.toString(),
     recipient: message.params.recipient,

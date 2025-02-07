@@ -12,7 +12,7 @@ const CollageContainer = styled.div`
   width: 100%;
   aspect-ratio: 1;
   border: 1px solid ${(props) => props.theme.colors.white_800};
-  border-radius: ${(props) => props.theme.radius(1)}px;
+  border-radius: ${(props) => props.theme.radius(2)}px;
 `;
 
 const CollageItem = styled.div`

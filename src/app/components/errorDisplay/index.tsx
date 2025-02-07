@@ -1,65 +1,178 @@
-import Error from '@assets/img/ErrorBoundary/error.svg';
+import xverseLogoIcon from '@assets/img/full_logo_horizontal.svg';
+import {
+  ActionButtons,
+  ErrorCode,
+  ErrorContents,
+  ErrorDescription,
+  ErrorDetailsSection,
+  ErrorDetailTitle,
+  ErrorStackContainer,
+  ErrorSubtitle,
+  ErrorTitle,
+  FooterContainer,
+  FullScreenHeader,
+  IconContainer,
+  InfoWarning,
+  RouteContainer,
+  ScreenContainer,
+  StackDetails,
+  StackToggle,
+  SupportEmail,
+  TestnetContainer,
+  TestnetText,
+  XverseLogo,
+} from '@components/errorDisplay/index.styled';
+import useWalletSelector from '@hooks/useWalletSelector';
+import { CaretDown, CaretUp, Copy, WarningOctagon } from '@phosphor-icons/react';
+import Button from '@ui-library/button';
+import { StyledP } from '@ui-library/common.styled';
 import { SUPPORT_EMAIL } from '@utils/constants';
+import { isInOptions } from '@utils/helper';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
+import Theme from '../../../theme';
 
-const ScreenContainer = styled.div((props) => ({
-  display: 'flex',
-  flex: 1,
-  height: '100vh',
-  width: '100vw',
-  flexDirection: 'column',
-  alignItems: 'center',
-  backgroundColor: props.theme.colors.elevation_n1,
-  paddingTop: props.theme.spacing(80),
-  paddingLeft: props.theme.spacing(9),
-  paddingRight: props.theme.spacing(9),
-}));
+declare const VERSION: string;
 
-const ScreenTitle = styled.h1((props) => ({
-  ...props.theme.headline_s,
-  marginTop: props.theme.spacing(10),
-}));
-
-const ErrorDescription = styled.p((props) => ({
-  ...props.theme.body_medium_m,
-  marginTop: props.theme.spacing(8),
-  textAlign: 'center',
-  color: props.theme.colors.white_200,
-}));
-
-const SupportText = styled.p((props) => ({
-  ...props.theme.body_medium_m,
-  marginTop: props.theme.spacing(5),
-  textAlign: 'center',
-  color: props.theme.colors.white_200,
-  span: {
-    color: props.theme.colors.white_0,
-  },
-}));
-
-const ErrorContent = styled.p((props) => ({
-  ...props.theme.body_medium_m,
-  marginTop: props.theme.spacing(20),
-  textAlign: 'center',
-  color: props.theme.colors.white_200,
-}));
+interface RouteError {
+  status: number;
+  statusText: string;
+  description?: string;
+  stack?: string;
+}
 
 type Props = {
-  error: { message: string };
+  error: RouteError;
 };
 
 function ErrorDisplay({ error }: Props) {
-  const { t } = useTranslation('translation', { keyPrefix: 'ERROR_SCREEN' });
+  const { network } = useWalletSelector();
+  const { t } = useTranslation('translation');
+  const { t: errorT } = useTranslation('translation', { keyPrefix: 'ERROR_SCREEN' });
+  const isInOption = isInOptions();
+  const navigate = useNavigate();
+  const year = new Date().getFullYear();
+  const [showStack, setShowStack] = useState(false);
+  const CaretIcon = showStack ? CaretUp : CaretDown;
+
+  const {
+    status = 404,
+    statusText = 'Not Found',
+    description = 'An unexpected error occurred',
+    stack,
+  } = error;
+
+  const handleCopyError = () => {
+    const errorReport = `
+    Error Details
+    Error: ${errorT('ERROR_CODE_MESSAGE', { code: status, message: statusText })}
+    Timestamp: ${new Date().toISOString()}
+    App Version: ${VERSION} (Beta)
+    Description: ${description}
+    ${stack ? `Stack Trace: ${stack}` : ''}
+    `.trim();
+    navigator.clipboard.writeText(errorReport);
+    toast(errorT('ERROR_REPORT_COPIED'));
+  };
+
   return (
     <ScreenContainer>
-      <img src={Error} alt="Error" width={88} />
-      <ScreenTitle>{t('TITLE')}</ScreenTitle>
-      <ErrorDescription>{t('ERROR_DESCRIPTION')}</ErrorDescription>
-      <SupportText>
-        {t('SUPPORT')} <span>{SUPPORT_EMAIL}</span>
-      </SupportText>
-      <ErrorContent>{`${t('ERROR_PREFIX')}${' '}${error.message}`}</ErrorContent>
+      {isInOption && (
+        <FullScreenHeader>
+          <XverseLogo src={xverseLogoIcon} />
+        </FullScreenHeader>
+      )}
+      <RouteContainer>
+        {network.type === 'Testnet' && (
+          <TestnetContainer>
+            <TestnetText>{t('SETTING_SCREEN.TESTNET')}</TestnetText>
+          </TestnetContainer>
+        )}
+        {network.type === 'Testnet4' && (
+          <TestnetContainer>
+            <TestnetText>{t('SETTING_SCREEN.TESTNET4')}</TestnetText>
+          </TestnetContainer>
+        )}
+        {network.type === 'Signet' && (
+          <TestnetContainer>
+            <TestnetText>{t('SETTING_SCREEN.SIGNET')}</TestnetText>
+          </TestnetContainer>
+        )}
+        {network.type === 'Regtest' && (
+          <TestnetContainer>
+            <TestnetText>{t('SETTING_SCREEN.REGTEST')}</TestnetText>
+          </TestnetContainer>
+        )}
+        <ErrorContents>
+          <ErrorTitle>:(</ErrorTitle>
+          <ErrorSubtitle>{errorT('ERROR_TITLE')}</ErrorSubtitle>
+          <ErrorDescription>
+            {errorT('ERROR_CODE_MESSAGE', { code: status, message: statusText })}
+          </ErrorDescription>
+          {description && <ErrorDescription>Error description: {description}</ErrorDescription>}
+          <ErrorDescription>
+            {errorT('CONTACT_SUPPORT')}{' '}
+            <SupportEmail href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</SupportEmail>
+          </ErrorDescription>
+          {stack && (
+            <ErrorStackContainer>
+              <StackToggle onClick={() => setShowStack(!showStack)}>
+                See details
+                <IconContainer>
+                  <CaretIcon size={14} weight="bold" color={Theme.colors.tangerine_light} />
+                </IconContainer>
+              </StackToggle>
+              {showStack && (
+                <StackDetails>
+                  <InfoWarning>
+                    <IconContainer>
+                      <WarningOctagon weight="fill" color={Theme.colors.white_200} size={24} />
+                    </IconContainer>
+                    <div>{errorT('SHARING_WARNING')}</div>
+                  </InfoWarning>
+                  <ErrorDetailsSection>
+                    <ErrorDetailTitle>Error Details</ErrorDetailTitle>
+                    <div>Error Code: {status}</div>
+                    <div>Timestamp: {new Date().toISOString()}</div>
+                    <div>{`App Version: ${VERSION} (Beta)`}</div>
+                  </ErrorDetailsSection>
+                  <ErrorDetailsSection>
+                    <ErrorDetailTitle>Description</ErrorDetailTitle>
+                    <div>{description}</div>
+                  </ErrorDetailsSection>
+                  {stack && (
+                    <ErrorCode>
+                      <pre>{stack}</pre>
+                    </ErrorCode>
+                  )}
+                </StackDetails>
+              )}
+            </ErrorStackContainer>
+          )}
+          <ActionButtons>
+            <Button
+              icon={<Copy color={Theme.colors.white_0} weight="bold" size={16} />}
+              title={errorT('COPY_ERROR_REPORT')}
+              onClick={handleCopyError}
+              variant="secondary"
+            />
+            <Button
+              title={errorT('RESTART_XVERSE')}
+              onClick={() => navigate('/')}
+              variant="primary"
+            />
+          </ActionButtons>
+        </ErrorContents>
+      </RouteContainer>
+      {isInOption && (
+        <FooterContainer>
+          <StyledP typography="body_medium_m" color="white_400">
+            {t('SEND.COPYRIGHT', { year })}
+          </StyledP>
+        </FooterContainer>
+      )}
     </ScreenContainer>
   );
 }

@@ -12,24 +12,23 @@ import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-interface TransactionTitleProps {
-  transaction:
-    | StxTransactionData
-    | BtcTransactionData
-    | Brc20HistoryTransactionData
-    | GetRunesActivityForAddressEvent;
-}
-
 const TransactionTitleText = styled.p((props) => ({
   ...props.theme.typography.body_bold_m,
   color: props.theme.colors.white_0,
   textAlign: 'left',
 }));
 
-export default function TransactionTitle(props: TransactionTitleProps) {
-  const { transaction } = props;
+type Props = {
+  transaction:
+    | StxTransactionData
+    | BtcTransactionData
+    | Brc20HistoryTransactionData
+    | GetRunesActivityForAddressEvent;
+};
+
+export default function TransactionTitle({ transaction }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
-  const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
+  const { data: sip10CoinsList = [] } = useVisibleSip10FungibleTokens();
 
   const getTokenTransferTitle = (
     tx: StxTransactionData | BtcTransactionData | Brc20HistoryTransactionData,

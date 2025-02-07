@@ -1,8 +1,6 @@
 /* eslint-disable import/prefer-default-export */
-import type { WebBtcMessage } from '@common/types/message-types';
-import { RpcErrorCode, signMessageRequestMessageSchema } from '@sats-connect/core';
+import { RpcErrorCode, type SignMessageRequestMessage } from '@sats-connect/core';
 import SuperJSON from 'superjson';
-import * as v from 'valibot';
 import {
   listenForOriginTabClose,
   listenForPopupClose,
@@ -14,21 +12,10 @@ import RequestsRoutes from '../../route-urls';
 import { makeRPCError } from '../helpers';
 
 export const handleSignMessage = async (
-  message: WebBtcMessage<'signMessage'>,
+  message: SignMessageRequestMessage,
   port: chrome.runtime.Port,
 ) => {
-  const safeParseResult = v.safeParse(signMessageRequestMessageSchema, message);
-
-  if (!safeParseResult.success) {
-    const invalidParamsError = makeRPCError(message.id, {
-      code: RpcErrorCode.INVALID_PARAMS,
-      message: 'Invalid params',
-    });
-    port.postMessage(invalidParamsError);
-    return;
-  }
-
-  const requestPayload = SuperJSON.stringify(safeParseResult.output.params);
+  const requestPayload = SuperJSON.stringify(message.params);
 
   const requestParams: ParamsKeyValueArray = [
     ['payload', requestPayload],

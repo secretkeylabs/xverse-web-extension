@@ -5,6 +5,9 @@
     "COMBO": "Combo",
     "SATS": "Sats",
     "BTC": "BTC",
+    "BALANCE": "Balance",
+    "BITCOIN": "Bitcoin",
+    "STACKS": "Stacks",
     "SATRIBUTES": "Satributes",
     "INPUT": "Input",
     "SIZE": "Size",
@@ -19,7 +22,18 @@
     "TO": "To",
     "FROM": "From",
     "OPTIONS": "Options",
-    "UNDO": "Undo"
+    "UNDO": "Undo",
+    "DASHBOARD": "Dashboard",
+    "COLLECTIBLES": "Collectibles",
+    "EARN": "Earn",
+    "EXPLORE": "Explore",
+    "SETTINGS": "Settings",
+    "COPIED_TO_CLIPBOARD": "Copied to clipboard",
+    "TRANSACTION": "Transaction"
+  },
+  "INFORMATION": {
+    "ORDINALS_ADDRESS_TOOLTIP": "These sats are used for your ordinals and runes. They cannot be spent with Xverse wallet.",
+    "WALLET_NOT_BACKED_UP": "Wallet not backed up"
   },
   "UNITS": {
     "SATS_PER_VB": "sats/vB"
@@ -29,7 +43,7 @@
     "SCREEN_TITLE": "The Bitcoin wallet for everyone",
     "CREATE_WALLET_BUTTON": "Create a new wallet",
     "RESTORE_WALLET_BUTTON": "Restore an existing wallet",
-    "ONBOARDING_1_TITLE": "Store BTC, Runes, Ordinals, BRC20, Rare Sats, STX and more!",
+    "ONBOARDING_1_TITLE": "Store BTC, Runes, Ordinals, BRC-20, Rare Sats, STX and more!",
     "ONBOARDING_2_TITLE": "Connect to your favorite Bitcoin apps"
   },
   "LEDGER_IMPORT_SCREEN": {
@@ -38,7 +52,7 @@
     "LEDGER_IMPORT_1_BUTTON": "Get started",
     "LEDGER_IMPORT_2_TITLE": "Select assets",
     "LEDGER_IMPORT_2_SUBTITLE": "Choose the assets you want to manage with this wallet.",
-    "LEDGER_IMPORT_2_FOOTNOTE": "If you don’t want to set a Stacks address now, you have the possibility to set it up later.",
+    "LEDGER_IMPORT_2_FOOTNOTE": "If you don't want to set a Stacks address now, you have the possibility to set it up later.",
     "LEDGER_IMPORT_2_SELECT": {
       "BTC_TITLE": "Bitcoin, Runes & Ordinals (default)",
       "BTC_SUBTITLE": "Native SegWit and Taproot addresses",
@@ -52,7 +66,13 @@
       "STX_SUBTITLE": "To continue, connect your Ledger device, make sure it's unlocked, and open the Stacks app.",
       "TITLE_FAILED": "Connection failed",
       "BTC_SUBTITLE_FAILED": "Make sure your Ledger device is connected, unlocked, authorised by your browser and the Bitcoin app is open.",
-      "STX_SUBTITLE_FAILED": "Make sure your Ledger device is connected, unlocked, authorised by your browser and the Stacks app is open."
+      "STX_SUBTITLE_FAILED": "Make sure your Ledger device is connected, unlocked, authorised by your browser and the Stacks app is open.",
+      "ALT": {
+        "CONNECT_STX_ALT": "Initiate Stacks connection",
+        "CONNECT_ERROR_ALT": "Connection error",
+        "CONNECT_SUCCESS_ALT": "Connection success",
+        "DEFAULT_ALT": "Use Ledger device"
+      }
     },
     "LEDGER_ADD_ADDRESS": {
       "TITLE_BTC": "Add a Bitcoin wallet",
@@ -106,10 +126,10 @@
     "LEARN_MORE": "Learn More",
     "LEDGER_BEFORE_GETTING_STARTED": {
       "TITLE": "Before getting started",
-      "DESCRIPTION": "Do you use Ledger Live with the hardware wallet device you wish to connect?",
+      "DESCRIPTION": "Please select one of the following options to continue.",
       "OPTIONS": {
-        "USE_LEDGER_LIVE": "I use Ledger Live with the device.",
-        "DONT_USE_LEDGER_LIVE": "I do not use Ledger Live with the device."
+        "USE_LEDGER_LIVE": "I am using Ledger Live with this device.",
+        "DONT_USE_LEDGER_LIVE": "I am not using Ledger Live with this device."
       },
       "IMPORTANT_WARNING": {
         "TITLE": "Important - Please read",
@@ -121,7 +141,52 @@
         "UNDERSTAND_SHOULD_NOT_USE_LEDGER_LIVE": "I understand I should not use Ledger Live or other Bitcoin wallets with the same hardware device"
       }
     },
-    "ADDRESS_MISMATCH": "There’s a mismatch between your signing address and the address you’re logged with.",
+    "ADDRESS_MISMATCH": "There's a mismatch between your signing address and the address you're logged in with.",
+    "CLOSE_BUTTON": "Close",
+    "TITLE_FAILED": "Connection failed"
+  },
+  "KEYSTONE_IMPORT_SCREEN": {
+    "KEYSTONE_IMPORT_1_TITLE": "Secure Your Assets with Keystone",
+    "KEYSTONE_IMPORT_1_SUBTITLE": "Keystone supports up to 3 sets of seed phrases to store different assets. You can use one Keystone hardware wallet to manage your Ordinals, Runes, and BRC-20 assets separately.",
+    "KEYSTONE_IMPORT_1_BUTTON": "Get started",
+    "KEYSTONE_CONNECT": {
+      "BTC_TITLE": "Connect Your Keystone",
+      "BTC_SUBTITLE": "To continue, connect your Keystone device, make sure it's unlocked, and on the homepage.",
+      "TITLE_FAILED": "Connection failed",
+      "BTC_SUBTITLE_FAILED": "Unable to connect to device, missing browser permissions, please grant Keystone permissions.",
+      "BTC_SUBTITLE_REJECT_FAILED": "Keystone request was cancelled. To proceed, please reauthorize.",
+      "BTC_SUBTITLE_PAGE_FAILED": "Please reconnect the Keystone on home screen and reauthorize."
+    },
+    "KEYSTONE_ADDRESS_ADDED": {
+      "TITLE_BTC": "Bitcoin wallet added",
+      "SUBTITLE": "You can now receive & send Bitcoin, Ordinals and BRC-20 tokens using Xverse and Keystone."
+    },
+    "KEYSTONE_ADD_ACCOUNT_NAME": {
+      "TITLE": "Name your Keystone wallet",
+      "SUBTITLE": "You can give your wallet a custom name.",
+      "INPUT": "Wallet name",
+      "PLACEHOLDER": "My Keystone"
+    },
+    "KEYSTONE_IMPORT_END": {
+      "TITLE": "Your wallet is ready!",
+      "SUBTITLE": "You can switch to this wallet from the accounts selection drop-down."
+    },
+    "KEYSTONE_STX_WALLET_ADDED": {
+      "TITLE": "Stacks wallet added",
+      "SUBTITLE": "You can now receive & send STX, Stacks NFTs and SIP-10 tokens using this wallet."
+    },
+    "KEYSTONE_IMPORT_2_BUTTON": "Get started",
+    "KEYSTONE_IMPORT_CONTINUE_BUTTON": "Continue",
+    "KEYSTONE_IMPORT_CONNECT_BUTTON": "Connect",
+    "KEYSTONE_IMPORT_ADD_BUTTON": "Add",
+    "KEYSTONE_IMPORT_NEXT_BUTTON": "Next",
+    "KEYSTONE_IMPORT_CONFIRM_BUTTON": "Confirm",
+    "KEYSTONE_IMPORT_CLOSE_BUTTON": "Close",
+    "KEYSTONE_IMPORT_TRY_AGAIN_BUTTON": "Try again",
+    "KEYSTONE_IMPORT_YES_BUTTON": "Add a new account",
+    "KEYSTONE_IMPORT_CANCEL_BUTTON": "Cancel",
+    "LEARN_MORE": "Learn More",
+    "ADDRESS_MISMATCH": "There's a mismatch between your signing address and the address you're logged with.",
     "CLOSE_BUTTON": "Close",
     "TITLE_FAILED": "Connection failed"
   },
@@ -149,7 +214,7 @@
     "ORDINALS_TITLE_VERIFIED": "Ordinals address verified successfully",
     "STACKS_TITLE_VERIFIED": "Stacks address verified successfully",
     "WRONG_DEVICE_ERROR_SUBTITLE": "The public key of the connected device did not match the wallet public key. Make sure you have the correct device connected.",
-    "ADDRESS_MISMATCH": "There’s a mismatch between the address you’re verifying and the address you’re logged with.",
+    "ADDRESS_MISMATCH": "There's a mismatch between the address you're verifying and the address you're logged with.",
     "LEDGER_CONNECT": {
       "BTC_TITLE": "Connect Your Ledger",
       "BTC_SUBTITLE": "To continue, connect your Ledger device, make sure it's unlocked, and open the Bitcoin app.",
@@ -202,7 +267,8 @@
     "AMOUNT": "Amount"
   },
   "DASHBOARD_SCREEN": {
-    "TOTAL_BALANCE": "total balance",
+    "TOTAL_BALANCE": "Total Balance",
+    "SHOW_BALANCE": "Show balance",
     "BITCOIN": "Bitcoin",
     "STACKS": "Stacks",
     "ACCOUNT_NAME": "Account",
@@ -215,7 +281,7 @@
     "SAVE": "Save",
     "CONFIRM": "Confirm",
     "MANAGE_TOKEN": "Manage token list",
-    "STACKS_AND_TOKEN": "Stacks NFTs & SIP-10 tokens",
+    "STACKS_AND_TOKEN": "STX, Stacks SIP-10 & NFTs",
     "ORDINALS_AND_BRC20": "Ordinals, BRC-20 & Runes",
     "VERIFY_ADDRESSES_ON_LEDGER": "Verify addresses on Ledger",
     "VIEW_ADDRESSES": "View addresses",
@@ -229,7 +295,33 @@
       "ALLOW": "Allow"
     },
     "TOKEN_HIDDEN": "Token hidden and reported",
-    "UNDO": "Undo"
+    "UNDO": "Undo",
+    "PRICE": "Price",
+    "ERRORS": {
+      "BTC_BALANCE": "Failed to load Bitcoin balance",
+      "STX_BALANCE": "Failed to load Stacks balance",
+      "SIP10_BALANCE": "Failed to load SIP-10 token balances",
+      "BRC20_BALANCE": "Failed to load BRC-20 token balances",
+      "RUNES_BALANCE": "Failed to load Rune balances"
+    },
+    "ANNOUNCEMENTS": {
+      "NATIVE_SEGWIT": {
+        "TITLE": "Native SegWit is here!",
+        "DESCRIPTION_1a": "Xverse now supports ",
+        "DESCRIPTION_1b": "Native SegWit",
+        "DESCRIPTION_1c": " addresses for lower fees and better performance!",
+        "DESCRIPTION_2": "You can select your preferred Bitcoin payment address (native or nested) used for sending, receiving, and connecting with apps.",
+        "DESCRIPTION_3": "Your Bitcoin balance includes funds from both addresses, and you can switch back anytime.",
+        "SELECT": "Select my Preferred Bitcoin Address",
+        "LATER": "Maybe later"
+      }
+    },
+    "CALLOUTS": {
+      "NATIVE_SEGWIT": {
+        "TITLE": "Now using Native SegWit!",
+        "DESCRIPTION": "Your new Native SegWit address is set as preferred. Switch back to Nested SegWit in Settings."
+      }
+    }
   },
   "TOKEN_SCREEN": {
     "ADD_COINS": "Manage tokens",
@@ -242,19 +334,28 @@
   "ACCOUNT_SCREEN": {
     "TITLE": "Accounts",
     "NEW_ACCOUNT": "Generate account",
-    "LEDGER_ACCOUNT": "Connect hardware wallet"
+    "NEW_HARDWARE_WALLET": "Add hardware wallet account"
   },
   "RECEIVE": {
     "RECEIVE": "Receive",
     "STX_ADDRESS": "Stacks address",
     "STX_ADDRESS_DESC": "Only send SIP-010 tokens to this address",
     "COPY_ADDRESS": "Copy address",
-    "COPIED_ADDRESS": "Address copied to clipboard",
     "BTC_ADDRESS": "Bitcoin address",
-    "ORDINAL_ADDRESS": "Ordinal, Runes & BRC-20 address",
+    "ORDINAL_ADDRESS": "Ordinals, Runes & BRC-20 address",
     "ORDINALS_RECEIVE_MESSAGE": "Only use this address to receive Ordinals, Runes, and BRC-20 tokens.",
-    "STX_RECEIVE_MESSAGE": "Only use this address to receive SIP-10 tokens.",
-    "BTC_RECEIVE_MESSAGE": "Only use this address to receive Bitcoin."
+    "STX_RECEIVE_MESSAGE": "Only use this address to receive STX, SIP-10 tokens & Stacks NFTs",
+    "BTC_RECEIVE_MESSAGE": "Only use this address to receive Bitcoin.",
+    "CALLOUTS": {
+      "NATIVE_SEGWIT": {
+        "TITLE": "Now using Native SegWit!",
+        "DESCRIPTION": "Your new Native SegWit address is set as preferred address."
+      },
+      "ADDRESS_CHANGE_TOOLTIP": {
+        "TITLE": "Switch Preferred Bitcoin Address",
+        "DESCRIPTION": "You can switch between Native SegWit and Nested SegWit."
+      }
+    }
   },
   "SEND": {
     "BTC": {
@@ -263,7 +364,9 @@
       "MAX_IGNORING_DUST_UTXO_MSG": "Small amounts may remain in your wallet, as sending them costs more in fees than their value.",
       "NO_FUNDS_TITLE": "Your balance is empty",
       "NO_FUNDS": "You don't have any funds to send. You can purchase crypto quickly and deposit directly into your Xverse wallet.",
-      "BUY_BTC": "Buy Bitcoin"
+      "BUY_BTC": "Buy Bitcoin",
+      "SELECT_ADDRESS_TYPE": "Select address type",
+      "SELECT_ADDRESS_TYPE_DESCRIPTION": "Select your preferred address to send BTC. Using Native SegWit is recommended for reduced fees and better performance."
     },
     "STX": {
       "BUY_STX": "Buy Stacks"
@@ -317,7 +420,9 @@
     "RATE_TOO_LOW": "Set fee is below minimum of {{minFee}} sats/vB",
     "RATE_TOO_HIGH": "Set fee is above maximum of {{maxFee}} sats/vB",
     "SPEND_DELEGATED_STX": "You are transferring some STX that is registered for the next stacking cycle. The amount transferred will be subtracted from your current stacking pool delegation, and will not be locked to generate rewards in the next cycle.",
-    "INVALID_FEE_RATE": "Invalid fee rate"
+    "INVALID_FEE_RATE": "Invalid fee rate",
+    "EMPTY_RUNE_BALANCE": "You don't have any {{symbol}} to send. You can swap BTC for {{symbol}} with Xverse.",
+    "SWAP_FROM_TO": "Swap {{from}} for {{to}}"
   },
   "CONFIRM_TRANSACTION": {
     "SEND": "Confirm Transaction",
@@ -336,7 +441,8 @@
     "ADVANCED_SETTING": "Advanced Settings",
     "EDIT_FEES": "Edit fees",
     "CONFIRM": "Confirm",
-    "CONFIRM_ALL": "Confirm all",
+    "CONFIRM_ALL_one": "Confirm",
+    "CONFIRM_ALL_other": "Confirm all",
     "CANCEL": "Cancel",
     "SATS": "sats",
     "BTC": "BTC",
@@ -348,7 +454,8 @@
     "AMOUNT_PLUS_FEES": "Amount + fees",
     "BUNDLE_PLUS_FEES": "Bundle size + fees",
     "REVIEW_TRANSACTION": "Review transaction",
-    "SIGN_TRANSACTIONS": "Sign {{count}} transactions",
+    "SIGN_TRANSACTIONS_one": "Sign {{count}} transaction",
+    "SIGN_TRANSACTIONS_other": "Sign {{count}} transactions",
     "SIGN_TRANSACTION": "Sign transaction",
     "AMOUNT": "Amount",
     "INSUFFICIENT_BALANCE": "Insufficient balance",
@@ -376,10 +483,10 @@
     "THIS_MAY_TAKE_A_FEW_MINUTES": "This may take a few minutes, please keep this window open.",
     "TRANSACTIONS_BROADCASTED": "Transactions broadcasted",
     "TRANSACTIONS_FAILED_TO_BROADCAST": "{{failed}}/{{total}} transactions failed to broadcast",
+    "SOME_TRANSACTIONS_FAILED_TO_BROADCAST": "Some transactions failed to broadcast",
     "CHECK_THE_APP_YOU_USE": "Please check the app you are using.",
+    "TRANSACTION_SIGNED": "Transaction signed",
     "TRANSACTIONS_SIGNED": "Transactions signed",
-    "NETWORK_MISMATCH": "There’s a mismatch between your active network and the network you’re logged with.",
-    "ADDRESS_MISMATCH": "There’s a mismatch between your signing address and the address you’re logged with.",
     "PSBT_NO_BROADCAST_DISCLAIMER": "This transaction will not be broadcasted from your wallet. It may be broadcasted later by a third party.",
     "PSBTS_NO_BROADCAST_DISCLAIMER": "These transactions will not be broadcasted from your wallet. They may be broadcasted later by a third party.",
     "PSBT_SIG_HASH_NONE_DISCLAIMER_TITLE": "Transaction uses SIGHASH_NONE",
@@ -424,6 +531,7 @@
       },
       "CONFIRM": {
         "TITLE": "Confirm the transaction",
+        "TITLE_MULTIPLE": "Confirm transaction {{current}}/{{total}}",
         "SUBTITLE": "Authorise the transaction on your device to continue.",
         "ERROR_TITLE": "Transaction denied",
         "ERROR_SUBTITLE": "The transaction have been rejected. You can try again or close this tab."
@@ -443,8 +551,7 @@
       "CLOSE_BUTTON": "Close",
       "CANCEL_BUTTON": "Cancel",
       "SEE_TRANSACTION_BUTTON": "See transaction",
-      "RETRY_BUTTON": "Try again",
-      "BATCH_NOT_SUPPORTED": "External transaction requests are not yet supported on a Ledger account. Switch to a different account to sign transactions from the application."
+      "RETRY_BUTTON": "Try again"
     },
     "INSCRIBE": {
       "TITLE": "You will inscribe",
@@ -467,7 +574,8 @@
     "POST_CONDITION_MODE_WARNING_TEXT": "This transaction might be unsafe. Be sure you trust the source of this transaction before confirming it. (Unsafe post condition mode)",
     "QUOTE_EXPIRES_IN": "Note that this swap quote will expire after {{seconds}} seconds",
     "INSCRIPTION_SERVICE_FEE": "Inscription Service Fee",
-    "TOTAL_FEES": "Total fees"
+    "TOTAL_FEES": "Total fees",
+    "FAILED_TO_SIGN": "Failed to sign"
   },
   "TX_ERRORS": {
     "INSUFFICIENT_BALANCE": "The requested transaction cannot be created due to insufficient balance",
@@ -505,6 +613,12 @@
       "HIGH": "High",
       "CUSTOM": "Custom"
     }
+  },
+  "CONNECT_HARDWARE_WALLET": {
+    "TITLE": "Add hardware wallet account",
+    "SUBTITLE": "Select which device you would like to connect to Xverse.",
+    "CONNECT_LEDGER": "Connect Ledger",
+    "CONNECT_KEYSTONE": "Connect Keystone"
   },
   "TRANSACTION_STATUS": {
     "BROADCASTED": "Transaction broadcasted",
@@ -556,9 +670,15 @@
     "CONFIRM_YOUR_SEEDPHRASE": "Confirm you've recorded your seed phrase correctly."
   },
   "CREATE_PASSWORD_SCREEN": {
-    "CREATE_PASSWORD_TITLE": "Enter a password to protect your wallet",
+    "CREATE_PASSWORD_TITLE": "Create your password",
+    "CREATE_PASSWORD_DESCRIPTION": "Create a strong password to protect your wallet. Your password must be at least 8 characters in length.",
+    "ENTER_PASSWORD_TITLE": "Enter a password to protect your wallet",
     "CONFIRM_PASSWORD_TITLE": "Confirm your password",
     "ENTER_PASSWORD": "Enter your current password",
+    "CREATE_PASSWORD_LABEL": "Create password",
+    "CONFIRM_PASSWORD_LABEL": "Confirm password",
+    "CREATE_PASSWORD_PLACEHOLDER": "Type your password",
+    "CONFIRM_PASSWORD_PLACEHOLDER": "Type your password again",
     "TEXT_INPUT_NEW_PASSWORD_LABEL": "Password",
     "TEXT_INPUT_CONFIRM_PASSWORD_LABEL": "Confirm Password",
     "CONTINUE_BUTTON": "Continue",
@@ -567,7 +687,6 @@
     "PASSWORD_STRENGTH_WEAK": "Weak",
     "PASSWORD_STRENGTH_MEDIUM": "Medium",
     "PASSWORD_STRENGTH_STRONG": "Strong",
-    "PASSWORD_STRENGTH_ERROR": "Your password should be at least 9 characters long. Use a mix of uppercase letters, lowercase letters, numbers, and symbols",
     "CONFIRM_PASSWORD_MATCH_ERROR": "Please make sure your passwords match",
     "INCORRECT_PASSWORD_ERROR": "Incorrect password"
   },
@@ -645,17 +764,26 @@
   },
   "FORGOT_PASSWORD_SCREEN": {
     "TITLE": "Forgot Password",
-    "PARAGRAPH1": "Xverse does not keep a copy of your password. If you're unable to access your account, you will need to reset your wallet and input the seedphrase you used when you generated your wallet.",
+    "PARAGRAPH1": "Xverse does not keep a copy of your password. If you're unable to access your account, you will need to reset your wallet and input the seed phrase you used when you generated your wallet.",
     "PARAGRAPH2": "This will reset your wallet from this browser. Make sure you have your seed phrase backed up.",
-    "BACKUP_CHECKBOX_LABEL": "I backed up my seedphrase",
+    "BACKUP_CHECKBOX_LABEL": "I backed up my seed phrase",
     "CANCEL": "Cancel",
     "RESET": "Reset"
   },
   "RESTORE_WALLET_SCREEN": {
-    "ENTER_SEED_HEADER": "Enter your seedphrase to restore your wallet.",
-    "SEED_INPUT_ERROR": "Invalid seed phrase, please try again",
+    "ENTER_SEED_TITLE": "Restore Wallet",
+    "ENTER_SEED_DESCRIPTION": "Enter or paste your 12 or 24 word seedphrase to restore your wallet",
+    "SEED_INPUT_ERROR": "Seed phrase does not match, please try again.",
     "CONTINUE_BUTTON": "Continue",
-    "HAVE_A_24_WORDS_SEEDPHRASE?": "Have a {{number}} words seedphrase?"
+    "HAVE_A_COUNT_WORDS_SEED_PHRASE": "Have a {{number}} words seed phrase?",
+    "SELECT_ADDRESS_TYPE": {
+      "TITLE": "Preferred Address Type",
+      "DESCRIPTION": "Select the default Bitcoin payment address type you would like to use for all accounts. You can switch at any time from settings.",
+      "LEARN_MORE": "Learn more about address types.",
+      "ACCOUNT_COUNT": "Accounts: {{accounts}}",
+      "ACCOUNT_SUMMARY_DESCRIPTION": "The balances shown are cumulative across all found accounts for each address type.",
+      "ACCOUNT_SUMMARY_DESCRIPTION_NO_FUNDS": "No balances found for this seed phrase."
+    }
   },
   "STACKING_SCREEN": {
     "STACK_AND_EARN": "Stack STX, earn BTC",
@@ -694,36 +822,31 @@
     "COPY": "Copy link",
     "NFT_DETAIL": "Item detail",
     "RECEIVE_NFT": "Receive",
-    "STACKS_NFT": "Stacks NFT",
+    "STACKS_NFT": "Stacks NFTs",
     "ORDINALS": "Ordinals",
     "ORDINAL": "Ordinal",
     "INSCRIPTION": "Inscription",
-    "ACTIVATE_ORDINALS": "Activate Ordinals",
-    "ACTIVATE_ORDINALS_INFO": "You have Bitcoin Ordinals in your wallet. Would you like to display them? This is an experimental feature. You can change this setting at anytime.",
-    "ACTIVATE": "Activate",
     "DENY": "No",
     "COPIED": "Copied",
     "MINT": "Mint",
     "TRANSFER": "Transfer",
     "DEPLOY": "Deploy",
+    "VERIFY": "Verify",
     "VERIFY_ADDRESS_ON_LEDGER": "Verify address on Ledger",
     "VIEW_ADDRESS": "View address",
     "ADD_STACKS_ADDRESS": "Add a Stacks address",
     "NFTS": "NFTs",
     "RARE_SAT": "Rare sat",
     "RARE_SATS": "Rare sats",
-    "NEW_FEATURE": "New Feature, Rare Sats",
-    "NEW_FEAT_RARE_SATS_DESCRIPTION": "Enable rare sats to display rare, interesting and unique sats in your wallet. You can change this setting at any time.",
-    "NEW_FEAT_RARE_SATS_ORDINALS_ENABLE": "Enable rare sats to display rare, interesting and unique sats in your wallet. Note than enabling rare sats will also enable Ordinals. You can change this setting at any time.",
-    "MAYBE_LATER": "Maybe Later",
-    "ENABLE": "Enable",
     "RARE_SATS_NOTICE_TITLE": "Don't see your rare sat?",
     "RARE_SATS_NOTICE_DETAIL": "Xverse supports most rare sats, but your sats may have other attributes.",
     "SEE_SUPPORTED": "See supported rarities",
     "FROM_RARE_SAT_BUNDLE": "This inscription belongs to the same bundle as other assets. Transferring it will involve transferring the full bundle.",
     "HOLDS_RARE_SAT": "This inscription holds a rare sat.",
     "HIDDEN_COLLECTIBLES": "Hidden collectibles",
-    "UNHIDE_ALL": "Unhide all"
+    "UNHIDE_ALL": "Unhide all",
+    "HIDDEN_ITEMS_RESTORED": "Hidden items restored",
+    "ITEMS_RETURNED_TO_HIDDEN": "Items returned to hidden"
   },
   "RESTORE_FUND_SCREEN": {
     "TITLE": "Recover assets",
@@ -772,6 +895,13 @@
     "UNHIDE_INSCRIPTION": "Unhide",
     "INSCRIPTION_HIDDEN": "Item hidden",
     "INSCRIPTION_UNHIDDEN": "Item un-hidden",
+    "REFRESH_THUMBNAIL": "Refresh Thumbnail",
+    "REFRESHING_THUMBNAIL": "Refreshing thumbnail",
+    "REFRESHING_THUMBNAIL_TIMEOUT_HOURS_one": "We've queued this thumbnail for an update. Try to refresh again in {{count}} hour.",
+    "REFRESHING_THUMBNAIL_TIMEOUT_HOURS_other": "We've queued this thumbnail for an update. Try to refresh again in {{count}} hours.",
+    "REFRESHING_THUMBNAIL_TIMEOUT_MINUTES_one": "We've queued this thumbnail for an update. Try to refresh again in {{count}} minute.",
+    "REFRESHING_THUMBNAIL_TIMEOUT_MINUTES_other": "We've queued this thumbnail for an update. Try to refresh again in {{count}} minutes.",
+    "REFRESHING_THUMBNAIL_ERROR": "Failed to refresh thumbnail. Please try again.",
     "SEND": "Send",
     "SHARE": "Share",
     "OWNED_BY": "Owned by",
@@ -879,8 +1009,10 @@
     "RESET": "Reset",
     "BACK": "Back",
     "INCORRECT_PASSWORD_ERROR": "Incorrect password",
-    "TESTNET": "Testnet",
+    "TESTNET": "Testnet3",
+    "TESTNET4": "Testnet4",
     "SIGNET": "Signet",
+    "REGTEST": "Regtest",
     "ORDINALS": "Ordinals",
     "ACTIVATE_ORDINAL_NFTS": "Display ordinals",
     "RECOVER_ASSETS": "Recover assets",
@@ -893,11 +1025,18 @@
     "ENTER_YOUR_NEW_PASSWORD": "Enter your new password",
     "CONFIRM_YOUR_NEW_PASSWORD": "Confirm your new password",
     "TEXT_INPUT_NEW_PASSWORD_LABEL": "New Password",
-    "ENABLE_RARE_SATS": "Enable Rare Sats (experimental)",
+    "ENABLE_RARE_SATS": "Enable Rare Sats",
     "ENABLE_ORDINALS_DETAIL": "Automatically scan your ordinal address for ordinals and display them in your collectibles and transaction review screens",
     "ENABLE_RARE_SATS_DETAIL": "Automatically scan your ordinal address for rare sats and display them in your collectibles and transaction review screens",
     "ENABLE_SPEED_UP_TRANSACTIONS": "Enable speed up transactions",
     "ENABLE_SPEED_UP_TRANSACTIONS_DETAIL": "Allows you to speed up unconfirmed transactions by paying a higher fee.",
+    "PREFERRED_BTC_ADDRESS": {
+      "TITLE": "Preferred Bitcoin Address",
+      "DESCRIPTION": "You can switch between Native SegWit (more efficient) and  Nested SegWit for your transactions. The selected address will be used for sending, receiving, and connecting with dapps. Your total balance includes funds from both addresses, and you can switch back anytime.",
+      "NESTED_SEGWIT": "Nested SegWit",
+      "NATIVE_SEGWIT": "Native SegWit",
+      "SUCCESS": "Preferred Bitcoin address changed"
+    },
     "ADVANCED": "Advanced",
     "XVERSE_DEFAULT": "Use Xverse as default wallet",
     "XVERSE_DEFAULT_DESCRIPTION": "Allow apps to prioritize Xverse when looking for a wallet with which to connect."
@@ -911,6 +1050,7 @@
     "DISCONNECT": "Disconnect",
     "DISCONNECT_ALL": "Disconnect all",
     "URL": "URL",
+    "NAME": "Name",
     "LAST_USED": "Last used",
     "PERMISSIONS": "Permissions"
   },
@@ -939,12 +1079,15 @@
       "SET_ACTION": "Set as avatar",
       "SET_TOAST": "Item set as avatar",
       "REMOVE_ACTION": "Remove avatar",
-      "REMOVE_TOAST": "Avatar removed"
+      "REMOVE_TOAST": "Avatar removed",
+      "UNDO": "Avatar reverted"
     }
   },
   "BUY_SCREEN": {
     "BUY": "Buy",
     "PURCHASE_CRYPTO": "Purchase crypto quickly and deposit directly into your Xverse wallet.",
+    "XVERSE_SWAPS": "Xverse Swaps",
+    "XVERSE_SWAPS_DESC": "Swap Crypto for Bitcoin. Fast, Easy, and No KYC!",
     "MOONPAY": "Moonpay",
     "TRANSAK": "Transak",
     "PAYPAL": "Paypal",
@@ -954,7 +1097,7 @@
   },
   "LIST_RUNE_SCREEN": {
     "LISTING_STATUS": "Listing status",
-    "FLOOR_PRICE": "Floor Price: {{floor_price}} Sats/{{symbol}}",
+    "FLOOR_PRICE": "Floor Price: ",
     "LISTED_FOR": "Listed for {{floor_price}} Sats/{{symbol}}",
     "FAILED_TO_LIST": "Failed to list",
     "SELECT_RUNES": "Select Runes",
@@ -972,7 +1115,7 @@
     "SET_PRICES": "Set price",
     "EDIT_PRICE": "Edit price",
     "MAGIC_EDEN_FLOOR_PRICE": "The Magic Eden floor price is currently {{sats}} sats/{{symbol}}",
-    "MARKETPLACE_FLOOR_PRICE": "The floor price for {{marketplaces}} is currently {{sats}} Sats/{{symbol}}",
+    "MARKETPLACE_FLOOR_PRICE": "The floor price for {{marketplaces}} is currently ",
     "NO_FLOOR_PRICE": "There is no floor price for {{symbol}}",
     "TOTAL_LISTED": "Total listed",
     "TOTAL_RECEIVED_IF_SOLD": "Total received if sold",
@@ -1001,6 +1144,15 @@
       "BACK": "Back",
       "CONTINUE": "Continue",
       "CALLOUT": "This transaction will perform on-chain delisting for your runes on all marketplaces and has to confirm before you can list again."
+    }
+  },
+  "COIN_PRICE_CHART": {
+    "EMPTY_CHART": {
+      "TITLE": "No Market Data Yet",
+      "TEXT": "When market data is available for this token, it will appear here."
+    },
+    "MISSING_PERIOD": {
+      "TEXT": "No data for this time period."
     }
   },
   "COIN_DASHBOARD_SCREEN": {
@@ -1044,10 +1196,14 @@
     "TRANSACTIONS": "TRANSACTIONS",
     "CONTRACT": "CONTRACT",
     "BUNDLES": "BUNDLES",
+    "BREAKDOWN": "BREAKDOWN",
     "COMING_SOON": "Coming soon",
     "VERIFY_ADDRESS_ON_LEDGER": "Verify address on Ledger",
     "VIEW_ADDRESS": "View address",
-    "HIDE_AND_REPORT": "Hide & Report"
+    "HIDE_AND_REPORT": "Hide & Report",
+    "DATA": "DATA",
+    "MARKET": "MARKET",
+    "PRICE": "Price"
   },
   "SPEED_UP_TRANSACTION": {
     "TITLE": "Speed up transaction",
@@ -1071,7 +1227,8 @@
     "TIME": {
       "SEVERAL_HOURS_OR_MORE": "several hours or more",
       "HOUR": "hour",
-      "MINUTES": "mins"
+      "MINUTES": "mins",
+      "SECONDS": "sec"
     }
   },
   "POST_CONDITION_MESSAGE": {
@@ -1097,14 +1254,20 @@
     "TRANSFER_OWN": "will keep"
   },
   "CONTRACT_CALL_REQUEST": {
-    "FUNCTION": "Function",
+    "TRANSACTION_DETAILS": "Transaction details",
+    "CONTRACT_CALL_DETAILS_TITLE": "Contract call",
+    "FUNCTION_NAME": "Name",
     "SHOW_MORE": "Show more ",
     "SHOW_LESS": "Show less",
+    "REQUEST_NETWORK": "Network",
+    "REQUEST_NETWORK_MAINNET": "Mainnet",
+    "REQUEST_NETWORK_TESTNET": "Testnet",
     "PLUS": "+",
     "MINUS": "-",
-    "CONTRACT_ADDRESS": "Contract ADDRESS",
+    "CONTRACT_ADDRESS": "Contract",
     "SPONSORED": "Sponsored",
-    "POST_CONDITION_ALERT": "No transfers (beside fees) will be made from your account or the transaction will abort"
+    "SPONSORED_VALUE_YES": "Yes",
+    "POST_CONDITION_ALERT": "No transfers (beside fees) will be made from your account"
   },
   "DEPLOY_CONTRACT_REQUEST": {
     "DEPLOY_CONTRACT": "deploy-contract",
@@ -1112,9 +1275,10 @@
     "SOURCE_CODE": "Source code",
     "VIEW_SOURCE_CODE": "View contract code",
     "SPONSORED": "Sponsored",
+    "SPONSORED_VALUE_YES": "Yes",
     "FUNCTION": "Source Code",
     "DOWNLOAD": "Download contract code",
-    "POST_CONDITION_ALERT": "No transfers (beside fees) will be made from your account or the transaction will abort"
+    "POST_CONDITION_ALERT": "No transfers (beside fees) will be made from your account"
   },
   "SIGNATURE_REQUEST": {
     "TITLE": "Sign Message",
@@ -1145,7 +1309,8 @@
         "ERROR_SUBTITLE_DEVICE_LOCKED": "Your Ledger device is locked. Please unlock it to continue."
       },
       "CONFIRM": {
-        "TITLE": "Confirm the signature",
+        "TITLE": "Confirm the transaction",
+        "TITLE_WITH_COUNT": "Confirm the transaction ({{current}} of {{total}})",
         "SUBTITLE": "Authorise the signature on your device to continue.",
         "ERROR_TITLE": "Error requesting signature",
         "ERROR_SUBTITLE": "The signature request encountered an error. Please check that your Ledger Bitcoin app is version 2.1.3 or newer.",
@@ -1157,6 +1322,40 @@
           "ERROR_TITLE": "Data Invalid",
           "ERROR_SUBTITLE": "Your Ledger device has rejected the message stating it is invalid."
         }
+      },
+      "SUCCESS": {
+        "TITLE": "Signature confirmed",
+        "SUBTITLE": "This transaction will be broadcasted by the sponsor."
+      },
+      "CONFIRM_BUTTON": "Confirm",
+      "CONNECT_BUTTON": "Connect",
+      "CLOSE_BUTTON": "Close",
+      "CANCEL_BUTTON": "Cancel",
+      "RETRY_BUTTON": "Try again"
+    },
+    "KEYSTONE": {
+      "CONNECT": {
+        "TITLE": "Connect Your Keystone",
+        "SUBTITLE": "Connect your Keystone device, make sure it's unlocked, and on the homepage.",
+        "ERROR_TITLE": "Connection error",
+        "ERROR_SUBTITLE": "We weren't able to connect to your device.",
+        "ERROR_SUBTITLE_DEVICE_LOCKED": "Your Keystone device is locked. Please unlock it to continue."
+      },
+      "CONFIRM": {
+        "TITLE": "Confirm transaction",
+        "TITLE_WITH_COUNT": "Confirm the transaction ({{current}} of {{total}})",
+        "SUBTITLE": "Confirm the transaction on your device to continue.",
+        "ERROR_TITLE": "Transaction failed",
+        "ERROR_SUBTITLE": "Unable to connect to device, ensure your Keystone 3 Pro is connected and on the homepage.",
+        "DENIED": {
+          "ERROR_TITLE": "Signature denied",
+          "ERROR_SUBTITLE": "The signature has been rejected. You can try again or close this tab."
+        },
+        "INVALID": {
+          "ERROR_TITLE": "Data Invalid",
+          "ERROR_SUBTITLE": "Your Keystone device has rejected the message stating it is invalid."
+        },
+        "NOT_MATCH_MFP": "Message rejected. Please select the correct wallet."
       },
       "SUCCESS": {
         "TITLE": "Signature confirmed",
@@ -1212,7 +1411,7 @@
       "TRANSACTION": "Network fee",
       "TOTAL": "Total fees"
     },
-    "LEDGER": {
+    "HARDWARE_WALLET": {
       "CONNECT_BUTTON": "Connect",
       "RETRY_BUTTON": "Retry",
       "CANCEL_BUTTON": "Cancel"
@@ -1257,10 +1456,14 @@
     }
   },
   "ERROR_SCREEN": {
-    "TITLE": "Xverse crashed unexpectedly",
-    "ERROR_DESCRIPTION": "Xverse encountered a fatal error and crashed. You need to relaunch your wallet.",
-    "ERROR_PREFIX": "Error:",
-    "SUPPORT": "If the issue persists, you can contact the support at"
+    "ERROR_TITLE": "An error occurred",
+    "ERROR_CODE_MESSAGE": "Error code {{code}}: {{message}}",
+    "CONTACT_SUPPORT": "If the issue persists, you can contact support at",
+    "SHARING_WARNING": "The information below may contain sensitive data. Be cautious about sharing this information.",
+    "ERROR_REPORT_COPIED": "Error report copied",
+    "COPY_ERROR_REPORT": "Copy error report",
+    "RESTART_XVERSE": "Restart Xverse",
+    "COPIED": "Copied"
   },
   "WINDOW_CLOSED_ALERT": {
     "TITLE": "Requesting window closed",
@@ -1303,7 +1506,7 @@
       "ADDRESS_REQUIRED": "Recipient address is required",
       "AMOUNT_REQUIRED": "Amount is required",
       "ADDRESS_INVALID": "Recipient address invalid",
-      "INSUFFICIENT_BALANCE": "Insufficient BRC20 balance",
+      "INSUFFICIENT_BALANCE": "Insufficient BRC-20 balance",
       "INSUFFICIENT_BALANCE_FEES": "Insufficient BTC balance for transaction fees",
       "SERVER_ERROR": "Unexpected error"
     },
@@ -1321,7 +1524,7 @@
   "CONFIRM_BRC20": {
     "BITCOIN_VALUE": "Bundle size",
     "ERROR_CODES": {
-      "INSUFFICIENT_BALANCE": "Insufficient BRC20 balance",
+      "INSUFFICIENT_BALANCE": "Insufficient BRC-20 balance",
       "INSUFFICIENT_FUNDS": "Insufficient BTC balance for transaction fees",
       "FAILED_TO_FINALIZE": "Failed to finalize",
       "UTXOS_MISSING": "UTXOs missing",
@@ -1350,6 +1553,19 @@
       "TRANSFER": {
         "TITLE": "Confirm the signature (2 of 2)",
         "SUBTITLE": "Sign the transfer of your BRC-20 token on your Ledger device to continue."
+      }
+    },
+    "KEYSTONE": {
+      "CONNECT_BUTTON": "Connect",
+      "RETRY_BUTTON": "Retry",
+      "CANCEL_BUTTON": "Cancel",
+      "INSCRIPTION": {
+        "TITLE": "Confirm the signature (1 of 2)",
+        "SUBTITLE": "Sign the inscription of your BRC-20 token transfer on your Keystone device to continue."
+      },
+      "TRANSFER": {
+        "TITLE": "Confirm the signature (2 of 2)",
+        "SUBTITLE": "Sign the transfer of your BRC-20 token on your Keystone device to continue."
       }
     }
   },
@@ -1405,6 +1621,7 @@
     "EXCHANGE": "EXCHANGE",
     "MARKETPLACE": "MARKETPLACE",
     "FLOOR_PRICE": "Floor price",
+    "EXCHANGE_RATE": "Exchange rate",
     "RECOMMENDED": "Recommended",
     "BEST": "Best",
     "SELECT_BUNDLES": "Select bundles to proceed with the swap",
@@ -1413,7 +1630,8 @@
     "LIST_YOUR_RUNES": "List your Runes on a marketplace",
     "SLIPPAGE_WARNING": "Your transaction may be frontrun and result in an unfavorable trade",
     "BAD_QUOTE_WARNING_TITLE": "The quote you are receiving may result in significant value loss.",
-    "BAD_QUOTE_WARNING_DESC": "The minimum amount you will receive will result in a loss of over {{percentage}}% of your trade’s value. This is due to low liquidity in the pool, causing discrepancies in pricing. Please review the details carefully before proceeding with the swap."
+    "BAD_QUOTE_WARNING_DESC": "The minimum amount you will receive will result in a loss of over {{percentage}}% of your trade’s value. This could be due to low liquidity in the pool or other provider issues. Please review the details carefully before proceeding with the swap.",
+    "UNKNOWN_QUOTE_VALUE_WARNING_DESC": "The market value of the token you will receive is unknown. Review details carefully before proceeding with the swap."
   },
   "SWAP_CONFIRM_SCREEN": {
     "TOKEN_SWAP": "Token swap",
@@ -1547,8 +1765,12 @@
   "REQUEST_ERRORS": {
     "INVALID_REQUEST": "Invalid request",
     "MISSING_ARGUMENTS": "Contract function call missing arguments",
-    "ADDRESS_MISMATCH": "There’s a mismatch between your signing address and the address you’re logged with.",
-    "NETWORK_MISMATCH": "There’s a mismatch between your active network and the network you’re logged with.",
+    "ADDRESS_MISMATCH_TITLE": "Address Mismatch",
+    "ADDRESS_MISMATCH": "The app is requesting a signature from an address that doesn't match the account currently active in your wallet.\n\nTo fix this:\n- Make sure the account in Xverse matches the one connected to the app\n- Try reconnecting to the app",
+    "ADDRESS_TYPE_MISMATCH_TITLE": "Address Type Mismatch",
+    "ADDRESS_TYPE_MISMATCH": "The app is requesting a signature from a Bitcoin payment address type that doesn't match the one currently active in your wallet.\n\nTo fix this:\n- Make sure the Bitcoin payment address type (Native SegWit or Nested SegWit) selected in Xverse matches the app\n- Try reconnecting to the app",
+    "ADDRESS_MISMATCH_STX": "The app is requesting a signature from an address that doesn't match the one currently active in your Xverse wallet.",
+    "NETWORK_MISMATCH": "There's a mismatch between your active network and the network you're logged in with on the app.",
     "PSBT_CANT_PARSE_ERROR_TITLE": "Transaction Error",
     "PSBT_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction is invalid and cannot be processed. Please contact the developer of the requesting app for support."
   }

@@ -24,8 +24,8 @@ export default function useTransactions(
   brc20Token: string | null,
   runeToken: string | null,
 ) {
-  const { stxAddress, btcAddress, ordinalsAddress } = useSelectedAccount();
-  const { network, hasActivatedOrdinalsKey } = useWalletSelector();
+  const selectedAccount = useSelectedAccount();
+  const { network, hasActivatedOrdinalsKey, btcPaymentAddressType } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
   const btcClient = useBtcClient();
   const fetchTransactions = async (): Promise<
@@ -35,23 +35,27 @@ export default function useTransactions(
     | APIGetRunesActivityForAddressResponse
   > => {
     if (coinType === 'FT' && brc20Token) {
-      return getBrc20History(network.type, ordinalsAddress, brc20Token);
+      return getBrc20History(network.type, selectedAccount.ordinalsAddress, brc20Token);
     }
     if (coinType === 'FT' && runeToken) {
       return getXverseApiClient(network.type).getRuneTxHistory(
-        ordinalsAddress,
+        selectedAccount.ordinalsAddress,
         runeToken,
         0,
         PAGINATION_LIMIT,
       );
     }
     if (coinType === 'STX' || coinType === 'FT' || coinType === 'NFT') {
-      return getStxAddressTransactions(stxAddress, selectedNetwork, 0, PAGINATION_LIMIT);
+      return getStxAddressTransactions(
+        selectedAccount.stxAddress,
+        selectedNetwork,
+        0,
+        PAGINATION_LIMIT,
+      );
     }
     if (coinType === 'BTC') {
       return fetchBtcTransactionsData(
-        btcAddress,
-        ordinalsAddress,
+        selectedAccount,
         btcClient,
         hasActivatedOrdinalsKey as boolean,
       );

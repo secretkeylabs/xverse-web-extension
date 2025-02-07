@@ -20,8 +20,6 @@ import {
   StyledButton,
 } from './index.styled';
 
-const REQUIRED_PASSWORD_LENGTH = 5;
-
 enum PasswordStrength {
   NoScore,
   PoorScore,
@@ -43,7 +41,6 @@ type Props = {
   checkPasswordStrength?: boolean;
   stackButtonAlignment?: boolean;
   loading?: boolean;
-  createPasswordFlow?: boolean;
   autoFocus?: boolean;
 };
 
@@ -59,18 +56,16 @@ function PasswordInput({
   checkPasswordStrength,
   stackButtonAlignment = false,
   loading,
-  createPasswordFlow,
   autoFocus = false,
 }: Props): JSX.Element {
-  const { t } = useTranslation('translation', { keyPrefix: 'CREATE_PASSWORD_SCREEN' });
   const theme = useTheme();
+  const { t } = useTranslation('translation', { keyPrefix: 'CREATE_PASSWORD_SCREEN' });
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>(
     PasswordStrength.NoScore,
   );
+
   const { score } = zxcvbn(enteredPassword);
-  const enteredPasswordLength = enteredPassword.length;
-  const [error, setError] = useState<string>(passwordError ?? '');
   const transition = useTransition(passwordStrength, {
     from: {
       opacity: 0,
@@ -79,6 +74,33 @@ function PasswordInput({
       opacity: 1,
     },
   });
+  const enteredPasswordLength = enteredPassword.length;
+  let passwordStrengthLabel;
+  if (!enteredPassword) {
+    passwordStrengthLabel = {
+      color: theme.colors.white_600,
+      width: '0',
+      message: '',
+    };
+  } else if (score <= PasswordStrength.WeakScore) {
+    passwordStrengthLabel = {
+      color: theme.colors.danger_medium,
+      width: '20%',
+      message: <p style={{ color: theme.colors.danger_medium }}>{t('PASSWORD_STRENGTH_WEAK')}</p>,
+    };
+  } else if (score <= PasswordStrength.AverageScore) {
+    passwordStrengthLabel = {
+      color: theme.colors.caution,
+      width: '50%',
+      message: <p>{t('PASSWORD_STRENGTH_MEDIUM')}</p>,
+    };
+  } else {
+    passwordStrengthLabel = {
+      color: theme.colors.success_medium,
+      width: '100%',
+      message: <p>{t('PASSWORD_STRENGTH_STRONG')}</p>,
+    };
+  }
 
   useEffect(() => {
     const keyDownHandler = (event) => {
@@ -86,7 +108,6 @@ function PasswordInput({
         event.key === 'Enter' &&
         document.activeElement?.id === 'password-input' &&
         !!enteredPassword &&
-        enteredPasswordLength >= REQUIRED_PASSWORD_LENGTH &&
         (checkPasswordStrength ? score >= PasswordStrength.AverageScore : true)
       ) {
         event.preventDefault();
@@ -97,94 +118,16 @@ function PasswordInput({
     return () => {
       document.removeEventListener('keydown', keyDownHandler);
     };
-  }, [enteredPassword]);
-
-  useEffect(() => {
-    if (passwordError) {
-      setError(passwordError);
-      return;
-    }
-    if (enteredPassword && !!createPasswordFlow && score <= PasswordStrength.WeakScore) {
-      setError(t('PASSWORD_STRENGTH_ERROR'));
-      return;
-    }
-    setError('');
-  }, [passwordError, enteredPassword]);
+  }, [checkPasswordStrength, enteredPassword, enteredPasswordLength, handleContinue, score]);
 
   useEffect(() => {
     if (enteredPassword !== '') {
       setPasswordStrength(score);
     }
-
     return () => {
       setPasswordStrength(PasswordStrength.NoScore);
     };
-  }, [enteredPassword, setPasswordStrength]);
-
-  const handleTogglePasswordView = () => {
-    setIsPasswordVisible(!isPasswordVisible);
-  };
-
-  const handlePasswordChange = (event: React.FormEvent<HTMLInputElement>) => {
-    setEnteredPassword(event.currentTarget.value);
-  };
-
-  const renderStrengthBar = () => {
-    if (enteredPassword !== '') {
-      if (
-        enteredPasswordLength <= REQUIRED_PASSWORD_LENGTH ||
-        score <= PasswordStrength.WeakScore
-      ) {
-        return (
-          <PasswordStrengthContainer>
-            <span>{t('PASSWORD_STRENGTH_LABEL')}</span>
-            <StrengthBar $strengthColor={theme.colors.feedback.error} $strengthWidth="20%">
-              {transition((style) => (
-                <animated.div style={style} />
-              ))}
-            </StrengthBar>
-            <p style={{ color: theme.colors.feedback.error }}>{t('PASSWORD_STRENGTH_WEAK')}</p>
-          </PasswordStrengthContainer>
-        );
-      }
-
-      if (score <= PasswordStrength.AverageScore) {
-        return (
-          <PasswordStrengthContainer>
-            <span>{t('PASSWORD_STRENGTH_LABEL')}</span>
-            {transition((style) => (
-              <StrengthBar $strengthColor={theme.colors.feedback.caution} $strengthWidth="50%">
-                <animated.div style={style} />
-              </StrengthBar>
-            ))}
-            <p>{t('PASSWORD_STRENGTH_MEDIUM')}</p>
-          </PasswordStrengthContainer>
-        );
-      }
-
-      return (
-        <PasswordStrengthContainer>
-          <span>{t('PASSWORD_STRENGTH_LABEL')}</span>
-          {transition((style) => (
-            <StrengthBar $strengthColor={theme.colors.feedback.success} $strengthWidth="100%">
-              <animated.div style={style} />
-            </StrengthBar>
-          ))}
-          <p>{t('PASSWORD_STRENGTH_STRONG')}</p>
-        </PasswordStrengthContainer>
-      );
-    }
-    return (
-      <PasswordStrengthContainer>
-        <span>{t('PASSWORD_STRENGTH_LABEL')}</span>
-        <StrengthBar $strengthColor={theme.colors.white_600} $strengthWidth="0">
-          {transition((style) => (
-            <animated.div style={style} />
-          ))}
-        </StrengthBar>
-      </PasswordStrengthContainer>
-    );
-  };
+  }, [enteredPassword, score, setPasswordStrength]);
 
   return (
     <Container>
@@ -198,10 +141,10 @@ function PasswordInput({
         id="password-input"
         type={isPasswordVisible ? 'text' : 'password'}
         value={enteredPassword}
-        onChange={handlePasswordChange}
+        onChange={(e) => setEnteredPassword(e.currentTarget.value)}
         autoFocus={autoFocus}
         complications={
-          <StyledButton onClick={handleTogglePasswordView}>
+          <StyledButton onClick={() => setIsPasswordVisible(!isPasswordVisible)}>
             <img
               src={isPasswordVisible ? Eye : EyeSlash}
               alt="toggle password visibility"
@@ -209,11 +152,22 @@ function PasswordInput({
             />
           </StyledButton>
         }
-        feedback={error !== '' ? [{ message: error, variant: 'danger' }] : undefined}
+        feedback={passwordError ? [{ message: passwordError, variant: 'danger' }] : undefined}
         hideClear
       />
-      {checkPasswordStrength ? renderStrengthBar() : null}
-      <ButtonsContainer $stackButtonAlignment={stackButtonAlignment} $ifError={error !== ''}>
+      <PasswordStrengthContainer $visibility={!!checkPasswordStrength}>
+        <span>{t('PASSWORD_STRENGTH_LABEL')}</span>
+        <StrengthBar
+          $strengthColor={passwordStrengthLabel.color}
+          $strengthWidth={passwordStrengthLabel.width}
+        >
+          {transition((style) => (
+            <animated.div style={style} />
+          ))}
+        </StrengthBar>
+        {passwordStrengthLabel.message}
+      </PasswordStrengthContainer>
+      <ButtonsContainer $stackButtonAlignment={stackButtonAlignment} $ifError={!!passwordError}>
         <ButtonContainer $stackButtonAlignment={stackButtonAlignment}>
           <Button title={t('BACK_BUTTON')} onClick={handleBack} variant="secondary" type="button" />
         </ButtonContainer>

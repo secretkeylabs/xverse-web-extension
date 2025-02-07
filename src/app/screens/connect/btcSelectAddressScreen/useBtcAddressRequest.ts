@@ -2,9 +2,7 @@ import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types'
 import { getPopupPayload, type Context } from '@common/utils/popup';
 import { accountPurposeAddresses } from '@common/utils/rpc/btc/getAddresses/utils';
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
-import { usePermissionsUtils } from '@components/permissionsManager';
-import { makeAccountResource } from '@components/permissionsManager/resources';
-import type { Client, Permission } from '@components/permissionsManager/schemas';
+import { usePermissions } from '@components/permissionsManager';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
@@ -17,6 +15,7 @@ import {
   type GetAddressOptions,
   type GetAddressResponse,
 } from '@sats-connect/core';
+import { permissions, type Permissions } from '@secretkeylabs/xverse-core';
 import { decodeToken } from 'jsontokens';
 import { useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -41,25 +40,38 @@ interface UseRequestHelperReturn {
 function useMakeTransitionalGrantAccountReadPermissions() {
   const { network } = useWalletSelector();
   const account = useSelectedAccount();
-  const { addClient, addResource, setPermission } = usePermissionsUtils();
+  const { addClient, addResource, setPermission } = usePermissions();
   return useCallback(
     async (context: Context) => {
-      const client: Client = {
-        id: context.origin,
-        name: context.origin,
+      const [clientIdError, clientId] = permissions.utils.store.makeClientId({
+        origin: context.origin,
+      });
+      if (clientIdError) {
+        throw new Error('Error creating client ID.');
+      }
+
+      const client: Permissions.Store.Client = {
+        id: clientId,
         origin: context.origin,
       };
 
-      const resource = makeAccountResource({
+      const accountId = permissions.utils.account.makeAccountId({
         accountId: account.id,
         networkType: network.type,
         masterPubKey: account.masterPubKey,
       });
 
-      const permission: Permission = {
+      const resource = permissions.resources.account.makeAccountResource({
+        accountId,
+        masterPubKey: account.masterPubKey,
+        networkType: network.type,
+      });
+
+      const permission: Permissions.Store.Permission = {
+        type: 'account',
         clientId: client.id,
         resourceId: resource.id,
-        actions: new Set(['read']),
+        actions: { read: true },
       };
 
       await addClient(client);
@@ -91,10 +103,10 @@ export default function useRequestHelper(): UseRequestHelperReturn {
       legacyRequestNetworkType: undefined,
       purposes: data.params.purposes,
       async sendApprovedResponse() {
-        const addresses = accountPurposeAddresses(
-          account,
-          popupPayloadGetAddresses.data.params.purposes,
-        );
+        const addresses = accountPurposeAddresses(account, {
+          type: 'select',
+          purposes: popupPayloadGetAddresses.data.params.purposes,
+        });
 
         sendRpcResponse(context.tabId, makeRpcSuccessResponse(data.id, { addresses }));
       },
@@ -122,10 +134,13 @@ export default function useRequestHelper(): UseRequestHelperReturn {
       purposes: data.params.purposes,
       async sendApprovedResponse() {
         await transitionalGrantReadPermissions(context);
-        const addresses: GetAccountsResult = accountPurposeAddresses(
-          account,
-          popupPayloadGetAccounts.data.params.purposes,
-        ).map((address) => ({ ...address, walletType: account.accountType ?? 'software' }));
+        const addresses: GetAccountsResult = accountPurposeAddresses(account, {
+          type: 'select',
+          purposes: popupPayloadGetAccounts.data.params.purposes,
+        }).map((address) => ({
+          ...address,
+          walletType: account.accountType ?? 'software',
+        }));
         sendRpcResponse(context.tabId, makeRpcSuccessResponse(data.id, addresses));
       },
       sendCancelledResponse() {
@@ -154,7 +169,7 @@ export default function useRequestHelper(): UseRequestHelperReturn {
     const message = request?.payload.message ?? params.get('message') ?? '';
     const pArray = params.get('purposes');
     const purposes = request?.payload.purposes ?? (pArray?.split(',') as AddressPurpose[]);
-    const addresses = accountPurposeAddresses(account, purposes);
+    const addresses = accountPurposeAddresses(account, { type: 'select', purposes });
     const tabId = Number(params.get('tabId') ?? '0');
     const sendApprovedResponse = async () => {
       const response: GetAddressResponse = {
@@ -175,6 +190,7 @@ export default function useRequestHelper(): UseRequestHelperReturn {
       };
       chrome.tabs.sendMessage(tabId, addressMessage);
     };
+
     return {
       legacyRequestNetworkType,
       message,

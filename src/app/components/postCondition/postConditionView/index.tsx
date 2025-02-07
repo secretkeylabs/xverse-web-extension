@@ -1,9 +1,9 @@
 /* eslint-disable no-nested-ternary */
 import {
-  addressToString,
   FungibleConditionCode,
   NonFungibleConditionCode,
-  type PostCondition,
+  addressToString,
+  type PostConditionWire,
 } from '@stacks/transactions';
 import { useTranslation } from 'react-i18next';
 
@@ -12,7 +12,7 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import { getNameFromPostCondition, getSymbolFromPostCondition } from './helper';
 
 type Props = {
-  postCondition: PostCondition;
+  postCondition: PostConditionWire;
   amount: string;
   icon?: string;
 };
@@ -46,9 +46,10 @@ function PostConditionsView({ postCondition, amount, icon }: Props) {
   const name = getNameFromPostCondition(postCondition);
   const contractName =
     'contractName' in postCondition.principal && postCondition.principal.contractName.content;
-  const address = addressToString(postCondition?.principal?.address!);
-  const isSending = address === stxAddress;
-  const isContractPrincipal = !!contractName || address.includes('.');
+  const addressString =
+    'address' in postCondition.principal ? addressToString(postCondition.principal.address) : '';
+  const isSending = addressString === stxAddress;
+  const isContractPrincipal = !!contractName || addressString.includes('.');
   return (
     <TransferAmountComponent
       title={`${
@@ -57,7 +58,7 @@ function PostConditionsView({ postCondition, amount, icon }: Props) {
       value={`${amount} ${ticker}`}
       subValue={name !== 'STX' ? name : ''}
       icon={icon}
-      address={`${address}${contractName ? `.${contractName}` : ''}`}
+      address={`${addressString}${contractName ? `.${contractName}` : ''}`}
       subTitle={`${
         isContractPrincipal
           ? t('CONTRACT_ADDRESS')

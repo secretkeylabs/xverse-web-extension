@@ -1,5 +1,5 @@
 import TokenTile from '@components/tokenTile';
-import { animated } from '@react-spring/web';
+import Callout from '@ui-library/callout';
 import Divider from '@ui-library/divider';
 import styled from 'styled-components';
 
@@ -17,55 +17,50 @@ export const ColumnContainer = styled.div((props) => ({
   alignItems: 'space-between',
   justifyContent: 'space-between',
   marginTop: props.theme.space.xs,
-  marginBottom: props.theme.space.s,
+  marginBottom: props.theme.space.l,
 }));
 
 export const ReceiveContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  marginTop: props.theme.space.l,
-  marginBottom: props.theme.space.xl,
   gap: props.theme.space.m,
-}));
-
-export const TokenListButton = styled.button((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'flex-end',
-  alignItems: 'center',
-  borderRadius: props.theme.radius(1),
-  backgroundColor: 'transparent',
-  opacity: 0.8,
-  marginTop: props.theme.spacing(5),
-  cursor: props.disabled ? 'not-allowed' : 'pointer',
-}));
-
-export const ButtonText = styled.div((props) => ({
-  ...props.theme.typography.body_s,
-  fontWeight: 700,
-  color: props.theme.colors.white_0,
-  textAlign: 'center',
-}));
-
-export const ButtonImage = styled.img((props) => ({
-  marginRight: props.theme.spacing(3),
-  alignSelf: 'center',
-  transform: 'all',
-}));
-
-export const RowButtonContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  marginTop: props.theme.spacing(11),
-  columnGap: props.theme.spacing(11),
+  padding: `${props.theme.space.m} 0`,
 }));
 
 export const TokenListButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
-  marginTop: props.theme.space.s,
-  marginBottom: props.theme.spacing(22),
+  marginBottom: props.theme.space.xxxl,
+}));
+
+export const TokenListButton = styled.button((props) => ({
+  ...props.theme.typography.body_medium_m,
+  cursor: props.disabled ? 'not-allowed' : 'pointer',
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'flex-end',
+  alignItems: 'center',
+  gap: props.theme.space.xs,
+  borderRadius: props.theme.radius(1),
+  backgroundColor: 'transparent',
+  color: props.theme.colors.white_0,
+  opacity: 0.8,
+  transition: 'opacity 0.1s ease',
+  '&:hover': {
+    opacity: 1,
+  },
+  '&:active, &:disabled': {
+    opacity: 0.6,
+  },
+}));
+
+export const RowButtonContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  marginTop: props.theme.space.l,
+  marginBottom: props.theme.space.xl,
+  columnGap: props.theme.space.l,
 }));
 
 export const StyledTokenTile = styled(TokenTile)`
@@ -157,7 +152,10 @@ export const IconBackground = styled.div((props) => ({
   alignItems: 'center',
 }));
 
-export const StyledDivider = styled(Divider)<{ $noMarginBottom?: boolean }>`
+export const StyledDivider = styled(Divider)<{
+  $noMarginBottom?: boolean;
+  $noMarginTop?: boolean;
+}>`
   flex: 1 0 auto;
   width: calc(100% + ${(props) => props.theme.space.xl});
   margin-left: -${(props) => props.theme.space.m};
@@ -168,8 +166,17 @@ export const StyledDivider = styled(Divider)<{ $noMarginBottom?: boolean }>`
     `
       margin-bottom: 0;
     `}
+  ${(props) =>
+    props.$noMarginTop &&
+    `
+      margin-top: 0;
+    `}
 `;
 
-export const StyledDividerSingle = styled(StyledDivider)`
-  margin-bottom: 0;
-`;
+export const SpacedCallout = styled(Callout)((props) => ({
+  marginTop: props.theme.space.s,
+}));
+
+export const InfoMessageContainer = styled.div((props) => ({
+  marginBottom: props.theme.space.m,
+}));

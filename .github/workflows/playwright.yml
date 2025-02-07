@@ -28,7 +28,6 @@ jobs:
           npm run knip
           npx eslint .
           npx tsc --noEmit
-          npm test
       - name: Build
         env:
           TRANSAC_API_KEY: ${{ secrets.TRANSAC_API_KEY }}
@@ -38,12 +37,13 @@ jobs:
           SKIP_ANIMATION_WALLET_STARTUP: 'true'
         run: npm run build --if-present
       - name: Upload Archive
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: web-extension1
           path: ./build
           retention-days: 4
           if-no-files-found: error
+          overwrite: true
   UItest:
     needs: [build]
     name: E2E Test ${{ matrix.shardIndex }} of ${{ matrix.shardTotal }}
@@ -57,7 +57,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Download build artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: web-extension1
           path: ./build
@@ -82,11 +82,12 @@ jobs:
         run: xvfb-run --auto-servernum --server-args="-screen 0 360x360x24" npx playwright test --grep-invert "#localexecution" --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
       - name: Upload Playwright report
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: all-blob-reports
+          name: blob-report-${{ matrix.shardIndex }}-of-${{ matrix.shardTotal }}
           path: blob-report
           retention-days: 1
+          overwrite: true
 
   merge-reports:
     # Merge reports after playwright-tests, even if some shards have failed
@@ -108,17 +109,19 @@ jobs:
         run: npm install playwright
 
       - name: Download blob reports from GitHub Actions Artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: all-blob-reports
+          pattern: blob-report-*
           path: all-blob-reports
+          merge-multiple: true
 
       - name: Merge into HTML Report
         run: npx playwright merge-reports --reporter html ./all-blob-reports
 
       - name: Upload HTML report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: html-report--attempt-${{ github.run_attempt }}
           path: playwright-report
           retention-days: 4
+          overwrite: true

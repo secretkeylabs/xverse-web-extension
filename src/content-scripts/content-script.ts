@@ -19,7 +19,7 @@ import {
   type LegacyMessageFromContentScript,
   type SatsConnectMessageFromContentScript,
 } from '@common/types/message-types';
-import getEventSourceWindow from '@common/utils/get-event-source-window';
+import getEventSourceWindow from '@common/utils/getEventSourceWindow';
 import { contentScriptWalletEventMessageSchema } from '@common/utils/messages/extensionToContentScript/schemas';
 
 import RequestsRoutes from '@common/utils/route-urls';

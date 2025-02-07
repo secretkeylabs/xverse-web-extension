@@ -1,17 +1,23 @@
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import { sendUserRejectionMessage } from '@common/utils/rpc/responseMessages/errors';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { RpcErrorCode, type TransferRunesRequest } from '@sats-connect/core';
+import { RpcErrorCode, type RunesTransferRequestMessage } from '@sats-connect/core';
 import { type TransactionSummary } from '@screens/sendBtc/helpers';
-import { btcTransaction, runesTransaction, type Transport } from '@secretkeylabs/xverse-core';
+import {
+  btcTransaction,
+  runesTransaction,
+  type KeystoneTransport,
+  type LedgerTransport,
+} from '@secretkeylabs/xverse-core';
 import { useCallback, useEffect, useState } from 'react';
 
 type Args = {
   tabId: number;
   messageId: string;
-  recipients: TransferRunesRequest['params']['recipients'];
+  recipients: RunesTransferRequestMessage['params']['recipients'];
 };
 const useTransferRunes = ({ tabId, messageId, recipients }: Args) => {
   const [txError, setTxError] = useState<{
@@ -26,6 +32,7 @@ const useTransferRunes = ({ tabId, messageId, recipients }: Args) => {
   const { data: btcFeeRates } = useBtcFeeRate();
   const { network } = useWalletSelector();
   const txContext = useTransactionContext();
+  const selectedAccount = useSelectedAccount();
 
   const generateTransferTxAndSummary = useCallback(
     async (desiredFeeRate: number) => {
@@ -85,11 +92,14 @@ const useTransferRunes = ({ tabId, messageId, recipients }: Args) => {
   }, [feeRate, btcFeeRates?.priority, buildTx]);
 
   const confirmRunesTransferRequest = useCallback(
-    async (ledgerTransport?: Transport) => {
+    async (options?: {
+      ledgerTransport?: LedgerTransport;
+      keystoneTransport?: KeystoneTransport;
+    }) => {
       try {
         setIsExecuting(true);
         const txid = await transaction?.broadcast({
-          ledgerTransport,
+          ...options,
           rbfEnabled: false,
         });
         if (!txid) {
@@ -116,7 +126,7 @@ const useTransferRunes = ({ tabId, messageId, recipients }: Args) => {
         setIsExecuting(false);
       }
     },
-    [messageId, tabId, transaction],
+    [messageId, tabId, transaction, selectedAccount],
   );
 
   const cancelRunesTransferRequest = useCallback(async () => {

@@ -1,4 +1,5 @@
 import RequestsRoutes from '@common/utils/route-urls';
+import FormattedNumber from '@components/formattedNumber';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useRuneFloorPricePerMarketplaceQuery from '@hooks/queries/runes/useRuneFloorPricePerMarketplaceQuery';
@@ -17,9 +18,11 @@ import SetRunePriceItem from '@screens/listRune/setRunePriceItem';
 import {
   FeatureId,
   currencySymbolMap,
+  formatBalance,
   getBtcFiatEquivalent,
   satsToBtc,
   type FungibleToken,
+  type FungibleTokenWithStates,
   type GetListedUtxosResponseUtxo,
   type Marketplace,
 } from '@secretkeylabs/xverse-core';
@@ -71,8 +74,10 @@ export default function ListRuneScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'LIST_RUNE_SCREEN' });
   const navigate = useNavigate();
   const { runeId } = useParams();
-  const { visible: runesCoinsList } = useVisibleRuneFungibleTokens(false);
-  const selectedRune = runesCoinsList.find((ft) => ft.principal === runeId);
+  const { data: runesCoinsList } = useVisibleRuneFungibleTokens(false);
+  const selectedRune = runesCoinsList?.find(
+    (ft: FungibleTokenWithStates) => ft.principal === runeId,
+  );
   const { fiatCurrency } = useWalletSelector();
   const { btcFiatRate } = useSupportedCoinRates();
   const location = useLocation();
@@ -231,15 +236,13 @@ export default function ListRuneScreen() {
     dispatch({ type: 'UPDATE_ONE_LIST_ITEM', key, payload: updatedSelectedListItem });
     if (
       Object.values(listItemsMap).filter((listItem) => listItem.selected).length ===
-        listItemsResponse?.length ??
-      0
+      listItemsResponse?.length
     ) {
       dispatch({ type: 'SET_SELECT_ALL_TOGGLE', payload: true });
     }
     if (
       Object.values(listItemsMap).filter((listItem) => !listItem.selected).length ===
-        listItemsResponse?.length ??
-      0
+      listItemsResponse?.length
     ) {
       dispatch({ type: 'SET_SELECT_ALL_TOGGLE', payload: false });
     }
@@ -287,7 +290,7 @@ export default function ListRuneScreen() {
         ),
       });
     }
-  }, [listItemsResponse, runeFloorPrice, location.state, selectedRune]);
+  }, [listItemsResponse.length, runeFloorPrice, location.state, selectedRune?.decimals]);
 
   useEffect(() => {
     if (signPsbtPayload) {
@@ -329,7 +332,9 @@ export default function ListRuneScreen() {
         selectedRuneId={selectedRune?.principal ?? ''}
         getDesc={getDesc}
       >
-        <NoItemsContainer>{t('NO_UNLISTED_ITEMS')}</NoItemsContainer>
+        <NoItemsContainer typography="body_medium_s" color="white_200">
+          {t('NO_UNLISTED_ITEMS')}
+        </NoItemsContainer>
       </WrapperComponent>
     );
   }
@@ -530,13 +535,17 @@ export default function ListRuneScreen() {
                       />
                     </SetRunePricesButtonsContainer>
                     <StyledP typography="body_medium_s" color="white_200">
-                      {noFloorPrice
-                        ? t('NO_FLOOR_PRICE', { symbol: selectedRune?.runeSymbol })
-                        : t('MARKETPLACE_FLOOR_PRICE', {
-                            sats: formatToXDecimalPlaces(runeFloorPrice, 5),
-                            symbol: selectedRune?.runeSymbol,
+                      {noFloorPrice ? (
+                        t('NO_FLOOR_PRICE', { symbol: selectedRune?.runeSymbol })
+                      ) : (
+                        <>
+                          {t('MARKETPLACE_FLOOR_PRICE', {
                             marketplaces: joinedSelectedMarketplaces([...selectedMarketplaces]),
                           })}
+                          <FormattedNumber number={formatBalance(runeFloorPrice.toString())} />
+                          {` Sats/${selectedRune?.runeSymbol}`}
+                        </>
+                      )}
                     </StyledP>
                   </SetRunePricesContainer>
                 </PaddingContainer>

@@ -1,5 +1,5 @@
-import type { Permission } from '@components/permissionsManager/schemas';
-import { getPermissionsStore } from '@components/permissionsManager/utils';
+import { initPermissionsStore } from '@common/utils/permissionsStore';
+import type { Permissions } from '@secretkeylabs/xverse-core';
 import { type ContentScriptMessage } from '../schemas';
 
 /**
@@ -37,7 +37,7 @@ function clientOriginToUrlMatchPattern(tabOrigin: string) {
  * @public
  */
 export async function sendMessageConnectedClient(id: string, message: ContentScriptMessage) {
-  const [error, store] = await getPermissionsStore();
+  const [error, store] = await initPermissionsStore();
   if (error) {
     // eslint-disable-next-line no-console
     console.error('Failed to load permissions store:', error);
@@ -76,7 +76,7 @@ export async function sendMessageConnectedClient(id: string, message: ContentScr
  * @public
  */
 export async function sendMessageConnectedClients(message: ContentScriptMessage) {
-  const [error, store] = await getPermissionsStore();
+  const [error, store] = await initPermissionsStore();
   if (error) {
     // eslint-disable-next-line no-console
     console.error('Failed to load permissions store:', error);
@@ -108,33 +108,32 @@ export async function sendMessageConnectedClients(message: ContentScriptMessage)
  * @public
  */
 export async function sendMessageAuthorizedConnectedClients(
-  permission: Omit<Permission, 'clientId'>,
+  targetPermissions: Omit<Permissions.Store.Permission, 'clientId'>[],
   message: ContentScriptMessage,
 ) {
-  const [error, store] = await getPermissionsStore();
+  const [error, store] = await initPermissionsStore();
   if (error) {
     // eslint-disable-next-line no-console
     console.error('Failed to load permissions store:', error);
     return;
   }
 
-  if (!store) {
-    // eslint-disable-next-line no-console
-    console.warn('Unable to notify connected clients, no permissions store found.');
-    return;
-  }
-
-  const authorizedClientIds = [...store.permissions]
-    .filter(
-      (p) =>
-        p.resourceId === permission.resourceId &&
-        [...permission.actions].every((action) => p.actions.has(action)),
+  const authorizedClientIds = store.permissions
+    .filter((storePermission) =>
+      targetPermissions.some(
+        (targetPermission) =>
+          storePermission.type === targetPermission.type &&
+          storePermission.resourceId === targetPermission.resourceId &&
+          Object.entries(targetPermission.actions).every(
+            ([action]) => storePermission.actions[action],
+          ),
+      ),
     )
     .map((p) => p.clientId);
 
   const origins = authorizedClientIds
     .map((id) => {
-      const client = [...store.clients].find((c) => c.id === id);
+      const client = store.clients.find((c) => c.id === id);
       return client?.origin;
     })
     .filter((origin) => typeof origin === 'string');

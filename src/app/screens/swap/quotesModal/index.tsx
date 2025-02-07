@@ -1,13 +1,13 @@
 import useGetSip10TokenInfo from '@hooks/queries/stx/useGetSip10TokenInfo';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import {
+  btcToSats,
   getBtcFiatEquivalent,
   getStxFiatEquivalent,
   stxToMicrostacks,
   type FungibleToken,
   type Quote,
   type StxQuote,
-  type Token,
   type UtxoQuote,
 } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
@@ -16,17 +16,6 @@ import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import QuoteTile from './quoteTile';
-
-interface Props {
-  visible: boolean;
-  onClose: () => void;
-  ammProviders: Quote[];
-  utxoProviders: UtxoQuote[];
-  stxProviders: StxQuote[];
-  toToken?: Token;
-  ammProviderClicked?: (amm: Quote) => void;
-  utxoProviderClicked?: (utxoProvider: UtxoQuote) => void;
-}
 
 const Container = styled.div`
   display: flex;
@@ -53,12 +42,25 @@ const SecondHeading = styled(StyledP)`
   text-transform: uppercase;
 `;
 
+type Props = {
+  visible: boolean;
+  onClose: () => void;
+  ammProviders: Quote[];
+  utxoProviders: UtxoQuote[];
+  stxProviders: StxQuote[];
+  amount: string;
+  toToken?: FungibleToken;
+  ammProviderClicked?: (amm: Quote) => void;
+  utxoProviderClicked?: (utxoProvider: UtxoQuote) => void;
+};
+
 function QuotesModal({
   visible,
   onClose,
   ammProviders,
   utxoProviders,
   stxProviders,
+  amount,
   toToken,
   ammProviderClicked,
   utxoProviderClicked,
@@ -66,7 +68,7 @@ function QuotesModal({
   const { t } = useTranslation('translation', { keyPrefix: 'SWAP_SCREEN' });
 
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
-  const { tokenInfo: toTokenInfo } = useGetSip10TokenInfo({ principal: toToken?.ticker });
+  const { tokenInfo: toTokenInfo } = useGetSip10TokenInfo({ principal: toToken?.principal });
 
   const sortQuotesByReceiveAmount = <T extends StxQuote | Quote>(quotes: T[]): T[] =>
     [...quotes].sort((a, b) => BigNumber(b.receiveAmount).comparedTo(a.receiveAmount));
@@ -85,10 +87,6 @@ function QuotesModal({
     const highestReceiveAmount = BigNumber.max(
       ...quotes.map((q) => new BigNumber(q.receiveAmount)),
     );
-
-    if (quote.provider.code === 'dotswap') {
-      return t('RECOMMENDED');
-    }
 
     if (new BigNumber(quote.receiveAmount).eq(highestReceiveAmount)) {
       return t('BEST');
@@ -141,11 +139,16 @@ function QuotesModal({
           <QuoteTile
             key={amm.provider.name}
             provider={amm.provider.name}
-            price={amm.receiveAmount}
-            image={{ ft: { image: amm.provider.logo } as FungibleToken }}
+            price={
+              amm.to.protocol === 'btc'
+                ? amm.receiveAmount
+                : btcToSats(BigNumber(amount).dividedBy(BigNumber(amm.receiveAmount))).toFixed(2)
+            }
+            floorText={amm.to.protocol === 'runes' ? t('EXCHANGE_RATE') : undefined}
+            image={amm.provider.logo}
             onClick={() => ammProviderClicked && ammProviderClicked(amm)}
             subtitle={getReceiveAmountSubtitle(amm, ammProviders)}
-            unit={amm.to.protocol === 'btc' ? 'Sats' : toToken?.symbol || ''}
+            unit={amm.to.protocol === 'btc' ? 'Sats' : `Sats / ${toToken?.runeSymbol}`}
             fiatValue={
               amm.to.protocol === 'btc'
                 ? getBtcFiatEquivalent(
@@ -166,10 +169,10 @@ function QuotesModal({
             key={stx.provider.name}
             provider={stx.provider.name}
             price={stx.receiveAmount}
-            image={{ ft: { image: stx.provider.logo } as FungibleToken }}
-            onClick={() => ammProviderClicked && ammProviderClicked(stx)}
+            image={stx.provider.logo}
+            onClick={() => ammProviderClicked?.(stx)}
             subtitle={getReceiveAmountSubtitle(stx, stxProviders)}
-            unit={stx.to.protocol === 'stx' ? 'STX' : toToken?.name || ''}
+            unit={stx.to.protocol === 'stx' ? 'STX' : toToken?.ticker || ''}
             fiatValue={
               stx.to.protocol === 'stx'
                 ? getStxFiatEquivalent(
@@ -190,11 +193,11 @@ function QuotesModal({
             key={utxoProvider.provider.name}
             provider={utxoProvider.provider.name}
             price={utxoProvider.floorRate}
-            image={{ ft: { image: utxoProvider.provider.logo } as FungibleToken }}
+            image={utxoProvider.provider.logo}
             floorText={t('FLOOR_PRICE')}
             onClick={() => utxoProviderClicked && utxoProviderClicked(utxoProvider)}
             subtitle={getFloorPriceSubtitle(utxoProvider, utxoProviders)}
-            unit={toToken?.symbol ? `Sats / ${toToken.symbol}` : ''}
+            unit={toToken?.runeSymbol ? `Sats / ${toToken.runeSymbol}` : ''}
           />
         ))}
       </Container>

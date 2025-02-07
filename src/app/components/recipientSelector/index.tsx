@@ -68,11 +68,11 @@ function RecipientSelector({
   };
 
   const inputFeedback = useMemo(() => {
-    if (toOwnAddress) {
+    if (displayInsufficientFunds) {
       return [
         {
-          variant: 'info' as const,
-          message: t('YOU_ARE_TRANSFERRING_TO_YOURSELF'),
+          variant: 'danger' as const,
+          message: t('ERRORS.INSUFFICIENT_BALANCE_FEES'),
         },
       ];
     }
@@ -84,11 +84,11 @@ function RecipientSelector({
         },
       ];
     }
-    if (displayInsufficientFunds) {
+    if (toOwnAddress) {
       return [
         {
-          variant: 'danger' as const,
-          message: t('ERRORS.INSUFFICIENT_BALANCE_FEES'),
+          variant: 'info' as const,
+          message: t('YOU_ARE_TRANSFERRING_TO_YOURSELF'),
         },
       ];
     }

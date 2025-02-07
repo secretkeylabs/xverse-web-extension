@@ -5,10 +5,12 @@ import {
   getOrdinalsFtBalance,
   type Brc20Token,
   type FungibleToken,
+  type FungibleTokenWithStates,
   type SettingsNetwork,
 } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
-import BigNumber from 'bignumber.js';
+import { selectWithDerivedState } from '@utils/tokens';
+import useGetTopTokens from '../useGetTopTokens';
 
 const brc20TokenToFungibleToken = (coin: Brc20Token): FungibleToken => ({
   name: coin.name,
@@ -17,7 +19,6 @@ const brc20TokenToFungibleToken = (coin: Brc20Token): FungibleToken => ({
   total_sent: '',
   total_received: '',
   assetName: coin.name ?? coin.ticker,
-  visible: true,
   ticker: coin.ticker,
   protocol: 'brc-20',
   supported: coin.supported,
@@ -43,6 +44,8 @@ export const fetchBrc20FungibleTokens =
         }
         return {
           ...ft,
+          priceChangePercentage24h: found.priceChangePercentage24h,
+          currentPrice: found.currentPrice,
           tokenFiatRate: Number(found.tokenFiatRate),
           name: found.name,
         };
@@ -54,40 +57,31 @@ export const fetchBrc20FungibleTokens =
       );
   };
 
-export const useGetBrc20FungibleTokens = () => {
+export const useGetBrc20FungibleTokens = (select?: (data: FungibleTokenWithStates[]) => any) => {
   const { ordinalsAddress } = useSelectedAccount();
-  const { fiatCurrency, network, spamTokens, showSpamTokens } = useWalletSelector();
+  const { brc20ManageTokens, fiatCurrency, network, spamTokens, showSpamTokens } =
+    useWalletSelector();
+  const { data: topTokensData } = useGetTopTokens();
+
   const queryFn = fetchBrc20FungibleTokens(ordinalsAddress, fiatCurrency, network);
 
-  const query = useQuery({
+  return useQuery({
     queryKey: ['brc20-fungible-tokens', ordinalsAddress, network.type, fiatCurrency],
     queryFn,
     enabled: Boolean(network && ordinalsAddress),
-  });
-
-  return {
-    ...query,
-    unfilteredData: query.data,
-    data: query.data?.filter((ft) => {
-      let passedSpamCheck = true;
-      if (spamTokens?.length) {
-        passedSpamCheck = showSpamTokens || !spamTokens.includes(ft.principal);
-      }
-      return passedSpamCheck;
+    keepPreviousData: true,
+    select: selectWithDerivedState({
+      manageTokens: brc20ManageTokens,
+      spamTokens,
+      showSpamTokens,
+      topTokensData: topTokensData?.['brc-20'],
+      select,
     }),
-  };
+  });
 };
 
-export const useVisibleBrc20FungibleTokens = (): ReturnType<typeof useGetBrc20FungibleTokens> & {
-  visible: FungibleToken[];
-} => {
-  const { brc20ManageTokens } = useWalletSelector();
-  const brc20Query = useGetBrc20FungibleTokens();
-  return {
-    ...brc20Query,
-    visible: (brc20Query.data ?? []).filter((ft) => {
-      const userSetting = brc20ManageTokens[ft.principal];
-      return userSetting === true || (userSetting === undefined && new BigNumber(ft.balance).gt(0));
-    }),
-  };
+// convenience hook to get only enabled brc20 fungible tokens
+export const useVisibleBrc20FungibleTokens = () => {
+  const selectEnabled = (data: FungibleTokenWithStates[]) => data.filter((ft) => ft.isEnabled);
+  return useGetBrc20FungibleTokens(selectEnabled);
 };

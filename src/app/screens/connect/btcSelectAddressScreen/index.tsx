@@ -11,6 +11,7 @@ import Button from '@ui-library/button';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
 import { trackMixPanel } from '@utils/mixpanel';
+import RoutePaths from 'app/routes/paths';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -165,7 +166,7 @@ function BtcSelectAddressScreen() {
   );
 
   const handleSwitchAccount = () => {
-    navigate('/account-list?hideListActions=true');
+    navigate(`${RoutePaths.AccountList}?hideListActions=true`);
   };
 
   if (isLoadingIcon) {

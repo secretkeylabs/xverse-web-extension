@@ -7,20 +7,18 @@ import { useMemo } from 'react';
 import { btcFt, stxFt } from './useMasterCoinsList';
 
 const useVisibleMasterCoinsList = () => {
-  const { visible: sip10FtList } = useVisibleSip10FungibleTokens();
-  const { visible: runesFtList } = useVisibleRuneFungibleTokens();
-  const isStacksSwapsEnabled = useHasFeature(FeatureId.STACKS_SWAPS);
-
+  const { data: sip10FtList } = useVisibleSip10FungibleTokens();
+  const { data: runesFtList } = useVisibleRuneFungibleTokens();
   const { hideStx } = useWalletSelector();
+  const isStacksSwapsEnabled = useHasFeature(FeatureId.STACKS_SWAPS);
 
   const coinsMasterList = useMemo(
     () => [
-      ...sip10FtList,
-      ...runesFtList,
+      ...(runesFtList || []),
       btcFt,
-      ...(!hideStx && isStacksSwapsEnabled ? [stxFt] : []),
+      ...(!hideStx && isStacksSwapsEnabled ? [stxFt, ...(sip10FtList ?? [])] : []),
     ],
-    [sip10FtList, runesFtList, hideStx, isStacksSwapsEnabled],
+    [runesFtList, hideStx, isStacksSwapsEnabled, sip10FtList],
   );
 
   return coinsMasterList;

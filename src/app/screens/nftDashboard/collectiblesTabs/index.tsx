@@ -49,9 +49,9 @@ const tabs: TabButton[] = [
   },
 ];
 
-const tabKeyToIndex = (key?: string | null) => {
+const tabKeyToIndex = (visibleTabButtons: TabButton[], key?: string | null) => {
   if (!key) return 0;
-  return tabs.findIndex((tab) => tab.key === key);
+  return visibleTabButtons.findIndex((tab) => tab.key === key);
 };
 
 type Props = {
@@ -70,8 +70,6 @@ export default function CollectiblesTabs({
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [tabIndex, setTabIndex] = useState(tabKeyToIndex(searchParams?.get('tab')));
-
   const {
     isGalleryOpen,
     rareSatsQuery,
@@ -84,6 +82,18 @@ export default function CollectiblesTabs({
     stacksNftsQuery,
     inscriptionsQuery,
   } = nftDashboard;
+  const visibleTabButtons = tabs.filter((tab: TabButton) => {
+    if (tab.key === 'rareSats' && !hasActivatedRareSatsKey) {
+      return false;
+    }
+    if (tab.key === 'inscriptions' && !hasActivatedOrdinalsKey) {
+      return false;
+    }
+    return true;
+  });
+  const [tabIndex, setTabIndex] = useState(
+    tabKeyToIndex(visibleTabButtons, searchParams?.get('tab')),
+  );
 
   useTrackMixPanelPageViewed(
     {
@@ -101,15 +111,6 @@ export default function CollectiblesTabs({
   const ordinalBundleCount = rareSatsQuery?.data?.pages?.[0]?.total || 0;
   const showNoBundlesNotice =
     ordinalBundleCount === 0 && !rareSatsQuery.isLoading && !rareSatsQuery.error;
-  const visibleTabButtons = tabs.filter((tab: TabButton) => {
-    if (tab.key === 'rareSats' && !hasActivatedRareSatsKey) {
-      return false;
-    }
-    if (tab.key === 'inscriptions' && !hasActivatedOrdinalsKey) {
-      return false;
-    }
-    return true;
-  });
 
   return (
     <Tabs className={className} selectedIndex={tabIndex} onSelect={handleSelectTab}>
@@ -119,8 +120,8 @@ export default function CollectiblesTabs({
           {visibleTabButtons.map(({ key, label }) => (
             <TabItem
               key={key}
-              $active={tabIndex === tabKeyToIndex(key)}
-              onClick={() => handleSelectTab(tabKeyToIndex(key))}
+              $active={tabIndex === tabKeyToIndex(visibleTabButtons, key)}
+              onClick={() => handleSelectTab(tabKeyToIndex(visibleTabButtons, key))}
             >
               {t(label)}
             </TabItem>
@@ -129,34 +130,32 @@ export default function CollectiblesTabs({
       )}
       {hasActivatedOrdinalsKey && (
         <TabPanel>
-          <div>
-            {inscriptionsQuery.isInitialLoading ? (
-              <SkeletonLoader isGalleryOpen={isGalleryOpen} />
-            ) : (
-              <>
-                <TopBarContainer>
-                  {totalInscriptions > 0 ? (
-                    <StyledP data-testid="total-items" typography="body_medium_m" color="white_200">
-                      {totalInscriptions === 1
-                        ? t('TOTAL_ITEMS_ONE')
-                        : t('TOTAL_ITEMS', { count: totalInscriptions })}
-                    </StyledP>
-                  ) : (
-                    <div />
-                  )}
-                  <StyledButton
-                    variant="tertiary"
-                    icon={<TrayArrowDown size={20} color={Theme.colors.white_200} />}
-                    title={t('HIDDEN_COLLECTIBLES')}
-                    onClick={() => {
-                      navigate(`/nft-dashboard/hidden?tab=${tabs[tabIndex]?.key}`);
-                    }}
-                  />
-                </TopBarContainer>
-                {inscriptionListView}
-              </>
-            )}
-          </div>
+          {inscriptionsQuery.isInitialLoading ? (
+            <SkeletonLoader isGalleryOpen={isGalleryOpen} />
+          ) : (
+            <>
+              <TopBarContainer>
+                {totalInscriptions > 0 ? (
+                  <StyledP data-testid="total-items" typography="body_medium_m" color="white_200">
+                    {totalInscriptions === 1
+                      ? t('TOTAL_ITEMS_ONE')
+                      : t('TOTAL_ITEMS', { count: totalInscriptions })}
+                  </StyledP>
+                ) : (
+                  <div />
+                )}
+                <StyledButton
+                  variant="tertiary"
+                  icon={<TrayArrowDown size={20} color={Theme.colors.white_200} />}
+                  title={t('HIDDEN_COLLECTIBLES')}
+                  onClick={() => {
+                    navigate(`/nft-dashboard/hidden?tab=${tabs[tabIndex]?.key}`);
+                  }}
+                />
+              </TopBarContainer>
+              {inscriptionListView}
+            </>
+          )}
         </TabPanel>
       )}
       <TabPanel>
@@ -165,13 +164,19 @@ export default function CollectiblesTabs({
         ) : (
           <>
             {totalNfts > 0 && (
-              <StyledTotalItems
-                data-testid="total-items"
-                typography="body_medium_m"
-                color="white_200"
-              >
-                {totalNfts === 1 ? t('TOTAL_ITEMS_ONE') : t('TOTAL_ITEMS', { count: totalNfts })}
-              </StyledTotalItems>
+              <TopBarContainer>
+                <StyledP data-testid="total-items" typography="body_medium_m" color="white_200">
+                  {totalNfts === 1 ? t('TOTAL_ITEMS_ONE') : t('TOTAL_ITEMS', { count: totalNfts })}
+                </StyledP>
+                <StyledButton
+                  variant="tertiary"
+                  icon={<TrayArrowDown size={20} color={Theme.colors.white_200} />}
+                  title={t('HIDDEN_COLLECTIBLES')}
+                  onClick={() => {
+                    navigate('/nft-dashboard/hidden?tab=nfts');
+                  }}
+                />
+              </TopBarContainer>
             )}
             {nftListView}
           </>

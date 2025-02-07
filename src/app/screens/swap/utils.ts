@@ -6,7 +6,6 @@ import type {
   TokenBasic,
 } from '@secretkeylabs/xverse-core';
 import type { CurrencyTypes } from '@utils/constants';
-import { btcFt, stxFt } from './useMasterCoinsList';
 
 export const mapFtToCurrencyType = (ft?: FungibleToken): CurrencyTypes => {
   const principalToCurrencyTypeMap: Record<string, CurrencyTypes> = {
@@ -15,15 +14,6 @@ export const mapFtToCurrencyType = (ft?: FungibleToken): CurrencyTypes => {
   };
 
   return ft ? principalToCurrencyTypeMap[ft.principal] ?? 'FT' : 'FT';
-};
-
-export const mapTokenToCurrencyType = (t?: Token): CurrencyTypes => {
-  const protocolToCurrencyTypeMap: Record<string, CurrencyTypes> = {
-    btc: 'BTC',
-    stx: 'STX',
-  };
-
-  return t ? protocolToCurrencyTypeMap[t.protocol] ?? 'FT' : 'FT';
 };
 
 export const BAD_QUOTE_PERCENTAGE = 0.25;
@@ -49,7 +39,7 @@ export const mapFTMotherProtocolToSwapProtocol = (ft: FungibleToken): Protocol =
   return 'runes';
 };
 
-export const mapSwapProtocolToFTProtocol = (protocol: Protocol): FungibleTokenProtocol => {
+const mapSwapProtocolToFTProtocol = (protocol: Protocol): FungibleTokenProtocol => {
   const protocolMap: Partial<Record<Protocol, FungibleTokenProtocol>> = {
     stx: 'stacks',
     btc: 'runes',
@@ -75,68 +65,50 @@ export const mapSwapTokenToFT = (token: Token): FungibleToken => ({
   runeInscriptionId: token.logo,
 });
 
-export const mapFTNativeSwapTokenToTokenBasic = (token: FungibleToken | Token): TokenBasic => {
-  // if token is FungibleToken
-  if ('principal' in token) {
-    return { ticker: token.principal, protocol: mapFTProtocolToSwapProtocol(token) };
-  }
-
-  // token will never have a principal prop so we can safely cast it as Token
-  const safeTypeToken = token as Token;
-  return { ticker: safeTypeToken.ticker, protocol: safeTypeToken.protocol };
-};
-
-export const mapFtToSwapToken = (st: FungibleToken): Token => {
-  if (st.principal === 'BTC' && st !== btcFt) {
-    return mapFtToSwapToken(btcFt);
-  }
-  if (st.principal === 'STX' && st !== stxFt) {
-    return mapFtToSwapToken(stxFt);
-  }
-
-  return {
-    ticker: st.principal ?? '',
-    name: st.name ?? st.assetName ?? '',
-    protocol: mapFTProtocolToSwapProtocol(st),
-    divisibility: st.decimals ?? 0,
-    logo: st.image ?? st.runeInscriptionId ?? '',
-    symbol: st.runeSymbol ?? '',
-  };
-};
+export const mapFTNativeSwapTokenToTokenBasic = (token: FungibleToken): TokenBasic => ({
+  ticker: token.principal,
+  protocol: mapFTProtocolToSwapProtocol(token),
+});
 
 export const isRunesTx = ({
   fromToken,
   toToken,
 }: {
   fromToken: FungibleToken;
-  toToken: Token;
+  toToken: FungibleToken;
 }): boolean =>
   (fromToken?.protocol === 'runes' || toToken?.protocol === 'runes') &&
-  (fromToken?.principal === 'BTC' || toToken?.ticker === 'BTC');
+  (fromToken?.principal === 'BTC' || toToken?.principal === 'BTC');
 
 export const isStxTx = ({
   fromToken,
   toToken,
 }: {
   fromToken?: FungibleToken;
-  toToken?: Token;
+  toToken?: FungibleToken;
 }): boolean =>
   fromToken?.protocol === 'stacks' ||
   fromToken?.principal === 'STX' ||
-  toToken?.protocol === 'sip10' ||
-  toToken?.ticker === 'STX';
+  toToken?.protocol === 'stacks' ||
+  toToken?.principal === 'STX';
 
-const getIdentifier = (token?: Token | FungibleToken) => {
-  if (!token) return '';
-  return 'principal' in token ? token.principal : token.ticker;
-};
-
-export const isMotherToken = (token?: Token | FungibleToken) => {
-  const identifier = getIdentifier(token);
+export const isMotherToken = (token?: FungibleToken) => {
+  const identifier = token?.principal;
   return identifier === 'BTC' || identifier === 'STX';
 };
 
-export const getTrackingIdentifier = (token?: Token | FungibleToken) => {
-  const identifier = getIdentifier(token);
-  return isMotherToken(token) ? identifier : token?.name ?? identifier;
+export const getTrackingIdentifier = (token?: FungibleToken): string => {
+  if (!token) return '';
+
+  const identifier = token.principal;
+
+  if (isMotherToken(token)) {
+    return identifier;
+  }
+
+  if (token.protocol === 'stacks') {
+    return token.ticker || token.name || identifier;
+  }
+
+  return token.name || identifier;
 };

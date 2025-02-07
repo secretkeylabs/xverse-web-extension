@@ -2,21 +2,23 @@ import QRCodeStyling, { type DotType, type Options } from 'qr-code-styling';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 
-interface Props {
+const QRCodeContainer = styled.div({
+  display: 'flex',
+  width: 154,
+  height: 154,
+});
+
+type Props = {
   image: string;
   data: string;
   gradientColor: string;
-}
-
-const QRCodeContainer = styled.div({
-  display: 'flex',
-});
+};
 
 function QrCode({ image, data, gradientColor }: Props) {
   const options: Options = useMemo(
     () => ({
-      width: 154,
-      height: 154,
+      width: 770,
+      height: 770,
       data,
       image,
       dotsOptions: {
@@ -54,6 +56,7 @@ function QrCode({ image, data, gradientColor }: Props) {
   );
   const [qrCode] = useState<QRCodeStyling>(new QRCodeStyling(options));
   const ref = useRef(null);
+
   useEffect(() => {
     if (ref.current) {
       qrCode.append(ref.current);

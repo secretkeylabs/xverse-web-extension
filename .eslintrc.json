@@ -24,7 +24,7 @@
   "rules": {
     "consistent-return": "off",
     "no-await-in-loop": "off",
-    "import/prefer-default-export": 1,
+    "import/prefer-default-export": "off",
     "no-restricted-imports": [
       "warn",
       {

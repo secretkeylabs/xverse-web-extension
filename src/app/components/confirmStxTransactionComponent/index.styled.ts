@@ -5,7 +5,7 @@ export const Container = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
-  padding-top: 22px;
+  padding-top: ${(props) => props.theme.space.xs};
   padding-left: ${(props) => props.theme.space.m};
   padding-right: ${(props) => props.theme.space.m};
   overflow-y: auto;

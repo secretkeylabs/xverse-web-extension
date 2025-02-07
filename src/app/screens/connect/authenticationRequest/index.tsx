@@ -1,9 +1,9 @@
 import bitcoinIcon from '@assets/img/dashboard/bitcoin_icon.svg';
 import stxIcon from '@assets/img/dashboard/stx_icon.svg';
-import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
-import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
+import ledgerConnectDefaultIcon from '@assets/img/hw/ledger/ledger_connect_default.svg';
+import ledgerConnectStxIcon from '@assets/img/hw/ledger/ledger_import_connect_stx.svg';
 import { MESSAGE_SOURCE } from '@common/types/message-types';
-import { delay } from '@common/utils/ledger';
+import { delay } from '@common/utils/promises';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
@@ -19,11 +19,12 @@ import {
   handleLedgerStxJWTAuth,
   type AuthRequest,
 } from '@secretkeylabs/xverse-core';
-import { AddressVersion, StacksMessageType, publicKeyToAddress } from '@stacks/transactions';
+import { Address } from '@stacks/transactions';
 import Callout from '@ui-library/callout';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
 import { isHardwareAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
+import RoutePaths from 'app/routes/paths';
 import { decodeToken } from 'jsontokens';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -218,10 +219,7 @@ function AuthenticationRequest() {
     const profile = {
       stxAddress: {
         mainnet: selectedAccount.stxAddress,
-        testnet: publicKeyToAddress(AddressVersion.MainnetSingleSig, {
-          data: Buffer.from(selectedAccount.stxPublicKey, 'hex'),
-          type: StacksMessageType.PublicKey,
-        }),
+        testnet: Address.fromPublicKey(selectedAccount.stxPublicKey, 'testnet'),
       },
     };
 
@@ -267,7 +265,7 @@ function AuthenticationRequest() {
   };
 
   const handleSwitchAccount = () => {
-    navigate('/account-list?hideListActions=true');
+    navigate(`${RoutePaths.AccountList}?hideListActions=true`);
   };
 
   const handleAddStxLedgerAccount = async () => {

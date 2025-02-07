@@ -1,17 +1,17 @@
 import { useRuneFungibleTokensQuery } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import useCancellableEffect from '@hooks/useCancellableEffect';
 import useHasFeature from '@hooks/useHasFeature';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
-import useWalletSelector from '@hooks/useWalletSelector';
 import {
   AnalyticsEvents,
   FeatureId,
   btcTransaction,
-  type Transport,
+  type KeystoneTransport,
+  type LedgerTransport,
 } from '@secretkeylabs/xverse-core';
-import { isInOptions, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { getFtBalance } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
@@ -24,7 +24,6 @@ import { Step, getPreviousStep } from './steps';
 
 function SendRuneScreen() {
   const navigate = useNavigate();
-  const isInOption = isInOptions();
 
   useResetUserFlow('/send-rune');
 
@@ -35,7 +34,7 @@ function SendRuneScreen() {
   const { data: runesCoinsList } = useRuneFungibleTokensQuery();
   // TODO: can we remove location.state here?
   const [recipientAddress, setRecipientAddress] = useState<string>(
-    location.state?.recipientAddress || '',
+    location.state?.recipientAddress,
   );
   const [amountError, setAmountError] = useState('');
   const [amountToSend, setAmountToSend] = useState<string>(location.state?.amount || '');
@@ -88,51 +87,39 @@ function SendRuneScreen() {
     );
   };
 
-  useEffect(() => {
-    const bigAmount = BigNumber(amountToSend);
+  useCancellableEffect(
+    async (isEffectActive) => {
+      const bigAmount = BigNumber(amountToSend);
 
-    if (!recipientAddress || !feeRate || bigAmount.isNaN() || bigAmount.isLessThanOrEqualTo(0)) {
-      setTransaction(undefined);
-      setSummary(undefined);
-      return;
-    }
+      if (!recipientAddress || !feeRate || bigAmount.isNaN() || bigAmount.isLessThanOrEqualTo(0)) {
+        setTransaction(undefined);
+        setSummary(undefined);
+        return;
+      }
 
-    // This effect can be slow to compute as it signs transactions, but
-    // it can also be very fast if there is not enough rune balance
-    // this can lead to a race condition where entering an amount to send
-    // with enough balance followed by a high balance will cause the first
-    // event to finish after the one with insufficient funds, and it will inject the
-    // incorrect state. This boolean will prevent the effect from setting the state
-    // if it finishes after the value has changed
-    let isActiveEffect = true;
-    const generateTxnAndSummary = async () => {
       setIsLoading(true);
+
       try {
         const transactionDetails = await generateTransactionAndSummary();
-        if (!isActiveEffect) return;
-        if (!transactionDetails) return;
-        setTransaction(transactionDetails.transaction);
-        if (transactionDetails.summary) {
-          setSummary(transactionDetails.summary);
+        if (isEffectActive() && transactionDetails) {
+          setTransaction(transactionDetails.transaction);
+          if (transactionDetails.summary) {
+            setSummary(transactionDetails.summary);
+          }
         }
       } catch (e) {
+        if (!isEffectActive()) return;
         if (!(e instanceof Error) || !e.message.includes('Insufficient funds')) {
-          // don't log the error if it's just an insufficient funds error
           console.error(e);
         }
         setTransaction(undefined);
         setSummary(undefined);
       } finally {
-        if (isActiveEffect) {
-          setIsLoading(false);
-        }
+        if (isEffectActive()) setIsLoading(false);
       }
-    };
-    generateTxnAndSummary();
-    return () => {
-      isActiveEffect = false;
-    };
-  }, [transactionContext, recipientAddress, amountToSend, feeRate, sendMax]);
+    },
+    [transactionContext, recipientAddress, amountToSend, feeRate, sendMax],
+  );
 
   if (!fungibleToken) {
     navigate('/');
@@ -140,11 +127,9 @@ function SendRuneScreen() {
   }
 
   const handleCancel = () => {
-    if (isLedgerAccount(selectedAccount) && isInOption) {
-      window.close();
-      return;
-    }
-    navigate('/');
+    navigate(
+      `/coinDashboard/FT?ftKey=${fungibleToken.principal}&protocol=${fungibleToken.protocol}`,
+    );
   };
 
   const handleBackButtonClick = () => {
@@ -165,10 +150,16 @@ function SendRuneScreen() {
     return undefined;
   };
 
-  const handleSubmit = async (ledgerTransport?: Transport) => {
+  const handleSubmit = async (options?: {
+    ledgerTransport?: LedgerTransport;
+    keystoneTransport?: KeystoneTransport;
+  }) => {
     try {
       setIsSubmitting(true);
-      const txnId = await transaction?.broadcast({ ledgerTransport, rbfEnabled: true });
+      const txnId = await transaction?.broadcast({
+        ...options,
+        rbfEnabled: true,
+      });
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
         protocol: 'runes',
         action: 'transfer',
@@ -180,17 +171,26 @@ function SendRuneScreen() {
           txid: txnId,
           currency: 'BTC',
           error: '',
-          browserTx: isInOption,
+          browserTx: false,
         },
       });
     } catch (e) {
       console.error(e);
+      let msg = e;
+      if (e instanceof Error) {
+        if (e.message.includes('Export address is just allowed on specific pages')) {
+          msg = t('SIGNATURE_REQUEST.KEYSTONE.CONFIRM.ERROR_SUBTITLE');
+        }
+        if (e.message.includes('UR parsing rejected')) {
+          msg = t('SIGNATURE_REQUEST.KEYSTONE.CONFIRM.DENIED.ERROR_SUBTITLE');
+        }
+      }
       navigate('/tx-status', {
         state: {
           txid: '',
           currency: 'BTC',
-          error: `${e}`,
-          browserTx: isInOption,
+          error: `${msg}`,
+          browserTx: false,
         },
       });
     } finally {

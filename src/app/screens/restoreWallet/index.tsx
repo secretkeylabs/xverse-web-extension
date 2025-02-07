@@ -1,43 +1,35 @@
+import CreatePassword from '@components/createPassword';
 import Dots from '@components/dots';
 import { useWalletExistsContext } from '@components/guards/onboarding';
-import PasswordInput from '@components/passwordInput';
 import useWalletReducer from '@hooks/useWalletReducer';
+import type { BtcPaymentType } from '@secretkeylabs/xverse-core';
 import * as bip39 from 'bip39';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import EnterSeedPhrase from './enterSeedphrase';
-
-const Body = styled.div(() => ({
-  display: 'flex',
-  height: '100%',
-  justifyContent: 'center',
-  alignItems: 'flex-start',
-  margin: '60px 0',
-}));
+import PaymentAddressTypeSelector from './paymentAddressTypeSelector';
 
 const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  height: 'auto',
-  backgroundColor: props.theme.colors.elevation0,
-  padding: `${props.theme.spacing(12)}px`,
-  border: `1px solid ${props.theme.colors.elevation2}`,
-  borderRadius: props.theme.radius(2),
+  flex: 1,
+  padding: `${props.theme.space.l} ${props.theme.space.m} 0`,
+  overflowY: 'auto',
 }));
 
 const PasswordContainer = styled.div((props) => ({
   display: 'flex',
+  width: '100%',
   height: '100%',
-  width: '312px',
-  marginBottom: props.theme.spacing(32),
-  marginTop: props.theme.spacing(32),
+  marginTop: props.theme.space.xs,
+  flex: '1 0 auto',
 }));
 
 function RestoreWallet(): JSX.Element {
   const { t } = useTranslation('translation');
-  const { restoreWallet } = useWalletReducer();
+  const { restoreWallet, changeBtcPaymentAddressType } = useWalletReducer();
   const [isRestoring, setIsRestoring] = useState(false);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [password, setPassword] = useState('');
@@ -45,30 +37,16 @@ function RestoreWallet(): JSX.Element {
   const [seedPhrase, setSeedPhrase] = useState('');
   const [seedError, setSeedError] = useState('');
   const [error, setError] = useState('');
+  const [btcPayAddressType, setBtcPayAddressType] = useState<BtcPaymentType>('native');
   const navigate = useNavigate();
   const { disableWalletExistsGuard } = useWalletExistsContext();
 
   const cleanMnemonic = (rawSeed: string): string =>
     rawSeed.replace(/\s\s+/g, ' ').replace(/\n/g, ' ').trim();
 
-  const handleNewPasswordBack = () => {
-    setCurrentStepIndex(0);
-  };
-
-  const handleConfirmPasswordBack = () => {
-    setCurrentStepIndex(1);
-  };
-
-  function validateMnemonic(seed: string) {
-    if (bip39.validateMnemonic(seed)) {
-      return true;
-    }
-    return false;
-  }
-
   const onSeedPhraseContinue = () => {
     const seed = cleanMnemonic(seedPhrase);
-    if (validateMnemonic(seed)) {
+    if (bip39.validateMnemonic(seed)) {
       setSeedError('');
       setCurrentStepIndex(1);
     } else {
@@ -76,11 +54,7 @@ function RestoreWallet(): JSX.Element {
     }
   };
 
-  const handleContinuePasswordCreation = () => {
-    setCurrentStepIndex(2);
-  };
-
-  const handleConfirmPassword = async () => {
+  const onConfirmPasswordContinue = async () => {
     setIsRestoring(true);
     if (confirmPassword === password) {
       setError('');
@@ -91,56 +65,60 @@ function RestoreWallet(): JSX.Element {
       await restoreWallet(seed, password);
       setIsRestoring(false);
 
-      navigate('/wallet-success/restore', { replace: true });
+      // restoreWallet clears chrome storage, so we call this for react-persist to persist the state again
+      changeBtcPaymentAddressType(btcPayAddressType);
+
+      setCurrentStepIndex(2);
     } else {
       setIsRestoring(false);
       setError(t('CREATE_PASSWORD_SCREEN.CONFIRM_PASSWORD_MATCH_ERROR'));
     }
   };
 
+  const handleSelectedTypeChange = (addressType: BtcPaymentType) => {
+    changeBtcPaymentAddressType(addressType);
+    setBtcPayAddressType(addressType);
+  };
+
+  const onAccountTypeContinue = () => {
+    navigate('/wallet-success/restore', { replace: true });
+  };
+
   const restoreSteps = [
     <EnterSeedPhrase
+      key="seed"
       seed={seedPhrase}
       setSeed={setSeedPhrase}
       onContinue={onSeedPhraseContinue}
       seedError={seedError}
       setSeedError={setSeedError}
     />,
-    <PasswordContainer>
-      <PasswordInput
-        title={t('CREATE_PASSWORD_SCREEN.CREATE_PASSWORD_TITLE')}
-        inputLabel={t('CREATE_PASSWORD_SCREEN.TEXT_INPUT_NEW_PASSWORD_LABEL')}
-        enteredPassword={password}
-        setEnteredPassword={setPassword}
-        handleContinue={handleContinuePasswordCreation}
-        handleBack={handleNewPasswordBack}
-        checkPasswordStrength
-        createPasswordFlow
-        autoFocus
-      />
-    </PasswordContainer>,
-    <PasswordContainer>
-      <PasswordInput
-        title={t('CREATE_PASSWORD_SCREEN.CONFIRM_PASSWORD_TITLE')}
-        inputLabel={t('CREATE_PASSWORD_SCREEN.TEXT_INPUT_NEW_PASSWORD_LABEL')}
-        enteredPassword={confirmPassword}
-        setEnteredPassword={setConfirmPassword}
-        handleContinue={handleConfirmPassword}
-        handleBack={handleConfirmPasswordBack}
-        passwordError={error}
+    <PasswordContainer key="password">
+      <CreatePassword
+        password={password}
+        setPassword={setPassword}
+        confirmPassword={confirmPassword}
+        setConfirmPassword={setConfirmPassword}
+        handleContinue={onConfirmPasswordContinue}
         loading={isRestoring}
-        autoFocus
+        confirmPasswordError={error}
+        checkPasswordStrength
       />
     </PasswordContainer>,
+    <PaymentAddressTypeSelector
+      key="addressType"
+      seedPhrase={seedPhrase}
+      selectedType={btcPayAddressType}
+      onSelectedTypeChange={handleSelectedTypeChange}
+      onContinue={onAccountTypeContinue}
+    />,
   ];
 
   return (
-    <Body>
-      <Container>
-        <Dots numDots={restoreSteps.length} activeIndex={currentStepIndex} />
-        {restoreSteps[currentStepIndex]}
-      </Container>
-    </Body>
+    <Container>
+      <Dots numDots={restoreSteps.length} activeIndex={currentStepIndex} />
+      {restoreSteps[currentStepIndex]}
+    </Container>
   );
 }
 

@@ -1,7 +1,9 @@
 import RareSatIcon from '@components/rareSatIcon/rareSatIcon';
 import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
+import useWalletSelector from '@hooks/useWalletSelector';
 import type { Bundle } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
+import { HIDDEN_BALANCE_LABEL } from '@utils/constants';
 import { getTruncatedAddress } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
@@ -81,6 +83,7 @@ type Props = {
 
 function RuneBundleRow({ runeAmount, runeSymbol, runeId, txId, vout, satAmount, bundle }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'COMMON' });
+  const { balanceHidden } = useWalletSelector();
   const navigate = useNavigate();
   const satributesArr = bundle.satributes.flatMap((item) => item);
   const { setSelectedSatBundleDetails } = useSatBundleDataReducer();
@@ -113,17 +116,23 @@ function RuneBundleRow({ runeAmount, runeSymbol, runeId, txId, vout, satAmount, 
         </Range>
       </RangeContainer>
       <InfoContainer>
-        <NumericFormat
-          value={runeAmount}
-          displayType="text"
-          suffix={` ${runeSymbol}`}
-          thousandSeparator
-          renderText={(value: string) => (
-            <RuneTitle typography="body_medium_m" color="white_0">
-              {value}
-            </RuneTitle>
-          )}
-        />
+        {balanceHidden ? (
+          <RuneTitle typography="body_medium_m" color="white_0">
+            {HIDDEN_BALANCE_LABEL}
+          </RuneTitle>
+        ) : (
+          <NumericFormat
+            value={runeAmount}
+            displayType="text"
+            suffix={` ${runeSymbol}`}
+            thousandSeparator
+            renderText={(value: string) => (
+              <RuneTitle typography="body_medium_m" color="white_0">
+                {value}
+              </RuneTitle>
+            )}
+          />
+        )}
         <SubContainer>
           <StyledP typography="body_medium_s" color="white_400">
             {`${getTruncatedAddress(txId, 6)}:${vout}`}

@@ -1,4 +1,4 @@
-import type { Return } from '@sats-connect/core';
+import type { ConnectResult, Return } from '@sats-connect/core';
 import { makeRpcSuccessResponse, sendRpcResponse } from '../helpers';
 import type { BaseArgs } from './types';
 
@@ -32,5 +32,49 @@ export function sendGetWalletTypeSuccessResponseMessage({
   messageId,
   result,
 }: GetWalletTypeSuccessArgs) {
+  sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
+}
+
+type GetPermissionsSuccessArgs = BaseArgs & {
+  result: Return<'wallet_getCurrentPermissions'>;
+};
+export function sendGetCurrentPermissionsSuccessResponseMessage({
+  tabId,
+  messageId,
+  result,
+}: GetPermissionsSuccessArgs) {
+  sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
+}
+
+type GetAccountSuccessArgs = BaseArgs & {
+  result: Return<'wallet_getAccount'>;
+};
+export function sendGetAccountSuccessResponseMessage({
+  tabId,
+  messageId,
+  result,
+}: GetAccountSuccessArgs) {
+  sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
+}
+
+type ConnectSuccessArgs = BaseArgs & {
+  result: Return<'wallet_connect'>;
+};
+export function sendConnectSuccessResponseMessage({
+  tabId,
+  messageId,
+  result,
+}: ConnectSuccessArgs) {
+  sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
+}
+
+type GetNetworkSuccessArgs = BaseArgs & {
+  result: Return<'wallet_getNetwork'>;
+};
+export function sendGetNetworkSuccessResponseMessage({
+  tabId,
+  messageId,
+  result,
+}: GetNetworkSuccessArgs) {
   sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
 }

@@ -1,16 +1,23 @@
 import useAddressInscription from '@hooks/queries/ordinals/useAddressInscription';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
+import useCancellableEffect from '@hooks/useCancellableEffect';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
 import type { TransactionSummary } from '@screens/sendBtc/helpers';
-import { AnalyticsEvents, btcTransaction, type Transport } from '@secretkeylabs/xverse-core';
+import {
+  AnalyticsEvents,
+  btcTransaction,
+  type KeystoneTransport,
+  type LedgerTransport,
+} from '@secretkeylabs/xverse-core';
 import { removeAccountAvatarAction } from '@stores/wallet/actions/actionCreators';
-import { isInOptions, isLedgerAccount } from '@utils/helper';
+import { isInOptions } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import RoutePaths from 'app/routes/paths';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import StepDisplay from './stepDisplay';
@@ -23,17 +30,18 @@ function SendOrdinalScreen() {
 
   const location = useLocation();
   const { id } = useParams();
+  const { t } = useTranslation('translation');
   const params = new URLSearchParams(location.search);
   const isRareSatParam = params.get('isRareSat');
   const vout = params.get('vout');
   const isRareSat = isRareSatParam === 'true';
-  const fromRune = params.get('fromRune');
 
   const context = useTransactionContext();
   const { data: selectedOrdinal } = useAddressInscription(isRareSat ? undefined : id);
   const selectedAccount = useSelectedAccount();
   const { avatarIds } = useWalletSelector();
-  const currentAvatar = avatarIds[selectedAccount.btcAddress];
+
+  const selectedAvatar = avatarIds[selectedAccount.ordinalsAddress];
   const { data: btcFeeRate, isLoading: feeRatesLoading } = useBtcFeeRate();
   const [currentStep, setCurrentStep] = useState<Step>(Step.SelectRecipient);
   const [feeRate, setFeeRate] = useState('');
@@ -59,17 +67,18 @@ function SendOrdinalScreen() {
     }
   }, [btcFeeRate, feeRatesLoading]);
 
-  useEffect(() => {
-    if (!recipientAddress || !feeRate) {
-      setTransaction(undefined);
-      setSummary(undefined);
-      setInsufficientFundsError(false);
-      return;
-    }
-    let isActiveEffect = true;
-    const generateTxnAndSummary = async () => {
+  useCancellableEffect(
+    async (isEffectActive) => {
+      if (!recipientAddress || !feeRate) {
+        setTransaction(undefined);
+        setSummary(undefined);
+        setInsufficientFundsError(false);
+        return;
+      }
+
       setIsLoading(true);
       setInsufficientFundsError(false);
+
       try {
         const transactionDetails = isRareSat
           ? await btcTransaction.sendOrdinals(
@@ -83,13 +92,13 @@ function SendOrdinalScreen() {
               Number(feeRate),
             );
 
-        if (!isActiveEffect) return;
-        if (!transactionDetails) return;
-        setTransaction(transactionDetails);
-        setSummary(await transactionDetails.getSummary());
+        if (isEffectActive() && transactionDetails) {
+          setTransaction(transactionDetails);
+          setSummary(await transactionDetails.getSummary());
+        }
       } catch (e) {
+        if (!isEffectActive()) return;
         if (e instanceof Error) {
-          // don't log the error if it's just an insufficient funds error
           if (e.message.includes('Insufficient funds')) {
             setInsufficientFundsError(true);
           } else {
@@ -99,16 +108,11 @@ function SendOrdinalScreen() {
         setTransaction(undefined);
         setSummary(undefined);
       } finally {
-        if (isActiveEffect) {
-          setIsLoading(false);
-        }
+        if (isEffectActive()) setIsLoading(false);
       }
-    };
-    generateTxnAndSummary();
-    return () => {
-      isActiveEffect = false;
-    };
-  }, [context, recipientAddress, feeRate, id]);
+    },
+    [context, recipientAddress, feeRate, id, vout, isRareSat],
+  );
 
   if (!selectedOrdinal && !isRareSat) {
     navigate('/');
@@ -116,11 +120,15 @@ function SendOrdinalScreen() {
   }
 
   const handleCancel = () => {
-    if (isLedgerAccount(selectedAccount) && isInOption) {
-      window.close();
-      return;
+    if (isInOption) {
+      navigate(
+        isRareSat
+          ? `/nft-dashboard/rare-sats-bundle`
+          : `/nft-dashboard/ordinal-detail/${selectedOrdinal?.id}`,
+      );
+    } else {
+      navigate(-1);
     }
-    navigate(-1);
   };
 
   const handleBackButtonClick = () => {
@@ -150,10 +158,16 @@ function SendOrdinalScreen() {
     return undefined;
   };
 
-  const handleSubmit = async (ledgerTransport?: Transport) => {
+  const handleSubmit = async (options?: {
+    ledgerTransport?: LedgerTransport;
+    keystoneTransport?: KeystoneTransport;
+  }) => {
     try {
       setIsSubmitting(true);
-      const txnId = await transaction?.broadcast({ ledgerTransport, rbfEnabled: true });
+      const txnId = await transaction?.broadcast({
+        ...options,
+        rbfEnabled: true,
+      });
 
       trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
         protocol: 'ordinals',
@@ -166,24 +180,33 @@ function SendOrdinalScreen() {
           txid: txnId,
           currency: 'BTC',
           error: '',
-          browserTx: isInOption,
+          browserTx: false,
         },
       });
 
       if (
-        currentAvatar?.type === 'inscription' &&
-        currentAvatar.inscription?.id === selectedOrdinal?.id
+        selectedAvatar?.type === 'inscription' &&
+        selectedAvatar.inscription?.id === selectedOrdinal?.id
       ) {
-        dispatch(removeAccountAvatarAction({ address: selectedAccount.btcAddress }));
+        dispatch(removeAccountAvatarAction({ address: selectedAccount.ordinalsAddress }));
       }
     } catch (e) {
       console.error(e);
+      let msg = e;
+      if (e instanceof Error) {
+        if (e.message.includes('Export address is just allowed on specific pages')) {
+          msg = t('SIGNATURE_REQUEST.KEYSTONE.CONFIRM.ERROR_SUBTITLE');
+        }
+        if (e.message.includes('UR parsing rejected')) {
+          msg = t('SIGNATURE_REQUEST.KEYSTONE.CONFIRM.DENIED.ERROR_SUBTITLE');
+        }
+      }
       navigate('/tx-status', {
         state: {
           txid: '',
           currency: 'BTC',
-          error: `${e}`,
-          browserTx: isInOption,
+          error: `${msg}`,
+          browserTx: false,
         },
       });
     } finally {

@@ -2,9 +2,11 @@ import ReceiveIcon from '@assets/img/transactions/received.svg';
 import SendIcon from '@assets/img/transactions/sent.svg';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useSelectedAccount from '@hooks/useSelectedAccount';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { microstacksToStx } from '@secretkeylabs/xverse-core';
 import type { AddressTransactionWithTransfers } from '@stacks/stacks-blockchain-api-types';
 import type { CurrencyTypes } from '@utils/constants';
+import { HIDDEN_BALANCE_LABEL } from '@utils/constants';
 import { ftDecimals } from '@utils/helper';
 import { getFtTicker } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
@@ -59,8 +61,9 @@ interface TxTransfersProps {
 
 export default function TxTransfers(props: TxTransfersProps) {
   const { transaction, coin, txFilter } = props;
+  const { balanceHidden } = useWalletSelector();
   const selectedAccount = useSelectedAccount();
-  const { visible: sip10CoinsList } = useVisibleSip10FungibleTokens();
+  const { data: sip10CoinsList = [] } = useVisibleSip10FungibleTokens();
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
 
   function formatAddress(addr: string): string {
@@ -87,29 +90,31 @@ export default function TxTransfers(props: TxTransfersProps) {
       if (isFT && transfer.asset_identifier !== txFilter) {
         return null;
       }
-
       return (
         <TransactionContainer key={nanoid()}>
           {renderTransactionIcon(transfer)}
           <TransactionInfoContainer>
             <TransactionRow>
               <TransactionTitleText>{getTokenTransferTitle(transfer)}</TransactionTitleText>
-              <NumericFormat
-                value={
-                  isFT
-                    ? ftDecimals(BigNumber(transfer.amount), ft?.decimals ?? 0)
-                    : microstacksToStx(BigNumber(transfer.amount)).toString()
-                }
-                displayType="text"
-                thousandSeparator
-                allowNegative={false}
-                prefix={isSentTransaction ? '-' : ''}
-                renderText={(value: string) => (
-                  <TransactionValue>
-                    {`${value} ${isFT && ft ? getFtTicker(ft) : coin}`}
-                  </TransactionValue>
-                )}
-              />
+              {balanceHidden && <TransactionValue>{HIDDEN_BALANCE_LABEL}</TransactionValue>}
+              {!balanceHidden && (
+                <NumericFormat
+                  value={
+                    isFT
+                      ? ftDecimals(BigNumber(transfer.amount), ft?.decimals ?? 0)
+                      : microstacksToStx(BigNumber(transfer.amount)).toString()
+                  }
+                  displayType="text"
+                  thousandSeparator
+                  allowNegative={false}
+                  prefix={isSentTransaction ? '-' : ''}
+                  renderText={(value: string) => (
+                    <TransactionValue>
+                      {`${value} ${isFT && ft ? getFtTicker(ft) : coin}`}
+                    </TransactionValue>
+                  )}
+                />
+              )}
             </TransactionRow>
             <RecipientAddress>{formatAddress(transfer.recipient as string)}</RecipientAddress>
           </TransactionInfoContainer>

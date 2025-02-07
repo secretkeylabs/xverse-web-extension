@@ -31,7 +31,7 @@ export const stxFt: FungibleToken = {
 
 const useMasterCoinsList = () => {
   const { data: sip10FtList } = useGetSip10FungibleTokens();
-  const { unfilteredData: runesFtList } = useRuneFungibleTokensQuery();
+  const { data: runesFtList } = useRuneFungibleTokensQuery();
   const { hideStx } = useWalletSelector();
   const isStacksSwapsEnabled = useHasFeature(FeatureId.STACKS_SWAPS);
 

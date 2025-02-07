@@ -35,7 +35,7 @@ export const Dot = styled.div((props) => ({
   height: 7,
   borderRadius: props.theme.radius(9),
   marginRight: props.theme.space.xs,
-  background: props.theme.colors.feedback.success,
+  background: props.theme.colors.success_medium,
 }));
 
 export const ColumnContainer = styled.div((props) => ({

@@ -2,8 +2,9 @@ import useNftDetail from '@hooks/queries/useNftDetail';
 import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { GAMMA_URL } from '@utils/constants';
-import { getExplorerUrl, isInOptions, isLedgerAccount } from '@utils/helper';
+import { getExplorerUrl, isInOptions, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -11,10 +12,13 @@ export default function useNftDetailScreen() {
   const navigate = useNavigate();
   const selectedAccount = useSelectedAccount();
   const { id } = useParams();
-
+  const { hiddenCollectibleIds } = useWalletSelector();
   const nftDetailQuery = useNftDetail(id!);
-  const nftCollectionsQuery = useStacksCollectibles();
   const collectionId = nftDetailQuery.data?.data.collection_contract_id;
+  const collectionHidden = Object.keys(hiddenCollectibleIds[selectedAccount.stxAddress] ?? {}).some(
+    (itemId) => itemId === collectionId,
+  );
+  const nftCollectionsQuery = useStacksCollectibles(collectionHidden);
   const collection = nftCollectionsQuery.data?.results.find(
     (c) => c.collection_id === collectionId,
   );
@@ -32,7 +36,7 @@ export default function useNftDetailScreen() {
   };
 
   const handleBackButtonClick = () => {
-    navigate(`/nft-dashboard/nft-collection/${collectionId}`);
+    navigate(`/nft-dashboard/nft-collection/${collectionId}${collectionHidden ? '/hidden' : ''}`);
   };
 
   const onGammaPress = () => {
@@ -51,7 +55,10 @@ export default function useNftDetailScreen() {
   };
 
   const handleOnSendClick = async () => {
-    if (isLedgerAccount(selectedAccount) && !isInOptions()) {
+    if (
+      (isLedgerAccount(selectedAccount) || isKeystoneAccount(selectedAccount)) &&
+      !isInOptions()
+    ) {
       await chrome.tabs.create({
         url: chrome.runtime.getURL(`options.html#/nft-dashboard/nft-detail/${id}/send-nft`),
       });

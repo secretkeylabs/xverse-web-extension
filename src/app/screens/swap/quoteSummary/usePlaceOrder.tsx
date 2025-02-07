@@ -7,7 +7,7 @@ import {
 import { useState } from 'react';
 
 const usePlaceOrder = () => {
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { network } = useWalletSelector();
 

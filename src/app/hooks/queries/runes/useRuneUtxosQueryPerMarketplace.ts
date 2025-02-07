@@ -3,10 +3,10 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
-import { useCallback } from 'react';
+import { handleRetries, InvalidParamsError } from '@utils/query';
 
 export default function useRuneUtxosQueryPerMarketplace(
-  rune: FungibleToken,
+  rune?: FungibleToken,
   backgroundRefetch = true,
 ) {
   const { network } = useWalletSelector();
@@ -16,7 +16,11 @@ export default function useRuneUtxosQueryPerMarketplace(
     throw new Error('Only available on Mainnet');
   }
 
-  const queryFn = useCallback(async () => {
+  const queryFn = async () => {
+    if (!rune) {
+      throw new InvalidParamsError('rune token is required');
+    }
+
     const res = await xverseApi.listings.getListedUtxos({
       address: ordinalsAddress,
       rune: {
@@ -52,13 +56,14 @@ export default function useRuneUtxosQueryPerMarketplace(
       listedItems,
       unlistedItems,
     };
-  }, [xverseApi, ordinalsAddress, rune.name, rune.ticker]);
+  };
 
   return useQuery({
     refetchOnWindowFocus: backgroundRefetch,
     refetchOnReconnect: backgroundRefetch,
-    queryKey: ['get-listed-rune-utxos', ordinalsAddress, rune.name],
-    enabled: Boolean(ordinalsAddress && rune.name),
+    queryKey: ['get-listed-rune-utxos', ordinalsAddress, rune?.name],
+    enabled: Boolean(ordinalsAddress && rune?.name),
     queryFn,
+    retry: handleRetries,
   });
 }

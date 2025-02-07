@@ -1,19 +1,26 @@
-import LedgerBadge from '@assets/img/ledger/ledger_badge.svg';
+import KeystoneBadge from '@assets/img/hw/keystone/keystone_badge.svg';
+import LedgerBadge from '@assets/img/hw/ledger/ledger_badge.svg';
 import BarLoader from '@components/barLoader';
 import OptionsDialog from '@components/optionsDialog/optionsDialog';
+import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useOptionsDialog from '@hooks/useOptionsDialog';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CaretDown, DotsThreeVertical } from '@phosphor-icons/react';
-import { currencySymbolMap, type Account } from '@secretkeylabs/xverse-core';
+import { currencySymbolMap, getFiatBtcEquivalent, type Account } from '@secretkeylabs/xverse-core';
 import { removeAccountAvatarAction } from '@stores/wallet/actions/actionCreators';
 import Button from '@ui-library/button';
 import Input from '@ui-library/input';
 import Sheet from '@ui-library/sheet';
-import SnackBar from '@ui-library/snackBar';
 import Spinner from '@ui-library/spinner';
-import { EMPTY_LABEL, LoaderSize } from '@utils/constants';
-import { isLedgerAccount, validateAccountName } from '@utils/helper';
+import { BTC_SYMBOL, EMPTY_LABEL, HIDDEN_BALANCE_LABEL, LoaderSize } from '@utils/constants';
+import {
+  getAccountBalanceKey,
+  isKeystoneAccount,
+  isLedgerAccount,
+  validateAccountName,
+} from '@utils/helper';
+import BigNumber from 'bignumber.js';
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -60,10 +67,18 @@ function AccountRow({
   const { t: optionsDialogTranslation } = useTranslation('translation', {
     keyPrefix: 'OPTIONS_DIALOG',
   });
-  const { accountsList, ledgerAccountsList, fiatCurrency, accountBalances, avatarIds } =
-    useWalletSelector();
-  const accountAvatar = avatarIds[account?.btcAddress ?? ''];
-  const totalBalance = accountBalances[account?.btcAddress ?? ''];
+  const {
+    accountsList,
+    ledgerAccountsList,
+    fiatCurrency,
+    accountBalances,
+    avatarIds,
+    balanceHidden,
+    showBalanceInBtc,
+  } = useWalletSelector();
+  const accountAvatar = avatarIds[account?.btcAddresses.taproot.address ?? ''];
+  // TODO: refactor this into a hook
+  const totalBalance = accountBalances[getAccountBalanceKey(account)];
   const btcCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
   const stxCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
   const [showRemoveAccountModal, setShowRemoveAccountModal] = useState(false);
@@ -71,7 +86,14 @@ function AccountRow({
   const [accountName, setAccountName] = useState('');
   const [accountNameError, setAccountNameError] = useState<string | null>(null);
   const [isAccountNameChangeLoading, setIsAccountNameChangeLoading] = useState(false);
-  const { removeLedgerAccount, renameAccount, updateLedgerAccounts } = useWalletReducer();
+  const {
+    removeLedgerAccount,
+    removeKeystoneAccount,
+    renameSoftwareAccount,
+    updateLedgerAccounts,
+    updateKeystoneAccounts,
+  } = useWalletReducer();
+  const { btcFiatRate } = useSupportedCoinRates();
 
   useEffect(
     () => () => {
@@ -116,19 +138,22 @@ function AccountRow({
   };
 
   const handleRemoveAvatar = () => {
-    dispatch(removeAccountAvatarAction({ address: account?.btcAddress ?? '' }));
-    toast.custom(
-      <SnackBar text={optionsDialogTranslation('NFT_AVATAR.REMOVE_TOAST')} type="neutral" />,
-    );
+    if (!account) return;
+    dispatch(removeAccountAvatarAction({ address: account?.btcAddresses.taproot.address }));
+    toast(optionsDialogTranslation('NFT_AVATAR.REMOVE_TOAST'));
   };
 
-  const handleRemoveLedgerAccount = async () => {
+  const handleRemoveAccount = async () => {
     if (!account) {
       return;
     }
 
     try {
-      await removeLedgerAccount(account);
+      if (account.accountType === 'ledger') {
+        await removeLedgerAccount(account);
+      } else if (account.accountType === 'keystone') {
+        await removeKeystoneAccount(account);
+      }
       onAccountSelected(accountsList[0], false);
       handleRemoveAccountModalClose();
     } catch (err) {
@@ -156,8 +181,10 @@ function AccountRow({
       setIsAccountNameChangeLoading(true);
       if (isLedgerAccount(account)) {
         await updateLedgerAccounts({ ...account, accountName });
+      } else if (isKeystoneAccount(account)) {
+        await updateKeystoneAccounts({ ...account, accountName });
       } else {
-        await renameAccount({ ...account, accountName });
+        await renameSoftwareAccount({ ...account, accountName });
       }
       handleRenameAccountModalClose();
     } catch (err) {
@@ -176,8 +203,10 @@ function AccountRow({
       setIsAccountNameChangeLoading(true);
       if (isLedgerAccount(account)) {
         updateLedgerAccounts({ ...account, accountName: undefined });
+      } else if (isKeystoneAccount(account)) {
+        updateKeystoneAccounts({ ...account, accountName: undefined });
       } else {
-        renameAccount({ ...account, accountName: undefined });
+        renameSoftwareAccount({ ...account, accountName: undefined });
       }
       setAccountName('');
       handleRenameAccountModalClose();
@@ -207,11 +236,28 @@ function AccountRow({
                     `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`}
                 </AccountName>
                 {isLedgerAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
+                {isKeystoneAccount(account) && <img src={KeystoneBadge} alt="Keystone icon" />}
                 {isSelected && !disabledAccountSelect && !isAccountListView && (
                   <CaretDown color={Theme.colors.white_0} weight="bold" size={16} />
                 )}
               </CurrentAccountTextContainer>
-              {isAccountListView && totalBalance && (
+              {showBalanceInBtc && isAccountListView && totalBalance && (
+                <NumericFormat
+                  value={getFiatBtcEquivalent(
+                    BigNumber(totalBalance),
+                    BigNumber(btcFiatRate),
+                  ).toString()}
+                  displayType="text"
+                  prefix={BTC_SYMBOL}
+                  thousandSeparator
+                  renderText={(value: string) => (
+                    <Balance data-testid="account-balance" $isSelected={isSelected}>
+                      {value}
+                    </Balance>
+                  )}
+                />
+              )}
+              {!showBalanceInBtc && isAccountListView && totalBalance && (
                 <NumericFormat
                   value={totalBalance}
                   displayType="text"
@@ -219,7 +265,8 @@ function AccountRow({
                   thousandSeparator
                   renderText={(value: string) => (
                     <Balance data-testid="account-balance" $isSelected={isSelected}>
-                      {value}
+                      {!showBalanceInBtc && balanceHidden && HIDDEN_BALANCE_LABEL}
+                      {!showBalanceInBtc && !balanceHidden && value}
                     </Balance>
                   )}
                 />
@@ -258,7 +305,7 @@ function AccountRow({
               {optionsDialogTranslation('NFT_AVATAR.REMOVE_ACTION')}
             </ButtonRow>
           )}
-          {isLedgerAccount(account) && (
+          {(isLedgerAccount(account) || isKeystoneAccount(account)) && (
             <ButtonRow onClick={handleRemoveAccountModalOpen}>
               {optionsDialogTranslation('REMOVE_FROM_LIST')}
             </ButtonRow>
@@ -283,11 +330,7 @@ function AccountRow({
                 />
               </ModalButtonContainer>
               <ModalButtonContainer>
-                <Button
-                  variant="danger"
-                  title={t('REMOVE_WALLET')}
-                  onClick={handleRemoveLedgerAccount}
-                />
+                <Button variant="danger" title={t('REMOVE_WALLET')} onClick={handleRemoveAccount} />
               </ModalButtonContainer>
             </ModalControlsContainer>
           </ModalContent>

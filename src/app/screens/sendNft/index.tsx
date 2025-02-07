@@ -8,15 +8,12 @@ import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  applyFeeMultiplier,
-  buf2hex,
   cvToHex,
-  generateUnsignedTransaction,
+  generateUnsignedNftTransferTransaction,
   uintCV,
   validateStxAddress,
-  type StacksTransaction,
-  type UnsignedStacksTransation,
 } from '@secretkeylabs/xverse-core';
+import { StacksTransactionWire } from '@stacks/transactions';
 import { useMutation } from '@tanstack/react-query';
 import { StickyButtonContainer, StyledHeading, StyledP } from '@ui-library/common.styled';
 import {
@@ -108,13 +105,13 @@ function SendNft() {
   const selectedNetwork = useNetworkSelector();
   const { data: stxPendingTxData } = useStxPendingTxData();
   const { stxAddress, stxPublicKey } = useSelectedAccount();
-  const { network, feeMultipliers } = useWalletSelector();
+  const { network } = useWalletSelector();
   const debouncedSearchTerm = useDebounce(recipientAddress, 300);
   const associatedBnsName = useBnsName(debouncedSearchTerm);
   const associatedAddress = useBnsResolver(debouncedSearchTerm, stxAddress);
 
   const { isLoading, data, mutate } = useMutation<
-    StacksTransaction,
+    StacksTransactionWire,
     Error,
     { tokenId: string; address: string }
   >({
@@ -122,7 +119,7 @@ function SendNft() {
       const principal = nft?.fully_qualified_token_id?.split('::')!;
       const name = principal[1].split(':')[0];
       const contractInfo: string[] = principal[0].split('.');
-      const unsginedTx: UnsignedStacksTransation = {
+      const options = {
         amount: tokenId,
         senderAddress: stxAddress,
         recipientAddress: address,
@@ -131,12 +128,9 @@ function SendNft() {
         assetName: name,
         publicKey: stxPublicKey,
         network: selectedNetwork,
-        pendingTxs: stxPendingTxData?.pendingTransactions ?? [],
         memo: '',
-        isNFT: true,
       };
-      const unsignedTx = await generateUnsignedTransaction(unsginedTx);
-      applyFeeMultiplier(unsignedTx, feeMultipliers);
+      const unsignedTx = await generateUnsignedNftTransferTransaction(options);
       setRecipientAddress(address);
       return unsignedTx;
     },
@@ -146,7 +140,7 @@ function SendNft() {
     if (data) {
       navigate(`/confirm-nft-tx/${id}`, {
         state: {
-          unsignedTx: buf2hex(data.serialize()),
+          unsignedTx: data.serialize(),
           recipientAddress,
         },
       });

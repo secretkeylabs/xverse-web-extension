@@ -1,52 +1,12 @@
 /* eslint-disable import/prefer-default-export */
-import { getTabIdFromPort } from '@common/utils';
-import { dispatchEventToOrigin } from '@common/utils/messages/extensionToContentScript/dispatchEvent';
-import { makeContext } from '@common/utils/popup';
-import * as utils from '@components/permissionsManager/utils';
-import {
-  renouncePermissionsRequestMessageSchema,
-  type RpcRequestMessage,
-} from '@sats-connect/core';
-import * as v from 'valibot';
-import { handleInvalidMessage } from '../handle-invalid-message';
-import { sendInternalErrorMessage } from '../responseMessages/errors';
-import { sendRenouncePermissionsSuccessResponseMessage } from '../responseMessages/wallet';
+import { type RenouncePermissionsRequestMessage } from '@sats-connect/core';
+import { handleDisconnect } from './disconnect';
 
 export const handleRenouncePermissions = async (
-  message: RpcRequestMessage,
+  message: RenouncePermissionsRequestMessage,
   port: chrome.runtime.Port,
 ) => {
-  const parseResult = v.safeParse(renouncePermissionsRequestMessageSchema, message);
-
-  if (!parseResult.success) {
-    handleInvalidMessage(message, getTabIdFromPort(port), parseResult.issues);
-    return;
-  }
-
-  const { origin, tabId } = makeContext(port);
-  const [error, store] = await utils.getPermissionsStore();
-
-  if (error) {
-    sendInternalErrorMessage({
-      tabId,
-      messageId: parseResult.output.id,
-      message: 'Error loading permissions store.',
-    });
-    return;
-  }
-
-  await utils.permissionsStoreMutex.runExclusive(async () => {
-    utils.removeClient(store, origin);
-    utils.savePermissionsStore(store);
-  });
-
-  dispatchEventToOrigin(origin, {
-    type: 'disconnect',
-  });
-
-  sendRenouncePermissionsSuccessResponseMessage({
-    tabId,
-    messageId: parseResult.output.id,
-    result: true,
-  });
+  // Renouncing individual permissions is not yet implemented, so all
+  // permissions are renounced by disconnecting.
+  handleDisconnect({ ...message, method: 'wallet_disconnect' }, port);
 };

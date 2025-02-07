@@ -16,7 +16,8 @@ import {
   useInscriptionExecute,
   useInscriptionFees,
   type BtcFeeResponse,
-  type Transport,
+  type KeystoneTransport,
+  type LedgerTransport,
   type UTXO,
 } from '@secretkeylabs/xverse-core';
 
@@ -25,7 +26,7 @@ import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types'
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmScreen from '@components/confirmScreen';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { isLedgerAccount } from '@utils/helper';
+import { isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 
 import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useConfirmedBtcBalance from '@hooks/queries/useConfirmedBtcBalance';
@@ -41,10 +42,11 @@ import InscribeSection from 'app/components/confirmBtcTransaction/sections/inscr
 import CompleteScreen from './CompleteScreen';
 import EditFee from './EditFee';
 import ErrorModal from './ErrorModal';
-import LedgerStepView from './ledgerStepView';
+import HardwareWalletStepView from './hardwareWalletStepView';
 
 import FeeRow, { SATS_PER_BTC } from './feeRow';
 
+import { createKeystoneTransport } from '@keystonehq/hw-transport-webusb';
 import {
   ButtonImage,
   ButtonText,
@@ -184,8 +186,7 @@ function CreateInscription() {
   const [isConnectSuccess, setIsConnectSuccess] = useState(false);
   const [isConnectFailed, setIsConnectFailed] = useState(false);
   const [isLedgerConnectVisible, setIsLedgerConnectVisible] = useState(false);
-
-  const isLedger = isLedgerAccount(selectedAccount);
+  const [isKeystoneConnectVisible, setIsKeystoneConnectVisible] = useState(false);
 
   const cancelCallback = () => {
     const response = {
@@ -240,7 +241,7 @@ function CreateInscription() {
     executeErrorCode &&
     (executeErrorCode === InscriptionErrorCode.DEVICE_LOCKED ||
       executeErrorCode === InscriptionErrorCode.USER_REJECTED ||
-      executeErrorCode === InscriptionErrorCode.GENERAL_LEDGER_ERROR)
+      executeErrorCode === InscriptionErrorCode.GENERAL_HARDWARE_WALLET_ERROR)
       ? undefined
       : executeErrorCode;
   const errorCode = feeErrorCode || nonLedgerExecuteErrorCode;
@@ -285,7 +286,10 @@ function CreateInscription() {
     return <CompleteScreen txId={revealTransactionId} onClose={onClose} network={network} />;
   }
 
-  const handleExecuteMint = (ledgerTransport?: Transport) => {
+  const handleExecuteMint = (options?: {
+    ledgerTransport?: LedgerTransport;
+    keystoneTransport?: KeystoneTransport;
+  }) => {
     trackMixPanel(AnalyticsEvents.TransactionConfirmed, {
       protocol: 'ordinals',
       action: 'inscribe',
@@ -293,26 +297,45 @@ function CreateInscription() {
       repeat,
     });
 
-    executeMint({ ledgerTransport });
+    executeMint(options);
   };
 
-  const handleLedgerConnect = async () => {
+  const handleHardwareConnect = async () => {
     try {
       setIsConnectSuccess(false);
       setIsConnectFailed(false);
       setIsConnecting(true);
 
-      const ledgerTransport = await TransportFactory.create();
+      const options: {
+        ledgerTransport?: LedgerTransport;
+        keystoneTransport?: KeystoneTransport;
+      } = {};
 
-      if (!ledgerTransport) {
-        setIsConnectSuccess(false);
-        setIsConnectFailed(true);
+      if (isLedgerAccount(selectedAccount)) {
+        const ledgerTransport = await TransportFactory.create();
+
+        if (!ledgerTransport) {
+          setIsConnectSuccess(false);
+          setIsConnectFailed(true);
+          return;
+        }
+        options.ledgerTransport = ledgerTransport;
+      } else if (isKeystoneAccount(selectedAccount)) {
+        const keystoneTransport = await createKeystoneTransport();
+
+        if (!keystoneTransport) {
+          setIsConnectSuccess(false);
+          setIsConnectFailed(true);
+          return;
+        }
+        options.keystoneTransport = keystoneTransport;
+      } else {
         return;
       }
 
       setIsConnectSuccess(true);
       setIsConnecting(false);
-      handleExecuteMint(ledgerTransport);
+      handleExecuteMint(options);
     } catch (error) {
       console.error(error);
       setIsConnectSuccess(false);
@@ -322,24 +345,27 @@ function CreateInscription() {
     }
   };
 
-  const handleLedgerConnectCancel = () => {
+  const handleHardwareWalletConnectCancel = () => {
     setIsLedgerConnectVisible(false);
+    setIsKeystoneConnectVisible(false);
   };
 
   const handleClickConfirm = () => {
-    if (!isLedger) {
-      handleExecuteMint();
-    } else {
+    if (isLedgerAccount(selectedAccount)) {
       setIsLedgerConnectVisible(true);
+    } else if (isKeystoneAccount(selectedAccount)) {
+      setIsKeystoneConnectVisible(true);
+    } else {
+      handleExecuteMint();
     }
   };
 
   const disableConfirmButton =
     !!errorCode || isExecuting || showOver24RepeatsError || showConfirmedBalanceError;
 
-  const canLedgerRetry =
+  const canHardwareConnectRetry =
     executeErrorCode === InscriptionErrorCode.USER_REJECTED ||
-    executeErrorCode === InscriptionErrorCode.GENERAL_LEDGER_ERROR;
+    executeErrorCode === InscriptionErrorCode.GENERAL_HARDWARE_WALLET_ERROR;
 
   return (
     <ConfirmScreen
@@ -481,31 +507,31 @@ function CreateInscription() {
             />
           )}
           <Sheet
-            title=""
-            visible={isLedgerConnectVisible}
-            onClose={isConnectSuccess ? undefined : handleLedgerConnectCancel}
+            visible={isLedgerConnectVisible || isKeystoneConnectVisible}
+            onClose={isConnectSuccess ? undefined : handleHardwareWalletConnectCancel}
           >
-            <LedgerStepView
+            <HardwareWalletStepView
+              walletCode={isLedgerConnectVisible ? 'LEDGER' : 'KEYSTONE'}
               isConnectSuccess={isConnectSuccess}
               isConnectFailed={isConnectFailed || !!executeErrorCode}
               errorCode={executeErrorCode}
             />
             <SuccessActionsContainer>
-              {(!isConnectSuccess || canLedgerRetry) && (
+              {(!isConnectSuccess || canHardwareConnectRetry) && (
                 <>
                   <Button
-                    onClick={handleLedgerConnect}
+                    onClick={handleHardwareConnect}
                     title={t(
-                      isConnectFailed || canLedgerRetry
-                        ? 'LEDGER.RETRY_BUTTON'
-                        : 'LEDGER.CONNECT_BUTTON',
+                      isConnectFailed || canHardwareConnectRetry
+                        ? 'HARDWARE_WALLET.RETRY_BUTTON'
+                        : 'HARDWARE_WALLET.CONNECT_BUTTON',
                     )}
                     disabled={isConnecting}
                     loading={isConnecting}
                   />
                   <Button
-                    onClick={handleLedgerConnectCancel}
-                    title={t('LEDGER.CANCEL_BUTTON')}
+                    onClick={handleHardwareWalletConnectCancel}
+                    title={t('HARDWARE_WALLET.CANCEL_BUTTON')}
                     variant="tertiary"
                   />
                 </>

@@ -1,6 +1,6 @@
 import TokenTile from '@components/tokenTile';
 import { getTrackingIdentifier } from '@screens/swap/utils';
-import { AnalyticsEvents, type FungibleToken, type Token } from '@secretkeylabs/xverse-core';
+import { AnalyticsEvents, type FungibleToken } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import { trackMixPanel } from '@utils/mixpanel';
@@ -26,7 +26,7 @@ interface Props {
   title: string;
   onSelectCoin: (token: FungibleToken) => void;
   onClose: () => void;
-  to?: Token;
+  to?: FungibleToken;
 }
 
 export default function TokenFromBottomSheet({ visible, title, onSelectCoin, onClose, to }: Props) {

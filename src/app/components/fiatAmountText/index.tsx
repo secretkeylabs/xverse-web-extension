@@ -8,24 +8,27 @@ type Props = {
   fiatAmount?: BigNumber;
   fiatCurrency: SupportedCurrency;
   dataTestId?: string;
+  withoutSuffix?: boolean;
 };
 
-function FiatAmountText({ className, fiatAmount, fiatCurrency, dataTestId }: Props) {
+function FiatAmountText({ className, fiatAmount, fiatCurrency, dataTestId, withoutSuffix }: Props) {
   if (!fiatAmount || !fiatCurrency) {
     return null;
   }
 
   if (fiatAmount.isEqualTo(0)) {
     return (
-      <span className={className}>{`${currencySymbolMap[fiatCurrency]}0.00 ${fiatCurrency}`}</span>
+      <span className={className}>{`${currencySymbolMap[fiatCurrency]}0.00${
+        withoutSuffix ? '' : ` ${fiatCurrency}`
+      }`}</span>
     );
   }
 
   if (fiatAmount.isLessThan(0.01)) {
     return (
-      <span
-        className={className}
-      >{`< ${currencySymbolMap[fiatCurrency]}0.01 ${fiatCurrency}`}</span>
+      <span className={className}>{`< ${currencySymbolMap[fiatCurrency]}0.01${
+        withoutSuffix ? '' : ` ${fiatCurrency}`
+      }`}</span>
     );
   }
   return (
@@ -34,8 +37,8 @@ function FiatAmountText({ className, fiatAmount, fiatCurrency, dataTestId }: Pro
       value={fiatAmount.toFixed(2).toString()}
       displayType="text"
       thousandSeparator
-      prefix={`~ ${currencySymbolMap[fiatCurrency]}`}
-      suffix={` ${fiatCurrency}`}
+      prefix={` ${currencySymbolMap[fiatCurrency]}`}
+      suffix={withoutSuffix ? '' : ` ${fiatCurrency}`}
       data-testid={dataTestId}
     />
   );
@@ -48,6 +51,7 @@ export const StyledFiatAmountText = styled(FiatAmountText)`
 
 export const RightAlignedStyledFiatAmountText = styled(StyledFiatAmountText)`
   text-align: right;
+  flex: 1 0 auto;
 `;
 
 export default FiatAmountText;

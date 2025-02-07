@@ -1,10 +1,9 @@
-import checkCircleIcon from '@assets/img/ledger/check_circle.svg';
-import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
-import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
-import { delay } from '@common/utils/ledger';
+import checkCircleIcon from '@assets/img/hw/ledger/check_circle.svg';
+import ledgerConnectDefaultIcon from '@assets/img/hw/ledger/ledger_connect_default.svg';
+import ledgerConnectStxIcon from '@assets/img/hw/ledger/ledger_import_connect_stx.svg';
+import { delay } from '@common/utils/promises';
 import ActionButton from '@components/button';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
-import FullScreenHeader from '@components/ledger/fullScreenHeader';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
@@ -142,12 +141,6 @@ function ConfirmLedgerStxTransaction(): JSX.Element {
     } finally {
       setIsButtonDisabled(false);
     }
-  };
-
-  const goToConfirmationStep = () => {
-    setCurrentStep(Steps.ConfirmTransaction);
-
-    handleConnectAndConfirm();
   };
 
   const handleRetry = async () => {
@@ -298,7 +291,6 @@ function ConfirmLedgerStxTransaction(): JSX.Element {
 
   return (
     <Container>
-      <FullScreenHeader />
       {transition((style) => (
         <>
           <OnBoardingContentContainer style={style}>

@@ -1,6 +1,6 @@
-import ledgerConnectDefaultIcon from '@assets/img/ledger/ledger_connect_default.svg';
-import ledgerConnectStxIcon from '@assets/img/ledger/ledger_import_connect_stx.svg';
-import { delay } from '@common/utils/ledger';
+import ledgerConnectDefaultIcon from '@assets/img/hw/ledger/ledger_connect_default.svg';
+import ledgerConnectStxIcon from '@assets/img/hw/ledger/ledger_import_connect_stx.svg';
+import { delay } from '@common/utils/promises';
 import { makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import AccountHeaderComponent from '@components/accountHeader';
 import BottomModal from '@components/bottomModal';
@@ -21,7 +21,12 @@ import Transport from '@ledgerhq/hw-transport-webusb';
 import type { Return } from '@sats-connect/core';
 import { buf2hex, hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
 import type { SignaturePayload, StructuredDataSignaturePayload } from '@stacks/connect';
-import { getNetworkType, getTruncatedAddress, isHardwareAccount } from '@utils/helper';
+import {
+  getNetworkType,
+  getStxNetworkForBtcNetwork,
+  getTruncatedAddress,
+  isHardwareAccount,
+} from '@utils/helper';
 import { signatureVrsToRsv } from '@utils/ledger';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -83,13 +88,13 @@ function SignatureRequest(): JSX.Element {
   };
 
   const switchAccountBasedOnRequest = () => {
-    if (getNetworkType(payload.network) !== network.type) {
+    if (getNetworkType(payload.network) !== getStxNetworkForBtcNetwork(network.type)) {
       navigate('/tx-status', {
         state: {
           txid: '',
           currency: 'STX',
           errorTitle: t('SIGNATURE_REQUEST.SIGNATURE_ERROR_TITLE'),
-          error: t('CONFIRM_TRANSACTION.NETWORK_MISMATCH'),
+          error: t('REQUEST_ERRORS.NETWORK_MISMATCH'),
           browserTx: true,
         },
       });
@@ -104,7 +109,7 @@ function SignatureRequest(): JSX.Element {
           txid: '',
           currency: 'STX',
           errorTitle: t('SIGNATURE_REQUEST.SIGNATURE_ERROR_TITLE'),
-          error: t('CONFIRM_TRANSACTION.ADDRESS_MISMATCH'),
+          error: t('REQUEST_ERRORS.ADDRESS_MISMATCH_STX'),
           browserTx: true,
         },
       });

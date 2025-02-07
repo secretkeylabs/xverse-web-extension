@@ -3,14 +3,13 @@ import { REHYDRATE } from 'redux-persist';
 import {
   AddToHideCollectiblesKey,
   AddToStarCollectiblesKey,
+  ChangeBtcPaymentAddressTypeKey,
   ChangeFiatCurrencyKey,
   ChangeHasActivatedOrdinalsKey,
   ChangeHasActivatedRareSatsKey,
   ChangeHasActivatedRBFKey,
   ChangeNetworkKey,
-  ChangeShowBtcReceiveAlertKey,
   ChangeShowDataCollectionAlertKey,
-  ChangeShowOrdinalReceiveAlertKey,
   RareSatsNoticeDismissedKey,
   RemoveAccountAvatarKey,
   RemoveAllFromHideCollectiblesKey,
@@ -20,18 +19,23 @@ import {
   SelectAccountKey,
   SetAccountAvatarKey,
   SetAccountBalanceKey,
+  SetBalanceHiddenToggleKey,
   SetBrc20ManageTokensKey,
   SetFeeMultiplierKey,
+  SetHiddenCollectiblesKey,
   SetNotificationBannersKey,
   SetRunesManageTokensKey,
+  SetShowBalanceInBtcToggleKey,
   SetShowSpamTokensKey,
   SetSip10ManageTokensKey,
   SetSpamTokenKey,
   SetSpamTokensKey,
+  SetWalletBackupStatusKey,
   SetWalletHideStxKey,
   SetWalletLockPeriodKey,
   SetWalletUnlockedKey,
   StoreEncryptedSeedKey,
+  UpdateKeystoneAccountsKey,
   UpdateLedgerAccountsKey,
   UpdateSavedNamesKey,
   UpdateSoftwareAccountsKey,
@@ -68,8 +72,10 @@ export const initialWalletState: WalletState = {
   savedNetworks: initialNetworksList,
   accountsList: [],
   ledgerAccountsList: [],
+  keystoneAccountsList: [],
   selectedAccountIndex: 0,
   selectedAccountType: 'software',
+  btcPaymentAddressType: 'native',
   encryptedSeed: '',
   fiatCurrency: 'USD',
   sip10ManageTokens: {},
@@ -77,12 +83,10 @@ export const initialWalletState: WalletState = {
   runesManageTokens: {},
   notificationBanners: {},
   feeMultipliers: null,
-  hasActivatedOrdinalsKey: undefined,
-  hasActivatedRareSatsKey: undefined,
+  hasActivatedOrdinalsKey: true,
+  hasActivatedRareSatsKey: true,
   hasActivatedRBFKey: true,
   rareSatsNoticeDismissed: undefined,
-  showBtcReceiveAlert: true,
-  showOrdinalReceiveAlert: true,
   showDataCollectionAlert: true,
   walletLockPeriod: WalletSessionPeriods.STANDARD,
   isUnlocked: false,
@@ -95,6 +99,9 @@ export const initialWalletState: WalletState = {
   hiddenCollectibleIds: {},
   starredCollectibleIds: {},
   avatarIds: {},
+  balanceHidden: false,
+  showBalanceInBtc: false,
+  hasBackedUpWallet: true,
 };
 
 /**
@@ -136,6 +143,11 @@ const walletReducer = (
         ...state,
         ledgerAccountsList: action.ledgerAccountsList,
       };
+    case UpdateKeystoneAccountsKey:
+      return {
+        ...state,
+        keystoneAccountsList: action.keystoneAccountsList,
+      };
     case SelectAccountKey:
       return {
         ...state,
@@ -169,6 +181,11 @@ const walletReducer = (
         accountsList: [],
         accountBalances: {},
       };
+    case ChangeBtcPaymentAddressTypeKey:
+      return {
+        ...state,
+        btcPaymentAddressType: action.btcPaymentType,
+      };
     case ChangeHasActivatedOrdinalsKey:
       return {
         ...state,
@@ -188,16 +205,6 @@ const walletReducer = (
       return {
         ...state,
         rareSatsNoticeDismissed: action.rareSatsNoticeDismissed,
-      };
-    case ChangeShowBtcReceiveAlertKey:
-      return {
-        ...state,
-        showBtcReceiveAlert: action.showBtcReceiveAlert,
-      };
-    case ChangeShowOrdinalReceiveAlertKey:
-      return {
-        ...state,
-        showOrdinalReceiveAlert: action.showOrdinalReceiveAlert,
       };
     case ChangeShowDataCollectionAlertKey:
       return {
@@ -251,7 +258,7 @@ const walletReducer = (
         ...state,
         accountBalances: {
           ...state.accountBalances,
-          [action.btcAddress]: action.totalBalance,
+          [action.accountKey]: action.totalBalance,
         },
       };
     case SetWalletHideStxKey:
@@ -346,6 +353,14 @@ const walletReducer = (
           [action.address]: {},
         },
       };
+    case SetHiddenCollectiblesKey:
+      return {
+        ...state,
+        hiddenCollectibleIds: {
+          ...state.hiddenCollectibleIds,
+          ...action.collectibleIds,
+        },
+      };
     case SetAccountAvatarKey:
       return {
         ...state,
@@ -355,14 +370,29 @@ const walletReducer = (
         },
       };
     case RemoveAccountAvatarKey: {
+      const clonedAvatarIds = { ...state.avatarIds };
+      delete clonedAvatarIds[action.address];
       return {
         ...state,
-        avatarIds: {
-          ...state.avatarIds,
-          [action.address]: null,
-        },
+        avatarIds: clonedAvatarIds,
       };
     }
+    case SetBalanceHiddenToggleKey: {
+      return {
+        ...state,
+        balanceHidden: action.toggle,
+      };
+    }
+    case SetShowBalanceInBtcToggleKey:
+      return {
+        ...state,
+        showBalanceInBtc: action.toggle,
+      };
+    case SetWalletBackupStatusKey:
+      return {
+        ...state,
+        hasBackedUpWallet: action.hasBackedUpWallet,
+      };
     default:
       return state;
   }

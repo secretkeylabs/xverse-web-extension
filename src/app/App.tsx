@@ -1,6 +1,7 @@
 import { PermissionsProvider } from '@components/permissionsManager';
 import StartupLoadingScreen from '@components/startupLoadingScreen';
 import Toaster from '@components/toaster';
+import TooltipProvider from '@components/tooltip/provider';
 import { CheckCircle, XCircle } from '@phosphor-icons/react';
 import { setXClientVersion } from '@secretkeylabs/xverse-core';
 import rootStore from '@stores/index';
@@ -29,68 +30,71 @@ const StyledIcon = styled.div`
   justify-content: center;
 `;
 
+const commonToastStyles = {
+  ...Theme.typography.body_medium_m,
+  position: 'relative' as const,
+  bottom: Theme.space.xxxxl,
+  borderRadius: Theme.radius(2),
+  padding: Theme.space.s,
+};
+
 function App(): React.ReactNode {
   return (
     <>
       <GlobalStyle />
       <ThemeProvider theme={Theme}>
-        <QueryClientProvider client={queryClient}>
-          <ReactQueryDevtools initialIsOpen={false} />
-          <Provider store={rootStore.store}>
-            <PersistGate persistor={rootStore.persistor} loading={<StartupLoadingScreen />}>
-              <SessionGuard>
-                <PermissionsProvider>
-                  <RouterProvider router={router} />
-                  <Toaster
-                    max={1}
-                    position="bottom-center"
-                    containerStyle={{ bottom: 32 }}
-                    toastOptions={{
-                      duration: 2000,
-                      success: {
-                        icon: (
-                          <StyledIcon>
-                            <CheckCircle size={20} weight="bold" />
-                          </StyledIcon>
-                        ),
-                        style: {
-                          ...Theme.typography.body_medium_m,
-                          backgroundColor: Theme.colors.success_medium,
-                          borderRadius: Theme.radius(2),
-                          padding: Theme.space.s,
-                          color: Theme.colors.elevation0,
+        <TooltipProvider>
+          <QueryClientProvider client={queryClient}>
+            <ReactQueryDevtools initialIsOpen={false} />
+            <Provider store={rootStore.store}>
+              <PersistGate persistor={rootStore.persistor} loading={<StartupLoadingScreen />}>
+                <SessionGuard>
+                  <PermissionsProvider>
+                    <RouterProvider router={router} />
+                    <Toaster
+                      max={1}
+                      position="bottom-center"
+                      toastOptions={{
+                        duration: 2000,
+                        success: {
+                          icon: (
+                            <StyledIcon>
+                              <CheckCircle size={20} weight="bold" />
+                            </StyledIcon>
+                          ),
+                          style: {
+                            ...commonToastStyles,
+                            backgroundColor: Theme.colors.success_medium,
+                            color: Theme.colors.elevation0,
+                          },
                         },
-                      },
-                      error: {
-                        icon: (
-                          <StyledIcon>
-                            <XCircle size={20} weight="bold" />
-                          </StyledIcon>
-                        ),
-                        style: {
-                          ...Theme.typography.body_medium_m,
-                          backgroundColor: Theme.colors.danger_dark,
-                          borderRadius: Theme.radius(2),
-                          padding: Theme.space.s,
-                          color: Theme.colors.white_0,
+                        error: {
+                          icon: (
+                            <StyledIcon>
+                              <XCircle size={20} weight="bold" />
+                            </StyledIcon>
+                          ),
+                          style: {
+                            ...commonToastStyles,
+                            backgroundColor: Theme.colors.danger_dark,
+                            color: Theme.colors.white_0,
+                          },
                         },
-                      },
-                      blank: {
-                        style: {
-                          ...Theme.typography.body_medium_m,
-                          backgroundColor: Theme.colors.white_0,
-                          borderRadius: Theme.radius(2),
-                          padding: Theme.space.s,
-                          color: Theme.colors.elevation0,
+                        blank: {
+                          style: {
+                            ...commonToastStyles,
+                            backgroundColor: Theme.colors.white_0,
+                            color: Theme.colors.elevation0,
+                          },
                         },
-                      },
-                    }}
-                  />
-                </PermissionsProvider>
-              </SessionGuard>
-            </PersistGate>
-          </Provider>
-        </QueryClientProvider>
+                      }}
+                    />
+                  </PermissionsProvider>
+                </SessionGuard>
+              </PersistGate>
+            </Provider>
+          </QueryClientProvider>
+        </TooltipProvider>
       </ThemeProvider>
     </>
   );

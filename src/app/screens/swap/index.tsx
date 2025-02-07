@@ -27,7 +27,6 @@ import {
 } from '@secretkeylabs/xverse-core';
 import Button, { LinkButton } from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
-import SnackBar from '@ui-library/snackBar';
 import { formatNumber, satsToBtcString } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { getFtBalance } from '@utils/tokens';
@@ -41,19 +40,18 @@ import AmountInput from './components/amountInput';
 import PsbtConfirmation from './components/psbtConfirmation/psbtConfirmation';
 import RouteItem from './components/routeItem';
 import TokenFromBottomSheet from './components/tokenFromBottomSheet';
+import useFromTokens from './components/tokenFromBottomSheet/useFromTokens';
 import TokenToBottomSheet from './components/tokenToBottomSheet';
-import trackSwapMixPanel from './mixpanel';
+import { getSwapsMixpanelProperties } from './mixpanel';
 import QuoteSummary from './quoteSummary';
 import QuotesModal from './quotesModal';
 import type { OrderInfo, Side, StxOrderInfo } from './types';
-import useMasterCoinsList from './useMasterCoinsList';
+import useVisibleMasterCoinsList from './useVisibleMasterCoinsList';
 import {
   getTrackingIdentifier,
   isStxTx,
   mapFTNativeSwapTokenToTokenBasic,
   mapFTProtocolToSwapProtocol,
-  mapFtToSwapToken,
-  mapSwapProtocolToFTProtocol,
   mapSwapTokenToFT,
 } from './utils';
 import UtxoSelection from './utxoSelection';
@@ -65,12 +63,12 @@ const Container = styled.div((props) => ({
   padding: `0 ${props.theme.space.m} ${props.theme.space.l} ${props.theme.space.m}`,
 }));
 
-const Flex1 = styled.div<{ center?: boolean }>`
+const Flex1 = styled.div<{ $center?: boolean }>`
   display: flex;
   flex-direction: column;
   flex: 1;
-  justify-content: ${(props) => (props.center ? 'center' : 'flex-start')};
-  align-items: ${(props) => (props.center ? 'center' : 'normal')};
+  justify-content: ${(props) => (props.$center ? 'center' : 'flex-start')};
+  align-items: ${(props) => (props.$center ? 'center' : 'normal')};
 `;
 
 const RouteContainer = styled.div((props) => ({
@@ -78,6 +76,7 @@ const RouteContainer = styled.div((props) => ({
   flexDirection: 'row',
   justifyContent: 'space-between',
   alignItems: 'center',
+  gap: props.theme.space.s,
   margin: `${props.theme.space.l} 0`,
 }));
 
@@ -114,12 +113,13 @@ export default function SwapScreen() {
   const [getQuotesModalVisible, setGetQuotesModalVisible] = useState(false);
   const [tokenSelectionBottomSheet, setTokenSelectionBottomSheet] = useState<Side | null>(null);
   const [fromToken, setFromToken] = useState<FungibleToken | undefined>();
-  const [toToken, setToToken] = useState<Token | undefined>();
+  const [toToken, setToToken] = useState<FungibleToken | undefined>();
   const [utxosRequest, setUtxosRequest] = useState<GetUtxosRequest | null>(null);
   const [inputError, setInputError] = useState('');
   const [hasQuoteError, setHasQuoteError] = useState(false);
   const [orderInfo, setOrderInfo] = useState<OrderInfo | undefined>();
   const [stxOrderInfo, setStxOrderInfo] = useState<StxOrderInfo | undefined>();
+  const fromTokens = useFromTokens();
 
   const [selectedUtxos, setSelectedUtxos] = useState<Omit<MarketUtxo, 'token'>[]>();
   const [utxoProviderSendAmount, setUtxoProviderSendAmount] = useState<string | undefined>();
@@ -136,20 +136,25 @@ export default function SwapScreen() {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const defaultFrom = params.get('from');
+  const defaultTo = params.get('to');
   const { quotes, loading: quotesLoading, error: quotesError, fetchQuotes } = useGetQuotes();
-  const { data: runeFloorPrice } = useRuneFloorPriceQuery(toToken?.name ?? '');
-  const coinsMasterList = useMasterCoinsList();
+  const coinsMasterList = useVisibleMasterCoinsList();
   const { tokenInfo: sip10FromTokenInfoUSD } = useGetSip10TokenInfo({
-    principal: toToken?.ticker,
+    principal: toToken?.principal,
     fiatCurrency: 'USD',
   });
+  const { data: fromRuneFloorPrice } = useRuneFloorPriceQuery(fromToken?.name ?? '');
 
   useEffect(() => {
-    if (defaultFrom) {
+    if (defaultFrom && !fromToken) {
       const token = coinsMasterList.find((coin) => coin.principal === defaultFrom);
       setFromToken(token);
     }
-  }, [defaultFrom, coinsMasterList.length]);
+    if (defaultTo && !toToken) {
+      const token = coinsMasterList.find((coin) => coin.principal === defaultTo);
+      setToToken(token);
+    }
+  }, [defaultFrom, defaultTo, coinsMasterList]);
 
   const handleGoBack = () => {
     navigate('/');
@@ -178,16 +183,18 @@ export default function SwapScreen() {
       return;
     }
 
-    trackSwapMixPanel(AnalyticsEvents.FetchSwapQuote, {
+    const trackingPayload = getSwapsMixpanelProperties({
       fromToken,
       toToken,
       amount: amountForQuote,
       quote,
-      btcUsdRate,
-      runeFloorPrice,
-      stxBtcRate,
-      fromTokenInfo: sip10FromTokenInfoUSD,
+      btcUsdRate: BigNumber(btcUsdRate),
+      stxBtcRate: BigNumber(stxBtcRate),
+      fromRuneFloorPrice: BigNumber(fromRuneFloorPrice ?? 0),
+      fromStxTokenFiatValue: BigNumber(sip10FromTokenInfoUSD?.tokenFiatRate ?? 0),
     });
+
+    trackMixPanel(AnalyticsEvents.FetchSwapQuote, trackingPayload);
 
     fetchQuotes({
       from: mapFTNativeSwapTokenToTokenBasic(fromToken),
@@ -199,42 +206,37 @@ export default function SwapScreen() {
   const onClickFrom = () => setTokenSelectionBottomSheet('from');
   const onClickTo = () => setTokenSelectionBottomSheet('to');
 
-  const getUserFTFromTokenTicker = (
-    protocol: Token['protocol'],
-    ticker: Token['ticker'],
-  ): FungibleToken | undefined => {
-    const ftProtocol = mapSwapProtocolToFTProtocol(protocol);
-
-    // add more protocols here when needed
-    switch (ftProtocol) {
-      case 'runes':
-        return coinsMasterList.find((coin) => coin.principal === ticker);
-      case 'stacks':
-        return coinsMasterList.find((coin) => coin.principal === ticker);
-      default:
-        return undefined;
-    }
-  };
-
   const isSwapRouteDisabled = !fromToken || !toToken;
 
   const onClickSwapRoute = () => {
     if (isSwapRouteDisabled) {
       return;
     }
+
     setInputError('');
     setAmount('');
     setHasQuoteError(false);
-    const newFrom =
-      getUserFTFromTokenTicker(toToken.protocol, toToken.ticker) ?? mapSwapTokenToFT(toToken);
-    const newTo = mapFtToSwapToken(fromToken);
+
+    const newFrom = toToken;
+    const newTo = fromToken;
+
     setFromToken(newFrom);
     setToToken(newTo);
+
+    if (newFrom?.principal !== 'BTC') {
+      const matchingToken = fromTokens.find(
+        (token) => token.principal !== 'BTC' && token.principal === newFrom?.principal,
+      );
+
+      if (matchingToken) {
+        setFromToken(matchingToken);
+      }
+    }
   };
 
   const onChangeToToken = (token: Token) => {
     setHasQuoteError(false);
-    setToToken(token);
+    setToToken(mapSwapTokenToFT(token));
   };
 
   const onChangeFromToken = (token: FungibleToken) => {
@@ -343,14 +345,11 @@ export default function SwapScreen() {
   const isRunesToBtcRoute =
     fromToken?.principal !== 'BTC' &&
     fromToken?.protocol === 'runes' &&
-    toToken?.protocol === 'btc';
+    toToken?.principal === 'BTC';
 
   useEffect(() => {
     if (errorMessage) {
-      const toastId = toast.custom(
-        <SnackBar text={errorMessage} type="error" dismissToast={() => toast.remove(toastId)} />,
-        { duration: 3000 },
-      );
+      toast.error(errorMessage, { duration: 3000 });
       // Reset
       setErrorMessage('');
     }
@@ -362,13 +361,15 @@ export default function SwapScreen() {
       return;
     }
 
-    trackMixPanel(AnalyticsEvents.SelectSwapQuote, {
+    const trackingPayload = {
       provider: provider.provider.name,
       from: getTrackingIdentifier(fromToken),
       to: getTrackingIdentifier(toToken),
       fromPrincipal: isStxTx({ fromToken, toToken }) ? fromToken.principal : undefined,
       toPrincipal: isStxTx({ fromToken, toToken }) ? toToken.ticker : undefined,
-    });
+    };
+
+    trackMixPanel(AnalyticsEvents.SelectSwapQuote, trackingPayload);
 
     if (isAmm) {
       setUtxosRequest(null);
@@ -395,17 +396,20 @@ export default function SwapScreen() {
     if (!fromToken || !toToken || !provider) {
       return;
     }
-    trackSwapMixPanel(AnalyticsEvents.SignSwap, {
+
+    const trackingPayload = getSwapsMixpanelProperties({
       provider,
       fromToken,
       toToken,
       amount: amountForQuote,
       quote,
-      btcUsdRate,
-      runeFloorPrice,
-      stxBtcRate,
-      fromTokenInfo: sip10FromTokenInfoUSD,
+      btcUsdRate: BigNumber(btcUsdRate),
+      stxBtcRate: BigNumber(stxBtcRate),
+      fromRuneFloorPrice: new BigNumber(fromRuneFloorPrice ?? 0),
+      fromStxTokenFiatValue: new BigNumber(sip10FromTokenInfoUSD?.tokenFiatRate ?? 0),
     });
+
+    trackMixPanel(AnalyticsEvents.SignSwap, trackingPayload);
   };
 
   const QuoteModal = (
@@ -417,6 +421,7 @@ export default function SwapScreen() {
       ammProviders={quotes?.amm || []}
       utxoProviders={quotes?.utxo || []}
       stxProviders={quotes?.stx || []}
+      amount={amount}
       toToken={toToken}
       ammProviderClicked={(provider: Quote) => {
         setProvider(true, provider);
@@ -460,6 +465,17 @@ export default function SwapScreen() {
     navigate(RequestsRoutes.TransactionRequest, {
       state: {
         dataStxSignTransactionOverride,
+        mixpanelMetadata: {
+          provider: quote.provider,
+          fromToken,
+          toToken,
+          amount: amountForQuote,
+          quote,
+          btcUsdRate: BigNumber(btcUsdRate),
+          fromRuneFloorPrice: BigNumber(fromRuneFloorPrice ?? 0),
+          fromStxTokenFiatValue: BigNumber(sip10FromTokenInfoUSD?.tokenFiatRate ?? 0),
+          stxBtcRate: BigNumber(stxBtcRate),
+        },
       },
     });
   }
@@ -568,7 +584,7 @@ export default function SwapScreen() {
             balance={getFromBalance()}
           />
           {hasQuoteError && (
-            <Flex1 center>
+            <Flex1 $center>
               <StyledP typography="body_m" color="white_200">
                 {t('SWAP_SCREEN.ERRORS.NO_PAIR_LIQUIDITY')}
               </StyledP>
