@@ -68,6 +68,7 @@ const handleGetStxAddresses = async (
           publicKey: account.stxPublicKey,
           addressType: AddressType.stacks,
           purpose: AddressPurpose.Stacks,
+          walletType: account.accountType ?? 'software',
         },
       ],
     },
