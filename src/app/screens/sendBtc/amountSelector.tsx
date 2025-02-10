@@ -3,11 +3,16 @@ import useBtcAddressBalance from '@hooks/useBtcAddressBalance';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getBtcFiatEquivalent, type BtcPaymentType } from '@secretkeylabs/xverse-core';
+import {
+  AnalyticsEvents,
+  getBtcFiatEquivalent,
+  type BtcPaymentType,
+} from '@secretkeylabs/xverse-core';
 import BtcAmountSelector from '@ui-components/btcAmountSelector';
 import SelectFeeRate from '@ui-components/selectFeeRate';
 import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
+import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -135,6 +140,10 @@ function AmountSelector({
             bodyText={t('BTC.NO_FUNDS')}
             redirectText={t('BTC.BUY_BTC')}
             onClickRedirect={() => {
+              trackMixPanel(AnalyticsEvents.InitiateBuyFlow, {
+                selectedToken: 'BTC',
+                source: 'send_btc',
+              });
               navigate('/buy/BTC');
             }}
           />

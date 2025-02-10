@@ -3,9 +3,11 @@ import ordinalsIcon from '@assets/img/nftDashboard/ordinals_icon.svg';
 import ReceiveCardComponent from '@components/receiveCardComponent';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import { Plus } from '@phosphor-icons/react';
+import { AnalyticsEvents } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import Sheet from '@ui-library/sheet';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
+import { trackMixPanel } from '@utils/mixpanel';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -74,10 +76,18 @@ function ReceiveNftModal({ visible, onClose }: Props) {
   const [choseToVerifyAddresses, setChoseToVerifyAddresses] = useState(false);
 
   const onReceivePress = () => {
+    trackMixPanel(AnalyticsEvents.InitiateReceiveFlow, {
+      addressType: 'stx',
+      source: 'collectibles',
+    });
     navigate('/receive/STX');
   };
 
   const onOrdinalsReceivePress = () => {
+    trackMixPanel(AnalyticsEvents.InitiateReceiveFlow, {
+      addressType: 'btc_ordinals',
+      source: 'collectibles',
+    });
     navigate('/receive/ORD');
   };
 

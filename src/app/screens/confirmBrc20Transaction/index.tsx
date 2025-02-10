@@ -145,6 +145,10 @@ function ConfirmBrc20Transaction() {
   }
 
   const handleGoBack = () => {
+    trackMixPanel(AnalyticsEvents.InitiateSendFlow, {
+      selectedToken: token.principal,
+      source: 'send_brc20',
+    });
     navigate(`/send-brc20-one-step?principal=${token.principal}`, {
       state: {
         amount: estimateFeesParams.amount.toString(),

@@ -230,10 +230,19 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
   const navigateToReceive = () => {
     if (fungibleToken) {
       // RUNES & BRC20s => ordinal wallet, SIP-10 => STX wallet
+      trackMixPanel(AnalyticsEvents.InitiateReceiveFlow, {
+        addressType: fungibleToken?.protocol === 'stacks' ? 'stx' : 'btc_ordinals',
+        selectedToken: fungibleToken.principal,
+        source: 'token',
+      });
       return navigate(`/receive/${fungibleToken?.protocol === 'stacks' ? 'STX' : 'ORD'}`);
     }
 
     if (isReceivingAddressesVisible) {
+      trackMixPanel(AnalyticsEvents.InitiateReceiveFlow, {
+        addressType: currency === 'BTC' ? 'btc_payment' : 'stx',
+        source: 'token',
+      });
       return navigate(`/receive/${currency}`);
     }
 
@@ -312,7 +321,17 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
           />
         )}
         {!fungibleToken && (
-          <SquareButton src={Buy} text={t('BUY')} onPress={() => navigate(`/buy/${currency}`)} />
+          <SquareButton
+            src={Buy}
+            text={t('BUY')}
+            onPress={() => {
+              trackMixPanel(AnalyticsEvents.InitiateBuyFlow, {
+                selectedToken: currency,
+                source: 'token',
+              });
+              navigate(`/buy/${currency}`);
+            }}
+          />
         )}
       </RowButtonContainer>
       <BottomModal

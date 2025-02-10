@@ -292,6 +292,10 @@ function Home() {
   };
 
   const onStxSendClick = async () => {
+    trackMixPanel(AnalyticsEvents.InitiateSendFlow, {
+      selectedToken: 'STX',
+      source: 'dashboard',
+    });
     if (isLedgerAccount(selectedAccount) && !isInOptions()) {
       await chrome.tabs.create({
         url: chrome.runtime.getURL('options.html#/send-stx'),
@@ -302,6 +306,10 @@ function Home() {
   };
 
   const onBtcSendClick = async () => {
+    trackMixPanel(AnalyticsEvents.InitiateSendFlow, {
+      selectedToken: 'BTC',
+      source: 'send_btc',
+    });
     if (
       (isLedgerAccount(selectedAccount) || isKeystoneAccount(selectedAccount)) &&
       !isInOptions()
@@ -343,10 +351,18 @@ function Home() {
   };
 
   const onBuyStxClick = () => {
+    trackMixPanel(AnalyticsEvents.InitiateBuyFlow, {
+      selectedToken: 'STX',
+      source: 'dashboard',
+    });
     navigate('/buy/STX');
   };
 
   const onBuyBtcClick = () => {
+    trackMixPanel(AnalyticsEvents.InitiateBuyFlow, {
+      selectedToken: 'BTC',
+      source: 'dashboard',
+    });
     navigate('/buy/BTC');
   };
 
