@@ -2,8 +2,7 @@ import OnboardingGuard from '@components/guards/onboarding';
 import { Outlet, type RouteObject } from 'react-router-dom';
 
 import BackupWallet from '@screens/backupWallet';
-import BackupWalletSteps from '@screens/backupWalletSteps';
-import CreatePassword from '@screens/createPassword';
+import CreateWallet from '@screens/createWallet';
 import Legal from '@screens/legal';
 import RestoreWallet from '@screens/restoreWallet';
 
@@ -30,11 +29,11 @@ const onboardingRoutes: RouteObject = {
     },
     {
       path: 'backupWalletSteps',
-      element: <BackupWalletSteps />,
+      element: <CreateWallet />,
     },
     {
       path: 'create-password',
-      element: <CreatePassword />,
+      element: <CreateWallet skipBackup />,
     },
   ],
 };

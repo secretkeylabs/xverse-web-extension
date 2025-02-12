@@ -18,6 +18,7 @@ import { ImportKeystoneSteps } from './types';
 
 import { getKeystoneDeviceNewAccountIndex, getNewAccountId } from '@common/utils/keystone';
 import { delay } from '@common/utils/promises';
+import useGetAllAccounts from '@hooks/useGetAllAccounts';
 import { createKeystoneTransport } from '@keystonehq/hw-transport-webusb';
 import { Container, OnBoardingActionsContainer, OnBoardingContentContainer } from './index.styled';
 
@@ -45,8 +46,9 @@ function ImportKeystone(): JSX.Element {
   });
 
   const { addKeystoneAccount, updateKeystoneAccounts } = useWalletReducer();
-  const { accountsList, keystoneAccountsList, network } = useWalletSelector();
+  const { keystoneAccountsList, network } = useWalletSelector();
   const transition = useTransition(currentStep, DEFAULT_TRANSITION_OPTIONS);
+  const allAccounts = useGetAllAccounts();
 
   const importBtcAccounts = async (transport: KeystoneTransport, masterFingerPrint?: string) => {
     let btcCreds: {
@@ -240,7 +242,7 @@ function ImportKeystone(): JSX.Element {
       return;
     }
 
-    const validationError = validateAccountName(accountName, t, accountsList, keystoneAccountsList);
+    const validationError = validateAccountName(accountName, t, allAccounts);
     if (validationError) {
       setAccountNameError(validationError);
       return;

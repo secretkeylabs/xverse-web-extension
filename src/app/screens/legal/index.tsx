@@ -9,7 +9,7 @@ import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
   flex: 1,
@@ -76,7 +76,6 @@ function Legal() {
   const navigate = useNavigate();
   const { changeShowDataCollectionAlert } = useWalletReducer();
   const [searchParams] = useSearchParams();
-  const theme = useTheme();
   const [isToggleEnabled, setIsToggleEnabled] = useState(true);
 
   const handleSwitchToggle = () => setIsToggleEnabled((prevEnabledState) => !prevEnabledState);

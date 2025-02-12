@@ -3,18 +3,20 @@ import type {
   AccountType,
   AppInfo,
   BtcPaymentType,
+  DerivationType,
   FungibleToken,
   Inscription,
   NetworkType,
   NftData,
   SettingsNetwork,
   SupportedCurrency,
+  WalletId,
 } from '@secretkeylabs/xverse-core';
 
 export const ResetWalletKey = 'ResetWallet';
 export const SelectAccountKey = 'SelectAccount';
 export const StoreEncryptedSeedKey = 'StoreEncryptedSeed';
-export const UpdateSoftwareAccountsKey = 'UpdateSoftwareAccountsKey';
+export const UpdateSoftwareWalletsKey = 'UpdateSoftwareWalletsKey';
 export const SetFeeMultiplierKey = 'SetFeeMultiplierKey';
 export const ChangeFiatCurrencyKey = 'ChangeFiatCurrency';
 export const ChangeNetworkKey = 'ChangeNetwork';
@@ -37,7 +39,6 @@ export const SetWalletHideStxKey = 'SetWalletHideStx';
 export const SetSpamTokenKey = 'SetSpamTokenKey';
 export const SetSpamTokensKey = 'SetSpamTokensKey';
 export const SetShowSpamTokensKey = 'SetShowSpamTokensKey';
-export const UpdateSavedNamesKey = 'UpdateSavedNamesKey';
 export const AddToStarCollectiblesKey = 'AddToStarCollectiblesKey';
 export const RemoveFromStarCollectiblesKey = 'RemoveFromStarCollectiblesKey';
 export const AddToHideCollectiblesKey = 'AddToHideCollectiblesKey';
@@ -57,12 +58,23 @@ export enum WalletSessionPeriods {
   VERY_LONG = 180,
 }
 
+export type SoftwareWallet = {
+  walletId: WalletId;
+  derivationType: DerivationType;
+  accounts: Account[];
+};
+
+export type SoftwareWallets = {
+  [network in NetworkType]: SoftwareWallet[];
+};
+
 export interface WalletState {
-  accountsList: Account[];
+  softwareWallets: SoftwareWallets;
   ledgerAccountsList: Account[];
   keystoneAccountsList: Account[];
   selectedAccountIndex: number;
   selectedAccountType: AccountType;
+  selectedWalletId?: WalletId;
   btcPaymentAddressType: BtcPaymentType;
   network: SettingsNetwork; // currently selected network urls and type
   savedNetworks: SettingsNetwork[]; // previously set network urls for type
@@ -87,9 +99,6 @@ export interface WalletState {
   showSpamTokens: boolean;
   spamToken: FungibleToken | null;
   spamTokens: string[];
-  savedNames: {
-    [key in NetworkType]?: { id: number; name?: string }[];
-  };
   hiddenCollectibleIds: Record<string, Record<string, string>>;
   starredCollectibleIds: Record<string, Array<{ id: string; collectionId: string }>>;
   avatarIds: Record<string, AvatarInfo>;
@@ -111,9 +120,10 @@ export interface ResetWallet {
   type: typeof ResetWalletKey;
 }
 
-export interface UpdateSoftwareAccounts {
-  type: typeof UpdateSoftwareAccountsKey;
-  accountsList: Account[];
+export interface UpdateSoftwareWallets {
+  type: typeof UpdateSoftwareWalletsKey;
+  network: NetworkType;
+  softwareWallets: SoftwareWallet[];
 }
 export interface UpdateLedgerAccounts {
   type: typeof UpdateLedgerAccountsKey;
@@ -123,6 +133,7 @@ export interface SelectAccount {
   type: typeof SelectAccountKey;
   selectedAccountIndex: number;
   selectedAccountType: AccountType;
+  selectedWalletId?: WalletId;
 }
 export interface UpdateKeystoneAccounts {
   type: typeof UpdateKeystoneAccountsKey;
@@ -228,12 +239,6 @@ export interface SetShowSpamTokens {
   showSpamTokens: boolean;
 }
 
-export interface UpdateSavedNames {
-  type: typeof UpdateSavedNamesKey;
-  networkType: NetworkType;
-  names: { id: number; name?: string }[];
-}
-
 export interface AddToStarCollectibles {
   type: typeof AddToStarCollectiblesKey;
   address: string;
@@ -308,7 +313,7 @@ export interface SetWalletBackupStatus {
 
 export type WalletActions =
   | ResetWallet
-  | UpdateSoftwareAccounts
+  | UpdateSoftwareWallets
   | UpdateLedgerAccounts
   | UpdateKeystoneAccounts
   | SelectAccount
@@ -333,7 +338,6 @@ export type WalletActions =
   | SetSpamToken
   | SetSpamTokens
   | SetShowSpamTokens
-  | UpdateSavedNames
   | AddToStarCollectibles
   | RemoveFromStarCollectibles
   | AddToHideCollectibles

@@ -1,9 +1,4 @@
-import {
-  decryptMnemonicWithHandler,
-  decryptSeedPhrase,
-  encryptMnemonicWithHandler,
-  encryptSeedPhrase,
-} from '@secretkeylabs/xverse-core';
+import { aesGcmDecrypt, aesGcmEncrypt } from '@secretkeylabs/xverse-core';
 import argon2 from 'argon2-browser';
 
 export async function generateKeyArgon2id(password: string, salt: string): Promise<string> {
@@ -49,25 +44,17 @@ export async function generatePasswordHash(password: string) {
   };
 }
 
-export async function encryptSeedPhraseHandler(seed: string, password: string): Promise<string> {
-  return encryptMnemonicWithHandler({
-    seed,
-    password,
-    mnemonicEncryptionHandler: encryptSeedPhrase,
-  });
+export async function encryptionHandler(data: string, passwordHash: string): Promise<string> {
+  return aesGcmEncrypt(data, passwordHash);
 }
 
-export async function decryptSeedPhraseHandler(
-  encryptedSeed: string,
-  password: string,
+export async function decryptionHandler(
+  encryptedData: string,
+  passwordHash: string,
 ): Promise<string> {
   try {
-    const seedPhrase = await decryptMnemonicWithHandler({
-      encryptedSeed,
-      password,
-      mnemonicDecryptionHandler: decryptSeedPhrase,
-    });
-    return seedPhrase;
+    const data = await aesGcmDecrypt(encryptedData, passwordHash);
+    return data;
   } catch (err) {
     throw new Error('Invalid Password');
   }

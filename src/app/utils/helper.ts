@@ -264,10 +264,10 @@ export const handleKeyDownFeeRateInput = (e: React.KeyboardEvent<HTMLInputElemen
 export const validateAccountName = (
   name: string,
   t: TFunction<'translation', 'OPTIONS_DIALOG'>,
-  accountsList: Account[],
-  ledgerAccountsList: Account[],
+  allAccounts: Account[],
 ) => {
-  const regex = /^[a-zA-Z0-9 ]*$/;
+  const validCharRegex = /^[a-zA-Z0-9 ]*$/;
+  const genericAccountNameRegex = new RegExp(`^${t('ACCOUNT_NAME')} [0-9]+$`);
 
   if (name.length > MAX_ACC_NAME_LENGTH) {
     return t('RENAME_ACCOUNT_MODAL.MAX_SYMBOLS_ERR', {
@@ -275,18 +275,15 @@ export const validateAccountName = (
     });
   }
 
-  if (
-    ledgerAccountsList.find((account) => account.accountName === name) ||
-    accountsList.find((account) => account.accountName === name) ||
-    accountsList.some(
-      (account) =>
-        `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}` === name && !account.bnsName,
-    )
-  ) {
+  if (genericAccountNameRegex.test(name)) {
+    return t('RENAME_ACCOUNT_MODAL.INVALID_ACCOUNT_NAME');
+  }
+
+  if (allAccounts.some((account) => account.accountName === name)) {
     return t('RENAME_ACCOUNT_MODAL.ALREADY_EXISTS_ERR');
   }
 
-  if (!regex.test(name)) {
+  if (!validCharRegex.test(name)) {
     return t('RENAME_ACCOUNT_MODAL.PROHIBITED_SYMBOLS_ERR');
   }
 

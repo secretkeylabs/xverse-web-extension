@@ -28,8 +28,6 @@ test.describe('onboarding flow', () => {
     await page.goto(`chrome-extension://${extensionId}/options.html#/create-password`);
     await expect(page.url()).toContain('create-password');
     await onboardingPage.checkPasswordPage();
-    await onboardingPage.buttonBack.click();
-    await expect(page.url()).toContain('backup');
   });
 
   // No Wallet is created in this step as we only check the display of the error messages and that you can't create a wallet if passwords don't align
@@ -46,22 +44,16 @@ test.describe('onboarding flow', () => {
     }, Promise.resolve());
 
     await onboardingPage.inputPassword.fill(strongPW);
-    await onboardingPage.buttonContinue.click();
-    // check Confirm header
-    await expect(page.locator('h1')).toHaveText(/confirm/i);
+
     // Enter wrong password to check error messages
     await expect(onboardingPage.buttonContinue).toBeDisabled();
-    await onboardingPage.inputPassword.fill(`${strongPW}123`);
+    await onboardingPage.inputConfirmPassword.fill(`${strongPW}123`);
     await expect(onboardingPage.buttonContinue).toBeEnabled();
+    await expect(onboardingPage.errorMessage2).toBeHidden();
     await onboardingPage.buttonContinue.click();
     await expect(onboardingPage.errorMessage2).toBeVisible();
     // multiple times clicking on continue to check that the user stays on the page and can't continue even of clicked multiple times
     await Onboarding.multipleClickCheck(onboardingPage.buttonContinue);
-    await expect(onboardingPage.errorMessage2).toBeVisible();
-    await onboardingPage.buttonBack.click();
-    await expect(onboardingPage.inputPassword).toHaveValue(/.+/);
-    await onboardingPage.buttonContinue.click();
-    await expect(onboardingPage.inputPassword).toHaveValue(/.+/);
     await expect(onboardingPage.errorMessage2).toBeVisible();
   });
 
@@ -70,6 +62,10 @@ test.describe('onboarding flow', () => {
   }) => {
     const onboardingPage = new Onboarding(page);
     await onboardingPage.navigateToRestorePage();
+
+    await onboardingPage.inputPassword.fill(strongPW);
+    await onboardingPage.inputConfirmPassword.fill(strongPW);
+    await onboardingPage.buttonContinue.click();
 
     await onboardingPage.checkRestoreWalletSeedPhrasePage();
 
@@ -107,6 +103,10 @@ test.describe('onboarding flow', () => {
   test('Restore wallet Error Message check for false 24 word seed phrase', async ({ page }) => {
     const onboardingPage = new Onboarding(page);
     await onboardingPage.navigateToRestorePage();
+
+    await onboardingPage.inputPassword.fill(strongPW);
+    await onboardingPage.inputConfirmPassword.fill(strongPW);
+    await onboardingPage.buttonContinue.click();
 
     await onboardingPage.checkRestoreWalletSeedPhrasePage();
     await onboardingPage.button24SeedPhrase.click();
@@ -150,6 +150,12 @@ test.describe('onboarding flow', () => {
 
     // Skip Landing and go directly to restore wallet via URL
     await page.goto(`chrome-extension://${extensionId}/options.html#/restoreWallet`);
+
+    await onboardingPage.checkPasswordPage();
+
+    await onboardingPage.inputPassword.fill(strongPW);
+    await onboardingPage.inputConfirmPassword.fill(strongPW);
+    await onboardingPage.buttonContinue.click();
 
     await onboardingPage.checkRestoreWalletSeedPhrasePage();
 

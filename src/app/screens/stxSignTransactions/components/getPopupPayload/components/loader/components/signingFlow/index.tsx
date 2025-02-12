@@ -5,6 +5,7 @@ import {
   broadcastSignedTransaction,
   safePromise,
   type StacksNetwork,
+  type WalletId,
 } from '@secretkeylabs/xverse-core';
 import type { StacksTransactionWire } from '@stacks/transactions';
 import { isLedgerAccount } from '@utils/helper';
@@ -17,6 +18,7 @@ import { SigningError } from './components/signingError';
 type StepsProps = {
   transactions: StacksTransactionWire[];
   account: AccountWithDetails;
+  walletId: WalletId | undefined;
   network: StacksNetwork;
   isBroadcastRequested: boolean;
   onSignSuccess: (transactions: StacksTransactionWire[]) => void;
@@ -32,11 +34,19 @@ type State =
   | { name: 'sign-success' };
 
 export function SigningFlow(props: StepsProps) {
-  const { account, transactions, network, isBroadcastRequested, onSignSuccess, onReviewCancel } =
-    props;
+  const {
+    account,
+    walletId,
+    transactions,
+    network,
+    isBroadcastRequested,
+    onSignSuccess,
+    onReviewCancel,
+  } = props;
   const [state, setState] = useState<State>({ name: 'review' });
   const { signTransactionsSoftware } = useSignTransactionsSoftware({
     account,
+    walletId,
     network,
     transactions,
   });

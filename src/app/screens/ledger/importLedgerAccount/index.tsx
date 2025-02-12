@@ -20,6 +20,7 @@ import StepControls from './stepControls';
 import Steps from './steps';
 import { ImportLedgerSteps, LedgerLiveOptions } from './types';
 
+import useGetAllAccounts from '@hooks/useGetAllAccounts';
 import { Container, OnBoardingActionsContainer, OnBoardingContentContainer } from './index.styled';
 
 export interface Credential {
@@ -53,8 +54,9 @@ function ImportLedger(): JSX.Element {
   const [selectedLedgerLiveOption, setSelectedLedgerLiveOption] =
     useState<LedgerLiveOptions | null>(null);
   const [isTogglerChecked, setIsTogglerChecked] = useState(false);
-  const { accountsList, ledgerAccountsList, network } = useWalletSelector();
+  const { ledgerAccountsList, network } = useWalletSelector();
   const transition = useTransition(currentStep, DEFAULT_TRANSITION_OPTIONS);
+  const allAccounts = useGetAllAccounts();
 
   const importBtcAccounts = async (showAddress: boolean, masterFingerPrint?: string) => {
     let btcCreds;
@@ -347,7 +349,7 @@ function ImportLedger(): JSX.Element {
       return;
     }
 
-    const validationError = validateAccountName(accountName, t, accountsList, ledgerAccountsList);
+    const validationError = validateAccountName(accountName, t, allAccounts);
     if (validationError) {
       setAccountNameError(validationError);
       return;

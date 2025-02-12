@@ -1072,6 +1072,7 @@
       "MAX_SYMBOLS_ERR": "Account name cannot be more than {{maxLength}} characters",
       "PROHIBITED_SYMBOLS_ERR": "Account name can only contain alphabetic and numeric characters and space",
       "ALREADY_EXISTS_ERR": "You already have an account with this name",
+      "INVALID_ACCOUNT_NAME": "Invalid account name",
       "NAME_RULES": "Your account's name can only include alphabetical and numerical characters.",
       "RESET_NAME": "Reset name"
     },

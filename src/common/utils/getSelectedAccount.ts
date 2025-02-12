@@ -1,12 +1,21 @@
-import type { Account, AccountType, BtcPaymentType } from '@secretkeylabs/xverse-core';
+import type {
+  Account,
+  AccountType,
+  BtcPaymentType,
+  NetworkType,
+  WalletId,
+} from '@secretkeylabs/xverse-core';
 import { getAccountAddressDetails } from '@secretkeylabs/xverse-core';
+import type { SoftwareWallets } from '@stores/wallet/actions/types';
 
 type GetSelectedAccountProps = {
   selectedAccountType: AccountType;
   selectedAccountIndex: number;
+  selectedWalletId: WalletId | undefined;
   ledgerAccountsList: Account[];
   keystoneAccountsList: Account[];
-  softwareAccountsList: Account[];
+  softwareWallets: SoftwareWallets;
+  network: NetworkType;
 };
 
 export type AccountWithDetails = Account & {
@@ -57,19 +66,32 @@ const getSelectedAccount = (props: GetSelectedAccountProps): Account | undefined
   const {
     selectedAccountType,
     selectedAccountIndex,
+    selectedWalletId,
     ledgerAccountsList,
     keystoneAccountsList,
-    softwareAccountsList,
+    softwareWallets,
+    network,
   } = props;
 
-  const accountList =
-    selectedAccountType === 'software'
-      ? softwareAccountsList
-      : selectedAccountType === 'ledger'
-      ? ledgerAccountsList
-      : selectedAccountType === 'keystone'
-      ? keystoneAccountsList
-      : undefined;
+  let accountList: Account[] | undefined;
+
+  switch (selectedAccountType) {
+    case 'software': {
+      const softwareWallet = softwareWallets?.[network]?.find(
+        (wallet) => wallet.walletId === selectedWalletId,
+      );
+      accountList = softwareWallet?.accounts;
+      break;
+    }
+    case 'ledger':
+      accountList = ledgerAccountsList;
+      break;
+    case 'keystone':
+      accountList = keystoneAccountsList;
+      break;
+    default:
+      return undefined;
+  }
 
   if (!accountList) {
     return undefined;

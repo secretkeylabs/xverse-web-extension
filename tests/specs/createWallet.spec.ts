@@ -19,6 +19,13 @@ test.describe('Create and Restore Wallet Flow', () => {
       await onboardingPage.navigateToBackupPage();
       await onboardingPage.buttonBackupNow.click();
       await expect(page.url()).toContain('backupWalletSteps');
+
+      await expect(onboardingPage.createPasswordInput).toBeVisible();
+      await onboardingPage.createPasswordInput.fill(strongPW);
+      await expect(onboardingPage.confirmPasswordInput).toBeVisible();
+      await onboardingPage.confirmPasswordInput.fill(strongPW);
+      await onboardingPage.buttonContinue.click();
+
       await expect(onboardingPage.buttonContinue).toBeDisabled();
       await expect(onboardingPage.buttonRevealSeed).toBeVisible();
       await expect(onboardingPage.firstParagraphBackupStep).toBeVisible();
@@ -54,15 +61,12 @@ test.describe('Create and Restore Wallet Flow', () => {
       await expect(page.locator('p:has-text("This word is not")')).toBeVisible();
 
       await page.locator(`button[value="${seedWord}"]`).click();
+      await expect(onboardingPage.page.getByTestId('nth-word')).toBeVisible();
       seedWord = await onboardingPage.selectSeedWord(seedWords);
       await page.locator(`button[value="${seedWord}"]`).click();
+      await expect(onboardingPage.page.getByTestId('nth-word')).toBeVisible();
       seedWord = await onboardingPage.selectSeedWord(seedWords);
       await page.locator(`button[value="${seedWord}"]`).click();
-
-      await onboardingPage.inputPassword.fill(strongPW);
-      await onboardingPage.buttonContinue.click();
-      await onboardingPage.inputPassword.fill(strongPW);
-      await onboardingPage.buttonContinue.click();
 
       await expect(onboardingPage.imageSuccess).toBeVisible();
       await expect(onboardingPage.instruction).toBeVisible();
@@ -117,17 +121,7 @@ test.describe('Create and Restore Wallet Flow', () => {
 
       const onboardingPage2 = new Onboarding(newPage);
       await expect(newPage.getByRole('button', { name: /accept/i })).toBeVisible();
-
       await newPage.getByRole('button', { name: /accept/i }).click();
-      await expect(newPage.url()).toContain('restore');
-
-      const seedWords = JSON.parse(fs.readFileSync(filePathSeedWords, 'utf8'));
-
-      for (let i = 0; i < seedWords.length; i++) {
-        await onboardingPage2.inputWord(i).fill(seedWords[i]);
-      }
-      await expect(newPage.getByRole('button', { name: /continue/i })).toBeVisible();
-      await newPage.getByRole('button', { name: /continue/i }).click();
 
       await expect(newPage.getByPlaceholder('Type your password', { exact: true })).toBeVisible();
       await newPage.getByPlaceholder('Type your password', { exact: true }).fill(strongPW);
@@ -137,6 +131,16 @@ test.describe('Create and Restore Wallet Flow', () => {
       ).toBeVisible();
       await newPage.getByPlaceholder('Type your password again', { exact: true }).fill(strongPW);
 
+      await expect(newPage.getByRole('button', { name: /continue/i })).toBeVisible();
+      await newPage.getByRole('button', { name: /continue/i }).click();
+
+      await expect(newPage.url()).toContain('restore');
+
+      const seedWords = JSON.parse(fs.readFileSync(filePathSeedWords, 'utf8'));
+
+      for (let i = 0; i < seedWords.length; i++) {
+        await onboardingPage2.inputWord(i).fill(seedWords[i]);
+      }
       await expect(newPage.getByRole('button', { name: /continue/i })).toBeVisible();
       await newPage.getByRole('button', { name: /continue/i }).click();
 

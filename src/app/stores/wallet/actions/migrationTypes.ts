@@ -3,10 +3,12 @@ import type {
   AppInfo,
   BtcPaymentType,
   Coin,
+  DerivationType,
   FungibleToken,
   NetworkType,
   SettingsNetwork,
   SupportedCurrency,
+  WalletId,
 } from '@secretkeylabs/xverse-core';
 import type { AvatarInfo, WalletSessionPeriods } from './types';
 
@@ -171,7 +173,39 @@ export type WalletStateV7 = WalletStateV6 & {
 
 export type WalletStateV8 = WalletStateV7; // no changes. just a data migration
 
-// should be exported and used when we add next migration
-type WalletStateV9 = Omit<WalletStateV8, 'showBtcReceiveAlert' | 'showOrdinalReceiveAlert'> & {
+export type WalletStateV9 = Omit<
+  WalletStateV8,
+  'showBtcReceiveAlert' | 'showOrdinalReceiveAlert'
+> & {
   keystoneAccountsList: AccountV5[];
+};
+
+/**
+ * =========V10=========
+ */
+export type AccountV10 = AccountV5 &
+  (
+    | {
+        accountType: 'software';
+        walletId: WalletId;
+      }
+    | {
+        accountType: Exclude<AccountType, 'software'>;
+        walletId: never;
+      }
+  );
+
+export type SoftwareWalletV10 = {
+  walletId: WalletId;
+  derivationType: DerivationType;
+  accounts: AccountV10[];
+};
+
+type NetworkTypeV10 = 'Mainnet' | 'Testnet' | 'Testnet4' | 'Signet' | 'Regtest';
+
+// should be exported and used when we add next migration
+type WalletStateV10 = Omit<WalletStateV9, 'accountsList' | 'savedNames'> & {
+  softwareWallets: {
+    [network in NetworkTypeV10]: SoftwareWalletV10[];
+  };
 };

@@ -1,8 +1,8 @@
 import PreferredBtcAddressItem from '@components/preferredBtcAddressItem';
 import useBtcClient from '@hooks/apiClients/useBtcClient';
-import { sha256 } from '@noble/hashes/sha256';
+import useVault from '@hooks/useVault';
 import type { BtcPaymentType } from '@secretkeylabs/xverse-core';
-import { getPaymentAccountSummaryForSeedPhrase } from '@secretkeylabs/xverse-core';
+import { getPaymentAccountSummary } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import Button from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
@@ -73,14 +73,12 @@ const LearnMoreLink = styled.a((props) => ({
 }));
 
 type Props = {
-  seedPhrase: string;
   selectedType: BtcPaymentType;
   onSelectedTypeChange: (type: BtcPaymentType) => void;
   onContinue: () => void;
 };
 
 export default function PaymentAddressTypeSelector({
-  seedPhrase,
   selectedType,
   onSelectedTypeChange,
   onContinue,
@@ -93,10 +91,25 @@ export default function PaymentAddressTypeSelector({
     keyPrefix: 'RESTORE_WALLET_SCREEN',
   });
 
+  const vault = useVault();
+
   const { data, isLoading } = useQuery({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ['onboardingBtcAddressBalance', sha256(seedPhrase.substring(0, 20)).toString()],
-    queryFn: () => getPaymentAccountSummaryForSeedPhrase(btcClient, seedPhrase, 'Mainnet', 10),
+    queryKey: ['onboardingBtcAddressBalance'],
+    queryFn: async () => {
+      // we should only have 1 wallet at this point
+      const walletIds = await vault.SeedVault.getWalletIds();
+      const [walletId] = walletIds;
+      const { rootNode, derivationType } = await vault.SeedVault.getWalletRootNode(walletId);
+      return getPaymentAccountSummary({
+        btcClient,
+        rootNode,
+        walletId,
+        derivationType,
+        network: 'Mainnet',
+        limit: 10,
+      });
+    },
+    refetchOnMount: true,
   });
 
   useEffect(() => {

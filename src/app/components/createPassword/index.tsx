@@ -2,7 +2,7 @@ import { Eye, EyeSlash } from '@phosphor-icons/react';
 import { animated, useTransition } from '@react-spring/web';
 import Button from '@ui-library/button';
 import Input from '@ui-library/input';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from 'styled-components';
 import zxcvbn from 'zxcvbn';
@@ -29,36 +29,31 @@ enum PasswordStrength {
 
 type Props = {
   submitButtonText?: string;
-  password: string;
-  setPassword: (password: string) => void;
-  confirmPassword: string;
-  setConfirmPassword: (confirmPassword: string) => void;
-  handleContinue: () => void;
-  confirmPasswordError?: string;
+  handleContinue: (password: string) => void;
   checkPasswordStrength?: boolean;
-  loading?: boolean;
 };
 
 function CreatePassword({
   submitButtonText,
-  password,
-  setPassword,
-  confirmPassword,
-  setConfirmPassword,
-  confirmPasswordError,
   handleContinue,
   checkPasswordStrength,
-  loading,
 }: Props): JSX.Element {
   const theme = useTheme();
   const { t } = useTranslation('translation', { keyPrefix: 'CREATE_PASSWORD_SCREEN' });
+
+  const [password, setPassword] = useState<string>('');
+  const [error, setError] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState<PasswordStrength>(
     PasswordStrength.NoScore,
   );
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { score } = zxcvbn(password);
+  const passwordIsStrongEnough = checkPasswordStrength ? score > PasswordStrength.WeakScore : true;
+
   const transition = useTransition(passwordStrength, {
     from: {
       opacity: 0,
@@ -67,7 +62,7 @@ function CreatePassword({
       opacity: 1,
     },
   });
-  const passwordLength = password.length;
+
   let passwordStrengthLabel;
   if (!password) {
     passwordStrengthLabel = {
@@ -79,39 +74,61 @@ function CreatePassword({
     passwordStrengthLabel = {
       color: theme.colors.danger_medium,
       width: '20%',
-      message: <p style={{ color: theme.colors.danger_medium }}>{t('PASSWORD_STRENGTH_WEAK')}</p>,
+      message: (
+        <p data-testid="strength-message" style={{ color: theme.colors.danger_medium }}>
+          {t('PASSWORD_STRENGTH_WEAK')}
+        </p>
+      ),
     };
   } else if (score <= PasswordStrength.AverageScore) {
     passwordStrengthLabel = {
       color: theme.colors.caution,
       width: '50%',
-      message: <p>{t('PASSWORD_STRENGTH_MEDIUM')}</p>,
+      message: <p data-testid="strength-message">{t('PASSWORD_STRENGTH_MEDIUM')}</p>,
     };
   } else {
     passwordStrengthLabel = {
       color: theme.colors.success_medium,
       width: '100%',
-      message: <p>{t('PASSWORD_STRENGTH_STRONG')}</p>,
+      message: <p data-testid="strength-message">{t('PASSWORD_STRENGTH_STRONG')}</p>,
     };
   }
 
+  const onSubmit = useCallback(() => {
+    if (confirmPassword === password) {
+      setError('');
+      setIsSubmitting(true);
+      handleContinue(password);
+    } else {
+      setError(t('CONFIRM_PASSWORD_MATCH_ERROR'));
+    }
+  }, [confirmPassword, password, handleContinue, t]);
+
   useEffect(() => {
     const keyDownHandler = (event) => {
+      if (event.key !== 'Enter') {
+        return;
+      }
+
+      if (document.activeElement?.id === 'password-input' && password) {
+        event.preventDefault();
+        document.getElementById('confirm-password-input')?.focus();
+      }
+
       if (
-        event.key === 'Enter' &&
-        document.activeElement?.id === 'password-input' &&
-        !!password &&
-        (checkPasswordStrength ? score >= PasswordStrength.AverageScore : true)
+        document.activeElement?.id === 'confirm-password-input' &&
+        confirmPassword &&
+        passwordIsStrongEnough
       ) {
         event.preventDefault();
-        handleContinue();
+        onSubmit();
       }
     };
     document.addEventListener('keydown', keyDownHandler);
     return () => {
       document.removeEventListener('keydown', keyDownHandler);
     };
-  }, [checkPasswordStrength, password, passwordLength, handleContinue, score]);
+  }, [password, confirmPassword, passwordIsStrongEnough, onSubmit]);
 
   useEffect(() => {
     if (password !== '') {
@@ -174,24 +191,16 @@ function CreatePassword({
               )}
             </StyledButton>
           }
-          feedback={
-            confirmPasswordError
-              ? [{ message: confirmPasswordError, variant: 'danger' }]
-              : undefined
-          }
+          feedback={error ? [{ message: error, variant: 'danger' }] : undefined}
           hideClear
         />
       </Wrapper>
-      <ButtonContainer $ifError={!!confirmPasswordError}>
+      <ButtonContainer $ifError={!!error}>
         <Button
-          loading={loading}
-          disabled={
-            !password ||
-            !confirmPassword ||
-            (!!checkPasswordStrength && score <= PasswordStrength.WeakScore)
-          }
+          loading={isSubmitting}
+          disabled={!password || !confirmPassword || !passwordIsStrongEnough}
           title={submitButtonText || t('CONTINUE_BUTTON')}
-          onClick={handleContinue}
+          onClick={onSubmit}
           type="submit"
         />
       </ButtonContainer>

@@ -34,7 +34,8 @@ export const handleConnect = async (message: ConnectRequestMessage, port: chrome
   const {
     selectedAccountIndex,
     selectedAccountType,
-    accountsList: softwareAccountsList,
+    selectedWalletId,
+    softwareWallets,
     ledgerAccountsList,
     keystoneAccountsList,
     network,
@@ -44,9 +45,11 @@ export const handleConnect = async (message: ConnectRequestMessage, port: chrome
   const account = getSelectedAccount({
     selectedAccountIndex,
     selectedAccountType,
-    softwareAccountsList,
+    selectedWalletId,
+    softwareWallets,
     ledgerAccountsList,
     keystoneAccountsList,
+    network: network.type,
   });
 
   if (!account) {
