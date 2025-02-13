@@ -36,7 +36,10 @@ export default function TokenHistoricalData({
   setChartPriceStats,
 }: TokenHistoricalDataProps) {
   const [currentTab, setCurrentTab] = useState<HistoricalDataParamsPeriod>(FIRST_TAB);
-  const { data, isLoading } = useGetHistoricalData(fungibleToken?.name || currency, currentTab);
+  const { data, isLoading } = useGetHistoricalData(
+    fungibleToken?.assetName || currency,
+    currentTab,
+  );
 
   const noDataAtAll = !isLoading && !data?.length && currentTab === FIRST_TAB;
   if (noDataAtAll) return <EmptyHistoricalDataChart />;
