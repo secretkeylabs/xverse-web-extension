@@ -19,7 +19,7 @@ const TabContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   marginTop: props.theme.space.m,
-  marginBottom: props.theme.space.xl,
+  justifyContent: 'center',
 }));
 
 type TokenHistoricalDataProps = {
@@ -46,6 +46,13 @@ export default function TokenHistoricalData({
 
   return (
     <>
+      {isLoading ? (
+        <LoadingHistoricalDataChart />
+      ) : data?.length ? (
+        <HistoricalDataChart data={data} setChartPriceStats={setChartPriceStats} />
+      ) : (
+        <MissingPeriodHistoricalDataChart />
+      )}
       <TabContainer>
         {HistoricalDataPeriods.map((tab) => (
           <Button
@@ -58,13 +65,6 @@ export default function TokenHistoricalData({
           </Button>
         ))}
       </TabContainer>
-      {isLoading ? (
-        <LoadingHistoricalDataChart />
-      ) : data?.length ? (
-        <HistoricalDataChart data={data} setChartPriceStats={setChartPriceStats} />
-      ) : (
-        <MissingPeriodHistoricalDataChart />
-      )}
     </>
   );
 }

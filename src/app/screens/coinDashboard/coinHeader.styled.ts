@@ -134,3 +134,11 @@ export const StacksLockedInfoText = styled.span((props) => ({
   color: props.theme.colors.white_400,
   textAlign: 'left',
 }));
+
+export const PriceStatsContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginTop: props.theme.space.xs,
+}));

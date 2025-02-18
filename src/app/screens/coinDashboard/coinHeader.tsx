@@ -6,6 +6,7 @@ import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import Lock from '@assets/img/transactions/Lock.svg';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
+import PercentageChange from '@components/percentageChange';
 import SquareButton from '@components/squareButton';
 import TokenImage from '@components/tokenImage';
 import useSelectedAccountBtcBalance from '@hooks/queries/useSelectedAccountBtcBalance';
@@ -31,7 +32,7 @@ import { isInOptions, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { getBalanceAmount, getFtTicker } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import { useNavigate } from 'react-router-dom';
@@ -46,6 +47,7 @@ import {
   FiatContainer,
   HeaderSeparator,
   LockedStxContainer,
+  PriceStatsContainer,
   ProtocolText,
   RowButtonContainer,
   RowContainer,
@@ -54,15 +56,17 @@ import {
   VerifyButtonContainer,
   VerifyOrViewContainer,
 } from './coinHeader.styled';
+import type { ChartPriceStats } from './tokenPrice';
 
 type Props = {
   currency: CurrencyTypes;
   fungibleToken?: FungibleToken;
+  chartPriceStats?: ChartPriceStats;
 };
 
-export default function CoinHeader({ currency, fungibleToken }: Props) {
+export default function CoinHeader({ currency, fungibleToken, chartPriceStats }: Props) {
   const selectedAccount = useSelectedAccount();
-  const { fiatCurrency, network, balanceHidden, showBalanceInBtc } = useWalletSelector();
+  const { fiatCurrency, network, balanceHidden } = useWalletSelector();
 
   // TODO: this should be a dumb component, move the logic to the parent
   // TODO: currently, we get btc and stx balances here for all currencies and FTs, but we should get them in
@@ -94,6 +98,12 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
     (useHasFeature(FeatureId.RUNES_LISTING) || process.env.NODE_ENV === 'development') &&
     network.type === 'Mainnet' &&
     fungibleToken?.protocol === 'runes';
+
+  const [priceStats, setPriceStats] = useState<ChartPriceStats | undefined>(chartPriceStats);
+
+  useEffect(() => {
+    setPriceStats(chartPriceStats);
+  }, [chartPriceStats]);
 
   const handleReceiveModalOpen = () => {
     setOpenReceiveModal(true);
@@ -309,6 +319,15 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
         </BalanceValuesContainer>
       </BalanceInfoContainer>
       {renderStackingBalances()}
+      {priceStats && (
+        <PriceStatsContainer>
+          <PercentageChange
+            ftCurrencyPairs={[[fungibleToken, currency]]}
+            chartPriceStats={priceStats}
+            displayAmountChange
+          />
+        </PriceStatsContainer>
+      )}
       <RowButtonContainer>
         <SquareButton src={ArrowUp} text={t('SEND')} onPress={goToSendScreen} />
         <SquareButton src={ArrowDown} text={t('RECEIVE')} onPress={navigateToReceive} />
