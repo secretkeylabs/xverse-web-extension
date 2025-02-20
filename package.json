@@ -4,7 +4,7 @@
   "version": "0.49.0",
   "private": true,
   "engines": {
-    "node": "^18.18.2"
+    "node": "^22.14.0"
   },
   "scripts": {
     "build": "npm run clean && NODE_ENV=production node webpack/utils/build.js",
