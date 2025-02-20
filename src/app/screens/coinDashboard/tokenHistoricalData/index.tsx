@@ -5,7 +5,7 @@ import {
   type HistoricalDataParamsPeriod,
 } from '@secretkeylabs/xverse-core';
 import type { CurrencyTypes } from '@utils/constants';
-import { useState, type Dispatch, type SetStateAction } from 'react';
+import { useMemo, useState, type Dispatch, type SetStateAction } from 'react';
 import styled from 'styled-components';
 import { Button } from '../index.styled';
 import type { ChartPriceStats } from '../tokenPrice';
@@ -26,14 +26,18 @@ type TokenHistoricalDataProps = {
   currency: CurrencyTypes;
   fungibleToken: FungibleToken | undefined;
   setChartPriceStats: Dispatch<SetStateAction<ChartPriceStats | undefined>>;
+  currentPrice?: number | string | null;
+  priceChangePercentage24h?: number | string | null;
 };
 
-const FIRST_TAB: HistoricalDataParamsPeriod = '1d';
+const FIRST_TAB = '1d';
 
 export default function TokenHistoricalData({
   currency,
   fungibleToken,
   setChartPriceStats,
+  currentPrice,
+  priceChangePercentage24h,
 }: TokenHistoricalDataProps) {
   const [currentTab, setCurrentTab] = useState<HistoricalDataParamsPeriod>(FIRST_TAB);
   const { data, isLoading } = useGetHistoricalData(
@@ -41,18 +45,46 @@ export default function TokenHistoricalData({
     currentTab,
   );
 
+  const dataToRender = useMemo(() => {
+    if (!currentPrice || !data?.length) {
+      return data;
+    }
+
+    const dataToRenderInternal = [...data];
+    dataToRenderInternal[dataToRenderInternal.length - 1] = {
+      ...dataToRenderInternal[dataToRenderInternal.length - 1],
+      y: +currentPrice,
+    };
+
+    if (currentTab === '1d' && priceChangePercentage24h) {
+      const priceChangePercentage = +priceChangePercentage24h;
+      dataToRenderInternal[0] = {
+        ...dataToRenderInternal[0],
+        y: +currentPrice / (priceChangePercentage / 100 + 1),
+      };
+    }
+
+    return dataToRenderInternal;
+  }, [data, currentPrice, currentTab, priceChangePercentage24h]);
+
   const noDataAtAll = !isLoading && !data?.length && currentTab === FIRST_TAB;
   if (noDataAtAll) return <EmptyHistoricalDataChart />;
 
+  const renderChart = () => {
+    if (isLoading) {
+      return <LoadingHistoricalDataChart />;
+    }
+
+    if (dataToRender?.length) {
+      return <HistoricalDataChart data={dataToRender} setChartPriceStats={setChartPriceStats} />;
+    }
+
+    return <MissingPeriodHistoricalDataChart />;
+  };
+
   return (
     <>
-      {isLoading ? (
-        <LoadingHistoricalDataChart />
-      ) : data?.length ? (
-        <HistoricalDataChart data={data} setChartPriceStats={setChartPriceStats} />
-      ) : (
-        <MissingPeriodHistoricalDataChart />
-      )}
+      {renderChart()}
       <TabContainer>
         {HistoricalDataPeriods.map((tab) => (
           <Button

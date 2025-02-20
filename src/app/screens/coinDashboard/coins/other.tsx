@@ -177,6 +177,8 @@ export default function CoinDashboard() {
             currency={currency as CurrencyTypes}
             fungibleToken={selectedFt}
             setChartPriceStats={setChartPriceStats}
+            currentPrice={selectedFt?.currentPrice}
+            priceChangePercentage24h={selectedFt?.priceChangePercentage24h}
           />
         </ChartContainer>
         {/* TODO: import { Tabs } from ui-library/tabs.tsx */}

@@ -32,7 +32,7 @@ import { isInOptions, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { getBalanceAmount, getFtTicker } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import { useNavigate } from 'react-router-dom';
@@ -98,12 +98,6 @@ export default function CoinHeader({ currency, fungibleToken, chartPriceStats }:
     (useHasFeature(FeatureId.RUNES_LISTING) || process.env.NODE_ENV === 'development') &&
     network.type === 'Mainnet' &&
     fungibleToken?.protocol === 'runes';
-
-  const [priceStats, setPriceStats] = useState<ChartPriceStats | undefined>(chartPriceStats);
-
-  useEffect(() => {
-    setPriceStats(chartPriceStats);
-  }, [chartPriceStats]);
 
   const handleReceiveModalOpen = () => {
     setOpenReceiveModal(true);
@@ -319,11 +313,11 @@ export default function CoinHeader({ currency, fungibleToken, chartPriceStats }:
         </BalanceValuesContainer>
       </BalanceInfoContainer>
       {renderStackingBalances()}
-      {priceStats && (
+      {chartPriceStats && (
         <PriceStatsContainer>
           <PercentageChange
             ftCurrencyPairs={[[fungibleToken, currency]]}
-            chartPriceStats={priceStats}
+            chartPriceStats={chartPriceStats}
             displayAmountChange
           />
         </PriceStatsContainer>
