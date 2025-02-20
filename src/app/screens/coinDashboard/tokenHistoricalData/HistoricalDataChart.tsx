@@ -40,9 +40,9 @@ const EmptyHistoricalDataChartContainer = styled.div({
   flexDirection: 'column',
   alignItems: 'center',
   gap: Theme.space.xxs,
+  height: '120px',
+  marginLeft: Theme.space.m,
   marginRight: Theme.space.m,
-  marginTop: Theme.space.xxl,
-  height: '130px',
 });
 const StyledChartLine = styled(ChartLine)({
   marginBottom: '20px',
@@ -104,8 +104,10 @@ export function EmptyHistoricalDataChart() {
 }
 
 const MissingPeriodHistoricalDataChartContainer = styled.div({
-  marginTop: '104px',
-  marginBottom: '154px',
+  height: '120px',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
 });
 export function MissingPeriodHistoricalDataChart() {
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_PRICE_CHART.MISSING_PERIOD' });
