@@ -116,6 +116,8 @@ test.describe('onboarding flow', () => {
     await onboardingPage.inputConfirmPassword.fill(strongPW);
     await onboardingPage.buttonContinue.click();
 
+    await onboardingPage.page.getByRole('button', { name: 'Xverse' }).click();
+
     await onboardingPage.checkRestoreWalletSeedPhrasePage();
     await onboardingPage.button24SeedPhrase.click();
 
@@ -164,6 +166,8 @@ test.describe('onboarding flow', () => {
     await onboardingPage.inputPassword.fill(strongPW);
     await onboardingPage.inputConfirmPassword.fill(strongPW);
     await onboardingPage.buttonContinue.click();
+
+    await onboardingPage.page.getByRole('button', { name: 'Xverse' }).click();
 
     await onboardingPage.checkRestoreWalletSeedPhrasePage();
 
