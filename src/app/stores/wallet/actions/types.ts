@@ -50,6 +50,7 @@ export const RemoveAccountAvatarKey = 'RemoveAccountAvatarKey';
 export const SetBalanceHiddenToggleKey = 'SetBalanceHiddenToggleKey';
 export const SetShowBalanceInBtcToggleKey = 'SetShowBalanceInBtcToggleKey';
 export const SetWalletBackupStatusKey = 'SetWalletBackupStatusKey';
+export const SetAddingAccountKey = 'SetAddingAccountKey';
 
 export enum WalletSessionPeriods {
   LOW = 15,
@@ -105,6 +106,7 @@ export interface WalletState {
   balanceHidden: boolean;
   showBalanceInBtc: boolean;
   hasBackedUpWallet: boolean;
+  addingAccount?: boolean;
 }
 
 export interface StoreEncryptedSeed {
@@ -311,6 +313,11 @@ export interface SetWalletBackupStatus {
   hasBackedUpWallet: boolean;
 }
 
+export interface SetAddingAccount {
+  type: typeof SetAddingAccountKey;
+  addingAccount: boolean;
+}
+
 export type WalletActions =
   | ResetWallet
   | UpdateSoftwareWallets
@@ -348,4 +355,5 @@ export type WalletActions =
   | RemoveAccountAvatar
   | SetBalanceHiddenToggle
   | SetShowBalanceInBtc
-  | SetWalletBackupStatus;
+  | SetWalletBackupStatus
+  | SetAddingAccount;

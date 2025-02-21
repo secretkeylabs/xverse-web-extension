@@ -62,7 +62,7 @@ function AccountList(): JSX.Element {
   const { search, state } = useLocation();
   const params = new URLSearchParams(search);
   const selectedAccount = useSelectedAccount();
-  const { network, softwareWallets, ledgerAccountsList, keystoneAccountsList } =
+  const { network, softwareWallets, ledgerAccountsList, keystoneAccountsList, addingAccount } =
     useWalletSelector();
   const { createSoftwareAccount, switchAccount } = useWalletReducer();
   const { enqueueFetchBalances } = useAccountBalance();
@@ -133,6 +133,8 @@ function AccountList(): JSX.Element {
               onClick={onCreateAccount}
               title={t('NEW_ACCOUNT')}
               variant="secondary"
+              loading={addingAccount}
+              disabled={addingAccount}
             />
             <Button
               icon={
@@ -141,6 +143,7 @@ function AccountList(): JSX.Element {
               onClick={() => navigate('/connect-hardware-wallet')}
               title={t('NEW_HARDWARE_WALLET')}
               variant="secondary"
+              disabled={addingAccount}
             />
           </ButtonsWrapper>
         ) : null}

@@ -336,3 +336,8 @@ export const setWalletBackupStatusAction = (
   type: actions.SetWalletBackupStatusKey,
   hasBackedUpWallet,
 });
+
+export const setAddingAccountAction = (addingAccount: boolean): actions.SetAddingAccount => ({
+  type: actions.SetAddingAccountKey,
+  addingAccount,
+});

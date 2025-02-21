@@ -33,6 +33,7 @@ import {
   changeShowDataCollectionAlertAction,
   resetWalletAction,
   selectAccount,
+  setAddingAccountAction,
   setWalletBackupStatusAction,
   setWalletHideStxAction,
   setWalletUnlockedAction,
@@ -250,6 +251,8 @@ const useWalletReducer = () => {
 
       // TODO: end
 
+      dispatch(setAddingAccountAction(true));
+
       let walletIds = await vault.SeedVault.getWalletIds();
       const walletIdSet = new Set(walletIds);
 
@@ -375,6 +378,7 @@ const useWalletReducer = () => {
         localStorage.removeItem(MIGRATION_ACCOUNT_COUNT_KEY);
       }
     } finally {
+      dispatch(setAddingAccountAction(false));
       release();
     }
   };
@@ -562,6 +566,7 @@ const useWalletReducer = () => {
   };
 
   const createSoftwareAccount = async (walletId: WalletId) => {
+    dispatch(setAddingAccountAction(true));
     const { rootNode, derivationType } = await vault.SeedVault.getWalletRootNode(walletId);
     const wallet = softwareWallets[network.type].find(
       (walletItem) => walletItem.walletId === walletId,
@@ -578,6 +583,7 @@ const useWalletReducer = () => {
       walletItem.walletId === walletId ? { ...walletItem, accounts: newAccounts } : walletItem,
     );
     dispatch(updateSoftwareWalletsAction(network.type, newSoftwareWallets));
+    dispatch(setAddingAccountAction(false));
   };
 
   const switchAccount = useCallback(

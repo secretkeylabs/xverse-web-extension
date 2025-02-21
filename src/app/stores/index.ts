@@ -269,6 +269,8 @@ const WalletPersistConfig: PersistConfig<WalletState> = {
   key: 'walletState',
   storage: chromeStorage.local,
   migrate: createMigrate(migrations as any, { debug: false }),
+  // we don't want to persist the addingAccount state as it's only used during the account creation process
+  blacklist: ['addingAccount'],
   // A timeout of 0 means timeout is disabled
   // If the timeout is enabled, the rehydration will fail on slower machines and the store will be reset
   timeout: 0,

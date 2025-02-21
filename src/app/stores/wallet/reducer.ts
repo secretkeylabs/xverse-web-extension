@@ -19,6 +19,7 @@ import {
   SelectAccountKey,
   SetAccountAvatarKey,
   SetAccountBalanceKey,
+  SetAddingAccountKey,
   SetBalanceHiddenToggleKey,
   SetBrc20ManageTokensKey,
   SetFeeMultiplierKey,
@@ -392,6 +393,11 @@ const walletReducer = (
       return {
         ...state,
         hasBackedUpWallet: action.hasBackedUpWallet,
+      };
+    case SetAddingAccountKey:
+      return {
+        ...state,
+        addingAccount: action.addingAccount,
       };
     default:
       return state;
