@@ -985,7 +985,7 @@ export default class Wallet {
     try {
       const locator = this.page
         .locator('button')
-        .filter({ hasText: new RegExp(`${tokenname}.*\\d`) });
+        .filter({ hasText: new RegExp(`^${tokenname}.*\\d`) });
 
       console.log(`Looking for balance for ${tokenname}`);
       const balanceText = await locator.innerText();

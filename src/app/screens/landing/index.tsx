@@ -99,7 +99,10 @@ function Landing() {
         await chrome.tabs.create({ url });
       }
 
-      window.close();
+      const currentTab = await chrome.tabs.getCurrent();
+      if (existingTab?.id !== currentTab?.id) {
+        window.close();
+      }
     },
     [navigate],
   );

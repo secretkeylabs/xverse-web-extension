@@ -266,8 +266,9 @@ export default class Onboarding {
 
     // choose the default derivation type between account and index
     // will be the one with the most funds
-    await expect(this.page.getByText('Select Import Source')).toBeVisible();
-    await this.page.getByRole('button', { name: 'Continue' }).click();
+    // TODO: Uncomment below when we use the restore method selector screen
+    // await expect(this.page.getByText('Select Import Source')).toBeVisible();
+    // await this.page.getByRole('button', { name: 'Continue' }).click();
 
     // choose the default address type between native and nested segwit
     // will be the one with the most funds
