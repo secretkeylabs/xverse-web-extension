@@ -80,6 +80,7 @@ function ImportKeystone(): JSX.Element {
       btcCreds = await importNativeSegwitAccountFromKeystone({
         transport,
         addressIndex: deviceAccountIndex,
+        network: 'Mainnet', // keystone only supports mainnet for now
       });
     } catch (err: any) {
       if ([4, 6].includes(err.transportErrorCode)) {
@@ -100,6 +101,7 @@ function ImportKeystone(): JSX.Element {
       ordinalsCreds = await importTaprootAccountFromKeystone({
         transport,
         addressIndex: deviceAccountIndex,
+        network: 'Mainnet', // keystone only supports mainnet for now
       });
     } catch (err: any) {
       if ([4, 6].includes(err.transportErrorCode)) {
