@@ -49,9 +49,6 @@ export function embellishAccountWithDetails(
       ...account,
       ...getAccountAddressDetails(account, 'native'),
       btcAddressType: 'native',
-      // TODO vic: remove below 2 once we migrate to using Core which returns them in getAccountAddressDetails
-      btcXpub: account.btcAddresses.native?.xpub,
-      ordinalsXpub: account.btcAddresses.taproot.xpub,
     };
   }
 

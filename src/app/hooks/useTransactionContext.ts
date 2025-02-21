@@ -7,7 +7,7 @@ import useWalletSelector from './useWalletSelector';
 
 const useTransactionContext = (overridePayAddressType?: BtcPaymentType) => {
   const selectedAccount = useSelectedAccount(overridePayAddressType);
-  const { network } = useWalletSelector();
+  const { network, softwareWallets } = useWalletSelector();
   const vault = useVault();
   const btcClient = useBtcClient();
 
@@ -69,6 +69,12 @@ const useTransactionContext = (overridePayAddressType?: BtcPaymentType) => {
       selectedAccount.accountType === 'software' ? undefined : selectedAccount.masterPubKey;
     const walletId =
       selectedAccount.accountType === 'software' ? selectedAccount.walletId : undefined;
+
+    const softwareWallet = softwareWallets[network.type]?.find(
+      (wallet) => wallet.walletId === selectedAccount.walletId,
+    );
+    const derivationType = softwareWallet?.derivationType || 'index';
+
     return btcTransaction.createTransactionContext({
       account: selectedAccount,
       seedVault: vault.SeedVault,
@@ -77,10 +83,10 @@ const useTransactionContext = (overridePayAddressType?: BtcPaymentType) => {
       esploraApiProvider: btcClient,
       btcPaymentAddressType: selectedAccount.btcAddressType,
       masterFingerprint,
-      derivationType: 'index',
+      derivationType,
       walletId,
     });
-  }, [utxoCache, selectedAccount, network, vault, btcClient]);
+  }, [utxoCache, selectedAccount, network.type, vault, btcClient, softwareWallets]);
 
   return transactionContext;
 };

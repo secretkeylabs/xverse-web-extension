@@ -29,7 +29,8 @@
     "EXPLORE": "Explore",
     "SETTINGS": "Settings",
     "COPIED_TO_CLIPBOARD": "Copied to clipboard",
-    "TRANSACTION": "Transaction"
+    "TRANSACTION": "Transaction",
+    "LEARN_MORE": "Learn more"
   },
   "INFORMATION": {
     "ORDINALS_ADDRESS_TOOLTIP": "These sats are used for your ordinals and runes. They cannot be spent with Xverse wallet.",
@@ -654,21 +655,21 @@
   },
   "BACKUP_WALLET_SCREEN": {
     "SCREEN_TITLE": "Backup your wallet",
-    "SCREEN_SUBTITLE": "Your seedphrase is the unique key that allows you to recover your wallet.",
+    "SCREEN_SUBTITLE": "Your seed phrase is the unique key that allows you to recover your wallet.",
     "BACKUP_BUTTON": "Backup now",
     "BACKUP_SKIP_BUTTON": "Backup later",
     "SEED_PHRASE_VIEW_HEADING": "Write down your seed phrase and make sure to keep it private. This is the unique key to your wallet. ",
-    "SEED_PHRASE_VIEW_LABEL": "Seedphrase",
+    "SEED_PHRASE_VIEW_LABEL": "Seed Phrase",
     "SEED_PHRASE_VIEW_CONTINUE": "Continue",
     "SEED_PHRASE_VIEW_REVEAL": "Reveal",
     "SEED_PHRASE_VIEW_HIDE": "Hide",
-    "SEED_PHRASE_VERIFY_HEADING": "Write your seedphrase to confirm you saved it properly.",
+    "SEED_PHRASE_VERIFY_HEADING": "Write your seed phrase to confirm you saved it properly.",
     "SEED_PHRASE_VERIFY_BUTTON": "Verify",
-    "SEED_PHRASE_BACK_BUTTON": "Back to seedphrase",
+    "SEED_PHRASE_BACK_BUTTON": "Back to seed phrase",
     "SEED_PHRASE_INCORRECT": "This word is not correct.",
     "SELECT_THE": "Select the ",
-    "WORD_OF_YOUR_SEEDPHRASE": " word of your seedphrase.",
-    "CONFIRM_YOUR_SEEDPHRASE": "Confirm you've recorded your seed phrase correctly."
+    "WORD_OF_YOUR_SEED_PHRASE": " word of your seed phrase.",
+    "CONFIRM_YOUR_SEED_PHRASE": "Confirm you've recorded your seed phrase correctly."
   },
   "CREATE_PASSWORD_SCREEN": {
     "CREATE_PASSWORD_TITLE": "Create your password",
@@ -772,11 +773,63 @@
     "RESET": "Reset"
   },
   "RESTORE_WALLET_SCREEN": {
-    "ENTER_SEED_TITLE": "Restore Wallet",
-    "ENTER_SEED_DESCRIPTION": "Enter or paste your 12 or 24 word seedphrase to restore your wallet",
+    "RESTORE_WALLET": "Restore Your Wallet",
+    "SELECT_RESTORE_METHOD": {
+      "DESCRIPTION": "You can restore an existing wallet using your seed phrase.",
+      "RESTORE_MANUALLY": "Restore Manually",
+      "TYPE_OR_PASTE_SEED_PHRASE": "Type or paste your seed phrase",
+      "IMPORT_FROM_OTHER_WALLET": "Import from other Wallet",
+      "AUTOMATICALLY_RESTORE_YOUR_WALLET": "Automatically restore your wallet"
+    },
+    "IMPORT_OTHER_WALLETS": {
+      "DESCRIPTION": "What wallet are you importing into Xverse?",
+      "NOT_SURE_WHERE_TO_GO": "Not sure where to go?",
+      "SELECT_OTHER_DESCRIPTION": "Select Other, enter your seed phrase and we'll take care of the rest!",
+      "OTHER": "Other"
+    },
+    "ENTER_SEED_TITLE": "Enter Seed Phrase",
+    "ENTER_SEED_DESCRIPTION": "Enter or paste your 12 or 24 word seed phrase to restore your wallet.",
     "SEED_INPUT_ERROR": "Seed phrase does not match, please try again.",
     "CONTINUE_BUTTON": "Continue",
+    "BACK_BUTTON": "Back",
     "HAVE_A_COUNT_WORDS_SEED_PHRASE": "Have a {{number}} words seed phrase?",
+    "SELECT_DERIVATION_TYPE": {
+      "TITLE": "Select a derivation path",
+      "DESCRIPTION": {
+        "FUNDS_FOUND": "Funds were found on two paths:",
+        "AND": "and",
+        "INDEX": "Index-based derivation path",
+        "ACCOUNT": "Account-based derivation path"
+      },
+      "ACCOUNT_TYPE_ACCOUNT": "Account-based derivation path",
+      "ACCOUNT_TYPE_INDEX": "Index-based derivation path",
+      "CALLOUT": {
+        "TITLE": "Tip:",
+        "DESCRIPTION_1": "Check accounts associated with each derivation path via \"See Account\" to view balances, addresses, and restorable funds.",
+        "DESCRIPTION_2": "If you restore the wrong funds by mistake, you can reset the wallet later and try again."
+      },
+      "XVERSE": "Xverse",
+      "LEDGER": "Ledger",
+      "UNISAT": "Unisat",
+      "MAGIC_EDEN": "Magic Eden",
+      "OTHER": "Other/I don't know",
+      "SEE_ACCOUNTS": "See Accounts",
+      "ACCOUNTS_FOUND": "accounts found",
+      "ACCOUNT_DETAIL": {
+        "TITLE_INDEX": "Index derivation path",
+        "TITLE_ACCOUNT": "Account derivation path",
+        "ACCOUNTS_FOUND": "accounts found",
+        "ACCOUNT_PREFIX": "Account",
+        "DERIVATION_TEMPLATE_TITLE": "Derivation path template",
+        "DERIVATION_TEMPLATE_VALUE": "m/<purpose>'/0'/{{account}}'/0/{{index}}",
+        "NATIVE_TITLE": "Native SegWit",
+        "NESTED_TITLE": "Nested SegWit",
+        "TAPROOT_TITLE": "Taproot",
+        "STACKS_TITLE": "Stacks",
+        "INFO_ACCOUNT_LIMIT": "There are more accounts in this derivation path, but only the first ten are displayed.",
+        "INFO_FUNDS_LIMIT": "Only BTC and STX balances are displayed. Other assets will appear after onboarding."
+      }
+    },
     "SELECT_ADDRESS_TYPE": {
       "TITLE": "Preferred Address Type",
       "DESCRIPTION": "Select the default Bitcoin payment address type you would like to use for all accounts. You can switch at any time from settings.",
@@ -989,7 +1042,7 @@
     "NETWORK": "Network",
     "SECURITY": "Security",
     "UPDATE_PASSWORD": "Update Password",
-    "BACKUP_WALLET": "Show Seedphrase",
+    "BACKUP_WALLET": "Show Seed Phrase",
     "AUTO_LOCK": "Auto Lock",
     "RESET_WALLET": "Reset Wallet",
     "ABOUT": "About",
@@ -1002,7 +1055,7 @@
     "RESET_WALLET_DESCRIPTION": "This will reset your wallet from this browser. Make sure you have your seed phrase backed up.",
     "CANCEL": "Cancel",
     "NODE": "STX Node",
-    "BACKUP_WALLET_UNLOCK_SEED": "Enter your password to reveal your seedphrase",
+    "BACKUP_WALLET_UNLOCK_SEED": "Enter your password to reveal your seed phrase",
     "SAVE": "Save",
     "INVALID_URL": "Invalid URL",
     "ENTER_PASSWORD": "Enter your password to reset your wallet",

@@ -1,6 +1,7 @@
 import CreatePassword from '@components/createPassword';
 import Dots from '@components/dots';
 import { useWalletExistsContext } from '@components/guards/onboarding';
+import useTabUnloadBlocker from '@hooks/useTabUnloadBlocker';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -39,11 +40,13 @@ export default function CreateWallet({ skipBackup }: Props): JSX.Element {
   const { disableWalletExistsGuard } = useWalletExistsContext();
   const { createWallet } = useWalletReducer();
 
+  useTabUnloadBlocker();
+
   const handleConfirmPasswordContinue = async (validatedPassword: string) => {
     disableWalletExistsGuard?.();
 
-    // TODO multiwallet: allow user to select derivation type. Currently hard coded to 'index' as per classic Xverse
-    await createWallet(validatedPassword, 'index', true);
+    // TODO multiwallet: allow user to select derivation type. Currently hard coded to 'account'
+    await createWallet(validatedPassword, 'account', true);
 
     if (skipBackup) {
       navigate('/wallet-success/create', { replace: true });

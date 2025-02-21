@@ -77,21 +77,26 @@ function Landing() {
         return;
       }
 
+      const allTabs = await chrome.tabs.query({});
+      const baseUrl = chrome.runtime.getURL('');
+      const existingTab = allTabs.find((tab) => tab.url && tab.url.includes(baseUrl));
+      let url: string;
+
       if (isLegalAccepted) {
-        if (isRestore) {
-          await chrome.tabs.create({
-            url: chrome.runtime.getURL(`options.html#/restoreWallet`),
-          });
-        } else {
-          await chrome.tabs.create({
-            url: chrome.runtime.getURL(`options.html#/backup`),
-          });
-        }
+        const targetUrlSuffix = isRestore ? '/restoreWallet' : '/backup';
+        url = chrome.runtime.getURL(`options.html#${targetUrlSuffix}`);
       } else {
         const params = isRestore ? '?restore=true' : '';
-        await chrome.tabs.create({
-          url: chrome.runtime.getURL(`options.html#/legal${params}`),
-        });
+        url = chrome.runtime.getURL(`options.html#/legal${params}`);
+      }
+
+      if (existingTab?.id) {
+        // Activate the existing tab
+        await chrome.tabs.update(existingTab.id, { active: true, url });
+        await chrome.windows.update(existingTab.windowId, { focused: true });
+      } else {
+        // Open a new tab
+        await chrome.tabs.create({ url });
       }
 
       window.close();

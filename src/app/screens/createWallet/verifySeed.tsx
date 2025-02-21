@@ -1,8 +1,9 @@
 import useVault from '@hooks/useVault';
 import { Spinner } from '@phosphor-icons/react';
+import { generateMnemonic } from '@scure/bip39';
+import { wordlist } from '@scure/bip39/wordlists/english';
 import Button from '@ui-library/button';
 import { InputFeedback } from '@ui-library/inputFeedback';
-import { generateMnemonic } from 'bip39';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -128,7 +129,7 @@ export default function VerifySeed({
 
     mnemonic = ''; // clear mnemonic from memory
 
-    const randomWords = generateMnemonic().split(' ');
+    const randomWords = generateMnemonic(wordlist).split(' ');
 
     // check randomWords doesn't contain our answer already.
     // only if it doesn't, do we need to insert the answer at a random index.
@@ -167,7 +168,7 @@ export default function VerifySeed({
 
   return (
     <Container>
-      <Heading>{t('CONFIRM_YOUR_SEEDPHRASE')}</Heading>
+      <Heading>{t('CONFIRM_YOUR_SEED_PHRASE')}</Heading>
       {isLoading && (
         <LoadingContainer>
           <Spinner size={50} />
@@ -178,7 +179,7 @@ export default function VerifySeed({
           <Heading>
             {t('SELECT_THE')}
             <NthSpan data-testid="nth-word">{getOrdinal(challenge.index + 1)}</NthSpan>
-            {t('WORD_OF_YOUR_SEEDPHRASE')}
+            {t('WORD_OF_YOUR_SEED_PHRASE')}
           </Heading>
           <WordGrid>
             {challenge.words.map((word) => (

@@ -1,0 +1,210 @@
+import type { DerivationType } from '@secretkeylabs/xverse-core';
+import Button from '@ui-library/button';
+import Callout from '@ui-library/callout';
+import { StyledP } from '@ui-library/common.styled';
+import Link from '@ui-library/link';
+import Spinner from '@ui-library/spinner';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import styled from 'styled-components';
+import type { Summary } from '../types';
+import AccountBreakdown from './accountBreakdown';
+import PreferredTypeItem from './preferredTypeItem';
+
+const SpinnerContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  minWidth: 300,
+  minHeight: 550,
+});
+
+const Container = styled.div({
+  display: 'flex',
+  flexDirection: 'column',
+  flex: 1,
+  minHeight: 550,
+});
+
+const Title = styled.h1((props) => ({
+  ...props.theme.typography.headline_s,
+  color: props.theme.colors.white_0,
+  marginTop: props.theme.space.m,
+  marginBottom: props.theme.space.m,
+}));
+
+const Description = styled.div((props) => ({
+  ...props.theme.typography.body_l,
+  color: props.theme.colors.white_200,
+  marginBottom: props.theme.space.m,
+}));
+
+const HighlightedText = styled.span((props) => ({
+  ...props.theme.typography.body_medium_l,
+  color: props.theme.colors.white_0,
+}));
+
+const BodyContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'column',
+  flexGrow: 1,
+});
+
+const SummaryContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  flexGrow: 1,
+  margin: `${props.theme.space.l} 0`,
+}));
+
+const TypesContainer = styled.div((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: props.theme.space.s,
+}));
+
+const ButtonContainer = styled.div((props) => ({
+  width: '100%',
+  marginBottom: props.theme.space.xxl,
+}));
+
+const CalloutContainer = styled.div((props) => ({
+  marginBottom: props.theme.space.l,
+}));
+
+const SUPPORT_DERIVATION_TYPE_LINK =
+  'https://support.xverse.app/hc/en-us/articles/28787677710989-Understanding-Derivation-Paths-and-Xverse-Wallet-Compatibility#h_01J3YZDTVSV3Z19FA9VBTRZPY3';
+
+type Props = {
+  onContinue: (finalSelection: DerivationType) => void;
+  summaryIsLoading: boolean;
+  autoDetectDerivationType: boolean;
+  summaryData:
+    | {
+        accountSummary: Summary;
+        indexSummary: Summary;
+      }
+    | undefined;
+};
+
+export default function DerivationTypeSelector({
+  onContinue,
+  summaryIsLoading,
+  autoDetectDerivationType,
+  summaryData,
+}: Props) {
+  const { t } = useTranslation('translation', {
+    keyPrefix: 'RESTORE_WALLET_SCREEN.SELECT_DERIVATION_TYPE',
+  });
+  const { t: tCommon } = useTranslation('translation', {
+    keyPrefix: 'COMMON',
+  });
+  const [selectedType, setSelectedType] = useState<DerivationType | undefined>(undefined);
+  const [typeAccountsToShow, setTypeAccountsToShow] = useState<DerivationType | undefined>(
+    undefined,
+  );
+
+  const totalIndexFunds =
+    !summaryData || summaryData.indexSummary.accountCount <= 1
+      ? 0n
+      : summaryData.indexSummary.nativeTotalSats + summaryData.indexSummary.nestedTotalSats;
+  const totalAccountFunds =
+    summaryData && (totalIndexFunds === 0n || summaryData.accountSummary.accountCount > 1)
+      ? summaryData.accountSummary.nativeTotalSats + summaryData.accountSummary.nestedTotalSats
+      : 0n;
+
+  const shouldAutoContinue = summaryIsLoading
+    ? false
+    : autoDetectDerivationType && (totalIndexFunds === 0n || totalAccountFunds === 0n);
+
+  useEffect(() => {
+    if (shouldAutoContinue) {
+      // prefer account over index if both are 0
+      const finalDerivationType = totalIndexFunds > 0n ? 'index' : 'account';
+      onContinue(finalDerivationType);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- we don't need to change on the others
+  }, [shouldAutoContinue]);
+
+  if (shouldAutoContinue || summaryIsLoading || !summaryData) {
+    return (
+      <SpinnerContainer>
+        <Spinner size={50} />
+      </SpinnerContainer>
+    );
+  }
+
+  const onClickType = (type: DerivationType) => () => setSelectedType(type);
+
+  if (typeAccountsToShow) {
+    const summary =
+      typeAccountsToShow === 'account' ? summaryData.accountSummary : summaryData.indexSummary;
+
+    return (
+      <AccountBreakdown
+        derivationType={typeAccountsToShow}
+        summary={summary}
+        onBack={() => setTypeAccountsToShow(undefined)}
+      />
+    );
+  }
+
+  return (
+    <Container>
+      <Title>{t('TITLE')}</Title>
+      <BodyContainer>
+        <Description>
+          {t('DESCRIPTION.FUNDS_FOUND')} <HighlightedText>{t('DESCRIPTION.INDEX')}</HighlightedText>{' '}
+          {t('DESCRIPTION.AND')} <HighlightedText>{t('DESCRIPTION.ACCOUNT')}</HighlightedText>.
+        </Description>
+        <Link href={SUPPORT_DERIVATION_TYPE_LINK}>{tCommon('LEARN_MORE')}</Link>
+        <SummaryContainer>
+          <TypesContainer>
+            <PreferredTypeItem
+              title={t('ACCOUNT_TYPE_ACCOUNT')}
+              accountCount={summaryData.accountSummary.accountCount}
+              isSelected={selectedType === 'account'}
+              onClick={onClickType('account')}
+              onShowAccountsClick={() => setTypeAccountsToShow('account')}
+            />
+            <PreferredTypeItem
+              title={t('ACCOUNT_TYPE_INDEX')}
+              accountCount={summaryData.indexSummary.accountCount}
+              isSelected={selectedType === 'index'}
+              onClick={onClickType('index')}
+              onShowAccountsClick={() => setTypeAccountsToShow('index')}
+            />
+          </TypesContainer>
+        </SummaryContainer>
+      </BodyContainer>
+      <CalloutContainer>
+        <Callout
+          titleText={t('CALLOUT.TITLE')}
+          bodyText={
+            <>
+              <StyledP typography="body_m" color="white_200">
+                {t('CALLOUT.DESCRIPTION_1')}
+              </StyledP>
+              <br />
+              <StyledP typography="body_m" color="white_200">
+                {t('CALLOUT.DESCRIPTION_2')}
+              </StyledP>
+            </>
+          }
+        />
+      </CalloutContainer>
+      <ButtonContainer>
+        <Button
+          disabled={!selectedType}
+          onClick={() => {
+            if (!selectedType) return;
+
+            return onContinue(selectedType);
+          }}
+          title={tCommon('CONFIRM')}
+        />
+      </ButtonContainer>
+    </Container>
+  );
+}

@@ -31,7 +31,7 @@ const OuterSeedContainer = styled.div((props) => ({
   borderRadius: props.theme.radius(1),
 }));
 
-export default function SeedphraseView(props: SeedPhraseViewProps) {
+export default function SeedPhraseView(props: SeedPhraseViewProps) {
   const { seedPhrase, isVisible } = props;
   const seedPhraseWords = seedPhrase?.split(' ');
 

@@ -1,4 +1,4 @@
-import SeedphraseView from '@components/seedPhraseView';
+import SeedPhraseView from '@components/seedPhraseView';
 import useVault from '@hooks/useVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Eye, EyeSlash } from '@phosphor-icons/react';
@@ -96,7 +96,7 @@ export default function SeedCheck({ walletId, onContinue }: Props): JSX.Element 
     <Container>
       <Heading>{t('SEED_PHRASE_VIEW_HEADING')}</Heading>
       <Label>{t('SEED_PHRASE_VIEW_LABEL')}</Label>
-      <SeedphraseView seedPhrase={seedPhrase} isVisible={isVisible} />
+      <SeedPhraseView seedPhrase={seedPhrase} isVisible={isVisible} />
       <ButtonContainer>
         <StyledButton
           icon={isVisible ? <EyeSlash weight="bold" size={16} /> : <Eye weight="bold" size={16} />}

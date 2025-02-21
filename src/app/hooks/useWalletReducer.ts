@@ -497,7 +497,7 @@ const useWalletReducer = () => {
     seedPhrase: string,
     password: string,
     derivationType: DerivationType,
-  ) => {
+  ): Promise<WalletId> => {
     // We create an account to ensure that the seed phrase is valid, but we don't store it
     // The actual account creation is done on startup of the wallet
     // If the seed phrase is invalid, then this will throw an error
@@ -526,42 +526,39 @@ const useWalletReducer = () => {
     );
     dispatch(selectAccount(firstAccount.id, 'software', walletId));
 
-    // since we cleared up storage above, the store won't be populated in storage
-    // and the selected value of showDataCollectionAlert will be lost
-    // we need to set it back here, making sure it changes so that redux-persist will save it
-    if (showDataCollectionAlert !== null && showDataCollectionAlert !== undefined) {
-      changeShowDataCollectionAlert(!showDataCollectionAlert);
-      changeShowDataCollectionAlert(showDataCollectionAlert);
-
-      // reinitialise with masterpubkey hash now that we have it
-      if (hasOptedInMixPanelTracking()) {
-        optInMixPanel(firstAccount.masterPubKey);
-      }
+    // reinitialise with masterpubkey hash now that we have it
+    if (hasOptedInMixPanelTracking()) {
+      optInMixPanel(firstAccount.masterPubKey);
     }
+
     localStorage.setItem('migrated', 'true');
     setSessionStartTime();
+
+    return walletId;
   };
 
   const restoreWallet = async (
     seedPhrase: string,
     password: string,
     derivationType: DerivationType,
-  ) => {
-    await initialiseSeedVault(seedPhrase, password, derivationType);
+  ): Promise<WalletId> => {
+    const walletId = await initialiseSeedVault(seedPhrase, password, derivationType);
     trackMixPanel(AnalyticsEvents.RestoreWallet, { backupType: 'manual' });
+    return walletId;
   };
 
   const createWallet = async (
     password: string,
     derivationType: DerivationType,
     hasBackedUpWallet: boolean,
-  ) => {
+  ): Promise<WalletId> => {
     let mnemonic = generateMnemonic();
-    await initialiseSeedVault(mnemonic, password, derivationType);
+    const walletId = await initialiseSeedVault(mnemonic, password, derivationType);
     mnemonic = ''; // clear seed phrase from memory
 
     dispatch(setWalletBackupStatusAction(hasBackedUpWallet));
     trackMixPanel(AnalyticsEvents.CreateNewWallet, { has_backed_up_wallet: hasBackedUpWallet });
+    return walletId;
   };
 
   const createSoftwareAccount = async (walletId: WalletId) => {

@@ -32,11 +32,14 @@ function OnboardingGuard({ children }: WalletExistsGuardProps): React.ReactEleme
   );
   useLayoutEffect(() => {
     (async () => {
+      await vault.restoreVault();
       const isVaultInitialised = await vault.isInitialised();
-      const isSeedVaultInitialised = isVaultInitialised && (await vault.SeedVault.isInitialised());
+      const isVaultUnlocked = await vault.isVaultUnlocked();
+      const isSeedVaultInitialised =
+        isVaultInitialised && (!isVaultUnlocked || (await vault.SeedVault.isInitialised()));
       setIsWalletInitialized(isSeedVaultInitialised);
       setGuardInitialized(true);
-    })();
+    })().catch(console.error);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

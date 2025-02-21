@@ -233,15 +233,17 @@ function MessageSigning({
         setIsModalVisible(true);
         return;
       }
-      const { rootNode } = await vault.SeedVault.getWalletRootNode(selectedAccount.walletId);
+      const { rootNode, derivationType } = await vault.SeedVault.getWalletRootNode(
+        selectedAccount.walletId,
+      );
       const signedMessage = await signMessage({
         message,
         address,
         rootNode,
         network: network.type,
         protocol,
-        accountIndex: 0n,
-        index: BigInt(selectedAccount.id),
+        accountIndex: BigInt(selectedAccount.id),
+        derivationType,
       });
       await onSigned(signedMessage);
     } catch (err) {

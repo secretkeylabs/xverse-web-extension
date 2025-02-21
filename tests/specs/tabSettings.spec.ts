@@ -100,7 +100,7 @@ test.describe('Settings Tab', () => {
     await wallet.buttonConfirm.click();
     await expect(wallet.infoUpdatePassword).toBeVisible();
   });
-  test('Show Seedphrase', async ({ page, extensionId }) => {
+  test('Show Seed Phrase', async ({ page, extensionId }) => {
     const onboardingPage = new Onboarding(page);
     const wallet = new Wallet(page);
     await onboardingPage.createWalletSkipBackup(strongPW);
@@ -111,8 +111,8 @@ test.describe('Settings Tab', () => {
     await expect(wallet.buttonSecurity).toBeVisible();
     await wallet.buttonSecurity.click();
     await expect(page.url()).toContain('security');
-    await expect(wallet.buttonShowSeedphrase).toBeVisible();
-    await wallet.buttonShowSeedphrase.click();
+    await expect(wallet.buttonShowSeedPhrase).toBeVisible();
+    await wallet.buttonShowSeedPhrase.click();
     await expect(onboardingPage.inputPassword).toBeVisible();
     await expect(onboardingPage.buttonContinue).toBeDisabled();
     await onboardingPage.inputPassword.fill(strongPW);

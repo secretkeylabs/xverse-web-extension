@@ -1,4 +1,5 @@
-import * as bip39 from 'bip39';
+import * as bip39 from '@scure/bip39';
+import { wordlist } from '@scure/bip39/wordlists/english';
 import { expect, test } from '../fixtures/base';
 import { passwordTestCases } from '../fixtures/passwordTestData';
 import Onboarding from '../pages/onboarding';
@@ -67,10 +68,17 @@ test.describe('onboarding flow', () => {
     await onboardingPage.inputConfirmPassword.fill(strongPW);
     await onboardingPage.buttonContinue.click();
 
+    // TODO: Uncomment this when we use the restore method selector screen
+    // await onboardingPage.checkRestoreMethodPage();
+    // await onboardingPage.buttonRestoreManual.click();
+
+    // TODO: remove this when above is uncommented
+    await onboardingPage.page.getByRole('button', { name: 'Xverse' }).click();
+
     await onboardingPage.checkRestoreWalletSeedPhrasePage();
 
     // get 12 words from bip39
-    const mnemonic = bip39.generateMnemonic();
+    const mnemonic = bip39.generateMnemonic(wordlist);
     const wordsArray = mnemonic.split(' '); // Split the mnemonic by spaces
 
     // We only input 11 word to cause the error message
@@ -116,7 +124,7 @@ test.describe('onboarding flow', () => {
     await expect(onboardingPage.inputSeedPhraseWord).toHaveCount(24);
 
     // get 24 words from bip39
-    const mnemonic = bip39.generateMnemonic(256);
+    const mnemonic = bip39.generateMnemonic(wordlist, 256);
     const wordsArray = mnemonic.split(' '); // Split the mnemonic by spaces
 
     for (let i = 0; i < wordsArray.length - 1; i++) {

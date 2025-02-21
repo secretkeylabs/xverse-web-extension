@@ -76,7 +76,9 @@ function TransactionRequest() {
     action,
   });
 
-  const requestedAccount = allAccounts.find((account) => account.stxAddress === payload.stxAddress);
+  const requestedAccount = payload.stxAddress
+    ? allAccounts.find((account) => account.stxAddress === payload.stxAddress)
+    : selectedAccount;
 
   const onSignTransaction = () => {
     const trackingPayload = getSwapsMixpanelProperties(mixpanelMetadata);

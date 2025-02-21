@@ -49,12 +49,18 @@ type Props = {
   onSeedChange: (seed: string) => void;
   seedError: string;
   setSeedError: (err: string) => void;
+  initialShow24Words: boolean;
 };
 
-export default function SeedPhraseInput({ onSeedChange, seedError, setSeedError }: Props) {
+export default function SeedPhraseInput({
+  onSeedChange,
+  seedError,
+  setSeedError,
+  initialShow24Words = false,
+}: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'RESTORE_WALLET_SCREEN' });
   const [seedInputValues, setSeedInputValues] = useState([...seedInit]);
-  const [show24Words, setShow24Words] = useState(false);
+  const [show24Words, setShow24Words] = useState(initialShow24Words);
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
 
   const handleKeyDownInput = (index: number) => (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -83,6 +89,13 @@ export default function SeedPhraseInput({ onSeedChange, seedError, setSeedError 
 
   const handlePaste = (pastedText: string) => {
     const splitPastedText = pastedText.split(' ');
+    // Automatically show/hide 24 words based on pasted text length
+    if (splitPastedText.length > 12) {
+      setShow24Words(true);
+    } else {
+      setShow24Words(false);
+    }
+
     setSeedInputValues((prevSeed) =>
       // To prevent unnecessary rerenders
       prevSeed.map((value, index) => splitPastedText[index] || value),

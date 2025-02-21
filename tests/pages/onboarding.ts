@@ -66,6 +66,10 @@ export default class Onboarding {
 
   readonly headingRestoreWallet: Locator;
 
+  readonly buttonRestoreManual: Locator;
+
+  readonly buttonRestoreFromWalletImport: Locator;
+
   readonly button24SeedPhrase: Locator;
 
   readonly button12SeedPhrase: Locator;
@@ -85,7 +89,7 @@ export default class Onboarding {
     this.buttonBackupLater = page.getByRole('button', { name: 'Backup later' });
     this.imageBackup = page.locator('img[alt="backup"]');
     this.titleBackupOnboarding = page.getByRole('heading', { name: 'Backup' });
-    this.subTitleBackupOnboarding = page.getByRole('heading', { name: 'Your seedphrase' });
+    this.subTitleBackupOnboarding = page.getByRole('heading', { name: 'Your seed phrase' });
     this.firstParagraphBackupStep = page.locator('p').filter({ hasText: 'Write down your' });
     this.buttonRevealSeed = page.getByRole('button', { name: 'Reveal' });
     this.secondParagraphBackupStep = page.getByRole('heading', { name: 'Confirm you' });
@@ -114,7 +118,9 @@ export default class Onboarding {
     this.instruction = page.getByRole('heading', { name: 'Locate Xverse' });
     this.headingWalletRestored = page.getByRole('heading', { name: 'Wallet restored' });
     this.buttonCloseTab = page.getByRole('button', { name: 'Close this tab' });
-    this.headingRestoreWallet = page.getByRole('heading', { name: 'Restore Wallet' });
+    this.buttonRestoreManual = page.getByTestId('restore-manual-btn');
+    this.buttonRestoreFromWalletImport = page.getByTestId('restore-import-btn');
+    this.headingRestoreWallet = page.getByRole('heading', { name: 'Enter Seed Phrase' });
     this.button24SeedPhrase = page.getByRole('button', { name: '24 words' });
     this.button12SeedPhrase = page.getByRole('button', { name: '12 words' });
     this.inputSeedPhraseWord = page.locator('input');
@@ -183,6 +189,11 @@ export default class Onboarding {
     await this.checkPasswordPage();
   }
 
+  async checkRestoreMethodPage() {
+    await expect(this.buttonRestoreManual).toBeVisible();
+    await expect(this.buttonRestoreFromWalletImport).toBeVisible();
+  }
+
   async checkRestoreWalletSeedPhrasePage() {
     await expect(this.buttonContinue).toBeVisible();
     await expect(this.headingRestoreWallet).toBeVisible();
@@ -236,6 +247,13 @@ export default class Onboarding {
     await this.confirmPasswordInput.fill(password);
     await this.buttonContinue.click();
 
+    // TODO: Uncomment this when we use the restore method selector screen
+    // await this.checkRestoreMethodPage();
+    // await this.buttonRestoreManual.click();
+
+    // TODO: remove this when above is uncommented
+    await this.page.getByRole('button', { name: 'Xverse' }).click();
+
     await this.checkRestoreWalletSeedPhrasePage();
 
     const seedWords = await this.getSeedWords(envVarName);
@@ -245,6 +263,11 @@ export default class Onboarding {
     }
     await expect(this.buttonContinue).toBeVisible();
     await this.buttonContinue.click();
+
+    // choose the default derivation type between account and index
+    // will be the one with the most funds
+    await expect(this.page.getByText('Select Import Source')).toBeVisible();
+    await this.page.getByRole('button', { name: 'Continue' }).click();
 
     // choose the default address type between native and nested segwit
     // will be the one with the most funds

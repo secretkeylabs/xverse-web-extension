@@ -132,7 +132,7 @@ export default class Wallet {
 
   readonly buttonCurrency: Locator;
 
-  readonly buttonShowSeedphrase: Locator;
+  readonly buttonShowSeedPhrase: Locator;
 
   readonly textCurrency: Locator;
 
@@ -430,7 +430,7 @@ export default class Wallet {
     this.headerNewPassword = page.getByRole('heading', { name: 'Enter your new password' });
     this.infoUpdatePassword = page.getByText(/password successfully updated/i);
     this.buttonCurrency = page.getByRole('button', { name: 'Fiat Currency' });
-    this.buttonShowSeedphrase = page.getByRole('button', { name: 'Show Seedphrase' });
+    this.buttonShowSeedPhrase = page.getByRole('button', { name: 'Show Seed Phrase' });
     this.selectCurrency = page.getByTestId('currency-button');
     this.iconFlag = page.locator('img[alt="flag"]');
 

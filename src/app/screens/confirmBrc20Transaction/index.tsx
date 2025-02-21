@@ -189,7 +189,7 @@ function ConfirmBrc20Transaction() {
             {callouts?.length > 0 && (
               <StyledCallouts>
                 {callouts.map((callout) => (
-                  <Callout key={callout.bodyText} {...callout} />
+                  <Callout key={callout.bodyText as string} {...callout} />
                 ))}
               </StyledCallouts>
             )}
