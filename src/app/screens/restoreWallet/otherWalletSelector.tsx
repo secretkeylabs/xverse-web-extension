@@ -92,7 +92,7 @@ const WALLET_LIST = [
   {
     name: 'Unisat',
     icon: unisatLogo,
-    derivationType: 'account' as const,
+    derivationType: 'index' as const,
   },
   {
     name: 'Phantom',
@@ -104,6 +104,7 @@ const WALLET_LIST = [
     icon: leatherLogo,
     derivationType: 'account' as const,
     show24Words: true,
+    autoDetect: true,
   },
   {
     name: 'OKX Wallet',
