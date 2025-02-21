@@ -1,3 +1,4 @@
+import useGetCoinsMarketData from '@hooks/queries/useGetCoinsMarketData';
 import useGetHistoricalData from '@hooks/queries/useGetHistoricalData';
 import {
   HistoricalDataPeriods,
@@ -26,8 +27,6 @@ type TokenHistoricalDataProps = {
   currency: CurrencyTypes;
   fungibleToken: FungibleToken | undefined;
   setChartPriceStats: Dispatch<SetStateAction<ChartPriceStats | undefined>>;
-  currentPrice?: number | string | null;
-  priceChangePercentage24h?: number | string | null;
 };
 
 const FIRST_TAB = '1d';
@@ -36,16 +35,29 @@ export default function TokenHistoricalData({
   currency,
   fungibleToken,
   setChartPriceStats,
-  currentPrice,
-  priceChangePercentage24h,
 }: TokenHistoricalDataProps) {
   const [currentTab, setCurrentTab] = useState<HistoricalDataParamsPeriod>(FIRST_TAB);
   const { data, isLoading } = useGetHistoricalData(
     fungibleToken?.assetName || currency,
     currentTab,
   );
+  const { data: btcMarketData } = useGetCoinsMarketData('bitcoin');
+  const { data: stxMarketData } = useGetCoinsMarketData('blockstack');
 
   const dataToRender = useMemo(() => {
+    const currentPrice =
+      currency === 'BTC'
+        ? btcMarketData?.current_price
+        : currency === 'STX'
+        ? stxMarketData?.current_price
+        : fungibleToken?.currentPrice;
+    const priceChangePercentage24h =
+      currency === 'BTC'
+        ? btcMarketData?.price_change_percentage_24h
+        : currency === 'STX'
+        ? stxMarketData?.price_change_percentage_24h
+        : fungibleToken?.priceChangePercentage24h;
+
     if (!currentPrice || !data?.length) {
       return data;
     }
@@ -65,7 +77,17 @@ export default function TokenHistoricalData({
     }
 
     return dataToRenderInternal;
-  }, [data, currentPrice, currentTab, priceChangePercentage24h]);
+  }, [
+    data,
+    currency,
+    btcMarketData?.current_price,
+    stxMarketData?.current_price,
+    btcMarketData?.price_change_percentage_24h,
+    stxMarketData?.price_change_percentage_24h,
+    fungibleToken?.currentPrice,
+    fungibleToken?.priceChangePercentage24h,
+    currentTab,
+  ]);
 
   const noDataAtAll = !isLoading && !data?.length && currentTab === FIRST_TAB;
   if (noDataAtAll) return <EmptyHistoricalDataChart />;
