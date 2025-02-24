@@ -6,6 +6,7 @@ import Toggle from '@ui-library/toggle';
 import { PRIVACY_POLICY_LINK, TERMS_LINK } from '@utils/constants';
 import { saveIsTermsAccepted } from '@utils/localStorage';
 import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
+import RoutePaths from 'app/routes/paths';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -91,9 +92,9 @@ function Legal() {
     saveIsTermsAccepted(true);
     const isRestore = !!searchParams.get('restore');
     if (isRestore) {
-      navigate('/restoreWallet', { replace: true });
+      navigate(RoutePaths.RestoreWallet, { replace: true });
     } else {
-      navigate('/backup', { replace: true });
+      navigate(RoutePaths.CreateWallet, { replace: true });
     }
   };
   return (

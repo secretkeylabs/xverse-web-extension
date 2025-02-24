@@ -1,4 +1,3 @@
-import useVault from '@hooks/useVault';
 import { Spinner } from '@phosphor-icons/react';
 import { generateMnemonic } from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english';
@@ -93,14 +92,15 @@ const getOrdinal = (num: number): string => {
 };
 
 export default function VerifySeed({
+  mnemonic,
   onBack,
   onVerifySuccess,
 }: {
+  mnemonic: string;
   onBack: () => void;
   onVerifySuccess: () => void;
 }) {
   const { t } = useTranslation('translation', { keyPrefix: 'BACKUP_WALLET_SCREEN' });
-  const vault = useVault();
 
   const [isLoading, setIsLoading] = useState(true);
   const [err, setErr] = useState('');
@@ -114,10 +114,6 @@ export default function VerifySeed({
   const generateChallenge = async (alreadyCheckedIndexes: number[]) => {
     setIsLoading(true);
 
-    // during onboarding we know we only have 1 wallet ID
-    const [walletId] = await vault.SeedVault.getWalletIds();
-    let { mnemonic } = await vault.SeedVault.getWalletSecrets(walletId);
-
     const seedWords = mnemonic!.split(' ');
     let seedPhraseIndex = Math.floor(Math.random() * seedWords.length);
 
@@ -126,8 +122,6 @@ export default function VerifySeed({
     }
 
     const answer = seedWords[seedPhraseIndex];
-
-    mnemonic = ''; // clear mnemonic from memory
 
     const randomWords = generateMnemonic(wordlist).split(' ');
 

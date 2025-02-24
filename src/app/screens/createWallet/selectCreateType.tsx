@@ -1,8 +1,8 @@
 import backup from '@assets/img/backupWallet/backup.svg';
 import Button from '@ui-library/button';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import { CreateType } from './common';
 
 const Container = styled.div((props) => ({
   flex: 1,
@@ -47,16 +47,19 @@ const BackupActionsContainer = styled.div((props) => ({
   columnGap: props.theme.space.xs,
 }));
 
-function BackupWallet(): JSX.Element {
+type Props = {
+  onTypeSelected: (type: CreateType) => void;
+};
+
+function SelectCreateType({ onTypeSelected }: Props): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'BACKUP_WALLET_SCREEN' });
-  const navigate = useNavigate();
 
   const handleBackup = () => {
-    navigate('/backupWalletSteps', { replace: true });
+    onTypeSelected(CreateType.WITH_BACKUP);
   };
 
   const handleSkip = () => {
-    navigate('/create-password', { replace: true });
+    onTypeSelected(CreateType.SKIP_BACKUP);
   };
 
   return (
@@ -76,4 +79,4 @@ function BackupWallet(): JSX.Element {
   );
 }
 
-export default BackupWallet;
+export default SelectCreateType;
