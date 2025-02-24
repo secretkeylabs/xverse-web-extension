@@ -97,7 +97,7 @@ const WALLET_LIST = [
   {
     name: 'Phantom',
     icon: phantomLogo,
-    derivationType: 'account' as const,
+    derivationType: 'index' as const,
   },
   {
     name: 'Leather',
@@ -109,7 +109,7 @@ const WALLET_LIST = [
   {
     name: 'OKX Wallet',
     icon: okxLogo,
-    derivationType: 'account' as const,
+    derivationType: 'index' as const,
   },
 ];
 
