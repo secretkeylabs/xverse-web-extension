@@ -2,10 +2,11 @@ import PasswordInput from '@components/passwordInput';
 import SeedBackup from '@components/seedBackup';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import useAsyncEffect from '@hooks/useAsyncEffect';
 import useVault from '@hooks/useVault';
 import { Spinner } from '@phosphor-icons/react';
 import { Container } from '@screens/settings/index.styles';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -41,29 +42,24 @@ function BackupWalletScreen() {
   const navigate = useNavigate();
   const vault = useVault();
 
-  useEffect(() => {
+  useAsyncEffect(async () => {
     if (!showSeed) {
       return;
     }
+    // TODO multiwallet: Allow user to select which wallet to view the seed phrase for and pass to SeedBackup below
+    const primaryWalletId = await vault.SeedVault.getPrimaryWalletId();
 
-    const fetchMnemonic = async () => {
-      // TODO multiwallet: Allow user to select which wallet to view the seed phrase for and pass to SeedBackup below
-      const primaryWalletId = await vault.SeedVault.getPrimaryWalletId();
+    if (!primaryWalletId) {
+      throw new Error('No primary wallet found');
+    }
 
-      if (!primaryWalletId) {
-        throw new Error('No primary wallet found');
-      }
+    const walletSecrets = await vault.SeedVault.getWalletSecrets(primaryWalletId);
 
-      const walletSecrets = await vault.SeedVault.getWalletSecrets(primaryWalletId);
+    if (!walletSecrets.mnemonic) {
+      throw new Error('No mnemonic found');
+    }
 
-      if (!walletSecrets.mnemonic) {
-        throw new Error('No mnemonic found');
-      }
-
-      setMnemonic(walletSecrets.mnemonic);
-    };
-
-    fetchMnemonic().catch(console.error);
+    setMnemonic(walletSecrets.mnemonic);
   }, [showSeed, vault]);
 
   const handleBackButtonClick = () => {
