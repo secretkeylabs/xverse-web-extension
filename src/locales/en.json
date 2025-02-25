@@ -794,19 +794,13 @@
     "BACK_BUTTON": "Back",
     "HAVE_A_COUNT_WORDS_SEED_PHRASE": "Have a {{number}} words seed phrase?",
     "SELECT_DERIVATION_TYPE": {
-      "TITLE": "Select a derivation path",
-      "DESCRIPTION": {
-        "FUNDS_FOUND": "Funds were found on two paths:",
-        "AND": "and",
-        "INDEX": "Index-based derivation path",
-        "ACCOUNT": "Account-based derivation path"
-      },
-      "ACCOUNT_TYPE_ACCOUNT": "Account-based derivation path",
-      "ACCOUNT_TYPE_INDEX": "Index-based derivation path",
+      "TITLE": "Select a Wallet to Restore",
+      "DESCRIPTION": "We found funds in two different wallets linked to your seed phrase. Choose which one to restore.",
+      "WALLET": "Wallet",
       "CALLOUT": {
-        "TITLE": "Tip:",
-        "DESCRIPTION_1": "Check accounts associated with each derivation path via \"See Account\" to view balances, addresses, and restorable funds.",
-        "DESCRIPTION_2": "If you restore the wrong funds by mistake, you can reset the wallet later and try again."
+        "TITLE": "Not sure which one to pick?",
+        "DESCRIPTION_1": "Tap “See Accounts” to check balances, addresses, and recoverable funds before making a choice.",
+        "DESCRIPTION_2": "If you restore the wrong wallet, you can reset and try the other one anytime."
       },
       "XVERSE": "Xverse",
       "LEDGER": "Ledger",
@@ -816,8 +810,8 @@
       "SEE_ACCOUNTS": "See Accounts",
       "ACCOUNTS_FOUND": "accounts found",
       "ACCOUNT_DETAIL": {
-        "TITLE_INDEX": "Index derivation path",
-        "TITLE_ACCOUNT": "Account derivation path",
+        "TITLE_ACCOUNT": "Wallet 1",
+        "TITLE_INDEX": "Wallet 2",
         "ACCOUNTS_FOUND": "accounts found",
         "ACCOUNT_PREFIX": "Account",
         "DERIVATION_TEMPLATE_TITLE": "Derivation path template",

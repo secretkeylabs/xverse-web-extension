@@ -40,11 +40,6 @@ const Description = styled.div((props) => ({
   marginBottom: props.theme.space.m,
 }));
 
-const HighlightedText = styled.span((props) => ({
-  ...props.theme.typography.body_medium_l,
-  color: props.theme.colors.white_0,
-}));
-
 const BodyContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
@@ -161,22 +156,19 @@ export default function DerivationTypeSelector({
     <Container>
       <Title>{t('TITLE')}</Title>
       <BodyContainer>
-        <Description>
-          {t('DESCRIPTION.FUNDS_FOUND')} <HighlightedText>{t('DESCRIPTION.INDEX')}</HighlightedText>{' '}
-          {t('DESCRIPTION.AND')} <HighlightedText>{t('DESCRIPTION.ACCOUNT')}</HighlightedText>.
-        </Description>
+        <Description>{t('DESCRIPTION')}</Description>
         <Link href={SUPPORT_DERIVATION_TYPE_LINK}>{tCommon('LEARN_MORE')}</Link>
         <SummaryContainer>
           <TypesContainer>
             <PreferredTypeItem
-              title={t('ACCOUNT_TYPE_ACCOUNT')}
+              title={`${t('WALLET')} 1`}
               accountCount={summaryData.accountSummary.accountCount}
               isSelected={selectedType === 'account'}
               onClick={onClickType('account')}
               onShowAccountsClick={() => setTypeAccountsToShow('account')}
             />
             <PreferredTypeItem
-              title={t('ACCOUNT_TYPE_INDEX')}
+              title={`${t('WALLET')} 2`}
               accountCount={summaryData.indexSummary.accountCount}
               isSelected={selectedType === 'index'}
               onClick={onClickType('index')}
