@@ -11,9 +11,9 @@ const useWalletSession = () => {
   const { walletLockPeriod } = useWalletSelector();
   const dispatch = useDispatch();
 
-  const setSessionStartTime = () => {
+  const setSessionStartTime = async () => {
     const sessionStartTime = new Date().getTime();
-    chromeStorage.session.setItem(SESSION_START_TIME_KEY, sessionStartTime);
+    await chromeStorage.session.setItem(SESSION_START_TIME_KEY, sessionStartTime);
   };
 
   const getSessionStartTime = async () =>
@@ -35,15 +35,15 @@ const useWalletSession = () => {
   const setWalletLockPeriod = async (lockPeriod: WalletSessionPeriods) => {
     await clearSessionTime();
     dispatch(setWalletLockPeriodAction(lockPeriod));
-    setSessionStartTime();
+    await setSessionStartTime();
   };
 
-  const setSessionStartTimeAndMigrate = () => {
+  const setSessionStartTimeAndMigrate = async () => {
     if (walletLockPeriod < WalletSessionPeriods.LOW) {
       return setWalletLockPeriod(WalletSessionPeriods.LOW);
     }
 
-    setSessionStartTime();
+    await setSessionStartTime();
   };
 
   return {

@@ -108,9 +108,7 @@ function BackupWalletScreen() {
             />
           </EnterPasswordContainer>
         )}
-        <SeedPhraseContainer>
-          {showSeed && <SeedBackup mnemonic={mnemonic} onContinue={handleBackButtonClick} />}
-        </SeedPhraseContainer>
+        <SeedPhraseContainer>{showSeed && <SeedBackup mnemonic={mnemonic} />}</SeedPhraseContainer>
       </Container>
       <BottomBar tab="settings" />
     </>

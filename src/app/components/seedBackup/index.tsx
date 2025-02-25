@@ -39,7 +39,7 @@ const ButtonContainer = styled.div((props) => ({
 
 type Props = {
   mnemonic: string;
-  onContinue: () => void;
+  onContinue?: () => void;
 };
 
 // TODO: support private key byte hex string seeds as well as mnemonics
@@ -70,11 +70,13 @@ export default function SeedBackup({ mnemonic, onContinue }: Props): JSX.Element
           title={isVisible ? t('SEED_PHRASE_VIEW_HIDE') : t('SEED_PHRASE_VIEW_REVEAL')}
           onClick={() => setIsVisible(!isVisible)}
         />
-        <StyledButton
-          disabled={!isVisible}
-          onClick={onContinue}
-          title={t('SEED_PHRASE_VIEW_CONTINUE')}
-        />
+        {onContinue && (
+          <StyledButton
+            disabled={!isVisible}
+            onClick={onContinue}
+            title={t('SEED_PHRASE_VIEW_CONTINUE')}
+          />
+        )}
       </ButtonContainer>
     </Container>
   );

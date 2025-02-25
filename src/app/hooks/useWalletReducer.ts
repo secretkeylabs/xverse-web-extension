@@ -395,12 +395,12 @@ const useWalletReducer = () => {
   const loadWallet = async (onReady?: () => void) => {
     let initialised = false;
 
-    const initialise = () => {
+    const initialise = async () => {
       if (initialised) return;
 
       onReady?.();
       dispatch(setWalletUnlockedAction(true));
-      setSessionStartTimeAndMigrate();
+      await setSessionStartTimeAndMigrate();
       initialised = true;
     };
 
@@ -424,12 +424,12 @@ const useWalletReducer = () => {
             const firstAccount = loadedAccounts[0];
             dispatch(selectAccount(firstAccount.id, 'software', firstAccount.walletId));
           }
-          initialise();
+          await initialise();
         }
       },
     });
 
-    initialise();
+    await initialise();
   };
 
   const unlockWallet = async (password: string) => {
@@ -535,7 +535,7 @@ const useWalletReducer = () => {
     }
 
     localStorage.setItem('migrated', 'true');
-    setSessionStartTime();
+    await setSessionStartTime();
 
     return walletId;
   };

@@ -1,6 +1,7 @@
 import Eye from '@assets/img/createPassword/Eye.svg';
 import EyeSlash from '@assets/img/createPassword/EyeSlash.svg';
 import logo from '@assets/img/xverse_logo.svg';
+import useAsyncEffect from '@hooks/useAsyncEffect';
 import useVault from '@hooks/useVault';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSession from '@hooks/useWalletSession';
@@ -48,12 +49,11 @@ function Login(): JSX.Element {
     delay: 100,
   });
 
-  useEffect(() => {
-    vault.isInitialised().then((isInitialised) => {
-      if (!isInitialised) {
-        navigate('/landing');
-      }
-    });
+  useAsyncEffect(async () => {
+    const isInitialised = await vault.isInitialised();
+    if (!isInitialised) {
+      navigate('/landing');
+    }
   }, [vault, navigate]);
 
   const handleTogglePasswordView = () => {
