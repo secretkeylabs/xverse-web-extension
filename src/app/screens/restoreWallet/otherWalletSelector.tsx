@@ -102,7 +102,7 @@ const WALLET_LIST = [
   {
     name: 'Leather',
     icon: leatherLogo,
-    derivationType: 'account' as const,
+    derivationType: 'index' as const,
     show24Words: true,
     autoDetect: true,
   },

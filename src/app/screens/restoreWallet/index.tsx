@@ -303,6 +303,7 @@ function RestoreWallet(): JSX.Element {
             summaryData={walletSummaryData}
             summaryIsLoading={walletSummaryIsLoading}
             autoDetectDerivationType={autoDetectDerivationType}
+            preferredAutoDerivationType={derivationType}
           />
         );
       case RestoreWalletStep.PAYMENT_ADDRESS_TYPE:

@@ -80,6 +80,7 @@ type Props = {
   onContinue: (finalSelection: DerivationType) => void;
   summaryIsLoading: boolean;
   autoDetectDerivationType: boolean;
+  preferredAutoDerivationType: DerivationType;
   summaryData:
     | {
         accountSummary: Summary;
@@ -92,6 +93,7 @@ export default function DerivationTypeSelector({
   onContinue,
   summaryIsLoading,
   autoDetectDerivationType,
+  preferredAutoDerivationType,
   summaryData,
 }: Props) {
   const { t } = useTranslation('translation', {
@@ -105,25 +107,30 @@ export default function DerivationTypeSelector({
     undefined,
   );
 
-  const totalIndexFunds =
-    !summaryData || summaryData.indexSummary.accountCount <= 1
-      ? 0n
-      : summaryData.indexSummary.nativeTotalSats + summaryData.indexSummary.nestedTotalSats;
-  const totalAccountFunds =
-    summaryData && (totalIndexFunds === 0n || summaryData.accountSummary.accountCount > 1)
-      ? summaryData.accountSummary.nativeTotalSats + summaryData.accountSummary.nestedTotalSats
-      : 0n;
-
   const shouldAutoContinue = summaryIsLoading
     ? false
-    : autoDetectDerivationType && (totalIndexFunds === 0n || totalAccountFunds === 0n);
+    : autoDetectDerivationType &&
+      summaryData &&
+      // only auto continue if there are no accounts or only a single account (shared between the two types) on one path
+      (summaryData.indexSummary.accountCount <= 1 || summaryData.accountSummary.accountCount <= 1);
 
   useEffect(() => {
-    if (shouldAutoContinue) {
-      // prefer account over index if both are 0
-      const finalDerivationType = totalIndexFunds > 0n ? 'index' : 'account';
-      onContinue(finalDerivationType);
+    if (!shouldAutoContinue) {
+      return;
     }
+
+    let finalDerivationType = preferredAutoDerivationType;
+    if (summaryData) {
+      if (summaryData.accountSummary.accountCount > summaryData.indexSummary.accountCount) {
+        // more accounts in account path, so use that
+        finalDerivationType = 'account';
+      } else if (summaryData.indexSummary.accountCount > summaryData.accountSummary.accountCount) {
+        // more accounts in index path, so use that
+        finalDerivationType = 'index';
+      }
+      // if neither prevail, use the preferred auto derivation type
+    }
+    onContinue(finalDerivationType);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- we don't need to change on the others
   }, [shouldAutoContinue]);
 
