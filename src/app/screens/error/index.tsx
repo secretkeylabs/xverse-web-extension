@@ -2,12 +2,22 @@ import ErrorDisplay from '@components/errorDisplay';
 import { CoreError } from '@secretkeylabs/xverse-core';
 import { isAxiosError } from 'axios';
 import { useMemo } from 'react';
-import { useRouteError } from 'react-router-dom';
+import { isRouteErrorResponse, useRouteError } from 'react-router-dom';
 
 function ErrorBoundary() {
   const error = useRouteError();
 
   const { status, statusText, code, message, stack } = useMemo(() => {
+    if (isRouteErrorResponse(error)) {
+      const { status: errorStatus, statusText: errorStatusText, error: routeError } = error;
+      return {
+        status: errorStatus,
+        statusText: errorStatusText,
+        message: routeError?.message,
+        stack: routeError?.stack,
+      };
+    }
+
     if (isAxiosError(error)) {
       return {
         status: error.response?.status,

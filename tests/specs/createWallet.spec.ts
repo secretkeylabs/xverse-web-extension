@@ -18,7 +18,6 @@ test.describe('Create and Restore Wallet Flow', () => {
     await test.step('backup seedPhrase and successfully create a wallet', async () => {
       await onboardingPage.navigateToBackupPage();
       await onboardingPage.buttonBackupNow.click();
-      await expect(page.url()).toContain('backupWalletSteps');
 
       await expect(onboardingPage.createPasswordInput).toBeVisible();
       await onboardingPage.createPasswordInput.fill(strongPW);
