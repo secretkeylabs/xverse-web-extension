@@ -8,6 +8,7 @@ import ActionButton from '@components/button';
 import ConfirmScreen from '@components/confirmScreen';
 import InfoContainer from '@components/infoContainer';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
+import useGetAllAccounts from '@hooks/useGetAllAccounts';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useSignatureRequest, {
   isStructuredMessage,
@@ -63,29 +64,21 @@ function SignatureRequest(): JSX.Element {
   const [isTxRejected, setIsTxRejected] = useState(false);
   const [isTxInvalid, setIsTxInvalid] = useState(false);
   const selectedAccount = useSelectedAccount();
-  const { accountsList, network } = useWalletSelector();
-  const [addressType, setAddressType] = useState('');
+  const { network } = useWalletSelector();
   const { switchAccount } = useWalletReducer();
   const { messageType, requestToken, payload, tabId, domain, requestId } = useSignatureRequest();
   const navigate = useNavigate();
   const isMessageSigningDisabled =
     isHardwareAccount(selectedAccount) && !selectedAccount?.stxAddress;
 
+  const allAccounts = useGetAllAccounts();
+
   useTrackMixPanelPageViewed({
     protocol: 'stacks',
     structured: !!isStructuredMessage(messageType),
   });
 
-  const checkAddressAvailability = () => {
-    const account = accountsList.filter((acc) => {
-      if (acc.stxAddress === payload.stxAddress) {
-        setAddressType(t('SIGNATURE_REQUEST.SIGNING_ADDRESS_STX'));
-        return true;
-      }
-      return false;
-    });
-    return isHardwareAccount(selectedAccount) ? account[0] || selectedAccount : account[0];
-  };
+  const requestedAccount = allAccounts.find((account) => account.stxAddress === payload.stxAddress);
 
   const switchAccountBasedOnRequest = () => {
     if (getNetworkType(payload.network) !== getStxNetworkForBtcNetwork(network.type)) {
@@ -100,9 +93,14 @@ function SignatureRequest(): JSX.Element {
       });
       return;
     }
-    const account = checkAddressAvailability();
-    if (account) {
-      switchAccount(account);
+
+    if (selectedAccount.ordinalsAddress === requestedAccount?.btcAddresses.taproot.address) {
+      // correct address already selected
+      return;
+    }
+
+    if (requestedAccount) {
+      switchAccount(requestedAccount);
     } else {
       navigate('/tx-status', {
         state: {
@@ -327,7 +325,9 @@ function SignatureRequest(): JSX.Element {
                   {t('SIGNATURE_REQUEST.SIGNING_ADDRESS_TITLE')}
                 </SigningAddressTitle>
                 <SigningAddress>
-                  {addressType && <SigningAddressType>{addressType}</SigningAddressType>}
+                  <SigningAddressType>
+                    {t('SIGNATURE_REQUEST.SIGNING_ADDRESS_STX')}
+                  </SigningAddressType>
                   <SigningAddressValue>
                     {getTruncatedAddress(payload.stxAddress, 6)}
                   </SigningAddressValue>

@@ -1,3 +1,4 @@
+import useGetAllAccounts from '@hooks/useGetAllAccounts';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -7,7 +8,6 @@ import {
   type SignMessageOptions,
   type SignMessagePayload,
 } from '@sats-connect/core';
-import { isHardwareAccount } from '@utils/helper';
 import { decodeToken } from 'jsontokens';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -56,18 +56,16 @@ export const useSignMessageValidation = (requestPayload: SignMessagePayload | un
   const [validationError, setValidationError] = useState<ValidationError | null>(null);
   const { t } = useTranslation('translation', { keyPrefix: 'REQUEST_ERRORS' });
   const selectedAccount = useSelectedAccount();
-  const { accountsList, network, btcPaymentAddressType } = useWalletSelector();
+  const { network, btcPaymentAddressType } = useWalletSelector();
   const { switchAccount } = useWalletReducer();
+  const allAccounts = useGetAllAccounts();
 
-  const checkAddressAvailability = () => {
-    const account = accountsList.filter(
-      (acc) =>
-        requestPayload?.address === acc.btcAddresses.native?.address ||
-        requestPayload?.address === acc.btcAddresses.nested?.address ||
-        requestPayload?.address === acc.btcAddresses.taproot.address,
-    );
-    return isHardwareAccount(selectedAccount) ? account[0] || selectedAccount : account[0];
-  };
+  const requestedAccount = allAccounts.find(
+    (account) =>
+      requestPayload?.address === account.btcAddresses.native?.address ||
+      requestPayload?.address === account.btcAddresses.nested?.address ||
+      requestPayload?.address === account.btcAddresses.taproot.address,
+  );
 
   const validateSignMessage = () => {
     if (!requestPayload) return;
@@ -77,33 +75,36 @@ export const useSignMessageValidation = (requestPayload: SignMessagePayload | un
       });
       return;
     }
-    const account = checkAddressAvailability();
 
-    if (!account) {
+    if (!requestedAccount) {
       setValidationError({
         error: t('ADDRESS_MISMATCH'),
       });
       return;
     }
 
-    if (selectedAccount.ordinalsAddress !== account.btcAddresses.taproot.address) {
-      switchAccount(account);
+    if (selectedAccount.ordinalsAddress !== requestedAccount.btcAddresses.taproot.address) {
+      switchAccount(requestedAccount);
     }
 
-    if (requestPayload?.address === account.btcAddresses.taproot.address) {
+    if (requestPayload?.address === requestedAccount.btcAddresses.taproot.address) {
       return;
     }
+    // Skip validation for hardware wallets since they handle address type internally
+    if (selectedAccount.accountType === 'software') {
+      const isNativeAddress =
+        requestPayload?.address === requestedAccount.btcAddresses.native?.address;
+      const isNestedAddress =
+        requestPayload?.address === requestedAccount.btcAddresses.nested?.address;
+      const addressTypeMatches =
+        (btcPaymentAddressType === 'native' && isNativeAddress) ||
+        (btcPaymentAddressType === 'nested' && isNestedAddress);
 
-    // ensure we have the correct address type signing on payment address
-    if (
-      (btcPaymentAddressType === 'native' &&
-        requestPayload?.address !== account.btcAddresses.native?.address) ||
-      (btcPaymentAddressType === 'nested' &&
-        requestPayload?.address !== account.btcAddresses.nested?.address)
-    ) {
-      setValidationError({
-        error: t('ADDRESS_TYPE_MISMATCH'),
-      });
+      if (!addressTypeMatches) {
+        setValidationError({
+          error: t('ADDRESS_TYPE_MISMATCH'),
+        });
+      }
     }
   };
 

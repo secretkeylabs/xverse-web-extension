@@ -302,6 +302,10 @@ function ConfirmStxTransaction() {
   };
 
   const handleGoBack = () => {
+    trackMixPanel(AnalyticsEvents.InitiateSendFlow, {
+      selectedToken: 'STX',
+      source: 'send_stx',
+    });
     navigate('/send-stx', {
       state: {
         recipientAddress: recipient,

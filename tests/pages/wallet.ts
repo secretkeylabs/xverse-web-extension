@@ -132,7 +132,7 @@ export default class Wallet {
 
   readonly buttonCurrency: Locator;
 
-  readonly buttonShowSeedphrase: Locator;
+  readonly buttonShowSeedPhrase: Locator;
 
   readonly textCurrency: Locator;
 
@@ -430,7 +430,7 @@ export default class Wallet {
     this.headerNewPassword = page.getByRole('heading', { name: 'Enter your new password' });
     this.infoUpdatePassword = page.getByText(/password successfully updated/i);
     this.buttonCurrency = page.getByRole('button', { name: 'Fiat Currency' });
-    this.buttonShowSeedphrase = page.getByRole('button', { name: 'Show Seedphrase' });
+    this.buttonShowSeedPhrase = page.getByRole('button', { name: 'Show Seed Phrase' });
     this.selectCurrency = page.getByTestId('currency-button');
     this.iconFlag = page.locator('img[alt="flag"]');
 
@@ -808,7 +808,7 @@ export default class Wallet {
   async fillSwapAmount(amount) {
     // .Fill() did not work with the field so we need to use this method
     await this.inputSwapAmount.pressSequentially(amount.toString());
-    await expect(this.buttonGetQuotes).toBeEnabled();
+    await expect(this.buttonGetQuotes).toBeVisible();
 
     const usdAmount = await this.textUSD.innerText();
     const numericUSDValue = parseFloat(usdAmount.replace(/[^0-9.]/g, ''));
@@ -985,7 +985,7 @@ export default class Wallet {
     try {
       const locator = this.page
         .locator('button')
-        .filter({ hasText: new RegExp(`${tokenname}.*\\d`) });
+        .filter({ hasText: new RegExp(`^${tokenname}.*\\d`) });
 
       console.log(`Looking for balance for ${tokenname}`);
       const balanceText = await locator.innerText();
@@ -1101,8 +1101,8 @@ export default class Wallet {
 
     // TODO think of a better way to do this
     // Wait for the network to be switched so that API doesn't fail because of the rate limiting
-    await this.page.waitForTimeout(15000);
 
+    await expect(this.buttonSave).toBeEnabled({ timeout: 15000 });
     await this.buttonSave.click();
     await expect(this.buttonNetwork).toBeVisible({ timeout: 30000 });
     await expect(this.buttonNetwork).toHaveText('NetworkTestnet');
@@ -1165,9 +1165,8 @@ export default class Wallet {
 
   async selectLastToken(tokenType: 'BRC20' | 'STACKS'): Promise<string> {
     await this.manageTokenButton.click();
-    expect(this.page.url()).toContain('manage-tokens');
+    await expect(this.page.url()).toContain('manage-tokens');
 
-    // Click on the specific token type button if BRC20 is selected
     if (tokenType === 'BRC20') {
       await this.buttonBRC20.click();
     } else if (tokenType === 'STACKS') {

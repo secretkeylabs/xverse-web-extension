@@ -23,11 +23,15 @@ import {
   AddressBoxContainer,
   Container,
   ContentContainer,
+  DappInfoContainer,
+  DappInfoTextContainer,
   PermissionDescriptionsContainer,
   RequestMessage,
 } from './index.styles';
 
 import useSelectedAccount from '@hooks/useSelectedAccount';
+import { getAppIconFromWebManifest, safePromise } from '@secretkeylabs/xverse-core';
+import { useQuery } from '@tanstack/react-query';
 import AddressPurposeBox from '../addressPurposeBox';
 import * as Permissions from './permissions';
 import { SelectAccountPrompt } from './selectAccount';
@@ -44,6 +48,17 @@ function ConnectionRequestInner({ data, context }: ConnectionRequestInnerProps) 
     window.close();
   }, []);
   const handleAccept = useMakeHandleAccept({ context, data });
+
+  const { data: appIconSrc } = useQuery({
+    queryKey: ['appIcon', context.origin],
+    queryFn: async () => {
+      const [error, icon] = await safePromise(getAppIconFromWebManifest(context.origin));
+
+      if (error) return null;
+
+      return icon;
+    },
+  });
 
   const AddressPurposeRow = useCallback(
     (purpose: AddressPurpose) => {
@@ -88,14 +103,18 @@ function ConnectionRequestInner({ data, context }: ConnectionRequestInnerProps) 
   return (
     <Container>
       <ContentContainer>
-        <DappLogo />
-        <Title />
-        <Host url={context.origin} />
-        {(data as ConnectRequestMessage).params?.message && (
-          <RequestMessage>
-            {(data as ConnectRequestMessage).params?.message?.substring(0, 80)}
-          </RequestMessage>
-        )}
+        <DappInfoContainer>
+          <DappLogo src={appIconSrc} />
+          <DappInfoTextContainer>
+            <Title />
+            <Host origin={context.origin} />
+            {(data as ConnectRequestMessage).params?.message && (
+              <RequestMessage>
+                {(data as ConnectRequestMessage).params?.message?.substring(0, 80)}
+              </RequestMessage>
+            )}
+          </DappInfoTextContainer>
+        </DappInfoContainer>
         <AccountSwitcherContainer>
           <SelectAccountPrompt />
         </AccountSwitcherContainer>

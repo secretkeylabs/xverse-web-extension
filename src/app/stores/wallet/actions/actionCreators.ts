@@ -8,6 +8,7 @@ import type {
   NetworkType,
   SettingsNetwork,
   SupportedCurrency,
+  WalletId,
 } from '@secretkeylabs/xverse-core';
 import * as actions from './types';
 
@@ -26,12 +27,14 @@ export function resetWalletAction(): actions.ResetWallet {
   };
 }
 
-export function updateSoftwareAccountsAction(
-  accountsList: Account[],
-): actions.UpdateSoftwareAccounts {
+export function updateSoftwareWalletsAction(
+  network: NetworkType,
+  softwareWallets: actions.SoftwareWallet[],
+): actions.UpdateSoftwareWallets {
   return {
-    type: actions.UpdateSoftwareAccountsKey,
-    accountsList,
+    type: actions.UpdateSoftwareWalletsKey,
+    network,
+    softwareWallets,
   };
 }
 
@@ -53,28 +56,19 @@ export function updateKeystoneAccountsAction(
   };
 }
 
-export function selectAccount(selectedAccount: Account): actions.SelectAccount;
 export function selectAccount(
   selectedAccountIdx: number,
   accountType: AccountType,
-): actions.SelectAccount;
-export function selectAccount(
-  selectedAccountOrIdx: Account | number,
-  accountType?: AccountType,
+  walletId?: WalletId,
 ): actions.SelectAccount {
-  let selectedAccountIndex = selectedAccountOrIdx;
-
-  let selectedAccountType = accountType ?? 'software';
-
-  if (typeof selectedAccountIndex === 'object') {
-    selectedAccountType = selectedAccountIndex.accountType ?? 'software';
-    selectedAccountIndex = selectedAccountIndex.id;
+  if (accountType === 'software' && !walletId) {
+    throw new Error('walletId is required for software accounts');
   }
-
   return {
     type: actions.SelectAccountKey,
-    selectedAccountIndex,
-    selectedAccountType,
+    selectedAccountIndex: selectedAccountIdx,
+    selectedAccountType: accountType,
+    selectedWalletId: walletId,
   };
 }
 
@@ -240,15 +234,6 @@ export function setShowSpamTokensAction(showSpamTokens: boolean): actions.SetSho
   };
 }
 
-export const updateSavedNamesAction = (
-  networkType: NetworkType,
-  names: { id: number; name?: string }[],
-): actions.UpdateSavedNames => ({
-  type: actions.UpdateSavedNamesKey,
-  networkType,
-  names,
-});
-
 export function addToStarCollectiblesAction(params: {
   address: string;
   id: string;
@@ -350,4 +335,9 @@ export const setWalletBackupStatusAction = (
 ): actions.SetWalletBackupStatus => ({
   type: actions.SetWalletBackupStatusKey,
   hasBackedUpWallet,
+});
+
+export const setAddingAccountAction = (addingAccount: boolean): actions.SetAddingAccount => ({
+  type: actions.SetAddingAccountKey,
+  addingAccount,
 });

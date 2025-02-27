@@ -18,7 +18,13 @@ test.describe('Create and Restore Wallet Flow', () => {
     await test.step('backup seedPhrase and successfully create a wallet', async () => {
       await onboardingPage.navigateToBackupPage();
       await onboardingPage.buttonBackupNow.click();
-      await expect(page.url()).toContain('backupWalletSteps');
+
+      await expect(onboardingPage.createPasswordInput).toBeVisible();
+      await onboardingPage.createPasswordInput.fill(strongPW);
+      await expect(onboardingPage.confirmPasswordInput).toBeVisible();
+      await onboardingPage.confirmPasswordInput.fill(strongPW);
+      await onboardingPage.buttonContinue.click();
+
       await expect(onboardingPage.buttonContinue).toBeDisabled();
       await expect(onboardingPage.buttonRevealSeed).toBeVisible();
       await expect(onboardingPage.firstParagraphBackupStep).toBeVisible();
@@ -54,15 +60,12 @@ test.describe('Create and Restore Wallet Flow', () => {
       await expect(page.locator('p:has-text("This word is not")')).toBeVisible();
 
       await page.locator(`button[value="${seedWord}"]`).click();
+      await expect(onboardingPage.page.getByTestId('nth-word')).toBeVisible();
       seedWord = await onboardingPage.selectSeedWord(seedWords);
       await page.locator(`button[value="${seedWord}"]`).click();
+      await expect(onboardingPage.page.getByTestId('nth-word')).toBeVisible();
       seedWord = await onboardingPage.selectSeedWord(seedWords);
       await page.locator(`button[value="${seedWord}"]`).click();
-
-      await onboardingPage.inputPassword.fill(strongPW);
-      await onboardingPage.buttonContinue.click();
-      await onboardingPage.inputPassword.fill(strongPW);
-      await onboardingPage.buttonContinue.click();
 
       await expect(onboardingPage.imageSuccess).toBeVisible();
       await expect(onboardingPage.instruction).toBeVisible();
@@ -110,49 +113,49 @@ test.describe('Create and Restore Wallet Flow', () => {
       await expect(landingPage.buttonRestoreWallet).toBeVisible();
       await landingPage.buttonRestoreWallet.click();
 
-      const newPage = await context.waitForEvent('page');
-
       // Clicking on restore opens in this setup a new page for legal
-      await expect(newPage.url()).toContain('legal');
+      await expect(page.url()).toContain('legal');
 
-      const onboardingPage2 = new Onboarding(newPage);
-      await expect(newPage.getByRole('button', { name: /accept/i })).toBeVisible();
+      const onboardingPage2 = new Onboarding(page);
+      await expect(page.getByRole('button', { name: /accept/i })).toBeVisible();
+      await page.getByRole('button', { name: /accept/i }).click();
 
-      await newPage.getByRole('button', { name: /accept/i }).click();
-      await expect(newPage.url()).toContain('restore');
+      await expect(page.getByPlaceholder('Type your password', { exact: true })).toBeVisible();
+      await page.getByPlaceholder('Type your password', { exact: true }).fill(strongPW);
+
+      await expect(
+        page.getByPlaceholder('Type your password again', { exact: true }),
+      ).toBeVisible();
+      await page.getByPlaceholder('Type your password again', { exact: true }).fill(strongPW);
+
+      await expect(page.getByRole('button', { name: /continue/i })).toBeVisible();
+      await page.getByRole('button', { name: /continue/i }).click();
+
+      await expect(page.url()).toContain('restore');
+
+      await onboardingPage.page.getByRole('button', { name: 'Xverse' }).click();
 
       const seedWords = JSON.parse(fs.readFileSync(filePathSeedWords, 'utf8'));
 
       for (let i = 0; i < seedWords.length; i++) {
         await onboardingPage2.inputWord(i).fill(seedWords[i]);
       }
-      await expect(newPage.getByRole('button', { name: /continue/i })).toBeVisible();
-      await newPage.getByRole('button', { name: /continue/i }).click();
+      await expect(page.getByRole('button', { name: /continue/i })).toBeVisible();
+      await page.getByRole('button', { name: /continue/i }).click();
 
-      await expect(newPage.getByPlaceholder('Type your password', { exact: true })).toBeVisible();
-      await newPage.getByPlaceholder('Type your password', { exact: true }).fill(strongPW);
-
-      await expect(
-        newPage.getByPlaceholder('Type your password again', { exact: true }),
-      ).toBeVisible();
-      await newPage.getByPlaceholder('Type your password again', { exact: true }).fill(strongPW);
-
-      await expect(newPage.getByRole('button', { name: /continue/i })).toBeVisible();
-      await newPage.getByRole('button', { name: /continue/i }).click();
-
-      await expect(newPage.getByText('Preferred Address Type')).toBeVisible();
+      await expect(page.getByText('Preferred Address Type')).toBeVisible();
 
       // address type screen (native/nested), we'll just continue with the default
-      await newPage.getByRole('button', { name: /continue/i }).click();
-      await expect(newPage.getByRole('img', { name: /success/i })).toBeVisible();
+      await page.getByRole('button', { name: /continue/i }).click();
+      await expect(page.getByRole('img', { name: /success/i })).toBeVisible();
 
       // Wallet restored
-      await expect(newPage.getByText(/wallet restored/i)).toBeVisible();
-      await expect(newPage.getByRole('button', { name: /close this tab/i })).toBeVisible();
+      await expect(page.getByText(/wallet restored/i)).toBeVisible();
+      await expect(page.getByRole('button', { name: /close this tab/i })).toBeVisible();
 
       // Open the wallet directly via URL
-      await newPage.goto(`chrome-extension://${extensionId}/options.html`);
-      const newWallet = new Wallet(newPage);
+      await page.goto(`chrome-extension://${extensionId}/options.html`);
+      const newWallet = new Wallet(page);
       await newWallet.checkVisualsStartpage();
 
       const balanceText = newWallet.balance;

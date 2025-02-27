@@ -1,7 +1,7 @@
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useWalletSession from '@hooks/useWalletSession';
-import { useEffect, useLayoutEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 
 let sessionTimeoutTracker: NodeJS.Timeout | undefined;
 
@@ -15,7 +15,7 @@ function SessionGuard({ children }: SessionGuardProps): ReactNode {
   const { walletLockPeriod } = useWalletSelector();
   const [lockTested, setLockTested] = useState(false);
 
-  useLayoutEffect(
+  useEffect(
     () => {
       // test if we should lock the wallet on first render ( when user first opens the app )
       const testLock = async () => {
@@ -23,7 +23,7 @@ function SessionGuard({ children }: SessionGuardProps): ReactNode {
         if (sessionEnded) {
           await lockWallet();
         } else {
-          setSessionStartTime();
+          await setSessionStartTime();
         }
         setLockTested(true);
       };
@@ -35,7 +35,7 @@ function SessionGuard({ children }: SessionGuardProps): ReactNode {
       const { body } = document;
 
       const handleClick = async () => {
-        setSessionStartTime();
+        await setSessionStartTime();
       };
 
       body?.addEventListener('click', handleClick);

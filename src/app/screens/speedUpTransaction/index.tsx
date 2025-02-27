@@ -18,9 +18,9 @@ import useRbfTransactionData, {
   getRawTransaction,
   isBtcTransaction,
 } from '@hooks/useRbfTransactionData';
-import useSeedVault from '@hooks/useSeedVault';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTransactionContext from '@hooks/useTransactionContext';
+import useVault from '@hooks/useVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { createKeystoneTransport } from '@keystonehq/hw-transport-webusb';
 import Transport from '@ledgerhq/hw-transport-webusb';
@@ -80,7 +80,7 @@ function SpeedUpTransactionScreen() {
   const [customFeeRate, setCustomFeeRate] = useState<string | undefined>();
   const [customTotalFee, setCustomTotalFee] = useState<string | undefined>();
   const [customFeeError, setCustomFeeError] = useState<string | undefined>();
-  const { getSeed } = useSeedVault();
+  const vault = useVault();
   const selectedStacksNetwork = useNetworkSelector();
   const isBtc = isBtcTransaction(stxTransaction || btcTransaction);
   const [isBroadcasting, setIsBroadcasting] = useState(false);
@@ -169,8 +169,6 @@ function SpeedUpTransactionScreen() {
         unsignedTx.setFee(BigInt(fee));
         unsignedTx.setNonce(BigInt(stxTransaction.nonce));
 
-        const seedPhrase = await getSeed();
-
         if (isLedgerAccount(selectedAccount)) {
           if (!transport || selectedAccount.deviceAccountIndex === undefined) {
             return;
@@ -183,10 +181,12 @@ function SpeedUpTransactionScreen() {
           });
           await delay(1500);
           await broadcastSignedTransaction(result, selectedStacksNetwork);
-        } else {
+        } else if (selectedAccount.accountType === 'software') {
+          const rootNodeData = await vault.SeedVault.getWalletRootNode(selectedAccount.walletId);
           const signedTx: StacksTransactionWire = await signTransaction(
             unsignedTx,
-            seedPhrase,
+            rootNodeData.rootNode,
+            rootNodeData.derivationType,
             selectedAccount.id,
             selectedStacksNetwork,
           );

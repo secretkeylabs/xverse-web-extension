@@ -145,6 +145,10 @@ function ConfirmBrc20Transaction() {
   }
 
   const handleGoBack = () => {
+    trackMixPanel(AnalyticsEvents.InitiateSendFlow, {
+      selectedToken: token.principal,
+      source: 'send_brc20',
+    });
     navigate(`/send-brc20-one-step?principal=${token.principal}`, {
       state: {
         amount: estimateFeesParams.amount.toString(),
@@ -185,7 +189,7 @@ function ConfirmBrc20Transaction() {
             {callouts?.length > 0 && (
               <StyledCallouts>
                 {callouts.map((callout) => (
-                  <Callout key={callout.bodyText} {...callout} />
+                  <Callout key={callout.bodyText as string} {...callout} />
                 ))}
               </StyledCallouts>
             )}

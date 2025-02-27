@@ -35,6 +35,7 @@ export const ButtonContainer = styled.div<{
 }>((props) => ({
   display: 'flex',
   justifyContent: 'center',
+  marginTop: props.theme.space.xxxl,
   marginBottom: props.theme.space.xxxl,
 }));
 

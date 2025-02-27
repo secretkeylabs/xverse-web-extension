@@ -80,7 +80,7 @@ export type CalloutProps = {
   className?: string;
   titleText?: string;
   dataTestID?: string;
-  bodyText: string;
+  bodyText: string | React.ReactNode;
   variant?: CalloutVariant;
   redirectText?: string;
   onClickRedirect?: () => void;

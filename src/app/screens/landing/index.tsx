@@ -6,6 +6,7 @@ import Dots from '@components/dots';
 import { CaretLeft, CaretRight } from '@phosphor-icons/react';
 import { isInOptions } from '@utils/helper';
 import { getIsTermsAccepted } from '@utils/localStorage';
+import RoutePaths from 'app/routes/paths';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Lottie from 'react-lottie';
@@ -66,35 +67,43 @@ function Landing() {
       if (isInOptions()) {
         if (isLegalAccepted) {
           if (isRestore) {
-            navigate(`/restoreWallet`);
+            navigate(RoutePaths.RestoreWallet);
           } else {
-            navigate(`/backup`);
+            navigate(RoutePaths.CreateWallet);
           }
         } else {
           const params = isRestore ? '?restore=true' : '';
-          navigate(`/legal${params}`);
+          navigate(`${RoutePaths.Legal}${params}`);
         }
         return;
       }
 
+      const allTabs = await chrome.tabs.query({});
+      const baseUrl = chrome.runtime.getURL('');
+      const existingTab = allTabs.find((tab) => tab.url && tab.url.includes(baseUrl));
+      let url: string;
+
       if (isLegalAccepted) {
-        if (isRestore) {
-          await chrome.tabs.create({
-            url: chrome.runtime.getURL(`options.html#/restoreWallet`),
-          });
-        } else {
-          await chrome.tabs.create({
-            url: chrome.runtime.getURL(`options.html#/backup`),
-          });
-        }
+        const targetUrlSuffix = isRestore ? RoutePaths.RestoreWallet : RoutePaths.CreateWallet;
+        url = chrome.runtime.getURL(`options.html#${targetUrlSuffix}`);
       } else {
         const params = isRestore ? '?restore=true' : '';
-        await chrome.tabs.create({
-          url: chrome.runtime.getURL(`options.html#/legal${params}`),
-        });
+        url = chrome.runtime.getURL(`options.html#${RoutePaths.Legal}${params}`);
       }
 
-      window.close();
+      if (existingTab?.id) {
+        // Activate the existing tab
+        await chrome.tabs.update(existingTab.id, { active: true, url });
+        await chrome.windows.update(existingTab.windowId, { focused: true });
+      } else {
+        // Open a new tab
+        await chrome.tabs.create({ url });
+      }
+
+      const currentTab = await chrome.tabs.getCurrent();
+      if (existingTab?.id !== currentTab?.id) {
+        window.close();
+      }
     },
     [navigate],
   );

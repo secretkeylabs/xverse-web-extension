@@ -3,7 +3,6 @@ import RuneTransactionHistoryItem from '@components/transactions/RuneTransaction
 import StxTransactionHistoryItem from '@components/transactions/stxTransaction';
 import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useTransactions from '@hooks/queries/useTransactions';
-import useSeedVault from '@hooks/useSeedVault';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { animated, config, useSpring } from '@react-spring/web';
@@ -284,7 +283,6 @@ function TransactionsHistoryList({
   const selectedAccount = useSelectedAccount();
   const { network, selectedAccountType } = useWalletSelector();
   const btcClient = useBtcClient();
-  const seedVault = useSeedVault();
   const { data, isLoading, error } = useTransactions(
     (coin as CurrencyTypes) || 'STX',
     brc20Token,
@@ -310,7 +308,6 @@ function TransactionsHistoryList({
             : selectedAccount.id,
         network: network.type,
         esploraProvider: btcClient,
-        getSeedPhrase: seedVault.getSeed,
       }
     : undefined;
 

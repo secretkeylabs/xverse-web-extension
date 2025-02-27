@@ -127,3 +127,7 @@ export const selectWithDerivedState =
     const withDerivedState = tokensWithDerivedState.concat(topTokensWithDerivedState);
     return select ? select(withDerivedState) : withDerivedState;
   };
+
+// todo: move into xverse-core
+export const formatSignificantDecimals = (input: string) =>
+  input.replace(/(\.\d*?[1-9](?:[^0]*?[1-9]){0,3}).*/, '$1');

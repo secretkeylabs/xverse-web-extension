@@ -6,6 +6,7 @@ import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import Lock from '@assets/img/transactions/Lock.svg';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
+import PercentageChange from '@components/percentageChange';
 import SquareButton from '@components/squareButton';
 import TokenImage from '@components/tokenImage';
 import useSelectedAccountBtcBalance from '@hooks/queries/useSelectedAccountBtcBalance';
@@ -46,6 +47,7 @@ import {
   FiatContainer,
   HeaderSeparator,
   LockedStxContainer,
+  PriceStatsContainer,
   ProtocolText,
   RowButtonContainer,
   RowContainer,
@@ -54,15 +56,17 @@ import {
   VerifyButtonContainer,
   VerifyOrViewContainer,
 } from './coinHeader.styled';
+import type { ChartPriceStats } from './tokenPrice';
 
 type Props = {
   currency: CurrencyTypes;
   fungibleToken?: FungibleToken;
+  chartPriceStats?: ChartPriceStats;
 };
 
-export default function CoinHeader({ currency, fungibleToken }: Props) {
+export default function CoinHeader({ currency, fungibleToken, chartPriceStats }: Props) {
   const selectedAccount = useSelectedAccount();
-  const { fiatCurrency, network, balanceHidden, showBalanceInBtc } = useWalletSelector();
+  const { fiatCurrency, network, balanceHidden } = useWalletSelector();
 
   // TODO: this should be a dumb component, move the logic to the parent
   // TODO: currently, we get btc and stx balances here for all currencies and FTs, but we should get them in
@@ -230,10 +234,19 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
   const navigateToReceive = () => {
     if (fungibleToken) {
       // RUNES & BRC20s => ordinal wallet, SIP-10 => STX wallet
+      trackMixPanel(AnalyticsEvents.InitiateReceiveFlow, {
+        addressType: fungibleToken?.protocol === 'stacks' ? 'stx' : 'btc_ordinals',
+        selectedToken: fungibleToken.principal,
+        source: 'token',
+      });
       return navigate(`/receive/${fungibleToken?.protocol === 'stacks' ? 'STX' : 'ORD'}`);
     }
 
     if (isReceivingAddressesVisible) {
+      trackMixPanel(AnalyticsEvents.InitiateReceiveFlow, {
+        addressType: currency === 'BTC' ? 'btc_payment' : 'stx',
+        source: 'token',
+      });
       return navigate(`/receive/${currency}`);
     }
 
@@ -300,6 +313,15 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
         </BalanceValuesContainer>
       </BalanceInfoContainer>
       {renderStackingBalances()}
+      {chartPriceStats && (
+        <PriceStatsContainer>
+          <PercentageChange
+            ftCurrencyPairs={[[fungibleToken, currency]]}
+            chartPriceStats={chartPriceStats}
+            displayAmountChange
+          />
+        </PriceStatsContainer>
+      )}
       <RowButtonContainer>
         <SquareButton src={ArrowUp} text={t('SEND')} onPress={goToSendScreen} />
         <SquareButton src={ArrowDown} text={t('RECEIVE')} onPress={navigateToReceive} />
@@ -312,7 +334,17 @@ export default function CoinHeader({ currency, fungibleToken }: Props) {
           />
         )}
         {!fungibleToken && (
-          <SquareButton src={Buy} text={t('BUY')} onPress={() => navigate(`/buy/${currency}`)} />
+          <SquareButton
+            src={Buy}
+            text={t('BUY')}
+            onPress={() => {
+              trackMixPanel(AnalyticsEvents.InitiateBuyFlow, {
+                selectedToken: currency,
+                source: 'token',
+              });
+              navigate(`/buy/${currency}`);
+            }}
+          />
         )}
       </RowButtonContainer>
       <BottomModal

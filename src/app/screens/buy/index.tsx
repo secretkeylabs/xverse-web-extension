@@ -7,10 +7,11 @@ import TopRow from '@components/topRow';
 import useHasFeature from '@hooks/useHasFeature';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { FeatureId, getMoonPaySignedUrl } from '@secretkeylabs/xverse-core';
+import { AnalyticsEvents, FeatureId, getMoonPaySignedUrl } from '@secretkeylabs/xverse-core';
 import Callout from '@ui-library/callout';
 import Spinner from '@ui-library/spinner';
 import { MOON_PAY_API_KEY, MOON_PAY_URL, TRANSAC_API_KEY, TRANSAC_URL } from '@utils/constants';
+import { trackMixPanel } from '@utils/mixpanel';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -83,6 +84,9 @@ function Buy() {
 
   const getMoonPayUrl = async (paymentMethod?: string) => {
     setLoading(true);
+    trackMixPanel(AnalyticsEvents.SelectBuyProvider, {
+      provider: paymentMethod === 'paypal' ? 'paypal' : 'moonpay',
+    });
     try {
       const moonPayUrl = new URL(MOON_PAY_URL);
       moonPayUrl.searchParams.append('apiKey', MOON_PAY_API_KEY!);
@@ -102,6 +106,9 @@ function Buy() {
 
   const getTransacUrl = () => {
     setLoading(true);
+    trackMixPanel(AnalyticsEvents.SelectBuyProvider, {
+      provider: 'transak',
+    });
     try {
       const transacUrl = new URL(TRANSAC_URL);
       transacUrl.searchParams.append('apiKey', TRANSAC_API_KEY!);
@@ -133,7 +140,12 @@ function Buy() {
             text={t('XVERSE_SWAPS')}
             subText={t('XVERSE_SWAPS_DESC')}
             src={XverseSwaps}
-            onClick={() => openUrl('https://wallet.xverse.app/swaps')}
+            onClick={() => {
+              trackMixPanel(AnalyticsEvents.SelectBuyProvider, {
+                provider: 'xverse_swaps',
+              });
+              openUrl('https://wallet.xverse.app/swaps');
+            }}
           />
         )}
         <RedirectButton text={t('MOONPAY')} src={MoonPay} onClick={getMoonPayUrl} />

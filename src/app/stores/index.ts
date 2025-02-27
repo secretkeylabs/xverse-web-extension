@@ -9,7 +9,9 @@ import NftDataStateReducer from './nftData/reducer';
 import type {
   AccountBtcAddressesV5,
   AccountV1,
+  AccountV10,
   AccountV5,
+  SoftwareWalletV10,
   WalletStateV1,
   WalletStateV2,
   WalletStateV3,
@@ -18,9 +20,15 @@ import type {
   WalletStateV6,
   WalletStateV7,
   WalletStateV8,
+  WalletStateV9,
 } from './wallet/actions/migrationTypes';
 import { type AvatarInfo, type WalletState } from './wallet/actions/types';
 import walletReducer, { initialWalletState, rehydrateError } from './wallet/reducer';
+
+// TODO multiwallet: remove these and related logic after allowing some time for users to migrate the names
+// TODO: maybe around June 2025
+export const MIGRATED_SAVED_NAMES_KEY = 'migration::v10::migratedSavedNames';
+export const MIGRATION_ACCOUNT_COUNT_KEY = 'migration::v10::accountCount';
 
 const rootPersistConfig = {
   version: 1,
@@ -191,12 +199,40 @@ const migrations = {
           : state.network) ?? initialWalletState.network,
     };
   },
-  9: (state: WalletStateV8): WalletState => {
+  9: (state: WalletStateV8): WalletStateV9 => {
     const { showBtcReceiveAlert, showOrdinalReceiveAlert, ...migratedState } = state;
 
     return {
       ...migratedState,
       keystoneAccountsList: [],
+    };
+  },
+  10: (state: WalletStateV9): WalletState => {
+    const { accountsList, savedNames, ledgerAccountsList, keystoneAccountsList, ...migratedState } =
+      state;
+
+    localStorage.setItem(MIGRATION_ACCOUNT_COUNT_KEY, JSON.stringify(accountsList.length));
+
+    const migrationNames = { ...savedNames };
+    migrationNames[migratedState.network.type] = accountsList
+      .filter((account) => account.accountName)
+      .map((account) => ({ name: account.accountName, id: account.id }));
+
+    if (Object.values(migrationNames).some((names) => names.length > 0)) {
+      localStorage.setItem(MIGRATED_SAVED_NAMES_KEY, JSON.stringify(savedNames));
+    }
+
+    return {
+      ...migratedState,
+      ledgerAccountsList: ledgerAccountsList as AccountV10[],
+      keystoneAccountsList: keystoneAccountsList as AccountV10[],
+      softwareWallets: {
+        Mainnet: [] as SoftwareWalletV10[],
+        Testnet: [] as SoftwareWalletV10[],
+        Testnet4: [] as SoftwareWalletV10[],
+        Signet: [] as SoftwareWalletV10[],
+        Regtest: [] as SoftwareWalletV10[],
+      },
     };
   },
 
@@ -229,10 +265,12 @@ const migrations = {
 };
 
 const WalletPersistConfig: PersistConfig<WalletState> = {
-  version: 9,
+  version: 10,
   key: 'walletState',
   storage: chromeStorage.local,
   migrate: createMigrate(migrations as any, { debug: false }),
+  // we don't want to persist the addingAccount state as it's only used during the account creation process
+  blacklist: ['addingAccount'],
   // A timeout of 0 means timeout is disabled
   // If the timeout is enabled, the rehydration will fail on slower machines and the store will be reset
   timeout: 0,

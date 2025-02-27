@@ -1,6 +1,7 @@
 import { sendInternalErrorMessage } from '@common/utils/rpc/responseMessages/errors';
 import ContractCallRequest from '@components/transactionsRequests/ContractCallRequest';
 import ContractDeployRequest from '@components/transactionsRequests/ContractDeployRequest';
+import useGetAllAccounts from '@hooks/useGetAllAccounts';
 import useNetworkSelector from '@hooks/useNetwork';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
@@ -19,7 +20,7 @@ import {
 import type { ContractCallPayload, ContractDeployPayload } from '@stacks/connect';
 import { StacksTransactionWire } from '@stacks/transactions';
 import Spinner from '@ui-library/spinner';
-import { getNetworkType, getStxNetworkForBtcNetwork, isHardwareAccount } from '@utils/helper';
+import { getNetworkType, getStxNetworkForBtcNetwork } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import RoutePaths from 'app/routes/paths';
 import { useEffect, useState } from 'react';
@@ -39,7 +40,7 @@ const LoaderContainer = styled.div((props) => ({
 
 function TransactionRequest() {
   const selectedAccount = useSelectedAccount();
-  const { network, accountsList } = useWalletSelector();
+  const { network } = useWalletSelector();
   const location = useLocation();
   const { dataStxSignTransactionOverride, mixpanelMetadata } = (location.state || {}) as {
     dataStxSignTransactionOverride?: DataStxSignTransaction;
@@ -56,6 +57,8 @@ function TransactionRequest() {
   const [contractName, setContractName] = useState<string | undefined>(undefined);
   const [attachment, setAttachment] = useState<Buffer | undefined>(undefined);
   const { t } = useTranslation('translation', { keyPrefix: 'REQUEST_ERRORS' });
+  const allAccounts = useGetAllAccounts();
+
   const { payload, tabId, requestToken, transaction } = txReq;
   const { messageId, rpcMethod } = 'rpcMethod' in txReq ? txReq : { messageId: '', rpcMethod: '' };
 
@@ -72,6 +75,10 @@ function TransactionRequest() {
     protocol: 'stacks',
     action,
   });
+
+  const requestedAccount = payload.stxAddress
+    ? allAccounts.find((account) => account.stxAddress === payload.stxAddress)
+    : selectedAccount;
 
   const onSignTransaction = () => {
     const trackingPayload = getSwapsMixpanelProperties(mixpanelMetadata);
@@ -219,30 +226,28 @@ function TransactionRequest() {
       });
       return;
     }
-    if (
-      payload.stxAddress &&
-      payload.stxAddress !== selectedAccount?.stxAddress &&
-      !isHardwareAccount(selectedAccount)
-    ) {
-      const account = accountsList.find((acc) => acc.stxAddress === payload.stxAddress);
-      if (account) {
-        await switchAccount(account);
-        await createRequestTx(account);
-      } else {
-        navigate('/tx-status', {
-          state: {
-            txid: '',
-            currency: 'STX',
-            error: t('ADDRESS_MISMATCH_STX'),
-            browserTx: true,
-            tabId,
-            messageId,
-            rpcMethod,
-          },
-        });
-      }
-    } else if (selectedAccount) {
+
+    if (selectedAccount.ordinalsAddress === requestedAccount?.btcAddresses.taproot.address) {
+      // correct address already selected
       await createRequestTx(selectedAccount);
+      return;
+    }
+
+    if (requestedAccount) {
+      switchAccount(requestedAccount);
+      await createRequestTx(requestedAccount);
+    } else {
+      navigate('/tx-status', {
+        state: {
+          txid: '',
+          currency: 'STX',
+          error: t('ADDRESS_MISMATCH_STX'),
+          browserTx: true,
+          tabId,
+          messageId,
+          rpcMethod,
+        },
+      });
     }
   };
 

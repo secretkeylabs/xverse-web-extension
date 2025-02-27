@@ -62,7 +62,12 @@ function TransactionOutput({ output, scriptOutputCount }: Props) {
       );
     }
     if (isOutputWithPubKey) {
-      const outputType = output.type === 'pk' ? t('PUBLIC_KEY') : t('MULTISIG');
+      const outputType =
+        output.type === 'pk'
+          ? t('PUBLIC_KEY')
+          : output.type === 'p2a'
+          ? t('PAY_TO_ANCHOR')
+          : t('MULTISIG');
       const toOwnKey =
         output.pubKeys?.includes(btcPublicKey) || output.pubKeys?.includes(ordinalsPublicKey);
       const toOwnString = toOwnKey ? ` (${t('YOUR_PUBLIC_KEY')})` : '';
@@ -99,9 +104,7 @@ function TransactionOutput({ output, scriptOutputCount }: Props) {
         hideAddress
         hideCopyButton={detailViewHideCopyButton}
         dataTestID="confirm-amount"
-        amount={`${satsToBtc(
-          new BigNumber(isOutputWithAddress ? output.amount.toString() : '0'),
-        ).toFixed()} BTC`}
+        amount={`${satsToBtc(new BigNumber(output.amount.toString())).toFixed()} BTC`}
         address={isOutputWithScript || isOutputWithPubKey ? '' : output.address}
         outputScript={isOutputWithScript ? output.script : undefined}
         outputScriptIndex={isOutputWithScript ? scriptOutputCount : undefined}

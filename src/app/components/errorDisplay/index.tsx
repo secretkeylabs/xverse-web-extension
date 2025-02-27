@@ -36,18 +36,15 @@ import Theme from '../../../theme';
 
 declare const VERSION: string;
 
-interface RouteError {
-  status: number;
-  statusText: string;
-  description?: string;
-  stack?: string;
-}
-
 type Props = {
-  error: RouteError;
+  status?: number;
+  statusText?: string;
+  code?: string;
+  message: string;
+  stack?: string;
 };
 
-function ErrorDisplay({ error }: Props) {
+function ErrorDisplay({ status, statusText, code, message, stack }: Props) {
   const { network } = useWalletSelector();
   const { t } = useTranslation('translation');
   const { t: errorT } = useTranslation('translation', { keyPrefix: 'ERROR_SCREEN' });
@@ -57,24 +54,49 @@ function ErrorDisplay({ error }: Props) {
   const [showStack, setShowStack] = useState(false);
   const CaretIcon = showStack ? CaretUp : CaretDown;
 
-  const {
-    status = 404,
-    statusText = 'Not Found',
-    description = 'An unexpected error occurred',
-    stack,
-  } = error;
-
   const handleCopyError = () => {
     const errorReport = `
     Error Details
     Error: ${errorT('ERROR_CODE_MESSAGE', { code: status, message: statusText })}
     Timestamp: ${new Date().toISOString()}
     App Version: ${VERSION} (Beta)
-    Description: ${description}
+    Code: ${code}
+    Message: ${message}
     ${stack ? `Stack Trace: ${stack}` : ''}
     `.trim();
     navigator.clipboard.writeText(errorReport);
     toast(errorT('ERROR_REPORT_COPIED'));
+  };
+
+  const renderNetwork = () => {
+    let networkText = '';
+
+    switch (network.type) {
+      case 'Testnet':
+        networkText = t('SETTING_SCREEN.TESTNET');
+        break;
+      case 'Testnet4':
+        networkText = t('SETTING_SCREEN.TESTNET4');
+        break;
+      case 'Signet':
+        networkText = t('SETTING_SCREEN.SIGNET');
+        break;
+      case 'Regtest':
+        networkText = t('SETTING_SCREEN.REGTEST');
+        break;
+      default:
+        break;
+    }
+
+    if (!networkText) {
+      return null;
+    }
+
+    return (
+      <TestnetContainer>
+        <TestnetText>{networkText}</TestnetText>
+      </TestnetContainer>
+    );
   };
 
   return (
@@ -85,33 +107,16 @@ function ErrorDisplay({ error }: Props) {
         </FullScreenHeader>
       )}
       <RouteContainer>
-        {network.type === 'Testnet' && (
-          <TestnetContainer>
-            <TestnetText>{t('SETTING_SCREEN.TESTNET')}</TestnetText>
-          </TestnetContainer>
-        )}
-        {network.type === 'Testnet4' && (
-          <TestnetContainer>
-            <TestnetText>{t('SETTING_SCREEN.TESTNET4')}</TestnetText>
-          </TestnetContainer>
-        )}
-        {network.type === 'Signet' && (
-          <TestnetContainer>
-            <TestnetText>{t('SETTING_SCREEN.SIGNET')}</TestnetText>
-          </TestnetContainer>
-        )}
-        {network.type === 'Regtest' && (
-          <TestnetContainer>
-            <TestnetText>{t('SETTING_SCREEN.REGTEST')}</TestnetText>
-          </TestnetContainer>
-        )}
+        {renderNetwork()}
         <ErrorContents>
           <ErrorTitle>:(</ErrorTitle>
           <ErrorSubtitle>{errorT('ERROR_TITLE')}</ErrorSubtitle>
-          <ErrorDescription>
-            {errorT('ERROR_CODE_MESSAGE', { code: status, message: statusText })}
-          </ErrorDescription>
-          {description && <ErrorDescription>Error description: {description}</ErrorDescription>}
+          {status && (
+            <ErrorDescription>
+              {errorT('ERROR_CODE_MESSAGE', { code: code || status, message: statusText })}
+            </ErrorDescription>
+          )}
+          <ErrorDescription>Error: {message}</ErrorDescription>
           <ErrorDescription>
             {errorT('CONTACT_SUPPORT')}{' '}
             <SupportEmail href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</SupportEmail>
@@ -134,13 +139,13 @@ function ErrorDisplay({ error }: Props) {
                   </InfoWarning>
                   <ErrorDetailsSection>
                     <ErrorDetailTitle>Error Details</ErrorDetailTitle>
-                    <div>Error Code: {status}</div>
+                    <div>Error Code: {code || status}</div>
                     <div>Timestamp: {new Date().toISOString()}</div>
                     <div>{`App Version: ${VERSION} (Beta)`}</div>
                   </ErrorDetailsSection>
                   <ErrorDetailsSection>
-                    <ErrorDetailTitle>Description</ErrorDetailTitle>
-                    <div>{description}</div>
+                    <ErrorDetailTitle>Error</ErrorDetailTitle>
+                    <div>{message}</div>
                   </ErrorDetailsSection>
                   {stack && (
                     <ErrorCode>

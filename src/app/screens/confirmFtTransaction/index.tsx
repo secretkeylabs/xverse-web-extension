@@ -105,6 +105,10 @@ function ConfirmFtTransaction() {
   };
 
   const handleBackButtonClick = () => {
+    trackMixPanel(AnalyticsEvents.InitiateSendFlow, {
+      selectedToken: fungibleToken?.principal,
+      source: 'send_sip10',
+    });
     navigate(`/send-stx?principal=${fungibleToken?.principal}`, {
       state: {
         recipientAddress,

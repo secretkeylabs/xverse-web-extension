@@ -1,3 +1,4 @@
+import { hex } from '@scure/base';
 import { getStxAddressKeyChain, signStacksMessage } from '@secretkeylabs/xverse-core';
 import type { SignaturePayload, StructuredDataSignatureRequestOptions } from '@stacks/connect';
 import { deserializeCV, hexToCV, signStructuredData, type TupleCV } from '@stacks/transactions';
@@ -5,8 +6,8 @@ import { decodeToken } from 'jsontokens';
 import { useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import useNetworkSelector from './useNetwork';
-import useSeedVault from './useSeedVault';
 import useSelectedAccount from './useSelectedAccount';
+import useVault from './useVault';
 
 type SignatureMessageType = 'utf8' | 'structured';
 
@@ -37,7 +38,7 @@ function useSignatureRequest() {
         requestToken: token,
         messageType: type as SignatureMessageType,
         domain: (request.payload as any).domain // TODO: fix type error
-          ? deserializeCV(Buffer.from((request.payload as any).domain, 'hex')) // TODO: fix type error
+          ? deserializeCV(hex.decode((request.payload as any).domain)) // TODO: fix type error
           : null,
       };
     }
@@ -74,15 +75,25 @@ function useSignatureRequest() {
 export function useSignMessage(messageType: SignatureMessageType) {
   const selectedAccount = useSelectedAccount();
   const CurrentNetwork = useNetworkSelector();
-  const { getSeed } = useSeedVault();
+  const vault = useVault();
+
   return useCallback(
     async ({ message, domain }: { message: string; domain?: TupleCV }) => {
-      const seedPhrase = await getSeed();
       if (!selectedAccount) return null;
+
+      if (selectedAccount.accountType !== 'software') {
+        throw new Error('Only software wallets are supported for stx message sign');
+      }
+
+      const { rootNode, derivationType } = await vault.SeedVault.getWalletRootNode(
+        selectedAccount.walletId,
+      );
+
       const { privateKey } = await getStxAddressKeyChain(
-        seedPhrase,
         CurrentNetwork,
-        selectedAccount.id,
+        rootNode,
+        derivationType,
+        BigInt(selectedAccount.id),
       );
       if (messageType === 'utf8') {
         return signStacksMessage(message, privateKey);

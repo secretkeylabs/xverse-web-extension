@@ -30,17 +30,21 @@ const handleGetStxAddresses = async (
   const {
     selectedAccountIndex,
     selectedAccountType,
-    accountsList: softwareAccountsList,
+    selectedWalletId,
+    softwareWallets,
     ledgerAccountsList,
     keystoneAccountsList,
+    network,
   } = rootStore.store.getState().walletState;
 
   const account = getSelectedAccount({
     selectedAccountIndex,
     selectedAccountType,
-    softwareAccountsList,
+    selectedWalletId,
+    softwareWallets,
     ledgerAccountsList,
     keystoneAccountsList,
+    network: network.type,
   });
 
   if (!account) {
@@ -68,6 +72,7 @@ const handleGetStxAddresses = async (
           publicKey: account.stxPublicKey,
           addressType: AddressType.stacks,
           purpose: AddressPurpose.Stacks,
+          walletType: account.accountType ?? 'software',
         },
       ],
     },

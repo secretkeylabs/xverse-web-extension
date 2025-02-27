@@ -6,10 +6,11 @@ import Toggle from '@ui-library/toggle';
 import { PRIVACY_POLICY_LINK, TERMS_LINK } from '@utils/constants';
 import { saveIsTermsAccepted } from '@utils/localStorage';
 import { optInMixPanel, optOutMixPanel } from '@utils/mixpanel';
+import RoutePaths from 'app/routes/paths';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 
 const Container = styled.div((props) => ({
   flex: 1,
@@ -76,7 +77,6 @@ function Legal() {
   const navigate = useNavigate();
   const { changeShowDataCollectionAlert } = useWalletReducer();
   const [searchParams] = useSearchParams();
-  const theme = useTheme();
   const [isToggleEnabled, setIsToggleEnabled] = useState(true);
 
   const handleSwitchToggle = () => setIsToggleEnabled((prevEnabledState) => !prevEnabledState);
@@ -92,9 +92,9 @@ function Legal() {
     saveIsTermsAccepted(true);
     const isRestore = !!searchParams.get('restore');
     if (isRestore) {
-      navigate('/restoreWallet', { replace: true });
+      navigate(RoutePaths.RestoreWallet, { replace: true });
     } else {
-      navigate('/backup', { replace: true });
+      navigate(RoutePaths.CreateWallet, { replace: true });
     }
   };
   return (

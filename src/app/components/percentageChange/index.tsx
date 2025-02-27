@@ -1,3 +1,4 @@
+import FormattedNumber from '@components/formattedNumber';
 import useBtcWalletData from '@hooks/queries/useBtcWalletData';
 import useGetCoinsMarketData from '@hooks/queries/useGetCoinsMarketData';
 import useGetExchangeRate from '@hooks/queries/useGetExchangeRate';
@@ -10,11 +11,13 @@ import type { ChartPriceStats } from '@screens/coinDashboard/tokenPrice';
 import {
   currencySymbolMap,
   FeatureId,
+  formatBalance,
   getFiatEquivalent,
   type FungibleToken,
 } from '@secretkeylabs/xverse-core';
+import { StyledP } from '@ui-library/common.styled';
 import { EMPTY_LABEL, type CurrencyTypes } from '@utils/constants';
-import { getBalanceAmount } from '@utils/tokens';
+import { formatSignificantDecimals, getBalanceAmount } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import styled from 'styled-components';
 import Theme from 'theme';
@@ -42,6 +45,10 @@ const IntervalText = styled.p((props) => ({
   ...props.theme.typography.body_medium_m,
   color: props.theme.colors.white_200,
   marginLeft: props.theme.space.xs,
+}));
+
+const AmountChangeText = styled(StyledP)((props) => ({
+  marginLeft: props.theme.space.xxs,
 }));
 
 type Props = {
@@ -166,12 +173,32 @@ function PercentageChange({
           .multipliedBy(priceChangePercentage24h)
           .multipliedBy(exchangeRate)
           .absoluteValue()
-          .toFormat(2)
       : null;
 
   const formattedAmountChange = amountChangeInUsd
     ? ['(', increase ? '+' : '-', currencySymbolMap[fiatCurrency], amountChangeInUsd, ')'].join('')
     : null;
+
+  const renderFormattedAmountChange = () => {
+    const price = BigNumber(amountChangeInUsd || 0);
+    return (
+      <AmountChangeText
+        typography="body_medium_m"
+        color={increase ? 'success_light' : 'danger_light'}
+      >
+        {`${increase ? '(+' : '(-'}`}
+        {price.isGreaterThan(1) ? (
+          `${currencySymbolMap[fiatCurrency]}${price.toFormat(2)}`
+        ) : (
+          <>
+            {currencySymbolMap[fiatCurrency]}
+            <FormattedNumber number={formatBalance(formatSignificantDecimals(price.toString()))} />
+          </>
+        )}
+        )
+      </AmountChangeText>
+    );
+  };
 
   return (
     <RowContainer>
@@ -179,8 +206,8 @@ function PercentageChange({
       <PercentageChangeText themeColor={themeColor}>
         {formattedPercentageChange}%
         {displayBalanceChange && formattedBalanceChange ? ` ${formattedBalanceChange}` : ''}
-        {formattedAmountChange ? ` ${formattedAmountChange}` : ''}
       </PercentageChangeText>
+      {formattedAmountChange && renderFormattedAmountChange()}
       {displayTimeInterval && <IntervalText>24h</IntervalText>}
     </RowContainer>
   );

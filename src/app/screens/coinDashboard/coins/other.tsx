@@ -35,6 +35,7 @@ import CoinHeader from '../coinHeader';
 import {
   Button,
   ButtonRow,
+  ChartContainer,
   Container,
   ContractAddressCopyButton,
   ContractDeploymentButton,
@@ -46,7 +47,8 @@ import {
   TokenContractAddress,
   TokenText,
 } from '../index.styled';
-import TokenPrice from '../tokenPrice';
+import TokenHistoricalData from '../tokenHistoricalData';
+import TokenPrice, { type ChartPriceStats } from '../tokenPrice';
 import TransactionsHistoryList from '../transactionsHistoryList';
 
 // TODO: This should be refactored into separate components for each protocol/coin as needed
@@ -69,6 +71,8 @@ export default function CoinDashboard() {
   const { data: runesCoinsList } = useVisibleRuneFungibleTokens();
   const { data: sip10CoinsList } = useVisibleSip10FungibleTokens();
   const { data: brc20CoinsList } = useVisibleBrc20FungibleTokens();
+
+  const [chartPriceStats, setChartPriceStats] = useState<ChartPriceStats | undefined>();
 
   let selectedFt: FungibleTokenWithStates | undefined;
 
@@ -163,7 +167,18 @@ export default function CoinDashboard() {
         </OptionsDialog>
       )}
       <Container>
-        <CoinHeader currency={currency as CurrencyTypes} fungibleToken={selectedFt} />
+        <CoinHeader
+          currency={currency as CurrencyTypes}
+          fungibleToken={selectedFt}
+          chartPriceStats={chartPriceStats}
+        />
+        <ChartContainer>
+          <TokenHistoricalData
+            currency={currency as CurrencyTypes}
+            fungibleToken={selectedFt}
+            setChartPriceStats={setChartPriceStats}
+          />
+        </ChartContainer>
         {/* TODO: import { Tabs } from ui-library/tabs.tsx */}
 
         <FtInfoContainer>
@@ -198,6 +213,7 @@ export default function CoinDashboard() {
           <TokenPrice
             currency={currency as CurrencyTypes}
             fungibleToken={selectedFt as FungibleTokenWithStates}
+            chartPriceStats={chartPriceStats}
           />
         )}
 

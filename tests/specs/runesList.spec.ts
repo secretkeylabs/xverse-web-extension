@@ -128,7 +128,6 @@ test.describe('List runes', () => {
     await wallet.tabListed.click();
     await expect(wallet.listedRune.first()).toBeVisible();
     const countListedRunesAfterCancel = await wallet.listedRune.count();
-
-    await expect(countListedRunes).not.toBeLessThan(1);
+    await expect(countListedRunesAfterCancel).toBe(countListedRunes + 1);
   });
 });
