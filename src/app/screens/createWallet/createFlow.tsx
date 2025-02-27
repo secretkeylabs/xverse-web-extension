@@ -58,7 +58,7 @@ export default function CreateFlow({ skipBackup }: Props): JSX.Element {
       disableWalletExistsGuard?.();
 
       // TODO multiwallet: allow user to select derivation type. Currently hard coded to 'account'
-      await createWallet(validatedPassword, mnemonic, 'account', true);
+      await createWallet(validatedPassword, mnemonic, 'account', false);
 
       navigate('/wallet-success/create', { replace: true });
     } else {
