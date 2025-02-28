@@ -15,15 +15,14 @@ type Props = {
 export function Connecting({ onCancel, onConnect, onError }: Props) {
   const { t } = useTranslation();
 
-  const connectionMutation = useMutation({
+  const { mutate } = useMutation({
     mutationFn: () => TransportWebUSB.create(),
     onSuccess: onConnect,
     onError,
   });
   useEffect(() => {
-    if (connectionMutation.isLoading) return;
-    connectionMutation.mutate();
-  }, [connectionMutation]);
+    mutate();
+  }, [mutate]);
 
   const title = t('LEDGER_CONFIRM_TRANSACTION_SCREEN.CONNECT.TITLE');
   const subtitle = t('LEDGER_CONFIRM_TRANSACTION_SCREEN.CONNECT.STX_SUBTITLE');
