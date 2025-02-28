@@ -1,4 +1,9 @@
 enum RoutePaths {
+  // Onboarding
+  Legal = '/legal',
+  RestoreWallet = '/restore-wallet',
+  CreateWallet = '/create-wallet',
+
   ConfirmStacksTransaction = '/confirm-stx-tx',
   SendOrdinal = '/send-ordinal',
   SendInscriptionsRequest = '/send-inscriptions-request',

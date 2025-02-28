@@ -6,6 +6,7 @@ import Dots from '@components/dots';
 import { CaretLeft, CaretRight } from '@phosphor-icons/react';
 import { isInOptions } from '@utils/helper';
 import { getIsTermsAccepted } from '@utils/localStorage';
+import RoutePaths from 'app/routes/paths';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Lottie from 'react-lottie';
@@ -66,13 +67,13 @@ function Landing() {
       if (isInOptions()) {
         if (isLegalAccepted) {
           if (isRestore) {
-            navigate(`/restoreWallet`);
+            navigate(RoutePaths.RestoreWallet);
           } else {
-            navigate(`/backup`);
+            navigate(RoutePaths.CreateWallet);
           }
         } else {
           const params = isRestore ? '?restore=true' : '';
-          navigate(`/legal${params}`);
+          navigate(`${RoutePaths.Legal}${params}`);
         }
         return;
       }
@@ -83,11 +84,11 @@ function Landing() {
       let url: string;
 
       if (isLegalAccepted) {
-        const targetUrlSuffix = isRestore ? '/restoreWallet' : '/backup';
+        const targetUrlSuffix = isRestore ? RoutePaths.RestoreWallet : RoutePaths.CreateWallet;
         url = chrome.runtime.getURL(`options.html#${targetUrlSuffix}`);
       } else {
         const params = isRestore ? '?restore=true' : '';
-        url = chrome.runtime.getURL(`options.html#/legal${params}`);
+        url = chrome.runtime.getURL(`options.html#${RoutePaths.Legal}${params}`);
       }
 
       if (existingTab?.id) {

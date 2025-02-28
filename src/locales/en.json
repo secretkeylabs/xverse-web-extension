@@ -529,7 +529,7 @@
         "TITLE": "Connect your hardware wallet",
         "SUBTITLE": "To continue, plug and unlock your device.",
         "ERROR_TITLE": "Connection error",
-        "ERROR_SUBTITLE": "We haven’t been able to connect to your device."
+        "ERROR_SUBTITLE": "We haven't been able to connect to your device."
       },
       "CONFIRM": {
         "TITLE": "Confirm the transaction",
@@ -640,7 +640,7 @@
     "SPONSORED_SUCCESS_MSG": "Transaction signed",
     "SPONSORED_MSG": "This transaction will be broadcasted by the sponsor",
     "BRC20_ORDINAL_MSG": "The inscription may take up to several hours to appear in your wallet. Once received, head to your collectible dashboard and send it to your recipient to complete the token transfer.",
-    "SPONSOR_SERVICE_ERROR": "If the issue persist, try again at a later time, or uncheck the “Sponsor Transaction” option in the swap details."
+    "SPONSOR_SERVICE_ERROR": "If the issue persist, try again at a later time, or uncheck the \"Sponsor Transaction\" option in the swap details."
   },
   "LEGAL_SCREEN": {
     "SCREEN_TITLE": "Legal",
@@ -672,7 +672,7 @@
     "CONFIRM_YOUR_SEED_PHRASE": "Confirm you've recorded your seed phrase correctly."
   },
   "CREATE_PASSWORD_SCREEN": {
-    "CREATE_PASSWORD_TITLE": "Create your password",
+    "CREATE_PASSWORD_TITLE": "Create Your Password",
     "CREATE_PASSWORD_DESCRIPTION": "Create a strong password to protect your wallet. Your password must be at least 8 characters in length.",
     "ENTER_PASSWORD_TITLE": "Enter a password to protect your wallet",
     "CONFIRM_PASSWORD_TITLE": "Confirm your password",
@@ -693,13 +693,13 @@
     "INCORRECT_PASSWORD_ERROR": "Incorrect password"
   },
   "WALLET_SUCCESS_SCREEN": {
-    "SCREEN_TITLE": "Wallet created successfully",
+    "SCREEN_TITLE": "Wallet Created Successfully",
     "SCREEN_SUBTITLE": "Your new wallet has been created successfully, you can now connect to your wallet.",
     "CLOSE_TAB": "Close this tab",
     "CLICK": "Click",
     "THEN": "then",
     "OPEN_WALLET": "to open your wallet",
-    "RESTORE_SCREEN_TITLE": "Wallet restored",
+    "RESTORE_SCREEN_TITLE": "Wallet Restored",
     "RESTORE_SCREEN_SUBTITLE": "Your wallet has been successfully restored.",
     "SEARCH_XVERSE": "Locate Xverse and click"
   },
@@ -735,7 +735,7 @@
         "TITLE": "Connect Your Ledger",
         "SUBTITLE": "To continue, connect your Ledger device, make sure it's unlocked, and open the Stacks app.",
         "ERROR_TITLE": "Connection error",
-        "ERROR_SUBTITLE": "We haven’t been able to connect to your device."
+        "ERROR_SUBTITLE": "We haven't been able to connect to your device."
       },
       "CONFIRM": {
         "TITLE": "Confirm the signature",
@@ -792,21 +792,15 @@
     "SEED_INPUT_ERROR": "Seed phrase does not match, please try again.",
     "CONTINUE_BUTTON": "Continue",
     "BACK_BUTTON": "Back",
-    "HAVE_A_COUNT_WORDS_SEED_PHRASE": "Have a {{number}} words seed phrase?",
+    "HAVE_A_COUNT_WORDS_SEED_PHRASE": "Have a {{number}} word seed phrase?",
     "SELECT_DERIVATION_TYPE": {
-      "TITLE": "Select a derivation path",
-      "DESCRIPTION": {
-        "FUNDS_FOUND": "Funds were found on two paths:",
-        "AND": "and",
-        "INDEX": "Index-based derivation path",
-        "ACCOUNT": "Account-based derivation path"
-      },
-      "ACCOUNT_TYPE_ACCOUNT": "Account-based derivation path",
-      "ACCOUNT_TYPE_INDEX": "Index-based derivation path",
+      "TITLE": "Select a Wallet to Restore",
+      "DESCRIPTION": "We found funds in two different wallets linked to your seed phrase. Choose which one to restore.",
+      "WALLET": "Wallet",
       "CALLOUT": {
-        "TITLE": "Tip:",
-        "DESCRIPTION_1": "Check accounts associated with each derivation path via \"See Account\" to view balances, addresses, and restorable funds.",
-        "DESCRIPTION_2": "If you restore the wrong funds by mistake, you can reset the wallet later and try again."
+        "TITLE": "Not sure which one to pick?",
+        "DESCRIPTION_1": "Tap \"See Accounts\" to check balances, addresses, and recoverable funds before making a choice.",
+        "DESCRIPTION_2": "If you restore the wrong wallet, you can reset and try the other one anytime."
       },
       "XVERSE": "Xverse",
       "LEDGER": "Ledger",
@@ -816,8 +810,8 @@
       "SEE_ACCOUNTS": "See Accounts",
       "ACCOUNTS_FOUND": "accounts found",
       "ACCOUNT_DETAIL": {
-        "TITLE_INDEX": "Index derivation path",
-        "TITLE_ACCOUNT": "Account derivation path",
+        "TITLE_ACCOUNT": "Wallet 1",
+        "TITLE_INDEX": "Wallet 2",
         "ACCOUNTS_FOUND": "accounts found",
         "ACCOUNT_PREFIX": "Account",
         "DERIVATION_TEMPLATE_TITLE": "Derivation path template",
@@ -918,7 +912,7 @@
     "TRANSFER": "Transfer",
     "BACK": "Back",
     "ORDINAL_ADDRESS": "Ordinal address",
-    "NO_FUNDS": "You don’t have any funds stored on your ordinal address.",
+    "NO_FUNDS": "You don't have any funds stored on your ordinal address.",
     "DESCRIPTION": "You have Bitcoin stored in your ordinal address. You can transfer them to your payment address so they can be used for payments and are shown in your balance."
   },
   "RESTORE_ORDINAL_SCREEN": {
@@ -927,7 +921,7 @@
     "TRANSFER": "Transfer",
     "BACK": "Back",
     "ORDINAL_ADDRESS": "Ordinal address",
-    "NO_FUNDS": "You don’t have any Ordinals stored on your Bitcoin payment address.",
+    "NO_FUNDS": "You don't have any Ordinals stored on your Bitcoin payment address.",
     "DESCRIPTION": "You have Ordinals stored in your Bitcoin payment address. You can transfer them to your Ordinals address so that they show up in your collection."
   },
   "RECOVER_RUNES_SCREEN": {
@@ -1685,7 +1679,7 @@
     "LIST_YOUR_RUNES": "List your Runes on a marketplace",
     "SLIPPAGE_WARNING": "Your transaction may be frontrun and result in an unfavorable trade",
     "BAD_QUOTE_WARNING_TITLE": "The quote you are receiving may result in significant value loss.",
-    "BAD_QUOTE_WARNING_DESC": "The minimum amount you will receive will result in a loss of over {{percentage}}% of your trade’s value. This could be due to low liquidity in the pool or other provider issues. Please review the details carefully before proceeding with the swap.",
+    "BAD_QUOTE_WARNING_DESC": "The minimum amount you will receive will result in a loss of over {{percentage}}% of your trade's value. This could be due to low liquidity in the pool or other provider issues. Please review the details carefully before proceeding with the swap.",
     "UNKNOWN_QUOTE_VALUE_WARNING_DESC": "The market value of the token you will receive is unknown. Review details carefully before proceeding with the swap."
   },
   "SWAP_CONFIRM_SCREEN": {

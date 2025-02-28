@@ -40,11 +40,6 @@ const Description = styled.div((props) => ({
   marginBottom: props.theme.space.m,
 }));
 
-const HighlightedText = styled.span((props) => ({
-  ...props.theme.typography.body_medium_l,
-  color: props.theme.colors.white_0,
-}));
-
 const BodyContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
@@ -80,6 +75,7 @@ type Props = {
   onContinue: (finalSelection: DerivationType) => void;
   summaryIsLoading: boolean;
   autoDetectDerivationType: boolean;
+  preferredAutoDerivationType: DerivationType;
   summaryData:
     | {
         accountSummary: Summary;
@@ -92,6 +88,7 @@ export default function DerivationTypeSelector({
   onContinue,
   summaryIsLoading,
   autoDetectDerivationType,
+  preferredAutoDerivationType,
   summaryData,
 }: Props) {
   const { t } = useTranslation('translation', {
@@ -105,25 +102,30 @@ export default function DerivationTypeSelector({
     undefined,
   );
 
-  const totalIndexFunds =
-    !summaryData || summaryData.indexSummary.accountCount <= 1
-      ? 0n
-      : summaryData.indexSummary.nativeTotalSats + summaryData.indexSummary.nestedTotalSats;
-  const totalAccountFunds =
-    summaryData && (totalIndexFunds === 0n || summaryData.accountSummary.accountCount > 1)
-      ? summaryData.accountSummary.nativeTotalSats + summaryData.accountSummary.nestedTotalSats
-      : 0n;
-
   const shouldAutoContinue = summaryIsLoading
     ? false
-    : autoDetectDerivationType && (totalIndexFunds === 0n || totalAccountFunds === 0n);
+    : autoDetectDerivationType &&
+      summaryData &&
+      // only auto continue if there are no accounts or only a single account (shared between the two types) on one path
+      (summaryData.indexSummary.accountCount <= 1 || summaryData.accountSummary.accountCount <= 1);
 
   useEffect(() => {
-    if (shouldAutoContinue) {
-      // prefer account over index if both are 0
-      const finalDerivationType = totalIndexFunds > 0n ? 'index' : 'account';
-      onContinue(finalDerivationType);
+    if (!shouldAutoContinue) {
+      return;
     }
+
+    let finalDerivationType = preferredAutoDerivationType;
+    if (summaryData) {
+      if (summaryData.accountSummary.accountCount > summaryData.indexSummary.accountCount) {
+        // more accounts in account path, so use that
+        finalDerivationType = 'account';
+      } else if (summaryData.indexSummary.accountCount > summaryData.accountSummary.accountCount) {
+        // more accounts in index path, so use that
+        finalDerivationType = 'index';
+      }
+      // if neither prevail, use the preferred auto derivation type
+    }
+    onContinue(finalDerivationType);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- we don't need to change on the others
   }, [shouldAutoContinue]);
 
@@ -154,22 +156,19 @@ export default function DerivationTypeSelector({
     <Container>
       <Title>{t('TITLE')}</Title>
       <BodyContainer>
-        <Description>
-          {t('DESCRIPTION.FUNDS_FOUND')} <HighlightedText>{t('DESCRIPTION.INDEX')}</HighlightedText>{' '}
-          {t('DESCRIPTION.AND')} <HighlightedText>{t('DESCRIPTION.ACCOUNT')}</HighlightedText>.
-        </Description>
+        <Description>{t('DESCRIPTION')}</Description>
         <Link href={SUPPORT_DERIVATION_TYPE_LINK}>{tCommon('LEARN_MORE')}</Link>
         <SummaryContainer>
           <TypesContainer>
             <PreferredTypeItem
-              title={t('ACCOUNT_TYPE_ACCOUNT')}
+              title={`${t('WALLET')} 1`}
               accountCount={summaryData.accountSummary.accountCount}
               isSelected={selectedType === 'account'}
               onClick={onClickType('account')}
               onShowAccountsClick={() => setTypeAccountsToShow('account')}
             />
             <PreferredTypeItem
-              title={t('ACCOUNT_TYPE_INDEX')}
+              title={`${t('WALLET')} 2`}
               accountCount={summaryData.indexSummary.accountCount}
               isSelected={selectedType === 'index'}
               onClick={onClickType('index')}

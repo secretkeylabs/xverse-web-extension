@@ -90,17 +90,21 @@ export const useSignMessageValidation = (requestPayload: SignMessagePayload | un
     if (requestPayload?.address === requestedAccount.btcAddresses.taproot.address) {
       return;
     }
+    // Skip validation for hardware wallets since they handle address type internally
+    if (selectedAccount.accountType === 'software') {
+      const isNativeAddress =
+        requestPayload?.address === requestedAccount.btcAddresses.native?.address;
+      const isNestedAddress =
+        requestPayload?.address === requestedAccount.btcAddresses.nested?.address;
+      const addressTypeMatches =
+        (btcPaymentAddressType === 'native' && isNativeAddress) ||
+        (btcPaymentAddressType === 'nested' && isNestedAddress);
 
-    // ensure we have the correct address type signing on payment address
-    if (
-      (btcPaymentAddressType === 'native' &&
-        requestPayload?.address !== requestedAccount.btcAddresses.native?.address) ||
-      (btcPaymentAddressType === 'nested' &&
-        requestPayload?.address !== requestedAccount.btcAddresses.nested?.address)
-    ) {
-      setValidationError({
-        error: t('ADDRESS_TYPE_MISMATCH'),
-      });
+      if (!addressTypeMatches) {
+        setValidationError({
+          error: t('ADDRESS_TYPE_MISMATCH'),
+        });
+      }
     }
   };
 

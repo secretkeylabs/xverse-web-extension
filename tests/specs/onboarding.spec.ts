@@ -25,9 +25,11 @@ test.describe('onboarding flow', () => {
   // Visual check of the first page for password creation
   test('skip backup and visual check password page', async ({ page, extensionId }) => {
     const onboardingPage = new Onboarding(page);
-    // Skip landing and go directly to create password via URL
-    await page.goto(`chrome-extension://${extensionId}/options.html#/create-password`);
-    await expect(page.url()).toContain('create-password');
+    // Skip landing and go directly to create wallet via URL
+    await page.goto(`chrome-extension://${extensionId}/options.html#/create-wallet`);
+    await expect(page.url()).toContain('create-wallet');
+    await onboardingPage.checkBackupPage();
+    await onboardingPage.buttonBackupLater.click();
     await onboardingPage.checkPasswordPage();
   });
 
@@ -36,7 +38,7 @@ test.describe('onboarding flow', () => {
     const onboardingPage = new Onboarding(page);
     await onboardingPage.navigateToBackupPage();
     await onboardingPage.buttonBackupLater.click();
-    await expect(page.url()).toContain('create-password');
+    await expect(page.url()).toContain('create-wallet');
 
     // Check error message, security label change, and status of continue button
     await passwordTestCases.reduce(async (previousPromise, testCase) => {
@@ -94,7 +96,7 @@ test.describe('onboarding flow', () => {
 
     // multiple times clicking on continue to check that the user stays on the page and can't continue even of clicked multiple times
     await Onboarding.multipleClickCheck(onboardingPage.buttonContinue);
-    await expect(page.url()).toContain('restoreWallet');
+    await expect(page.url()).toContain('restore-wallet');
     await expect(onboardingPage.inputSeedPhraseWordDisabled).toHaveCount(12);
     await expect(onboardingPage.errorMessageSeedPhrase).toBeVisible();
 
@@ -142,7 +144,7 @@ test.describe('onboarding flow', () => {
 
     // multiple times clicking on continue to check that the user stays on the page and can't continue even of clicked multiple times
     await Onboarding.multipleClickCheck(onboardingPage.buttonContinue);
-    await expect(page.url()).toContain('restoreWallet');
+    await expect(page.url()).toContain('restore-wallet');
 
     await expect(onboardingPage.inputSeedPhraseWordDisabled).toHaveCount(0);
     await expect(onboardingPage.errorMessageSeedPhrase).toBeVisible();
@@ -159,7 +161,7 @@ test.describe('onboarding flow', () => {
     const onboardingPage = new Onboarding(page);
 
     // Skip Landing and go directly to restore wallet via URL
-    await page.goto(`chrome-extension://${extensionId}/options.html#/restoreWallet`);
+    await page.goto(`chrome-extension://${extensionId}/options.html#/restore-wallet`);
 
     await onboardingPage.checkPasswordPage();
 

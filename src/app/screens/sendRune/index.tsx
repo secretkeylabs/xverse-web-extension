@@ -1,6 +1,6 @@
 import { useRuneFungibleTokensQuery } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
+import useAsyncEffect from '@hooks/useAsyncEffect';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
-import useCancellableEffect from '@hooks/useCancellableEffect';
 import useHasFeature from '@hooks/useHasFeature';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
@@ -87,7 +87,7 @@ function SendRuneScreen() {
     );
   };
 
-  useCancellableEffect(
+  useAsyncEffect(
     async (isEffectActive) => {
       const bigAmount = BigNumber(amountToSend);
 
@@ -109,8 +109,15 @@ function SendRuneScreen() {
         }
       } catch (e) {
         if (!isEffectActive()) return;
-        if (!(e instanceof Error) || !e.message.includes('Insufficient funds')) {
+        if (
+          !(e instanceof Error) ||
+          !(
+            e.message.toLowerCase().includes('not enough runes to send') ||
+            e.message.toLowerCase().includes('insufficient funds')
+          )
+        ) {
           console.error(e);
+          throw e;
         }
         setTransaction(undefined);
         setSummary(undefined);

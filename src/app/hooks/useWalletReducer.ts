@@ -9,7 +9,6 @@ import {
   AnalyticsEvents,
   BitcoinEsploraApiProvider,
   createWalletAccount,
-  generateMnemonic,
   getAccountFromRootNode,
   getBnsName,
   mnemonicToRootNode,
@@ -396,12 +395,12 @@ const useWalletReducer = () => {
   const loadWallet = async (onReady?: () => void) => {
     let initialised = false;
 
-    const initialise = () => {
+    const initialise = async () => {
       if (initialised) return;
 
       onReady?.();
       dispatch(setWalletUnlockedAction(true));
-      setSessionStartTimeAndMigrate();
+      await setSessionStartTimeAndMigrate();
       initialised = true;
     };
 
@@ -425,12 +424,12 @@ const useWalletReducer = () => {
             const firstAccount = loadedAccounts[0];
             dispatch(selectAccount(firstAccount.id, 'software', firstAccount.walletId));
           }
-          initialise();
+          await initialise();
         }
       },
     });
 
-    initialise();
+    await initialise();
   };
 
   const unlockWallet = async (password: string) => {
@@ -498,14 +497,14 @@ const useWalletReducer = () => {
   };
 
   const initialiseSeedVault = async (
-    seedPhrase: string,
+    mnemonic: string,
     password: string,
     derivationType: DerivationType,
   ): Promise<WalletId> => {
     // We create an account to ensure that the seed phrase is valid, but we don't store it
     // The actual account creation is done on startup of the wallet
     // If the seed phrase is invalid, then this will throw an error
-    const rootNode = await mnemonicToRootNode(seedPhrase);
+    const rootNode = await mnemonicToRootNode(mnemonic);
     const firstAccount = await createSingleAccount({
       rootNode,
       walletId: 'default' as WalletId,
@@ -520,7 +519,7 @@ const useWalletReducer = () => {
     await chrome.storage.session.clear();
 
     await vault.initialise(password);
-    const walletId = await vault.SeedVault.storeWalletByMnemonic(seedPhrase, derivationType);
+    const walletId = await vault.SeedVault.storeWalletByMnemonic(mnemonic, derivationType);
 
     firstAccount.walletId = walletId;
     dispatch(
@@ -536,29 +535,28 @@ const useWalletReducer = () => {
     }
 
     localStorage.setItem('migrated', 'true');
-    setSessionStartTime();
+    await setSessionStartTime();
 
     return walletId;
   };
 
   const restoreWallet = async (
-    seedPhrase: string,
+    mnemonic: string,
     password: string,
     derivationType: DerivationType,
   ): Promise<WalletId> => {
-    const walletId = await initialiseSeedVault(seedPhrase, password, derivationType);
+    const walletId = await initialiseSeedVault(mnemonic, password, derivationType);
     trackMixPanel(AnalyticsEvents.RestoreWallet, { backupType: 'manual' });
     return walletId;
   };
 
   const createWallet = async (
     password: string,
+    mnemonic: string,
     derivationType: DerivationType,
     hasBackedUpWallet: boolean,
   ): Promise<WalletId> => {
-    let mnemonic = generateMnemonic();
     const walletId = await initialiseSeedVault(mnemonic, password, derivationType);
-    mnemonic = ''; // clear seed phrase from memory
 
     dispatch(setWalletBackupStatusAction(hasBackedUpWallet));
     trackMixPanel(AnalyticsEvents.CreateNewWallet, { has_backed_up_wallet: hasBackedUpWallet });

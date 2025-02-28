@@ -1,7 +1,8 @@
 import { useSingleTabGuard } from '@components/guards/singleTab';
 import useHasStateRehydrated from '@hooks/stores/useHasRehydrated';
+import useAsyncEffect from '@hooks/useAsyncEffect';
 import useVault from '@hooks/useVault';
-import { useLayoutEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import {
   WalletExistsContext,
@@ -30,16 +31,15 @@ function OnboardingGuard({ children }: WalletExistsGuardProps): React.ReactEleme
     }),
     [],
   );
-  useLayoutEffect(() => {
-    (async () => {
-      await vault.restoreVault();
-      const isVaultInitialised = await vault.isInitialised();
-      const isVaultUnlocked = await vault.isVaultUnlocked();
-      const isSeedVaultInitialised =
-        isVaultInitialised && (!isVaultUnlocked || (await vault.SeedVault.isInitialised()));
-      setIsWalletInitialized(isSeedVaultInitialised);
-      setGuardInitialized(true);
-    })().catch(console.error);
+
+  useAsyncEffect(async () => {
+    await vault.restoreVault();
+    const isVaultInitialised = await vault.isInitialised();
+    const isVaultUnlocked = await vault.isVaultUnlocked();
+    const isSeedVaultInitialised =
+      isVaultInitialised && (!isVaultUnlocked || (await vault.SeedVault.isInitialised()));
+    setIsWalletInitialized(isSeedVaultInitialised);
+    setGuardInitialized(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

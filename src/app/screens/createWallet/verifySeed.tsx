@@ -1,4 +1,3 @@
-import useVault from '@hooks/useVault';
 import { Spinner } from '@phosphor-icons/react';
 import { generateMnemonic } from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english';
@@ -45,23 +44,21 @@ function Wrapper({ children }: PropsWithChildren) {
 }
 
 export default function VerifySeed({
+  mnemonic,
   onBack,
   onVerifySuccess,
 }: {
+  mnemonic: string;
   onBack: () => void;
   onVerifySuccess: () => void;
 }) {
   const { t } = useTranslation('translation', { keyPrefix: 'BACKUP_WALLET_SCREEN' });
-  const vault = useVault();
 
   const [error, setError] = useState('');
   const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0);
 
   const { data, isLoading, mutate, isSuccess } = useMutation({
     mutationFn: async () => {
-      const [walletId] = await vault.SeedVault.getWalletIds();
-      const { mnemonic } = await vault.SeedVault.getWalletSecrets(walletId);
-
       if (!mnemonic) throw new Error("Couldn't retrieve mnemonic from vault.");
 
       const words = mnemonic.split(' ');

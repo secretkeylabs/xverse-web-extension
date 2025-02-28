@@ -169,7 +169,7 @@ export default class Onboarding {
     await landingPage.buttonCreateWallet.click();
     await expect(this.page.url()).toContain('legal');
     await this.buttonAccept.click();
-    await expect(this.page.url()).toContain('backup');
+    await expect(this.page.url()).toContain('create-wallet');
   }
 
   async checkBackupPage() {
@@ -223,7 +223,7 @@ export default class Onboarding {
   async createWalletSkipBackup(password) {
     await this.navigateToBackupPage();
     await this.buttonBackupLater.click();
-    await expect(this.page.url()).toContain('create-password');
+    await expect(this.page.url()).toContain('create-wallet');
 
     await expect(this.createPasswordInput).toBeVisible();
     await this.createPasswordInput.fill(password);

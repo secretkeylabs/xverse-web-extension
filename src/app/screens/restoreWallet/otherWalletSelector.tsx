@@ -92,23 +92,24 @@ const WALLET_LIST = [
   {
     name: 'Unisat',
     icon: unisatLogo,
-    derivationType: 'account' as const,
+    derivationType: 'index' as const,
   },
   {
     name: 'Phantom',
     icon: phantomLogo,
-    derivationType: 'account' as const,
+    derivationType: 'index' as const,
   },
   {
     name: 'Leather',
     icon: leatherLogo,
-    derivationType: 'account' as const,
+    derivationType: 'index' as const,
     show24Words: true,
+    autoDetect: true,
   },
   {
     name: 'OKX Wallet',
     icon: okxLogo,
-    derivationType: 'account' as const,
+    derivationType: 'index' as const,
   },
 ];
 

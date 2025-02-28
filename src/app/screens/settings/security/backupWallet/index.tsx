@@ -1,8 +1,10 @@
 import PasswordInput from '@components/passwordInput';
+import SeedBackup from '@components/seedBackup';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import useAsyncEffect from '@hooks/useAsyncEffect';
 import useVault from '@hooks/useVault';
-import SeedCheck from '@screens/createWallet/seedCheck';
+import { Spinner } from '@phosphor-icons/react';
 import { Container } from '@screens/settings/index.styles';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -22,16 +24,43 @@ const SeedPhraseContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(5),
 }));
 
+const LoaderContainer = styled.div((props) => ({
+  display: 'flex',
+  flex: 1,
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginTop: props.theme.space.l,
+}));
+
 function BackupWalletScreen() {
   const { t } = useTranslation('translation');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showSeed, setShowSeed] = useState(false);
+  const [mnemonic, setMnemonic] = useState('');
   const navigate = useNavigate();
   const vault = useVault();
 
-  // TODO multiwallet: Allow user to select which wallet to view the seed phrase for and pass to SeedCheck below
+  useAsyncEffect(async () => {
+    if (!showSeed) {
+      return;
+    }
+    // TODO multiwallet: Allow user to select which wallet to view the seed phrase for and pass to SeedBackup below
+    const primaryWalletId = await vault.SeedVault.getPrimaryWalletId();
+
+    if (!primaryWalletId) {
+      throw new Error('No primary wallet found');
+    }
+
+    const walletSecrets = await vault.SeedVault.getWalletSecrets(primaryWalletId);
+
+    if (!walletSecrets.mnemonic) {
+      throw new Error('No mnemonic found');
+    }
+
+    setMnemonic(walletSecrets.mnemonic);
+  }, [showSeed, vault]);
 
   const handleBackButtonClick = () => {
     navigate(-1);
@@ -50,6 +79,14 @@ function BackupWalletScreen() {
       setLoading(false);
     }
   };
+
+  if (showSeed && !mnemonic) {
+    return (
+      <LoaderContainer>
+        <Spinner color="white" size={50} />
+      </LoaderContainer>
+    );
+  }
 
   return (
     <>
@@ -71,9 +108,7 @@ function BackupWalletScreen() {
             />
           </EnterPasswordContainer>
         )}
-        <SeedPhraseContainer>
-          {showSeed && <SeedCheck onContinue={handleBackButtonClick} />}
-        </SeedPhraseContainer>
+        <SeedPhraseContainer>{showSeed && <SeedBackup mnemonic={mnemonic} />}</SeedPhraseContainer>
       </Container>
       <BottomBar tab="settings" />
     </>
