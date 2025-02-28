@@ -121,8 +121,8 @@ export default class Onboarding {
     this.buttonRestoreManual = page.getByTestId('restore-manual-btn');
     this.buttonRestoreFromWalletImport = page.getByTestId('restore-import-btn');
     this.headingRestoreWallet = page.getByRole('heading', { name: 'Enter Seed Phrase' });
-    this.button24SeedPhrase = page.getByRole('button', { name: '24 words' });
-    this.button12SeedPhrase = page.getByRole('button', { name: '12 words' });
+    this.button24SeedPhrase = page.getByRole('button', { name: 'Have a 24 word seed phrase?' });
+    this.button12SeedPhrase = page.getByRole('button', { name: 'Have a 12 word seed phrase?' });
     this.inputSeedPhraseWord = page.locator('input');
     this.inputSeedPhraseWordDisabled = page.locator('input[disabled]');
     this.buttonUnlock = page.getByRole('button', { name: 'Unlock' });
