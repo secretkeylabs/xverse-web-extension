@@ -1,5 +1,5 @@
 import { useRuneFungibleTokensQuery } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
-import useAsyncEffect from '@hooks/useAsyncEffect';
+import useAsyncFn from '@hooks/useAsyncFn';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import useHasFeature from '@hooks/useHasFeature';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
@@ -42,7 +42,6 @@ function SendRuneScreen() {
   const [feeRate, setFeeRate] = useState('');
   const [sendMax, setSendMax] = useState(false);
   const [currentStep, setCurrentStep] = useState<Step>(Step.SelectRecipient);
-  const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const transactionContext = useTransactionContext();
   const [transaction, setTransaction] = useState<btcTransaction.EnhancedTransaction | undefined>();
@@ -87,8 +86,8 @@ function SendRuneScreen() {
     );
   };
 
-  useAsyncEffect(
-    async (isEffectActive) => {
+  const { isLoading } = useAsyncFn(
+    async ({ signal }) => {
       const bigAmount = BigNumber(amountToSend);
 
       if (!recipientAddress || !feeRate || bigAmount.isNaN() || bigAmount.isLessThanOrEqualTo(0)) {
@@ -97,18 +96,16 @@ function SendRuneScreen() {
         return;
       }
 
-      setIsLoading(true);
-
       try {
         const transactionDetails = await generateTransactionAndSummary();
-        if (isEffectActive() && transactionDetails) {
+        if (!signal.aborted && transactionDetails) {
           setTransaction(transactionDetails.transaction);
           if (transactionDetails.summary) {
             setSummary(transactionDetails.summary);
           }
         }
       } catch (e) {
-        if (!isEffectActive()) return;
+        if (signal.aborted) return;
         if (
           !(e instanceof Error) ||
           !(
@@ -121,8 +118,6 @@ function SendRuneScreen() {
         }
         setTransaction(undefined);
         setSummary(undefined);
-      } finally {
-        if (isEffectActive()) setIsLoading(false);
       }
     },
     [transactionContext, recipientAddress, amountToSend, feeRate, sendMax],

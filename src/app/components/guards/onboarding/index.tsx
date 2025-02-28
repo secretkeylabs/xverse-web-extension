@@ -1,6 +1,6 @@
 import { useSingleTabGuard } from '@components/guards/singleTab';
 import useHasStateRehydrated from '@hooks/stores/useHasRehydrated';
-import useAsyncEffect from '@hooks/useAsyncEffect';
+import useAsyncFn from '@hooks/useAsyncFn';
 import useVault from '@hooks/useVault';
 import { useMemo, useState } from 'react';
 import { Navigate } from 'react-router-dom';
@@ -32,7 +32,7 @@ function OnboardingGuard({ children }: WalletExistsGuardProps): React.ReactEleme
     [],
   );
 
-  useAsyncEffect(async () => {
+  useAsyncFn(async () => {
     await vault.restoreVault();
     const isVaultInitialised = await vault.isInitialised();
     const isVaultUnlocked = await vault.isVaultUnlocked();

@@ -1,4 +1,4 @@
-import useAsyncEffect from '@hooks/useAsyncEffect';
+import useAsyncFn from '@hooks/useAsyncFn';
 import useTransactionContext from '@hooks/useTransactionContext';
 import type { TransactionSummary } from '@screens/sendBtc/helpers';
 import {
@@ -17,23 +17,15 @@ export default function useExtractTxSummary(
   const [data, setData] = useState<UserTransactionSummary | AggregatedSummary | undefined>(
     undefined,
   );
-  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const context = useTransactionContext();
-  useAsyncEffect(
-    async (isEffectActive) => {
+  const { isLoading } = useAsyncFn(
+    async ({ signal }) => {
       if (!summary) return;
 
-      setIsLoading(true);
-      try {
-        const extractedSummary = await extractViewSummary(context, summary, network);
-        if (isEffectActive()) {
-          setData(extractedSummary);
-        }
-      } finally {
-        if (isEffectActive()) {
-          setIsLoading(false);
-        }
+      const extractedSummary = await extractViewSummary(context, summary, network);
+      if (!signal.aborted) {
+        setData(extractedSummary);
       }
     },
     [context, network, summary],
