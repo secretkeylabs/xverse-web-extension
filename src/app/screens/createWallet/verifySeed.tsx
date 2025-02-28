@@ -59,9 +59,6 @@ export default function VerifySeed({
 
   const { data, isLoading, mutate, isSuccess } = useMutation({
     mutationFn: async () => {
-      const [walletId] = await vault.SeedVault.getWalletIds();
-      const { mnemonic } = await vault.SeedVault.getWalletSecrets(walletId);
-
       if (!mnemonic) throw new Error("Couldn't retrieve mnemonic from vault.");
 
       const words = mnemonic.split(' ');
