@@ -574,7 +574,7 @@ export default function SwapScreen() {
                   ? mapFTProtocolToSwapProtocol(fromToken)
                   : undefined,
               decimals: fromToken?.principal === 'BTC' ? 8 : fromToken?.decimals,
-              unit: fromToken?.principal === 'BTC' ? 'BTC' : fromToken?.runeSymbol ?? '',
+              unit: fromToken?.runeSymbol ?? fromToken?.ticker ?? fromToken?.principal,
             }}
             max={
               fromToken?.principal === 'BTC' || fromToken?.principal === 'STX'
