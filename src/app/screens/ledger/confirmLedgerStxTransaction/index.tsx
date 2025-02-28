@@ -21,6 +21,11 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 
+import { sendInternalErrorMessage } from '@common/utils/rpc/responseMessages/errors';
+import {
+  sendSignTransactionSuccessResponseMessage,
+  sendStxTransferSuccessResponseMessage,
+} from '@common/utils/rpc/responseMessages/stacks';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import {
   Container,
@@ -64,7 +69,8 @@ function ConfirmLedgerStxTransaction(): JSX.Element {
     unsignedTx,
     fee,
     tabId,
-    tabMessageId: messageId,
+    messageId,
+    rpcMethod,
   }: {
     amount: BigNumber;
     recipients: StacksRecipient[];
@@ -72,7 +78,7 @@ function ConfirmLedgerStxTransaction(): JSX.Element {
     fee?: BigNumber;
     messageId?: string;
     tabId?: number;
-    tabMessageId?: string;
+    rpcMethod: string;
   } = location.state;
 
   const transition = useTransition(currentStep, DEFAULT_TRANSITION_OPTIONS);
@@ -86,8 +92,30 @@ function ConfirmLedgerStxTransaction(): JSX.Element {
       });
       setIsFinalTxApproved(true);
       await delay(1500);
-      const transactionHash = await broadcastSignedTransaction(result, selectedNetwork);
-      setTxId(transactionHash);
+      const transactionHash = result.serialize();
+      const broadcastedTxId = await broadcastSignedTransaction(result, selectedNetwork);
+      setTxId(broadcastedTxId);
+      switch (rpcMethod) {
+        case 'stx_signTransaction': {
+          sendSignTransactionSuccessResponseMessage({
+            tabId: tabId ?? 0,
+            messageId,
+            result: { transaction: transactionHash },
+          });
+          break;
+        }
+        case 'stx_transferStx': {
+          sendStxTransferSuccessResponseMessage({
+            tabId: tabId ?? 0,
+            messageId,
+            result: { transaction: transactionHash, txid: broadcastedTxId },
+          });
+          break;
+        }
+        default: {
+          sendInternalErrorMessage({ tabId: tabId ?? 0, messageId });
+        }
+      }
       setCurrentStep(Steps.TransactionConfirmed);
     } catch (err) {
       console.error(err);
