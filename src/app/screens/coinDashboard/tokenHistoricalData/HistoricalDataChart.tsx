@@ -32,6 +32,8 @@ const ToolTipTextContainer = styled.div({
 });
 
 const StyledBetterBarLoader = styled(BetterBarLoader)<{}>({
+  width: `calc(100% + ${Theme.space.xxl})`,
+  height: '120px',
   marginLeft: '-21px',
 });
 
@@ -87,7 +89,7 @@ function CustomTooltip({
 }
 
 export function LoadingHistoricalDataChart() {
-  return <StyledBetterBarLoader width={370} height={120} />;
+  return <StyledBetterBarLoader width="100%" height={120} />;
 }
 
 export function EmptyHistoricalDataChart() {

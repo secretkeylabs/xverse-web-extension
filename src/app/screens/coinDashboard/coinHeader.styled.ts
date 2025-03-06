@@ -79,7 +79,7 @@ export const RowButtonContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'center',
-  marginTop: props.theme.space.l,
+  marginTop: props.theme.space.ml,
   columnGap: props.theme.space.l,
 }));
 
@@ -141,4 +141,5 @@ export const PriceStatsContainer = styled.div((props) => ({
   justifyContent: 'center',
   alignItems: 'center',
   marginTop: props.theme.space.xs,
+  height: props.theme.space.ml,
 }));
