@@ -1,7 +1,12 @@
 import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types';
 import { getPopupPayload, type Context } from '@common/utils/popup';
 import { accountPurposeAddresses } from '@common/utils/rpc/btc/getAddresses/utils';
-import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
+import {
+  getBitcoinNetworkType,
+  makeRPCError,
+  makeRpcSuccessResponse,
+  sendRpcResponse,
+} from '@common/utils/rpc/helpers';
 import { usePermissions } from '@components/permissionsManager';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -84,6 +89,7 @@ function useMakeTransitionalGrantAccountReadPermissions() {
 
 export default function useRequestHelper(): UseRequestHelperReturn {
   const account = useSelectedAccount();
+  const { network } = useWalletSelector();
   const transitionalGrantReadPermissions = useMakeTransitionalGrantAccountReadPermissions();
 
   // Used for handling a legacy request at the end of this function. Although
@@ -108,7 +114,20 @@ export default function useRequestHelper(): UseRequestHelperReturn {
           purposes: popupPayloadGetAddresses.data.params.purposes,
         });
 
-        sendRpcResponse(context.tabId, makeRpcSuccessResponse(data.id, { addresses }));
+        sendRpcResponse(
+          context.tabId,
+          makeRpcSuccessResponse(data.id, {
+            addresses,
+            network: {
+              bitcoin: {
+                name: getBitcoinNetworkType(network.type),
+              },
+              stacks: {
+                name: getBitcoinNetworkType(network.type),
+              },
+            },
+          }),
+        );
       },
       sendCancelledResponse() {
         sendRpcResponse(

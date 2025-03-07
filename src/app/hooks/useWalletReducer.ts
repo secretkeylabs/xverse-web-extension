@@ -2,6 +2,7 @@ import getSelectedAccount from '@common/utils/getSelectedAccount';
 import { getDeviceAccountIndex } from '@common/utils/ledger';
 import { dispatchEventAuthorizedConnectedClients } from '@common/utils/messages/extensionToContentScript/dispatchEvent';
 import { delay } from '@common/utils/promises';
+import { getBitcoinNetworkType } from '@common/utils/rpc/helpers';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
 import type { HDKey } from '@scure/bip32';
@@ -645,7 +646,7 @@ const useWalletReducer = () => {
         {
           type: 'networkChange',
           bitcoin: {
-            name: changedNetwork.type,
+            name: getBitcoinNetworkType(changedNetwork.type),
           },
           stacks: {
             name: changedNetwork.type,

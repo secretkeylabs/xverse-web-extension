@@ -1,10 +1,12 @@
 import { MESSAGE_SOURCE } from '@common/types/message-types';
+import { getBitcoinNetworkType } from '@common/utils/rpc/helpers';
 import { sendGetAddressesSuccessResponseMessage } from '@common/utils/rpc/responseMessages/stacks';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   AddressPurpose,
   AddressType,
   type GetAddressOptions,
+  type Return,
   type WalletType,
 } from '@sats-connect/core';
 import { decodeToken } from 'jsontokens';
@@ -45,8 +47,16 @@ const useStxAddressRequest = () => {
       },
     ];
 
-    const response = {
+    const response: Return<'stx_getAddresses'> = {
       addresses: addressesResponse,
+      network: {
+        bitcoin: {
+          name: getBitcoinNetworkType(network.type),
+        },
+        stacks: {
+          name: getBitcoinNetworkType(network.type),
+        },
+      },
     };
     const addressMessage = {
       source: MESSAGE_SOURCE,
@@ -65,6 +75,7 @@ const useStxAddressRequest = () => {
 
     chrome.tabs.sendMessage(+tabId, addressMessage);
   }, [stxAddress, stxPublicKey, requestToken, tabId]);
+
   const cancelAddressRequest = useCallback(() => {
     const addressMessage = {
       source: MESSAGE_SOURCE,
