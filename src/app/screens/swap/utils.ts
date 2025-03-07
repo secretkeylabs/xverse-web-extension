@@ -2,6 +2,7 @@ import type {
   FungibleToken,
   FungibleTokenProtocol,
   Protocol,
+  Quote,
   Token,
   TokenBasic,
 } from '@secretkeylabs/xverse-core';
@@ -111,4 +112,17 @@ export const getTrackingIdentifier = (token?: FungibleToken): string => {
   }
 
   return token.name || identifier;
+};
+
+export const getProviderDetails = (amm: Quote) => {
+  if (amm.provider.code === 'satsterminal') {
+    return {
+      name: amm.bestMarketplaceProvider?.name ?? amm.provider.name,
+      logo: amm.bestMarketplaceProvider?.logo ?? amm.provider.logo,
+    };
+  }
+  return {
+    name: amm.provider.name,
+    logo: amm.provider.logo,
+  };
 };

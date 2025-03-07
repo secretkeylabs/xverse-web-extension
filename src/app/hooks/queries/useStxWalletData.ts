@@ -13,6 +13,7 @@ const useStxWalletData = () => {
       balance: response.totalBalance,
       locked: response.lockedBalance,
       transactions: [],
+      nonce: 0,
     };
   };
 
