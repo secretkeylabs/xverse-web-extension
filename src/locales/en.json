@@ -789,7 +789,7 @@
     },
     "ENTER_SEED_TITLE": "Enter Seed Phrase",
     "ENTER_SEED_DESCRIPTION": "Enter or paste your 12 or 24 word seed phrase to restore your wallet.",
-    "SEED_INPUT_ERROR": "Seed phrase does not match, please try again.",
+    "SEED_INPUT_ERROR": "Invalid seed phrase",
     "CONTINUE_BUTTON": "Continue",
     "BACK_BUTTON": "Back",
     "HAVE_A_COUNT_WORDS_SEED_PHRASE": "Have a {{number}} word seed phrase?",
