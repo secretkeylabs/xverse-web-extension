@@ -48,7 +48,7 @@ jobs:
     needs: [build]
     name: E2E Test ${{ matrix.shardIndex }} of ${{ matrix.shardTotal }}
     timeout-minutes: 10
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
@@ -93,7 +93,7 @@ jobs:
     # Merge reports after playwright-tests, even if some shards have failed
     if: ${{ always() && needs.UItest.result != 'skipped' }}
     needs: [UItest]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
