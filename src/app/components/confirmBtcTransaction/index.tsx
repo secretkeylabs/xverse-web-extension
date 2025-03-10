@@ -179,7 +179,15 @@ function ConfirmBtcTransaction({
           )}
         </ConfirmTxLayout>
         <Sheet visible={isLedgerModalVisible} onClose={() => setIsLedgerModalVisible(false)}>
-          {isLedgerModalVisible && <LedgerSteps onConfirm={onConfirm} onCancel={onCancel} />}
+          {isLedgerModalVisible && (
+            <LedgerSteps
+              onConfirm={onConfirm}
+              onCancel={onCancel}
+              showExternalInputsWarning={
+                extractedTxSummary.hasExternalInputs || !extractedTxSummary.isFinal
+              }
+            />
+          )}
         </Sheet>
         <Sheet visible={isKeystoneModalVisible} onClose={() => setIsKeystoneModalVisible(false)}>
           {isKeystoneModalVisible && <KeystoneSteps onConfirm={onConfirm} onCancel={onCancel} />}
