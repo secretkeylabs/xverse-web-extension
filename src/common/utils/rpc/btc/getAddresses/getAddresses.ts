@@ -3,6 +3,7 @@ import { getTabIdFromPort } from '@common/utils';
 import getSelectedAccount, { embellishAccountWithDetails } from '@common/utils/getSelectedAccount';
 import { type GetAddressesRequestMessage } from '@sats-connect/core';
 import rootStore from '@stores/index';
+import { getBitcoinNetworkType } from '../../helpers';
 import { sendGetAddressesSuccessResponseMessage } from '../../responseMessages/bitcoin';
 import { sendInternalErrorMessage } from '../../responseMessages/errors';
 import { accountPurposeAddresses } from './utils';
@@ -49,6 +50,14 @@ export const handleGetAddresses = async (
     messageId: message.id,
     result: {
       addresses,
+      network: {
+        bitcoin: {
+          name: getBitcoinNetworkType(network.type),
+        },
+        stacks: {
+          name: getBitcoinNetworkType(network.type),
+        },
+      },
     },
   });
 };

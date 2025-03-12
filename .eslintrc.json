@@ -36,7 +36,12 @@
     "no-inline-styles/no-inline-styles": 2,
     "no-nested-ternary": "off",
     "no-param-reassign": "off",
-    "react-hooks/exhaustive-deps": "warn",
+    "react-hooks/exhaustive-deps": [
+      "warn",
+      {
+        "additionalHooks": "(useAsyncFn)"
+      }
+    ],
     "react/jsx-key": "warn",
     "react/jsx-props-no-spreading": "off",
     "react/react-in-jsx-scope": "off",

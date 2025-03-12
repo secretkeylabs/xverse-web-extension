@@ -101,9 +101,7 @@ export default class Onboarding {
     this.createPasswordInput = page.getByPlaceholder('Type your password', { exact: true });
     this.confirmPasswordInput = page.getByPlaceholder('Type your password again');
     this.errorMessage2 = page.locator('p').filter({ hasText: 'Please make sure your' });
-    this.errorMessageSeedPhrase = page
-      .locator('p')
-      .filter({ hasText: 'Seed phrase does not match' });
+    this.errorMessageSeedPhrase = page.getByText('Invalid seed phrase');
     this.labelSecurityLevelWeak = page.getByTestId('strength-message').filter({ hasText: 'Weak' });
     this.labelSecurityLevelMedium = page
       .getByTestId('strength-message')
@@ -121,8 +119,8 @@ export default class Onboarding {
     this.buttonRestoreManual = page.getByTestId('restore-manual-btn');
     this.buttonRestoreFromWalletImport = page.getByTestId('restore-import-btn');
     this.headingRestoreWallet = page.getByRole('heading', { name: 'Enter Seed Phrase' });
-    this.button24SeedPhrase = page.getByRole('button', { name: '24 words' });
-    this.button12SeedPhrase = page.getByRole('button', { name: '12 words' });
+    this.button24SeedPhrase = page.getByRole('button', { name: 'Have a 24 word seed phrase?' });
+    this.button12SeedPhrase = page.getByRole('button', { name: 'Have a 12 word seed phrase?' });
     this.inputSeedPhraseWord = page.locator('input');
     this.inputSeedPhraseWordDisabled = page.locator('input[disabled]');
     this.buttonUnlock = page.getByRole('button', { name: 'Unlock' });

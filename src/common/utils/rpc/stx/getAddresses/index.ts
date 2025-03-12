@@ -13,7 +13,7 @@ import {
   triggerRequestWindowOpen,
 } from '../../../legacy-external-message-handler';
 import RequestsRoutes from '../../../route-urls';
-import { makeRPCError } from '../../helpers';
+import { getBitcoinNetworkType, makeRPCError } from '../../helpers';
 import { sendGetAddressesSuccessResponseMessage } from '../../responseMessages/stacks';
 
 const handleGetStxAddresses = async (
@@ -75,6 +75,14 @@ const handleGetStxAddresses = async (
           walletType: account.accountType ?? 'software',
         },
       ],
+      network: {
+        bitcoin: {
+          name: getBitcoinNetworkType(network.type),
+        },
+        stacks: {
+          name: getBitcoinNetworkType(network.type),
+        },
+      },
     },
   });
 };

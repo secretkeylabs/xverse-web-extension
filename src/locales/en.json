@@ -591,7 +591,7 @@
     "EDIT_FEE": "Edit Fees",
     "FEE": "Fee",
     "NETWORK_FEE": "Network Fee",
-    "FEE_RATE": "Fee Rate",
+    "FEE_RATE": "Fee rate",
     "STANDARD": "Regular",
     "HIGH": "Fast",
     "CUSTOM": "Custom",
@@ -789,7 +789,7 @@
     },
     "ENTER_SEED_TITLE": "Enter Seed Phrase",
     "ENTER_SEED_DESCRIPTION": "Enter or paste your 12 or 24 word seed phrase to restore your wallet.",
-    "SEED_INPUT_ERROR": "Seed phrase does not match, please try again.",
+    "SEED_INPUT_ERROR": "Invalid seed phrase",
     "CONTINUE_BUTTON": "Continue",
     "BACK_BUTTON": "Back",
     "HAVE_A_COUNT_WORDS_SEED_PHRASE": "Have a {{number}} word seed phrase?",
@@ -1640,9 +1640,9 @@
     "SELECT_COIN": "Select asset",
     "DETAILS": "Details",
     "MIN_RECEIVE": "Minimum received",
-    "SLIPPAGE": "Slippage Tolerance",
+    "SLIPPAGE": "Slippage tolerance",
     "SLIPPAGE_TITLE": "Slippage",
-    "LP_FEE": "Liquidity Provider Fee",
+    "LP_FEE": "Liquidity provider fee",
     "ROUTE": "Route",
     "SPONSOR_TRANSACTION": "Sponsor transaction (no fees)",
     "POWERED_BY_ALEX": "Powered by ALEX",
@@ -1664,7 +1664,7 @@
     "SWAP_TRANSACTION_CANNOT_BE_SPONSORED": "Swap transaction cannot be sponsored while you have a pending transaction.",
     "LEARN_MORE": "Learn more",
     "GET_QUOTES": "Get quotes",
-    "SEARCH_BY_NAME": "Search by token name",
+    "SEARCH_BY_NAME": "Search by token name or ticker",
     "GET_QUOTES_TITLE": "Rates",
     "QUOTE_TITLE": "We found the following rates for your swap",
     "EXCHANGE": "EXCHANGE",
@@ -1679,8 +1679,9 @@
     "LIST_YOUR_RUNES": "List your Runes on a marketplace",
     "SLIPPAGE_WARNING": "Your transaction may be frontrun and result in an unfavorable trade",
     "BAD_QUOTE_WARNING_TITLE": "The quote you are receiving may result in significant value loss.",
-    "BAD_QUOTE_WARNING_DESC": "The minimum amount you will receive will result in a loss of over {{percentage}}% of your trade's value. This could be due to low liquidity in the pool or other provider issues. Please review the details carefully before proceeding with the swap.",
-    "UNKNOWN_QUOTE_VALUE_WARNING_DESC": "The market value of the token you will receive is unknown. Review details carefully before proceeding with the swap."
+    "BAD_QUOTE_WARNING_DESC": "The minimum amount you will receive will result in a loss of over {{percentage}}% of your trade’s value. This could be due to low liquidity in the pool or other provider issues. Please review the details carefully before proceeding with the swap.",
+    "UNKNOWN_QUOTE_VALUE_WARNING_DESC": "The market value of the token you will receive is unknown. Review details carefully before proceeding with the swap.",
+    "UTXO_PROVIDER_DISCLAIMER": "Based on floor price / lot availability of your order."
   },
   "SWAP_CONFIRM_SCREEN": {
     "TOKEN_SWAP": "Token swap",
@@ -1822,5 +1823,12 @@
     "NETWORK_MISMATCH": "There's a mismatch between your active network and the network you're logged in with on the app.",
     "PSBT_CANT_PARSE_ERROR_TITLE": "Transaction Error",
     "PSBT_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction is invalid and cannot be processed. Please contact the developer of the requesting app for support."
+  },
+  "CHANGE_NETWORK_REQUEST": {
+    "TITLE": "Allow this app to switch the network?",
+    "INFO_MESSAGE": "This will switch the selected network within Xverse.",
+    "CALLOUT": "Make sure you trust the app requesting the network change.",
+    "CANCEL_BUTTON": "Cancel",
+    "SWITCH_NETWORK_BUTTON": "Switch Network"
   }
 }

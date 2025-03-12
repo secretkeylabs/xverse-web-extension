@@ -1,9 +1,10 @@
 import { MESSAGE_SOURCE } from '@common/types/message-types';
 
+import { getBitcoinNetworkType } from '@common/utils/rpc/helpers';
 import { sendUserRejectionMessage } from '@common/utils/rpc/responseMessages/errors';
 import { sendGetAccountsSuccessResponseMessage } from '@common/utils/rpc/responseMessages/stacks';
 import useWalletSelector from '@hooks/useWalletSelector';
-import type { GetAddressOptions } from '@sats-connect/core';
+import type { GetAddressOptions, Return } from '@sats-connect/core';
 import { base58, hex } from '@scure/base';
 import { decodeToken } from 'jsontokens';
 import { useCallback, useMemo } from 'react';
@@ -57,8 +58,16 @@ const useStxAccountRequest = () => {
       },
     ];
 
-    const response = {
+    const response: Return<'stx_getAccounts'> = {
       addresses: addressesResponse,
+      network: {
+        bitcoin: {
+          name: getBitcoinNetworkType(network.type),
+        },
+        stacks: {
+          name: getBitcoinNetworkType(network.type),
+        },
+      },
     };
     const addressMessage = {
       source: MESSAGE_SOURCE,

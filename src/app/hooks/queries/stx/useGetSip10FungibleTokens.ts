@@ -11,7 +11,6 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import { selectWithDerivedState } from '@utils/tokens';
-import useGetTopTokens from '../useGetTopTokens';
 
 export const fetchSip10FungibleTokens =
   (
@@ -46,7 +45,6 @@ export const useGetSip10FungibleTokens = (select?: (data: FungibleTokenWithState
   const { sip10ManageTokens, fiatCurrency, network, spamTokens, showSpamTokens } =
     useWalletSelector();
   const currentNetworkInstance = useNetworkSelector();
-  const { data: topTokensData } = useGetTopTokens();
 
   const queryFn = fetchSip10FungibleTokens(
     stxAddress,
@@ -64,7 +62,6 @@ export const useGetSip10FungibleTokens = (select?: (data: FungibleTokenWithState
       manageTokens: sip10ManageTokens,
       spamTokens,
       showSpamTokens,
-      topTokensData: topTokensData?.stacks,
       select,
     }),
   });

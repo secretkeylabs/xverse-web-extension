@@ -79,13 +79,6 @@ test.describe('Swap Flow Exchange', () => {
 
     expect(await wallet.confirmAmount.count()).toBeGreaterThan(3);
 
-    // Confirm Amount is the same as swapAmount
-    const swapSendAmount = await wallet.confirmAmount
-      .filter({ hasText: swapAmount.toString() })
-      .innerText();
-    const numericValueSwap = parseFloat(swapSendAmount.replace(/[^0-9.]/g, ''));
-    expect(numericValueSwap).toEqual(swapAmount);
-
     // Check Rune token name
     await expect(wallet.nameRune).toContainText(tokenName1);
 

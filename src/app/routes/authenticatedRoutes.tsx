@@ -5,6 +5,7 @@ import RequestsRoutes from '@common/utils/route-urls';
 import { SingleTabGuard } from '@components/guards/singleTab';
 import AccountList from '@screens/accountList';
 import Buy from '@screens/buy';
+import ChangeNetworkRequest from '@screens/changeNetworkRequest';
 import CoinDashboard from '@screens/coinDashboard';
 import ConfirmBrc20Transaction from '@screens/confirmBrc20Transaction';
 import ConfirmFtTransaction from '@screens/confirmFtTransaction';
@@ -442,6 +443,10 @@ const authedRoutesWithSidebar: RouteObject = {
     {
       path: 'connect-hardware-wallet',
       element: <ConnectHardwareWallet />,
+    },
+    {
+      path: RequestsRoutes.ChangeNetworkRequest,
+      element: <ChangeNetworkRequest />,
     },
   ],
 };

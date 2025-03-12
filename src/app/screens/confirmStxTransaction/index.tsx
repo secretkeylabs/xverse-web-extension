@@ -224,6 +224,9 @@ function ConfirmStxTransaction() {
         unsignedTx: Buffer.from(unsignedTx.serializeBytes()),
         recipients: [{ address: recipient, amountMicrostacks: amount }],
         fee,
+        tabId,
+        messageId,
+        rpcMethod,
       };
 
       navigate('/confirm-ledger-stx-tx', { state });

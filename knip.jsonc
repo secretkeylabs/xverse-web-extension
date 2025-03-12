@@ -30,6 +30,6 @@
   ],
   "ignore": [
     // Temporary ignore as one of the overloads is not currently used
-    "src/app/hooks/useAsyncEffect.ts"
+    "src/app/hooks/useAsyncFn.ts"
   ]
 }

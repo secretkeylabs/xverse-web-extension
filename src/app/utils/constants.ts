@@ -47,7 +47,7 @@ export enum LoaderSize {
   LARGE,
 }
 
-export const BITCOIN_DUST_AMOUNT_SATS = 1500;
+export const BITCOIN_DUST_AMOUNT_SATS = 546;
 export const PAGINATION_LIMIT = 50;
 
 /**

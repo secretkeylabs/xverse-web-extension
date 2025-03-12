@@ -1,7 +1,6 @@
 /* eslint-disable no-void */
 import { CONTENT_SCRIPT_PORT } from '@common/types/message-types';
 import { handleLegacyExternalMethodFormat } from '@common/utils/legacy-external-message-handler';
-import internalBackgroundMessageHandler from '@common/utils/messageHandlers';
 import handleRPCRequest from '@common/utils/rpc';
 import { rpcRequestMessageSchema } from '@sats-connect/core';
 import * as v from 'valibot';
@@ -28,12 +27,6 @@ chrome.runtime.onConnect.addListener((port) => {
       console.error('Failed to handle message:', error);
     });
   });
-});
-
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  void internalBackgroundMessageHandler(message, sender, sendResponse);
-  // Listener fn must return `true` to indicate the response will be async
-  return true;
 });
 
 async function onInstalledListener(details: chrome.runtime.InstalledDetails) {

@@ -2,7 +2,7 @@ import PasswordInput from '@components/passwordInput';
 import SeedBackup from '@components/seedBackup';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import useAsyncEffect from '@hooks/useAsyncEffect';
+import useAsyncFn from '@hooks/useAsyncFn';
 import useVault from '@hooks/useVault';
 import { Spinner } from '@phosphor-icons/react';
 import { Container } from '@screens/settings/index.styles';
@@ -42,25 +42,31 @@ function BackupWalletScreen() {
   const navigate = useNavigate();
   const vault = useVault();
 
-  useAsyncEffect(async () => {
-    if (!showSeed) {
-      return;
-    }
-    // TODO multiwallet: Allow user to select which wallet to view the seed phrase for and pass to SeedBackup below
-    const primaryWalletId = await vault.SeedVault.getPrimaryWalletId();
+  const { isLoading } = useAsyncFn(
+    async ({ signal }) => {
+      if (!showSeed && !signal.aborted) {
+        setMnemonic('');
+        return;
+      }
+      // TODO multiwallet: Allow user to select which wallet to view the seed phrase for and pass to SeedBackup below
+      const primaryWalletId = await vault.SeedVault.getPrimaryWalletId();
 
-    if (!primaryWalletId) {
-      throw new Error('No primary wallet found');
-    }
+      if (!primaryWalletId) {
+        throw new Error('No primary wallet found');
+      }
 
-    const walletSecrets = await vault.SeedVault.getWalletSecrets(primaryWalletId);
+      const walletSecrets = await vault.SeedVault.getWalletSecrets(primaryWalletId);
 
-    if (!walletSecrets.mnemonic) {
-      throw new Error('No mnemonic found');
-    }
+      if (!walletSecrets.mnemonic) {
+        throw new Error('No mnemonic found');
+      }
 
-    setMnemonic(walletSecrets.mnemonic);
-  }, [showSeed, vault]);
+      if (!signal.aborted) {
+        setMnemonic(walletSecrets.mnemonic);
+      }
+    },
+    [showSeed, vault],
+  );
 
   const handleBackButtonClick = () => {
     navigate(-1);
@@ -80,7 +86,7 @@ function BackupWalletScreen() {
     }
   };
 
-  if (showSeed && !mnemonic) {
+  if (isLoading) {
     return (
       <LoaderContainer>
         <Spinner color="white" size={50} />

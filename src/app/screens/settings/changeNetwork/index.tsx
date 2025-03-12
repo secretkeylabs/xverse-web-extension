@@ -176,7 +176,7 @@ function ChangeNetworkScreen() {
 
   return (
     <>
-      <TopRow onClick={handleBackButtonClick} />
+      <TopRow onClick={handleBackButtonClick} showBackButton={!isChangingNetwork} />
       <Container>
         <Title>{t('NETWORK')}</Title>
         <NetworkRow

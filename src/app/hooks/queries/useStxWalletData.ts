@@ -7,11 +7,15 @@ const useStxWalletData = () => {
   const { stxAddress } = useSelectedAccount();
   const StacksAPI = useStacksAPI();
   const fetchStxWalletData = async (): Promise<StxAddressData> => {
-    const response = await StacksAPI.getAddressBalance(stxAddress);
+    const [balanceData, nonce] = await Promise.all([
+      StacksAPI.getAddressBalance(stxAddress),
+      StacksAPI.getAddressNonce(stxAddress),
+    ]);
     return {
-      ...response,
-      balance: response.totalBalance,
-      locked: response.lockedBalance,
+      ...balanceData,
+      balance: balanceData.totalBalance,
+      locked: balanceData.lockedBalance,
+      nonce,
       transactions: [],
     };
   };
