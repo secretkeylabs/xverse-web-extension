@@ -141,7 +141,7 @@ function TokenTile({
                 displayType="text"
                 thousandSeparator
                 renderText={(value: string) => (
-                  <TokenTicker aria-label={`Token Ticker: ${value} ${getTickerTitle()}`}>
+                  <TokenTicker aria-label={`Token Ticker: ${getTickerTitle()}`}>
                     {`${value} ${getTickerTitle()}`}
                   </TokenTicker>
                 )}
