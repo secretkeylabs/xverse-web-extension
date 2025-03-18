@@ -1,6 +1,7 @@
 import SlippageEditIcon from '@assets/img/swap/slippageEdit.svg';
 import FormattedNumber from '@components/formattedNumber';
 import TopRow from '@components/topRow';
+import useRuneFiatRateQuery from '@hooks/queries/runes/useRuneFiatRateQuery';
 import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery';
 import useGetSip10TokenInfo from '@hooks/queries/stx/useGetSip10TokenInfo';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
@@ -126,6 +127,9 @@ export default function QuoteSummary({
   const { data: recommendedFees } = useBtcFeeRate();
   const [feeRate, setFeeRate] = useSearchParamsState('feeRate', '0');
   const { data: runeFloorPrice } = useRuneFloorPriceQuery(toToken?.name ?? '');
+  const { data: toRuneFiatRate } = useRuneFiatRateQuery(
+    toToken?.protocol === 'runes' ? toToken?.principal ?? '' : '',
+  );
 
   useEffect(() => {
     if (recommendedFees && feeRate === '0') {
@@ -284,11 +288,8 @@ export default function QuoteSummary({
         new BigNumber(btcFiatRate),
       ).toFixed(2);
     }
-    if (toToken?.protocol === 'runes') {
-      return getBtcFiatEquivalent(
-        new BigNumber(runeFloorPrice ?? 0).multipliedBy(quote.receiveAmount),
-        new BigNumber(btcFiatRate),
-      ).toFixed(2);
+    if (toToken?.protocol === 'runes' && toRuneFiatRate) {
+      return new BigNumber(toRuneFiatRate).multipliedBy(quote.receiveAmount).toFixed(2);
     }
     if (toToken?.principal === 'STX') {
       return getStxFiatEquivalent(
