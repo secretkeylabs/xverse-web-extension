@@ -157,6 +157,9 @@ function ConfirmBtcTransaction({
               bodyText={t('PSBT_SIG_HASH_NONE_DISCLAIMER')}
             />
           )}
+          {hasInsufficientBalance && (
+            <SpacedCallout variant="warning" bodyText={t('PSBT_INSUFFICIENT_RUNES')} />
+          )}
           {!isBroadcast && <SpacedCallout bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />}
           {customCallout && <Callout {...customCallout} />}
           <TransactionSummary
@@ -170,10 +173,10 @@ function ConfirmBtcTransaction({
               <Button onClick={onCancel} title={cancelText} variant="secondary" />
               <Button
                 onClick={onConfirmPress}
-                disabled={confirmDisabled || hasInsufficientBalance || hasInvalidMint}
+                disabled={confirmDisabled || hasInvalidMint}
                 loading={isSubmitting}
-                title={hasInsufficientBalance ? t('INSUFFICIENT_BALANCE') : confirmText}
-                variant={isError || hasInsufficientBalance ? 'danger' : 'primary'}
+                title={confirmText}
+                variant={isError ? 'danger' : 'primary'}
               />
             </StickyHorizontalSplitButtonContainer>
           )}
