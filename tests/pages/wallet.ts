@@ -376,7 +376,7 @@ export default class Wallet {
     this.navigationExplore = page.getByTestId('nav-explore');
     this.navigationSettings = page.getByTestId('nav-settings');
     // this.balance = page.getByTestId('total-balance-value');
-    this.balance = page.getByLabel(/^Total balance/);
+    this.balance = page.getByRole('button', { name: /^Total balance/ });
     this.textCurrency = page.getByTestId('currency-text');
     this.allUpperButtons = page.getByTestId('transaction-buttons-row').getByRole('button');
     this.buttonTransactionSend = this.allUpperButtons.nth(0);
@@ -623,7 +623,7 @@ export default class Wallet {
   async checkVisualsStartpage() {
     // to-do fix the element itself, after the native-segwit update it resolves to 2 elements
     // data-testid="total-balance-value"
-    await expect(this.balance.first()).toBeVisible();
+    await expect(this.balance).toBeVisible();
     await expect(this.manageTokenButton).toBeVisible();
 
     // Deny data collection --> modal window is not always appearing so when it does we deny the data collection
