@@ -47,7 +47,7 @@ function RareSatsBundle() {
   const [searchParams] = useSearchParams();
   const { network } = useWalletSelector();
   const { selectedSatBundle: bundle } = useNftDataSelector();
-  const { isPending, pendingTxHash } = usePendingOrdinalTxs(bundle?.txid);
+  const { isPending, pendingTxId } = usePendingOrdinalTxs(bundle ?? undefined);
   const [showSendOrdinalsAlert, setShowSendOrdinalsAlert] = useState(false);
   const { setSelectedSatBundleDetails } = useSatBundleDataReducer();
 
@@ -106,8 +106,8 @@ function RareSatsBundle() {
   };
 
   const handleRedirectToTx = () => {
-    if (pendingTxHash) {
-      window.open(getBtcTxStatusUrl(pendingTxHash, network), '_blank', 'noopener,noreferrer');
+    if (pendingTxId) {
+      window.open(getBtcTxStatusUrl(pendingTxId, network), '_blank', 'noopener,noreferrer');
     }
   };
 
