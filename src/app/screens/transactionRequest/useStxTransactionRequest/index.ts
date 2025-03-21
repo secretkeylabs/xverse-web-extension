@@ -1,5 +1,4 @@
 import { getPopupPayload, type Context } from '@common/utils/popup';
-// import { callContractParamsSchema } from '@common/utils/rpc/stx/callContract/paramsSchema';
 import useNetworkSelector from '@hooks/useNetwork';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import {
@@ -13,7 +12,12 @@ import {
   type ContractCallPayload,
   type ContractDeployPayload,
 } from '@stacks/connect';
-import { AuthType, PayloadType, deserializeTransaction } from '@stacks/transactions';
+import {
+  AuthType,
+  PayloadType,
+  PostConditionMode,
+  deserializeTransaction,
+} from '@stacks/transactions';
 import { createUnsecuredToken, decodeToken } from 'jsontokens';
 import { useLocation } from 'react-router-dom';
 import { parse } from 'superjson';
@@ -164,9 +168,21 @@ const useStxTransactionRequest = (
       const contract = params.get('contract') ?? '';
       const functionName = params.get('functionName') ?? '';
       const argumentsString = params.get('arguments') ?? '';
+      const postConditionsString = params.get('postConditions') ?? '';
+      const postConditionMode = params.get('postConditionMode') ?? '';
       const argumentsParseResult = v.safeParse(
         stxCallContractParamsSchema.entries.arguments,
         parse(decodeToken(argumentsString).payload as string),
+      );
+      const postConditionsParseResult = postConditionsString
+        ? v.safeParse(
+            stxCallContractParamsSchema.entries.postConditions,
+            parse(decodeToken(postConditionsString).payload as string),
+          )
+        : { success: true, output: [] };
+      const postConditionModeParseResult = v.safeParse(
+        stxCallContractParamsSchema.entries.postConditionMode,
+        postConditionMode,
       );
 
       const argumentsArray = argumentsParseResult.success
@@ -185,7 +201,12 @@ const useStxTransactionRequest = (
         functionArgs: argumentsArray ?? [],
         publicKey: stxPublicKey,
         network,
-        postConditions: [],
+        postConditions: postConditionsParseResult.success ? postConditionsParseResult.output : [],
+        postConditionMode: postConditionModeParseResult.success
+          ? postConditionModeParseResult.output === 'allow'
+            ? PostConditionMode.Allow
+            : PostConditionMode.Deny
+          : undefined,
       };
       const requestToken = createUnsecuredToken(payload as any);
 
@@ -204,6 +225,8 @@ const useStxTransactionRequest = (
     case 'stx_deployContract': {
       const name = params.get('name') ?? '';
       const clarityCodeParam = params.get('clarityCode') ?? '';
+      const postConditionsString = params.get('postConditions') ?? '';
+      const postConditionMode = params.get('postConditionMode') ?? '';
       const clarityCode = (() => {
         const parseResult = v.safeParse(
           stxDeployContractParamsSchema.entries.clarityCode,
@@ -211,12 +234,28 @@ const useStxTransactionRequest = (
         );
         return parseResult.success ? parseResult.output : '';
       })();
+      const postConditionsParseResult = postConditionsString
+        ? v.safeParse(
+            stxCallContractParamsSchema.entries.postConditions,
+            parse(decodeToken(postConditionsString).payload as string),
+          )
+        : { success: true, output: [] };
+      const postConditionModeParseResult = v.safeParse(
+        stxDeployContractParamsSchema.entries.postConditionMode,
+        postConditionMode,
+      );
 
       const payload: ContractDeployPayload = {
         contractName: name,
         codeBody: clarityCode,
         txType: TransactionTypes.ContractDeploy,
         publicKey: stxPublicKey,
+        postConditions: postConditionsParseResult.success ? postConditionsParseResult.output : [],
+        postConditionMode: postConditionModeParseResult.success
+          ? postConditionModeParseResult.output === 'allow'
+            ? PostConditionMode.Allow
+            : PostConditionMode.Deny
+          : undefined,
       };
       const requestToken = createUnsecuredToken(payload as any);
 
