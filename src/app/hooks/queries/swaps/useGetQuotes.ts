@@ -1,18 +1,13 @@
-import useWalletSelector from '@hooks/useWalletSelector';
-import {
-  getXverseApiClient,
-  type GetQuotesRequest,
-  type GetQuotesResponse,
-} from '@secretkeylabs/xverse-core';
+import useXverseApi from '@hooks/apiClients/useXverseApi';
+import { type GetQuotesRequest, type GetQuotesResponse } from '@secretkeylabs/xverse-core';
 import { useState } from 'react';
 
 const useGetQuotes = () => {
   const [quotes, setQuotes] = useState<GetQuotesResponse | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const { network } = useWalletSelector();
 
-  const xverseApiClient = getXverseApiClient(network.type);
+  const xverseApiClient = useXverseApi();
 
   const fetchQuotes = async (request: GetQuotesRequest) => {
     setLoading(true);

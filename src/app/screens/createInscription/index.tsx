@@ -11,7 +11,6 @@ import {
   AnalyticsEvents,
   InscriptionErrorCode,
   currencySymbolMap,
-  fetchBtcFeeRate,
   getNonOrdinalUtxo,
   useInscriptionExecute,
   useInscriptionFees,
@@ -46,6 +45,7 @@ import HardwareWalletStepView from './hardwareWalletStepView';
 
 import FeeRow, { SATS_PER_BTC } from './feeRow';
 
+import useXverseApi from '@hooks/apiClients/useXverseApi';
 import { createKeystoneTransport } from '@keystonehq/hw-transport-webusb';
 import {
   ButtonImage,
@@ -106,6 +106,7 @@ function CreateInscription() {
   const [feeRate, setFeeRate] = useState(suggestedMinerFeeRate ?? DEFAULT_FEE_RATE);
   const [feeRates, setFeeRates] = useState<BtcFeeResponse>();
   const btcClient = useBtcClient();
+  const xverseApiClient = useXverseApi();
 
   const selectedAccount = useSelectedAccount();
   const { ordinalsAddress, btcAddress } = selectedAccount;
@@ -119,7 +120,7 @@ function CreateInscription() {
   }, [btcAddress, requestedNetwork]);
 
   useEffect(() => {
-    fetchBtcFeeRate(network.type).then((feeRatesResponse: BtcFeeResponse) => {
+    xverseApiClient.fetchBtcFeeRate().then((feeRatesResponse: BtcFeeResponse) => {
       setFeeRates(feeRatesResponse);
       if (suggestedMinerFeeRate === undefined) {
         setFeeRate(feeRatesResponse.regular);

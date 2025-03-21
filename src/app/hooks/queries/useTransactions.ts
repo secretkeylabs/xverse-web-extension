@@ -1,10 +1,10 @@
 import useBtcClient from '@hooks/apiClients/useBtcClient';
+import useXverseApi from '@hooks/apiClients/useXverseApi';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   fetchBtcTransactionsData,
   getBrc20History,
-  getXverseApiClient,
   type APIGetRunesActivityForAddressResponse,
   type Brc20HistoryTransactionData,
   type BtcTransactionData,
@@ -24,8 +24,9 @@ export default function useTransactions(
   brc20Token: string | null,
   runeToken: string | null,
 ) {
+  const xverseApiClient = useXverseApi();
   const selectedAccount = useSelectedAccount();
-  const { network, hasActivatedOrdinalsKey, btcPaymentAddressType } = useWalletSelector();
+  const { network, hasActivatedOrdinalsKey } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
   const btcClient = useBtcClient();
   const fetchTransactions = async (): Promise<
@@ -38,7 +39,7 @@ export default function useTransactions(
       return getBrc20History(network.type, selectedAccount.ordinalsAddress, brc20Token);
     }
     if (coinType === 'FT' && runeToken) {
-      return getXverseApiClient(network.type).getRuneTxHistory(
+      return xverseApiClient.getRuneTxHistory(
         selectedAccount.ordinalsAddress,
         runeToken,
         0,

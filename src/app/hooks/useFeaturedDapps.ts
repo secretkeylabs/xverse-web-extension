@@ -1,25 +1,24 @@
-import { getFeaturedDapps } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import useWalletSelector from './useWalletSelector';
+import useXverseApi from './apiClients/useXverseApi';
 import useWalletSession from './useWalletSession';
 
 function useFeaturedDapps() {
-  const { network } = useWalletSelector();
   const { getSessionStartTime } = useWalletSession();
   const [sessionStartTime, setSessionStartTime] = useState<number | undefined>(undefined);
-
-  const fetchSessionStartTime = async () => {
-    const time = await getSessionStartTime();
-    setSessionStartTime(time);
-  };
+  const xverseApiClient = useXverseApi();
 
   useEffect(() => {
-    fetchSessionStartTime();
+    const fetchSessionStartTime = async () => {
+      const time = await getSessionStartTime();
+      setSessionStartTime(time);
+    };
+
+    fetchSessionStartTime().catch(console.error);
   }, []);
 
   const fetchFeaturedDapps = async () => {
-    const response = await getFeaturedDapps(network.type);
+    const response = await xverseApiClient.getFeaturedDapps();
 
     const featured = response.find((f) => f.section === 'Featured')?.apps ?? [];
     const recommended = response.find((f) => f.section === 'Recommended')?.apps ?? [];

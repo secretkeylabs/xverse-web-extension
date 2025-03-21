@@ -1,4 +1,5 @@
 import ActionButton from '@components/button';
+import useXverseApi from '@hooks/apiClients/useXverseApi';
 import { useBnsName, useBnsResolver } from '@hooks/queries/useBnsName';
 import useNftDetail from '@hooks/queries/useNftDetail';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
@@ -109,6 +110,7 @@ function SendNft() {
   const debouncedSearchTerm = useDebounce(recipientAddress, 300);
   const associatedBnsName = useBnsName(debouncedSearchTerm);
   const associatedAddress = useBnsResolver(debouncedSearchTerm, stxAddress);
+  const xverseApiClient = useXverseApi();
 
   const { isLoading, data, mutate } = useMutation<
     StacksTransactionWire,
@@ -129,6 +131,7 @@ function SendNft() {
         publicKey: stxPublicKey,
         network: selectedNetwork,
         memo: '',
+        xverseApiClient,
       };
       const unsignedTx = await generateUnsignedNftTransferTransaction(options);
       setRecipientAddress(address);

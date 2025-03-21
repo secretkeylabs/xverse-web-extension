@@ -1,11 +1,11 @@
 import PlaceholderImage from '@assets/img/nftDashboard/nft_fallback.svg';
 import { BetterBarLoader } from '@components/barLoader';
+import useXverseApi from '@hooks/apiClients/useXverseApi';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { TextT } from '@phosphor-icons/react';
 import {
   getBrc20Details,
-  getErc721Metadata,
   type CondensedInscription,
   type Inscription,
 } from '@secretkeylabs/xverse-core';
@@ -133,6 +133,7 @@ function OrdinalImage({
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const [brc721eImage, setBrc721eImage] = useState<string | undefined>(undefined);
   const { network } = useWalletSelector();
+  const xverseApiClient = useXverseApi();
 
   useEffect(() => {
     const fetchBrc721eMetadata = async () => {
@@ -142,8 +143,7 @@ function OrdinalImage({
 
       try {
         const parsedContent = JSON.parse(textContent);
-        const erc721Metadata = await getErc721Metadata(
-          network.type,
+        const erc721Metadata = await xverseApiClient.getErc721Metadata(
           parsedContent.contract,
           parsedContent.token_id,
         );

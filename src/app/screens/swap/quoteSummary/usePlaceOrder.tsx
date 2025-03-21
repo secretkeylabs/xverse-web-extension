@@ -1,17 +1,12 @@
-import useWalletSelector from '@hooks/useWalletSelector';
-import {
-  getXverseApiClient,
-  type PlaceOrderRequest,
-  type PlaceStxOrderRequest,
-} from '@secretkeylabs/xverse-core';
+import useXverseApi from '@hooks/apiClients/useXverseApi';
+import { type PlaceOrderRequest, type PlaceStxOrderRequest } from '@secretkeylabs/xverse-core';
 import { useState } from 'react';
 
 const usePlaceOrder = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { network } = useWalletSelector();
 
-  const xverseApiClient = getXverseApiClient(network.type);
+  const xverseApiClient = useXverseApi();
 
   const placeOrder = async (request: PlaceOrderRequest) => {
     setLoading(true);

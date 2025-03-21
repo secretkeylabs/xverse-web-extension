@@ -1,17 +1,14 @@
+import useXverseApi from '@hooks/apiClients/useXverseApi';
 import useWalletSelector from '@hooks/useWalletSelector';
 import useMasterCoinsList from '@screens/swap/useMasterCoinsList';
 import { mapFTProtocolToSwapProtocol } from '@screens/swap/utils';
-import {
-  getXverseApiClient,
-  type Protocol,
-  type Token,
-  type TokenBasic,
-} from '@secretkeylabs/xverse-core';
+import { type Protocol, type Token, type TokenBasic } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import { handleRetries } from '@utils/query';
 
 const useToTokens = (protocol: Protocol, from?: TokenBasic, query?: string) => {
   const coinsMasterList = useMasterCoinsList();
+  const xverseApiClient = useXverseApi();
   const { network, spamTokens, runesManageTokens, sip10ManageTokens } = useWalletSelector();
   const spamTokenSet = new Set(spamTokens);
 
@@ -24,7 +21,7 @@ const useToTokens = (protocol: Protocol, from?: TokenBasic, query?: string) => {
   const search = query?.trim().replace(/\s+/g, ' ').replace(/ /g, '•') ?? '';
 
   const queryFn = async () => {
-    const response = await getXverseApiClient(network.type).swaps.getDestinationTokens({
+    const response = await xverseApiClient.swaps.getDestinationTokens({
       protocol,
       from,
       search,

@@ -1,5 +1,6 @@
 import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useRunesApi from '@hooks/apiClients/useRunesApi';
+import useXverseApi from '@hooks/apiClients/useXverseApi';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -24,6 +25,7 @@ import { fetchSip10FungibleTokens } from './stx/useGetSip10FungibleTokens';
 
 const useAccountBalance = () => {
   const btcClient = useBtcClient();
+  const xverseApiClient = useXverseApi();
   const stacksNetwork = useNetworkSelector();
   const { fiatCurrency, network, hideStx, sip10ManageTokens, spamTokens, showSpamTokens } =
     useWalletSelector();
@@ -76,6 +78,7 @@ const useAccountBalance = () => {
           account.btcAddresses.taproot.address,
           fiatCurrency,
           network,
+          xverseApiClient,
         );
         finalBrcCoinsList = (await fetchBrc20Balances())
           .map(withDerivedState)
@@ -105,6 +108,7 @@ const useAccountBalance = () => {
           fiatCurrency,
           network,
           stacksNetwork,
+          xverseApiClient,
         );
         finalSipCoinsList = (await fetchSip10Balances())
           .map(withDerivedState)

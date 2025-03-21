@@ -1,4 +1,5 @@
 import TokenImage from '@components/tokenImage';
+import useXverseApi from '@hooks/apiClients/useXverseApi';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useCancellableEffect from '@hooks/useCancellableEffect';
@@ -54,6 +55,8 @@ function SendStxScreen() {
   const { t } = useTranslation('translation');
 
   useResetUserFlow('/send-stx');
+
+  const xverseApiClient = useXverseApi();
 
   const location = useLocation();
   const {
@@ -148,6 +151,7 @@ function SendStxScreen() {
             publicKey: stxPublicKey,
             network: selectedNetwork,
             memo,
+            xverseApiClient,
           });
 
           if (isEffectActive()) {
@@ -170,6 +174,7 @@ function SendStxScreen() {
           },
           fee: feeInMicrostacks,
           nonce,
+          xverseApiClient,
         });
         if (isEffectActive()) {
           setUnsignedSendStxTx(rawUnsignedSendStxTx.serialize());

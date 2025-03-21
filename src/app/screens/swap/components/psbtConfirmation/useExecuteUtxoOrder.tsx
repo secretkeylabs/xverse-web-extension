@@ -1,6 +1,5 @@
-import useWalletSelector from '@hooks/useWalletSelector';
+import useXverseApi from '@hooks/apiClients/useXverseApi';
 import {
-  getXverseApiClient,
   type ExecuteUtxoOrderRequest,
   type ExecuteUtxoOrderResponse,
 } from '@secretkeylabs/xverse-core';
@@ -10,9 +9,8 @@ const useExecuteUtxoOrder = () => {
   const [order, setOrder] = useState<ExecuteUtxoOrderResponse>();
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const { network } = useWalletSelector();
 
-  const xverseApiClient = getXverseApiClient(network.type);
+  const xverseApiClient = useXverseApi();
 
   const executeUtxoOrder = async (request: ExecuteUtxoOrderRequest) => {
     setLoading(true);
