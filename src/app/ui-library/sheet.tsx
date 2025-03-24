@@ -69,7 +69,7 @@ function Sheet({
   const customStyles = {
     overlay: {
       backgroundColor: theme.colors.background.modalBackdrop,
-      zIndex: 15000,
+      zIndex: 100,
       display: 'flex',
       alignItems: isGalleryOpen ? 'center' : 'flex-end',
       justifyContent: 'center',

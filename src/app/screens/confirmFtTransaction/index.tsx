@@ -19,6 +19,7 @@ import { deserializeTransaction, StacksTransactionWire } from '@stacks/transacti
 import { useMutation } from '@tanstack/react-query';
 import { isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
+import RoutePaths from 'app/routes/paths';
 import BigNumber from 'bignumber.js';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -109,7 +110,7 @@ function ConfirmFtTransaction() {
       selectedToken: fungibleToken?.principal,
       source: 'send_sip10',
     });
-    navigate(`/send-stx?principal=${fungibleToken?.principal}`, {
+    navigate(`${RoutePaths.SendStx}?principal=${fungibleToken?.principal}`, {
       state: {
         recipientAddress,
         amountToSend: amount.toString(),

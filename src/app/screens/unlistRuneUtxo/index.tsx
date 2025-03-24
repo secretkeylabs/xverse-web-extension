@@ -182,6 +182,7 @@ export default function UnlistRuneUtxoScreen() {
   if (unisatDialogCallback) {
     return (
       <Dialog
+        visible={!!unisatDialogCallback}
         title={t('UNISAT_DIALOG.TITLE')}
         description={t('UNISAT_DIALOG.DESCRIPTION')}
         rightButtonText={t('UNISAT_DIALOG.CONTINUE')}

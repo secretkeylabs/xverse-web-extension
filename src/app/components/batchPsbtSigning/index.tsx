@@ -22,6 +22,7 @@ import {
   type UserTransactionSummary,
 } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
+import { CrossButtonInline } from '@ui-library/crossButton';
 import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
 import { isKeystoneAccount, isLedgerAccount } from '@utils/helper';
@@ -29,13 +30,13 @@ import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import Theme from 'theme';
 import {
   BundleLinkContainer,
   BundleLinkText,
   ButtonsContainer,
   CloseContainer,
   Container,
-  CrossButtonInline,
   HeaderContainer,
   InlineButtonsContainer,
   LoaderContainer,
@@ -283,7 +284,9 @@ function BatchPsbtSigning({ onSigned, psbts, onCancel, onPostSignDone }: Props) 
 
       return (
         <>
-          <CloseContainer>{onClose && <CrossButtonInline onClick={onClose} />}</CloseContainer>
+          <CloseContainer>
+            {onClose && <CrossButtonInline onClick={onClose} $marginBottom={Theme.space.s} />}
+          </CloseContainer>
           <OuterContainer>
             <ModalContainer>
               <HeaderContainer>

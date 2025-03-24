@@ -27,6 +27,7 @@ import {
 } from '@utils/brc20';
 import { isInOptions } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
+import RoutePaths from 'app/routes/paths';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -61,13 +62,13 @@ function ConfirmBrc20Transaction() {
     estimatedFees: initEstimatedFees,
     token,
   }: ConfirmBrc20TransferState = useLocation().state;
-  const [showFeeWarning, setShowFeeWarning] = useState(false);
   const transactionContext = useTransactionContext();
   const { data: recommendedFees } = useBtcFeeRate();
 
   useResetUserFlow('/confirm-brc20-tx');
 
   /* state */
+  const [showFeeWarning, setShowFeeWarning] = useState(false);
   const [isConfirmLoading, setIsConfirmLoading] = useState(false);
   const [userInputFeeRate, setUserInputFeeRate] = useState(estimateFeesParams.feeRate.toString());
   const [error, setError] = useState<BRC20ErrorCode | ''>('');
@@ -149,10 +150,11 @@ function ConfirmBrc20Transaction() {
       selectedToken: token.principal,
       source: 'send_brc20',
     });
-    navigate(`/send-brc20-one-step?principal=${token.principal}`, {
+    navigate(`${RoutePaths.SendBrc20OneStep}?principal=${token.principal}`, {
       state: {
         amount: estimateFeesParams.amount.toString(),
         recipientAddress,
+        step: 1,
       },
     });
   };
@@ -279,4 +281,5 @@ function ConfirmBrc20Transaction() {
     </>
   );
 }
+
 export default ConfirmBrc20Transaction;

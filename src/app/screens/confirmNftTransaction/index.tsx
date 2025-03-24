@@ -61,13 +61,13 @@ const NftContainer = styled.div((props) => ({
   alignItems: 'center',
   borderRadius: props.theme.radius(1),
   padding: props.theme.spacing(5),
-  marginBottom: props.theme.spacing(6),
+  marginBottom: props.theme.space.s,
 }));
 
 const ReviewTransactionText = styled.h1((props) => ({
   ...props.theme.typography.headline_s,
   color: props.theme.colors.white_0,
-  marginBottom: props.theme.spacing(16),
+  marginBottom: props.theme.space.xl,
   textAlign: 'center',
 }));
 
@@ -177,8 +177,12 @@ function ConfirmNftTransaction() {
 
   useResetUserFlow('/confirm-nft-tx');
 
-  const handleOnCancelClick = () => {
+  const handleBackButtonClick = () => {
     navigate(-1);
+  };
+
+  const handleOnCancelClick = () => {
+    navigate(`/nft-dashboard/nft-detail/${id}`);
   };
 
   return (
@@ -187,7 +191,7 @@ function ConfirmNftTransaction() {
         <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
       )}
       <ScrollContainer>
-        {!isGalleryOpen && <TopRow title={t('CONFIRM_TX')} onClick={handleOnCancelClick} />}
+        {!isGalleryOpen && <TopRow title={t('CONFIRM_TX')} onClick={handleBackButtonClick} />}
         <ConfirmStxTransactionComponent
           initialStxTransactions={initialStxTransactions}
           loading={isLoading}
@@ -220,4 +224,5 @@ function ConfirmNftTransaction() {
     </>
   );
 }
+
 export default ConfirmNftTransaction;

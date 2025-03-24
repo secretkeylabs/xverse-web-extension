@@ -1,5 +1,5 @@
 import { XCircle } from '@phosphor-icons/react';
-import styled, { useTheme } from 'styled-components';
+import styled from 'styled-components';
 import Theme from 'theme';
 
 const Button = styled.button`
@@ -22,13 +22,12 @@ const Button = styled.button`
 
 type Props = {
   onClick: () => void;
+  color?: string;
   size?: keyof typeof Theme.space;
   className?: string;
 };
 
-function CrossButton({ onClick, size = 'l', className }: Props) {
-  const theme = useTheme();
-
+function CrossButton({ onClick, size = 'l', className, color = Theme.colors.white_200 }: Props) {
   const internalOnClick = (e) => {
     e.stopPropagation();
     onClick();
@@ -36,9 +35,16 @@ function CrossButton({ onClick, size = 'l', className }: Props) {
 
   return (
     <Button onClick={internalOnClick} className={className}>
-      <XCircle color={theme.colors.white_200} weight="fill" size={Theme.space[size]} />
+      <XCircle color={color} weight="fill" size={Theme.space[size]} />
     </Button>
   );
 }
 
 export default CrossButton;
+
+export const CrossButtonInline = styled(CrossButton)<{ $marginBottom?: string }>((props) => ({
+  position: 'relative',
+  marginBottom: props.$marginBottom ? props.$marginBottom : 0,
+  top: 'initial',
+  right: 'initial',
+}));

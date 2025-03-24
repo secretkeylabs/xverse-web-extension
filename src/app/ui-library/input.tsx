@@ -182,7 +182,7 @@ const Feedback = styled.div`
 
 type Props = {
   id?: string;
-  title?: string;
+  title?: string | React.ReactNode;
   placeholder?: string;
   value: string;
   dataTestID?: string;
@@ -266,12 +266,13 @@ function Input({
 
   return (
     <Container className={className}>
-      {(title || infoPanel) && (
+      {(title || infoPanel) && typeof title === 'string' && (
         <TitleContainer>
           <Title>{title}</Title>
           {infoPanel && <InfoText>{infoPanel}</InfoText>}
         </TitleContainer>
       )}
+      {title && typeof title !== 'string' && title}
       <InputContainer>
         {leftAccessory && <LeftAccessoryContainer>{leftAccessory.icon}</LeftAccessoryContainer>}
         <InputField

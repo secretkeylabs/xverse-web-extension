@@ -1,5 +1,3 @@
-import BottomBar from '@components/tabBar';
-import TopRow from '@components/topRow';
 import { useGetBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
@@ -16,10 +14,12 @@ import { isDangerFeedback, type InputFeedbackProps } from '@ui-library/inputFeed
 import type { Brc20TransferEstimateFeesParams, ConfirmBrc20TransferState } from '@utils/brc20';
 import { replaceCommaByDot } from '@utils/helper';
 import { getFtTicker } from '@utils/tokens';
+import RoutePaths from 'app/routes/paths';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import Brc20TransferForm from './brc20TransferForm';
+import StepDisplay from './stepDisplay';
+import { getPreviousStep, Step } from './steps';
 
 function SendBrc20Screen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND_BRC20' });
@@ -35,9 +35,12 @@ function SendBrc20Screen() {
   const [recipientAddress, setRecipientAddress] = useState(location.state?.recipientAddress || '');
   const [recipientError, setRecipientError] = useState<InputFeedbackProps | null>(null);
   const [processing, setProcessing] = useState(false);
+  const [currentStep, setCurrentStep] = useState<Step>(
+    location.state?.step !== undefined ? location.state.step : Step.SelectRecipient,
+  );
   const transactionContext = useTransactionContext();
 
-  useResetUserFlow('/send-brc20-one-step');
+  useResetUserFlow(RoutePaths.SendBrc20OneStep);
 
   const principal = searchParams.get('principal');
   const fungibleToken = brc20CoinsList?.find((coin) => coin.principal === principal);
@@ -48,8 +51,16 @@ function SendBrc20Screen() {
     !!recipientAddress &&
     amountToSend !== '';
 
-  const handleBackButtonClick = () => {
+  const handleCancel = () => {
     navigate(`/coinDashboard/FT?ftKey=${fungibleToken?.principal}&protocol=brc-20`);
+  };
+
+  const handleBackButtonClick = () => {
+    if (currentStep > 0) {
+      setCurrentStep(getPreviousStep(currentStep));
+    } else {
+      handleCancel();
+    }
   };
 
   const validateAmount = (amountInput: string): boolean => {
@@ -98,6 +109,21 @@ function SendBrc20Screen() {
     }
   }, [location.state]);
 
+  useEffect(() => {
+    const recipient = searchParams.get('address');
+    if (recipient) {
+      setRecipientAddress(recipient);
+      validateRecipientAddress(recipient);
+    }
+  }, [searchParams]);
+
+  // Validate recipient address when it changes
+  useEffect(() => {
+    if (recipientAddress) {
+      validateRecipientAddress(recipientAddress);
+    }
+  }, [recipientAddress]);
+
   const onInputChange = (e: React.FormEvent<HTMLInputElement>) => {
     const newValue = e.currentTarget.value;
     const resultRegex = /^\d*\.?\d*$/;
@@ -105,11 +131,6 @@ function SendBrc20Screen() {
       validateAmount(newValue);
       setAmountToSend(newValue);
     }
-  };
-
-  const onAddressInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    validateRecipientAddress(e.target.value);
-    setRecipientAddress(e.target.value);
   };
 
   const handleOnPressNext = async () => {
@@ -162,22 +183,21 @@ function SendBrc20Screen() {
   }
 
   return (
-    <>
-      <TopRow title={t('SEND')} onClick={handleBackButtonClick} showBackButton />
-      <Brc20TransferForm
-        amountToSend={amountToSend}
-        onAmountChange={onInputChange}
-        amountError={amountError}
-        token={fungibleToken}
-        recipientAddress={recipientAddress}
-        recipientError={recipientError}
-        onAddressChange={onAddressInputChange}
-        onPressNext={handleOnPressNext}
-        processing={processing}
-        isNextEnabled={isNextEnabled}
-      />
-      <BottomBar tab="dashboard" />
-    </>
+    <StepDisplay
+      token={fungibleToken}
+      amountToSend={amountToSend}
+      onAmountChange={onInputChange}
+      amountError={amountError}
+      currentStep={currentStep}
+      setCurrentStep={setCurrentStep}
+      recipientAddress={recipientAddress}
+      setRecipientAddress={setRecipientAddress}
+      onConfirm={handleOnPressNext}
+      onBack={handleBackButtonClick}
+      isLoading={false}
+      isNextEnabled={isNextEnabled}
+      processing={processing}
+    />
   );
 }
 

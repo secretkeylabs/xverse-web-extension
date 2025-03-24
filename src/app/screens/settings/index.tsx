@@ -35,7 +35,7 @@ function Setting() {
     navigate(RoutePaths.ChangeNetwork);
   };
 
-  const createNavigationHandler = (path: RoutePaths) => () => {
+  const createNavigationHandler = (path: string) => () => {
     navigate(path);
   };
 
@@ -46,6 +46,7 @@ function Setting() {
   const openConnectedAppsAndPermissionsScreen = createNavigationHandler(
     RoutePaths.ConnectedAppsAndPermissions,
   );
+  const openAddressBook = createNavigationHandler(RoutePaths.AddressBook);
 
   return (
     <>
@@ -60,6 +61,11 @@ function Setting() {
         <SettingComponent
           text={t('CATEGORIES.CONNECTED_APPS')}
           onClick={openConnectedAppsAndPermissionsScreen}
+          showDivider
+        />
+        <SettingComponent
+          text={t('CATEGORIES.ADDRESS_BOOK')}
+          onClick={openAddressBook}
           showDivider
         />
         <SettingComponent

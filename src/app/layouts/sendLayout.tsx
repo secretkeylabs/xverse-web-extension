@@ -18,9 +18,8 @@ const ScrollContainer = styled.div`
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  margin: auto;
-  margin-top: ${(props) => props.theme.space.m};
-  margin-bottom: ${(props) => props.theme.space.xxs};
+  padding-top: ${(props) => props.theme.space.xs};
+  padding-bottom: ${(props) => props.theme.space.xxs};
   padding: 0 ${(props) => props.theme.space.xs};
   width: 100%;
   height: 100%;

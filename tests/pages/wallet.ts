@@ -674,8 +674,7 @@ export default class Wallet {
       await expect(this.receiveAddress).toBeVisible();
     }
 
-    await expect(this.imageToken).toBeVisible();
-    // await expect(this.buttonBack).toBeVisible();
+    await expect(this.buttonBack).toBeVisible();
   }
 
   /**
@@ -702,7 +701,7 @@ export default class Wallet {
     await expect(this.buttonEditFee).toBeVisible();
     await expect(this.feeAmount).toBeVisible();
     await expect(this.imageToken).toBeVisible();
-    // await expect(this.buttonBack).toBeVisible();
+    await expect(this.buttonBack).toBeVisible();
   }
 
   /**

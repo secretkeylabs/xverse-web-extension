@@ -5,6 +5,7 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { GAMMA_URL } from '@utils/constants';
 import { getExplorerUrl, isInOptions, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
+import { RoutePathsSuffixes } from 'app/routes/paths';
 import { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -60,11 +61,13 @@ export default function useNftDetailScreen() {
       !isInOptions()
     ) {
       await chrome.tabs.create({
-        url: chrome.runtime.getURL(`options.html#/nft-dashboard/nft-detail/${id}/send-nft`),
+        url: chrome.runtime.getURL(
+          `options.html#/nft-dashboard/nft-detail/${id}${RoutePathsSuffixes.SendNft}`,
+        ),
       });
       return;
     }
-    navigate(`/nft-dashboard/nft-detail/${id}/send-nft`);
+    navigate(`/nft-dashboard/nft-detail/${id}${RoutePathsSuffixes.SendNft}`);
   };
 
   return {

@@ -31,6 +31,7 @@ import { BTC_SYMBOL, HIDDEN_BALANCE_LABEL } from '@utils/constants';
 import { isInOptions, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { getBalanceAmount, getFtTicker } from '@utils/tokens';
+import RoutePaths from 'app/routes/paths';
 import BigNumber from 'bignumber.js';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -165,13 +166,13 @@ export default function CoinHeader({ currency, fungibleToken, chartPriceStats }:
     } else {
       switch (fungibleToken?.protocol) {
         case 'stacks':
-          route = `/send-stx?principal=${fungibleToken?.principal}`;
+          route = `${RoutePaths.SendStx}?principal=${fungibleToken?.principal}`;
           break;
         case 'brc-20':
-          route = `/send-brc20-one-step?principal=${fungibleToken?.principal}`;
+          route = `${RoutePaths.SendBrc20OneStep}?principal=${fungibleToken?.principal}`;
           break;
         case 'runes':
-          route = `/send-rune?principal=${fungibleToken?.principal}`;
+          route = `${RoutePaths.SendRune}?principal=${fungibleToken?.principal}`;
           break;
         default:
           break;

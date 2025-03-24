@@ -1,6 +1,7 @@
 import TokenImage from '@components/tokenImage';
 import useXverseApi from '@hooks/apiClients/useXverseApi';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
+import { useBnsResolver } from '@hooks/queries/useBnsName';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useCancellableEffect from '@hooks/useCancellableEffect';
 import useDebounce from '@hooks/useDebounce';
@@ -21,13 +22,14 @@ import { deserializeTransaction, StacksTransactionWire } from '@stacks/transacti
 import type { FeeRates } from '@ui-components/selectFeeRate';
 import { convertAmountToFtDecimalPlaces } from '@utils/helper';
 import SendLayout from 'app/layouts/sendLayout';
+import RoutePaths from 'app/routes/paths';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { getNextStep, getPreviousStep, Step } from './stepResolver';
-import Step1SelectRecipientAndMemo from './steps/Step1SelectRecipient';
+import Step1SelectRecipientAndMemo from './steps/Step1SelectRecipientAndMemo';
 import Step2SelectAmount from './steps/Step2SelectAmount';
 import Step3Confirm from './steps/Step3Confirm';
 
@@ -54,7 +56,7 @@ function SendStxScreen() {
   const navigate = useNavigate();
   const { t } = useTranslation('translation');
 
-  useResetUserFlow('/send-stx');
+  useResetUserFlow(RoutePaths.SendStx);
 
   const xverseApiClient = useXverseApi();
 
@@ -81,8 +83,6 @@ function SendStxScreen() {
 
   // Step 1 states
   const [recipientAddress, setRecipientAddress] = useState(stateAddress ?? '');
-  // Will be used in the future when the summary screen is refactored
-  const [, setRecipientDomain] = useState('');
   const [memo, setMemo] = useState(stxMemo ?? '');
   const { data: sip10CoinsList } = useVisibleSip10FungibleTokens();
   const [searchParams] = useSearchParams();
@@ -110,6 +110,7 @@ function SendStxScreen() {
   // Debounced values
   const debouncedRecipient = useDebounce(recipientAddress, 300);
   const debouncedAmount = useDebounce(amount, 300, true);
+  const { data: associatedAddress } = useBnsResolver(debouncedRecipient, stxAddress, 'STX');
 
   const handleCancel = () => {
     if (fungibleToken) {
@@ -131,6 +132,8 @@ function SendStxScreen() {
 
   useCancellableEffect(
     async (isEffectActive) => {
+      const recipient = associatedAddress || debouncedRecipient;
+
       try {
         setIsLoadingTx(true);
         if (fungibleToken) {
@@ -144,7 +147,7 @@ function SendStxScreen() {
           const rawUnsignedSendFtTx = await generateUnsignedSip10TransferTransaction({
             amount: convertedAmount,
             senderAddress: stxAddress,
-            recipientAddress: debouncedRecipient,
+            recipientAddress: recipient,
             contractAddress: fungibleToken.principal.split('.')[0],
             contractName: fungibleToken.principal.split('.')[1],
             assetName: fungibleToken?.assetName ?? '',
@@ -166,7 +169,7 @@ function SendStxScreen() {
           publicKey: stxPublicKey,
           payload: {
             txType: TransactionTypes.STXTransfer,
-            recipient: debouncedRecipient,
+            recipient,
             memo,
             amount: debouncedAmount,
             network: selectedNetwork,
@@ -187,6 +190,7 @@ function SendStxScreen() {
     },
     [
       debouncedRecipient,
+      associatedAddress,
       debouncedAmount,
       memo,
       stxPendingTxData?.pendingTransactions,
@@ -239,38 +243,41 @@ function SendStxScreen() {
     }
   }, [fee, feeMultipliers, selectedNetwork, unsignedSendStxTx]);
 
-  const header = (
-    <TitleContainer>
-      <TokenImage currency={fungibleToken ? 'FT' : 'STX'} fungibleToken={fungibleToken} />
-      <Title>{t('SEND.SEND')}</Title>
-    </TitleContainer>
-  );
+  useEffect(() => {
+    const recipientAddr = searchParams.get('address');
+    if (recipientAddr) {
+      setRecipientAddress(recipientAddr);
+    }
+  }, [searchParams]);
 
   switch (currentStep) {
     case Step.SelectRecipient:
       return (
-        <SendLayout selectedBottomTab="dashboard" onClickBack={handleBackButtonClick}>
-          <Container>
-            <Step1SelectRecipientAndMemo
-              dataTestID="address-receive"
-              header={header}
-              recipientAddress={recipientAddress}
-              setRecipientAddress={setRecipientAddress}
-              setRecipientDomain={setRecipientDomain}
-              memo={memo}
-              setMemo={setMemo}
-              onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient, true))}
-              isLoading={isLoadingTx || recipientAddress !== debouncedRecipient}
-            />
-          </Container>
-        </SendLayout>
+        <Step1SelectRecipientAndMemo
+          recipientAddress={recipientAddress}
+          setRecipientAddress={setRecipientAddress}
+          memo={memo}
+          setMemo={setMemo}
+          onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient, true))}
+          isLoading={isLoadingTx || recipientAddress !== debouncedRecipient}
+          selectedBottomTab="dashboard"
+          onBack={handleBackButtonClick}
+        />
       );
     case Step.SelectAmount:
       return (
         <SendLayout selectedBottomTab="dashboard" onClickBack={handleBackButtonClick}>
           <Container>
             <Step2SelectAmount
-              header={header}
+              header={
+                <TitleContainer>
+                  <TokenImage
+                    currency={fungibleToken ? 'FT' : 'STX'}
+                    fungibleToken={fungibleToken}
+                  />
+                  <Title>{t('SEND.SEND')}</Title>
+                </TitleContainer>
+              }
               amount={amount}
               setAmount={setAmount}
               fee={fee}
@@ -299,7 +306,7 @@ function SendStxScreen() {
                   amount: debouncedAmount,
                   fungibleToken,
                   memo,
-                  recipientAddress: debouncedRecipient,
+                  recipientAddress: associatedAddress || debouncedRecipient,
                   selectedFee: stxToMicrostacks(new BigNumber(fee)).toString(),
                 }
               : undefined

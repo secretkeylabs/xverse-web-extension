@@ -13,7 +13,7 @@ import {
   type StxMempoolTransactionData,
 } from '@secretkeylabs/xverse-core';
 import { getFtBalance } from '@utils/tokens';
-import RoutePaths from 'app/routes/paths';
+import RoutePaths, { RoutePathsSuffixes } from 'app/routes/paths';
 import BigNumber from 'bignumber.js';
 import type { TFunction } from 'react-i18next';
 import {
@@ -397,8 +397,8 @@ export const getActiveTab = (currentPath: string): TabType => {
   if (
     currentPath.includes('/nft-dashboard') ||
     currentPath.includes('/ordinal-detail') ||
-    currentPath.includes('send-ordinal') ||
-    currentPath.includes('send-nft')
+    currentPath.includes(RoutePaths.SendOrdinal) ||
+    currentPath.includes(RoutePathsSuffixes.SendNft)
   ) {
     return 'nft';
   }
