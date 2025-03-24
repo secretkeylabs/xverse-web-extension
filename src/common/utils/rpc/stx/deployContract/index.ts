@@ -15,6 +15,10 @@ async function deployContract(message: StxDeployContractRequestMessage, port: ch
     name: message.params.name,
     clarityCode: stringifyData(message.params.clarityCode),
     clarityVersion: message.params.clarityVersion,
+    postConditions: message.params.postConditions
+      ? stringifyData(message.params.postConditions)
+      : undefined,
+    postConditionMode: message.params.postConditionMode,
 
     // Metadata
     rpcMethod: 'stx_deployContract',
