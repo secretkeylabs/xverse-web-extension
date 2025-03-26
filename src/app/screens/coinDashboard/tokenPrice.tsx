@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -11,7 +11,7 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { currencySymbolMap, formatBalance, type FungibleToken } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
 import type { CurrencyTypes } from '@utils/constants';
-import TokenHistoricalData from './tokenHistoricalData';
+import { formatSignificantDecimals } from '@utils/tokens';
 
 const Container = styled.div`
   display: flex;
@@ -23,6 +23,7 @@ const Container = styled.div`
 type Props = {
   currency: CurrencyTypes;
   fungibleToken: FungibleToken | undefined;
+  chartPriceStats: ChartPriceStats | undefined;
 };
 
 export type ChartPriceStats = {
@@ -30,17 +31,11 @@ export type ChartPriceStats = {
   change?: number;
 };
 
-// todo: move into xverse-core
-function formatSignificantDecimals(input: string) {
-  return input.replace(/(\.\d*?[1-9](?:[^0]*?[1-9]){0,3}).*/, '$1');
-}
-
-function TokenPrice({ currency, fungibleToken }: Props) {
+function TokenPrice({ currency, fungibleToken, chartPriceStats }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_DASHBOARD_SCREEN' });
   const { fiatCurrency } = useWalletSelector();
   const { data: exchangeRates } = useGetExchangeRate('USD');
   const { stxBtcRate, btcUsdRate } = useSupportedCoinRates();
-  const [chartPriceStats, setChartPriceStats] = useState<ChartPriceStats | undefined>();
 
   const exchangeRate = useMemo(
     () => (exchangeRates ? Number(exchangeRates[fiatCurrency]) : 1),
@@ -78,11 +73,6 @@ function TokenPrice({ currency, fungibleToken }: Props) {
         ftCurrencyPairs={[[fungibleToken, currency]]}
         chartPriceStats={chartPriceStats}
         displayAmountChange
-      />
-      <TokenHistoricalData
-        currency={currency}
-        fungibleToken={fungibleToken}
-        setChartPriceStats={setChartPriceStats}
       />
     </Container>
   );

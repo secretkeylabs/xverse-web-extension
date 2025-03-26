@@ -26,6 +26,8 @@ export default class Onboarding {
 
   readonly inputPassword: Locator;
 
+  readonly inputConfirmPassword: Locator;
+
   readonly createPasswordInput: Locator;
 
   readonly confirmPasswordInput: Locator;
@@ -64,6 +66,10 @@ export default class Onboarding {
 
   readonly headingRestoreWallet: Locator;
 
+  readonly buttonRestoreManual: Locator;
+
+  readonly buttonRestoreFromWalletImport: Locator;
+
   readonly button24SeedPhrase: Locator;
 
   readonly button12SeedPhrase: Locator;
@@ -83,23 +89,26 @@ export default class Onboarding {
     this.buttonBackupLater = page.getByRole('button', { name: 'Backup later' });
     this.imageBackup = page.locator('img[alt="backup"]');
     this.titleBackupOnboarding = page.getByRole('heading', { name: 'Backup' });
-    this.subTitleBackupOnboarding = page.getByRole('heading', { name: 'Your seedphrase' });
+    this.subTitleBackupOnboarding = page.getByRole('heading', { name: 'Your seed phrase' });
     this.firstParagraphBackupStep = page.locator('p').filter({ hasText: 'Write down your' });
     this.buttonRevealSeed = page.getByRole('button', { name: 'Reveal' });
     this.secondParagraphBackupStep = page.getByRole('heading', { name: 'Confirm you' });
     this.textSeedWords = page.locator('p[translate="no"]');
     this.buttonSeedWords = page.locator('button[value]:not([value=""])');
     this.header = page.locator('#app h3');
-    this.inputPassword = page.locator('input[type="password"]');
+    this.inputPassword = page.locator('#password-input');
+    this.inputConfirmPassword = page.locator('#confirm-password-input');
     this.createPasswordInput = page.getByPlaceholder('Type your password', { exact: true });
     this.confirmPasswordInput = page.getByPlaceholder('Type your password again');
     this.errorMessage2 = page.locator('p').filter({ hasText: 'Please make sure your' });
-    this.errorMessageSeedPhrase = page
-      .locator('p')
-      .filter({ hasText: 'Seed phrase does not match' });
-    this.labelSecurityLevelWeak = page.locator('p').filter({ hasText: 'Weak' });
-    this.labelSecurityLevelMedium = page.locator('p').filter({ hasText: 'Medium' });
-    this.labelSecurityLevelStrong = page.locator('p').filter({ hasText: 'Strong' });
+    this.errorMessageSeedPhrase = page.getByText('Invalid seed phrase');
+    this.labelSecurityLevelWeak = page.getByTestId('strength-message').filter({ hasText: 'Weak' });
+    this.labelSecurityLevelMedium = page
+      .getByTestId('strength-message')
+      .filter({ hasText: 'Medium' });
+    this.labelSecurityLevelStrong = page
+      .getByTestId('strength-message')
+      .filter({ hasText: 'Strong' });
     this.linkTOS = page.getByRole('link', { name: 'Terms of Service' });
     this.linkPrivacy = page.getByRole('link', { name: 'Privacy Policy' });
     this.buttonAccept = page.getByRole('button', { name: 'Accept' });
@@ -107,9 +116,11 @@ export default class Onboarding {
     this.instruction = page.getByRole('heading', { name: 'Locate Xverse' });
     this.headingWalletRestored = page.getByRole('heading', { name: 'Wallet restored' });
     this.buttonCloseTab = page.getByRole('button', { name: 'Close this tab' });
-    this.headingRestoreWallet = page.getByRole('heading', { name: 'Restore Wallet' });
-    this.button24SeedPhrase = page.getByRole('button', { name: '24 words' });
-    this.button12SeedPhrase = page.getByRole('button', { name: '12 words' });
+    this.buttonRestoreManual = page.getByTestId('restore-manual-btn');
+    this.buttonRestoreFromWalletImport = page.getByTestId('restore-import-btn');
+    this.headingRestoreWallet = page.getByRole('heading', { name: 'Enter Seed Phrase' });
+    this.button24SeedPhrase = page.getByRole('button', { name: 'Have a 24 word seed phrase?' });
+    this.button12SeedPhrase = page.getByRole('button', { name: 'Have a 12 word seed phrase?' });
     this.inputSeedPhraseWord = page.locator('input');
     this.inputSeedPhraseWordDisabled = page.locator('input[disabled]');
     this.buttonUnlock = page.getByRole('button', { name: 'Unlock' });
@@ -156,7 +167,7 @@ export default class Onboarding {
     await landingPage.buttonCreateWallet.click();
     await expect(this.page.url()).toContain('legal');
     await this.buttonAccept.click();
-    await expect(this.page.url()).toContain('backup');
+    await expect(this.page.url()).toContain('create-wallet');
   }
 
   async checkBackupPage() {
@@ -173,8 +184,12 @@ export default class Onboarding {
     await landingPage.buttonRestoreWallet.click();
     await expect(this.page.url()).toContain('legal');
     await this.buttonAccept.click();
-    await expect(this.page.url()).toContain('restore');
-    await this.checkRestoreWalletSeedPhrasePage();
+    await this.checkPasswordPage();
+  }
+
+  async checkRestoreMethodPage() {
+    await expect(this.buttonRestoreManual).toBeVisible();
+    await expect(this.buttonRestoreFromWalletImport).toBeVisible();
   }
 
   async checkRestoreWalletSeedPhrasePage() {
@@ -187,8 +202,8 @@ export default class Onboarding {
 
   // Check the visuals on the password page before inputting any values in the input field
   async checkPasswordPage() {
-    await expect(this.buttonBack).toBeVisible();
     await expect(this.inputPassword).toBeVisible();
+    await expect(this.inputConfirmPassword).toBeVisible();
     await expect(this.buttonContinue).toBeVisible();
     await expect(this.buttonContinue).toBeDisabled();
     await expect(this.labelSecurityLevelWeak).toBeHidden();
@@ -206,11 +221,14 @@ export default class Onboarding {
   async createWalletSkipBackup(password) {
     await this.navigateToBackupPage();
     await this.buttonBackupLater.click();
-    await expect(this.page.url()).toContain('create-password');
-    await this.inputPassword.fill(password);
+    await expect(this.page.url()).toContain('create-wallet');
+
+    await expect(this.createPasswordInput).toBeVisible();
+    await this.createPasswordInput.fill(password);
+    await expect(this.confirmPasswordInput).toBeVisible();
+    await this.confirmPasswordInput.fill(password);
     await this.buttonContinue.click();
-    await this.inputPassword.fill(password);
-    await this.buttonContinue.click();
+
     await expect(this.imageSuccess).toBeVisible();
   }
 
@@ -220,6 +238,20 @@ export default class Onboarding {
     await expect(this.page.url()).toContain('legal');
     await this.buttonAccept.click();
     await expect(this.page.url()).toContain('restore');
+
+    await expect(this.createPasswordInput).toBeVisible();
+    await this.createPasswordInput.fill(password);
+    await expect(this.confirmPasswordInput).toBeVisible();
+    await this.confirmPasswordInput.fill(password);
+    await this.buttonContinue.click();
+
+    // TODO: Uncomment this when we use the restore method selector screen
+    // await this.checkRestoreMethodPage();
+    // await this.buttonRestoreManual.click();
+
+    // TODO: remove this when above is uncommented
+    await this.page.getByRole('button', { name: 'Xverse' }).click();
+
     await this.checkRestoreWalletSeedPhrasePage();
 
     const seedWords = await this.getSeedWords(envVarName);
@@ -229,13 +261,15 @@ export default class Onboarding {
     }
     await expect(this.buttonContinue).toBeVisible();
     await this.buttonContinue.click();
+
+    // choose the default derivation type between account and index
+    // will be the one with the most funds
+    // TODO: Uncomment below when we use the restore method selector screen
+    // await expect(this.page.getByText('Select Import Source')).toBeVisible();
+    // await this.page.getByRole('button', { name: 'Continue' }).click();
+
     // choose the default address type between native and nested segwit
     // will be the one with the most funds
-    await expect(this.createPasswordInput).toBeVisible();
-    await this.createPasswordInput.fill(password);
-    await expect(this.confirmPasswordInput).toBeVisible();
-    await this.confirmPasswordInput.fill(password);
-    await this.buttonContinue.click();
     await expect(this.page.getByText('Preferred Address Type')).toBeVisible();
     await this.page.getByRole('button', { name: 'Continue' }).click();
     await expect(this.imageSuccess).toBeVisible();
@@ -272,6 +306,7 @@ export default class Onboarding {
   async testPasswordInput({ password, expectations }) {
     // Fill in the password input field with the specified password.
     await this.inputPassword.fill(password);
+    await this.inputConfirmPassword.fill(password);
 
     // Define a mapping of security levels to their corresponding label elements.
     const visibilityChecks = {
@@ -304,6 +339,7 @@ export default class Onboarding {
 
     // Clear the password input field after all checks are done.
     await this.inputPassword.clear();
+    await this.inputConfirmPassword.clear();
   }
 
   static generateSecurePasswordCrypto() {

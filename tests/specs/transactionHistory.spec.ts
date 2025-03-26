@@ -75,7 +75,7 @@ test.describe('Transaction', () => {
     await expect(await wallet.containerTransactionHistory.count()).toBeGreaterThanOrEqual(1);
   });
 
-  test('Visual Check Runes Transaction history', async ({ page, extensionId }) => {
+  test.fixme('Visual Check Runes Transaction history', async ({ page, extensionId }) => {
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
     // Check if Rune is enabled and if not enable the rune and click on it

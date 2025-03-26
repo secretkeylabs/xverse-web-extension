@@ -27,5 +27,9 @@
     "@types/chrome",
     // Used for linking xverse core locally
     "process"
+  ],
+  "ignore": [
+    // Temporary ignore as one of the overloads is not currently used
+    "src/app/hooks/useAsyncFn.ts"
   ]
 }

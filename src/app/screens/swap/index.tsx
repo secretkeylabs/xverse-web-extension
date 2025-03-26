@@ -2,6 +2,7 @@ import ArrowSwap from '@assets/img/icons/ArrowSwap.svg';
 import RequestsRoutes from '@common/utils/route-urls';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import useRuneFiatRateQuery from '@hooks/queries/runes/useRuneFiatRateQuery';
 import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery';
 import useGetSip10TokenInfo from '@hooks/queries/stx/useGetSip10TokenInfo';
 import useGetQuotes from '@hooks/queries/swaps/useGetQuotes';
@@ -125,7 +126,7 @@ export default function SwapScreen() {
   const [utxoProviderSendAmount, setUtxoProviderSendAmount] = useState<string | undefined>();
 
   const { fiatCurrency } = useWalletSelector();
-  const { stxPublicKey } = useSelectedAccount();
+  const { stxPublicKey, ordinalsAddress } = useSelectedAccount();
 
   const { data: btcBalance } = useBtcWalletData();
   const { data: stxData } = useStxWalletData();
@@ -145,12 +146,16 @@ export default function SwapScreen() {
   });
   const { data: fromRuneFloorPrice } = useRuneFloorPriceQuery(fromToken?.name ?? '');
 
+  const { data: toRuneFiatRate } = useRuneFiatRateQuery(
+    toToken?.protocol === 'runes' ? toToken?.principal ?? '' : '',
+  );
+
   useEffect(() => {
-    if (defaultFrom) {
+    if (defaultFrom && !fromToken) {
       const token = coinsMasterList.find((coin) => coin.principal === defaultFrom);
       setFromToken(token);
     }
-    if (defaultTo) {
+    if (defaultTo && !toToken) {
       const token = coinsMasterList.find((coin) => coin.principal === defaultTo);
       setToToken(token);
     }
@@ -196,10 +201,11 @@ export default function SwapScreen() {
 
     trackMixPanel(AnalyticsEvents.FetchSwapQuote, trackingPayload);
 
-    fetchQuotes({
+    await fetchQuotes({
       from: mapFTNativeSwapTokenToTokenBasic(fromToken),
       to: mapFTNativeSwapTokenToTokenBasic(toToken),
       amount: amountForQuote,
+      ordAddress: ordinalsAddress,
     });
   };
 
@@ -216,8 +222,10 @@ export default function SwapScreen() {
     setInputError('');
     setAmount('');
     setHasQuoteError(false);
+
     const newFrom = toToken;
     const newTo = fromToken;
+
     setFromToken(newFrom);
     setToToken(newTo);
 
@@ -419,14 +427,15 @@ export default function SwapScreen() {
       ammProviders={quotes?.amm || []}
       utxoProviders={quotes?.utxo || []}
       stxProviders={quotes?.stx || []}
-      amount={amount}
       toToken={toToken}
+      amount={amount}
       ammProviderClicked={(provider: Quote) => {
         setProvider(true, provider);
       }}
       utxoProviderClicked={(provider: UtxoQuote) => {
         setProvider(false, provider);
       }}
+      toRuneFiatRate={toRuneFiatRate}
     />
   );
 
@@ -572,7 +581,7 @@ export default function SwapScreen() {
                   ? mapFTProtocolToSwapProtocol(fromToken)
                   : undefined,
               decimals: fromToken?.principal === 'BTC' ? 8 : fromToken?.decimals,
-              unit: fromToken?.principal === 'BTC' ? 'BTC' : fromToken?.runeSymbol ?? '',
+              unit: fromToken?.runeSymbol ?? fromToken?.ticker ?? fromToken?.principal,
             }}
             max={
               fromToken?.principal === 'BTC' || fromToken?.principal === 'STX'

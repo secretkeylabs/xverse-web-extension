@@ -15,17 +15,21 @@ export async function handleGetWalletType(
   const {
     selectedAccountIndex,
     selectedAccountType,
-    accountsList: softwareAccountsList,
+    selectedWalletId,
+    softwareWallets,
     ledgerAccountsList,
     keystoneAccountsList,
+    network,
   } = rootStore.store.getState().walletState;
 
   const account = getSelectedAccount({
     selectedAccountIndex,
     selectedAccountType,
-    softwareAccountsList,
+    selectedWalletId,
+    softwareWallets,
     ledgerAccountsList,
     keystoneAccountsList,
+    network: network.type,
   });
 
   if (!account) {

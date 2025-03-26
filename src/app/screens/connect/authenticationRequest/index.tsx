@@ -7,8 +7,8 @@ import { delay } from '@common/utils/promises';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
-import useSeedVault from '@hooks/useSeedVault';
 import useSelectedAccount from '@hooks/useSelectedAccount';
+import useVault from '@hooks/useVault';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { animated, useSpring } from '@react-spring/web';
 import { AddressPurpose } from '@sats-connect/core';
@@ -22,7 +22,6 @@ import {
 import { Address } from '@stacks/transactions';
 import Callout from '@ui-library/callout';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
-import { isHardwareAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import RoutePaths from 'app/routes/paths';
 import { decodeToken } from 'jsontokens';
@@ -112,7 +111,7 @@ function AuthenticationRequest() {
   const authRequest = decodeToken(authRequestToken) as unknown as AuthRequest;
   const selectedAccount = useSelectedAccount();
   const { btcAddress, stxAddress } = selectedAccount;
-  const { getSeed } = useSeedVault();
+  const vault = useVault();
   const isDisabled = !selectedAccount?.stxAddress;
 
   const styles = useSpring({
@@ -129,14 +128,17 @@ function AuthenticationRequest() {
   const confirmCallback = async () => {
     setLoading(true);
     try {
-      if (isHardwareAccount(selectedAccount) && !isDisabled) {
-        setIsModalVisible(true);
+      if (selectedAccount.accountType !== 'software') {
+        if (!isDisabled) {
+          setIsModalVisible(true);
+        }
         return;
       }
 
-      const seedPhrase = await getSeed();
+      const rootNodeData = await vault.SeedVault.getWalletRootNode(selectedAccount.walletId);
       const authResponse = await createAuthResponse(
-        seedPhrase,
+        rootNodeData.rootNode,
+        rootNodeData.derivationType,
         selectedAccount?.id ?? 0,
         authRequest,
         {

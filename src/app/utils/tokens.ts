@@ -85,45 +85,26 @@ export const selectWithDerivedState =
     manageTokens,
     spamTokens,
     showSpamTokens,
-    topTokensData,
     select,
   }: {
     manageTokens: FTTokenVisibilityObject;
     spamTokens?: string[];
     showSpamTokens: boolean;
-    topTokensData?: Record<string, FungibleToken>;
     select?: (data: FungibleTokenWithStates[]) => FungibleTokenWithStates[];
   }) =>
   (data: FungibleToken[]) => {
-    const topTokens = { ...topTokensData };
-    const tokensWithDerivedState = data.map((ft: FungibleToken) => {
-      let token = ft;
-      if (topTokens[token.principal]) {
-        delete topTokens[token.principal];
-        token = { ...token, isTopToken: true };
-      }
-      return {
-        ...token,
-        ...getFungibleTokenStates({
-          fungibleToken: token,
-          manageTokens,
-          spamTokens,
-          showSpamTokens,
-        }),
-      } as FungibleTokenWithStates;
-    });
-    const topTokensWithDerivedState = Object.values(topTokens).map((ft) => {
-      const token = { ...ft, isTopToken: true };
-      return {
-        ...token,
-        ...getFungibleTokenStates({
-          fungibleToken: token,
-          manageTokens,
-          spamTokens,
-          showSpamTokens,
-        }),
-      };
-    });
-    const withDerivedState = tokensWithDerivedState.concat(topTokensWithDerivedState);
+    const withDerivedState = data.map((fungibleToken: FungibleToken) => ({
+      ...fungibleToken,
+      ...getFungibleTokenStates({
+        fungibleToken,
+        manageTokens,
+        spamTokens,
+        showSpamTokens,
+      }),
+    }));
     return select ? select(withDerivedState) : withDerivedState;
   };
+
+// todo: move into xverse-core
+export const formatSignificantDecimals = (input: string) =>
+  input.replace(/(\.\d*?[1-9](?:[^0]*?[1-9]){0,3}).*/, '$1');

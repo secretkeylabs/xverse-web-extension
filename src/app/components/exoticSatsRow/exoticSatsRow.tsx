@@ -1,6 +1,7 @@
 import OrdinalIcon from '@assets/img/rareSats/ic_ordinal_small.svg';
 import type { SatRangeInscription } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
+import BigNumber from 'bignumber.js';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
@@ -61,6 +62,7 @@ const Row = styled.div`
   flex-direction: row;
 `;
 
+// inscription number is parsed to BigNumber cuz it can be number | BigNumber depending on the data source
 function ExoticSatsRow({
   title,
   satAmount,
@@ -98,7 +100,7 @@ function ExoticSatsRow({
             <InscriptionText typography="body_medium_m" color="white_0">
               {inscriptions.length > 1
                 ? `+${inscriptions.length}`
-                : inscriptions[0].inscription_number}
+                : BigNumber(inscriptions[0].inscription_number).toString()}
             </InscriptionText>
           </Row>
         ) : (
@@ -106,7 +108,7 @@ function ExoticSatsRow({
             <Row key={inscription.id}>
               <img src={OrdinalIcon} alt="ordinal" />
               <InscriptionText typography="body_medium_m" color="white_0">
-                {inscription.inscription_number}
+                {BigNumber(inscription.inscription_number).toString()}
               </InscriptionText>
             </Row>
           ))

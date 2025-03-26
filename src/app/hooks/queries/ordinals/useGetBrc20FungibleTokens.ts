@@ -10,7 +10,6 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import { selectWithDerivedState } from '@utils/tokens';
-import useGetTopTokens from '../useGetTopTokens';
 
 const brc20TokenToFungibleToken = (coin: Brc20Token): FungibleToken => ({
   name: coin.name,
@@ -61,7 +60,6 @@ export const useGetBrc20FungibleTokens = (select?: (data: FungibleTokenWithState
   const { ordinalsAddress } = useSelectedAccount();
   const { brc20ManageTokens, fiatCurrency, network, spamTokens, showSpamTokens } =
     useWalletSelector();
-  const { data: topTokensData } = useGetTopTokens();
 
   const queryFn = fetchBrc20FungibleTokens(ordinalsAddress, fiatCurrency, network);
 
@@ -74,7 +72,6 @@ export const useGetBrc20FungibleTokens = (select?: (data: FungibleTokenWithState
       manageTokens: brc20ManageTokens,
       spamTokens,
       showSpamTokens,
-      topTokensData: topTokensData?.['brc-20'],
       select,
     }),
   });

@@ -39,8 +39,7 @@ test.describe('Transaction BRC20', () => {
 
     await wallet.inputField.first().fill(sendAmount.toString());
     await expect(wallet.buttonNext).toBeEnabled();
-    // TODO keep checking if we still need this timeout. The E2E is so fast that the button can't catch up and this was the only solution working
-    await page.waitForTimeout(500);
+    await wallet.buttonNext.waitFor({ state: 'visible' });
     await wallet.buttonNext.click();
 
     await expect(wallet.receiveAddress.first()).toBeVisible();
@@ -119,8 +118,7 @@ test.describe('Transaction BRC20', () => {
 
     await wallet.inputField.first().fill(sendAmount.toString());
     await expect(wallet.buttonNext).toBeEnabled();
-    // TODO keep checking if we still need this timeout. The E2E is so fast that the button can't catch up and this was the only solution working
-    await page.waitForTimeout(500);
+    await wallet.buttonNext.waitFor({ state: 'attached' });
     await wallet.buttonNext.click();
 
     await expect(wallet.receiveAddress.first()).toBeVisible();

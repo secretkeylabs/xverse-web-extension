@@ -6,14 +6,15 @@ import useHasFeature from '@hooks/useHasFeature';
 import { broadcastResetUserFlow, useResetUserFlow } from '@hooks/useResetUserFlow';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import type { Tab } from '@screens/coinDashboard';
-import TokenPrice from '@screens/coinDashboard/tokenPrice';
+import TokenHistoricalData from '@screens/coinDashboard/tokenHistoricalData';
+import TokenPrice, { type ChartPriceStats } from '@screens/coinDashboard/tokenPrice';
 import { FeatureId } from '@secretkeylabs/xverse-core';
 import { Tabs, type TabProp } from '@ui-library/tabs';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import CoinHeader from '../../coinHeader';
-import { Container, FtInfoContainer } from '../../index.styled';
+import { ChartContainer, Container, FtInfoContainer } from '../../index.styled';
 import TransactionsHistoryList from '../../transactionsHistoryList';
 import BalanceBreakdown from './balanceBreakdown';
 
@@ -24,6 +25,8 @@ export default function CoinDashboard() {
 
   const [currentTab, setCurrentTab] = useState<Tab>(fromSecondaryTab);
   const [showPreferredBtcAddressSheet, setShowPreferredBtcAddressSheet] = useState(false);
+
+  const [chartPriceStats, setChartPriceStats] = useState<ChartPriceStats | undefined>();
 
   useResetUserFlow('/coinDashboard');
 
@@ -61,7 +64,14 @@ export default function CoinDashboard() {
     <>
       <TopRow onClick={handleGoBack} onSettingsClick={handleChangeAddressTypeClick} />
       <Container>
-        <CoinHeader currency="BTC" />
+        <CoinHeader currency="BTC" chartPriceStats={chartPriceStats} />
+        <ChartContainer>
+          <TokenHistoricalData
+            currency="BTC"
+            fungibleToken={undefined}
+            setChartPriceStats={setChartPriceStats}
+          />
+        </ChartContainer>
         <FtInfoContainer>
           <Tabs
             tabs={tabs}
@@ -79,7 +89,9 @@ export default function CoinDashboard() {
             runeSymbol={null}
           />
         )}
-        {currentTab === 'second' && <TokenPrice currency="BTC" fungibleToken={undefined} />}
+        {currentTab === 'second' && (
+          <TokenPrice currency="BTC" fungibleToken={undefined} chartPriceStats={chartPriceStats} />
+        )}
         {currentTab === 'third' && <BalanceBreakdown />}
       </Container>
       <BottomBar tab="dashboard" />

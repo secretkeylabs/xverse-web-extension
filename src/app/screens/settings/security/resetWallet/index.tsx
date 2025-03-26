@@ -1,7 +1,7 @@
 import PasswordInput from '@components/passwordInput';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import useSeedVault from '@hooks/useSeedVault';
+import useVault from '@hooks/useVault';
 import useWalletReducer from '@hooks/useWalletReducer';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,7 +20,7 @@ const Container = styled.div((props) => ({
 
 function ResetWalletScreen() {
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
-  const { unlockVault } = useSeedVault();
+  const vault = useVault();
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -34,7 +34,7 @@ function ResetWalletScreen() {
   const handlePasswordNextClick = async () => {
     try {
       setLoading(true);
-      await unlockVault(password);
+      await vault.unlockVault(password);
       setPassword('');
       setError('');
       await resetWallet();

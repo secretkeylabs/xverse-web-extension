@@ -1,5 +1,5 @@
 import WarningIcon from '@assets/img/Warning_red.svg';
-import CheckBox from '@components/checkBox';
+import Checkbox from '@ui-library/checkbox';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -85,11 +85,11 @@ function WalletExists(): JSX.Element {
         <Subtitle>{t('SCREEN_SUBTITLE')}</Subtitle>
       </ContentContainer>
       <CheckBoxContainer>
-        <CheckBox
-          checkBoxLabel={t('UNDERSTAND')}
-          isChecked={userAccepted}
-          checkBoxId="backup"
-          onCheck={handleToggleAccept}
+        <Checkbox
+          checkboxId="backup"
+          text={t('UNDERSTAND')}
+          checked={userAccepted}
+          onChange={handleToggleAccept}
         />
       </CheckBoxContainer>
       <ContinueButton onClick={handleClose} disabled={!userAccepted}>

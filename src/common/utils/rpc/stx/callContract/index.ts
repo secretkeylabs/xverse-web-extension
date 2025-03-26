@@ -14,7 +14,18 @@ async function callContract(message: StxCallContractRequestMessage, port: chrome
     // RPC params
     contract: message.params.contract,
     functionName: message.params.functionName,
-    arguments: stringifyData(message.params.arguments),
+    /**
+     * Support both arguments and functionArgs for @stacks/connect compatibility
+     */
+    arguments: message.params.arguments
+      ? stringifyData(message.params.arguments)
+      : message.params.functionArgs
+      ? stringifyData(message.params.functionArgs)
+      : undefined,
+    postConditions: message.params.postConditions
+      ? stringifyData(message.params.postConditions)
+      : undefined,
+    postConditionMode: message.params.postConditionMode,
 
     // Metadata
     rpcMethod: 'stx_callContract',

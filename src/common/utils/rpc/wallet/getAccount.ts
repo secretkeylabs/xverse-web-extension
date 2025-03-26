@@ -5,6 +5,7 @@ import { type GetAccountRequestMessage, type GetAccountResult } from '@sats-conn
 import { permissions } from '@secretkeylabs/xverse-core';
 import rootStore from '@stores/index';
 import { accountPurposeAddresses } from '../btc/getAddresses/utils';
+import { getBitcoinNetworkType } from '../helpers';
 import { sendInternalErrorMessage } from '../responseMessages/errors';
 import { sendGetAccountSuccessResponseMessage } from '../responseMessages/wallet';
 
@@ -15,7 +16,8 @@ export async function handleGetAccount(
   const {
     selectedAccountIndex,
     selectedAccountType,
-    accountsList: softwareAccountsList,
+    selectedWalletId,
+    softwareWallets,
     ledgerAccountsList,
     keystoneAccountsList,
     network,
@@ -25,9 +27,11 @@ export async function handleGetAccount(
   const account = getSelectedAccount({
     selectedAccountIndex,
     selectedAccountType,
-    softwareAccountsList,
+    selectedWalletId,
+    softwareWallets,
     ledgerAccountsList,
     keystoneAccountsList,
+    network: network.type,
   });
 
   if (!account) {
@@ -50,6 +54,14 @@ export async function handleGetAccount(
   const result: GetAccountResult = {
     id: accountId,
     walletType: account.accountType ?? 'software',
+    network: {
+      bitcoin: {
+        name: getBitcoinNetworkType(network.type),
+      },
+      stacks: {
+        name: getBitcoinNetworkType(network.type),
+      },
+    },
     addresses,
   };
   sendGetAccountSuccessResponseMessage({

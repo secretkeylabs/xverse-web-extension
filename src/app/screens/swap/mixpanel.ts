@@ -8,14 +8,21 @@ import {
 } from '@secretkeylabs/xverse-core';
 import BigNumber from 'bignumber.js';
 
-const getFiatEquivalent = (
-  token: FungibleToken | undefined,
-  amount: BigNumber,
-  btcUsdRate: BigNumber,
-  runeFloorPrice?: BigNumber,
-  stxBtcRate?: BigNumber,
-  stxTokenFiatValue?: BigNumber,
-) => {
+const getFiatEquivalent = ({
+  token,
+  amount,
+  btcUsdRate,
+  runeFloorPrice,
+  stxBtcRate,
+  stxTokenFiatValue,
+}: {
+  token: FungibleToken | undefined;
+  amount: BigNumber;
+  btcUsdRate: BigNumber;
+  runeFloorPrice?: BigNumber;
+  stxBtcRate?: BigNumber;
+  stxTokenFiatValue?: BigNumber;
+}) => {
   if (!token || amount.isZero()) {
     return undefined;
   }
@@ -65,17 +72,29 @@ const getSwapsMixpanelProperties = ({
   const to = toToken?.principal === 'BTC' ? 'BTC' : toToken?.name ?? toToken?.ticker;
 
   const fromTokenAmount = amount;
-
-  const fromTokenUsdValue = getFiatEquivalent(
-    fromToken,
-    new BigNumber(amount),
-    btcUsdRate,
-    fromRuneFloorPrice,
-    stxBtcRate,
-    fromStxTokenFiatValue,
-  );
-
   const toTokenAmount = quote?.receiveAmount;
+  let rawFromTokenUsdValue;
+
+  let fromTokenUsdValue = getFiatEquivalent({
+    token: fromToken,
+    amount: new BigNumber(amount),
+    btcUsdRate,
+    runeFloorPrice: fromRuneFloorPrice,
+    stxBtcRate,
+    stxTokenFiatValue: fromStxTokenFiatValue,
+  });
+
+  // Derive fromTokenUsdValue from received STX amount
+  if (toToken?.principal === 'STX' && quote?.receiveAmount && stxBtcRate) {
+    rawFromTokenUsdValue = fromTokenUsdValue;
+
+    fromTokenUsdValue = getFiatEquivalent({
+      token: toToken,
+      amount: new BigNumber(quote.receiveAmount),
+      btcUsdRate,
+      stxBtcRate,
+    });
+  }
 
   const fromPrincipal = fromToken?.protocol === 'stacks' ? fromToken?.principal : undefined;
   const toPrincipal = toToken?.protocol === 'stacks' ? toToken?.principal : undefined;
@@ -89,6 +108,7 @@ const getSwapsMixpanelProperties = ({
     ...(fromTokenAmount ? { fromTokenAmount } : {}),
     ...{ fromTokenUsdValue: fromTokenUsdValue ?? 0 },
     ...(toTokenAmount ? { toTokenAmount } : {}),
+    ...(rawFromTokenUsdValue ? { rawFromTokenUsdValue } : {}),
   };
 };
 

@@ -1,5 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import {
+  changeNetworkMethodName,
+  changeNetworkRequestMessageSchema,
   connectMethodName,
   connectRequestMessageSchema,
   disconnectMethodName,
@@ -19,6 +21,7 @@ import {
 } from '@sats-connect/core';
 import type { Handler } from '.';
 import { requirePermissions, validateMessageSchema } from '../messageMiddlewares';
+import { handleChangeNetwork } from '../wallet/changeNetwork';
 import { handleConnect } from '../wallet/connect';
 import { handleDisconnect } from '../wallet/disconnect';
 import { handleGetAccount } from '../wallet/getAccount';
@@ -79,5 +82,9 @@ export const router: Record<string, Handler> = {
   [getNetworkMethodName]: requirePermissions(
     [{ type: 'wallet', resourceId: 'wallet', actions: { readNetwork: true } }],
     validateMessageSchema(getNetworkRequestMessageSchema, handleGetNetwork),
+  ),
+  [changeNetworkMethodName]: requirePermissions(
+    [{ type: 'wallet', resourceId: 'wallet', actions: { readNetwork: true } }],
+    validateMessageSchema(changeNetworkRequestMessageSchema, handleChangeNetwork),
   ),
 };

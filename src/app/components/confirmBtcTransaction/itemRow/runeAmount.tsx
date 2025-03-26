@@ -61,7 +61,7 @@ export default function RuneAmount({
   const { runeName, amount, divisibility, symbol } = rune;
   const amountWithDecimals = ftDecimals(String(amount), divisibility);
   const { fiatCurrency } = useWalletSelector();
-  const { data: runeFiatRate } = useRuneFiatRateQuery(rune);
+  const { data: runeFiatRate } = useRuneFiatRateQuery(rune.runeId);
   return (
     <Container topMargin={topMargin}>
       <AvatarContainer>

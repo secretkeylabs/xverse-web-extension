@@ -1,6 +1,7 @@
 /* eslint-disable import/prefer-default-export */
 import { type Context } from '@common/utils/popup';
 import { accountPurposeAddresses } from '@common/utils/rpc/btc/getAddresses/utils';
+import { getBitcoinNetworkType } from '@common/utils/rpc/helpers';
 import { sendInternalErrorMessage } from '@common/utils/rpc/responseMessages/errors';
 import {
   sendConnectSuccessResponseMessage,
@@ -106,7 +107,7 @@ export function useMakeHandleAccept({ context, data }: Args) {
           addresses,
           network: {
             bitcoin: {
-              name: network.type,
+              name: getBitcoinNetworkType(network.type),
             },
             stacks: {
               name: network.type,

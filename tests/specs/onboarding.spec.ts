@@ -1,4 +1,5 @@
-import * as bip39 from 'bip39';
+import * as bip39 from '@scure/bip39';
+import { wordlist } from '@scure/bip39/wordlists/english';
 import { expect, test } from '../fixtures/base';
 import { passwordTestCases } from '../fixtures/passwordTestData';
 import Onboarding from '../pages/onboarding';
@@ -24,12 +25,12 @@ test.describe('onboarding flow', () => {
   // Visual check of the first page for password creation
   test('skip backup and visual check password page', async ({ page, extensionId }) => {
     const onboardingPage = new Onboarding(page);
-    // Skip landing and go directly to create password via URL
-    await page.goto(`chrome-extension://${extensionId}/options.html#/create-password`);
-    await expect(page.url()).toContain('create-password');
+    // Skip landing and go directly to create wallet via URL
+    await page.goto(`chrome-extension://${extensionId}/options.html#/create-wallet`);
+    await expect(page.url()).toContain('create-wallet');
+    await onboardingPage.checkBackupPage();
+    await onboardingPage.buttonBackupLater.click();
     await onboardingPage.checkPasswordPage();
-    await onboardingPage.buttonBack.click();
-    await expect(page.url()).toContain('backup');
   });
 
   // No Wallet is created in this step as we only check the display of the error messages and that you can't create a wallet if passwords don't align
@@ -37,7 +38,7 @@ test.describe('onboarding flow', () => {
     const onboardingPage = new Onboarding(page);
     await onboardingPage.navigateToBackupPage();
     await onboardingPage.buttonBackupLater.click();
-    await expect(page.url()).toContain('create-password');
+    await expect(page.url()).toContain('create-wallet');
 
     // Check error message, security label change, and status of continue button
     await passwordTestCases.reduce(async (previousPromise, testCase) => {
@@ -46,22 +47,16 @@ test.describe('onboarding flow', () => {
     }, Promise.resolve());
 
     await onboardingPage.inputPassword.fill(strongPW);
-    await onboardingPage.buttonContinue.click();
-    // check Confirm header
-    await expect(page.locator('h1')).toHaveText(/confirm/i);
+
     // Enter wrong password to check error messages
     await expect(onboardingPage.buttonContinue).toBeDisabled();
-    await onboardingPage.inputPassword.fill(`${strongPW}123`);
+    await onboardingPage.inputConfirmPassword.fill(`${strongPW}123`);
     await expect(onboardingPage.buttonContinue).toBeEnabled();
+    await expect(onboardingPage.errorMessage2).toBeHidden();
     await onboardingPage.buttonContinue.click();
     await expect(onboardingPage.errorMessage2).toBeVisible();
     // multiple times clicking on continue to check that the user stays on the page and can't continue even of clicked multiple times
     await Onboarding.multipleClickCheck(onboardingPage.buttonContinue);
-    await expect(onboardingPage.errorMessage2).toBeVisible();
-    await onboardingPage.buttonBack.click();
-    await expect(onboardingPage.inputPassword).toHaveValue(/.+/);
-    await onboardingPage.buttonContinue.click();
-    await expect(onboardingPage.inputPassword).toHaveValue(/.+/);
     await expect(onboardingPage.errorMessage2).toBeVisible();
   });
 
@@ -71,10 +66,21 @@ test.describe('onboarding flow', () => {
     const onboardingPage = new Onboarding(page);
     await onboardingPage.navigateToRestorePage();
 
+    await onboardingPage.inputPassword.fill(strongPW);
+    await onboardingPage.inputConfirmPassword.fill(strongPW);
+    await onboardingPage.buttonContinue.click();
+
+    // TODO: Uncomment this when we use the restore method selector screen
+    // await onboardingPage.checkRestoreMethodPage();
+    // await onboardingPage.buttonRestoreManual.click();
+
+    // TODO: remove this when above is uncommented
+    await onboardingPage.page.getByRole('button', { name: 'Xverse' }).click();
+
     await onboardingPage.checkRestoreWalletSeedPhrasePage();
 
     // get 12 words from bip39
-    const mnemonic = bip39.generateMnemonic();
+    const mnemonic = bip39.generateMnemonic(wordlist);
     const wordsArray = mnemonic.split(' '); // Split the mnemonic by spaces
 
     // We only input 11 word to cause the error message
@@ -90,7 +96,7 @@ test.describe('onboarding flow', () => {
 
     // multiple times clicking on continue to check that the user stays on the page and can't continue even of clicked multiple times
     await Onboarding.multipleClickCheck(onboardingPage.buttonContinue);
-    await expect(page.url()).toContain('restoreWallet');
+    await expect(page.url()).toContain('restore-wallet');
     await expect(onboardingPage.inputSeedPhraseWordDisabled).toHaveCount(12);
     await expect(onboardingPage.errorMessageSeedPhrase).toBeVisible();
 
@@ -108,6 +114,12 @@ test.describe('onboarding flow', () => {
     const onboardingPage = new Onboarding(page);
     await onboardingPage.navigateToRestorePage();
 
+    await onboardingPage.inputPassword.fill(strongPW);
+    await onboardingPage.inputConfirmPassword.fill(strongPW);
+    await onboardingPage.buttonContinue.click();
+
+    await onboardingPage.page.getByRole('button', { name: 'Xverse' }).click();
+
     await onboardingPage.checkRestoreWalletSeedPhrasePage();
     await onboardingPage.button24SeedPhrase.click();
 
@@ -116,7 +128,7 @@ test.describe('onboarding flow', () => {
     await expect(onboardingPage.inputSeedPhraseWord).toHaveCount(24);
 
     // get 24 words from bip39
-    const mnemonic = bip39.generateMnemonic(256);
+    const mnemonic = bip39.generateMnemonic(wordlist, 256);
     const wordsArray = mnemonic.split(' '); // Split the mnemonic by spaces
 
     for (let i = 0; i < wordsArray.length - 1; i++) {
@@ -132,7 +144,7 @@ test.describe('onboarding flow', () => {
 
     // multiple times clicking on continue to check that the user stays on the page and can't continue even of clicked multiple times
     await Onboarding.multipleClickCheck(onboardingPage.buttonContinue);
-    await expect(page.url()).toContain('restoreWallet');
+    await expect(page.url()).toContain('restore-wallet');
 
     await expect(onboardingPage.inputSeedPhraseWordDisabled).toHaveCount(0);
     await expect(onboardingPage.errorMessageSeedPhrase).toBeVisible();
@@ -149,7 +161,15 @@ test.describe('onboarding flow', () => {
     const onboardingPage = new Onboarding(page);
 
     // Skip Landing and go directly to restore wallet via URL
-    await page.goto(`chrome-extension://${extensionId}/options.html#/restoreWallet`);
+    await page.goto(`chrome-extension://${extensionId}/options.html#/restore-wallet`);
+
+    await onboardingPage.checkPasswordPage();
+
+    await onboardingPage.inputPassword.fill(strongPW);
+    await onboardingPage.inputConfirmPassword.fill(strongPW);
+    await onboardingPage.buttonContinue.click();
+
+    await onboardingPage.page.getByRole('button', { name: 'Xverse' }).click();
 
     await onboardingPage.checkRestoreWalletSeedPhrasePage();
 

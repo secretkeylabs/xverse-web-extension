@@ -1,7 +1,7 @@
 import PasswordInput from '@components/passwordInput';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import useSeedVault from '@hooks/useSeedVault';
+import useVault from '@hooks/useVault';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -20,9 +20,9 @@ const Container = styled.div((props) => ({
 
 function ChangePasswordScreen() {
   const { t } = useTranslation('translation');
-  const { unlockVault, changePassword } = useSeedVault();
-  const [password, setPassword] = useState('');
+  const vault = useVault();
   const [oldPassword, setOldPassword] = useState('');
+  const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -36,7 +36,7 @@ function ChangePasswordScreen() {
   const handleConfirmCurrentPasswordNextClick = async () => {
     try {
       setLoading(true);
-      await unlockVault(oldPassword);
+      await vault.unlockVault(oldPassword);
       setPassword('');
       setError('');
       setCurrentStepIndex(1);
@@ -54,7 +54,7 @@ function ChangePasswordScreen() {
   const handleConfirmNewPasswordNextClick = async () => {
     if (confirmPassword === password) {
       setError('');
-      await changePassword(oldPassword, confirmPassword);
+      await vault.changePassword(oldPassword, confirmPassword);
       toast.success(t('SETTING_SCREEN.UPDATE_PASSWORD_SUCCESS'));
       navigate('/settings');
     } else {

@@ -1,3 +1,6 @@
+import { permissions } from '@secretkeylabs/xverse-core';
+import { useTranslation } from 'react-i18next';
+
 import styled from 'styled-components';
 
 /* eslint-disable import/prefer-default-export */
@@ -8,12 +11,29 @@ const Container = styled('div')((props) => ({
 }));
 
 type Props = {
-  url: ConstructorParameters<typeof URL>[0];
+  origin: string;
 };
 
-export function Host({ url }: Props) {
-  const parsedUrl = new URL(url);
-  const { host } = parsedUrl;
+export function Host({ origin }: Props) {
+  const { t } = useTranslation('translation', { keyPrefix: 'AUTH_REQUEST_SCREEN' });
 
-  return <Container>{host}</Container>;
+  const { nameFromOrigin } = permissions.utils.originName;
+  const name = nameFromOrigin(origin);
+
+  const dappName = (() => {
+    // This means there was no name found for the origin, and the host is used
+    // as the name instead.
+    if (name === origin) {
+      const parsedUrl = new URL(origin);
+      return parsedUrl.host;
+    }
+
+    return name;
+  })();
+
+  return (
+    <Container>
+      {t('REQUEST_TOOLTIP')} {dappName}
+    </Container>
+  );
 }

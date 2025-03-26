@@ -1,7 +1,8 @@
 import { useSingleTabGuard } from '@components/guards/singleTab';
 import useHasStateRehydrated from '@hooks/stores/useHasRehydrated';
-import useSeedVault from '@hooks/useSeedVault';
-import { useLayoutEffect, useMemo, useState } from 'react';
+import useAsyncFn from '@hooks/useAsyncFn';
+import useVault from '@hooks/useVault';
+import { useMemo, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import {
   WalletExistsContext,
@@ -23,31 +24,22 @@ function OnboardingGuard({ children }: WalletExistsGuardProps): React.ReactEleme
   const [walletExistsGuardEnabled, setWalletExistsGuardEnabled] = useState(true);
   const [isWalletInitialized, setIsWalletInitialized] = useState(false);
   const [guardInitialized, setGuardInitialized] = useState(false);
-  const { hasSeed, unlockVault } = useSeedVault();
+  const vault = useVault();
   const contextValue: WalletExistsContextProps = useMemo(
     () => ({
       disableWalletExistsGuard: () => setWalletExistsGuardEnabled(false),
     }),
     [],
   );
-  useLayoutEffect(() => {
-    (async () => {
-      try {
-        const hasSeedPhrase = await hasSeed();
-        if (!hasSeedPhrase) {
-          setIsWalletInitialized(false);
-          return;
-        }
 
-        await unlockVault('');
-        setIsWalletInitialized(false);
-      } catch (e) {
-        // seed exists and unlocking with empty password failed
-        setIsWalletInitialized(true);
-      } finally {
-        setGuardInitialized(true);
-      }
-    })();
+  useAsyncFn(async () => {
+    await vault.restoreVault();
+    const isVaultInitialised = await vault.isInitialised();
+    const isVaultUnlocked = await vault.isVaultUnlocked();
+    const isSeedVaultInitialised =
+      isVaultInitialised && (!isVaultUnlocked || (await vault.SeedVault.isInitialised()));
+    setIsWalletInitialized(isSeedVaultInitialised);
+    setGuardInitialized(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

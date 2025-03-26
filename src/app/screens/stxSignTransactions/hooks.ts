@@ -1,12 +1,13 @@
 import type { AccountWithDetails } from '@common/utils/getSelectedAccount';
 import { sendSignTransactionsSuccessResponseMessage } from '@common/utils/rpc/responseMessages/stacks';
 import useNetworkSelector from '@hooks/useNetwork';
-import useSeedVault from '@hooks/useSeedVault';
+import useVault from '@hooks/useVault';
 import type { StxSignTransactionsRequestMessage } from '@sats-connect/core';
 import {
   estimateStacksTransactionWithFallback,
   safePromise,
   type StacksNetwork,
+  type WalletId,
 } from '@secretkeylabs/xverse-core';
 import { type StacksTransactionWire } from '@stacks/transactions';
 import { useQuery } from '@tanstack/react-query';
@@ -18,27 +19,33 @@ type UseSignTransactionsSoftwareArgs = {
   account: AccountWithDetails;
   network: StacksNetwork;
   transactions: StacksTransactionWire[];
+  walletId: WalletId | undefined;
 };
 type CallbackArgs = {
   onError: (e: unknown) => void;
   onSuccess: (transactions: StacksTransactionWire[]) => Promise<void> | void;
 };
 export function useSignTransactionsSoftware(args: UseSignTransactionsSoftwareArgs) {
-  const { account, network, transactions } = args;
+  const { account, network, transactions, walletId } = args;
 
-  const { getSeed } = useSeedVault();
+  const vault = useVault();
 
   const signTransactionsSoftware = useCallback(
     async ({ onError, onSuccess }: CallbackArgs) => {
-      const [getSeedError, seed] = await safePromise(getSeed());
+      if (!walletId) return onError(new Error('Wallet ID is required for software accounts'));
 
-      if (getSeedError) return onError(getSeedError);
+      const [getRootNodeError, rootNodeData] = await safePromise(
+        vault.SeedVault.getWalletRootNode(walletId),
+      );
+
+      if (getRootNodeError) return onError(getRootNodeError);
 
       const [error, signedTransactions] = await safePromise(
         signTransactions({
           accountId: account.id,
           network,
-          seed,
+          rootNode: rootNodeData.rootNode,
+          derivationType: rootNodeData.derivationType,
           transactions,
         }),
       );
@@ -47,7 +54,7 @@ export function useSignTransactionsSoftware(args: UseSignTransactionsSoftwareArg
 
       onSuccess(signedTransactions);
     },
-    [account.id, getSeed, network, transactions],
+    [account.id, vault, network, transactions],
   );
 
   return useMemo(() => ({ signTransactionsSoftware }), [signTransactionsSoftware]);

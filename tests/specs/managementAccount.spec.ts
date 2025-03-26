@@ -39,7 +39,7 @@ test.describe('Account Management', () => {
     await page.getByRole('textbox', { name: '' }).fill('Bla Bla Bla 1');
     await page.getByRole('button', { name: /confirm/i }).click();
 
-    await expect(page.getByText('Bla Bla Bla 1')).toBeVisible();
+    await expect(page.getByText('Bla Bla Bla 1')).toBeVisible({ timeout: 5000 });
 
     await page.getByRole('button', { name: /open account options/i }).click();
     await page.getByRole('button', { name: /rename account/i }).click();
@@ -60,6 +60,6 @@ test.describe('Account Management', () => {
     await page.getByRole('button', { name: /account name/i }).click();
     await expect(page.getByText('Account 1')).toBeVisible();
     await page.getByRole('button', { name: /generate account/i }).click();
-    await expect(page.getByText('Account 2')).toBeVisible();
+    await expect(page.getByText('Account 2')).toBeVisible({ timeout: 5000 });
   });
 });

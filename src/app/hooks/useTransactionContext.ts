@@ -1,14 +1,14 @@
 import { btcTransaction, UtxoCache, type BtcPaymentType } from '@secretkeylabs/xverse-core';
 import { useEffect, useMemo } from 'react';
 import useBtcClient from './apiClients/useBtcClient';
-import useSeedVault from './useSeedVault';
 import useSelectedAccount from './useSelectedAccount';
+import useVault from './useVault';
 import useWalletSelector from './useWalletSelector';
 
 const useTransactionContext = (overridePayAddressType?: BtcPaymentType) => {
   const selectedAccount = useSelectedAccount(overridePayAddressType);
-  const { network } = useWalletSelector();
-  const seedVault = useSeedVault();
+  const { network, softwareWallets } = useWalletSelector();
+  const vault = useVault();
   const btcClient = useBtcClient();
 
   // TODO: we can remove this useEffect after a while once the localstorage cache clearance has propagated
@@ -67,17 +67,26 @@ const useTransactionContext = (overridePayAddressType?: BtcPaymentType) => {
     // we should not be doing this, but we need to refactor the account model to support this
     const masterFingerprint =
       selectedAccount.accountType === 'software' ? undefined : selectedAccount.masterPubKey;
+    const walletId =
+      selectedAccount.accountType === 'software' ? selectedAccount.walletId : undefined;
+
+    const softwareWallet = softwareWallets[network.type]?.find(
+      (wallet) => wallet.walletId === selectedAccount.walletId,
+    );
+    const derivationType = softwareWallet?.derivationType || 'index';
 
     return btcTransaction.createTransactionContext({
       account: selectedAccount,
-      seedVault,
+      seedVault: vault.SeedVault,
       utxoCache,
       network: network.type,
       esploraApiProvider: btcClient,
       btcPaymentAddressType: selectedAccount.btcAddressType,
       masterFingerprint,
+      derivationType,
+      walletId,
     });
-  }, [utxoCache, selectedAccount, network, seedVault, btcClient]);
+  }, [utxoCache, selectedAccount, network.type, vault, btcClient, softwareWallets]);
 
   return transactionContext;
 };

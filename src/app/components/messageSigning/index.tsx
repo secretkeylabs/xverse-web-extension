@@ -7,8 +7,8 @@ import ConfirmScreen from '@components/confirmScreen';
 import InfoContainer from '@components/infoContainer';
 import KeystoneConnectionView from '@components/keystone/connectKeystoneView';
 import LedgerConnectionView from '@components/ledger/connectLedgerView';
-import useSeedVault from '@hooks/useSeedVault';
 import useSelectedAccount from '@hooks/useSelectedAccount';
+import useVault from '@hooks/useVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { createKeystoneTransport } from '@keystonehq/hw-transport-webusb';
 import Transport from '@ledgerhq/hw-transport-webusb';
@@ -23,12 +23,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import Sheet from '@ui-library/sheet';
-import {
-  getTruncatedAddress,
-  isHardwareAccount,
-  isKeystoneAccount,
-  isLedgerAccount,
-} from '@utils/helper';
+import { getTruncatedAddress, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import { handleKeystoneMessageSigning } from '@utils/keystone';
 import { handleLedgerMessageSigning } from '@utils/ledger';
 import { useCallback, useState } from 'react';
@@ -66,9 +61,9 @@ function MessageSigning({
   header,
 }: MessageSigningProps) {
   const { t } = useTranslation('translation');
-  const { accountsList, network } = useWalletSelector();
+  const { network } = useWalletSelector();
   const selectedAccount = useSelectedAccount();
-  const { getSeed } = useSeedVault();
+  const vault = useVault();
 
   const [isSigning, setIsSigning] = useState(false);
 
@@ -226,22 +221,10 @@ function MessageSigning({
     }
   }, [accountType, handleKeystoneConnectAndConfirm, handleLedgerConnectAndConfirm]);
 
-  const confirmSignMessage = async () => {
-    const seedPhrase = await getSeed();
-    return signMessage({
-      accounts: accountsList,
-      message,
-      address,
-      seedPhrase,
-      network: network.type,
-      protocol,
-    });
-  };
-
   const confirmCallback = async () => {
     try {
       setIsSigning(true);
-      if (isHardwareAccount(selectedAccount)) {
+      if (selectedAccount.accountType !== 'software') {
         if (isLedgerAccount(selectedAccount)) {
           setAccountType('ledger');
         } else if (isKeystoneAccount(selectedAccount)) {
@@ -250,7 +233,18 @@ function MessageSigning({
         setIsModalVisible(true);
         return;
       }
-      const signedMessage = await confirmSignMessage();
+      const { rootNode, derivationType } = await vault.SeedVault.getWalletRootNode(
+        selectedAccount.walletId,
+      );
+      const signedMessage = await signMessage({
+        message,
+        address,
+        rootNode,
+        network: network.type,
+        protocol,
+        accountIndex: BigInt(selectedAccount.id),
+        derivationType,
+      });
       await onSigned(signedMessage);
     } catch (err) {
       onSignedError?.(err);

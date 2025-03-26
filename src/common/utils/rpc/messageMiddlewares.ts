@@ -50,17 +50,21 @@ export function requirePermissions(
     const {
       selectedAccountIndex,
       selectedAccountType,
-      accountsList: softwareAccountsList,
+      selectedWalletId,
+      softwareWallets,
       ledgerAccountsList,
       keystoneAccountsList,
+      network,
     } = rootStore.store.getState().walletState;
 
     const existingAccount = getSelectedAccount({
       selectedAccountIndex,
       selectedAccountType,
-      softwareAccountsList,
+      selectedWalletId,
+      softwareWallets,
       ledgerAccountsList,
       keystoneAccountsList,
+      network: network.type,
     });
 
     if (!existingAccount) {

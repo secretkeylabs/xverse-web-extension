@@ -14,7 +14,8 @@ const handleGetRunesBalance = async (
   const {
     selectedAccountIndex,
     selectedAccountType,
-    accountsList: softwareAccountsList,
+    selectedWalletId,
+    softwareWallets,
     ledgerAccountsList,
     keystoneAccountsList,
     network,
@@ -23,9 +24,11 @@ const handleGetRunesBalance = async (
   const existingAccount = getSelectedAccount({
     selectedAccountIndex,
     selectedAccountType,
-    softwareAccountsList,
+    selectedWalletId,
+    softwareWallets,
     ledgerAccountsList,
     keystoneAccountsList,
+    network: network.type,
   });
 
   if (!existingAccount) {

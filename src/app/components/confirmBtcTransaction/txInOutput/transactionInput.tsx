@@ -39,17 +39,27 @@ function TransactionInput({ input }: Props) {
   //   input.sigHash === btc.SigHash.NONE || input.sigHash === btc.SigHash.NONE_ANYONECANPAY;
 
   const renderAddress = (addressToBeDisplayed: string) =>
-    userAddresses.some((address) => address === addressToBeDisplayed) ? (
+    input.isPayToAnchor ? (
+      <TxIdContainer>
+        <SubValueText data-testid="pay-to-anchor-send" typography="body_medium_s">
+          {getTruncatedAddress(input.extendedUtxo.utxo.txid)}
+        </SubValueText>
+        <StyledP typography="body_medium_s">({t('PAY_TO_ANCHOR')})</StyledP>
+      </TxIdContainer>
+    ) : isExternalInput ? (
+      <TxIdContainer>
+        <SubValueText typography="body_medium_s">
+          {getTruncatedAddress(input.extendedUtxo.utxo.txid)}
+        </SubValueText>
+        <StyledP typography="body_medium_s">(txid)</StyledP>
+      </TxIdContainer>
+    ) : (
       <TxIdContainer>
         <SubValueText data-testid="address-send" typography="body_medium_s">
           {getTruncatedAddress(addressToBeDisplayed)}
         </SubValueText>
         <StyledP typography="body_medium_s">({t('YOUR_ADDRESS')})</StyledP>
       </TxIdContainer>
-    ) : (
-      <SubValueText typography="body_medium_s">
-        {getTruncatedAddress(addressToBeDisplayed)}
-      </SubValueText>
     );
 
   return (
@@ -64,16 +74,7 @@ function TransactionInput({ input }: Props) {
         ).toFixed()} BTC`}
         address={isExternalInput ? input.extendedUtxo.utxo.txid : input.extendedUtxo.address}
       >
-        {isExternalInput ? (
-          <TxIdContainer>
-            <SubValueText typography="body_medium_s">
-              {getTruncatedAddress(input.extendedUtxo.utxo.txid)}
-            </SubValueText>
-            <StyledP typography="body_medium_s">(txid)</StyledP>
-          </TxIdContainer>
-        ) : (
-          renderAddress(input.extendedUtxo.address)
-        )}
+        {renderAddress(input.extendedUtxo.address)}
       </TransferDetailView>
     </TransferDetailContainer>
   );

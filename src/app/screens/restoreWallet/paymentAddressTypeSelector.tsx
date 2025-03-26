@@ -1,9 +1,5 @@
 import PreferredBtcAddressItem from '@components/preferredBtcAddressItem';
-import useBtcClient from '@hooks/apiClients/useBtcClient';
-import { sha256 } from '@noble/hashes/sha256';
 import type { BtcPaymentType } from '@secretkeylabs/xverse-core';
-import { getPaymentAccountSummaryForSeedPhrase } from '@secretkeylabs/xverse-core';
-import { useQuery } from '@tanstack/react-query';
 import Button from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
 import { InputFeedback } from '@ui-library/inputFeedback';
@@ -11,6 +7,7 @@ import Spinner from '@ui-library/spinner';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
+import type { Summary } from './types';
 
 const SpinnerContainer = styled.div({
   display: 'flex',
@@ -73,19 +70,20 @@ const LearnMoreLink = styled.a((props) => ({
 }));
 
 type Props = {
-  seedPhrase: string;
   selectedType: BtcPaymentType;
   onSelectedTypeChange: (type: BtcPaymentType) => void;
   onContinue: () => void;
+  summaryIsLoading: boolean;
+  summaryData: Summary | undefined;
 };
 
 export default function PaymentAddressTypeSelector({
-  seedPhrase,
   selectedType,
   onSelectedTypeChange,
   onContinue,
+  summaryIsLoading,
+  summaryData,
 }: Props) {
-  const btcClient = useBtcClient();
   const { t } = useTranslation('translation', {
     keyPrefix: 'RESTORE_WALLET_SCREEN.SELECT_ADDRESS_TYPE',
   });
@@ -93,19 +91,14 @@ export default function PaymentAddressTypeSelector({
     keyPrefix: 'RESTORE_WALLET_SCREEN',
   });
 
-  const { data, isLoading } = useQuery({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
-    queryKey: ['onboardingBtcAddressBalance', sha256(seedPhrase.substring(0, 20)).toString()],
-    queryFn: () => getPaymentAccountSummaryForSeedPhrase(btcClient, seedPhrase, 'Mainnet', 10),
-  });
-
   useEffect(() => {
-    if (isLoading || !data) return;
-    const preferredType = data.nestedTotalSats > data.nativeTotalSats ? 'nested' : 'native';
+    if (summaryIsLoading || !summaryData) return;
+    const preferredType =
+      summaryData.nestedTotalSats > summaryData.nativeTotalSats ? 'nested' : 'native';
     onSelectedTypeChange(preferredType);
-  }, [data, isLoading]);
+  }, [summaryData, summaryIsLoading]);
 
-  if (isLoading || !data) {
+  if (summaryIsLoading || !summaryData) {
     return (
       <SpinnerContainer>
         <Spinner size={50} />
@@ -115,7 +108,7 @@ export default function PaymentAddressTypeSelector({
 
   const onClickType = (type: BtcPaymentType) => () => onSelectedTypeChange(type);
 
-  const totalFunds = data.nativeTotalSats + data.nestedTotalSats;
+  const totalFunds = summaryData.nativeTotalSats + summaryData.nestedTotalSats;
 
   return (
     <Container>
@@ -132,21 +125,21 @@ export default function PaymentAddressTypeSelector({
           <InputFeedback message={t('LEARN_MORE')} />
         </LearnMoreLink>
         <SummaryContainer>
-          <StyledP typography="body_bold_m" color="white_200">
+          <StyledP typography="body_medium_m" color="white_0">
             {t('ACCOUNT_COUNT', {
-              accounts: `${data.accountCount}${data.hasMoreAccounts ? '+' : ''}`,
+              accounts: `${summaryData.accountCount}${summaryData.hasMoreAccounts ? '+' : ''}`,
             })}
           </StyledP>
           <TypesContainer>
             <PreferredBtcAddressItem
               title="Native SegWit"
-              balanceSats={data.nativeTotalSats}
+              balanceSats={summaryData.nativeTotalSats}
               isSelected={selectedType === 'native'}
               onClick={onClickType('native')}
             />
             <PreferredBtcAddressItem
               title="Nested SegWit"
-              balanceSats={data.nestedTotalSats}
+              balanceSats={summaryData.nestedTotalSats}
               isSelected={selectedType === 'nested'}
               onClick={onClickType('nested')}
             />

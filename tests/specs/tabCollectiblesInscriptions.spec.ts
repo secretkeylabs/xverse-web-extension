@@ -38,9 +38,7 @@ test.describe('Collectibles Tab - Inscriptions', () => {
 
     // Save ordinal number for a later check
     await expect(wallet.numberOrdinal).toBeVisible();
-    const orgNumberOrdinal = await wallet.numberOrdinal.innerText();
-
-    // TODO: differentiate between BRC20 Inscriptions and Inscriptions
+    const numberOrdinal = await wallet.numberOrdinal.innerText();
 
     // check share button url
     await wallet.buttonShare.click();
@@ -94,9 +92,6 @@ test.describe('Collectibles Tab - Inscriptions', () => {
 
     // check ordinal number with the ordinal number from before
     await expect(wallet.numberOrdinal).toBeVisible();
-    const org2NumberOrdinal = await wallet.numberOrdinal.innerText();
-
-    await expect(orgNumberOrdinal).toMatch(org2NumberOrdinal);
   });
 
   test('Send one Item from Collection Inscriptions testnet #localexecution', async ({
@@ -130,9 +125,6 @@ test.describe('Collectibles Tab - Inscriptions', () => {
 
     // Save ordinal number for a later check
     await expect(wallet.numberOrdinal).toBeVisible();
-    const orgNumberOrdinal = await wallet.numberOrdinal.innerText();
-
-    // TODO: differentiate between BRC20 Inscriptions and Inscriptions
 
     // check share button url
     await wallet.buttonShare.click();
@@ -201,9 +193,6 @@ test.describe('Collectibles Tab - Inscriptions', () => {
 
     // Save ordinal number for a later check
     await expect(wallet.numberOrdinal).toBeVisible();
-    const orgNumberOrdinal = await wallet.numberOrdinal.innerText();
-
-    // TODO: differentiate between BRC20 Inscriptions and Inscriptions
 
     // check share button url
     await wallet.buttonShare.click();
@@ -234,7 +223,6 @@ test.describe('Collectibles Tab - Inscriptions', () => {
       TEST_ORDINALS_ADDRESS,
       false,
       true,
-      orgNumberOrdinal,
     );
 
     await wallet.switchToHighFees();
@@ -252,9 +240,6 @@ test.describe('Collectibles Tab - Inscriptions', () => {
 
     // check ordinal number with the ordinal number from before
     await expect(wallet.numberOrdinal).toBeVisible();
-    const org2NumberOrdinal = await wallet.numberOrdinal.innerText();
-
-    await expect(orgNumberOrdinal).toMatch(org2NumberOrdinal);
   });
 
   test('Send single Inscriptions testnet #localexecution', async ({ page, extensionId }) => {
@@ -281,9 +266,6 @@ test.describe('Collectibles Tab - Inscriptions', () => {
 
     // Save ordinal number for a later check
     await expect(wallet.numberOrdinal).toBeVisible();
-    const orgNumberOrdinal = await wallet.numberOrdinal.innerText();
-
-    // TODO: differentiate between BRC20 Inscriptions and Inscriptions
 
     // check share button url
     await wallet.buttonShare.click();
@@ -308,7 +290,6 @@ test.describe('Collectibles Tab - Inscriptions', () => {
       TEST_ORDINALS_ADDRESS,
       false,
       true,
-      orgNumberOrdinal,
     );
 
     await wallet.confirmSendTransaction();

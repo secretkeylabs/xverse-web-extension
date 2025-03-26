@@ -8,7 +8,7 @@ import { permissions } from '@secretkeylabs/xverse-core';
 import rootStore from '@stores/index';
 import RequestsRoutes from '../../route-urls';
 import { accountPurposeAddresses } from '../btc/getAddresses/utils';
-import { makeSendPopupClosedUserRejectionMessage } from '../helpers';
+import { getBitcoinNetworkType, makeSendPopupClosedUserRejectionMessage } from '../helpers';
 import { sendInternalErrorMessage } from '../responseMessages/errors';
 import { sendConnectSuccessResponseMessage } from '../responseMessages/wallet';
 
@@ -34,7 +34,8 @@ export const handleConnect = async (message: ConnectRequestMessage, port: chrome
   const {
     selectedAccountIndex,
     selectedAccountType,
-    accountsList: softwareAccountsList,
+    selectedWalletId,
+    softwareWallets,
     ledgerAccountsList,
     keystoneAccountsList,
     network,
@@ -44,9 +45,11 @@ export const handleConnect = async (message: ConnectRequestMessage, port: chrome
   const account = getSelectedAccount({
     selectedAccountIndex,
     selectedAccountType,
-    softwareAccountsList,
+    selectedWalletId,
+    softwareWallets,
     ledgerAccountsList,
     keystoneAccountsList,
+    network: network.type,
   });
 
   if (!account) {
@@ -109,10 +112,10 @@ export const handleConnect = async (message: ConnectRequestMessage, port: chrome
     addresses,
     network: {
       bitcoin: {
-        name: network.type,
+        name: getBitcoinNetworkType(network.type),
       },
       stacks: {
-        name: network.type,
+        name: getBitcoinNetworkType(network.type),
       },
     },
   };

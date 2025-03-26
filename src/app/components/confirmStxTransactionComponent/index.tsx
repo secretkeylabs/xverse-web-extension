@@ -6,8 +6,8 @@ import TransactionSettingAlert from '@components/transactionSetting';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useNetworkSelector from '@hooks/useNetwork';
-import useSeedVault from '@hooks/useSeedVault';
 import useSelectedAccount from '@hooks/useSelectedAccount';
+import useVault from '@hooks/useVault';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
 import { FadersHorizontal } from '@phosphor-icons/react';
@@ -27,7 +27,6 @@ import SelectFeeRate from '@ui-components/selectFeeRate';
 import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
 import Sheet from '@ui-library/sheet';
-import { isHardwareAccount } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -95,7 +94,7 @@ function ConfirmStxTransactionComponent({
   const selectedNetwork = useNetworkSelector();
   const { stxBtcRate, btcFiatRate } = useSupportedCoinRates();
   const { data: stxData } = useStxWalletData();
-  const { getSeed } = useSeedVault();
+  const vault = useVault();
   const [showFeeSettings, setShowFeeSettings] = useState(false);
   const selectedAccount = useSelectedAccount();
   const { feeMultipliers, fiatCurrency } = useWalletSelector();
@@ -205,12 +204,14 @@ function ConfirmStxTransactionComponent({
       onConfirmClick(initialStxTransactions);
       return;
     }
-    if (isHardwareAccount(selectedAccount)) {
+    if (selectedAccount.accountType !== 'software') {
       setIsModalVisible(true);
       return;
     }
 
-    const seed = await getSeed();
+    const { rootNode, derivationType } = await vault.SeedVault.getWalletRootNode(
+      selectedAccount.walletId,
+    );
     let signedTxs: StacksTransactionWire[] = [];
 
     if (fee) {
@@ -223,7 +224,8 @@ function ConfirmStxTransactionComponent({
       const transaction = initialStxTransactions[0];
       const signedContractCall = await signTransaction(
         transaction,
-        seed,
+        rootNode,
+        derivationType,
         selectedAccount?.id ?? 0,
         selectedNetwork,
       );
@@ -233,7 +235,8 @@ function ConfirmStxTransactionComponent({
         initialStxTransactions,
         selectedAccount?.id ?? 0,
         selectedNetwork,
-        seed,
+        rootNode,
+        derivationType,
       );
     }
     onConfirmClick(signedTxs);

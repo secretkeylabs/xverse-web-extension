@@ -1,16 +1,16 @@
 import { MESSAGE_SOURCE } from '@common/types/message-types';
 
+import { getBitcoinNetworkType } from '@common/utils/rpc/helpers';
 import { sendUserRejectionMessage } from '@common/utils/rpc/responseMessages/errors';
 import { sendGetAccountsSuccessResponseMessage } from '@common/utils/rpc/responseMessages/stacks';
 import useWalletSelector from '@hooks/useWalletSelector';
-import type { GetAddressOptions } from '@sats-connect/core';
-import { base58 } from '@scure/base';
-import { bip32, bip39 } from '@secretkeylabs/xverse-core';
+import type { GetAddressOptions, Return } from '@sats-connect/core';
+import { base58, hex } from '@scure/base';
 import { decodeToken } from 'jsontokens';
 import { useCallback, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import useSeedVault from './useSeedVault';
 import useSelectedAccount from './useSelectedAccount';
+import useVault from './useVault';
 
 const GAIA_HUB_URL = 'https://hub.hiro.so';
 
@@ -20,9 +20,9 @@ const useStxAccountRequest = () => {
   const params = new URLSearchParams(search);
 
   // Utils
-  const { stxAddress, stxPublicKey } = useSelectedAccount();
+  const selectedAccount = useSelectedAccount();
   const { network } = useWalletSelector();
-  const { getSeed } = useSeedVault();
+  const vault = useVault();
 
   // Related to WebBTC RPC request
   const messageId = params.get('messageId') ?? '';
@@ -39,27 +39,35 @@ const useStxAccountRequest = () => {
 
   // Actions
   const approveStxAccountRequest = useCallback(async () => {
-    const seedPhrase = await getSeed();
-    const seed = await bip39.mnemonicToSeed(seedPhrase);
-    const rootNode = bip32.fromSeed(seed);
-    const identitiesKeychain = rootNode.derivePath(`m/888'/0'`);
+    if (selectedAccount.accountType !== 'software') {
+      throw new Error('Only software wallet is supported for stx account derivation');
+    }
+    const { rootNode } = await vault.SeedVault.getWalletRootNode(selectedAccount.walletId);
 
-    const identityKeychain = identitiesKeychain.deriveHardened(0);
-    const appsKeyBase58 = identityKeychain.deriveHardened(0).toBase58();
+    const appsKey = rootNode.derive(`m/888'/0'/0'/0'`);
+    const appsKeyBase58 = appsKey.privateExtendedKey;
     const appsKeyUint8Array = base58.decode(appsKeyBase58);
-    const appsKeyHex = Buffer.from(appsKeyUint8Array).toString('hex');
+    const appsKeyHex = hex.encode(appsKeyUint8Array);
 
     const addressesResponse = [
       {
-        address: stxAddress,
-        publicKey: stxPublicKey,
+        address: selectedAccount.stxAddress,
+        publicKey: selectedAccount.stxPublicKey,
         gaiaHubUrl: GAIA_HUB_URL,
         gaiaAppKey: appsKeyHex,
       },
     ];
 
-    const response = {
+    const response: Return<'stx_getAccounts'> = {
       addresses: addressesResponse,
+      network: {
+        bitcoin: {
+          name: getBitcoinNetworkType(network.type),
+        },
+        stacks: {
+          name: getBitcoinNetworkType(network.type),
+        },
+      },
     };
     const addressMessage = {
       source: MESSAGE_SOURCE,
@@ -73,7 +81,7 @@ const useStxAccountRequest = () => {
     }
 
     chrome.tabs.sendMessage(+tabId, addressMessage);
-  }, [getSeed, stxAddress, stxPublicKey, requestToken, tabId, messageId, rpcMethod]);
+  }, [vault, selectedAccount, requestToken, tabId, messageId, rpcMethod]);
   const cancelAccountRequest = useCallback(() => {
     if (rpcMethod === 'stx_getAccounts') {
       sendUserRejectionMessage({ tabId, messageId });

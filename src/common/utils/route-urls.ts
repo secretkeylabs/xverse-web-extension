@@ -18,6 +18,7 @@ enum RequestsRoutes {
   ConnectionRequest = '/connection-request',
   MintRune = '/mint-rune',
   EtchRune = '/etch-rune',
+  ChangeNetworkRequest = '/change-network-request',
 }
 
 export default RequestsRoutes;

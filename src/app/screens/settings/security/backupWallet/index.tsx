@@ -1,14 +1,13 @@
 import PasswordInput from '@components/passwordInput';
+import SeedBackup from '@components/seedBackup';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
-import useSeedVault from '@hooks/useSeedVault';
-import useWalletSelector from '@hooks/useWalletSelector';
-import SeedCheck from '@screens/backupWalletSteps/seedCheck';
+import useAsyncFn from '@hooks/useAsyncFn';
+import useVault from '@hooks/useVault';
+import { Spinner } from '@phosphor-icons/react';
 import { Container } from '@screens/settings/index.styles';
-import { setWalletBackupStatusAction } from '@stores/wallet/actions/actionCreators';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -21,8 +20,16 @@ const EnterPasswordContainer = styled.div((props) => ({
   paddingTop: props.theme.space.l,
 }));
 
-const SeedphraseContainer = styled.div((props) => ({
+const SeedPhraseContainer = styled.div((props) => ({
   marginTop: props.theme.spacing(5),
+}));
+
+const LoaderContainer = styled.div((props) => ({
+  display: 'flex',
+  flex: 1,
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginTop: props.theme.space.l,
 }));
 
 function BackupWalletScreen() {
@@ -31,20 +38,35 @@ function BackupWalletScreen() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showSeed, setShowSeed] = useState(false);
-  const [seed, setSeed] = useState('');
+  const [mnemonic, setMnemonic] = useState('');
   const navigate = useNavigate();
-  const { getSeed, unlockVault } = useSeedVault();
+  const vault = useVault();
 
-  useEffect(() => {
-    (async () => {
-      const seedPhrase = await getSeed();
-      setSeed(seedPhrase);
-    })();
+  const { isLoading } = useAsyncFn(
+    async ({ signal }) => {
+      if (!showSeed && !signal.aborted) {
+        setMnemonic('');
+        return;
+      }
+      // TODO multiwallet: Allow user to select which wallet to view the seed phrase for and pass to SeedBackup below
+      const primaryWalletId = await vault.SeedVault.getPrimaryWalletId();
 
-    return () => {
-      setSeed('');
-    };
-  }, []);
+      if (!primaryWalletId) {
+        throw new Error('No primary wallet found');
+      }
+
+      const walletSecrets = await vault.SeedVault.getWalletSecrets(primaryWalletId);
+
+      if (!walletSecrets.mnemonic) {
+        throw new Error('No mnemonic found');
+      }
+
+      if (!signal.aborted) {
+        setMnemonic(walletSecrets.mnemonic);
+      }
+    },
+    [showSeed, vault],
+  );
 
   const handleBackButtonClick = () => {
     navigate(-1);
@@ -53,7 +75,7 @@ function BackupWalletScreen() {
   const handlePasswordNextClick = async () => {
     try {
       setLoading(true);
-      await unlockVault(password);
+      await vault.unlockVault(password);
       setPassword('');
       setError('');
       setShowSeed(true);
@@ -63,6 +85,14 @@ function BackupWalletScreen() {
       setLoading(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <LoaderContainer>
+        <Spinner color="white" size={50} />
+      </LoaderContainer>
+    );
+  }
 
   return (
     <>
@@ -84,9 +114,7 @@ function BackupWalletScreen() {
             />
           </EnterPasswordContainer>
         )}
-        <SeedphraseContainer>
-          {showSeed && <SeedCheck seedPhrase={seed} onContinue={handleBackButtonClick} />}
-        </SeedphraseContainer>
+        <SeedPhraseContainer>{showSeed && <SeedBackup mnemonic={mnemonic} />}</SeedPhraseContainer>
       </Container>
       <BottomBar tab="settings" />
     </>

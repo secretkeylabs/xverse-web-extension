@@ -44,8 +44,8 @@ export const FtInfoContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'row',
   borderTop: `1px solid ${props.theme.colors.elevation2}`,
-  paddingTop: props.theme.space.l,
-  marginTop: props.theme.space.xl,
+  paddingTop: props.theme.space.m,
+  marginTop: props.theme.space.m,
   paddingLeft: props.theme.space.m,
 }));
 
@@ -118,4 +118,12 @@ export const RuneBundlesContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${(props) => props.theme.space.s};
+`;
+
+export const ChartContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-top: ${(props) => props.theme.space.l};
+  padding-left: ${(props) => props.theme.space.m};
+  padding-right: ${(props) => props.theme.space.m};
 `;

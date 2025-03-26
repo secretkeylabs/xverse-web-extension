@@ -7,6 +7,7 @@ import TopRow from '@components/topRow';
 import useAccountBalance from '@hooks/queries/useAccountBalance';
 import { broadcastResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
+import useVault from '@hooks/useVault';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Plus } from '@phosphor-icons/react';
@@ -61,9 +62,11 @@ function AccountList(): JSX.Element {
   const { search, state } = useLocation();
   const params = new URLSearchParams(search);
   const selectedAccount = useSelectedAccount();
-  const { network, accountsList, ledgerAccountsList, keystoneAccountsList } = useWalletSelector();
-  const { createAccount, switchAccount } = useWalletReducer();
+  const { network, softwareWallets, ledgerAccountsList, keystoneAccountsList, addingAccount } =
+    useWalletSelector();
+  const { createSoftwareAccount, switchAccount } = useWalletReducer();
   const { enqueueFetchBalances } = useAccountBalance();
+  const vault = useVault();
 
   const hideListActions = Boolean(params.get('hideListActions')) || false;
 
@@ -73,8 +76,9 @@ function AccountList(): JSX.Element {
       keystoneAccountsList,
       network.type,
     );
-    return [...networkLedgerAccounts, ...networkKeystoneAccounts, ...accountsList];
-  }, [accountsList, ledgerAccountsList, keystoneAccountsList, network]);
+    const softwareAccounts = softwareWallets[network.type].map((wallet) => wallet.accounts).flat();
+    return [...networkLedgerAccounts, ...networkKeystoneAccounts, ...softwareAccounts];
+  }, [softwareWallets, ledgerAccountsList, keystoneAccountsList, network]);
 
   const handleBackButtonClick = () => {
     navigate(state?.from || -1);
@@ -93,7 +97,9 @@ function AccountList(): JSX.Element {
     account.stxAddress === selectedAccount.stxAddress;
 
   const onCreateAccount = async () => {
-    await createAccount();
+    // TODO multiwallet: with multi wallet, walletId needs to be set by the user on click
+    const walletIds = await vault.SeedVault.getWalletIds();
+    await createSoftwareAccount(walletIds[0]);
   };
 
   return (
@@ -108,6 +114,7 @@ function AccountList(): JSX.Element {
                 key={`${account.accountType}:${account.masterPubKey}:${account.id}:${account.deviceAccountIndex}`}
               >
                 <LazyAccountRow
+                  walletId={account.walletId}
                   account={account}
                   isSelected={isAccountSelected(account)}
                   onAccountSelected={handleAccountSelect}
@@ -126,6 +133,8 @@ function AccountList(): JSX.Element {
               onClick={onCreateAccount}
               title={t('NEW_ACCOUNT')}
               variant="secondary"
+              loading={addingAccount}
+              disabled={addingAccount}
             />
             <Button
               icon={
@@ -134,6 +143,7 @@ function AccountList(): JSX.Element {
               onClick={() => navigate('/connect-hardware-wallet')}
               title={t('NEW_HARDWARE_WALLET')}
               variant="secondary"
+              disabled={addingAccount}
             />
           </ButtonsWrapper>
         ) : null}

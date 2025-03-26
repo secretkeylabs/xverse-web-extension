@@ -1,15 +1,12 @@
 import Eye from '@assets/img/createPassword/Eye.svg';
 import EyeSlash from '@assets/img/createPassword/EyeSlash.svg';
 import logo from '@assets/img/xverse_logo.svg';
-import useSeedVault from '@hooks/useSeedVault';
-import useSeedVaultMigration from '@hooks/useSeedVaultMigration';
+import useAsyncFn from '@hooks/useAsyncFn';
+import useVault from '@hooks/useVault';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSession from '@hooks/useWalletSession';
 import { useSpring } from '@react-spring/web';
-import MigrationConfirmation from '@screens/migrationConfirmation';
-import { AnalyticsEvents } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
-import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -33,13 +30,11 @@ function Login(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'LOGIN_SCREEN' });
   const navigate = useNavigate();
   const { unlockWallet } = useWalletReducer();
-  const { hasSeed } = useSeedVault();
-  const { migrateCachedStorage, isVaultUpdated } = useSeedVaultMigration();
+  const vault = useVault();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
-  const [showMigration, setShowMigration] = useState(false);
   const { setSessionStartTime } = useWalletSession();
 
   const styles = useSpring({
@@ -54,22 +49,12 @@ function Login(): JSX.Element {
     delay: 100,
   });
 
-  useEffect(() => {
-    hasSeed().then((hasSeedPhrase) => {
-      if (!hasSeedPhrase) {
-        navigate('/landing');
-      }
-    });
-  }, [hasSeed, navigate]);
-
-  const handleMigrateCache = async () => {
-    try {
-      await migrateCachedStorage();
-      trackMixPanel(AnalyticsEvents.WalletMigrated);
-    } catch (err) {
-      setShowMigration(false);
+  useAsyncFn(async () => {
+    const isInitialised = await vault.isInitialised();
+    if (!isInitialised) {
+      navigate('/landing');
     }
-  };
+  }, [vault, navigate]);
 
   const handleTogglePasswordView = () => {
     setIsPasswordVisible(!isPasswordVisible);
@@ -82,28 +67,13 @@ function Login(): JSX.Element {
     setPassword(event.currentTarget.value);
   };
 
-  const onPasswordVerify = async () => {
-    // Check for SeedVault Migrations
-    try {
-      const hasMigrated = await isVaultUpdated();
-      if (!hasMigrated) {
-        setShowMigration(true);
-      } else {
-        setIsVerifying(false);
-        navigate(-1);
-      }
-    } catch (err) {
-      setIsVerifying(false);
-      navigate(-1);
-    }
-  };
-
   const handleVerifyPassword = async () => {
     setIsVerifying(true);
     try {
       await setSessionStartTime();
       await unlockWallet(password);
-      await onPasswordVerify();
+      setIsVerifying(false);
+      navigate(-1);
     } catch (err) {
       setIsVerifying(false);
       setError(t('VERIFY_PASSWORD_ERROR'));
@@ -128,47 +98,40 @@ function Login(): JSX.Element {
   };
 
   return (
-    // eslint-disable-next-line react/jsx-no-useless-fragment
-    <>
-      {!showMigration ? (
-        <ScreenContainer>
-          <AppVersion>{t('BETA_VERSION')}</AppVersion>
-          <ContentContainer style={styles}>
-            <TopSectionContainer>
-              <Logo src={logo} />
-              <LandingTitle>{t('WELCOME_MESSAGE_FIRST_LOGIN')}</LandingTitle>
-            </TopSectionContainer>
-            <PasswordInputLabel>{t('PASSWORD_INPUT_LABEL')}</PasswordInputLabel>
-            <PasswordInputContainer>
-              <PasswordInput
-                id="password-input"
-                type={isPasswordVisible ? 'text' : 'password'}
-                value={password}
-                onChange={handlePasswordChange}
-                placeholder={t('PASSWORD_INPUT_PLACEHOLDER')}
-                autoFocus
-              />
-              <IconButton type="button" onClick={handleTogglePasswordView}>
-                <img src={isPasswordVisible ? Eye : EyeSlash} alt="show-password" height={24} />
-              </IconButton>
-            </PasswordInputContainer>
-            {error && <ErrorMessage>{error}</ErrorMessage>}
-            <ButtonContainer>
-              <Button
-                onClick={handleVerifyPassword}
-                title={t('VERIFY_PASSWORD_BUTTON')}
-                loading={isVerifying}
-              />
-            </ButtonContainer>
-            <ForgotPasswordButton onClick={handleForgotPassword}>
-              {t('FORGOT_PASSWORD_BUTTON')}
-            </ForgotPasswordButton>
-          </ContentContainer>
-        </ScreenContainer>
-      ) : (
-        <MigrationConfirmation migrateCallback={handleMigrateCache} />
-      )}
-    </>
+    <ScreenContainer>
+      <AppVersion>{t('BETA_VERSION')}</AppVersion>
+      <ContentContainer style={styles}>
+        <TopSectionContainer>
+          <Logo src={logo} />
+          <LandingTitle>{t('WELCOME_MESSAGE_FIRST_LOGIN')}</LandingTitle>
+        </TopSectionContainer>
+        <PasswordInputLabel>{t('PASSWORD_INPUT_LABEL')}</PasswordInputLabel>
+        <PasswordInputContainer>
+          <PasswordInput
+            id="password-input"
+            type={isPasswordVisible ? 'text' : 'password'}
+            value={password}
+            onChange={handlePasswordChange}
+            placeholder={t('PASSWORD_INPUT_PLACEHOLDER')}
+            autoFocus
+          />
+          <IconButton type="button" onClick={handleTogglePasswordView}>
+            <img src={isPasswordVisible ? Eye : EyeSlash} alt="show-password" height={24} />
+          </IconButton>
+        </PasswordInputContainer>
+        {error && <ErrorMessage>{error}</ErrorMessage>}
+        <ButtonContainer>
+          <Button
+            onClick={handleVerifyPassword}
+            title={t('VERIFY_PASSWORD_BUTTON')}
+            loading={isVerifying}
+          />
+        </ButtonContainer>
+        <ForgotPasswordButton onClick={handleForgotPassword}>
+          {t('FORGOT_PASSWORD_BUTTON')}
+        </ForgotPasswordButton>
+      </ContentContainer>
+    </ScreenContainer>
   );
 }
 export default Login;

@@ -2,6 +2,7 @@ import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
+  AnalyticsEvents,
   getStxFiatEquivalent,
   microstacksToStx,
   stxToMicrostacks,
@@ -10,6 +11,7 @@ import {
 import SelectFeeRate, { type FeeRates } from '@ui-components/selectFeeRate';
 import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
+import { trackMixPanel } from '@utils/mixpanel';
 import { getFtBalance } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { useEffect } from 'react';
@@ -169,6 +171,10 @@ function Step2SelectAmount({
             bodyText={t('BTC.NO_FUNDS')}
             redirectText={t('STX.BUY_STX')}
             onClickRedirect={() => {
+              trackMixPanel(AnalyticsEvents.InitiateBuyFlow, {
+                selectedToken: 'STX',
+                source: 'send_stx',
+              });
               navigate('/buy/STX');
             }}
           />

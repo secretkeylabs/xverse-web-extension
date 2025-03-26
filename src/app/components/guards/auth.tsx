@@ -1,4 +1,4 @@
-import useSeedVault from '@hooks/useSeedVault';
+import useVault from '@hooks/useVault';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Spinner from '@ui-library/spinner';
@@ -24,12 +24,12 @@ const isInitialised = {
 
 function AuthGuard({ children }: PropsWithChildren) {
   const navigate = useNavigate();
-  const { encryptedSeed, isUnlocked, accountsList } = useWalletSelector();
+  const { encryptedSeed, isUnlocked, softwareWallets, network } = useWalletSelector();
   const { loadWallet, lockWallet } = useWalletReducer();
-  const seedVault = useSeedVault();
+  const vault = useVault();
 
   const restoreSession = async () => {
-    const unlocked = await seedVault.isVaultUnlocked();
+    const unlocked = await vault.isVaultUnlocked();
 
     if (!unlocked && isUnlocked) {
       // ensure lock state is in sync before proceeding
@@ -44,32 +44,34 @@ function AuthGuard({ children }: PropsWithChildren) {
       return;
     }
 
-    const hasSeedPhrase = await seedVault.hasSeed();
-    if (!hasSeedPhrase) {
+    const vaultIsInitialised = await vault.isInitialised();
+    if (!vaultIsInitialised) {
       // wallet has not been set up yet
       navigate('/landing');
       return;
     }
 
-    try {
-      // if we successfully unlock with empty pwd, then the wallet is not set up yet
-      await seedVault.unlockVault('');
-      navigate('/landing');
-      return;
-    } catch (e) {
-      // no-op - if we can't unlock with empty pwd, then the wallet is set up and we should check if logged in
-    }
-
-    try {
-      await seedVault.getSeed();
-    } catch (error) {
+    if (!unlocked) {
       navigate('/login');
       return;
     }
 
-    await loadWallet(() => {
-      isInitialised.current = true;
-    });
+    try {
+      await vault.restoreVault();
+      const walletCount = await vault.SeedVault.getWalletCount();
+      // TODO multiwallet: In future with multi wallet, if no wallets found, navigate to add wallet page
+    } catch (error) {
+      console.error(error);
+      // seed vault access failed, we need to re-authenticate
+      navigate('/login');
+      return;
+    }
+
+    if (!isInitialised.current) {
+      await loadWallet(() => {
+        isInitialised.current = true;
+      });
+    }
   };
 
   useEffect(() => {
@@ -79,7 +81,7 @@ function AuthGuard({ children }: PropsWithChildren) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isUnlocked]);
 
-  if (!isInitialised.current || !isUnlocked || accountsList.length === 0) {
+  if (!isInitialised.current || !isUnlocked || softwareWallets[network.type].length === 0) {
     return (
       <CenterChildContainer>
         <Spinner size={50} />

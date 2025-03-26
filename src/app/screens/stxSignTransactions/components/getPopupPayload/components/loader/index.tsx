@@ -2,6 +2,7 @@ import { type Context } from '@common/utils/popup';
 import { sendUserRejectionMessage } from '@common/utils/rpc/responseMessages/errors';
 import useNetworkSelector from '@hooks/useNetwork';
 import useSelectedAccount from '@hooks/useSelectedAccount';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { type StxSignTransactionsRequestMessage } from '@sats-connect/core';
 import {
   useGetMakeSendRpcSuccessResponse,
@@ -20,6 +21,7 @@ export function Loader({ data, context }: Loader2Props) {
   const makeSendRpcSuccessResponse = useGetMakeSendRpcSuccessResponse();
   const account = useSelectedAccount();
   const network = useNetworkSelector();
+  const { selectedWalletId } = useWalletSelector();
 
   const handleReviewCancel = useCallback(() => {
     sendUserRejectionMessage({
@@ -40,6 +42,7 @@ export function Loader({ data, context }: Loader2Props) {
   return (
     <SigningFlow
       account={account}
+      walletId={selectedWalletId}
       network={network}
       transactions={transactions}
       isBroadcastRequested={isBroadcastRequested}

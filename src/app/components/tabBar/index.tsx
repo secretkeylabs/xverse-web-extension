@@ -1,5 +1,7 @@
 import { ChartLineUp, Gear, Globe, SketchLogo, Wallet } from '@phosphor-icons/react';
+import { AnalyticsEvents } from '@secretkeylabs/xverse-core';
 import { isInOptions, type TabType } from '@utils/helper';
+import { trackMixPanel } from '@utils/mixpanel';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled, { useTheme } from 'styled-components';
@@ -85,18 +87,21 @@ function BottomTabBar({ tab }: Props) {
 
   const handleNftButtonClick = () => {
     if (tab !== 'nft') {
+      trackMixPanel(AnalyticsEvents.VisitCollectiblesTab);
       navigate('/nft-dashboard');
     }
   };
 
   const handleStackingButtonClick = () => {
     if (tab !== 'stacking') {
+      trackMixPanel(AnalyticsEvents.VisitStackingTab);
       navigate('/stacking');
     }
   };
 
   const handleExploreButtonClick = () => {
     if (tab !== 'explore') {
+      trackMixPanel(AnalyticsEvents.VisitExplorePage);
       navigate('/explore');
     }
   };

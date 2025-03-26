@@ -5,11 +5,13 @@ import ReceiveCardComponent from '@components/receiveCardComponent';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Plus } from '@phosphor-icons/react';
+import { AnalyticsEvents } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import { InputFeedback } from '@ui-library/inputFeedback';
 import Sheet from '@ui-library/sheet';
 import { markAlertSeen, shouldShowAlert } from '@utils/alertTracker';
 import { isInOptions, isLedgerAccount } from '@utils/helper';
+import { trackMixPanel } from '@utils/mixpanel';
 import RoutePaths from 'app/routes/paths';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -63,14 +65,26 @@ function ReceiveSheet({ visible, onClose }: Props) {
   };
 
   const onBTCReceiveSelect = () => {
+    trackMixPanel(AnalyticsEvents.InitiateReceiveFlow, {
+      addressType: 'btc_payment',
+      source: 'dashboard',
+    });
     navigate('/receive/BTC');
   };
 
   const onSTXReceiveSelect = () => {
+    trackMixPanel(AnalyticsEvents.InitiateReceiveFlow, {
+      addressType: 'stx',
+      source: 'dashboard',
+    });
     navigate('/receive/STX');
   };
 
   const onOrdinalsReceivePress = () => {
+    trackMixPanel(AnalyticsEvents.InitiateReceiveFlow, {
+      addressType: 'btc_ordinals',
+      source: 'dashboard',
+    });
     navigate('/receive/ORD');
   };
 

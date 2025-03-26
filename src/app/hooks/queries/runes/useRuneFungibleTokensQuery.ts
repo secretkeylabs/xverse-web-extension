@@ -4,7 +4,6 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { type FungibleToken, type FungibleTokenWithStates } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import { selectWithDerivedState } from '@utils/tokens';
-import useGetTopTokens from '../useGetTopTokens';
 
 export const fetchRuneBalances =
   (
@@ -42,7 +41,6 @@ export const useRuneFungibleTokensQuery = (
   const { runesManageTokens, network, fiatCurrency, spamTokens, showSpamTokens } =
     useWalletSelector();
   const runesApi = useRunesApi();
-  const { data: topTokensData } = useGetTopTokens();
 
   const queryFn = fetchRuneBalances(runesApi, ordinalsAddress, fiatCurrency);
 
@@ -54,7 +52,6 @@ export const useRuneFungibleTokensQuery = (
       manageTokens: runesManageTokens,
       spamTokens,
       showSpamTokens,
-      topTokensData: topTokensData?.runes,
       select,
     }),
     refetchOnWindowFocus: !!backgroundRefetch,

@@ -1,6 +1,6 @@
 import { useRuneFungibleTokensQuery } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
+import useAsyncFn from '@hooks/useAsyncFn';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
-import useCancellableEffect from '@hooks/useCancellableEffect';
 import useHasFeature from '@hooks/useHasFeature';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
@@ -42,7 +42,6 @@ function SendRuneScreen() {
   const [feeRate, setFeeRate] = useState('');
   const [sendMax, setSendMax] = useState(false);
   const [currentStep, setCurrentStep] = useState<Step>(Step.SelectRecipient);
-  const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const transactionContext = useTransactionContext();
   const [transaction, setTransaction] = useState<btcTransaction.EnhancedTransaction | undefined>();
@@ -87,8 +86,8 @@ function SendRuneScreen() {
     );
   };
 
-  useCancellableEffect(
-    async (isEffectActive) => {
+  const { isLoading } = useAsyncFn(
+    async ({ signal }) => {
       const bigAmount = BigNumber(amountToSend);
 
       if (!recipientAddress || !feeRate || bigAmount.isNaN() || bigAmount.isLessThanOrEqualTo(0)) {
@@ -97,25 +96,28 @@ function SendRuneScreen() {
         return;
       }
 
-      setIsLoading(true);
-
       try {
         const transactionDetails = await generateTransactionAndSummary();
-        if (isEffectActive() && transactionDetails) {
+        if (!signal.aborted && transactionDetails) {
           setTransaction(transactionDetails.transaction);
           if (transactionDetails.summary) {
             setSummary(transactionDetails.summary);
           }
         }
       } catch (e) {
-        if (!isEffectActive()) return;
-        if (!(e instanceof Error) || !e.message.includes('Insufficient funds')) {
+        if (signal.aborted) return;
+        if (
+          !(e instanceof Error) ||
+          !(
+            e.message.toLowerCase().includes('not enough runes to send') ||
+            e.message.toLowerCase().includes('insufficient funds')
+          )
+        ) {
           console.error(e);
+          throw e;
         }
         setTransaction(undefined);
         setSummary(undefined);
-      } finally {
-        if (isEffectActive()) setIsLoading(false);
       }
     },
     [transactionContext, recipientAddress, amountToSend, feeRate, sendMax],

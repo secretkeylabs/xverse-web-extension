@@ -1,5 +1,6 @@
 import { MESSAGE_SOURCE } from '@common/types/message-types';
 import {
+  BitcoinNetworkType,
   RpcErrorCode,
   type Requests,
   type Return,
@@ -8,7 +9,13 @@ import {
   type RpcId,
   type RpcSuccessResponse,
 } from '@sats-connect/core';
-import { error, permissions, success, type Result } from '@secretkeylabs/xverse-core';
+import {
+  error,
+  permissions,
+  success,
+  type NetworkType,
+  type Result,
+} from '@secretkeylabs/xverse-core';
 import { getOriginFromPort } from '..';
 import { initPermissionsStore, saveStore } from '../permissionsStore';
 
@@ -81,3 +88,15 @@ export async function updateClientLastUsedTime(port: chrome.runtime.Port): Promi
 
   return success(undefined);
 }
+
+export const getBitcoinNetworkType = (networkType: NetworkType): BitcoinNetworkType => {
+  const networkTypeMap: Record<NetworkType, BitcoinNetworkType> = {
+    Mainnet: BitcoinNetworkType.Mainnet,
+    Testnet: BitcoinNetworkType.Testnet,
+    Testnet4: BitcoinNetworkType.Testnet4,
+    Regtest: BitcoinNetworkType.Regtest,
+    Signet: BitcoinNetworkType.Signet,
+  };
+
+  return networkTypeMap[networkType] ?? BitcoinNetworkType.Mainnet;
+};

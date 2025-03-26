@@ -12,23 +12,30 @@ const useSelectedAccount = (overridePayAddressType?: BtcPaymentType): AccountWit
   const {
     selectedAccountIndex,
     selectedAccountType,
-    accountsList: softwareAccountsList,
+    selectedWalletId,
+    softwareWallets,
     ledgerAccountsList,
     keystoneAccountsList,
     btcPaymentAddressType,
+    network,
   } = useWalletSelector();
 
   return useMemo(() => {
     let account = getSelectedAccount({
       selectedAccountIndex,
       selectedAccountType,
-      softwareAccountsList,
+      selectedWalletId,
+      softwareWallets,
       ledgerAccountsList,
       keystoneAccountsList,
+      network: network.type,
     });
 
     if (!account) {
-      [account] = softwareAccountsList;
+      const firstWalletWithAccounts = softwareWallets[network.type].find(
+        (w) => w.accounts.length > 0,
+      );
+      [account] = firstWalletWithAccounts?.accounts || [];
       if (!account) {
         // this should never happen
         // if it does, then this hook is being called before onboarding is complete, which is a bug
@@ -61,12 +68,14 @@ const useSelectedAccount = (overridePayAddressType?: BtcPaymentType): AccountWit
   }, [
     selectedAccountIndex,
     selectedAccountType,
-    softwareAccountsList,
+    selectedWalletId,
+    softwareWallets,
     ledgerAccountsList,
     keystoneAccountsList,
     switchAccount,
     btcPaymentAddressType,
     overridePayAddressType,
+    network.type,
   ]);
 };
 

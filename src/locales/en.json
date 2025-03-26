@@ -29,7 +29,8 @@
     "EXPLORE": "Explore",
     "SETTINGS": "Settings",
     "COPIED_TO_CLIPBOARD": "Copied to clipboard",
-    "TRANSACTION": "Transaction"
+    "TRANSACTION": "Transaction",
+    "LEARN_MORE": "Learn more"
   },
   "INFORMATION": {
     "ORDINALS_ADDRESS_TOOLTIP": "These sats are used for your ordinals and runes. They cannot be spent with Xverse wallet.",
@@ -147,7 +148,7 @@
   },
   "KEYSTONE_IMPORT_SCREEN": {
     "KEYSTONE_IMPORT_1_TITLE": "Secure Your Assets with Keystone",
-    "KEYSTONE_IMPORT_1_SUBTITLE": "Keystone supports up to 3 sets of seed phrases to store different assets. You can use one Keystone hardware wallet to manage your ordinals, rune, and BRC-20 assets separately.",
+    "KEYSTONE_IMPORT_1_SUBTITLE": "Keystone supports up to 3 sets of seed phrases to store different assets. You can use one Keystone hardware wallet to manage your Ordinals, Runes, and BRC-20 assets separately.",
     "KEYSTONE_IMPORT_1_BUTTON": "Get started",
     "KEYSTONE_CONNECT": {
       "BTC_TITLE": "Connect Your Keystone",
@@ -250,8 +251,8 @@
       }
     },
     "SUCCESS": {
-      "TITLE": "Transaction broadcasted",
-      "SUBTITLE": "Your transaction has been successfully broadcasted. You can close this tab.",
+      "TITLE": "Transaction broadcast",
+      "SUBTITLE": "Your transaction has been successfully broadcast. You can close this tab.",
       "BRC20_INFO": "The inscription may take up to several hours to appear in your wallet. Once received, head to your collectible dashboard and send it to your recipient to complete the token transfer."
     },
     "CONFIRM_BUTTON": "Confirm",
@@ -481,18 +482,19 @@
     "SIGNING_TRANSACTIONS": "Signing transactions",
     "BROADCASTING_TRANSACTIONS": "Broadcasting transactions",
     "THIS_MAY_TAKE_A_FEW_MINUTES": "This may take a few minutes, please keep this window open.",
-    "TRANSACTIONS_BROADCASTED": "Transactions broadcasted",
+    "TRANSACTIONS_BROADCASTED": "Transactions broadcast",
     "TRANSACTIONS_FAILED_TO_BROADCAST": "{{failed}}/{{total}} transactions failed to broadcast",
     "SOME_TRANSACTIONS_FAILED_TO_BROADCAST": "Some transactions failed to broadcast",
     "CHECK_THE_APP_YOU_USE": "Please check the app you are using.",
     "TRANSACTION_SIGNED": "Transaction signed",
     "TRANSACTIONS_SIGNED": "Transactions signed",
-    "PSBT_NO_BROADCAST_DISCLAIMER": "This transaction will not be broadcasted from your wallet. It may be broadcasted later by a third party.",
-    "PSBTS_NO_BROADCAST_DISCLAIMER": "These transactions will not be broadcasted from your wallet. They may be broadcasted later by a third party.",
+    "PSBT_NO_BROADCAST_DISCLAIMER": "This transaction will not be broadcast from your wallet. It may be broadcast later by a third party.",
+    "PSBTS_NO_BROADCAST_DISCLAIMER": "These transactions will not be broadcast from your wallet. They may be broadcast later by a third party.",
     "PSBT_SIG_HASH_NONE_DISCLAIMER_TITLE": "Transaction uses SIGHASH_NONE",
     "PSBT_SIG_HASH_NONE_DISCLAIMER": "Signing this transaction gives the requester full authority over your funds; they may alter fund destinations. Use with understanding of potential fund loss.",
     "PSBT_CANT_PARSE_ERROR_TITLE": "Transaction Error",
     "PSBT_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction is invalid and cannot be processed. Please contact the developer of the requesting app for support.",
+    "PSBT_INSUFFICIENT_RUNES": "This transaction is attempting to send more confirmed Runes than you have. It may send fewer Runes than intended.",
     "PSBT_INDEX_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction at {{index}} index is invalid and cannot be processed. Please contact the developer of the requesting app for support.",
     "PSBT_CANT_SIGN_ERROR_TITLE": "Failed to sign transaction",
     "TO": "To",
@@ -508,6 +510,7 @@
     "SCRIPT_OUTPUT_TX": "This transaction contains a script output. Be sure you trust the source of this transaction before confirming it.",
     "PUBLIC_KEY": "Public key",
     "MULTISIG": "Multi-signature",
+    "PAY_TO_ANCHOR": "Pay to anchor",
     "YOUR_PUBLIC_KEY": "with your public key",
     "ORDINAL": "Ordinal",
     "ORDINAL_DETECTED_WARNING": "Ordinal inscription detected in transaction. Continuing will cause your ordinal to be transferred away.",
@@ -527,7 +530,7 @@
         "TITLE": "Connect your hardware wallet",
         "SUBTITLE": "To continue, plug and unlock your device.",
         "ERROR_TITLE": "Connection error",
-        "ERROR_SUBTITLE": "We haven’t been able to connect to your device."
+        "ERROR_SUBTITLE": "We haven't been able to connect to your device."
       },
       "CONFIRM": {
         "TITLE": "Confirm the transaction",
@@ -537,8 +540,8 @@
         "ERROR_SUBTITLE": "The transaction have been rejected. You can try again or close this tab."
       },
       "SUCCESS": {
-        "TITLE": "Transaction broadcasted",
-        "SUBTITLE": "Your transaction have been successfully broadcasted. You can close this tab."
+        "TITLE": "Transaction broadcast",
+        "SUBTITLE": "Your transaction has been successfully broadcast. You can close this tab."
       },
       "INPUTS_WARNING": {
         "EXTERNAL_INPUTS": "External inputs",
@@ -589,7 +592,7 @@
     "EDIT_FEE": "Edit Fees",
     "FEE": "Fee",
     "NETWORK_FEE": "Network Fee",
-    "FEE_RATE": "Fee Rate",
+    "FEE_RATE": "Fee rate",
     "STANDARD": "Regular",
     "HIGH": "Fast",
     "CUSTOM": "Custom",
@@ -621,9 +624,9 @@
     "CONNECT_KEYSTONE": "Connect Keystone"
   },
   "TRANSACTION_STATUS": {
-    "BROADCASTED": "Transaction broadcasted",
-    "BROADCASTED_MULTIPLE": "Transactions broadcasted",
-    "BROADCASTED_MULTIPLE_PARTIALLY": "Transactions partially broadcasted",
+    "BROADCASTED": "Transaction broadcast",
+    "BROADCASTED_MULTIPLE": "Transactions broadcast",
+    "BROADCASTED_MULTIPLE_PARTIALLY": "Transactions have been partially broadcast",
     "BROADCASTED_MULTIPLE_PARTIALLY_SUBTITLE": "{{failedTranscations}}/{{totalTranscations}} transcations failed to broadcast.",
     "SUCCESS_MSG": "Your transaction has been successfully submitted.",
     "SEE_ON": "See on",
@@ -636,9 +639,9 @@
     "FAILED": "Transaction Failed",
     "RETRY": "Try again",
     "SPONSORED_SUCCESS_MSG": "Transaction signed",
-    "SPONSORED_MSG": "This transaction will be broadcasted by the sponsor",
+    "SPONSORED_MSG": "This transaction will be broadcast by the sponsor",
     "BRC20_ORDINAL_MSG": "The inscription may take up to several hours to appear in your wallet. Once received, head to your collectible dashboard and send it to your recipient to complete the token transfer.",
-    "SPONSOR_SERVICE_ERROR": "If the issue persist, try again at a later time, or uncheck the “Sponsor Transaction” option in the swap details."
+    "SPONSOR_SERVICE_ERROR": "If the issue persist, try again at a later time, or uncheck the \"Sponsor Transaction\" option in the swap details."
   },
   "LEGAL_SCREEN": {
     "SCREEN_TITLE": "Legal",
@@ -653,24 +656,24 @@
   },
   "BACKUP_WALLET_SCREEN": {
     "SCREEN_TITLE": "Backup your wallet",
-    "SCREEN_SUBTITLE": "Your seedphrase is the unique key that allows you to recover your wallet.",
+    "SCREEN_SUBTITLE": "Your seed phrase is the unique key that allows you to recover your wallet.",
     "BACKUP_BUTTON": "Backup now",
     "BACKUP_SKIP_BUTTON": "Backup later",
     "SEED_PHRASE_VIEW_HEADING": "Write down your seed phrase and make sure to keep it private. This is the unique key to your wallet. ",
-    "SEED_PHRASE_VIEW_LABEL": "Seedphrase",
+    "SEED_PHRASE_VIEW_LABEL": "Seed Phrase",
     "SEED_PHRASE_VIEW_CONTINUE": "Continue",
     "SEED_PHRASE_VIEW_REVEAL": "Reveal",
     "SEED_PHRASE_VIEW_HIDE": "Hide",
-    "SEED_PHRASE_VERIFY_HEADING": "Write your seedphrase to confirm you saved it properly.",
+    "SEED_PHRASE_VERIFY_HEADING": "Write your seed phrase to confirm you saved it properly.",
     "SEED_PHRASE_VERIFY_BUTTON": "Verify",
-    "SEED_PHRASE_BACK_BUTTON": "Back to seedphrase",
+    "SEED_PHRASE_BACK_BUTTON": "Back to seed phrase",
     "SEED_PHRASE_INCORRECT": "This word is not correct.",
     "SELECT_THE": "Select the ",
-    "WORD_OF_YOUR_SEEDPHRASE": " word of your seedphrase.",
-    "CONFIRM_YOUR_SEEDPHRASE": "Confirm you've recorded your seed phrase correctly."
+    "WORD_OF_YOUR_SEED_PHRASE": " word of your seed phrase.",
+    "CONFIRM_YOUR_SEED_PHRASE": "Confirm you've recorded your seed phrase correctly."
   },
   "CREATE_PASSWORD_SCREEN": {
-    "CREATE_PASSWORD_TITLE": "Create your password",
+    "CREATE_PASSWORD_TITLE": "Create Your Password",
     "CREATE_PASSWORD_DESCRIPTION": "Create a strong password to protect your wallet. Your password must be at least 8 characters in length.",
     "ENTER_PASSWORD_TITLE": "Enter a password to protect your wallet",
     "CONFIRM_PASSWORD_TITLE": "Confirm your password",
@@ -691,13 +694,13 @@
     "INCORRECT_PASSWORD_ERROR": "Incorrect password"
   },
   "WALLET_SUCCESS_SCREEN": {
-    "SCREEN_TITLE": "Wallet created successfully",
+    "SCREEN_TITLE": "Wallet Created Successfully",
     "SCREEN_SUBTITLE": "Your new wallet has been created successfully, you can now connect to your wallet.",
     "CLOSE_TAB": "Close this tab",
     "CLICK": "Click",
     "THEN": "then",
     "OPEN_WALLET": "to open your wallet",
-    "RESTORE_SCREEN_TITLE": "Wallet restored",
+    "RESTORE_SCREEN_TITLE": "Wallet Restored",
     "RESTORE_SCREEN_SUBTITLE": "Your wallet has been successfully restored.",
     "SEARCH_XVERSE": "Locate Xverse and click"
   },
@@ -733,7 +736,7 @@
         "TITLE": "Connect Your Ledger",
         "SUBTITLE": "To continue, connect your Ledger device, make sure it's unlocked, and open the Stacks app.",
         "ERROR_TITLE": "Connection error",
-        "ERROR_SUBTITLE": "We haven’t been able to connect to your device."
+        "ERROR_SUBTITLE": "We haven't been able to connect to your device."
       },
       "CONFIRM": {
         "TITLE": "Confirm the signature",
@@ -743,7 +746,7 @@
       },
       "SUCCESS": {
         "TITLE": "Signature confirmed",
-        "SUBTITLE": "This transaction will be broadcasted by the sponsor."
+        "SUBTITLE": "This transaction will be broadcast by the sponsor."
       },
       "CONFIRM_BUTTON": "Confirm",
       "CONNECT_BUTTON": "Connect",
@@ -771,11 +774,57 @@
     "RESET": "Reset"
   },
   "RESTORE_WALLET_SCREEN": {
-    "ENTER_SEED_TITLE": "Restore Wallet",
-    "ENTER_SEED_DESCRIPTION": "Enter or paste your 12 or 24 word seedphrase to restore your wallet",
-    "SEED_INPUT_ERROR": "Seed phrase does not match, please try again.",
+    "RESTORE_WALLET": "Restore Your Wallet",
+    "SELECT_RESTORE_METHOD": {
+      "DESCRIPTION": "You can restore an existing wallet using your seed phrase.",
+      "RESTORE_MANUALLY": "Restore Manually",
+      "TYPE_OR_PASTE_SEED_PHRASE": "Type or paste your seed phrase",
+      "IMPORT_FROM_OTHER_WALLET": "Import from other Wallet",
+      "AUTOMATICALLY_RESTORE_YOUR_WALLET": "Automatically restore your wallet"
+    },
+    "IMPORT_OTHER_WALLETS": {
+      "DESCRIPTION": "What wallet are you importing into Xverse?",
+      "NOT_SURE_WHERE_TO_GO": "Not sure where to go?",
+      "SELECT_OTHER_DESCRIPTION": "Select Other, enter your seed phrase and we'll take care of the rest!",
+      "OTHER": "Other"
+    },
+    "ENTER_SEED_TITLE": "Enter Seed Phrase",
+    "ENTER_SEED_DESCRIPTION": "Enter or paste your 12 or 24 word seed phrase to restore your wallet.",
+    "SEED_INPUT_ERROR": "Invalid seed phrase",
     "CONTINUE_BUTTON": "Continue",
-    "HAVE_A_COUNT_WORDS_SEED_PHRASE": "Have a {{number}} words seed phrase?",
+    "BACK_BUTTON": "Back",
+    "HAVE_A_COUNT_WORDS_SEED_PHRASE": "Have a {{number}} word seed phrase?",
+    "SELECT_DERIVATION_TYPE": {
+      "TITLE": "Select a Wallet to Restore",
+      "DESCRIPTION": "We found funds in two different wallets linked to your seed phrase. Choose which one to restore.",
+      "WALLET": "Wallet",
+      "CALLOUT": {
+        "TITLE": "Not sure which one to pick?",
+        "DESCRIPTION_1": "Tap \"See Accounts\" to check balances, addresses, and recoverable funds before making a choice.",
+        "DESCRIPTION_2": "If you restore the wrong wallet, you can reset and try the other one anytime."
+      },
+      "XVERSE": "Xverse",
+      "LEDGER": "Ledger",
+      "UNISAT": "Unisat",
+      "MAGIC_EDEN": "Magic Eden",
+      "OTHER": "Other/I don't know",
+      "SEE_ACCOUNTS": "See Accounts",
+      "ACCOUNTS_FOUND": "accounts found",
+      "ACCOUNT_DETAIL": {
+        "TITLE_ACCOUNT": "Wallet 1",
+        "TITLE_INDEX": "Wallet 2",
+        "ACCOUNTS_FOUND": "accounts found",
+        "ACCOUNT_PREFIX": "Account",
+        "DERIVATION_TEMPLATE_TITLE": "Derivation path template",
+        "DERIVATION_TEMPLATE_VALUE": "m/<purpose>'/0'/{{account}}'/0/{{index}}",
+        "NATIVE_TITLE": "Native SegWit",
+        "NESTED_TITLE": "Nested SegWit",
+        "TAPROOT_TITLE": "Taproot",
+        "STACKS_TITLE": "Stacks",
+        "INFO_ACCOUNT_LIMIT": "There are more accounts in this derivation path, but only the first ten are displayed.",
+        "INFO_FUNDS_LIMIT": "Only BTC and STX balances are displayed. Other assets will appear after onboarding."
+      }
+    },
     "SELECT_ADDRESS_TYPE": {
       "TITLE": "Preferred Address Type",
       "DESCRIPTION": "Select the default Bitcoin payment address type you would like to use for all accounts. You can switch at any time from settings.",
@@ -864,7 +913,7 @@
     "TRANSFER": "Transfer",
     "BACK": "Back",
     "ORDINAL_ADDRESS": "Ordinal address",
-    "NO_FUNDS": "You don’t have any funds stored on your ordinal address.",
+    "NO_FUNDS": "You don't have any funds stored on your ordinal address.",
     "DESCRIPTION": "You have Bitcoin stored in your ordinal address. You can transfer them to your payment address so they can be used for payments and are shown in your balance."
   },
   "RESTORE_ORDINAL_SCREEN": {
@@ -873,7 +922,7 @@
     "TRANSFER": "Transfer",
     "BACK": "Back",
     "ORDINAL_ADDRESS": "Ordinal address",
-    "NO_FUNDS": "You don’t have any Ordinals stored on your Bitcoin payment address.",
+    "NO_FUNDS": "You don't have any Ordinals stored on your Bitcoin payment address.",
     "DESCRIPTION": "You have Ordinals stored in your Bitcoin payment address. You can transfer them to your Ordinals address so that they show up in your collection."
   },
   "RECOVER_RUNES_SCREEN": {
@@ -988,7 +1037,7 @@
     "NETWORK": "Network",
     "SECURITY": "Security",
     "UPDATE_PASSWORD": "Update Password",
-    "BACKUP_WALLET": "Show Seedphrase",
+    "BACKUP_WALLET": "Show Seed Phrase",
     "AUTO_LOCK": "Auto Lock",
     "RESET_WALLET": "Reset Wallet",
     "ABOUT": "About",
@@ -1001,7 +1050,7 @@
     "RESET_WALLET_DESCRIPTION": "This will reset your wallet from this browser. Make sure you have your seed phrase backed up.",
     "CANCEL": "Cancel",
     "NODE": "STX Node",
-    "BACKUP_WALLET_UNLOCK_SEED": "Enter your password to reveal your seedphrase",
+    "BACKUP_WALLET_UNLOCK_SEED": "Enter your password to reveal your seed phrase",
     "SAVE": "Save",
     "INVALID_URL": "Invalid URL",
     "ENTER_PASSWORD": "Enter your password to reset your wallet",
@@ -1072,6 +1121,7 @@
       "MAX_SYMBOLS_ERR": "Account name cannot be more than {{maxLength}} characters",
       "PROHIBITED_SYMBOLS_ERR": "Account name can only contain alphabetic and numeric characters and space",
       "ALREADY_EXISTS_ERR": "You already have an account with this name",
+      "INVALID_ACCOUNT_NAME": "Invalid account name",
       "NAME_RULES": "Your account's name can only include alphabetical and numerical characters.",
       "RESET_NAME": "Reset name"
     },
@@ -1090,7 +1140,7 @@
     "XVERSE_SWAPS_DESC": "Swap Crypto for Bitcoin. Fast, Easy, and No KYC!",
     "MOONPAY": "Moonpay",
     "TRANSAK": "Transak",
-    "PAYPAL": "Paypal",
+    "PAYPAL": "PayPal via Moonpay",
     "US_UK_EU_ONLY": "US, UK or EU Citizens only",
     "DISCLAIMER": "Disclaimer",
     "THIRD_PARTY_WARNING": "You will be redirected to a third-party service provider to complete the purchase. If you encounter any issues during the process please contact the provider."
@@ -1287,7 +1337,7 @@
     "MESSAGE_HASH_HEADER": "Message Hash",
     "SHOW_HASH_BUTTON": "Show Hash",
     "HIDE_HASH_BUTTON": "Hide Hash",
-    "ACTION_DISCLAIMER": "No transactions will be broadcasted and no fees will be applied.",
+    "ACTION_DISCLAIMER": "No transactions will be broadcast and no fees will be applied.",
     "SIGNING_WARNING": "By signing this message, you prove that you are the owner of an account without broadcasting any on chain transactions. This signature cannot be used to send transactions on your behalf. You should only sign messages you trust.",
     "SIGNING_ADDRESS_TITLE": "Signing with address",
     "SIGNING_ADDRESS_STX": "Your Stacks address",
@@ -1325,7 +1375,7 @@
       },
       "SUCCESS": {
         "TITLE": "Signature confirmed",
-        "SUBTITLE": "This transaction will be broadcasted by the sponsor."
+        "SUBTITLE": "This transaction will be broadcast by the sponsor."
       },
       "CONFIRM_BUTTON": "Confirm",
       "CONNECT_BUTTON": "Connect",
@@ -1359,7 +1409,7 @@
       },
       "SUCCESS": {
         "TITLE": "Signature confirmed",
-        "SUBTITLE": "This transaction will be broadcasted by the sponsor."
+        "SUBTITLE": "This transaction will be broadcast by the sponsor."
       },
       "CONFIRM_BUTTON": "Confirm",
       "CONNECT_BUTTON": "Connect",
@@ -1591,9 +1641,9 @@
     "SELECT_COIN": "Select asset",
     "DETAILS": "Details",
     "MIN_RECEIVE": "Minimum received",
-    "SLIPPAGE": "Slippage Tolerance",
+    "SLIPPAGE": "Slippage tolerance",
     "SLIPPAGE_TITLE": "Slippage",
-    "LP_FEE": "Liquidity Provider Fee",
+    "LP_FEE": "Liquidity provider fee",
     "ROUTE": "Route",
     "SPONSOR_TRANSACTION": "Sponsor transaction (no fees)",
     "POWERED_BY_ALEX": "Powered by ALEX",
@@ -1615,7 +1665,7 @@
     "SWAP_TRANSACTION_CANNOT_BE_SPONSORED": "Swap transaction cannot be sponsored while you have a pending transaction.",
     "LEARN_MORE": "Learn more",
     "GET_QUOTES": "Get quotes",
-    "SEARCH_BY_NAME": "Search by token name",
+    "SEARCH_BY_NAME": "Search by token name or ticker",
     "GET_QUOTES_TITLE": "Rates",
     "QUOTE_TITLE": "We found the following rates for your swap",
     "EXCHANGE": "EXCHANGE",
@@ -1630,8 +1680,9 @@
     "LIST_YOUR_RUNES": "List your Runes on a marketplace",
     "SLIPPAGE_WARNING": "Your transaction may be frontrun and result in an unfavorable trade",
     "BAD_QUOTE_WARNING_TITLE": "The quote you are receiving may result in significant value loss.",
-    "BAD_QUOTE_WARNING_DESC": "The minimum amount you will receive will result in a loss of over {{percentage}}% of your trade’s value. This is due to low liquidity in the pool, causing discrepancies in pricing. Please review the details carefully before proceeding with the swap.",
-    "UNKNOWN_QUOTE_VALUE_WARNING_DESC": "The market value of the token you will receive is unknown. Review details carefully before proceeding with the swap."
+    "BAD_QUOTE_WARNING_DESC": "The minimum amount you will receive will result in a loss of over {{percentage}}% of your trade’s value. This could be due to low liquidity in the pool or other provider issues. Please review the details carefully before proceeding with the swap.",
+    "UNKNOWN_QUOTE_VALUE_WARNING_DESC": "The market value of the token you will receive is unknown. Review details carefully before proceeding with the swap.",
+    "UTXO_PROVIDER_DISCLAIMER": "Based on floor price / lot availability of your order."
   },
   "SWAP_CONFIRM_SCREEN": {
     "TOKEN_SWAP": "Token swap",
@@ -1773,5 +1824,12 @@
     "NETWORK_MISMATCH": "There's a mismatch between your active network and the network you're logged in with on the app.",
     "PSBT_CANT_PARSE_ERROR_TITLE": "Transaction Error",
     "PSBT_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction is invalid and cannot be processed. Please contact the developer of the requesting app for support."
+  },
+  "CHANGE_NETWORK_REQUEST": {
+    "TITLE": "Allow this app to switch the network?",
+    "INFO_MESSAGE": "This will switch the selected network within Xverse.",
+    "CALLOUT": "Make sure you trust the app requesting the network change.",
+    "CANCEL_BUTTON": "Cancel",
+    "SWITCH_NETWORK_BUTTON": "Switch Network"
   }
 }

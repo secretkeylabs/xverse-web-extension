@@ -19,6 +19,7 @@ import {
   SelectAccountKey,
   SetAccountAvatarKey,
   SetAccountBalanceKey,
+  SetAddingAccountKey,
   SetBalanceHiddenToggleKey,
   SetBrc20ManageTokensKey,
   SetFeeMultiplierKey,
@@ -37,8 +38,7 @@ import {
   StoreEncryptedSeedKey,
   UpdateKeystoneAccountsKey,
   UpdateLedgerAccountsKey,
-  UpdateSavedNamesKey,
-  UpdateSoftwareAccountsKey,
+  UpdateSoftwareWalletsKey,
   type WalletActions,
   WalletSessionPeriods,
   type WalletState,
@@ -70,7 +70,13 @@ import {
 export const initialWalletState: WalletState = {
   network: { ...defaultMainnet },
   savedNetworks: initialNetworksList,
-  accountsList: [],
+  softwareWallets: {
+    Mainnet: [],
+    Testnet: [],
+    Testnet4: [],
+    Signet: [],
+    Regtest: [],
+  },
   ledgerAccountsList: [],
   keystoneAccountsList: [],
   selectedAccountIndex: 0,
@@ -95,7 +101,6 @@ export const initialWalletState: WalletState = {
   spamToken: null,
   spamTokens: [],
   showSpamTokens: false,
-  savedNames: {},
   hiddenCollectibleIds: {},
   starredCollectibleIds: {},
   avatarIds: {},
@@ -133,11 +138,15 @@ const walletReducer = (
       return {
         ...initialWalletState,
       };
-    case UpdateSoftwareAccountsKey:
+    case UpdateSoftwareWalletsKey: {
+      const { network, softwareWallets } = action;
+      const newSoftwareWallets = { ...state.softwareWallets };
+      newSoftwareWallets[network] = softwareWallets;
       return {
         ...state,
-        accountsList: action.accountsList,
+        softwareWallets: newSoftwareWallets,
       };
+    }
     case UpdateLedgerAccountsKey:
       return {
         ...state,
@@ -153,6 +162,7 @@ const walletReducer = (
         ...state,
         selectedAccountIndex: action.selectedAccountIndex,
         selectedAccountType: action.selectedAccountType,
+        selectedWalletId: action.selectedWalletId,
       };
     case StoreEncryptedSeedKey:
       return {
@@ -178,7 +188,6 @@ const walletReducer = (
           ...state.savedNetworks.filter((n) => n.type !== action.network.type),
           action.network,
         ],
-        accountsList: [],
         accountBalances: {},
       };
     case ChangeBtcPaymentAddressTypeKey:
@@ -280,14 +289,6 @@ const walletReducer = (
       return {
         ...state,
         showSpamTokens: action.showSpamTokens,
-      };
-    case UpdateSavedNamesKey:
-      return {
-        ...state,
-        savedNames: {
-          ...state.savedNames,
-          [action.networkType]: action.names,
-        },
       };
     case AddToStarCollectiblesKey:
       return {
@@ -392,6 +393,11 @@ const walletReducer = (
       return {
         ...state,
         hasBackedUpWallet: action.hasBackedUpWallet,
+      };
+    case SetAddingAccountKey:
+      return {
+        ...state,
+        addingAccount: action.addingAccount,
       };
     default:
       return state;

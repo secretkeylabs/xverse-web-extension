@@ -1,3 +1,4 @@
+import useAsyncFn from '@hooks/useAsyncFn';
 import useTransactionContext from '@hooks/useTransactionContext';
 import type { TransactionSummary } from '@screens/sendBtc/helpers';
 import {
@@ -7,7 +8,7 @@ import {
   type NetworkType,
   type UserTransactionSummary,
 } from '@secretkeylabs/xverse-core';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 export default function useExtractTxSummary(
   network: NetworkType,
@@ -16,19 +17,19 @@ export default function useExtractTxSummary(
   const [data, setData] = useState<UserTransactionSummary | AggregatedSummary | undefined>(
     undefined,
   );
-  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const context = useTransactionContext();
-  useEffect(() => {
-    if (!summary) return;
+  const { isLoading } = useAsyncFn(
+    async ({ signal }) => {
+      if (!summary) return;
 
-    setIsLoading(true);
-    extractViewSummary(context, summary, network)
-      .then((extractedSummary) => {
+      const extractedSummary = await extractViewSummary(context, summary, network);
+      if (!signal.aborted) {
         setData(extractedSummary);
-      })
-      .finally(() => setIsLoading(false));
-  }, [context, network, summary]);
+      }
+    },
+    [context, network, summary],
+  );
 
   return { data, isLoading };
 }

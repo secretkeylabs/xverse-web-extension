@@ -38,7 +38,12 @@ import { getSwapsMixpanelProperties } from '../mixpanel';
 import QuoteTile from '../quotesModal/quoteTile';
 import SlippageModalContent from '../slippageModal';
 import type { OrderInfo, StxOrderInfo } from '../types';
-import { BAD_QUOTE_PERCENTAGE, isRunesTx, mapFTNativeSwapTokenToTokenBasic } from '../utils';
+import {
+  BAD_QUOTE_PERCENTAGE,
+  getProviderDetails,
+  isRunesTx,
+  mapFTNativeSwapTokenToTokenBasic,
+} from '../utils';
 import EditFee from './EditFee';
 import {
   ArrowInnerContainer,
@@ -320,6 +325,8 @@ export default function QuoteSummary({
     return new BigNumber(1).dividedBy(satsPerRune).toString();
   };
 
+  const { name: providerName, logo: providerLogo } = getProviderDetails(quote);
+
   return (
     <>
       <TopRow onClick={onClose} />
@@ -330,7 +337,7 @@ export default function QuoteSummary({
             <Callout
               titleText={t('SWAP_SCREEN.BAD_QUOTE_WARNING_TITLE')}
               bodyText={
-                quote.slippageSupported && BigNumber(toTokenFiatValue).isGreaterThan(0)
+                BigNumber(toTokenFiatValue).isGreaterThan(0)
                   ? t('SWAP_SCREEN.BAD_QUOTE_WARNING_DESC', {
                       percentage: valueLossPercentage,
                     })
@@ -348,8 +355,8 @@ export default function QuoteSummary({
             fromUnit={fromUnit}
             toUnit={toUnit}
             rate={getTokenRate()}
-            provider={quote.provider.name}
-            image={quote.provider.logo}
+            provider={providerName}
+            image={providerLogo}
             onClick={onChangeProvider}
           />
           <QuoteToBaseContainer>

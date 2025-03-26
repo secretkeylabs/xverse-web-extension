@@ -23,9 +23,16 @@ type Props = {
   onCancel: () => void;
   txnToSignCount?: number;
   txnSignIndex?: number;
+  showExternalInputsWarning?: boolean;
 };
 
-function LedgerSteps({ onConfirm, onCancel, txnToSignCount, txnSignIndex }: Props) {
+function LedgerSteps({
+  onConfirm,
+  onCancel,
+  txnToSignCount,
+  txnSignIndex,
+  showExternalInputsWarning = false,
+}: Props) {
   const [currentStep, setCurrentStep] = useState(Steps.ConnectLedger);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const [isConnectSuccess, setIsConnectSuccess] = useState(false);
@@ -52,7 +59,11 @@ function LedgerSteps({ onConfirm, onCancel, txnToSignCount, txnSignIndex }: Prop
     setIsConnectSuccess(true);
     await delay(1500);
 
-    if (currentStep !== Steps.ExternalInputs && currentStep !== Steps.ConfirmTransaction) {
+    if (
+      currentStep !== Steps.ExternalInputs &&
+      currentStep !== Steps.ConfirmTransaction &&
+      showExternalInputsWarning
+    ) {
       setCurrentStep(Steps.ExternalInputs);
       return;
     }

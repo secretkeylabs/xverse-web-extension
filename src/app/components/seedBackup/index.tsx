@@ -1,4 +1,4 @@
-import SeedphraseView from '@components/seedPhraseView';
+import SeedPhraseView from '@components/seedPhraseView';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Eye, EyeSlash } from '@phosphor-icons/react';
 import { setWalletBackupStatusAction } from '@stores/wallet/actions/actionCreators';
@@ -38,31 +38,30 @@ const ButtonContainer = styled.div((props) => ({
 }));
 
 type Props = {
-  onContinue: () => void;
-  seedPhrase: string;
+  mnemonic: string;
+  onContinue?: () => void;
 };
 
-export default function SeedCheck({ onContinue, seedPhrase }: Props): JSX.Element {
+// TODO: support private key byte hex string seeds as well as mnemonics
+export default function SeedBackup({ mnemonic, onContinue }: Props): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'BACKUP_WALLET_SCREEN' });
   const [isVisible, setIsVisible] = useState(false);
   const dispatch = useDispatch();
   const { hasBackedUpWallet } = useWalletSelector();
 
   useEffect(() => {
-    if (!isVisible) {
+    if (!isVisible || hasBackedUpWallet) {
       return;
     }
 
-    if (!hasBackedUpWallet) {
-      dispatch(setWalletBackupStatusAction(true));
-    }
+    dispatch(setWalletBackupStatusAction(true));
   }, [isVisible, hasBackedUpWallet, dispatch]);
 
   return (
     <Container>
       <Heading>{t('SEED_PHRASE_VIEW_HEADING')}</Heading>
       <Label>{t('SEED_PHRASE_VIEW_LABEL')}</Label>
-      <SeedphraseView seedPhrase={seedPhrase} isVisible={isVisible} />
+      <SeedPhraseView seedPhrase={mnemonic} isVisible={isVisible} />
       <ButtonContainer>
         <StyledButton
           icon={isVisible ? <EyeSlash weight="bold" size={16} /> : <Eye weight="bold" size={16} />}
@@ -71,11 +70,13 @@ export default function SeedCheck({ onContinue, seedPhrase }: Props): JSX.Elemen
           title={isVisible ? t('SEED_PHRASE_VIEW_HIDE') : t('SEED_PHRASE_VIEW_REVEAL')}
           onClick={() => setIsVisible(!isVisible)}
         />
-        <StyledButton
-          disabled={!isVisible}
-          onClick={onContinue}
-          title={t('SEED_PHRASE_VIEW_CONTINUE')}
-        />
+        {onContinue && (
+          <StyledButton
+            disabled={!isVisible}
+            onClick={onContinue}
+            title={t('SEED_PHRASE_VIEW_CONTINUE')}
+          />
+        )}
       </ButtonContainer>
     </Container>
   );

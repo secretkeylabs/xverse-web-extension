@@ -7,7 +7,8 @@ export function getCurrentAccountResourceId() {
   const {
     selectedAccountIndex,
     selectedAccountType,
-    accountsList: softwareAccountsList,
+    selectedWalletId,
+    softwareWallets,
     ledgerAccountsList,
     keystoneAccountsList,
     network,
@@ -16,9 +17,11 @@ export function getCurrentAccountResourceId() {
   const existingAccount = getSelectedAccount({
     selectedAccountIndex,
     selectedAccountType,
-    softwareAccountsList,
+    selectedWalletId,
+    softwareWallets,
     ledgerAccountsList,
     keystoneAccountsList,
+    network: network.type,
   });
 
   if (!existingAccount) {
@@ -26,7 +29,8 @@ export function getCurrentAccountResourceId() {
       cause: {
         selectedAccountIndex,
         selectedAccountType,
-        softwareAccountsList,
+        selectedWalletId,
+        softwareWallets,
         ledgerAccountsList,
       },
     });

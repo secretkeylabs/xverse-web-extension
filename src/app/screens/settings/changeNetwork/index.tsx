@@ -1,4 +1,3 @@
-import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -41,7 +40,7 @@ const Title = styled.h1((props) => ({
 }));
 
 const ButtonContainer = styled.div`
-  margin: ${(props) => props.theme.space.m};
+  margin: ${(props) => props.theme.space.l};
 `;
 
 const NodeInputsContainer = styled.div`
@@ -158,7 +157,7 @@ function ChangeNetworkScreen() {
 
     if (isValidStacksUrl && isValidBtcApiUrl && isValidFallbackBtcApiUrl) {
       await changeNetwork(formInputs);
-      navigate('/settings');
+      navigate('/');
     } else {
       setFormErrors({
         address: !isValidStacksUrl ? t('INVALID_URL') : '',
@@ -177,7 +176,7 @@ function ChangeNetworkScreen() {
 
   return (
     <>
-      <TopRow onClick={handleBackButtonClick} />
+      <TopRow onClick={handleBackButtonClick} showBackButton={!isChangingNetwork} />
       <Container>
         <Title>{t('NETWORK')}</Title>
         <NetworkRow
@@ -238,7 +237,6 @@ function ChangeNetworkScreen() {
           disabled={isChangingNetwork}
         />
       </ButtonContainer>
-      <BottomBar tab="settings" />
     </>
   );
 }

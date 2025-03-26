@@ -5,4 +5,7 @@ export type ConfirmStxTransactionState = {
   recipients: StacksRecipient[];
   unsignedTx: Buffer;
   fee: BigNumber;
+  tabId?: number;
+  messageId?: string;
+  rpcMethod?: string;
 };

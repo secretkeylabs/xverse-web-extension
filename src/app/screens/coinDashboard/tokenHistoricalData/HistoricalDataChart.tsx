@@ -1,9 +1,17 @@
 import { BetterBarLoader } from '@components/barLoader';
+import FormattedNumber from '@components/formattedNumber';
+import useWalletSelector from '@hooks/useWalletSelector';
 import { ChartLine } from '@phosphor-icons/react';
-import type {
-  HistoricalDataResponsePrice,
-  HistoricalDataResponsePrices,
+import {
+  currencySymbolMap,
+  formatBalance,
+  type HistoricalDataResponsePrice,
+  type HistoricalDataResponsePrices,
+  type SupportedCurrency,
 } from '@secretkeylabs/xverse-core';
+import { StyledP } from '@ui-library/common.styled';
+import { formatSignificantDecimals } from '@utils/tokens';
+import BigNumber from 'bignumber.js';
 import { useEffect, type Dispatch, type SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
@@ -16,33 +24,27 @@ type HistoricalDataChartProps = {
   setChartPriceStats: Dispatch<SetStateAction<ChartPriceStats | undefined>>;
 };
 
-function CustomTooltip({
-  active,
-  payload,
-}: {
-  active?: boolean;
-  payload?: undefined | [{ payload: HistoricalDataResponsePrice }];
-}) {
-  return active && payload && payload.length ? (
-    <span>{payload[0].payload.tooltipLabel}</span>
-  ) : null;
-}
+const ToolTipTextContainer = styled.div({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: Theme.space.xxs,
+});
 
 const StyledBetterBarLoader = styled(BetterBarLoader)<{}>({
+  width: `calc(100% + ${Theme.space.xxl})`,
+  height: '120px',
   marginLeft: '-21px',
 });
-export function LoadingHistoricalDataChart() {
-  return <StyledBetterBarLoader width={370} height={215} />;
-}
 
 const EmptyHistoricalDataChartContainer = styled.div({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   gap: Theme.space.xxs,
+  height: '120px',
+  marginLeft: Theme.space.m,
   marginRight: Theme.space.m,
-  marginTop: Theme.space.xxl,
-  height: '130px',
 });
 const StyledChartLine = styled(ChartLine)({
   marginBottom: '20px',
@@ -56,6 +58,40 @@ const Text = styled.p({
   color: Theme.colors.white_400,
   textAlign: 'center',
 });
+
+function CustomTooltip({
+  active,
+  payload,
+  fiatCurrency,
+}: {
+  active?: boolean;
+  payload?: undefined | [{ payload: HistoricalDataResponsePrice }];
+  fiatCurrency: SupportedCurrency;
+}) {
+  const price = new BigNumber(payload?.[0]?.payload.y || 0);
+  return active && payload && payload.length ? (
+    <ToolTipTextContainer>
+      <StyledP typography="body_medium_s" color="white_0">
+        {price.isGreaterThan(1) ? (
+          `${currencySymbolMap[fiatCurrency]}${price.toFormat(2)}`
+        ) : (
+          <>
+            {currencySymbolMap[fiatCurrency]}
+            <FormattedNumber number={formatBalance(formatSignificantDecimals(price.toString()))} />
+          </>
+        )}
+      </StyledP>
+      <StyledP typography="body_medium_s" color="white_400">
+        {payload[0].payload.tooltipLabel}
+      </StyledP>
+    </ToolTipTextContainer>
+  ) : null;
+}
+
+export function LoadingHistoricalDataChart() {
+  return <StyledBetterBarLoader width="100%" height={120} />;
+}
+
 export function EmptyHistoricalDataChart() {
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_PRICE_CHART.EMPTY_CHART' });
 
@@ -70,8 +106,10 @@ export function EmptyHistoricalDataChart() {
 }
 
 const MissingPeriodHistoricalDataChartContainer = styled.div({
-  marginTop: '104px',
-  marginBottom: '154px',
+  height: '120px',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
 });
 export function MissingPeriodHistoricalDataChart() {
   const { t } = useTranslation('translation', { keyPrefix: 'COIN_PRICE_CHART.MISSING_PERIOD' });
@@ -85,7 +123,7 @@ export function MissingPeriodHistoricalDataChart() {
 
 const ChartContainer = styled.div((props) => ({
   width: `calc(100% + ${props.theme.space.xl})`,
-  height: '119px',
+  height: '120px',
   marginLeft: `-${props.theme.space.m}`,
 }));
 
@@ -96,6 +134,7 @@ export default function HistoricalDataChart({
   const first = data[0].y;
   const last = data[data.length - 1].y;
   const defaultChartPriceStats = { amount: last, change: last / first };
+  const { fiatCurrency } = useWalletSelector();
 
   const { colors } = Theme;
   const increased = last > first;
@@ -126,7 +165,7 @@ export default function HistoricalDataChart({
           <XAxis hide dataKey="x" />
           <YAxis hide domain={['dataMin', 'dataMax']} />
           <Tooltip
-            content={<CustomTooltip />}
+            content={<CustomTooltip fiatCurrency={fiatCurrency} />}
             position={{ y: -20 }}
             cursor={{
               stroke: 'grey',

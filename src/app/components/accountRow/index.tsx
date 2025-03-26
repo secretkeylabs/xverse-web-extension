@@ -3,11 +3,17 @@ import LedgerBadge from '@assets/img/hw/ledger/ledger_badge.svg';
 import BarLoader from '@components/barLoader';
 import OptionsDialog from '@components/optionsDialog/optionsDialog';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
+import useGetAllAccounts from '@hooks/useGetAllAccounts';
 import useOptionsDialog from '@hooks/useOptionsDialog';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CaretDown, DotsThreeVertical } from '@phosphor-icons/react';
-import { currencySymbolMap, getFiatBtcEquivalent, type Account } from '@secretkeylabs/xverse-core';
+import {
+  currencySymbolMap,
+  getFiatBtcEquivalent,
+  type Account,
+  type WalletId,
+} from '@secretkeylabs/xverse-core';
 import { removeAccountAvatarAction } from '@stores/wallet/actions/actionCreators';
 import Button from '@ui-library/button';
 import Input from '@ui-library/input';
@@ -49,13 +55,15 @@ import {
 } from './index.styled';
 
 function AccountRow({
+  walletId,
   account,
   isSelected,
   onAccountSelected,
   isAccountListView = false,
   disabledAccountSelect = false,
 }: {
-  account: Account | null;
+  walletId?: WalletId;
+  account: Account;
   isSelected: boolean;
   onAccountSelected: (account: Account, goBack?: boolean) => void;
   isAccountListView?: boolean;
@@ -68,13 +76,13 @@ function AccountRow({
     keyPrefix: 'OPTIONS_DIALOG',
   });
   const {
-    accountsList,
-    ledgerAccountsList,
+    softwareWallets,
     fiatCurrency,
     accountBalances,
     avatarIds,
     balanceHidden,
     showBalanceInBtc,
+    network,
   } = useWalletSelector();
   const accountAvatar = avatarIds[account?.btcAddresses.taproot.address ?? ''];
   // TODO: refactor this into a hook
@@ -89,7 +97,7 @@ function AccountRow({
   const {
     removeLedgerAccount,
     removeKeystoneAccount,
-    renameSoftwareAccount,
+    updateSoftwareWalletAccounts,
     updateLedgerAccounts,
     updateKeystoneAccounts,
   } = useWalletReducer();
@@ -103,22 +111,19 @@ function AccountRow({
     [],
   );
 
+  const allAccounts = useGetAllAccounts();
+
   useEffect(() => {
-    const validationError = validateAccountName(
-      accountName,
-      optionsDialogTranslation,
-      accountsList,
-      ledgerAccountsList,
-    );
+    const validationError = validateAccountName(accountName, optionsDialogTranslation, allAccounts);
     if (validationError) {
       setAccountNameError(validationError);
     } else {
       setAccountNameError(null);
     }
-  }, [accountName, accountsList, ledgerAccountsList, optionsDialogTranslation]);
+  }, [accountName, allAccounts, optionsDialogTranslation]);
 
   const handleClick = () => {
-    onAccountSelected(account!);
+    onAccountSelected(account);
   };
 
   const handleRemoveAccountModalOpen = () => {
@@ -154,7 +159,11 @@ function AccountRow({
       } else if (account.accountType === 'keystone') {
         await removeKeystoneAccount(account);
       }
-      onAccountSelected(accountsList[0], false);
+      const wallet = softwareWallets[network.type].find((w) => w.accounts.length > 0);
+      if (!wallet) {
+        throw new Error('No software wallet found');
+      }
+      onAccountSelected(wallet.accounts[0], false);
       handleRemoveAccountModalClose();
     } catch (err) {
       // console.error(err);
@@ -166,12 +175,7 @@ function AccountRow({
       return;
     }
 
-    const validationError = validateAccountName(
-      accountName,
-      optionsDialogTranslation,
-      accountsList,
-      ledgerAccountsList,
-    );
+    const validationError = validateAccountName(accountName, optionsDialogTranslation, allAccounts);
     if (validationError) {
       setAccountNameError(validationError);
       return;
@@ -184,7 +188,10 @@ function AccountRow({
       } else if (isKeystoneAccount(account)) {
         await updateKeystoneAccounts({ ...account, accountName });
       } else {
-        await renameSoftwareAccount({ ...account, accountName });
+        if (!walletId) {
+          throw new Error('No selected wallet id. Cannot rename account.');
+        }
+        await updateSoftwareWalletAccounts(walletId, { ...account, accountName });
       }
       handleRenameAccountModalClose();
     } catch (err) {
@@ -201,12 +208,16 @@ function AccountRow({
 
     try {
       setIsAccountNameChangeLoading(true);
+      const { accountName: removedAccountName, ...namelessAccount } = account;
       if (isLedgerAccount(account)) {
-        updateLedgerAccounts({ ...account, accountName: undefined });
+        updateLedgerAccounts(namelessAccount);
       } else if (isKeystoneAccount(account)) {
-        updateKeystoneAccounts({ ...account, accountName: undefined });
+        updateKeystoneAccounts(namelessAccount);
       } else {
-        renameSoftwareAccount({ ...account, accountName: undefined });
+        if (!walletId) {
+          throw new Error('No wallet id. Cannot remove account name.');
+        }
+        updateSoftwareWalletAccounts(walletId, namelessAccount);
       }
       setAccountName('');
       handleRenameAccountModalClose();

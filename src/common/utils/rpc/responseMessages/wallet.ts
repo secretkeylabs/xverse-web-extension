@@ -78,3 +78,7 @@ export function sendGetNetworkSuccessResponseMessage({
 }: GetNetworkSuccessArgs) {
   sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, result));
 }
+
+export function sendChangeNetworkSuccessResponseMessage({ tabId, messageId }: BaseArgs) {
+  sendRpcResponse(tabId, makeRpcSuccessResponse(messageId, null));
+}

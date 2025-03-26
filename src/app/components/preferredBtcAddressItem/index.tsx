@@ -11,7 +11,7 @@ import styled from 'styled-components';
 const Button = styled.button<{ $isSelected: boolean }>((props) => ({
   color: props.theme.colors.white_0,
   backgroundColor: props.$isSelected
-    ? props.theme.colors.white_900
+    ? props.theme.colors.elevation6_600
     : props.theme.colors.transparent,
   padding: props.theme.space.m,
   borderRadius: props.theme.space.s,
@@ -21,13 +21,19 @@ const Button = styled.button<{ $isSelected: boolean }>((props) => ({
   justifyContent: 'flex-start',
   alignItems: 'center',
   width: '100%',
+  transition: 'background-color 0.1s ease',
+  '&:hover': {
+    backgroundColor: props.theme.colors.elevation6_800,
+  },
 }));
 
-const BtcIcon = styled.img((props) => ({
+const BtcIcon = styled.img<{ $isSelected: boolean }>((props) => ({
   height: props.theme.space.xl,
   width: props.theme.space.xl,
   borderRadius: '50%',
   marginRight: props.theme.space.s,
+  opacity: props.$isSelected ? 1 : 0.8,
+  transition: 'opacity 0.1s ease',
 }));
 
 const TextContainer = styled.div((_) => ({
@@ -71,14 +77,16 @@ export default function PreferredBtcAddressItem({
 
   return (
     <Button type="button" onClick={onClick} $isSelected={isSelected}>
-      <BtcIcon src={IconBitcoin} />
+      <BtcIcon src={IconBitcoin} $isSelected={isSelected} />
       <TextContainer>
         <RowContainer>
-          <StyledP typography="body_m">{title}</StyledP>
-          <StyledP typography="body_m">{balanceHidden ? HIDDEN_BALANCE_LABEL : balance}</StyledP>
+          <StyledP typography="body_medium_m">{title}</StyledP>
+          <StyledP typography="body_medium_m">
+            {balanceHidden ? HIDDEN_BALANCE_LABEL : balance}
+          </StyledP>
         </RowContainer>
         <RowContainer>
-          <StyledP typography="body_m" color="white_400">
+          <StyledP typography="body_medium_m" color="white_400">
             {address && getShortTruncatedAddress(address, 6)}
           </StyledP>
         </RowContainer>

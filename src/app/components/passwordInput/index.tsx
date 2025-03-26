@@ -36,7 +36,7 @@ type Props = {
   enteredPassword: string;
   setEnteredPassword: (enteredPassword: string) => void;
   handleContinue: () => void;
-  handleBack: () => void;
+  handleBack?: () => void;
   passwordError?: string;
   checkPasswordStrength?: boolean;
   stackButtonAlignment?: boolean;
@@ -168,9 +168,16 @@ function PasswordInput({
         {passwordStrengthLabel.message}
       </PasswordStrengthContainer>
       <ButtonsContainer $stackButtonAlignment={stackButtonAlignment} $ifError={!!passwordError}>
-        <ButtonContainer $stackButtonAlignment={stackButtonAlignment}>
-          <Button title={t('BACK_BUTTON')} onClick={handleBack} variant="secondary" type="button" />
-        </ButtonContainer>
+        {handleBack && (
+          <ButtonContainer $stackButtonAlignment={stackButtonAlignment}>
+            <Button
+              title={t('BACK_BUTTON')}
+              onClick={handleBack}
+              variant="secondary"
+              type="button"
+            />
+          </ButtonContainer>
+        )}
         <ButtonContainer $stackButtonAlignment={stackButtonAlignment}>
           <Button
             loading={loading}

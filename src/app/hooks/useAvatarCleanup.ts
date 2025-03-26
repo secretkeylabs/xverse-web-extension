@@ -9,14 +9,16 @@ import { removeAccountAvatarAction } from '@stores/wallet/actions/actionCreators
 import type { AvatarInfo } from '@stores/wallet/actions/types';
 import { useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
+import useGetAllAccounts from './useGetAllAccounts';
 import useWalletSelector from './useWalletSelector';
 
 /* Check and clear NFT Avatar that being used, but no-longer belongs to this Wallet */
 export default function useAvatarCleanup() {
   const dispatch = useDispatch();
-  const { avatarIds, network, accountsList } = useWalletSelector();
+  const { avatarIds, network } = useWalletSelector();
   const xverseApi = getXverseApiClient(network.type);
   const stacksApiClient = getStacksApiClient(network.type);
+  const allAccounts = useGetAllAccounts();
 
   const checkAndRemoveInvalidAvatar = useCallback(
     async (account: Account, avatar: AvatarInfo) => {
@@ -48,10 +50,10 @@ export default function useAvatarCleanup() {
 
   useEffect(() => {
     if (!avatarIds) return;
-    accountsList
+    allAccounts
       .filter((account) => !!avatarIds[account.btcAddresses.taproot.address])
       .forEach((account) =>
         checkAndRemoveInvalidAvatar(account, avatarIds[account.btcAddresses.taproot.address]),
       );
-  }, [checkAndRemoveInvalidAvatar, avatarIds, accountsList]);
+  }, [checkAndRemoveInvalidAvatar, avatarIds, allAccounts]);
 }
