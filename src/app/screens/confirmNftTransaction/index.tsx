@@ -22,6 +22,7 @@ import {
 import { deserializeTransaction, StacksTransactionWire } from '@stacks/transactions';
 import { removeAccountAvatarAction } from '@stores/wallet/actions/actionCreators';
 import { useMutation } from '@tanstack/react-query';
+import { POPUP_WIDTH } from '@utils/constants';
 import { isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
@@ -40,7 +41,7 @@ const ScrollContainer = styled.div`
     display: none;
   }
   height: 600px;
-  width: 360px;
+  width: ${POPUP_WIDTH}px;
   margin: auto;
 `;
 
@@ -74,7 +75,7 @@ const ReviewTransactionText = styled.h1((props) => ({
 function ConfirmNftTransaction() {
   const dispatch = useDispatch();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+  const isGalleryOpen: boolean = document.documentElement.clientWidth > POPUP_WIDTH;
   const selectedAccount = useSelectedAccount();
   const { avatarIds, network } = useWalletSelector();
   const selectedAvatar = avatarIds[selectedAccount.ordinalsAddress];

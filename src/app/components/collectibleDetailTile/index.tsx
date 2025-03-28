@@ -1,4 +1,5 @@
 import { BetterBarLoader } from '@components/barLoader';
+import { POPUP_WIDTH } from '@utils/constants';
 import { useMemo } from 'react';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
@@ -66,7 +67,10 @@ function CollectibleDetailTile({
   isColumnAlignment,
   isLoading = false,
 }: Props) {
-  const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
+  const isGalleryOpen: boolean = useMemo(
+    () => document.documentElement.clientWidth > POPUP_WIDTH,
+    [],
+  );
 
   return (
     <Container isColumnAlignment={!isGalleryOpen || isColumnAlignment}>

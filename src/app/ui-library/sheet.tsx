@@ -1,3 +1,4 @@
+import { POPUP_WIDTH } from '@utils/constants';
 import { isInOptions } from '@utils/helper';
 import Modal from 'react-modal';
 import styled, { useTheme } from 'styled-components';
@@ -77,7 +78,7 @@ function Sheet({
     },
     content: {
       width: '100vw',
-      maxWidth: 360,
+      maxWidth: POPUP_WIDTH,
       maxHeight: '90vh',
       border: 'transparent',
       background: theme.colors.elevation6_600,

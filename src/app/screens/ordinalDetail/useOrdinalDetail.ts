@@ -7,7 +7,7 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getBrc20Details } from '@secretkeylabs/xverse-core';
-import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
+import { POPUP_WIDTH, XVERSE_ORDIVIEW_URL } from '@utils/constants';
 import { getBtcTxStatusUrl, isInOptions, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import {
   getInscriptionsCollectionGridItemSubText,
@@ -46,7 +46,10 @@ export default function useOrdinalDetail() {
 
   const [showSendOrdinalsAlert, setShowSendOrdinalsAlert] = useState(false);
 
-  const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
+  const isGalleryOpen: boolean = useMemo(
+    () => document.documentElement.clientWidth > POPUP_WIDTH,
+    [],
+  );
 
   const brc20InscriptionStatus = getInscriptionsCollectionGridItemSubText(ordinalData);
   const brc20InscriptionStatusColor =

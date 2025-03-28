@@ -2,6 +2,7 @@ import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
+import { POPUP_WIDTH } from '@utils/constants';
 import { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -27,7 +28,10 @@ export default function useNftCollection() {
       ? collectionData.floor_price * collectionData.all_nfts.length
       : null;
 
-  const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
+  const isGalleryOpen: boolean = useMemo(
+    () => document.documentElement.clientWidth > POPUP_WIDTH,
+    [],
+  );
 
   const handleBackButtonClick = () =>
     navigate(`/nft-dashboard${comesFromHidden || collectionHidden ? '/hidden' : ''}?tab=nfts`);

@@ -3,7 +3,7 @@ import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { GAMMA_URL } from '@utils/constants';
+import { GAMMA_URL, POPUP_WIDTH } from '@utils/constants';
 import { getExplorerUrl, isInOptions, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import { RoutePathsSuffixes } from 'app/routes/paths';
 import { useMemo } from 'react';
@@ -29,7 +29,10 @@ export default function useNftDetailScreen() {
 
   useResetUserFlow('/nft-detail');
 
-  const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
+  const isGalleryOpen: boolean = useMemo(
+    () => document.documentElement.clientWidth > POPUP_WIDTH,
+    [],
+  );
   const galleryTitle = metadata?.name;
 
   const onSharePress = () => {

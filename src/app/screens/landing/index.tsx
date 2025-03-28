@@ -4,6 +4,7 @@ import onboarding1 from '@assets/img/landing/onboarding1.svg';
 import onboarding2 from '@assets/img/landing/onboarding2.svg';
 import Dots from '@components/dots';
 import { CaretLeft, CaretRight } from '@phosphor-icons/react';
+import { POPUP_WIDTH } from '@utils/constants';
 import { isInOptions } from '@utils/helper';
 import { getIsTermsAccepted } from '@utils/localStorage';
 import RoutePaths from 'app/routes/paths';
@@ -42,7 +43,10 @@ function Landing() {
   const [slideTransitions, setSlideTransitions] = useState(false);
   const [transitionDirection, setTransitionDirection] = useState<'left' | 'right'>('right');
   const navigate = useNavigate();
-  const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
+  const isGalleryOpen: boolean = useMemo(
+    () => document.documentElement.clientWidth > POPUP_WIDTH,
+    [],
+  );
 
   const theme = useTheme();
   const onboardingViews = [

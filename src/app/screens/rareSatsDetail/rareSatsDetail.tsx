@@ -4,6 +4,7 @@ import TopRow from '@components/topRow';
 import useSatBundleDataReducer from '@hooks/stores/useSatBundleReducer';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import { StyledP } from '@ui-library/common.styled';
+import { POPUP_WIDTH } from '@utils/constants';
 import { useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -32,7 +33,10 @@ function RareSatsDetailScreen() {
   const { setSelectedSatBundleItemIndex } = useSatBundleDataReducer();
   useResetUserFlow('/rare-sats-detail');
 
-  const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
+  const isGalleryOpen: boolean = useMemo(
+    () => document.documentElement.clientWidth > POPUP_WIDTH,
+    [],
+  );
 
   const handleBackButtonClick = () => {
     // only go back if there is history

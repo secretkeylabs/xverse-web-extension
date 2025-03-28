@@ -2,6 +2,7 @@ import { parse, stringify } from '@aryzing/superqs';
 import { InternalMethods } from '@common/types/message-types';
 import { sendMessage } from '@common/types/messages';
 import { error, success, type Result } from '@secretkeylabs/xverse-core';
+import { POPUP_WIDTH } from '@utils/constants';
 import * as v from 'valibot';
 import { getOriginFromPort, getTabIdFromPort } from '..';
 
@@ -42,7 +43,7 @@ type Options<TData> = {
 async function createCenteredPopupOptions(
   options: Pick<chrome.windows.CreateData, 'url' | 'height' | 'width'>,
 ): Promise<chrome.windows.CreateData> {
-  const { url, width: popupWidth = 360, height: popupHeight = 600 } = options;
+  const { url, width: popupWidth = POPUP_WIDTH, height: popupHeight = 600 } = options;
 
   const win = await chrome.windows.getCurrent();
   const {

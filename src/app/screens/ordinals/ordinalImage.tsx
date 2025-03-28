@@ -9,7 +9,7 @@ import {
   type CondensedInscription,
   type Inscription,
 } from '@secretkeylabs/xverse-core';
-import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
+import { POPUP_WIDTH, XVERSE_ORDIVIEW_URL } from '@utils/constants';
 import { getFetchableUrl } from '@utils/helper';
 import { isThumbnailInscription } from '@utils/inscriptions';
 import Image from 'rc-image';
@@ -128,7 +128,8 @@ function OrdinalImage({
   showContentTypeThumbnail = false,
   thumbnailTimestamp = Date.now(),
 }: Props) {
-  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360 && !withoutSizeIncrease;
+  const isGalleryOpen: boolean =
+    document.documentElement.clientWidth > POPUP_WIDTH && !withoutSizeIncrease;
   const textContent = useTextOrdinalContent(ordinal);
   const { t } = useTranslation('translation', { keyPrefix: 'NFT_DASHBOARD_SCREEN' });
   const [brc721eImage, setBrc721eImage] = useState<string | undefined>(undefined);
