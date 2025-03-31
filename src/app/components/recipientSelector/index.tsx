@@ -2,6 +2,7 @@ import type { AddressType } from '@common/types/address';
 import type { AddressSource } from '@components/selectAddress';
 import SelectAddress from '@components/selectAddress';
 import AccountRow from '@components/selectAddress/accountRow';
+import { valibotResolver } from '@hookform/resolvers/valibot';
 import { useBnsName, useBnsResolver } from '@hooks/queries/useBnsName';
 import useAddressBookEntries from '@hooks/useAddressBookEntries';
 import useGetAllAccounts from '@hooks/useGetAllAccounts';
@@ -16,15 +17,18 @@ import Button from '@ui-library/button';
 import Input from '@ui-library/input';
 import { InputFeedback, type InputFeedbackProps } from '@ui-library/inputFeedback';
 import Sheet from '@ui-library/sheet';
+import { MAX_ACC_NAME_LENGTH } from '@utils/constants';
 import { type TabType } from '@utils/helper';
 import SendLayout from 'app/layouts/sendLayout';
 import RoutePaths, { RoutePathsSuffixes } from 'app/routes/paths';
 import type { ReactNode } from 'react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import Theme from 'theme';
+import * as v from 'valibot';
 import {
   Buttons,
   Container,
@@ -33,9 +37,16 @@ import {
   HeaderContainer,
   HeaderTitle,
   SaveAddressButton,
-  SaveAddressContainer,
+  SaveAddressForm,
 } from './index.styled';
 import SelectedRecipient from './selectedRecipient';
+
+type FormValues = {
+  name: string;
+  address: string;
+};
+
+const validNameCharRegex = /^[a-zA-Z0-9 ]*$/;
 
 type Props = {
   recipientAddress: string;
@@ -70,14 +81,15 @@ function RecipientSelector({
   const [addressIsValid, setAddressIsValid] = useState(true);
   const [toOwnAddress, setToOwnAddress] = useState(false);
   const [displayInsufficientFunds, setDisplayInsufficientFunds] = useState(false);
-  const [newRecipientAddress, setNewRecipientAddress] = useState(recipientAddress);
   const [showSaveAddressSheet, setShowSaveAddressSheet] = useState(false);
   const [showAddressSelector, setShowAddressSelector] = useState(false);
   const [addressSource, setAddressSource] = useState<AddressSource | null>(null);
-  const [name, setName] = useState('');
 
   /* hooks */
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
+  const { t: tAddressBook } = useTranslation('translation', {
+    keyPrefix: 'SETTING_SCREEN.ADDRESS_BOOK',
+  });
   const { t: tCommon } = useTranslation('translation', { keyPrefix: 'COMMON' });
 
   const { network } = useWalletSelector();
@@ -85,6 +97,40 @@ function RecipientSelector({
   const { entries: addressBook, addEntry, isAddingEntry: isSaving } = useAddressBookEntries();
   const allAccounts = useGetAllAccounts();
   const location = useLocation();
+
+  const formSchema = v.object({
+    name: v.pipe(
+      v.string(),
+      v.trim(),
+      v.nonEmpty(tCommon('FIELD_REQUIRED')),
+      v.maxLength(
+        MAX_ACC_NAME_LENGTH,
+        tAddressBook('ERROR.NAME_TOO_LONG', { maxLength: MAX_ACC_NAME_LENGTH }),
+      ),
+      v.check(
+        (nameString) => validNameCharRegex.test(nameString),
+        tAddressBook('ERROR.PROHIBITED_SYMBOLS'),
+      ),
+    ),
+    address: v.pipe(v.string(), v.trim(), v.nonEmpty(tCommon('FIELD_REQUIRED'))),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<FormValues>({
+    resolver: valibotResolver(formSchema),
+  });
+
+  const name = watch('name');
+  const recipient = watch('address', recipientAddress);
+
+  useEffect(() => {
+    setValue('address', recipientAddress);
+  }, [recipientAddress, setValue]);
 
   /* BNS */
   let currencyType: 'BTC' | 'STX' | undefined;
@@ -98,11 +144,11 @@ function RecipientSelector({
     currencyType = 'STX';
   }
   const { data: associatedAddress } = useBnsResolver(
-    newRecipientAddress,
+    recipient,
     selectedAccount.stxAddress,
     currencyType,
   );
-  const { data: associatedBnsName } = useBnsName(newRecipientAddress);
+  const { data: associatedBnsName } = useBnsName(recipient);
 
   // Handle back button click
   const handleBackClick = () => {
@@ -140,7 +186,6 @@ function RecipientSelector({
 
   const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRecipientAddress(e.target.value);
-    setNewRecipientAddress(e.target.value);
     setToOwnAddress(
       [
         selectedAccount.btcAddress,
@@ -153,16 +198,18 @@ function RecipientSelector({
     setAddressSource(null);
   };
 
-  const handleSaveAddress = async () => {
-    if (!name || !newRecipientAddress) {
+  const handleSaveAddress = async (formData: FormValues) => {
+    if (!formData.name || !formData.address) {
       return;
     }
 
     addEntry(
-      { address: newRecipientAddress, name },
+      { address: formData.address, name: formData.name },
       {
         onSuccess: () => {
           setShowSaveAddressSheet(false);
+          setValue('name', '');
+          setValue('address', '');
           toast(t('ADDRESS_ADDED'));
         },
       },
@@ -171,7 +218,6 @@ function RecipientSelector({
 
   const handleAddressSelect = (address: string, source: AddressSource) => {
     setRecipientAddress(address);
-    setNewRecipientAddress(address);
     setShowAddressSelector(false);
     setAddressSource(source);
     setToOwnAddress(
@@ -294,7 +340,7 @@ function RecipientSelector({
           ) : (
             <Input
               dataTestID="address-receive"
-              title={t('RECIPIENT')}
+              titleElement={t('RECIPIENT')}
               placeholder={recipientPlaceholder || t('BTC.RECIPIENT_PLACEHOLDER')}
               value={recipientAddress}
               onChange={handleAddressChange}
@@ -345,27 +391,35 @@ function RecipientSelector({
           title={t('SAVE_ADDRESS')}
           onClose={() => setShowSaveAddressSheet(false)}
         >
-          <SaveAddressContainer>
+          <SaveAddressForm onSubmit={handleSubmit(handleSaveAddress)}>
             <Input
-              title={t('NAME')}
+              {...register('name')}
+              titleElement={t('NAME')}
               placeholder={t('NAME_PLACEHOLDER')}
-              value={name}
-              onChange={(e) => setName(e.target.value)}
               autoFocus
+              feedback={
+                errors.name?.message
+                  ? [{ message: errors.name.message, variant: 'danger' }]
+                  : undefined
+              }
             />
             <Input
-              title={t('RECIPIENT')}
+              {...register('address')}
+              titleElement={tCommon('ADDRESS')}
               placeholder={recipientPlaceholder || t('BTC.RECIPIENT_PLACEHOLDER')}
-              value={newRecipientAddress}
-              onChange={(e) => setNewRecipientAddress(e.target.value)}
+              feedback={
+                errors.address?.message
+                  ? [{ message: errors.address.message, variant: 'danger' }]
+                  : undefined
+              }
             />
             <Button
               title={tCommon('SAVE')}
-              onClick={handleSaveAddress}
-              disabled={!name || !newRecipientAddress || isSaving}
-              loading={isSaving}
+              disabled={!name || !recipient || isSaving || isSubmitting}
+              loading={isSaving || isSubmitting}
+              type="submit"
             />
-          </SaveAddressContainer>
+          </SaveAddressForm>
         </Sheet>
       </Container>
     </SendLayout>

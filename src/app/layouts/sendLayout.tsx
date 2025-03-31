@@ -25,12 +25,11 @@ const Container = styled.div`
   height: 100%;
   max-width: ${breakpoints.xs}px;
   max-height: 600px;
+  flex: 1;
 
   @media only screen and ${devices.min.s} {
-    flex: initial;
     max-width: 588px;
     max-height: unset;
-    height: auto;
     padding: 0 ${(props) => props.theme.space.xs};
     margin-bottom: ${(props) => props.theme.space.m};
   }

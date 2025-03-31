@@ -2,15 +2,13 @@ import type { AddressType } from '@common/types/address';
 import Separator from '@components/separator';
 import useAddressBookEntries from '@hooks/useAddressBookEntries';
 import useGetAllAccounts from '@hooks/useGetAllAccounts';
-import { AddressBook } from '@phosphor-icons/react';
 import AddressBookItem from '@screens/settings/addressBook/addressBookItem';
-import { StyledP } from '@ui-library/common.styled';
+import AddressBookPlaceholder from '@screens/settings/addressBook/addressBookPlaceholder';
 import Spinner from '@ui-library/spinner';
 import { Tabs } from '@ui-library/tabs';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
-import Theme from 'theme';
 import AccountRow from './accountRow';
 
 const Container = styled.div((_) => ({
@@ -37,32 +35,17 @@ const ListContainer = styled.div((props) => ({
   ...props.theme.scrollbar,
 }));
 
-const PlaceholderContainer = styled.div({
-  height: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  textAlign: 'center',
-});
-
-const PlaceholderTitle = styled(StyledP)((props) => ({
-  marginTop: props.theme.space.l,
-  marginBottom: props.theme.space.xxs,
-}));
-
 const Subtitle = styled.p((props) => ({
   ...props.theme.typography.body_bold_s,
   color: props.theme.colors.white_200,
   textTransform: 'uppercase',
 }));
 
-const LoaderContainer = styled.div((props) => ({
+const LoaderContainer = styled.div((_) => ({
   display: 'flex',
   flex: 1,
   justifyContent: 'center',
   alignItems: 'center',
-  marginTop: props.theme.space.l,
 }));
 
 export type AddressSource = 'my_accounts' | 'address_book';
@@ -118,17 +101,7 @@ function SelectAddress({ setAddress, addressType }: Props) {
     }
 
     if (showPlaceholder) {
-      return (
-        <PlaceholderContainer>
-          <AddressBook size={40} weight="fill" color={Theme.colors.white_600} />
-          <PlaceholderTitle typography="body_medium_l" color="white_0">
-            {t('SELECT_ADDRESS.NO_ADDRESSES.TITLE')}
-          </PlaceholderTitle>
-          <StyledP typography="body_m" color="white_400">
-            {t('SELECT_ADDRESS.NO_ADDRESSES.DESCRIPTION')}
-          </StyledP>
-        </PlaceholderContainer>
-      );
+      return <AddressBookPlaceholder />;
     }
 
     return (

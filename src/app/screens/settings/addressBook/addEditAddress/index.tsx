@@ -1,15 +1,27 @@
 import BottomTabBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import { valibotResolver } from '@hookform/resolvers/valibot';
 import useAddressBookEntries from '@hooks/useAddressBookEntries';
-import { Container, Title } from '@screens/settings/index.styles';
+import { Title } from '@screens/settings/index.styles';
 import Button from '@ui-library/button';
 import Input from '@ui-library/input';
 import Spinner from '@ui-library/spinner';
+import { MAX_ACC_NAME_LENGTH } from '@utils/constants';
 import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
+import * as v from 'valibot';
+
+const FormContainer = styled.form((props) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  flex: 1,
+  padding: `0 ${props.theme.space.xs}`,
+  ...props.theme.scrollbar,
+}));
 
 const ContentContainer = styled.div((props) => ({
   display: 'flex',
@@ -32,11 +44,19 @@ const LoaderContainer = styled.div((props) => ({
   marginTop: props.theme.space.l,
 }));
 
+type FormValues = {
+  name: string;
+  address: string;
+};
+
+const validNameCharRegex = /^[a-zA-Z0-9 ]*$/;
+
 type Mode = 'add' | 'edit';
 
 function AddEditAddress({ mode }: { mode: Mode }) {
   /* hooks */
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN.ADDRESS_BOOK' });
+  const { t: tCommon } = useTranslation('translation', { keyPrefix: 'COMMON' });
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const {
@@ -48,9 +68,34 @@ function AddEditAddress({ mode }: { mode: Mode }) {
     isEditingEntry,
   } = useAddressBookEntries();
 
+  const formSchema = v.object({
+    name: v.pipe(
+      v.string(),
+      v.trim(),
+      v.nonEmpty(tCommon('FIELD_REQUIRED')),
+      v.maxLength(
+        MAX_ACC_NAME_LENGTH,
+        t('ERROR.NAME_TOO_LONG', { maxLength: MAX_ACC_NAME_LENGTH }),
+      ),
+      v.check((name) => validNameCharRegex.test(name), t('ERROR.PROHIBITED_SYMBOLS')),
+    ),
+    address: v.pipe(v.string(), v.trim(), v.nonEmpty(tCommon('FIELD_REQUIRED'))),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<FormValues>({
+    resolver: valibotResolver(formSchema),
+  });
+
+  const name = watch('name');
+  const address = watch('address');
+
   /* state */
-  const [name, setName] = useState('');
-  const [address, setAddress] = useState('');
   const [isLoading, setIsLoading] = useState(!!id);
 
   // Load the address if in edit mode
@@ -61,47 +106,32 @@ function AddEditAddress({ mode }: { mode: Mode }) {
 
     const foundEntry = entries.find((entry) => entry.id === id);
     if (foundEntry) {
-      setName(foundEntry.name);
-      setAddress(foundEntry.address);
+      setValue('name', foundEntry.name);
+      setValue('address', foundEntry.address);
     } else {
       toast.error(t('EDIT_ADDRESS.ADDRESS_NOT_FOUND'));
       navigate(-1);
     }
     setIsLoading(false);
-  }, [id, entries, isLoadingEntries, navigate, t]);
+  }, [id, entries, isLoadingEntries, navigate, t, setValue]);
 
   const handleBackButtonClick = () => {
     navigate(-1);
   };
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setName(e.target.value);
-  };
-
-  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAddress(e.target.value);
-  };
-
-  const handleSaveAddress = () => {
-    if (!name || !address) {
-      return;
-    }
-
+  const handleSaveAddress = (data: FormValues) => {
     if (mode === 'add') {
-      addEntry(
-        { address, name },
-        {
-          onSuccess: () => {
-            navigate(-1);
-            toast(t('ADD_ADDRESS.ADDRESS_ADDED'));
-          },
+      addEntry(data, {
+        onSuccess: () => {
+          navigate(-1);
+          toast(t('ADD_ADDRESS.ADDRESS_ADDED'));
         },
-      );
+      });
     } else if (mode === 'edit' && id) {
       editEntry(
         {
           id,
-          data: { name, address },
+          data,
         },
         {
           onSuccess: () => {
@@ -118,7 +148,7 @@ function AddEditAddress({ mode }: { mode: Mode }) {
   return (
     <>
       <TopRow onClick={handleBackButtonClick} />
-      <Container>
+      <FormContainer onSubmit={handleSubmit(handleSaveAddress)}>
         <Title>{mode === 'add' ? t('ADD_ADDRESS.TITLE') : t('EDIT_ADDRESS.TITLE')}</Title>
         {isLoading || isLoadingEntries ? (
           <LoaderContainer>
@@ -127,32 +157,46 @@ function AddEditAddress({ mode }: { mode: Mode }) {
         ) : (
           <ContentContainer>
             <Input
-              title={t('ADD_ADDRESS.NAME')}
+              {...register('name')}
+              titleElement={t('ADD_ADDRESS.NAME')}
               placeholder={t('ADD_ADDRESS.NAME_PLACEHOLDER')}
-              value={name}
-              onChange={handleNameChange}
+              feedback={
+                errors.name?.message
+                  ? [{ message: errors.name.message, variant: 'danger' }]
+                  : undefined
+              }
               autoFocus
             />
             <Input
-              title={t('ADD_ADDRESS.ADDRESS')}
+              {...register('address')}
+              titleElement={t('ADD_ADDRESS.ADDRESS')}
               placeholder={t('ADD_ADDRESS.ADDRESS_PLACEHOLDER')}
-              value={address}
-              onChange={handleAddressChange}
-              variant="default"
+              feedback={
+                errors.address?.message
+                  ? [{ message: errors.address.message, variant: 'danger' }]
+                  : undefined
+              }
             />
             <ButtonContainer>
               <Button
                 title={
                   mode === 'add' ? t('ADD_ADDRESS.ADD_BUTTON') : t('EDIT_ADDRESS.SAVE_CHANGES')
                 }
-                onClick={handleSaveAddress}
-                loading={isProcessing}
-                disabled={!name || !address || isProcessing}
+                loading={isProcessing || isSubmitting}
+                disabled={
+                  !name ||
+                  !address ||
+                  isProcessing ||
+                  isSubmitting ||
+                  (mode === 'edit' &&
+                    name === entries.find((entry) => entry.id === id)?.name &&
+                    address === entries.find((entry) => entry.id === id)?.address)
+                }
               />
             </ButtonContainer>
           </ContentContainer>
         )}
-      </Container>
+      </FormContainer>
       <BottomTabBar tab="settings" />
     </>
   );

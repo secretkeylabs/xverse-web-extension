@@ -23,7 +23,9 @@ const Container = styled.div({
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-between',
+  flex: 1,
   overflowY: 'auto',
+  borderRadius: 'inherit',
   '&::-webkit-scrollbar': {
     display: 'none',
   },
@@ -48,6 +50,8 @@ const ButtonsWrapper = styled.div(
   padding: ${props.theme.space.m};
   padding-top: ${props.theme.space.l};
   padding-bottom: ${props.theme.space.xxl};
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
 `,
 );
 

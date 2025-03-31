@@ -166,7 +166,7 @@ function AmountSelector({
 
   return (
     <Input
-      title={t('BTC.AMOUNT', { currency: useBtcValue ? 'BTC' : fiatCurrency })}
+      titleElement={t('BTC.AMOUNT', { currency: useBtcValue ? 'BTC' : fiatCurrency })}
       value={amountDisplay}
       dataTestID="btc-amount"
       onChange={(e) => handleAmountChange(e.target.value)}

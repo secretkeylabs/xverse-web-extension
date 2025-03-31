@@ -79,7 +79,7 @@ function AmountSelector({
         <InputGroup>
           <Input
             dataTestID="amount-input"
-            title={
+            titleElement={
               <RowContainer>
                 <StyledP typography="body_medium_m" color="white_200">
                   {t('AMOUNT')}

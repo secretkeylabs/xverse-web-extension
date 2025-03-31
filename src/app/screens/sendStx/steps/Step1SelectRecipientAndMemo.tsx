@@ -79,7 +79,7 @@ function Step1SelectRecipientAndMemo({
       customFields={
         <MemoInput>
           <Input
-            title={t('MEMO')}
+            titleElement={t('MEMO')}
             value={memo}
             onChange={handleMemoChange}
             variant={memoInputFeedback.some((i) => i.variant === 'danger') ? 'danger' : 'default'}

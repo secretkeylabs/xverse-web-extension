@@ -37,7 +37,7 @@ function EditNonce({ nonce, setNonce }: Props) {
     <Container>
       <Description>{t('NONCE_INFO')}</Description>
       <Input
-        title={t('NONCE')}
+        titleElement={t('NONCE')}
         value={nonceInput}
         onChange={handleOnChange}
         placeholder="0"

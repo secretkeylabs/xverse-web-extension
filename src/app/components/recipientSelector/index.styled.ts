@@ -2,8 +2,9 @@ import Button from '@ui-library/button';
 import styled from 'styled-components';
 
 export const Container = styled.div`
-  flex: 1 1 100%;
+  flex: 1;
 
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -17,7 +18,7 @@ export const SaveAddressButton = styled(Button)`
   margin-top: ${(props) => props.theme.space.m};
 `;
 
-export const SaveAddressContainer = styled.div`
+export const SaveAddressForm = styled.form`
   display: flex;
   flex-direction: column;
   gap: ${(props) => props.theme.space.l};

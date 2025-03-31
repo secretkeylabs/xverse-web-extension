@@ -132,7 +132,9 @@ function RuneAmountSelector({
 
   return (
     <Input
-      title={t('BTC.AMOUNT', { currency: useTokenValue ? getFtTicker(token) : fiatCurrency })}
+      titleElement={t('BTC.AMOUNT', {
+        currency: useTokenValue ? getFtTicker(token) : fiatCurrency,
+      })}
       value={displayAmount}
       dataTestID="send-input"
       onChange={(e) => handleAmountChange(e.target.value)}

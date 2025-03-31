@@ -33,16 +33,14 @@
     "TRANSACTION": "Transaction",
     "LEARN_MORE": "Learn more",
     "SAVE": "Save",
-    "SOMETHING_WENT_WRONG": "Something went wrong"
+    "SOMETHING_WENT_WRONG": "Something went wrong",
+    "FIELD_REQUIRED": "This field is required",
+    "ADDRESS": "Address"
   },
   "SELECT_ADDRESS": {
-    "TITLE": "Select address",
+    "TITLE": "Select Address",
     "MY_ACCOUNTS": "My accounts",
-    "ADDRESS_BOOK": "Address book",
-    "NO_ADDRESSES": {
-      "TITLE": "No saved addresses yet",
-      "DESCRIPTION": "When you have your first address saved in the Address Book, it will appear here."
-    }
+    "ADDRESS_BOOK": "Address book"
   },
   "INFORMATION": {
     "ORDINALS_ADDRESS_TOOLTIP": "These sats are used for your ordinals and runes. They cannot be spent with Xverse wallet.",
@@ -384,11 +382,11 @@
     "STX": {
       "BUY_STX": "Buy Stacks"
     },
-    "ADDRESS_BOOK": "Address Book",
-    "SAVE_ADDRESS": "Save address",
+    "ADDRESS_BOOK": "Address book",
+    "SAVE_ADDRESS": "Save Address",
     "ADDRESS_ADDED": "Address added",
-    "SAVE_TO_ADDRESS_BOOK": "Save to Address Book",
-    "SEND_TO": "Send to",
+    "SAVE_TO_ADDRESS_BOOK": "Save to address book",
+    "SEND_TO": "Send To",
     "SEND": "Send",
     "NAME": "Name",
     "NAME_PLACEHOLDER": "Enter custom address name",
@@ -1108,7 +1106,7 @@
     "ADDRESS_BOOK": {
       "TITLE": "Address Book",
       "ADD_ADDRESS": {
-        "TITLE": "Add address",
+        "TITLE": "Add Address",
         "NAME": "Name",
         "NAME_PLACEHOLDER": "Enter custom address name",
         "ADDRESS": "Address",
@@ -1119,7 +1117,7 @@
         "ADDRESS_ADDED": "Address added"
       },
       "EDIT_ADDRESS": {
-        "TITLE": "Edit address",
+        "TITLE": "Edit Address",
         "SAVE_CHANGES": "Save changes",
         "CHANGES_SAVED": "Changes saved"
       },
@@ -1132,6 +1130,10 @@
         "TITLE": "Delete address \"{{name}}\"?",
         "CONFIRMATION": "Are you sure you want to delete this address?"
       },
+      "NO_ADDRESSES": {
+        "TITLE": "No saved address yet",
+        "DESCRIPTION": "Your saved addresses will be displayed here after you add them."
+      },
       "ERROR": {
         "FETCH_FAILED": "Could not fetch address book entries",
         "ADDRESS_ALREADY_EXISTS": "Address already exists in your address book",
@@ -1139,8 +1141,8 @@
         "INVALID_ADDRESS": "Invalid address format",
         "NAME_ALREADY_EXISTS": "Name already exists in your address book",
         "INVALID_NAME": "Invalid name format",
-        "NAME_TOO_LONG": "Name is too long",
-        "PROHIBITED_SYMBOLS": "Name contains prohibited symbols",
+        "NAME_TOO_LONG": "Name must not be longer than {{maxLength}} characters",
+        "PROHIBITED_SYMBOLS": "Name can only contain alphanumeric characters and spaces",
         "INVALID_CHAIN": "Invalid blockchain selected",
         "GENERIC_ERROR": "Something went wrong with the address book operation"
       }

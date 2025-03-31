@@ -6,7 +6,6 @@ import { Plus } from '@phosphor-icons/react';
 import { Container, Title } from '@screens/settings/index.styles';
 import type { AddressBookEntry } from '@secretkeylabs/xverse-core/addressBook/types';
 import Button from '@ui-library/button';
-import { StyledP } from '@ui-library/common.styled';
 import Spinner from '@ui-library/spinner';
 import RoutePaths from 'app/routes/paths';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Theme from 'theme';
 import AddressBookItem from './addressBookItem';
+import AddressBookPlaceholder from './addressBookPlaceholder';
 
 const ItemsContainer = styled.div((props) => ({
   ...props.theme.scrollbar,
@@ -25,11 +25,6 @@ const ItemsContainer = styled.div((props) => ({
   paddingBottom: props.theme.space.xs,
 }));
 
-const EmptyAddressBookContainer = styled.div((props) => ({
-  paddingTop: props.theme.space.xs,
-  height: '100%',
-}));
-
 const ControlsContainer = styled.div((props) => ({
   position: 'sticky',
   bottom: 0,
@@ -38,12 +33,12 @@ const ControlsContainer = styled.div((props) => ({
   backgroundColor: props.theme.colors.elevation0,
 }));
 
-const LoaderContainer = styled.div((props) => ({
+const LoaderContainer = styled.div((_) => ({
   display: 'flex',
   flex: 1,
   justifyContent: 'center',
   alignItems: 'center',
-  marginTop: props.theme.space.l,
+  height: '100%',
 }));
 
 function AddressBook() {
@@ -51,6 +46,7 @@ function AddressBook() {
 
   const navigate = useNavigate();
   const { entries, isLoading, addEntry, removeEntry } = useAddressBookEntries();
+  const showPlaceholder = !isLoading && entries.length === 0;
 
   const handleUndoDeleteAddress = async (item: AddressBookEntry, successCallback: () => void) => {
     addEntry(
@@ -78,22 +74,14 @@ function AddressBook() {
   const renderBody = () => {
     if (isLoading) {
       return (
-        <EmptyAddressBookContainer>
-          <LoaderContainer>
-            <Spinner color="white" size={30} />
-          </LoaderContainer>
-        </EmptyAddressBookContainer>
+        <LoaderContainer>
+          <Spinner color="white" size={30} />
+        </LoaderContainer>
       );
     }
 
-    if (entries.length === 0) {
-      return (
-        <EmptyAddressBookContainer>
-          <StyledP typography="body_m" color="white_200">
-            Your address book is currently empty.
-          </StyledP>
-        </EmptyAddressBookContainer>
-      );
+    if (showPlaceholder) {
+      return <AddressBookPlaceholder />;
     }
 
     return (
@@ -118,16 +106,18 @@ function AddressBook() {
       <Container>
         <Title>{t('ADDRESS_BOOK.TITLE')}</Title>
         {renderBody()}
-        <ControlsContainer>
-          <Button
-            title={t('ADDRESS_BOOK.ADD_ADDRESS.TITLE')}
-            variant="secondary"
-            onClick={() => {
-              navigate(RoutePaths.AddAddress);
-            }}
-            icon={<Plus size={16} color={Theme.colors.white_0} />}
-          />
-        </ControlsContainer>
+        {!showPlaceholder && (
+          <ControlsContainer>
+            <Button
+              title={t('ADDRESS_BOOK.ADD_ADDRESS.ADD_BUTTON')}
+              variant="secondary"
+              onClick={() => {
+                navigate(RoutePaths.AddAddress);
+              }}
+              icon={<Plus size={16} color={Theme.colors.white_0} />}
+            />
+          </ControlsContainer>
+        )}
       </Container>
       <BottomTabBar tab="settings" />
     </>
