@@ -72,7 +72,6 @@ function ConfirmBrc20Transaction() {
   const [isConfirmLoading, setIsConfirmLoading] = useState(false);
   const [userInputFeeRate, setUserInputFeeRate] = useState(estimateFeesParams.feeRate.toString());
   const [error, setError] = useState<BRC20ErrorCode | ''>('');
-  const debouncedUserInputFeeRate = useDebounce(userInputFeeRate, 500);
 
   const {
     commitValueBreakdown,
@@ -80,7 +79,7 @@ function ConfirmBrc20Transaction() {
     errorCode,
   } = useBrc20TransferFees({
     ...estimateFeesParams,
-    feeRate: Number(debouncedUserInputFeeRate),
+    feeRate: Number(userInputFeeRate),
     skipInitialFetch: false,
     context: transactionContext,
   });
@@ -108,7 +107,7 @@ function ConfirmBrc20Transaction() {
       recipientAddress,
       estimateFeesParams: {
         ...estimateFeesParams,
-        feeRate: Number(debouncedUserInputFeeRate),
+        feeRate: Number(userInputFeeRate),
       },
       token,
     };
@@ -121,7 +120,6 @@ function ConfirmBrc20Transaction() {
     setIsConfirmLoading(false);
   };
 
-  /* other */
   const errorMessage = errorCode ? t(`CONFIRM_BRC20.ERROR_CODES.${errorCode}`) : error;
 
   const recipient: RecipientCardProps = {
@@ -228,7 +226,7 @@ function ConfirmBrc20Transaction() {
                 <SelectFeeRate
                   fee={txFee.toString()}
                   feeUnits="sats"
-                  feeRate={debouncedUserInputFeeRate}
+                  feeRate={userInputFeeRate}
                   feeRateUnits="sats/vB"
                   setFeeRate={(newFeeRate) => setUserInputFeeRate(newFeeRate)}
                   baseToFiat={(amount) =>

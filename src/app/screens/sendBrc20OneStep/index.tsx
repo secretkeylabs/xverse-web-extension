@@ -177,6 +177,14 @@ function SendBrc20Screen() {
     }
   };
 
+  const handleSetCurrentStep = (step: Step) => {
+    if (step === Step.Confirm) {
+      return handleOnPressNext();
+    }
+
+    setCurrentStep(step);
+  };
+
   if (!fungibleToken) {
     navigate('/');
     return null;
@@ -189,10 +197,9 @@ function SendBrc20Screen() {
       onAmountChange={onInputChange}
       amountError={amountError}
       currentStep={currentStep}
-      setCurrentStep={setCurrentStep}
+      setCurrentStep={handleSetCurrentStep}
       recipientAddress={recipientAddress}
       setRecipientAddress={setRecipientAddress}
-      onConfirm={handleOnPressNext}
       onBack={handleBackButtonClick}
       isLoading={false}
       isNextEnabled={isNextEnabled}
