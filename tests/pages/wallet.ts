@@ -36,6 +36,8 @@ export default class Wallet {
 
   readonly buttonConfirm: Locator;
 
+  readonly buttonRemoveRecipient: Locator;
+
   readonly buttonDenyDataCollection: Locator;
 
   readonly buttonNetwork: Locator;
@@ -385,6 +387,7 @@ export default class Wallet {
     this.buttonLock = page.getByRole('button', { name: 'Lock' });
     this.buttonConfirm = page.getByRole('button', { name: 'Confirm' });
     this.buttonDenyDataCollection = page.getByRole('button', { name: 'Deny' });
+    this.buttonRemoveRecipient = page.getByRole('button', { name: 'Remove recipient' });
     this.labelBalanceAmountSelector = page.getByTestId('balance-label');
     this.buttonClose = page.getByRole('button', { name: 'Close' });
     this.buttonEditFee = page.getByTestId('fee-button');
@@ -541,12 +544,8 @@ export default class Wallet {
     this.inputSendAmount = page.getByTestId('send-input');
     this.inputRecipientAddress = page.getByTestId('recipient-address');
     this.inputMemo = page.getByTestId('memo-input');
-    this.errorMessageAddressInvalid = page
-      .locator('p')
-      .filter({ hasText: 'Recipient address invalid' });
-    this.errorMessageAddressRequired = page
-      .locator('p')
-      .filter({ hasText: 'Recipient address is required' });
+    this.errorMessageAddressInvalid = page.getByText('Recipient address invalid');
+    this.errorMessageAddressRequired = page.getByText('Recipient address is required');
     this.infoMessageSendSelf = page
       .locator('p')
       .filter({ hasText: 'You are transferring to yourself' });
@@ -568,7 +567,7 @@ export default class Wallet {
     this.buttonSign = page.getByRole('button', { name: 'Sign' });
     this.sendTransactionID = page.getByTestId('transaction-id');
     this.sendSTXValue = page.getByTestId('send-value');
-    this.inputField = page.locator('input[type="text"]');
+    this.inputField = page.getByRole('textbox');
     this.sendRuneAmount = page.getByTestId('send-rune-amount');
 
     // List

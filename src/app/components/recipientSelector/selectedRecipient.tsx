@@ -39,6 +39,7 @@ function SelectedRecipient({
         <CrossButtonInline
           size="ml"
           color={Theme.colors.white_0}
+          ariaLabel={t('REMOVE_RECIPIENT')}
           onClick={() => {
             setRecipientAddress('');
             const filteredParams = new URLSearchParams(searchParams);

@@ -315,7 +315,7 @@ const Input = React.forwardRef(
           />
           <ComplicationsContainer ref={complicationsRef}>
             {!hideClear && hasValue && (
-              <ClearButtonContainer type="button" onClick={handleClear}>
+              <ClearButtonContainer type="button" onClick={handleClear} aria-label="Clear input">
                 <ClearButton $hasSiblings={!!complications} />
               </ClearButtonContainer>
             )}

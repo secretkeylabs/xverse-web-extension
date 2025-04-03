@@ -35,9 +35,11 @@ test.describe('Transaction STX', () => {
 
     // Recipient address send self check
     await wallet.inputField.first().fill(selfSTXMain);
-    await wallet.buttonNext.click();
     await expect(wallet.errorMessageSendSelf).toBeVisible();
     await expect(wallet.buttonNext).toBeDisabled();
+
+    // Clear input field
+    await wallet.buttonRemoveRecipient.click();
 
     // Fill in correct Receiver Address
     await wallet.inputField.first().fill(STXMain);
