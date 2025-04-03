@@ -402,6 +402,7 @@ function RecipientSelector({
                   ? [{ message: errors.name.message, variant: 'danger' }]
                   : undefined
               }
+              clearValue={() => setValue('name', '')}
             />
             <Input
               {...register('address')}
@@ -412,6 +413,7 @@ function RecipientSelector({
                   ? [{ message: errors.address.message, variant: 'danger' }]
                   : undefined
               }
+              clearValue={() => setValue('address', '')}
             />
             <Button
               title={tCommon('SAVE')}

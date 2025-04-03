@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef, type ChangeEvent } from 'react';
+import React, { useLayoutEffect, useRef, useState, type ChangeEvent } from 'react';
 import styled from 'styled-components';
 import { InputFeedback, type FeedbackVariant } from './inputFeedback';
 
@@ -205,6 +205,7 @@ type Props = React.InputHTMLAttributes<HTMLInputElement> & {
   leftAccessory?: {
     icon: React.ReactNode;
   };
+  clearValue?: () => void;
 };
 
 const Input = React.forwardRef(
@@ -229,14 +230,17 @@ const Input = React.forwardRef(
       autoFocus = false,
       bgColor,
       leftAccessory,
+      clearValue,
       ...props
     }: Props,
     ref,
   ) => {
+    const [hasValue, setHasValue] = useState(false);
     const inputRef = useRef<HTMLInputElement | null>(null);
     const complicationsRef = useRef<HTMLDivElement>(null);
 
     const handleChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+      setHasValue(e.target.value !== '');
       onChange(e);
     };
 
@@ -264,6 +268,8 @@ const Input = React.forwardRef(
 
     const handleClear = () => {
       onChange({ target: { value: '' } } as ChangeEvent<HTMLInputElement>);
+      clearValue?.();
+      setHasValue(false);
       inputRef.current?.focus();
     };
 
@@ -308,7 +314,7 @@ const Input = React.forwardRef(
             {...props}
           />
           <ComplicationsContainer ref={complicationsRef}>
-            {!hideClear && value && (
+            {!hideClear && hasValue && (
               <ClearButtonContainer type="button" onClick={handleClear}>
                 <ClearButton $hasSiblings={!!complications} />
               </ClearButtonContainer>

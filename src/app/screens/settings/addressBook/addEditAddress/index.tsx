@@ -166,6 +166,7 @@ function AddEditAddress({ mode }: { mode: Mode }) {
                   : undefined
               }
               autoFocus
+              clearValue={() => setValue('name', '')}
             />
             <Input
               {...register('address')}
@@ -176,6 +177,7 @@ function AddEditAddress({ mode }: { mode: Mode }) {
                   ? [{ message: errors.address.message, variant: 'danger' }]
                   : undefined
               }
+              clearValue={() => setValue('address', '')}
             />
             <ButtonContainer>
               <Button
