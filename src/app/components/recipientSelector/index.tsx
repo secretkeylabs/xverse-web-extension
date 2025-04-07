@@ -126,11 +126,7 @@ function RecipientSelector({
   });
 
   const name = watch('name');
-  const recipient = watch('address', recipientAddress);
-
-  useEffect(() => {
-    setValue('address', recipientAddress);
-  }, [recipientAddress, setValue]);
+  const address = watch('address', recipientAddress);
 
   /* BNS */
   let currencyType: 'BTC' | 'STX' | undefined;
@@ -144,13 +140,27 @@ function RecipientSelector({
     currencyType = 'STX';
   }
   const { data: associatedAddress } = useBnsResolver(
-    recipient,
+    recipientAddress,
     selectedAccount.stxAddress,
     currencyType,
   );
-  const { data: associatedBnsName } = useBnsName(recipient);
+  // TODO: Optimize this by validating the address before fetching the associated BNS name
+  const { data: associatedBnsName } = useBnsName(recipientAddress);
 
-  // Handle back button click
+  useEffect(() => {
+    if (!associatedAddress) {
+      return;
+    }
+
+    if (!showSaveAddressSheet && address !== associatedAddress) {
+      setValue('address', associatedAddress);
+    }
+  }, [associatedAddress, showSaveAddressSheet, address, setValue]);
+
+  useEffect(() => {
+    setValue('address', recipientAddress);
+  }, [recipientAddress, setValue]);
+
   const handleBackClick = () => {
     if (showAddressSelector) {
       // If address selector is visible, hide it instead of navigating back
@@ -216,8 +226,8 @@ function RecipientSelector({
     );
   };
 
-  const handleAddressSelect = (address: string, source: AddressSource) => {
-    setRecipientAddress(address);
+  const handleAddressSelect = (newAddress: string, source: AddressSource) => {
+    setRecipientAddress(newAddress);
     setShowAddressSelector(false);
     setAddressSource(source);
     setToOwnAddress(
@@ -225,7 +235,7 @@ function RecipientSelector({
         selectedAccount.btcAddress,
         selectedAccount.ordinalsAddress,
         selectedAccount.stxAddress,
-      ].includes(address),
+      ].includes(newAddress),
     );
     setAddressIsValid(true);
     setDisplayInsufficientFunds(false);
@@ -358,18 +368,14 @@ function RecipientSelector({
               ))}
             </Feedback>
           )}
-          {recipientAddress &&
-            !addressBookItem &&
-            !accountListItem &&
-            !associatedAddress &&
-            !associatedBnsName && (
-              <SaveAddressButton
-                title={t('SAVE_TO_ADDRESS_BOOK')}
-                variant="secondary"
-                onClick={() => setShowSaveAddressSheet(true)}
-                icon={<Plus size={16} color={Theme.colors.white_0} />}
-              />
-            )}
+          {recipientAddress && !addressBookItem && !accountListItem && (
+            <SaveAddressButton
+              title={t('SAVE_TO_ADDRESS_BOOK')}
+              variant="secondary"
+              onClick={() => setShowSaveAddressSheet(true)}
+              icon={<Plus size={16} color={Theme.colors.white_0} />}
+            />
+          )}
 
           {/* Render custom fields if provided */}
           {customFields}
@@ -417,7 +423,7 @@ function RecipientSelector({
             />
             <Button
               title={tCommon('SAVE')}
-              disabled={!name || !recipient || isSaving || isSubmitting}
+              disabled={!name || !address || isSaving || isSubmitting}
               loading={isSaving || isSubmitting}
               type="submit"
             />
