@@ -1,7 +1,6 @@
 import { StyledP } from '@ui-library/common.styled';
 import { CrossButtonInline } from '@ui-library/crossButton';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import Theme from 'theme';
 
@@ -25,9 +24,6 @@ function SelectedRecipient({
   children: React.ReactNode;
 }) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
 
   return (
     <>
@@ -42,14 +38,6 @@ function SelectedRecipient({
           ariaLabel={t('REMOVE_RECIPIENT')}
           onClick={() => {
             setRecipientAddress('');
-            const filteredParams = new URLSearchParams(searchParams);
-            // these two params are used when address is selected from address book
-            // so we need to remove them when the address is removed
-            filteredParams.delete('address');
-            filteredParams.delete('source');
-            navigate(`${location.pathname}?${filteredParams.toString()}`, {
-              replace: true,
-            });
           }}
         />
       </AddressBookItemContainer>

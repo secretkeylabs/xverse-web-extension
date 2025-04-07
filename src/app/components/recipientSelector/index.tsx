@@ -246,7 +246,8 @@ function RecipientSelector({
     allAccounts.find(
       (item) =>
         item.btcAddresses.taproot.address === recipientAddress ||
-        item.btcAddresses[selectedAccount.btcAddressType]?.address === recipientAddress ||
+        item.btcAddresses.native?.address === recipientAddress ||
+        item.btcAddresses.nested?.address === recipientAddress ||
         item.stxAddress === recipientAddress,
     );
   const addressBookItem =
@@ -339,13 +340,13 @@ function RecipientSelector({
               icon={<At size={16} weight="bold" color={Theme.colors.white_0} />}
             />
           </HeaderContainer>
-          {accountListItem && (!addressSource || addressSource === 'my_accounts') ? (
-            <SelectedRecipient setRecipientAddress={setRecipientAddress}>
-              <AccountRow account={accountListItem} addressType={addressType} />
-            </SelectedRecipient>
-          ) : addressBookItem && (!addressSource || addressSource === 'address_book') ? (
+          {addressBookItem && (!addressSource || addressSource === 'address_book') ? (
             <SelectedRecipient setRecipientAddress={setRecipientAddress}>
               <AddressBookItem item={addressBookItem} isViewOnly />
+            </SelectedRecipient>
+          ) : accountListItem && (!addressSource || addressSource === 'my_accounts') ? (
+            <SelectedRecipient setRecipientAddress={setRecipientAddress}>
+              <AccountRow account={accountListItem} address={recipientAddress} />
             </SelectedRecipient>
           ) : (
             <Input
