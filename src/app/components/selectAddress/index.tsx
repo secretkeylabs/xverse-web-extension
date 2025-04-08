@@ -2,6 +2,7 @@ import type { AddressType } from '@common/types/address';
 import Separator from '@components/separator';
 import useAddressBookEntries from '@hooks/useAddressBookEntries';
 import useGetAllAccounts from '@hooks/useGetAllAccounts';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import AddressBookItem from '@screens/settings/addressBook/addressBookItem';
 import AddressBookPlaceholder from '@screens/settings/addressBook/addressBookPlaceholder';
 import type { Account } from '@secretkeylabs/xverse-core';
@@ -60,6 +61,7 @@ function SelectAddress({ setAddress, addressType }: Props) {
   const { t } = useTranslation('translation');
   const { entries: addressBookEntries, isLoading } = useAddressBookEntries();
   const allAccounts = useGetAllAccounts();
+  const selectedAccount = useSelectedAccount();
 
   const getAccountAddress = (account: Account) => {
     if (addressType === 'stx') {
@@ -70,7 +72,7 @@ function SelectAddress({ setAddress, addressType }: Props) {
       return account.btcAddresses.taproot.address;
     }
 
-    return account.btcAddresses[addressType].address;
+    return account.btcAddresses[selectedAccount.btcAddressType]?.address ?? '';
   };
 
   const filteredAddressBookEntries = addressBookEntries.filter((entry) => {
