@@ -42,6 +42,7 @@ import Callout from '@ui-library/callout';
 import { XVERSE_POOL_ADDRESS } from '@utils/constants';
 import { isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
+import RoutePaths from 'app/routes/paths';
 import BigNumber from 'bignumber.js';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -309,7 +310,7 @@ function ConfirmStxTransaction() {
       selectedToken: 'STX',
       source: 'send_stx',
     });
-    navigate('/send-stx', {
+    navigate(RoutePaths.SendStx, {
       state: {
         recipientAddress: recipient,
         amountToSend: microstacksToStx(amount).toString(),

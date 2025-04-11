@@ -1,36 +1,49 @@
 import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useSelectedAccount from '@hooks/useSelectedAccount';
-import type { BtcAddressMempool } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 
-const usePendingOrdinalTxs = (ordinalUtxoHash: string | undefined) => {
+function usePendingOrdinalTxs(lookup?: { txid: string; vout: number });
+function usePendingOrdinalTxs(lookup?: { output: string });
+function usePendingOrdinalTxs(lookup?: { txid?: string; vout?: number; output?: string }) {
+  let { txid, vout } = lookup || {};
+
+  if (lookup?.output) {
+    const [txidOverride, voutOverride] = lookup.output.split(':');
+
+    if (txidOverride && voutOverride) {
+      txid = txidOverride;
+      vout = parseInt(voutOverride, 10);
+    }
+  }
+
   const { ordinalsAddress } = useSelectedAccount();
   const btcClient = useBtcClient();
 
-  const fetchOrdinalsMempoolTxs = async (): Promise<BtcAddressMempool[]> =>
-    btcClient.getAddressMempoolTransactions(ordinalsAddress);
+  const fetchOrdinalsMempoolTxs = async () => {
+    if (!txid || !vout) return { isPending: false };
 
-  let isPending: boolean | undefined = false;
-  let pendingTxHash: string | undefined;
+    const mempoolTxns = await btcClient.getAddressMempoolTransactions(ordinalsAddress);
+
+    const spendingTxn = mempoolTxns.find((tx) =>
+      tx.vin.some((v) => v.txid === txid && v.vout === vout),
+    );
+
+    return {
+      isPending: !!spendingTxn,
+      pendingTxid: spendingTxn?.txid,
+    };
+  };
 
   const response = useQuery({
-    queryKey: ['ordinal-pending-transactions'],
+    queryKey: ['ordinal-pending-transactions', txid, vout],
     queryFn: fetchOrdinalsMempoolTxs,
   });
 
-  if (response.data) {
-    response.data.forEach((tx) => {
-      tx.vin.forEach((v) => {
-        if (v.txid === ordinalUtxoHash) isPending = true;
-        pendingTxHash = tx.txid;
-      });
-    });
-  }
-
   return {
-    isPending,
-    pendingTxHash,
+    isPending: response.data?.isPending,
+    pendingTxid: response.data?.pendingTxid,
+    isLoading: response.isLoading,
   };
-};
+}
 
 export default usePendingOrdinalTxs;

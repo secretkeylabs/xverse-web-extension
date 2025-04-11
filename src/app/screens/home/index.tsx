@@ -50,6 +50,7 @@ import { ANIMATION_EASING, type CurrencyTypes } from '@utils/constants';
 import { isInOptions, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import { optInMixPanel, optOutMixPanel, trackMixPanel } from '@utils/mixpanel';
 import { sortFtByFiatBalance } from '@utils/tokens';
+import RoutePaths from 'app/routes/paths';
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -298,11 +299,11 @@ function Home() {
     });
     if (isLedgerAccount(selectedAccount) && !isInOptions()) {
       await chrome.tabs.create({
-        url: chrome.runtime.getURL('options.html#/send-stx'),
+        url: chrome.runtime.getURL(`options.html#${RoutePaths.SendStx}`),
       });
       return;
     }
-    navigate('/send-stx');
+    navigate(RoutePaths.SendStx);
   };
 
   const onBtcSendClick = async () => {
@@ -315,24 +316,24 @@ function Home() {
       !isInOptions()
     ) {
       await chrome.tabs.create({
-        url: chrome.runtime.getURL('options.html#/send-btc'),
+        url: chrome.runtime.getURL(`options.html#${RoutePaths.SendBtc}`),
       });
       return;
     }
-    navigate('/send-btc');
+    navigate(RoutePaths.SendBtc);
   };
 
   const onSendFtSelect = async (fungibleToken: FungibleToken) => {
     let route = '';
     switch (fungibleToken?.protocol) {
       case 'stacks':
-        route = `/send-stx?principal=${fungibleToken?.principal}`;
+        route = `${RoutePaths.SendStx}?principal=${fungibleToken?.principal}`;
         break;
       case 'brc-20':
-        route = `/send-brc20-one-step?principal=${fungibleToken?.principal}`;
+        route = `${RoutePaths.SendBrc20OneStep}?principal=${fungibleToken?.principal}`;
         break;
       case 'runes':
-        route = `/send-rune?principal=${fungibleToken?.principal}`;
+        route = `${RoutePaths.SendRune}?principal=${fungibleToken?.principal}`;
         break;
       default:
         break;

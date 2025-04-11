@@ -1,5 +1,6 @@
+import useXverseApi from '@hooks/apiClients/useXverseApi';
 import useSelectedAccount from '@hooks/useSelectedAccount';
-import { getStacksInfo, getXverseApiClient, type StackingData } from '@secretkeylabs/xverse-core';
+import { getStacksInfo, type StackingData } from '@secretkeylabs/xverse-core';
 import { useQueries } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import useWalletSelector from '../useWalletSelector';
@@ -10,7 +11,7 @@ const useStackingData = () => {
   const { network } = useWalletSelector();
   const { data: delegationStateData, isLoading: delegateStateIsLoading } = useDelegationState();
 
-  const xverseApiClient = getXverseApiClient(network.type);
+  const xverseApiClient = useXverseApi();
 
   const results = useQueries({
     queries: [

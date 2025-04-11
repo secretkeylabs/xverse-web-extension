@@ -24,7 +24,7 @@ const userFlowConfig: Record<string, { resetTo: string }> = {
   '/rare-sats-bundle': { resetTo: '/nft-dashboard?tab=rareSats' },
   '/verify-ledger': { resetTo: '/verify-ledger?mismatch=true' },
   '/add-stx-address-ledger': { resetTo: '/add-stx-address-ledger?mismatch=true' },
-  '/send-rune': { resetTo: '/' },
+  [RoutePaths.SendRune]: { resetTo: '/' },
   '/coinDashboard': { resetTo: '/' },
 };
 type UserFlowConfigKey = keyof typeof userFlowConfig;

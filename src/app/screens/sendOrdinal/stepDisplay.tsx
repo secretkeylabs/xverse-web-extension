@@ -1,11 +1,8 @@
-import OrdinalIcon from '@assets/img/rareSats/ic_ordinal_small_over_card.svg';
 import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RecipientSelector from '@components/recipientSelector';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
-import OrdinalImage from '@screens/ordinals/ordinalImage';
 import type { TransactionSummary } from '@screens/sendBtc/helpers';
-import { getBrc20Details, type Inscription, type RuneSummary } from '@secretkeylabs/xverse-core';
-import Avatar from '@ui-library/avatar';
+import { getBrc20Details, type Inscription } from '@secretkeylabs/xverse-core';
 import {
   getInscriptionsCollectionGridItemSubText,
   getInscriptionsCollectionGridItemSubTextColor,
@@ -15,19 +12,6 @@ import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 import SendLayout from '../../layouts/sendLayout';
 import { Step, getNextStep } from './steps';
-
-const TitleContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 0 0;
-`;
-
-const Title = styled.div`
-  ${(props) => props.theme.typography.headline_xs}
-  margin-top: ${(props) => props.theme.space.s};
-  margin-bottom: ${(props) => props.theme.space.l};
-`;
 
 const Container = styled.div`
   display: flex;
@@ -88,37 +72,20 @@ function StepDisplay({
       }
     : undefined;
 
-  let header: React.ReactNode = (
-    <TitleContainer>
-      <Title>{t('SEND.SEND_TO')}</Title>
-    </TitleContainer>
-  );
-
-  if (ordinal) {
-    header = (
-      <TitleContainer>
-        <Avatar src={<OrdinalImage ordinal={ordinal} placeholderIcon={OrdinalIcon} />} />
-        <Title>{t('SEND.SEND')} Ordinal</Title>
-      </TitleContainer>
-    );
-  }
-
   switch (currentStep) {
     case Step.SelectRecipient:
       return (
-        <SendLayout selectedBottomTab="nft" onClickBack={onBack}>
-          <Container>
-            <RecipientSelector
-              header={header}
-              recipientAddress={recipientAddress}
-              setRecipientAddress={setRecipientAddress}
-              onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient))}
-              isLoading={isLoading}
-              calloutText={t('SEND.MAKE_SURE_THE_RECIPIENT')}
-              insufficientFunds={insufficientFunds}
-            />
-          </Container>
-        </SendLayout>
+        <RecipientSelector
+          recipientAddress={recipientAddress}
+          setRecipientAddress={setRecipientAddress}
+          onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient))}
+          isLoading={isLoading}
+          calloutText={t('SEND.MAKE_SURE_THE_RECIPIENT')}
+          insufficientFunds={insufficientFunds}
+          onBack={onBack}
+          selectedBottomTab="nft"
+          addressType="btc_ordinals"
+        />
       );
     case Step.Confirm:
       if (!summary) {

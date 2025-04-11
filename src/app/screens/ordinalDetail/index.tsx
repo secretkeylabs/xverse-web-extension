@@ -89,7 +89,7 @@ function OrdinalDetailScreen() {
     collectionMarketData,
     isLoading,
     ordinalsAddress,
-    showSendOridnalsAlert,
+    showSendOrdinalsAlert,
     brc20Details,
     isPartOfABundle,
     ordinalSatributes,
@@ -493,7 +493,7 @@ function OrdinalDetailScreen() {
         isStarred={inscriptionStarred}
         onMenuClick={!isHidden || isStandaloneInscription ? optionsSheet.open : undefined}
       />
-      {showSendOridnalsAlert && (
+      {showSendOrdinalsAlert && (
         <AlertMessage
           title={t('ORDINAL_PENDING_SEND_TITLE')}
           onClose={onCloseAlert}

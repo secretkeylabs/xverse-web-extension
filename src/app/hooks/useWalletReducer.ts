@@ -96,7 +96,6 @@ const useWalletReducer = () => {
     softwareWallets,
     ledgerAccountsList,
     keystoneAccountsList,
-    showDataCollectionAlert,
     hideStx,
     selectedWalletId,
   } = useWalletSelector();

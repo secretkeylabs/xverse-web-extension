@@ -172,7 +172,7 @@ const useStxTransactionRequest = (
       const postConditionMode = params.get('postConditionMode') ?? '';
       const argumentsParseResult = v.safeParse(
         stxCallContractParamsSchema.entries.arguments,
-        parse(decodeToken(argumentsString).payload as string),
+        argumentsString ? parse(decodeToken(argumentsString).payload as string) : [],
       );
       const postConditionsParseResult = postConditionsString
         ? v.safeParse(

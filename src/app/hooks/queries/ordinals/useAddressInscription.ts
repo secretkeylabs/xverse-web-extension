@@ -1,6 +1,6 @@
+import useXverseApi from '@hooks/apiClients/useXverseApi';
 import useSelectedAccount from '@hooks/useSelectedAccount';
-import useWalletSelector from '@hooks/useWalletSelector';
-import { getXverseApiClient, type Inscription } from '@secretkeylabs/xverse-core';
+import { type Inscription } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import { handleRetries, InvalidParamsError } from '@utils/query';
 
@@ -9,15 +9,14 @@ import { handleRetries, InvalidParamsError } from '@utils/query';
  */
 const useAddressInscription = (ordinalId?: string, ordinal?: Inscription | null) => {
   const { ordinalsAddress } = useSelectedAccount();
-  const { network } = useWalletSelector();
-  const xverseApi = getXverseApiClient(network.type);
+  const xverseApiClient = useXverseApi();
 
   const fetchOrdinals = async (): Promise<Inscription> => {
     if (ordinal && ordinal.id === ordinalId) return ordinal;
     if (!ordinalsAddress || !ordinalId) {
       throw new InvalidParamsError('ordinalsAddress and ordinalId are required');
     }
-    return xverseApi.getInscription(ordinalsAddress, ordinalId);
+    return xverseApiClient.getInscription(ordinalsAddress, ordinalId);
   };
 
   return useQuery({

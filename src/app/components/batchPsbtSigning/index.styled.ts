@@ -8,11 +8,6 @@ export const CloseContainer = styled.div((props) => ({
   marginBottom: props.theme.space.s,
 }));
 
-export const CrossButtonInline = styled(CrossButton)((props) => ({
-  position: 'relative',
-  marginBottom: props.theme.space.s,
-}));
-
 export const OuterContainer = styled.div`
   display: flex;
   flex: 1;

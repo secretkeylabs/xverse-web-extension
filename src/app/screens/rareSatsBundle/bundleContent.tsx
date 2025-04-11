@@ -3,9 +3,10 @@ import { RuneAmountContainer } from '@screens/rareSatsBundle/index.styled';
 import RareSatsBundleGridItem from '@screens/rareSatsBundle/rareSatsBundleGridItem';
 import RuneAmount from '@screens/rareSatsBundle/runeAmount';
 import type { Bundle, BundleSatRange, FungibleToken } from '@secretkeylabs/xverse-core';
+import { POPUP_WIDTH } from '@utils/constants';
 
 export default function BundleContent({ bundle }: { bundle: Bundle }) {
-  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+  const isGalleryOpen: boolean = document.documentElement.clientWidth > POPUP_WIDTH;
   const { data: runesCoinsList } = useRuneFungibleTokensQuery();
   return (
     <>

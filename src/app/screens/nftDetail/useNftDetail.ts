@@ -3,8 +3,9 @@ import useStacksCollectibles from '@hooks/queries/useStacksCollectibles';
 import { useResetUserFlow } from '@hooks/useResetUserFlow';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { GAMMA_URL } from '@utils/constants';
+import { GAMMA_URL, POPUP_WIDTH } from '@utils/constants';
 import { getExplorerUrl, isInOptions, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
+import { RoutePathsSuffixes } from 'app/routes/paths';
 import { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -28,7 +29,10 @@ export default function useNftDetailScreen() {
 
   useResetUserFlow('/nft-detail');
 
-  const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
+  const isGalleryOpen: boolean = useMemo(
+    () => document.documentElement.clientWidth > POPUP_WIDTH,
+    [],
+  );
   const galleryTitle = metadata?.name;
 
   const onSharePress = () => {
@@ -60,11 +64,13 @@ export default function useNftDetailScreen() {
       !isInOptions()
     ) {
       await chrome.tabs.create({
-        url: chrome.runtime.getURL(`options.html#/nft-dashboard/nft-detail/${id}/send-nft`),
+        url: chrome.runtime.getURL(
+          `options.html#/nft-dashboard/nft-detail/${id}${RoutePathsSuffixes.SendNft}`,
+        ),
       });
       return;
     }
-    navigate(`/nft-dashboard/nft-detail/${id}/send-nft`);
+    navigate(`/nft-dashboard/nft-detail/${id}${RoutePathsSuffixes.SendNft}`);
   };
 
   return {

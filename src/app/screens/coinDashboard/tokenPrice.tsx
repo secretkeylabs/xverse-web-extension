@@ -63,7 +63,7 @@ function TokenPrice({ currency, fungibleToken, chartPriceStats }: Props) {
           <>
             {currencySymbolMap[fiatCurrency]}
             <FormattedNumber
-              number={formatBalance(formatSignificantDecimals(currentPrice.toString()))}
+              number={formatBalance(formatSignificantDecimals(currentPrice.toFixed(12)))}
               tokenSymbol={fiatCurrency}
             />
           </>

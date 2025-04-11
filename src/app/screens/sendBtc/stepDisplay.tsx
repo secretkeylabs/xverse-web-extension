@@ -13,7 +13,6 @@ import AccountSelector from './accountSelector';
 import AmountSelector from './amountSelector';
 import type { TransactionSummary } from './helpers';
 import { Step, getNextStep, getPreviousStep } from './steps';
-import Title from './title';
 
 const Container = styled.div`
   display: flex;
@@ -84,17 +83,15 @@ function StepDisplay({
   switch (currentStep) {
     case Step.SelectRecipient:
       return (
-        <SendLayout selectedBottomTab="dashboard" onClickBack={onBack}>
-          <Container>
-            <RecipientSelector
-              header={<Title title={t('SEND.SEND')} showBtcIcon />}
-              recipientAddress={recipientAddress}
-              setRecipientAddress={setRecipientAddress}
-              onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient, showAccountSelect))}
-              isLoading={isLoading}
-            />
-          </Container>
-        </SendLayout>
+        <RecipientSelector
+          recipientAddress={recipientAddress}
+          setRecipientAddress={setRecipientAddress}
+          onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient, showAccountSelect))}
+          isLoading={isLoading}
+          onBack={onBack}
+          selectedBottomTab="dashboard"
+          addressType="btc_payment"
+        />
       );
     case Step.SelectAccount:
       return (

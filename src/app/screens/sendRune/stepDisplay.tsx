@@ -88,20 +88,19 @@ function StepDisplay({
       </Title>
     </TitleContainer>
   );
+
   switch (currentStep) {
     case Step.SelectRecipient:
       return (
-        <SendLayout selectedBottomTab="dashboard" onClickBack={onBack}>
-          <Container>
-            <RecipientSelector
-              header={header}
-              recipientAddress={recipientAddress}
-              setRecipientAddress={setRecipientAddress}
-              onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient))}
-              isLoading={isLoading}
-            />
-          </Container>
-        </SendLayout>
+        <RecipientSelector
+          recipientAddress={recipientAddress}
+          setRecipientAddress={setRecipientAddress}
+          onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient))}
+          isLoading={isLoading}
+          onBack={onBack}
+          selectedBottomTab="dashboard"
+          addressType="btc_ordinals"
+        />
       );
     case Step.SelectAmount:
       return (

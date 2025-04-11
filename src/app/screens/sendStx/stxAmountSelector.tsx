@@ -175,7 +175,7 @@ function StxAmountSelector({ amount, setAmount, sendMax, setSendMax, disabled = 
 
   return (
     <Input
-      title={t('BTC.AMOUNT', { currency: useStxValue ? 'STX' : fiatCurrency })}
+      titleElement={t('BTC.AMOUNT', { currency: useStxValue ? 'STX' : fiatCurrency })}
       value={amountDisplay}
       onChange={(e) => handleAmountChange(e.target.value)}
       onBlur={handleBlur}

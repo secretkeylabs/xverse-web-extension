@@ -39,6 +39,7 @@ type Props = {
   className?: string;
   showProtocolIcon?: boolean;
   hideSwapBalance?: boolean;
+  hidePriceChange?: boolean;
 };
 
 function TokenTile({
@@ -51,6 +52,7 @@ function TokenTile({
   className,
   showProtocolIcon = true,
   hideSwapBalance = false,
+  hidePriceChange = false,
 }: Props) {
   const { fiatCurrency, balanceHidden, showBalanceInBtc } = useWalletSelector();
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
@@ -139,7 +141,7 @@ function TokenTile({
                 displayType="text"
                 thousandSeparator
                 renderText={(value: string) => (
-                  <TokenTicker aria-label={`Token Ticker: ${value} ${getTickerTitle()}`}>
+                  <TokenTicker aria-label={`Token Ticker: ${getTickerTitle()}`}>
                     {`${value} ${getTickerTitle()}`}
                   </TokenTicker>
                 )}
@@ -148,7 +150,7 @@ function TokenTile({
             {balanceHidden && <TokenTicker>{HIDDEN_BALANCE_LABEL}</TokenTicker>}
           </TokenTitleContainer>
           {loading && <StyledBarLoader width="25%" height={20} />}
-          {!loading && !hideSwapBalance && (
+          {!loading && !hideSwapBalance && !hidePriceChange && (
             <AmountContainer>
               {balanceHidden && <TokenTicker>{EMPTY_LABEL}</TokenTicker>}
               {!balanceHidden && <PercentageChange ftCurrencyPairs={[[fungibleToken, currency]]} />}

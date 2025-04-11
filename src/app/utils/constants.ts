@@ -76,6 +76,7 @@ export const BTC_SYMBOL = '₿';
 export const OPTIONS_DIALOG_WIDTH = 179;
 export const SPAM_OPTIONS_WIDTH = 244;
 export const LONG_TOAST_DURATION = 4000;
+export const POPUP_WIDTH = 375;
 
 export const XverseProviderInfo: Provider = {
   id: 'XverseProviders.BitcoinProvider',

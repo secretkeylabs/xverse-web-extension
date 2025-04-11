@@ -1,6 +1,5 @@
 import ArrowIcon from '@assets/img/transactions/ArrowDown.svg';
 import WalletIcon from '@assets/img/transactions/wallet.svg';
-import { StyledFiatAmountText } from '@components/fiatAmountText';
 import TokenImage from '@components/tokenImage';
 import TransferDetailView from '@components/transferDetailView';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
@@ -8,119 +7,30 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CubeTransparent } from '@phosphor-icons/react';
 import { type FungibleToken, getFiatEquivalent } from '@secretkeylabs/xverse-core';
-import { StyledP } from '@ui-library/common.styled';
 import type { CurrencyTypes } from '@utils/constants';
 import { getFtTicker } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
-import styled from 'styled-components';
-
-const Container = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-  background: props.theme.colors.elevation1,
-  borderRadius: 12,
-  padding: props.theme.space.m,
-  paddingBottom: 20,
-  marginBottom: props.theme.space.s,
-}));
-
-const RecipientTitleText = styled.p((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_200,
-  marginBottom: props.theme.space.xs,
-}));
-
-const RowContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  width: '100%',
-  alignItems: 'flex-start',
-  marginTop: props.theme.space.m,
-}));
-
-const Icon = styled.img((props) => ({
-  marginRight: props.theme.space.m,
-  width: 32,
-  height: 32,
-  borderRadius: 30,
-}));
-
-const DownArrowIcon = styled.img((props) => ({
-  width: 16,
-  height: 16,
-  marginTop: props.theme.space.xs,
-  marginLeft: props.theme.space.xs,
-  marginBottom: props.theme.space.xs,
-}));
-
-const TitleContainer = styled.div({
-  display: 'flex',
-  alignItems: 'center',
-});
-
-const TitleText = styled.p((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_0,
-}));
-
-const Subtitle = styled(StyledP)((props) => ({
-  color: props.theme.colors.white_400,
-  marginTop: props.theme.space.xxxs,
-}));
-
-const ValueText = styled.p((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_0,
-}));
-
-const SubValueText = styled.p((props) => ({
-  ...props.theme.typography.body_s,
-  color: props.theme.colors.white_400,
-}));
-
-const ColumnContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-  justifyContent: 'flex-end',
-  alignItems: 'flex-end',
-});
-
-const MultipleAddressContainer = styled.div({
-  display: 'flex',
-  flexDirection: 'column',
-});
-
-const TokenContainer = styled.div((props) => ({
-  marginRight: props.theme.space.m,
-}));
-
-const IconContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: 30,
-  backgroundColor: props.theme.colors.elevation3,
-  width: 32,
-  height: 32,
-  marginRight: props.theme.space.m,
-}));
-
-const FiatText = styled(StyledFiatAmountText)((props) => ({
-  marginTop: props.theme.space.xxxs,
-}));
-
-const Title = styled.p`
-  ${(props) => props.theme.typography.body_medium_m};
-  color: ${(props) => props.theme.colors.white_200};
-  margin-top: ${(props) => props.theme.space.s};
-  margin-bottom: ${(props) => props.theme.space.xs};
-`;
+import {
+  ColumnContainer,
+  Container,
+  DownArrowIcon,
+  FiatText,
+  Icon,
+  IconContainer,
+  MultipleAddressContainer,
+  RecipientTitleText,
+  RowContainer,
+  SubValueText,
+  Subtitle,
+  Title,
+  TitleContainer,
+  TitleText,
+  TokenContainer,
+  ValueText,
+} from './index.styled';
 
 type Props = {
   address?: string;
@@ -129,8 +39,6 @@ type Props = {
   currencyType: CurrencyTypes;
   valueDetail?: string;
   dataTestID?: string;
-  recipientIndex?: number;
-  totalRecipient?: number;
   icon?: string;
   fungibleToken?: FungibleToken;
   heading?: string;
@@ -138,10 +46,8 @@ type Props = {
 };
 
 function RecipientComponent({
-  recipientIndex,
   address,
   value,
-  totalRecipient,
   valueDetail,
   dataTestID,
   title,

@@ -12,9 +12,10 @@ import {
   type LedgerTransport,
 } from '@secretkeylabs/xverse-core';
 import { trackMixPanel } from '@utils/mixpanel';
+import RoutePaths from 'app/routes/paths';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   generateSendMaxTransaction,
   generateTransaction,
@@ -27,7 +28,7 @@ function SendBtcScreen() {
   const navigate = useNavigate();
   const { t } = useTranslation('translation');
 
-  useResetUserFlow('/send-btc');
+  useResetUserFlow(RoutePaths.SendBtc);
 
   const { selectedAccountType, btcPaymentAddressType } = useWalletSelector();
   const [overridePaymentType, setOverridePaymentType] = useState(btcPaymentAddressType);
@@ -42,6 +43,7 @@ function SendBtcScreen() {
   const [amountSats, setAmountSats] = useState('');
   const [feeRate, setFeeRate] = useState('');
   const [sendMax, setSendMax] = useState(false);
+  const [searchParams] = useSearchParams();
 
   const debouncedRecipient = useDebounce(recipientAddress, 500);
 
@@ -56,6 +58,13 @@ function SendBtcScreen() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- specifically don't care if feeRate changes
   }, [btcFeeRate, feeRatesLoading]);
+
+  useEffect(() => {
+    const recipient = searchParams.get('address');
+    if (recipient) {
+      setRecipientAddress(recipient);
+    }
+  }, [searchParams]);
 
   const generateTransactionAndSummary = async (feeRateOverride?: number) => {
     const amountBigInt = Number.isNaN(Number(amountSats)) ? 0n : BigInt(amountSats);

@@ -36,6 +36,8 @@ export default class Wallet {
 
   readonly buttonConfirm: Locator;
 
+  readonly buttonRemoveRecipient: Locator;
+
   readonly buttonDenyDataCollection: Locator;
 
   readonly buttonNetwork: Locator;
@@ -376,7 +378,7 @@ export default class Wallet {
     this.navigationExplore = page.getByTestId('nav-explore');
     this.navigationSettings = page.getByTestId('nav-settings');
     // this.balance = page.getByTestId('total-balance-value');
-    this.balance = page.getByLabel(/^Total balance/);
+    this.balance = page.getByRole('button', { name: /^Total balance/ });
     this.textCurrency = page.getByTestId('currency-text');
     this.allUpperButtons = page.getByTestId('transaction-buttons-row').getByRole('button');
     this.buttonTransactionSend = this.allUpperButtons.nth(0);
@@ -385,6 +387,7 @@ export default class Wallet {
     this.buttonLock = page.getByRole('button', { name: 'Lock' });
     this.buttonConfirm = page.getByRole('button', { name: 'Confirm' });
     this.buttonDenyDataCollection = page.getByRole('button', { name: 'Deny' });
+    this.buttonRemoveRecipient = page.getByRole('button', { name: 'Remove recipient' });
     this.labelBalanceAmountSelector = page.getByTestId('balance-label');
     this.buttonClose = page.getByRole('button', { name: 'Close' });
     this.buttonEditFee = page.getByTestId('fee-button');
@@ -541,12 +544,8 @@ export default class Wallet {
     this.inputSendAmount = page.getByTestId('send-input');
     this.inputRecipientAddress = page.getByTestId('recipient-address');
     this.inputMemo = page.getByTestId('memo-input');
-    this.errorMessageAddressInvalid = page
-      .locator('p')
-      .filter({ hasText: 'Recipient address invalid' });
-    this.errorMessageAddressRequired = page
-      .locator('p')
-      .filter({ hasText: 'Recipient address is required' });
+    this.errorMessageAddressInvalid = page.getByText('Recipient address invalid');
+    this.errorMessageAddressRequired = page.getByText('Recipient address is required');
     this.infoMessageSendSelf = page
       .locator('p')
       .filter({ hasText: 'You are transferring to yourself' });
@@ -568,7 +567,7 @@ export default class Wallet {
     this.buttonSign = page.getByRole('button', { name: 'Sign' });
     this.sendTransactionID = page.getByTestId('transaction-id');
     this.sendSTXValue = page.getByTestId('send-value');
-    this.inputField = page.locator('input[type="text"]');
+    this.inputField = page.getByRole('textbox');
     this.sendRuneAmount = page.getByTestId('send-rune-amount');
 
     // List
@@ -623,7 +622,7 @@ export default class Wallet {
   async checkVisualsStartpage() {
     // to-do fix the element itself, after the native-segwit update it resolves to 2 elements
     // data-testid="total-balance-value"
-    await expect(this.balance.first()).toBeVisible();
+    await expect(this.balance).toBeVisible();
     await expect(this.manageTokenButton).toBeVisible();
 
     // Deny data collection --> modal window is not always appearing so when it does we deny the data collection
@@ -674,8 +673,7 @@ export default class Wallet {
       await expect(this.receiveAddress).toBeVisible();
     }
 
-    await expect(this.imageToken).toBeVisible();
-    // await expect(this.buttonBack).toBeVisible();
+    await expect(this.buttonBack).toBeVisible();
   }
 
   /**
@@ -702,7 +700,7 @@ export default class Wallet {
     await expect(this.buttonEditFee).toBeVisible();
     await expect(this.feeAmount).toBeVisible();
     await expect(this.imageToken).toBeVisible();
-    // await expect(this.buttonBack).toBeVisible();
+    await expect(this.buttonBack).toBeVisible();
   }
 
   /**

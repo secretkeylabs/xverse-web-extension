@@ -4,10 +4,11 @@ import Transak from '@assets/img/dashboard/transak.svg';
 import XverseSwaps from '@assets/img/dashboard/xverse_swaps_logo.svg';
 import BottomBar from '@components/tabBar';
 import TopRow from '@components/topRow';
+import useXverseApi from '@hooks/apiClients/useXverseApi';
 import useHasFeature from '@hooks/useHasFeature';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { AnalyticsEvents, FeatureId, getMoonPaySignedUrl } from '@secretkeylabs/xverse-core';
+import { AnalyticsEvents, FeatureId } from '@secretkeylabs/xverse-core';
 import Callout from '@ui-library/callout';
 import Spinner from '@ui-library/spinner';
 import { MOON_PAY_API_KEY, MOON_PAY_URL, TRANSAC_API_KEY, TRANSAC_URL } from '@utils/constants';
@@ -73,6 +74,7 @@ function Buy() {
   const address = currency === 'STX' ? stxAddress : btcAddress;
   const [loading, setLoading] = useState(false);
   const showPaypal = useHasFeature(FeatureId.PAYPAL);
+  const xverseApiClient = useXverseApi();
 
   const handleBackButtonClick = () => {
     navigate('/');
@@ -95,7 +97,7 @@ function Buy() {
       moonPayUrl.searchParams.append('colorCode', '#5546FF');
       if (typeof paymentMethod === 'string')
         moonPayUrl.searchParams.append('paymentMethod', paymentMethod);
-      const signedUrl = await getMoonPaySignedUrl(network.type, moonPayUrl.href);
+      const signedUrl = await xverseApiClient.getMoonPaySignedUrl(moonPayUrl.href);
       if (signedUrl) openUrl(signedUrl.signedUrl);
     } catch (e) {
       setLoading(false);

@@ -1,14 +1,15 @@
+import useXverseApi from '@hooks/apiClients/useXverseApi';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getAppConfig } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 
 const useAppConfig = () => {
   const { network } = useWalletSelector();
+  const xverseApiClient = useXverseApi();
 
   return useQuery({
     queryKey: ['app-config', network.type],
     queryFn: async () => {
-      const response = await getAppConfig(network.type);
+      const response = await xverseApiClient.getAppConfig();
       return response;
     },
   });

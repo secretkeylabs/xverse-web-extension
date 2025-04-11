@@ -19,7 +19,7 @@ import RoutePaths from 'app/routes/paths';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import StepDisplay from './stepDisplay';
 import { getPreviousStep, Step } from './steps';
 
@@ -28,12 +28,11 @@ function SendOrdinalScreen() {
   const navigate = useNavigate();
   const isInOption = isInOptions();
 
-  const location = useLocation();
   const { id } = useParams();
   const { t } = useTranslation('translation');
-  const params = new URLSearchParams(location.search);
-  const isRareSatParam = params.get('isRareSat');
-  const vout = params.get('vout');
+  const [searchParams] = useSearchParams();
+  const isRareSatParam = searchParams.get('isRareSat');
+  const vout = searchParams.get('vout');
   const isRareSat = isRareSatParam === 'true';
 
   const context = useTransactionContext();
@@ -46,9 +45,7 @@ function SendOrdinalScreen() {
   const [currentStep, setCurrentStep] = useState<Step>(Step.SelectRecipient);
   const [feeRate, setFeeRate] = useState('');
 
-  const [recipientAddress, setRecipientAddress] = useState<string>(
-    location.state?.recipientAddress ?? '',
-  );
+  const [recipientAddress, setRecipientAddress] = useState('');
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -66,6 +63,13 @@ function SendOrdinalScreen() {
       setFeeRate(btcFeeRate.regular.toString());
     }
   }, [btcFeeRate, feeRatesLoading]);
+
+  useEffect(() => {
+    const recipient = searchParams.get('address');
+    if (recipient) {
+      setRecipientAddress(recipient);
+    }
+  }, [searchParams]);
 
   useCancellableEffect(
     async (isEffectActive) => {

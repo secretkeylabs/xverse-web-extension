@@ -168,7 +168,7 @@ function FtAmountSelector({
 
   return (
     <Input
-      title={t('BTC.AMOUNT', { currency: useTokenValue ? tokenSymbol : fiatCurrency })}
+      titleElement={t('BTC.AMOUNT', { currency: useTokenValue ? tokenSymbol : fiatCurrency })}
       value={amountDisplay}
       onChange={(e) => handleAmountChange(e.target.value)}
       onBlur={handleBlur}

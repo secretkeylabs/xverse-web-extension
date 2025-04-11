@@ -1,6 +1,7 @@
 import { sendInternalErrorMessage } from '@common/utils/rpc/responseMessages/errors';
 import ContractCallRequest from '@components/transactionsRequests/ContractCallRequest';
 import ContractDeployRequest from '@components/transactionsRequests/ContractDeployRequest';
+import useXverseApi from '@hooks/apiClients/useXverseApi';
 import useGetAllAccounts from '@hooks/useGetAllAccounts';
 import useNetworkSelector from '@hooks/useNetwork';
 import useSelectedAccount from '@hooks/useSelectedAccount';
@@ -58,6 +59,7 @@ function TransactionRequest() {
   const [attachment, setAttachment] = useState<Buffer | undefined>(undefined);
   const { t } = useTranslation('translation', { keyPrefix: 'REQUEST_ERRORS' });
   const allAccounts = useGetAllAccounts();
+  const xverseApiClient = useXverseApi();
 
   const { payload, tabId, requestToken, transaction } = txReq;
   const { messageId, rpcMethod } = 'rpcMethod' in txReq ? txReq : { messageId: '', rpcMethod: '' };
@@ -95,6 +97,7 @@ function TransactionRequest() {
       publicKey: requestAccount.stxPublicKey,
       nonce: transaction?.auth?.spendingCondition.nonce || nonce,
       fee: transaction?.auth?.spendingCondition.fee.toString() || '0',
+      xverseApiClient,
     });
     setUnsignedTx(unsignedSendStxTx);
 
@@ -120,6 +123,7 @@ function TransactionRequest() {
       contractCallPayload,
       selectedNetwork,
       requestAccount.stxPublicKey,
+      xverseApiClient,
       transaction?.auth,
     );
     setUnsignedTx(unSignedContractCall);
@@ -160,6 +164,7 @@ function TransactionRequest() {
       publicKey: requestAccount.stxPublicKey,
       nonce: transaction?.auth?.spendingCondition.nonce || nonce,
       fee: transaction?.auth?.spendingCondition.fee.toString() || '0',
+      xverseApiClient,
     });
     setUnsignedTx(unsignedContractDeployTx);
     setCodeBody(contractDeployPayload.codeBody);

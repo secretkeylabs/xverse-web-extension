@@ -1,11 +1,12 @@
 import SlippageEditIcon from '@assets/img/swap/slippageEdit.svg';
 import FormattedNumber from '@components/formattedNumber';
 import TopRow from '@components/topRow';
+import useXverseApi from '@hooks/apiClients/useXverseApi';
+import useRuneFiatRateQuery from '@hooks/queries/runes/useRuneFiatRateQuery';
 import useRuneFloorPriceQuery from '@hooks/queries/runes/useRuneFloorPriceQuery';
 import useGetSip10TokenInfo from '@hooks/queries/stx/useGetSip10TokenInfo';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
-import useNetworkSelector from '@hooks/useNetwork';
 import useSearchParamsState from '@hooks/useSearchParamsState';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -99,12 +100,12 @@ export default function QuoteSummary({
     principal: fromToken?.principal,
     fiatCurrency: 'USD',
   });
+  const xverseApiClient = useXverseApi();
 
   const theme = useTheme();
   const { btcFiatRate, btcUsdRate, stxBtcRate } = useSupportedCoinRates();
   const { btcAddress, ordinalsAddress, btcPublicKey, ordinalsPublicKey, stxAddress, stxPublicKey } =
     useSelectedAccount();
-  const network = useNetworkSelector();
   const {
     loading: isPlaceOrderLoading,
     error: placeOrderError,
@@ -126,6 +127,9 @@ export default function QuoteSummary({
   const { data: recommendedFees } = useBtcFeeRate();
   const [feeRate, setFeeRate] = useSearchParamsState('feeRate', '0');
   const { data: runeFloorPrice } = useRuneFloorPriceQuery(toToken?.name ?? '');
+  const { data: toRuneFiatRate } = useRuneFiatRateQuery(
+    toToken?.protocol === 'runes' ? toToken?.principal ?? '' : '',
+  );
 
   useEffect(() => {
     if (recommendedFees && feeRate === '0') {
@@ -248,7 +252,7 @@ export default function QuoteSummary({
 
       if (placeOrderResponse?.unsignedTransaction) {
         const swapTx = deserializeTransaction(placeOrderResponse.unsignedTransaction);
-        await applyMultiplierAndCapFeeAtThreshold(swapTx, network);
+        await applyMultiplierAndCapFeeAtThreshold(swapTx, xverseApiClient);
         placeOrderResponse.unsignedTransaction = swapTx.serialize();
         onStxOrderPlaced({ order: placeOrderResponse, providerCode: quote.provider.code });
       }
@@ -284,11 +288,8 @@ export default function QuoteSummary({
         new BigNumber(btcFiatRate),
       ).toFixed(2);
     }
-    if (toToken?.protocol === 'runes') {
-      return getBtcFiatEquivalent(
-        new BigNumber(runeFloorPrice ?? 0).multipliedBy(quote.receiveAmount),
-        new BigNumber(btcFiatRate),
-      ).toFixed(2);
+    if (toToken?.protocol === 'runes' && toRuneFiatRate) {
+      return new BigNumber(toRuneFiatRate).multipliedBy(quote.receiveAmount).toFixed(2);
     }
     if (toToken?.principal === 'STX') {
       return getStxFiatEquivalent(

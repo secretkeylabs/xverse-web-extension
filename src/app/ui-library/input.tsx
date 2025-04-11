@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, type ChangeEvent } from 'react';
+import React, { useLayoutEffect, useRef, useState, type ChangeEvent } from 'react';
 import styled from 'styled-components';
 import { InputFeedback, type FeedbackVariant } from './inputFeedback';
 
@@ -180,11 +180,11 @@ const Feedback = styled.div`
   margin-top: ${(props) => props.theme.space.xs};
 `;
 
-type Props = {
+type Props = React.InputHTMLAttributes<HTMLInputElement> & {
   id?: string;
-  title?: string;
+  titleElement?: string | React.ReactNode;
   placeholder?: string;
-  value: string;
+  value?: string;
   dataTestID?: string;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (event: ChangeEvent<HTMLInputElement>) => void;
@@ -205,110 +205,135 @@ type Props = {
   leftAccessory?: {
     icon: React.ReactNode;
   };
+  clearValue?: () => void;
 };
 
-function Input({
-  id,
-  title,
-  placeholder,
-  value,
-  dataTestID,
-  onChange,
-  onBlur,
-  type = 'text',
-  hideClear = false,
-  infoPanel,
-  complications,
-  variant = 'default',
-  subText,
-  className,
-  feedback,
-  disabled = false,
-  autoFocus = false,
-  bgColor,
-  leftAccessory,
-}: Props) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const complicationsRef = useRef<HTMLDivElement>(null);
+const Input = React.forwardRef(
+  (
+    {
+      id,
+      titleElement,
+      placeholder,
+      dataTestID,
+      value,
+      onChange,
+      onBlur,
+      type = 'text',
+      hideClear = false,
+      infoPanel,
+      complications,
+      variant = 'default',
+      subText,
+      className,
+      feedback,
+      disabled = false,
+      autoFocus = false,
+      bgColor,
+      leftAccessory,
+      clearValue,
+      ...props
+    }: Props,
+    ref,
+  ) => {
+    const [hasValue, setHasValue] = useState(false);
+    const inputRef = useRef<HTMLInputElement | null>(null);
+    const complicationsRef = useRef<HTMLDivElement>(null);
 
-  const handleChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    onChange(e);
-  };
+    const handleChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+      setHasValue(e.target.value !== '');
+      onChange(e);
+    };
 
-  useLayoutEffect(() => {
-    // This ensures that the complications don't overlap the text input
-    const stickyComplicationsRef = complicationsRef.current;
-    const stickyInputRef = inputRef.current;
+    useLayoutEffect(() => {
+      // This ensures that the complications don't overlap the text input
+      const stickyComplicationsRef = complicationsRef.current;
+      const stickyInputRef = inputRef.current;
 
-    if (stickyComplicationsRef && stickyInputRef) {
-      const padInput = () => {
-        const complicationsWidth = stickyComplicationsRef.clientWidth;
-        stickyInputRef.style.paddingRight = `${complicationsWidth + 16}px`;
-      };
+      if (stickyComplicationsRef && stickyInputRef) {
+        const padInput = () => {
+          const complicationsWidth = stickyComplicationsRef.clientWidth;
+          stickyInputRef.style.paddingRight = `${complicationsWidth + 16}px`;
+        };
 
-      padInput();
+        padInput();
 
-      const resizeObserver = new ResizeObserver(padInput);
-      resizeObserver.observe(stickyComplicationsRef);
+        const resizeObserver = new ResizeObserver(padInput);
+        resizeObserver.observe(stickyComplicationsRef);
 
-      return () => {
-        resizeObserver.disconnect();
-      };
-    }
-  }, []);
+        return () => {
+          resizeObserver.disconnect();
+        };
+      }
+    }, []);
 
-  const handleClear = () => {
-    onChange({ target: { value: '' } } as ChangeEvent<HTMLInputElement>);
-    inputRef.current?.focus();
-  };
+    const handleClear = () => {
+      onChange({ target: { value: '' } } as ChangeEvent<HTMLInputElement>);
+      clearValue?.();
+      setHasValue(false);
+      inputRef.current?.focus();
+    };
 
-  const displayVariant = feedback?.some((f) => f.variant === 'danger') ? 'danger' : variant;
+    const displayVariant = feedback?.some((f) => f.variant === 'danger') ? 'danger' : variant;
 
-  return (
-    <Container className={className}>
-      {(title || infoPanel) && (
-        <TitleContainer>
-          <Title>{title}</Title>
-          {infoPanel && <InfoText>{infoPanel}</InfoText>}
-        </TitleContainer>
-      )}
-      <InputContainer>
-        {leftAccessory && <LeftAccessoryContainer>{leftAccessory.icon}</LeftAccessoryContainer>}
-        <InputField
-          id={id}
-          className={displayVariant}
-          ref={inputRef}
-          type={type}
-          value={value}
-          data-testid={dataTestID}
-          onChange={handleChange}
-          onBlur={onBlur}
-          placeholder={placeholder}
-          disabled={disabled}
-          autoFocus={autoFocus}
-          $bgColor={bgColor}
-          $hasLeftAccessory={!!leftAccessory}
-        />
-        <ComplicationsContainer ref={complicationsRef}>
-          {!hideClear && value && (
-            <ClearButtonContainer onClick={handleClear}>
-              <ClearButton $hasSiblings={!!complications} />
-            </ClearButtonContainer>
-          )}
-          {complications}
-        </ComplicationsContainer>
-      </InputContainer>
-      {subText && <SubText>{subText}</SubText>}
-      {!!feedback?.length && (
-        <Feedback>
-          {feedback?.map((f) => (
-            <InputFeedback key={f.message} message={f.message} variant={f.variant} />
-          ))}
-        </Feedback>
-      )}
-    </Container>
-  );
-}
+    return (
+      <Container className={className}>
+        {(titleElement || infoPanel) && typeof titleElement === 'string' && (
+          <TitleContainer>
+            <Title>{titleElement}</Title>
+            {infoPanel && <InfoText>{infoPanel}</InfoText>}
+          </TitleContainer>
+        )}
+        {titleElement && typeof titleElement !== 'string' && titleElement}
+        <InputContainer>
+          {leftAccessory && <LeftAccessoryContainer>{leftAccessory.icon}</LeftAccessoryContainer>}
+          <InputField
+            id={id}
+            className={displayVariant}
+            ref={(inputEl) => {
+              inputRef.current = inputEl;
+
+              if (ref === null) return;
+
+              if (typeof ref === 'function') {
+                ref(inputEl);
+                return;
+              }
+
+              ref.current = inputEl;
+            }}
+            type={type}
+            data-testid={dataTestID}
+            onChange={handleChange}
+            onBlur={onBlur}
+            placeholder={placeholder}
+            disabled={disabled}
+            autoFocus={autoFocus}
+            $bgColor={bgColor}
+            $hasLeftAccessory={!!leftAccessory}
+            value={value}
+            {...props}
+          />
+          <ComplicationsContainer ref={complicationsRef}>
+            {!hideClear && hasValue && (
+              <ClearButtonContainer type="button" onClick={handleClear} aria-label="Clear input">
+                <ClearButton $hasSiblings={!!complications} />
+              </ClearButtonContainer>
+            )}
+            {complications}
+          </ComplicationsContainer>
+        </InputContainer>
+        {subText && <SubText>{subText}</SubText>}
+        {!!feedback?.length && (
+          <Feedback>
+            {feedback?.map((f) => (
+              <InputFeedback key={f.message} message={f.message} variant={f.variant} />
+            ))}
+          </Feedback>
+        )}
+      </Container>
+    );
+  },
+);
 
 export default Input;
 

@@ -1,6 +1,6 @@
+import useXverseApi from '@hooks/apiClients/useXverseApi';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getXverseApiClient } from '@secretkeylabs/xverse-core';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { handleRetries, InvalidParamsError } from '@utils/query';
 
@@ -11,8 +11,7 @@ const PAGE_SIZE = 30;
  */
 const useAddressCollectionInscriptions = (collectionId?: string) => {
   const { ordinalsAddress } = useSelectedAccount();
-  const { network } = useWalletSelector();
-  const xverseApi = getXverseApiClient(network.type);
+  const xverseApiClient = useXverseApi();
   const { starredCollectibleIds } = useWalletSelector();
   const starredIds = starredCollectibleIds[ordinalsAddress]?.map(({ id }) => id);
 
@@ -20,7 +19,7 @@ const useAddressCollectionInscriptions = (collectionId?: string) => {
     if (!ordinalsAddress || !collectionId) {
       throw new InvalidParamsError('ordinalsAddress and collectionId are required');
     }
-    return xverseApi.getCollectionSpecificInscriptions(
+    return xverseApiClient.getCollectionSpecificInscriptions(
       ordinalsAddress,
       collectionId,
       pageParam,

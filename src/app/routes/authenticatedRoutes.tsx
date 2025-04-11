@@ -49,6 +49,8 @@ import SendRuneScreen from '@screens/sendRune';
 import SendStxScreen from '@screens/sendStx';
 import Setting from '@screens/settings';
 import About from '@screens/settings/about';
+import AddressBook from '@screens/settings/addressBook';
+import AddEditAddress from '@screens/settings/addressBook/addEditAddress';
 import AdvancedSettings from '@screens/settings/advanced';
 import PaymentAddressTypeSelector from '@screens/settings/advanced/paymentAddressTypeSelector';
 import RecoverFunds from '@screens/settings/advanced/recoverFunds';
@@ -261,6 +263,18 @@ const authedRoutesWithSidebar: RouteObject = {
       element: <Security />,
     },
     {
+      path: RoutePaths.AddressBook,
+      element: <AddressBook />,
+    },
+    {
+      path: RoutePaths.AddAddress,
+      element: <AddEditAddress mode="add" />,
+    },
+    {
+      path: RoutePaths.EditAddress(':id'),
+      element: <AddEditAddress mode="edit" />,
+    },
+    {
       path: RoutePaths.AdvancedSettings,
       element: <AdvancedSettings />,
     },
@@ -361,7 +375,7 @@ const authedRoutesWithSidebar: RouteObject = {
       element: <TransferRunesRequest />,
     },
     {
-      path: 'send-brc20-one-step',
+      path: RoutePaths.SendBrc20OneStep,
       element: <SendBrc20OneStepScreen />,
     },
     {
@@ -389,15 +403,15 @@ const authedRoutesWithSidebar: RouteObject = {
       element: <NftDashboard />,
     },
     {
-      path: 'send-btc',
+      path: RoutePaths.SendBtc,
       element: <SendBtcScreen />,
     },
     {
-      path: 'send-stx',
+      path: RoutePaths.SendStx,
       element: <SendStxScreen />,
     },
     {
-      path: 'send-rune',
+      path: RoutePaths.SendRune,
       element: <SendRuneScreen />,
     },
     {

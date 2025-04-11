@@ -27,6 +27,7 @@ import {
 } from '@utils/brc20';
 import { isInOptions } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
+import RoutePaths from 'app/routes/paths';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -61,17 +62,16 @@ function ConfirmBrc20Transaction() {
     estimatedFees: initEstimatedFees,
     token,
   }: ConfirmBrc20TransferState = useLocation().state;
-  const [showFeeWarning, setShowFeeWarning] = useState(false);
   const transactionContext = useTransactionContext();
   const { data: recommendedFees } = useBtcFeeRate();
 
   useResetUserFlow('/confirm-brc20-tx');
 
   /* state */
+  const [showFeeWarning, setShowFeeWarning] = useState(false);
   const [isConfirmLoading, setIsConfirmLoading] = useState(false);
   const [userInputFeeRate, setUserInputFeeRate] = useState(estimateFeesParams.feeRate.toString());
   const [error, setError] = useState<BRC20ErrorCode | ''>('');
-  const debouncedUserInputFeeRate = useDebounce(userInputFeeRate, 500);
 
   const {
     commitValueBreakdown,
@@ -79,7 +79,7 @@ function ConfirmBrc20Transaction() {
     errorCode,
   } = useBrc20TransferFees({
     ...estimateFeesParams,
-    feeRate: Number(debouncedUserInputFeeRate),
+    feeRate: Number(userInputFeeRate),
     skipInitialFetch: false,
     context: transactionContext,
   });
@@ -107,7 +107,7 @@ function ConfirmBrc20Transaction() {
       recipientAddress,
       estimateFeesParams: {
         ...estimateFeesParams,
-        feeRate: Number(debouncedUserInputFeeRate),
+        feeRate: Number(userInputFeeRate),
       },
       token,
     };
@@ -120,7 +120,6 @@ function ConfirmBrc20Transaction() {
     setIsConfirmLoading(false);
   };
 
-  /* other */
   const errorMessage = errorCode ? t(`CONFIRM_BRC20.ERROR_CODES.${errorCode}`) : error;
 
   const recipient: RecipientCardProps = {
@@ -149,10 +148,11 @@ function ConfirmBrc20Transaction() {
       selectedToken: token.principal,
       source: 'send_brc20',
     });
-    navigate(`/send-brc20-one-step?principal=${token.principal}`, {
+    navigate(`${RoutePaths.SendBrc20OneStep}?principal=${token.principal}`, {
       state: {
         amount: estimateFeesParams.amount.toString(),
         recipientAddress,
+        step: 1,
       },
     });
   };
@@ -226,7 +226,7 @@ function ConfirmBrc20Transaction() {
                 <SelectFeeRate
                   fee={txFee.toString()}
                   feeUnits="sats"
-                  feeRate={debouncedUserInputFeeRate}
+                  feeRate={userInputFeeRate}
                   feeRateUnits="sats/vB"
                   setFeeRate={(newFeeRate) => setUserInputFeeRate(newFeeRate)}
                   baseToFiat={(amount) =>
@@ -279,4 +279,5 @@ function ConfirmBrc20Transaction() {
     </>
   );
 }
+
 export default ConfirmBrc20Transaction;
