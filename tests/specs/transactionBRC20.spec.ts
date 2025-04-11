@@ -26,23 +26,25 @@ test.describe('Transaction BRC20', () => {
 
     // Invalid Address check
     await wallet.inputField.last().fill(`Test Address 123`);
-    await expect(wallet.buttonNext).toBeDisabled();
+    await expect(wallet.buttonNext).toBeEnabled();
+    await wallet.buttonNext.click();
     await expect(wallet.errorMessageAddressInvalid).toBeVisible();
 
     // Fill in valid Address
-    await wallet.inputField.last().fill(addressOrdinals);
+    await wallet.inputField.fill(addressOrdinals);
+    await wallet.buttonNext.click();
 
     // Insufficient BRC20 balance Check
-    await wallet.inputField.first().fill(`1000`);
+    await wallet.inputField.fill(`1000`);
     await expect(wallet.errorInsufficientBRC20Balance).toBeVisible();
     await expect(wallet.buttonNext).toBeDisabled();
 
-    await wallet.inputField.first().fill(sendAmount.toString());
-    await expect(wallet.buttonNext).toBeEnabled();
-    await wallet.buttonNext.waitFor({ state: 'visible' });
+    await page.getByRole('button', { name: 'Clear input' }).click();
+
+    await wallet.inputField.fill(sendAmount.toString());
     await wallet.buttonNext.click();
 
-    await expect(wallet.receiveAddress.first()).toBeVisible();
+    await expect(wallet.receiveAddress).toBeVisible();
     await expect(wallet.page.url()).toContain('confirm-brc20-tx');
     await expect(wallet.buttonCancel).toBeEnabled();
     await expect(wallet.buttonConfirm).toBeEnabled();

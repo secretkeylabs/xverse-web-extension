@@ -24,30 +24,20 @@ const CustomAccountContainer = styled(CurrentAccountContainer)((props) => ({
 
 type Props = {
   account: Account | null;
+  address: string;
   onSelect?: (address: string) => void;
-  addressType: AddressType;
 };
 
-function AccountRow({ account, onSelect, addressType }: Props) {
+function AccountRow({ account, onSelect, address }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const { avatarIds } = useWalletSelector();
   const selectedAccount = useSelectedAccount();
   const accountAvatar = avatarIds[account?.btcAddresses.taproot.address ?? ''];
 
-  let addressToBeDisplayed = account?.btcAddresses.taproot.address;
-
-  if (addressType === 'btc_payment') {
-    addressToBeDisplayed = account?.btcAddresses[selectedAccount.btcAddressType]?.address;
-  }
-
-  if (addressType === 'stx') {
-    addressToBeDisplayed = account?.stxAddress;
-  }
-
-  const isDisabled = addressToBeDisplayed === selectedAccount.stxAddress;
+  const isDisabled = address === selectedAccount.stxAddress;
 
   const handleClick = () => {
-    onSelect?.(addressToBeDisplayed ?? '');
+    onSelect?.(address);
   };
 
   return (
@@ -69,7 +59,7 @@ function AccountRow({ account, onSelect, addressType }: Props) {
               {isKeystoneAccount(account) && <img src={KeystoneBadge} alt="Keystone icon" />}
             </CurrentAccountTextContainer>
             <StyledP typography="body_medium_m" color="white_200">
-              {getTruncatedAddress(addressToBeDisplayed ?? '', 6)}
+              {getTruncatedAddress(address, 6)}
             </StyledP>
           </CustomAccountContainer>
         )}

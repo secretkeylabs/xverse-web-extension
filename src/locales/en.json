@@ -394,6 +394,7 @@
     "BALANCE": "Balance",
     "RECIPIENT": "Recipient",
     "RECIPIENT_PLACEHOLDER": "STX Address or .btc domain",
+    "REMOVE_RECIPIENT": "Remove recipient",
     "ORDINAL_RECIPIENT_PLACEHOLDER": "Enter address",
     "MEMO": "Memo (optional)",
     "MEMO_PLACEHOLDER": "Memo",

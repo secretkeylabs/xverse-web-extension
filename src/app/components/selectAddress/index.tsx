@@ -2,8 +2,10 @@ import type { AddressType } from '@common/types/address';
 import Separator from '@components/separator';
 import useAddressBookEntries from '@hooks/useAddressBookEntries';
 import useGetAllAccounts from '@hooks/useGetAllAccounts';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import AddressBookItem from '@screens/settings/addressBook/addressBookItem';
 import AddressBookPlaceholder from '@screens/settings/addressBook/addressBookPlaceholder';
+import type { Account } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
 import { Tabs } from '@ui-library/tabs';
 import { useState } from 'react';
@@ -59,6 +61,20 @@ function SelectAddress({ setAddress, addressType }: Props) {
   const { t } = useTranslation('translation');
   const { entries: addressBookEntries, isLoading } = useAddressBookEntries();
   const allAccounts = useGetAllAccounts();
+  const selectedAccount = useSelectedAccount();
+
+  const getAccountAddress = (account: Account) => {
+    if (addressType === 'stx') {
+      return account.stxAddress;
+    }
+
+    if (addressType === 'btc_ordinals') {
+      return account.btcAddresses.taproot.address;
+    }
+
+    return account.btcAddresses[selectedAccount.btcAddressType]?.address ?? '';
+  };
+
   const filteredAddressBookEntries = addressBookEntries.filter((entry) => {
     if (addressType === 'stx') {
       return entry.chain === 'stacks';
@@ -122,8 +138,8 @@ function SelectAddress({ setAddress, addressType }: Props) {
               <div key={`${account.accountType}:${account.masterPubKey}:${account.id}`}>
                 <AccountRow
                   account={account}
+                  address={getAccountAddress(account)}
                   onSelect={(address) => handleAddressSelect(address, 'my_accounts')}
-                  addressType={addressType}
                 />
                 {index !== allAccounts.length - 1 && <Separator />}
               </div>

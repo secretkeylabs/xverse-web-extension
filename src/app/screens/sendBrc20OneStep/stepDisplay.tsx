@@ -41,7 +41,6 @@ type Props = {
   setCurrentStep: (step: Step) => void;
   recipientAddress: string;
   setRecipientAddress: (address: string) => void;
-  onConfirm: () => void;
   onBack: () => void;
   isLoading: boolean;
   isNextEnabled: boolean;
@@ -57,20 +56,12 @@ function StepDisplay({
   setCurrentStep,
   recipientAddress,
   setRecipientAddress,
-  onConfirm,
   onBack,
   isLoading,
   isNextEnabled,
   processing,
 }: Props) {
   const { t } = useTranslation('translation');
-
-  // When we reach the Confirm step, trigger the onConfirm action
-  useEffect(() => {
-    if (currentStep === Step.Confirm && !processing) {
-      onConfirm();
-    }
-  }, [currentStep, onConfirm, processing]);
 
   switch (currentStep) {
     case Step.SelectRecipient:

@@ -25,16 +25,23 @@ type Props = {
   color?: string;
   size?: keyof typeof Theme.space;
   className?: string;
+  ariaLabel?: string;
 };
 
-function CrossButton({ onClick, size = 'l', className, color = Theme.colors.white_200 }: Props) {
+function CrossButton({
+  onClick,
+  size = 'l',
+  className,
+  color = Theme.colors.white_200,
+  ariaLabel,
+}: Props) {
   const internalOnClick = (e) => {
     e.stopPropagation();
     onClick();
   };
 
   return (
-    <Button onClick={internalOnClick} className={className}>
+    <Button onClick={internalOnClick} className={className} aria-label={ariaLabel}>
       <XCircle color={color} weight="fill" size={Theme.space[size]} />
     </Button>
   );
