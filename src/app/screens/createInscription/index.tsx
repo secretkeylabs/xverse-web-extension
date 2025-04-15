@@ -392,9 +392,6 @@ function CreateInscription() {
           {showConfirmedBalanceError && (
             <StyledCallout variant="danger" bodyText={t('ERRORS.UNCONFIRMED_UTXO')} />
           )}
-          {isLedgerAccount(selectedAccount) && (
-            <StyledCallout variant="danger" bodyText={t('ERRORS.LEDGER_INSCRIPTION')} />
-          )}
           <InscribeSection
             content={content}
             contentType={contentType}
