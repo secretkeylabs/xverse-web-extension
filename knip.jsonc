@@ -5,28 +5,31 @@
     "src/content-scripts/content-script.ts",
     "src/inpage/index.ts",
     "src/pages/Options/index.tsx",
-    "src/pages/Popup/index.tsx",
-    "webpack/utils/build.js",
-    "webpack/utils/devServer.js"
+    "src/pages/Popup/index.tsx"
   ],
-  "project": [
-    "src/**/*.{ts,tsx}",
-    "webpack/**/*.js"
-  ],
-  "webpack": {
-    "config": [
-      "webpack/webpack.config.js"
-    ]
-  },
+  "project": ["src/**/*.{ts,tsx}"],
   "ignoreDependencies": [
-    // Used by webpack to polyfill references to Node.js's `path` module, yet
-    // not explicitly imported anywhere in the project.
-    "path",
     // Used by the extension, yet not explicitly imported anywhere in the
     // project.
     "@types/chrome",
-    // Used for linking xverse core locally
-    "process"
+
+    // Used by rspack yet not detected by knip. Used to provide Buffer polyfill.
+    "process",
+
+    // Package `path` is needed to satisfy Argon2,
+    //
+    // ```
+    //  × Module not found: Can't resolve 'path' in 'node_modules/argon2-browser/dist'
+    // ╭─[35:26]
+    // 33 │ if (ENVIRONMENT_IS_NODE) {
+    // 34 │     if (ENVIRONMENT_IS_WORKER) {
+    // 35 │         scriptDirectory = require("path").dirname(scriptDirectory) + "/";
+    //    ·                           ───────────────────────
+    // 36 │     } else {
+    // 37 │         scriptDirectory = __dirname + "/";
+    //    ╰────
+    // ```
+    "path"
   ],
   "ignore": [
     // Temporary ignore as one of the overloads is not currently used

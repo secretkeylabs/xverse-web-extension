@@ -301,7 +301,7 @@
     "REMOVE_FROM_LIST_DESCRIPTION": "This will remove this wallet from this list. You can import it again by connecting your device.",
     "DATA_COLLECTION_POPUP": {
       "TITLE": "Help us improve Xverse!",
-      "DESCRIPTION": "Help improve the app experience, by allowing Xverse to collect anonymized usage data. This data cannot be used to identify your wallet individually.",
+      "DESCRIPTION": "Help improve the app experience, by allowing Xverse to collect anonymized usage data. This data cannot be used to identify you or your wallet.",
       "DENY": "Deny",
       "ALLOW": "Allow"
     },
@@ -1044,7 +1044,7 @@
     "CURRENCY": "Fiat Currency",
     "PRIVACY_PREFERENCES": {
       "TITLE": "Privacy Preferences",
-      "DESCRIPTION": "Help improve the app experience, by allowing Xverse to collect anonymized usage data. This data cannot be used to identify your wallet individually.",
+      "DESCRIPTION": "Help improve the app experience, by allowing Xverse to collect anonymized usage data. This data cannot be used to identify you or your wallet.",
       "AUTHORIZE_DATA_COLLECTION": "Authorize data collection"
     },
     "BTC_URL": "BTC URL",
