@@ -1889,7 +1889,7 @@
   },
   "CHANGE_NETWORK_REQUEST": {
     "TITLE": "Allow this app to switch the network?",
-    "INFO_MESSAGE": "This will switch the selected network within Xverse.",
+    "INFO_MESSAGE": "This will switch the selected network in Xverse and connect the app to the new network.",
     "CALLOUT": "Make sure you trust the app requesting the network change.",
     "CANCEL_BUTTON": "Cancel",
     "SWITCH_NETWORK_BUTTON": "Switch Network"

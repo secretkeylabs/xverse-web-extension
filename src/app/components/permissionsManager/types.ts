@@ -6,6 +6,7 @@ type Permission = Permissions.Store.Permission;
 
 export type TPermissionsUtilsContext = {
   // Queries
+  getClient: (clientId: Client['id']) => Client | undefined;
   getClients: () => Client[];
   getResource: (resourceId: Resource['id']) => Resource | undefined;
   getClientPermissions: (clientId: Client['id']) => Permission[];

@@ -69,6 +69,14 @@ export function PermissionsProvider({ children }: PropsWithChildren) {
 
   // Queries
 
+  const getClient = useCallback(
+    (clientId: Permissions.Store.Client['id']) => {
+      const store = getStore();
+      return permissions.utils.store.getClient(store, clientId);
+    },
+    [getStore],
+  );
+
   const getClients = useCallback(() => {
     const store = getStore();
     return permissions.utils.store.getClients(store);
@@ -190,6 +198,7 @@ export function PermissionsProvider({ children }: PropsWithChildren) {
   //
   // eslint-disable-next-line react/jsx-no-constructed-context-values
   const contextValue = {
+    getClient,
     getClients,
     addClient,
     addResource,
