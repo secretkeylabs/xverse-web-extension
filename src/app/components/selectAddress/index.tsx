@@ -3,54 +3,29 @@ import Separator from '@components/separator';
 import useAddressBookEntries from '@hooks/useAddressBookEntries';
 import useGetAllAccounts from '@hooks/useGetAllAccounts';
 import useSelectedAccount from '@hooks/useSelectedAccount';
+import { useTransition } from '@react-spring/web';
 import AddressBookItem from '@screens/settings/addressBook/addressBookItem';
 import AddressBookPlaceholder from '@screens/settings/addressBook/addressBookPlaceholder';
 import type { Account } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
 import { Tabs } from '@ui-library/tabs';
+import { ANIMATION_EASING } from '@utils/constants';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import styled from 'styled-components';
 import AccountRow from './accountRow';
-
-const Container = styled.div((_) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  flex: 1,
-}));
-
-const Title = styled.h1((props) => ({
-  ...props.theme.typography.headline_xs,
-}));
-
-const TabsContainer = styled.div((props) => ({
-  marginTop: props.theme.space.l,
-  marginBottom: props.theme.space.l,
-}));
-
-const ListContainer = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: props.theme.space.m,
-  height: '100%',
-  overflowY: 'auto',
-  ...props.theme.scrollbar,
-}));
-
-const Subtitle = styled.p((props) => ({
-  ...props.theme.typography.body_bold_s,
-  color: props.theme.colors.white_200,
-  textTransform: 'uppercase',
-}));
-
-const LoaderContainer = styled.div((_) => ({
-  display: 'flex',
-  flex: 1,
-  justifyContent: 'center',
-  alignItems: 'center',
-}));
+import {
+  AnimatedContent,
+  Container,
+  ListContainer,
+  LoaderContainer,
+  Subtitle,
+  TabContentContainer,
+  TabsContainer,
+  Title,
+} from './index.styled';
 
 export type AddressSource = 'my_accounts' | 'address_book';
+type TabType = 'my_accounts' | 'address_book';
 
 type Props = {
   setAddress: (address: string, source: AddressSource) => void;
@@ -62,6 +37,7 @@ function SelectAddress({ setAddress, addressType }: Props) {
   const { entries: addressBookEntries, isLoading } = useAddressBookEntries();
   const allAccounts = useGetAllAccounts();
   const selectedAccount = useSelectedAccount();
+  const [transitionDirection, setTransitionDirection] = useState<'forward' | 'back'>('forward');
 
   const getAccountAddress = (account: Account) => {
     if (addressType === 'stx') {
@@ -91,7 +67,8 @@ function SelectAddress({ setAddress, addressType }: Props) {
     setAddress(address, source);
   };
 
-  const tabs: { label: string; value: 'my_accounts' | 'address_book' }[] = [];
+  // Prepare tabs data
+  const tabs: { label: string; value: TabType }[] = [];
 
   if (allAccounts.length > 1) {
     tabs.push({ label: t('SELECT_ADDRESS.MY_ACCOUNTS'), value: 'my_accounts' });
@@ -103,9 +80,38 @@ function SelectAddress({ setAddress, addressType }: Props) {
 
   const showPlaceholder = !isLoading && tabs.length === 0;
 
-  const [activeTab, setActiveTab] = useState<'my_accounts' | 'address_book' | null>(
-    showPlaceholder ? null : tabs[0].value,
-  );
+  const [activeTab, setActiveTab] = useState<TabType>('my_accounts');
+
+  const handleTabChange = (newTab: TabType) => {
+    // Set direction based on tab index change
+    const oldIndex = tabs.findIndex((tab) => tab.value === activeTab);
+    const newIndex = tabs.findIndex((tab) => tab.value === newTab);
+
+    if (newIndex > oldIndex) {
+      setTransitionDirection('forward');
+    } else {
+      setTransitionDirection('back');
+    }
+
+    setActiveTab(newTab);
+  };
+
+  const tabTransition = useTransition(activeTab, {
+    from: () => ({
+      opacity: 0,
+      transform: `translateX(${transitionDirection === 'forward' ? '80px' : '-80px'})`,
+    }),
+    enter: {
+      opacity: 1,
+      transform: 'translateX(0px)',
+    },
+    leave: () => ({
+      opacity: 0,
+      transform: `translateX(${transitionDirection === 'forward' ? '-80px' : '80px'})`,
+    }),
+    config: { duration: 125, easing: ANIMATION_EASING },
+    exitBeforeEnter: true,
+  });
 
   const renderBody = () => {
     if (isLoading) {
@@ -123,7 +129,9 @@ function SelectAddress({ setAddress, addressType }: Props) {
     return (
       <>
         <TabsContainer>
-          {tabs.length > 1 && <Tabs tabs={tabs} activeTab={activeTab} onTabClick={setActiveTab} />}
+          {tabs.length > 1 && (
+            <Tabs tabs={tabs} activeTab={activeTab} onTabClick={handleTabChange} />
+          )}
           {tabs.length === 1 && (
             <Subtitle>
               {allAccounts.length > 1 && t('SELECT_ADDRESS.MY_ACCOUNTS')}
@@ -132,34 +140,39 @@ function SelectAddress({ setAddress, addressType }: Props) {
           )}
         </TabsContainer>
 
-        {activeTab === 'my_accounts' && (
-          <ListContainer>
-            {allAccounts.map((account, index) => (
-              <div key={`${account.accountType}:${account.masterPubKey}:${account.id}`}>
-                <AccountRow
-                  account={account}
-                  address={getAccountAddress(account)}
-                  onSelect={(address) => handleAddressSelect(address, 'my_accounts')}
-                />
-                {index !== allAccounts.length - 1 && <Separator />}
-              </div>
-            ))}
-          </ListContainer>
-        )}
-        {activeTab === 'address_book' && (
-          <ListContainer>
-            {filteredAddressBookEntries.map((item, index) => (
-              <div key={item.address}>
-                <AddressBookItem
-                  item={item}
-                  isViewOnly
-                  onSelect={(address) => handleAddressSelect(address, 'address_book')}
-                />
-                {index !== filteredAddressBookEntries.length - 1 && <Separator />}
-              </div>
-            ))}
-          </ListContainer>
-        )}
+        <TabContentContainer>
+          {tabTransition((styles, currentTab) => (
+            <AnimatedContent style={styles}>
+              {currentTab === 'my_accounts' ? (
+                <ListContainer>
+                  {allAccounts.map((account, index) => (
+                    <div key={`${account.accountType}:${account.masterPubKey}:${account.id}`}>
+                      <AccountRow
+                        account={account}
+                        address={getAccountAddress(account)}
+                        onSelect={(address) => handleAddressSelect(address, 'my_accounts')}
+                      />
+                      {index !== allAccounts.length - 1 && <Separator />}
+                    </div>
+                  ))}
+                </ListContainer>
+              ) : (
+                <ListContainer>
+                  {filteredAddressBookEntries.map((item, index) => (
+                    <div key={item.address}>
+                      <AddressBookItem
+                        item={item}
+                        isViewOnly
+                        onSelect={(address) => handleAddressSelect(address, 'address_book')}
+                      />
+                      {index !== filteredAddressBookEntries.length - 1 && <Separator />}
+                    </div>
+                  ))}
+                </ListContainer>
+              )}
+            </AnimatedContent>
+          ))}
+        </TabContentContainer>
       </>
     );
   };

@@ -1,4 +1,6 @@
+import { animated } from '@react-spring/web';
 import Button from '@ui-library/button';
+import { StyledP } from '@ui-library/common.styled';
 import styled from 'styled-components';
 
 export const Container = styled.div`
@@ -47,4 +49,27 @@ export const HeaderButton = styled(Button)`
   padding-right: ${(props) => props.theme.space.m};
   gap: ${(props) => props.theme.space.xs};
   min-height: initial;
+`;
+
+export const RecipientLabel = styled(StyledP)`
+  margin-bottom: ${(props) => props.theme.space.xs};
+`;
+
+export const MainScreenContainer = styled(animated.div)`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-x: hidden;
+  position: relative;
+`;
+
+export const TransitionWrapper = styled.div`
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  position: relative;
 `;
