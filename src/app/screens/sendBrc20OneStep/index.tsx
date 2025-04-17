@@ -22,6 +22,7 @@ import StepDisplay from './stepDisplay';
 import { getPreviousStep, Step } from './steps';
 
 function SendBrc20Screen() {
+  /* hooks */
   const { t } = useTranslation('translation', { keyPrefix: 'SEND_BRC20' });
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -30,6 +31,11 @@ function SendBrc20Screen() {
   const { network } = useWalletSelector();
   const { data: brc20CoinsList } = useGetBrc20FungibleTokens();
   const { data: feeRate } = useBtcFeeRate();
+  const transactionContext = useTransactionContext();
+
+  useResetUserFlow(RoutePaths.SendBrc20OneStep);
+
+  /* state */
   const [amountToSend, setAmountToSend] = useState(location.state?.amount || '');
   const [amountError, setAmountError] = useState<InputFeedbackProps | null>(null);
   const [recipientAddress, setRecipientAddress] = useState(location.state?.recipientAddress || '');
@@ -38,9 +44,6 @@ function SendBrc20Screen() {
   const [currentStep, setCurrentStep] = useState<Step>(
     location.state?.step !== undefined ? location.state.step : Step.SelectRecipient,
   );
-  const transactionContext = useTransactionContext();
-
-  useResetUserFlow(RoutePaths.SendBrc20OneStep);
 
   const principal = searchParams.get('principal');
   const fungibleToken = brc20CoinsList?.find((coin) => coin.principal === principal);
@@ -124,7 +127,7 @@ function SendBrc20Screen() {
     }
   }, [recipientAddress]);
 
-  const onInputChange = (e: React.FormEvent<HTMLInputElement>) => {
+  const onInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.currentTarget.value;
     const resultRegex = /^\d*\.?\d*$/;
     if (resultRegex.test(newValue)) {

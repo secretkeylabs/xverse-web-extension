@@ -181,26 +181,20 @@ const Feedback = styled.div`
 `;
 
 type Props = React.InputHTMLAttributes<HTMLInputElement> & {
-  id?: string;
   titleElement?: string | React.ReactNode;
-  placeholder?: string;
   value?: string;
   dataTestID?: string;
+  className?: string;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
-  onBlur?: (event: ChangeEvent<HTMLInputElement>) => void;
-  type?: 'text' | 'number' | 'password';
   hideClear?: boolean;
   infoPanel?: React.ReactNode;
   complications?: React.ReactNode;
   variant?: InputVariant;
   subText?: string;
-  className?: string;
-  disabled?: boolean;
   feedback?: {
     message: string;
     variant?: FeedbackVariant;
   }[];
-  autoFocus?: boolean;
   bgColor?: string;
   leftAccessory?: {
     icon: React.ReactNode;
@@ -211,14 +205,10 @@ type Props = React.InputHTMLAttributes<HTMLInputElement> & {
 const Input = React.forwardRef(
   (
     {
-      id,
       titleElement,
-      placeholder,
       dataTestID,
       value,
       onChange,
-      onBlur,
-      type = 'text',
       hideClear = false,
       infoPanel,
       complications,
@@ -226,8 +216,6 @@ const Input = React.forwardRef(
       subText,
       className,
       feedback,
-      disabled = false,
-      autoFocus = false,
       bgColor,
       leftAccessory,
       clearValue,
@@ -287,7 +275,6 @@ const Input = React.forwardRef(
         <InputContainer>
           {leftAccessory && <LeftAccessoryContainer>{leftAccessory.icon}</LeftAccessoryContainer>}
           <InputField
-            id={id}
             className={displayVariant}
             ref={(inputEl) => {
               inputRef.current = inputEl;
@@ -301,13 +288,8 @@ const Input = React.forwardRef(
 
               ref.current = inputEl;
             }}
-            type={type}
             data-testid={dataTestID}
             onChange={handleChange}
-            onBlur={onBlur}
-            placeholder={placeholder}
-            disabled={disabled}
-            autoFocus={autoFocus}
             $bgColor={bgColor}
             $hasLeftAccessory={!!leftAccessory}
             value={value}
@@ -336,37 +318,6 @@ const Input = React.forwardRef(
 );
 
 export default Input;
-
-// some complications that can be used with the input
-export const ConvertComplication = styled.button`
-  ${(props) => props.theme.typography.body_medium_s}
-  user-select: none;
-
-  display: flex;
-  align-items: center;
-  gap: ${(props) => props.theme.space.xs};
-
-  cursor: pointer;
-  background-color: transparent;
-  color: ${(props) => props.theme.colors.white_200};
-  transition: opacity 0.1s ease;
-
-  &:hover:enabled {
-    opacity: 0.8;
-  }
-
-  &:disabled {
-    color: ${(props) => props.theme.colors.white_600};
-    cursor: not-allowed;
-  }
-`;
-
-export const VertRule = styled.div`
-  width: 1px;
-  height: 16px;
-  background-color: ${(props) => props.theme.colors.white_800};
-  margin: 0 8px;
-`;
 
 export const MaxButton = styled.button`
   ${(props) => props.theme.typography.body_medium_m}

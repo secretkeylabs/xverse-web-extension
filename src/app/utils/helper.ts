@@ -12,6 +12,7 @@ import {
   type SettingsNetwork,
   type StxMempoolTransactionData,
 } from '@secretkeylabs/xverse-core';
+import type { AddressBookEntry } from '@secretkeylabs/xverse-core/addressBook/types';
 import { getFtBalance } from '@utils/tokens';
 import RoutePaths, { RoutePathsSuffixes } from 'app/routes/paths';
 import BigNumber from 'bignumber.js';
@@ -288,6 +289,55 @@ export const validateAccountName = (
   }
 
   return null;
+};
+
+export const getAccountName = (
+  account: Account | null | undefined,
+  t: TFunction<'translation', 'COMMON'>,
+) => {
+  if (!account) return '';
+
+  return (
+    account.accountName ?? account.bnsName ?? `${t('ACCOUNT_NAME')} ${`${(account.id ?? 0) + 1}`}`
+  );
+};
+
+/**
+ * Gets the name of a recipient from either an account or an address book entry
+ * @param recipientAddress The address to look up
+ * @param allAccounts List of all wallet accounts
+ * @param addressBookEntries List of address book entries
+ * @param t Translation function with keyPrefix 'COMMON'
+ * @returns The name of the recipient, or an empty string if not found
+ */
+export const getRecipientName = (
+  recipientAddress: string,
+  allAccounts: Account[],
+  addressBookEntries: AddressBookEntry[],
+  t: TFunction<'translation', 'COMMON'>,
+): string => {
+  // First look for the address in the address book
+  const addressBookEntry = addressBookEntries.find((item) => item.address === recipientAddress);
+
+  if (addressBookEntry) {
+    return addressBookEntry.name;
+  }
+
+  // Then look for the address in accounts
+  const accountWithAddress = allAccounts.find(
+    (item) =>
+      item.btcAddresses.taproot.address === recipientAddress ||
+      item.btcAddresses.nested?.address === recipientAddress ||
+      item.btcAddresses.native?.address === recipientAddress ||
+      item.stxAddress === recipientAddress,
+  );
+
+  if (accountWithAddress) {
+    return getAccountName(accountWithAddress, t);
+  }
+
+  // Return empty string if not found
+  return '';
 };
 
 export const getAccountBalanceKey = (account: Account | null) => {

@@ -34,7 +34,6 @@ function SendRuneScreen() {
   const selectedAccount = useSelectedAccount();
   const { data: runesCoinsList } = useRuneFungibleTokensQuery();
   const [recipientAddress, setRecipientAddress] = useState('');
-  const [amountError, setAmountError] = useState('');
   const [amountToSend, setAmountToSend] = useState<string>(location.state?.amount || '');
   const [useTokenValue, setUseTokenValue] = useState(true);
   const [feeRate, setFeeRate] = useState('');
@@ -77,11 +76,6 @@ function SendRuneScreen() {
     const realBalance = balance.multipliedBy(decimalsToBase);
     const realAmountToSend = BigNumber(amountToSend || 0).multipliedBy(decimalsToBase);
 
-    if (realBalance.isLessThan(realAmountToSend)) {
-      setAmountError(t('SEND.ERRORS.INSUFFICIENT_BALANCE'));
-    } else {
-      setAmountError('');
-    }
     return generateTransaction(
       transactionContext,
       fungibleToken.name,
@@ -231,7 +225,6 @@ function SendRuneScreen() {
       setAmountToSend={setAmount}
       useTokenValue={useTokenValue}
       setUseTokenValue={setUseTokenValue}
-      amountError={amountError}
       currentStep={currentStep}
       setCurrentStep={setCurrentStep}
       recipientAddress={recipientAddress}

@@ -1,9 +1,11 @@
 import FiatAmountText from '@components/fiatAmountText';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowsDownUp } from '@phosphor-icons/react';
-import { currencySymbolMap, type FungibleToken } from '@secretkeylabs/xverse-core';
+import { type FungibleToken } from '@secretkeylabs/xverse-core';
+import Button from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
-import Input, { ConvertComplication, MaxButton } from '@ui-library/input';
+import { MaxButton } from '@ui-library/input';
+import TextArea from '@ui-library/textarea';
 import { HIDDEN_BALANCE_LABEL } from '@utils/constants';
 import { ftDecimals } from '@utils/helper';
 import { getFtTicker } from '@utils/tokens';
@@ -12,22 +14,21 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
-import Theme from 'theme';
 
-const BalanceTextWrapper = styled.div`
-  text-align: right;
+const BalanceContainer = styled.div`
+  display: flex;
+  gap: ${(props) => props.theme.space.xs};
 `;
 
-const BalanceText = styled.span`
-  ${(props) => props.theme.typography.body_medium_m}
-  color: ${(props) => props.theme.colors.white_200};
+const ConvertedAmountWrapper = styled.div`
+  width: 100%;
+  word-break: break-all;
 `;
 
-const VertRule = styled.div`
-  width: 1px;
-  height: 16px;
-  background-color: ${(props) => props.theme.colors.white_800};
-  margin: 0 ${(props) => props.theme.space.xs};
+const ConvertButton = styled(Button)`
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
 `;
 
 const AmountText = styled(StyledP)`
@@ -35,7 +36,7 @@ const AmountText = styled(StyledP)`
 `;
 
 const StyledFiatAmountText = styled(FiatAmountText)`
-  ${(props) => props.theme.typography.body_medium_s}
+  ${(props) => props.theme.typography.body_medium_m}
   color: ${(props) => props.theme.colors.white_200};
 `;
 
@@ -70,11 +71,12 @@ function FtAmountSelector({
   fungibleToken,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
+
   const { fiatCurrency, balanceHidden } = useWalletSelector();
   const tokenDecimals = fungibleToken.decimals ?? 0;
   const tokenSymbol = getFtTicker(fungibleToken);
 
-  const [amountDisplay, setAmountDisplay] = useState(amount);
+  const [amountDisplay, setAmountDisplay] = useState(amount && amount !== '0' ? amount : '');
 
   const [useTokenValue, setUseTokenValue] = useState(true);
 
@@ -106,16 +108,25 @@ function FtAmountSelector({
     : getTokenFiatEquivalent(tokenBalance, fungibleToken).toNumber().toFixed(2);
 
   const handleAmountChange = (newAmount: string) => {
-    const isValidInput = inputValidator.test(newAmount);
-    if (!isValidInput) return;
-
-    setAmountDisplay(newAmount);
-
     if (!newAmount) {
       setAmount('0');
+      setAmountDisplay('');
       setSendMax(false);
       return;
     }
+
+    // If user starts with a decimal point, prepend a zero
+    if (newAmount.startsWith('.')) {
+      newAmount = `0${newAmount}`;
+    }
+
+    // If user enters a number after a leading zero, replace the zero
+    if (newAmount.length > 1 && newAmount.startsWith('0') && newAmount[1] !== '.') {
+      newAmount = newAmount.slice(1);
+    }
+
+    const isValidInput = inputValidator.test(newAmount);
+    if (!isValidInput) return;
 
     const isValidAmount = useTokenValue
       ? tokenInputValidator(tokenDecimals).test(newAmount)
@@ -123,6 +134,7 @@ function FtAmountSelector({
 
     if (!isValidAmount) return;
 
+    setAmountDisplay(newAmount);
     setSendMax(false);
 
     if (useTokenValue) {
@@ -167,61 +179,56 @@ function FtAmountSelector({
   const handleMaxClick = () => setSendMax(!sendMax);
 
   return (
-    <Input
-      titleElement={t('BTC.AMOUNT', { currency: useTokenValue ? tokenSymbol : fiatCurrency })}
-      value={amountDisplay}
-      onChange={(e) => handleAmountChange(e.target.value)}
-      onBlur={handleBlur}
-      placeholder="0"
-      infoPanel={
-        <NumericFormat
-          value={balance}
-          displayType="text"
-          thousandSeparator
-          prefix={useTokenValue ? '' : `~ ${currencySymbolMap[fiatCurrency]}`}
-          renderText={(value: string) => (
-            <BalanceTextWrapper data-testid="balance-label">
-              <BalanceText>{t('BALANCE')}</BalanceText>
-              {balanceHidden && ` ${HIDDEN_BALANCE_LABEL}`}
-              {!balanceHidden && ` ${value} ${useTokenValue ? tokenSymbol : fiatCurrency}`}
-            </BalanceTextWrapper>
-          )}
-        />
-      }
-      complications={
-        <>
-          <ConvertComplication disabled={disabled} onClick={handleUseTokenValueChange}>
-            {useTokenValue ? (
-              <StyledFiatAmountText
-                fiatAmount={getTokenFiatEquivalent(BigNumber(amount), fungibleToken)}
-                fiatCurrency={fiatCurrency}
-              />
-            ) : (
-              <NumericFormat
-                value={Number(amount)}
-                displayType="text"
-                thousandSeparator
-                renderText={(value: string) => (
-                  <div>
-                    <AmountText typography="body_medium_s" color="white_200">
-                      {value} {tokenSymbol}
-                    </AmountText>
-                  </div>
-                )}
-              />
+    <>
+      <TextArea
+        titleElement={
+          <BalanceContainer data-testid="balance-label">
+            <StyledP typography="body_medium_m" color="white_200">
+              {useTokenValue ? tokenSymbol : fiatCurrency} {t('BALANCE')}:{' '}
+              {balanceHidden ? HIDDEN_BALANCE_LABEL : balance}
+            </StyledP>
+            <MaxButton disabled={sendMax || disabled} onClick={handleMaxClick}>
+              {t('MAX')}
+            </MaxButton>
+          </BalanceContainer>
+        }
+        value={amountDisplay}
+        onChange={(e) => handleAmountChange(e.target.value)}
+        onBlur={handleBlur}
+        placeholder="0"
+        rows={1}
+        complications={
+          <ConvertButton
+            variant="secondary"
+            title=""
+            icon={<ArrowsDownUp size={20} />}
+            onClick={handleUseTokenValueChange}
+          />
+        }
+        disabled={disabled}
+        hideClear
+        autoFocus
+      />
+      <ConvertedAmountWrapper>
+        {useTokenValue ? (
+          <StyledFiatAmountText
+            fiatAmount={getTokenFiatEquivalent(BigNumber(amount), fungibleToken)}
+            fiatCurrency={fiatCurrency}
+          />
+        ) : (
+          <NumericFormat
+            value={Number(amount)}
+            displayType="text"
+            thousandSeparator
+            renderText={(value: string) => (
+              <AmountText typography="body_medium_s" color="white_200">
+                {value} {tokenSymbol}
+              </AmountText>
             )}
-            <ArrowsDownUp size={16} color={Theme.colors.white_200} />
-          </ConvertComplication>
-          <VertRule />
-          <MaxButton disabled={sendMax || disabled} onClick={handleMaxClick}>
-            MAX
-          </MaxButton>
-        </>
-      }
-      disabled={disabled}
-      hideClear
-      autoFocus
-    />
+          />
+        )}
+      </ConvertedAmountWrapper>
+    </>
   );
 }
 

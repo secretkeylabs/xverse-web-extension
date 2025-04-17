@@ -5,31 +5,35 @@ import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowsDownUp } from '@phosphor-icons/react';
 import {
-  currencySymbolMap,
   getStxFiatEquivalent,
   getStxTokenEquivalent,
   stxToMicrostacks,
 } from '@secretkeylabs/xverse-core';
+import Button from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
-import Input, { ConvertComplication, MaxButton } from '@ui-library/input';
+import { MaxButton } from '@ui-library/input';
+import TextArea from '@ui-library/textarea';
 import { HIDDEN_BALANCE_LABEL } from '@utils/constants';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
-import Theme from 'theme';
 
-const BalanceText = styled.span`
-  ${(props) => props.theme.typography.body_medium_m}
-  color: ${(props) => props.theme.colors.white_200};
+const BalanceContainer = styled.div`
+  display: flex;
+  gap: ${(props) => props.theme.space.xs};
 `;
 
-const VertRule = styled.div`
-  width: 1px;
-  height: 16px;
-  background-color: ${(props) => props.theme.colors.white_800};
-  margin: 0 ${(props) => props.theme.space.xs};
+const ConvertedAmountWrapper = styled.div`
+  width: 100%;
+  word-break: break-all;
+`;
+
+const ConvertButton = styled(Button)`
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
 `;
 
 const AmountText = styled(StyledP)`
@@ -37,15 +41,8 @@ const AmountText = styled(StyledP)`
 `;
 
 const StyledFiatAmountText = styled(FiatAmountText)`
-  ${(props) => props.theme.typography.body_medium_s}
+  ${(props) => props.theme.typography.body_medium_m}
   color: ${(props) => props.theme.colors.white_200};
-`;
-
-const ConvertedAmountWrapper = styled.div`
-  max-width: 120px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 `;
 
 const inputValidator = /^[0-9.]*$/;
@@ -69,13 +66,14 @@ type Props = {
 
 function StxAmountSelector({ amount, setAmount, sendMax, setSendMax, disabled = false }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
+
   const { fiatCurrency, balanceHidden } = useWalletSelector();
   const { data: stxData } = useStxWalletData();
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const stxBalanceStr = stxData?.availableBalance.toString() ?? '0';
 
   const [amountDisplay, setAmountDisplay] = useState(
-    amount && microStxToStxString(BigNumber(amount)),
+    amount && amount !== '0' ? microStxToStxString(BigNumber(amount)) : '',
   );
 
   const [useStxValue, setUseStxValue] = useState(true);
@@ -105,16 +103,26 @@ function StxAmountSelector({ amount, setAmount, sendMax, setSendMax, disabled = 
         .toFixed(2);
 
   const handleAmountChange = (newAmount: string) => {
-    const isValidInput = inputValidator.test(newAmount);
-    if (!isValidInput) return;
-
-    setAmountDisplay(newAmount);
-
     if (!newAmount) {
+      setAmountDisplay(newAmount);
       setAmount('0');
+      setAmountDisplay('');
       setSendMax(false);
       return;
     }
+
+    // If user starts with a decimal point, prepend a zero
+    if (newAmount.startsWith('.')) {
+      newAmount = `0${newAmount}`;
+    }
+
+    // If user enters a number after a leading zero, replace the zero
+    if (newAmount.length > 1 && newAmount.startsWith('0') && newAmount[1] !== '.') {
+      newAmount = newAmount.slice(1);
+    }
+
+    const isValidInput = inputValidator.test(newAmount);
+    if (!isValidInput) return;
 
     const isValidAmount = useStxValue
       ? stxInputValidator.test(newAmount)
@@ -122,6 +130,7 @@ function StxAmountSelector({ amount, setAmount, sendMax, setSendMax, disabled = 
 
     if (!isValidAmount) return;
 
+    setAmountDisplay(newAmount);
     setSendMax(false);
 
     if (useStxValue) {
@@ -174,65 +183,60 @@ function StxAmountSelector({ amount, setAmount, sendMax, setSendMax, disabled = 
   const handleMaxClick = () => setSendMax(!sendMax);
 
   return (
-    <Input
-      titleElement={t('BTC.AMOUNT', { currency: useStxValue ? 'STX' : fiatCurrency })}
-      value={amountDisplay}
-      onChange={(e) => handleAmountChange(e.target.value)}
-      onBlur={handleBlur}
-      placeholder="0"
-      infoPanel={
-        <NumericFormat
-          value={balance}
-          displayType="text"
-          thousandSeparator
-          prefix={useStxValue ? '' : `~ ${currencySymbolMap[fiatCurrency]}`}
-          renderText={(value: string) => (
-            <div data-testid="balance-label">
-              <BalanceText>{t('BALANCE')}</BalanceText>
-              {balanceHidden && ` ${HIDDEN_BALANCE_LABEL}`}
-              {!balanceHidden && ` ${value} ${useStxValue ? 'STX' : fiatCurrency}`}
-            </div>
-          )}
-        />
-      }
-      complications={
-        <>
-          <ConvertComplication disabled={disabled} onClick={handleUseStxValueChange}>
-            <ConvertedAmountWrapper>
-              {useStxValue ? (
-                <StyledFiatAmountText
-                  fiatAmount={getStxFiatEquivalent(
-                    BigNumber(amount),
-                    BigNumber(stxBtcRate),
-                    BigNumber(btcFiatRate),
-                  )}
-                  fiatCurrency={fiatCurrency}
-                />
-              ) : (
-                <NumericFormat
-                  value={microStxToStxString(amount)}
-                  displayType="text"
-                  thousandSeparator
-                  renderText={(value: string) => (
-                    <AmountText typography="body_medium_s" color="white_200">
-                      {value} STX
-                    </AmountText>
-                  )}
-                />
-              )}
-            </ConvertedAmountWrapper>
-            <ArrowsDownUp size={16} color={Theme.colors.white_200} />
-          </ConvertComplication>
-          <VertRule />
-          <MaxButton disabled={sendMax || disabled} onClick={handleMaxClick}>
-            MAX
-          </MaxButton>
-        </>
-      }
-      disabled={disabled}
-      hideClear
-      autoFocus
-    />
+    <>
+      <TextArea
+        titleElement={
+          <BalanceContainer data-testid="balance-label">
+            <StyledP typography="body_medium_m" color="white_200">
+              {useStxValue ? 'STX' : fiatCurrency} {t('BALANCE')}:{' '}
+              {balanceHidden ? HIDDEN_BALANCE_LABEL : balance}
+            </StyledP>
+            <MaxButton disabled={sendMax} onClick={handleMaxClick}>
+              {t('MAX')}
+            </MaxButton>
+          </BalanceContainer>
+        }
+        value={amountDisplay}
+        onChange={(e) => handleAmountChange(e.target.value)}
+        onBlur={handleBlur}
+        placeholder="0"
+        rows={1}
+        complications={
+          <ConvertButton
+            variant="secondary"
+            title=""
+            icon={<ArrowsDownUp size={20} />}
+            onClick={handleUseStxValueChange}
+          />
+        }
+        disabled={disabled}
+        hideClear
+        autoFocus
+      />
+      <ConvertedAmountWrapper>
+        {useStxValue ? (
+          <StyledFiatAmountText
+            fiatAmount={getStxFiatEquivalent(
+              BigNumber(amount),
+              BigNumber(stxBtcRate),
+              BigNumber(btcFiatRate),
+            )}
+            fiatCurrency={fiatCurrency}
+          />
+        ) : (
+          <NumericFormat
+            value={microStxToStxString(amount)}
+            displayType="text"
+            thousandSeparator
+            renderText={(value: string) => (
+              <AmountText typography="body_medium_s" color="white_200">
+                {value} STX
+              </AmountText>
+            )}
+          />
+        )}
+      </ConvertedAmountWrapper>
+    </>
   );
 }
 

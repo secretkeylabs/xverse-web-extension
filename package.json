@@ -49,7 +49,7 @@
     "@scure/bip32": "1.6.2",
     "@scure/bip39": "1.5.4",
     "@scure/btc-signer": "1.6.0",
-    "@secretkeylabs/xverse-core": "43.0.2",
+    "@secretkeylabs/xverse-core": "43.0.3",
     "@stacks/connect": "7.9.0",
     "@stacks/encryption": "7.0.2",
     "@stacks/stacks-blockchain-api-types": "7.14.1",

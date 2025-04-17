@@ -3,7 +3,7 @@ import LedgerBadge from '@assets/img/hw/ledger/ledger_badge.svg';
 import { CaretRight } from '@phosphor-icons/react';
 import type { Account } from '@secretkeylabs/xverse-core';
 import { getAccountGradient } from '@utils/gradient';
-import { isKeystoneAccount, isLedgerAccount } from '@utils/helper';
+import { getAccountName, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import { useTranslation } from 'react-i18next';
 import styled, { useTheme } from 'styled-components';
 
@@ -75,9 +75,11 @@ type Props = {
 };
 
 function SelectAccount({ account, handlePressAccount }: Props) {
-  const gradient = getAccountGradient(account);
   const { t } = useTranslation('translation', { keyPrefix: 'SELECT_BTC_ADDRESS_SCREEN' });
+  const { t: tCommon } = useTranslation('translation', { keyPrefix: 'COMMON' });
+
   const theme = useTheme();
+  const gradient = getAccountGradient(account);
 
   return (
     <AccountInfoContainer onClick={handlePressAccount}>
@@ -90,11 +92,7 @@ function SelectAccount({ account, handlePressAccount }: Props) {
           />
           {account && (
             <CurrentAccountTextContainer>
-              <CurrentAccountName>
-                {account?.accountName ??
-                  account?.bnsName ??
-                  `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`}
-              </CurrentAccountName>
+              <CurrentAccountName>{getAccountName(account, tCommon)}</CurrentAccountName>
               {isLedgerAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
               {isKeystoneAccount(account) && <img src={KeystoneBadge} alt="Keystone icon" />}
             </CurrentAccountTextContainer>

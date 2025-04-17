@@ -34,6 +34,7 @@
     "LEARN_MORE": "Learn more",
     "SAVE": "Save",
     "SOMETHING_WENT_WRONG": "Something went wrong",
+    "ACCOUNT_NAME": "Account",
     "FIELD_REQUIRED": "This field is required",
     "ADDRESS": "Address"
   },
@@ -282,7 +283,6 @@
     "SHOW_BALANCE": "Show balance",
     "BITCOIN": "Bitcoin",
     "STACKS": "Stacks",
-    "ACCOUNT_NAME": "Account",
     "RECEIVE": "Receive",
     "CANCEL": "Cancel",
     "REMOVE_WALLET": "Remove",
@@ -382,8 +382,9 @@
     "STX": {
       "BUY_STX": "Buy Stacks"
     },
+    "MAX": "MAX",
     "ADDRESS_BOOK": "Address book",
-    "SAVE_ADDRESS": "Save Address",
+    "SAVE_ADDRESS": "Save address",
     "ADDRESS_ADDED": "Address added",
     "SAVE_TO_ADDRESS_BOOK": "Save to address book",
     "SEND_TO": "Send To",
@@ -1177,7 +1178,6 @@
     "RESET_WALLET": "Reset Wallet",
     "REMOVE_FROM_LIST": "Remove from list",
     "RENAME_ACCOUNT": "Rename account",
-    "ACCOUNT_NAME": "Account",
     "RENAME_ACCOUNT_MODAL": {
       "LABEL": "Account name",
       "MAX_SYMBOLS_ERR": "Account name cannot be more than {{maxLength}} characters",
@@ -1591,7 +1591,6 @@
   },
   "SELECT_BTC_ADDRESS_SCREEN": {
     "TITLE": "Connection Request",
-    "ACCOUNT_NAME": "Account",
     "CONNECT_BUTTON": "Connect",
     "CANCEL_BUTTON": "Cancel",
     "BITCOIN_ADDRESS": "Payments address",

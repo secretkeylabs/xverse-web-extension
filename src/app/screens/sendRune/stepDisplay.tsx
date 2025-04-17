@@ -1,6 +1,5 @@
 import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RecipientSelector from '@components/recipientSelector';
-import TokenImage from '@components/tokenImage';
 import type { FungibleToken } from '@secretkeylabs/xverse-core';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
@@ -8,23 +7,6 @@ import SendLayout from '../../layouts/sendLayout';
 import AmountSelector from './amountSelector';
 import type { TransactionSummary } from './helpers';
 import { Step, getNextStep } from './steps';
-
-const TitleContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 0 0;
-`;
-
-const Title = styled.div`
-  ${(props) => props.theme.typography.headline_xs}
-  margin-top: ${(props) => props.theme.space.s};
-  margin-bottom: ${(props) => props.theme.space.l};
-  text-overflow: ellipsis;
-  overflow: hidden;
-  max-width: 300px;
-  white-space: nowrap;
-`;
 
 const Container = styled.div`
   display: flex;
@@ -39,7 +21,6 @@ type Props = {
   setAmountToSend: (amount: string) => void;
   useTokenValue: boolean;
   setUseTokenValue: (toggle: boolean) => void;
-  amountError: string;
   currentStep: Step;
   setCurrentStep: (step: Step) => void;
   recipientAddress: string;
@@ -63,7 +44,6 @@ function StepDisplay({
   setAmountToSend,
   useTokenValue,
   setUseTokenValue,
-  amountError,
   currentStep,
   setCurrentStep,
   recipientAddress,
@@ -80,14 +60,6 @@ function StepDisplay({
   isSubmitting,
 }: Props) {
   const { t } = useTranslation('translation');
-  const header = (
-    <TitleContainer>
-      <TokenImage currency="FT" fungibleToken={token} />
-      <Title>
-        {t('SEND.SEND')} {token.name}
-      </Title>
-    </TitleContainer>
-  );
 
   switch (currentStep) {
     case Step.SelectRecipient:
@@ -108,12 +80,10 @@ function StepDisplay({
           <Container>
             <AmountSelector
               token={token}
-              header={header}
               amountToSend={amountToSend}
               setAmountToSend={setAmountToSend}
               useTokenValue={useTokenValue}
               setUseTokenValue={setUseTokenValue}
-              amountError={amountError}
               feeRate={feeRate}
               setFeeRate={setFeeRate}
               sendMax={sendMax}
@@ -124,6 +94,7 @@ function StepDisplay({
               onNext={() => setCurrentStep(getNextStep(Step.SelectAmount))}
               hasSufficientFunds={!!summary || isLoading}
               isLoading={isLoading}
+              recipientAddress={recipientAddress}
             />
           </Container>
         </SendLayout>
