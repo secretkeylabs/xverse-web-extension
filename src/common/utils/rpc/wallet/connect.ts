@@ -56,7 +56,7 @@ export const handleConnect = async (message: ConnectRequestMessage, port: chrome
     sendInternalErrorMessage({
       tabId: getTabIdFromPort(port),
       messageId: message.id,
-      message: 'Failed to get selected account.',
+      message: 'Failed to get selected account to handle `wallet_connect` request.',
     });
     return;
   }
