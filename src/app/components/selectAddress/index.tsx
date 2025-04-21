@@ -51,6 +51,12 @@ function SelectAddress({ setAddress, addressType }: Props) {
     return account.btcAddresses[selectedAccount.btcAddressType]?.address ?? '';
   };
 
+  // Filter out any accounts without an STX address for the STX flow
+  const filteredAccounts = allAccounts.filter(
+    (account) => addressType !== 'stx' || !!account.stxAddress,
+  );
+
+  // Filter address book entries by chain
   const filteredAddressBookEntries = addressBookEntries.filter((entry) => {
     if (addressType === 'stx') {
       return entry.chain === 'stacks';
@@ -69,18 +75,22 @@ function SelectAddress({ setAddress, addressType }: Props) {
 
   // Prepare tabs data
   const tabs: { label: string; value: TabType }[] = [];
+  const myAccountsVisible = filteredAccounts.length > 1;
+  const addressBookVisible = filteredAddressBookEntries.length > 0;
 
-  if (allAccounts.length > 1) {
+  if (myAccountsVisible) {
     tabs.push({ label: t('SELECT_ADDRESS.MY_ACCOUNTS'), value: 'my_accounts' });
   }
 
-  if (filteredAddressBookEntries.length > 0) {
+  if (addressBookVisible) {
     tabs.push({ label: t('SELECT_ADDRESS.ADDRESS_BOOK'), value: 'address_book' });
   }
 
   const showPlaceholder = !isLoading && tabs.length === 0;
 
-  const [activeTab, setActiveTab] = useState<TabType>('my_accounts');
+  const [activeTab, setActiveTab] = useState<TabType>(
+    myAccountsVisible ? 'my_accounts' : 'address_book',
+  );
 
   const handleTabChange = (newTab: TabType) => {
     // Set direction based on tab index change
@@ -134,8 +144,8 @@ function SelectAddress({ setAddress, addressType }: Props) {
           )}
           {tabs.length === 1 && (
             <Subtitle>
-              {allAccounts.length > 1 && t('SELECT_ADDRESS.MY_ACCOUNTS')}
-              {filteredAddressBookEntries.length >= 1 && t('SELECT_ADDRESS.ADDRESS_BOOK')}
+              {myAccountsVisible && t('SELECT_ADDRESS.MY_ACCOUNTS')}
+              {addressBookVisible && t('SELECT_ADDRESS.ADDRESS_BOOK')}
             </Subtitle>
           )}
         </TabsContainer>
@@ -145,14 +155,14 @@ function SelectAddress({ setAddress, addressType }: Props) {
             <AnimatedContent style={styles}>
               {currentTab === 'my_accounts' ? (
                 <ListContainer>
-                  {allAccounts.map((account, index) => (
+                  {filteredAccounts.map((account, index) => (
                     <div key={`${account.accountType}:${account.masterPubKey}:${account.id}`}>
                       <AccountRow
                         account={account}
                         address={getAccountAddress(account)}
                         onSelect={(address) => handleAddressSelect(address, 'my_accounts')}
                       />
-                      {index !== allAccounts.length - 1 && <Separator />}
+                      {index !== filteredAccounts.length - 1 && <Separator />}
                     </div>
                   ))}
                 </ListContainer>
