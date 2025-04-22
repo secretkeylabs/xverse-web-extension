@@ -6,6 +6,7 @@ import useHasFeature from '@hooks/useHasFeature';
 import { broadcastResetUserFlow, useResetUserFlow } from '@hooks/useResetUserFlow';
 import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import type { Tab } from '@screens/coinDashboard';
+import BtcTxHistoryList from '@screens/coinDashboard/btcTxHistoryList';
 import TokenHistoricalData from '@screens/coinDashboard/tokenHistoricalData';
 import TokenPrice, { type ChartPriceStats } from '@screens/coinDashboard/tokenPrice';
 import { FeatureId } from '@secretkeylabs/xverse-core';
@@ -15,7 +16,6 @@ import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import CoinHeader from '../../coinHeader';
 import { ChartContainer, Container, FtInfoContainer } from '../../index.styled';
-import TransactionsHistoryList from '../../transactionsHistoryList';
 import BalanceBreakdown from './balanceBreakdown';
 
 export default function CoinDashboard() {
@@ -79,16 +79,7 @@ export default function CoinDashboard() {
             onTabClick={(tabClicked: Tab) => setCurrentTab(tabClicked)}
           />
         </FtInfoContainer>
-        {currentTab === 'first' && (
-          <TransactionsHistoryList
-            withTitle={false}
-            coin="BTC"
-            stxTxFilter={null}
-            brc20Token={null}
-            runeToken={null}
-            runeSymbol={null}
-          />
-        )}
+        {currentTab === 'first' && <BtcTxHistoryList />}
         {currentTab === 'second' && <TokenPrice currency="BTC" fungibleToken={undefined} />}
         {currentTab === 'third' && <BalanceBreakdown />}
       </Container>

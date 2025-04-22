@@ -53,6 +53,7 @@ import {
 import { Mutex } from 'async-mutex';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
+import useXverseApi from './apiClients/useXverseApi';
 import useVault from './useVault';
 import useWalletSession from './useWalletSession';
 
@@ -110,6 +111,7 @@ const useWalletReducer = () => {
     keystoneAccountsList,
     network: network.type,
   });
+  const xverseApiClient = useXverseApi();
 
   const dispatch = useDispatch();
   const { setSessionStartTime, clearSessionTime, setSessionStartTimeAndMigrate } =
@@ -130,6 +132,20 @@ const useWalletReducer = () => {
     ): Promise<boolean> => {
       if (selectedAccountTypeLocal !== 'software') {
         // these accounts are created by ledger or keystone, so we cannot regenerate them
+        // we do ensure that they are in the auth scope though
+        const selectedAccount = getSelectedAccount({
+          selectedAccountIndex: selectedAccountIndexLocal,
+          selectedAccountType: selectedAccountTypeLocal,
+          selectedWalletId: selectedWalletIdLocal,
+          softwareWallets,
+          ledgerAccountsList,
+          keystoneAccountsList,
+          network: network.type,
+        });
+
+        if (selectedAccount) {
+          xverseApiClient.auth.ensureAccountRegistered(selectedAccount);
+        }
         return true;
       }
 
@@ -172,6 +188,8 @@ const useWalletReducer = () => {
         stacksNetwork,
         accountName: selectedAccount.accountName,
       });
+
+      xverseApiClient.auth.ensureAccountRegistered(recreatedAccount);
 
       const accountsMatch = Object.keys(recreatedAccount).every(
         (key) => JSON.stringify(selectedAccount[key]) === JSON.stringify(recreatedAccount[key]),

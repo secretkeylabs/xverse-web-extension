@@ -6,7 +6,6 @@ import useWalletSelector from '@hooks/useWalletSelector';
 import { microstacksToStx } from '@secretkeylabs/xverse-core';
 import type { AddressTransactionWithTransfers } from '@stacks/stacks-blockchain-api-types';
 import type { CurrencyTypes } from '@utils/constants';
-import { HIDDEN_BALANCE_LABEL } from '@utils/constants';
 import { ftDecimals } from '@utils/helper';
 import { getFtTicker } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
@@ -14,6 +13,7 @@ import { nanoid } from 'nanoid';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
+import { TransactionValue } from './TransactionValue';
 
 const TransactionContainer = styled.div((props) => ({
   display: 'flex',
@@ -48,11 +48,6 @@ const RecipientAddress = styled.p((props) => ({
   textAlign: 'left',
 }));
 
-const TransactionValue = styled.p((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_0,
-}));
-
 interface TxTransfersProps {
   transaction: AddressTransactionWithTransfers;
   coin: CurrencyTypes;
@@ -78,9 +73,7 @@ export default function TxTransfers(props: TxTransfersProps) {
   };
 
   const getTokenTransferTitle = (transfer): string =>
-    selectedAccount?.stxAddress === transfer.recipient
-      ? t('TRANSACTION_RECEIVED')
-      : t('TRANSACTION_SENT');
+    selectedAccount?.stxAddress === transfer.recipient ? t('RECEIVE') : t('SEND');
 
   function renderTransaction(transactionList) {
     return transactionList.map((transfer) => {
@@ -96,7 +89,7 @@ export default function TxTransfers(props: TxTransfersProps) {
           <TransactionInfoContainer>
             <TransactionRow>
               <TransactionTitleText>{getTokenTransferTitle(transfer)}</TransactionTitleText>
-              {balanceHidden && <TransactionValue>{HIDDEN_BALANCE_LABEL}</TransactionValue>}
+              {balanceHidden && <TransactionValue hidden />}
               {!balanceHidden && (
                 <NumericFormat
                   value={
@@ -109,9 +102,7 @@ export default function TxTransfers(props: TxTransfersProps) {
                   allowNegative={false}
                   prefix={isSentTransaction ? '-' : ''}
                   renderText={(value: string) => (
-                    <TransactionValue>
-                      {`${value} ${isFT && ft ? getFtTicker(ft) : coin}`}
-                    </TransactionValue>
+                    <TransactionValue amount={value} unit={isFT && ft ? getFtTicker(ft) : coin} />
                   )}
                 />
               )}

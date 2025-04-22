@@ -3,7 +3,7 @@ import useXverseApi from '@hooks/apiClients/useXverseApi';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  fetchBtcTransactionsData,
+  fetchBtcMempoolTransactions,
   getBrc20History,
   type APIGetRunesActivityForAddressResponse,
   type Brc20HistoryTransactionData,
@@ -26,7 +26,7 @@ export default function useTransactions(
 ) {
   const xverseApiClient = useXverseApi();
   const selectedAccount = useSelectedAccount();
-  const { network, hasActivatedOrdinalsKey } = useWalletSelector();
+  const { network } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
   const btcClient = useBtcClient();
   const fetchTransactions = async (): Promise<
@@ -55,11 +55,7 @@ export default function useTransactions(
       );
     }
     if (coinType === 'BTC') {
-      return fetchBtcTransactionsData(
-        selectedAccount,
-        btcClient,
-        hasActivatedOrdinalsKey as boolean,
-      );
+      return fetchBtcMempoolTransactions(selectedAccount.btcAddresses, btcClient);
     }
     return [];
   };

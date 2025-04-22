@@ -11,16 +11,10 @@ import {
   type StxTransactionData,
 } from '@secretkeylabs/xverse-core';
 import type { CurrencyTypes } from '@utils/constants';
-import { HIDDEN_BALANCE_LABEL } from '@utils/constants';
 import { getFtBalance, getFtTicker } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 import { NumericFormat } from 'react-number-format';
-import styled from 'styled-components';
-
-const TransactionValue = styled.p((props) => ({
-  ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_0,
-}));
+import { TransactionValue } from './TransactionValue';
 
 type Props = {
   transaction:
@@ -45,7 +39,7 @@ export default function TransactionAmount({
   if (currency === 'STX' || (currency === 'FT' && protocol === 'stacks')) {
     const stxTransaction = transaction as StxTransactionData;
     if (stxTransaction.amount.gt(0) && balanceHidden) {
-      return <TransactionValue>{HIDDEN_BALANCE_LABEL}</TransactionValue>;
+      return <TransactionValue hidden />;
     }
     if (stxTransaction.txType === 'token_transfer') {
       const prefix = stxTransaction.incoming ? '' : '-';
@@ -56,9 +50,7 @@ export default function TransactionAmount({
           thousandSeparator
           prefix={prefix}
           allowNegative={false}
-          renderText={(value: string) => (
-            <TransactionValue>{`${value} ${currency}`}</TransactionValue>
-          )}
+          renderText={(value: string) => <TransactionValue amount={value} unit={currency} />}
         />
       );
     }
@@ -76,9 +68,10 @@ export default function TransactionAmount({
             prefix={prefix}
             allowNegative={false}
             renderText={(value: string) => (
-              <TransactionValue>{`${value} ${getFtTicker(
-                token as FungibleToken,
-              )?.toUpperCase()}`}</TransactionValue>
+              <TransactionValue
+                amount={value}
+                unit={getFtTicker(token as FungibleToken)?.toUpperCase()}
+              />
             )}
           />
         );
@@ -88,7 +81,7 @@ export default function TransactionAmount({
     const btcTransaction = transaction as BtcTransactionData;
     const prefix = btcTransaction.incoming ? '' : '-';
     if (balanceHidden) {
-      return <TransactionValue>{HIDDEN_BALANCE_LABEL}</TransactionValue>;
+      return <TransactionValue hidden />;
     }
     if (btcTransaction.isOrdinal && btcTransaction.txStatus === 'pending') {
       return null;
@@ -101,7 +94,7 @@ export default function TransactionAmount({
           thousandSeparator
           prefix={prefix}
           allowNegative={false}
-          renderText={(value: string) => <TransactionValue>{`${value} BTC`}</TransactionValue>}
+          renderText={(value: string) => <TransactionValue amount={value} unit="BTC" />}
         />
       );
     }
@@ -109,7 +102,7 @@ export default function TransactionAmount({
     const brc20Transaction = transaction as Brc20HistoryTransactionData;
     const prefix = brc20Transaction.incoming ? '' : '-';
     if (balanceHidden) {
-      return <TransactionValue>{HIDDEN_BALANCE_LABEL}</TransactionValue>;
+      return <TransactionValue hidden />;
     }
     if (!new BigNumber(brc20Transaction.amount).isEqualTo(0)) {
       return (
@@ -120,7 +113,7 @@ export default function TransactionAmount({
           prefix={prefix}
           allowNegative={false}
           renderText={(value: string) => (
-            <TransactionValue>{`${value} ${brc20Transaction.ticker.toUpperCase()}`}</TransactionValue>
+            <TransactionValue amount={value} unit={brc20Transaction.ticker.toUpperCase()} />
           )}
         />
       );
@@ -128,7 +121,7 @@ export default function TransactionAmount({
   } else if (currency === 'FT' && protocol === 'runes') {
     const runeTransaction = transaction as GetRunesActivityForAddressEvent;
     if (balanceHidden) {
-      return <TransactionValue>{HIDDEN_BALANCE_LABEL}</TransactionValue>;
+      return <TransactionValue hidden />;
     }
     return (
       <NumericFormat
@@ -136,9 +129,7 @@ export default function TransactionAmount({
         displayType="text"
         thousandSeparator
         allowNegative
-        renderText={(value: string) => (
-          <TransactionValue>{`${value} ${tokenSymbol}`}</TransactionValue>
-        )}
+        renderText={(value: string) => <TransactionValue amount={value} unit={tokenSymbol} />}
       />
     );
   }

@@ -4,6 +4,7 @@ import type {
   GetRunesActivityForAddressEvent,
   StxTransactionData,
 } from '@secretkeylabs/xverse-core';
+import { getTruncatedAddress } from '@utils/helper';
 import {
   isBrc20Transaction,
   isBtcTransaction,
@@ -25,19 +26,19 @@ interface TransactionRecipientProps {
     | GetRunesActivityForAddressEvent;
 }
 
-function formatAddress(addr: string): string {
-  return addr ? `${addr.substring(0, 4)}...${addr.substring(addr.length - 4, addr.length)}` : '';
-}
-
 export default function TransactionRecipient(props: TransactionRecipientProps): JSX.Element | null {
   const { transaction } = props;
   if (isBtcTransaction(transaction)) {
-    return <RecipientAddress>{formatAddress(transaction.recipientAddress ?? '')}</RecipientAddress>;
+    return (
+      <RecipientAddress>
+        {getTruncatedAddress(transaction.recipientAddress ?? '', 6)}
+      </RecipientAddress>
+    );
   }
   if (isBrc20Transaction(transaction)) {
     return (
       <RecipientAddress>
-        {formatAddress(transaction.transfer_send?.to_address ?? '')}
+        {getTruncatedAddress(transaction.transfer_send?.to_address ?? '', 6)}
       </RecipientAddress>
     );
   }
@@ -45,7 +46,7 @@ export default function TransactionRecipient(props: TransactionRecipientProps): 
     if (transaction.txType === 'token_transfer' || transaction.txType === 'coinbase') {
       return (
         <RecipientAddress>
-          {formatAddress(transaction.tokenTransfer?.recipientAddress as string)}
+          {getTruncatedAddress(transaction.tokenTransfer?.recipientAddress as string, 6)}
         </RecipientAddress>
       );
     }

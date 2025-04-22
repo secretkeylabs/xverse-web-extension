@@ -35,6 +35,7 @@ export const handleKeystoneMessageSigning = async ({
   const signature = await signMessageKeystone({
     transport,
     networkType,
+    accountIndex: 0,
     addressIndex,
     address,
     message,
