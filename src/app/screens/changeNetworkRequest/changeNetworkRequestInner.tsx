@@ -100,7 +100,7 @@ function ChangeNetworkRequestInner({ context, data }: ChangeNetworkRequestInnerP
     const targetResource = permissions.resources.account.makeAccountResource({
       accountId: targetAccountId,
       masterPubKey: currentAccount.masterPubKey,
-      networkType: network.type,
+      networkType: toNetwork.type,
     });
 
     const clientPermissions = getClientPermissions(clientId);
