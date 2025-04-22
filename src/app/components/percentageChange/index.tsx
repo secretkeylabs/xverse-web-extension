@@ -107,7 +107,7 @@ function PercentageChange({
 
       if (fungibleToken) {
         if (!fungibleToken.priceChangePercentage24h || !fungibleToken.tokenFiatRate || !currency) {
-          return [BigNumber(0), BigNumber(0)];
+          return [BigNumber(fiatBalance), BigNumber(fiatBalance)];
         }
 
         currentPrice = Number(fungibleToken.currentPrice || '0');
