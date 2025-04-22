@@ -775,12 +775,11 @@
   },
   "LOGIN_SCREEN": {
     "BETA_VERSION": "Beta",
-    "WELCOME_MESSAGE_FIRST_LOGIN": "Welcome!",
-    "WELCOME_MESSAGE": "Welcome back!",
+    "SCREEN_TITLE": "The Bitcoin wallet for everyone",
     "PASSWORD_INPUT_LABEL": "Password",
     "PASSWORD_INPUT_PLACEHOLDER": "Enter your password",
     "VERIFY_PASSWORD_BUTTON": "Unlock",
-    "VERIFY_PASSWORD_ERROR": "Incorrect Password",
+    "VERIFY_PASSWORD_ERROR": "Incorrect password",
     "FORGOT_PASSWORD_BUTTON": "Forgot your password?"
   },
   "FORGOT_PASSWORD_SCREEN": {

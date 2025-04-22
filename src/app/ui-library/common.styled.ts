@@ -14,7 +14,7 @@ import type { Color, Typography } from 'theme';
 type TypographyProps = { typography: Typography; color?: Color };
 
 export const StyledP = styled.p<TypographyProps>`
-  ${(props) => props.theme[props.typography]}
+  ${(props) => props.theme.typography[props.typography]}
   color: ${(props) => (props.color ? props.theme.colors[props.color] : 'inherit')}
 `;
 

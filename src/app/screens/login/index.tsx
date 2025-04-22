@@ -1,41 +1,61 @@
-import Eye from '@assets/img/createPassword/Eye.svg';
-import EyeSlash from '@assets/img/createPassword/EyeSlash.svg';
-import logo from '@assets/img/xverse_logo.svg';
+import logo from '@assets/img/full_logo_horizontal.svg';
+import { valibotResolver } from '@hookform/resolvers/valibot';
 import useAsyncFn from '@hooks/useAsyncFn';
 import useVault from '@hooks/useVault';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSession from '@hooks/useWalletSession';
+import { Eye, EyeSlash } from '@phosphor-icons/react';
 import { useSpring } from '@react-spring/web';
 import Button from '@ui-library/button';
-import { useEffect, useState } from 'react';
+import Input from '@ui-library/input';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import Theme from 'theme';
+import * as v from 'valibot';
 import {
   AppVersion,
   ButtonContainer,
   ContentContainer,
-  ErrorMessage,
   ForgotPasswordButton,
-  IconButton,
   LandingTitle,
   Logo,
-  PasswordInput,
-  PasswordInputContainer,
-  PasswordInputLabel,
   ScreenContainer,
+  StyledButton,
   TopSectionContainer,
 } from './index.styled';
 
+type FormValues = {
+  password: string;
+};
+
 function Login(): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'LOGIN_SCREEN' });
+  const { t: tCommon } = useTranslation('translation', { keyPrefix: 'COMMON' });
+
   const navigate = useNavigate();
   const { unlockWallet } = useWalletReducer();
   const vault = useVault();
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const { setSessionStartTime } = useWalletSession();
+
+  const formSchema = v.object({
+    password: v.pipe(v.string(), v.trim(), v.nonEmpty(tCommon('FIELD_REQUIRED'))),
+  });
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm<FormValues>({
+    resolver: valibotResolver(formSchema),
+  });
+
+  const password = watch('password');
 
   const styles = useSpring({
     from: {
@@ -60,38 +80,18 @@ function Login(): JSX.Element {
     setIsPasswordVisible(!isPasswordVisible);
   };
 
-  const handlePasswordChange = (event: React.FormEvent<HTMLInputElement>) => {
-    if (error) {
-      setError('');
-    }
-    setPassword(event.currentTarget.value);
-  };
-
-  const handleVerifyPassword = async () => {
+  const handleVerifyPassword = async (formData: FormValues) => {
     setIsVerifying(true);
     try {
       await setSessionStartTime();
-      await unlockWallet(password);
+      await unlockWallet(formData.password);
       setIsVerifying(false);
       navigate(-1);
     } catch (err) {
       setIsVerifying(false);
-      setError(t('VERIFY_PASSWORD_ERROR'));
+      setError('password', { message: t('VERIFY_PASSWORD_ERROR') });
     }
   };
-
-  useEffect(() => {
-    const keyDownHandler = async (event) => {
-      if (event.key === 'Enter' && !!password && document.activeElement?.id === 'password-input') {
-        event.preventDefault();
-        await handleVerifyPassword();
-      }
-    };
-    document.addEventListener('keydown', keyDownHandler);
-    return () => {
-      document.removeEventListener('keydown', keyDownHandler);
-    };
-  }, [password]);
 
   const handleForgotPassword = () => {
     navigate('/forgotPassword');
@@ -103,33 +103,45 @@ function Login(): JSX.Element {
       <ContentContainer style={styles}>
         <TopSectionContainer>
           <Logo src={logo} />
-          <LandingTitle>{t('WELCOME_MESSAGE_FIRST_LOGIN')}</LandingTitle>
+          <LandingTitle typography="body_medium_l" color="white_200">
+            {t('SCREEN_TITLE')}
+          </LandingTitle>
         </TopSectionContainer>
-        <PasswordInputLabel>{t('PASSWORD_INPUT_LABEL')}</PasswordInputLabel>
-        <PasswordInputContainer>
-          <PasswordInput
+        <form onSubmit={handleSubmit(handleVerifyPassword)}>
+          <Input
+            {...register('password')}
+            titleElement={t('PASSWORD_INPUT_LABEL')}
             id="password-input"
             type={isPasswordVisible ? 'text' : 'password'}
-            value={password}
-            onChange={handlePasswordChange}
             placeholder={t('PASSWORD_INPUT_PLACEHOLDER')}
             autoFocus
+            complications={
+              <StyledButton type="button" onClick={handleTogglePasswordView}>
+                {isPasswordVisible ? (
+                  <Eye weight="fill" size={20} color={Theme.colors.white_200} />
+                ) : (
+                  <EyeSlash weight="fill" size={20} color={Theme.colors.white_200} />
+                )}
+              </StyledButton>
+            }
+            feedback={
+              errors.password?.message
+                ? [{ message: errors.password.message, variant: 'danger' }]
+                : undefined
+            }
+            hideClear
           />
-          <IconButton type="button" onClick={handleTogglePasswordView}>
-            <img src={isPasswordVisible ? Eye : EyeSlash} alt="show-password" height={24} />
-          </IconButton>
-        </PasswordInputContainer>
-        {error && <ErrorMessage>{error}</ErrorMessage>}
-        <ButtonContainer>
-          <Button
-            onClick={handleVerifyPassword}
-            title={t('VERIFY_PASSWORD_BUTTON')}
-            loading={isVerifying}
-          />
-        </ButtonContainer>
-        <ForgotPasswordButton onClick={handleForgotPassword}>
-          {t('FORGOT_PASSWORD_BUTTON')}
-        </ForgotPasswordButton>
+          <ButtonContainer>
+            <Button
+              title={t('VERIFY_PASSWORD_BUTTON')}
+              loading={isSubmitting || isVerifying}
+              disabled={!password || isSubmitting || isVerifying}
+            />
+          </ButtonContainer>
+          <ForgotPasswordButton onClick={handleForgotPassword}>
+            {t('FORGOT_PASSWORD_BUTTON')}
+          </ForgotPasswordButton>
+        </form>
       </ContentContainer>
     </ScreenContainer>
   );
