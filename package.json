@@ -143,6 +143,7 @@
     "prettier": "2.8.8",
     "prettier-plugin-organize-imports": "3.2.3",
     "process": "0.11.10",
+    "react-refresh": "0.17.0",
     "rimraf": "3.0.2",
     "ts-checker-rspack-plugin": "1.1.1",
     "tsc-files": "1.1.4",
