@@ -1314,7 +1314,20 @@
     "HIDE_AND_REPORT": "Hide & Report",
     "DATA": "DATA",
     "MARKET": "MARKET",
-    "PRICE": "Price"
+    "PRICE": "Price",
+    "ABOUT": "ABOUT",
+    "STATS": "STATS",
+    "INFO": "INFO",
+    "CURRENT_PRICE": "Current Price",
+    "DIVISIBILITY": "Divisibility",
+    "MINTABLE": "Mintable",
+    "MINT_LIMIT": "Mint Limit",
+    "MINT_AMOUNT": "Mint Amount",
+    "VOLUME_24H": "Volume (24h)",
+    "MARKET_CAP": "Market Cap",
+    "HOLDERS": "Holders",
+    "NAME": "Name",
+    "TICKER": "Ticker"
   },
   "SPEED_UP_TRANSACTION": {
     "TITLE": "Speed up transaction",

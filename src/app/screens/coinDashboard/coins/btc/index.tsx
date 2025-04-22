@@ -55,7 +55,7 @@ export default function CoinDashboard() {
 
   if (showDataTab) {
     tabs.splice(1, 0, {
-      label: t('MARKET'),
+      label: t('ABOUT'),
       value: 'second',
     });
   }
@@ -89,9 +89,7 @@ export default function CoinDashboard() {
             runeSymbol={null}
           />
         )}
-        {currentTab === 'second' && (
-          <TokenPrice currency="BTC" fungibleToken={undefined} chartPriceStats={chartPriceStats} />
-        )}
+        {currentTab === 'second' && <TokenPrice currency="BTC" fungibleToken={undefined} />}
         {currentTab === 'third' && <BalanceBreakdown />}
       </Container>
       <BottomBar tab="dashboard" />
