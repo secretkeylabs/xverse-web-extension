@@ -8,9 +8,9 @@ import { POPUP_WIDTH } from '@utils/constants';
 import { isInOptions } from '@utils/helper';
 import { getIsTermsAccepted } from '@utils/localStorage';
 import RoutePaths from 'app/routes/paths';
+import Lottie from 'lottie-react';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Lottie from 'react-lottie';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from 'styled-components';
 import {
@@ -229,14 +229,14 @@ function Landing() {
       ) : (
         <AnimationContainer>
           <Lottie
-            options={{ loop: false, animationData }}
+            // eslint-disable-next-line no-inline-styles/no-inline-styles
+            style={{ width: '70%' }}
+            animationData={animationData}
+            loop={false}
             width={isGalleryOpen ? '42.5%' : '70%'}
-            eventListeners={[
-              {
-                eventName: 'complete',
-                callback: () => setTimeout(() => setAnimationComplete(true), 1000),
-              },
-            ]}
+            onComplete={() => {
+              setTimeout(() => setAnimationComplete(true), 1000);
+            }}
           />
         </AnimationContainer>
       )}
