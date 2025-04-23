@@ -1,7 +1,8 @@
-import getSelectedAccount from '@common/utils/getSelectedAccount';
+import getSelectedAccount, { embellishAccountWithDetails } from '@common/utils/getSelectedAccount';
 import { getDeviceAccountIndex } from '@common/utils/ledger';
 import { dispatchEventAuthorizedConnectedClients } from '@common/utils/messages/extensionToContentScript/dispatchEvent';
 import { delay } from '@common/utils/promises';
+import { accountPurposeAddresses } from '@common/utils/rpc/btc/getAddresses/utils';
 import { getBitcoinNetworkType } from '@common/utils/rpc/helpers';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -99,6 +100,7 @@ const useWalletReducer = () => {
     keystoneAccountsList,
     hideStx,
     selectedWalletId,
+    btcPaymentAddressType,
   } = useWalletSelector();
   const vault = useVault();
   const stacksNetwork = useNetworkSelector();
@@ -637,7 +639,12 @@ const useWalletReducer = () => {
         });
       }
 
-      dispatchEventAuthorizedConnectedClients(changeEventPermissions, { type: 'accountChange' });
+      const embellishedAccount = embellishAccountWithDetails(nextAccount, btcPaymentAddressType);
+
+      dispatchEventAuthorizedConnectedClients(changeEventPermissions, {
+        type: 'accountChange',
+        addresses: accountPurposeAddresses(embellishedAccount, { type: 'all' }),
+      });
     },
     [dispatch, ensureSelectedAccountValid, network.type, queryClient, currentlySelectedAccount],
   );
@@ -745,10 +752,13 @@ const useWalletReducer = () => {
     dispatch(updateKeystoneAccountsAction(newKeystoneAccountsList));
   };
 
-  const changeBtcPaymentAddressType = async (btcPaymentAddressType: 'native' | 'nested') => {
-    dispatch(ChangeBtcPaymentAddressType(btcPaymentAddressType));
-
+  const changeBtcPaymentAddressType = async (newBtcPaymentAddressType: 'native' | 'nested') => {
+    dispatch(ChangeBtcPaymentAddressType(newBtcPaymentAddressType));
     if (currentlySelectedAccount) {
+      const embellishedAccount = embellishAccountWithDetails(
+        currentlySelectedAccount,
+        newBtcPaymentAddressType,
+      );
       dispatchEventAuthorizedConnectedClients(
         [
           {
@@ -763,7 +773,10 @@ const useWalletReducer = () => {
             actions: { read: true },
           },
         ],
-        { type: 'accountChange' },
+        {
+          type: 'accountChange',
+          addresses: accountPurposeAddresses(embellishedAccount, { type: 'all' }),
+        },
       );
     }
   };
