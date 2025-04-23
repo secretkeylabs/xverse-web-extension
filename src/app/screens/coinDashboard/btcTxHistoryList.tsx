@@ -43,25 +43,14 @@ const GroupContainer = styled(animated.div)((props) => ({
   marginBottom: props.theme.space.m,
 }));
 
-const SectionHeader = styled.div((props) => ({
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginBottom: props.theme.spacing(7),
-  paddingLeft: props.theme.space.m,
-  paddingRight: props.theme.space.m,
-}));
-
-const SectionSeparator = styled.div((props) => ({
-  border: `0.5px solid ${props.theme.colors.white_400}`,
-  opacity: 0.2,
-  flexGrow: 1,
-}));
-
 const SectionTitle = styled.p((props) => ({
-  ...props.theme.body_xs,
+  ...props.theme.headline_category_m,
   color: props.theme.colors.white_200,
   marginRight: props.theme.space.xs,
+  marginBottom: props.theme.space.xs,
+  paddingLeft: props.theme.space.m,
+  paddingRight: props.theme.space.m,
+  textTransform: 'uppercase',
 }));
 
 const LoadMoreButtonContainer = styled.div((props) => ({
@@ -208,10 +197,7 @@ function BtcTxHistoryList() {
         <>
           {groupedTxs.map(([, group, items]) => (
             <GroupContainer key={group} style={styles}>
-              <SectionHeader>
-                <SectionTitle>{group}</SectionTitle>
-                <SectionSeparator />
-              </SectionHeader>
+              <SectionTitle>{group}</SectionTitle>
               {items.map((transaction) => {
                 if (wallet && 'txStatus' in transaction) {
                   return (
