@@ -32,6 +32,7 @@ const StatsContainer = styled.div`
 
 const StatColumn = styled.div`
   flex: 1;
+  display: flex;
   align-items: flex-start;
   flex-direction: column;
   margin-top: ${({ theme }) => theme.space.m};
@@ -78,11 +79,11 @@ function Stat({ label, value, additionalContent }: StatProps) {
 
 function FormattedCurrencyValue({ value, currency }: { value: BigNumber; currency: string }) {
   if (value.isGreaterThan(1)) {
-    return `${currencySymbolMap[currency]}${value.toFormat(2)} ${currency}`;
+    return `${currency === '' ? '' : currencySymbolMap[currency]}${value.toFormat(2)} ${currency}`;
   }
   return (
     <>
-      {currencySymbolMap[currency]}
+      {currency === '' ? '' : currencySymbolMap[currency]}
       <FormattedNumber number={formatBalance(formatSignificantDecimals(value.toFixed(12)))} />
     </>
   );
@@ -118,13 +119,17 @@ function TokenPrice({ currency, fungibleToken }: Props) {
   const tokenName =
     currency === 'BTC' ? btcFt.name : currency === 'STX' ? stxFt.name : fungibleToken?.name;
   const tokenSymbol =
-    currency === 'BTC' || currency === 'STX' ? currency : fungibleToken?.runeSymbol;
+    currency === 'BTC' || currency === 'STX'
+      ? currency
+      : fungibleToken?.protocol === 'runes'
+      ? fungibleToken?.runeSymbol
+      : fungibleToken?.ticker;
   const tokenDivisibility =
     currency === 'BTC' ? btcFt.decimals : currency === 'STX' ? stxFt.decimals : divisibility;
 
   return (
     <Container>
-      <StyledP typography="headline_xs" color="white_200">
+      <StyledP typography="body_medium_m" color="white_200">
         {t('STATS')}
       </StyledP>
       <StatsContainer>
@@ -168,7 +173,7 @@ function TokenPrice({ currency, fungibleToken }: Props) {
       </StatsContainer>
 
       <InfoContainer>
-        <StyledP typography="headline_xs" color="white_200">
+        <StyledP typography="body_medium_m" color="white_200">
           {t('INFO')}
         </StyledP>
         <StatsContainer>
@@ -177,10 +182,15 @@ function TokenPrice({ currency, fungibleToken }: Props) {
         </StatsContainer>
         <StatsContainer>
           <Stat label={t('DIVISIBILITY')} value={tokenDivisibility} />
-          {fungibleToken && <Stat label={t('MINTABLE')} value={mintable ? 'Yes' : 'No'} />}
+          {fungibleToken && fungibleToken.protocol !== 'stacks' && (
+            <Stat
+              label={t('MINTABLE')}
+              value={mintable === undefined ? null : mintable ? 'Yes' : 'No'}
+            />
+          )}
         </StatsContainer>
         <StatsContainer>
-          {fungibleToken && (
+          {fungibleToken && fungibleToken.protocol !== 'stacks' && (
             <Stat
               label={t('MINT_LIMIT')}
               value={
