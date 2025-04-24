@@ -53,7 +53,7 @@ jobs:
           echo "TARGET_COMMITISH=$TARGET_COMMITISH" >> $GITHUB_ENV
           echo "TAG_RC=$TAG_RC" >> $GITHUB_ENV
           echo "FILENAME=xverse-web-extension.$TAG.zip" >> $GITHUB_ENV
-          echo "UPLOAD_URL=$(cat release.json | jq -r .upload_url)" >> $GITHUB_ENV
+          # UPLOAD_URL is no longer needed with softprops/action-gh-release
       - id: update-description
         name: Update PR description with release notes
         env:
@@ -76,17 +76,18 @@ jobs:
             -H "Accept: application/octet-stream" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             /repos/{owner}/{repo}/releases/assets/$ASSET_ID > build.zip
+      - name: Rename asset to match filename
+        run: cp build.zip "${{ env.FILENAME }}"
       - id: upload-latest-asset
         name: Upload latest asset to latest release
-        # TODO this looks like a deprecated & archived action we should upgrade
-        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1
+        uses: softprops/action-gh-release@da05d552573ad5aba039eaac05058a918a7bf631 # v2.2
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
         with:
-          upload_url: ${{ env.UPLOAD_URL}}
-          asset_path: build.zip
-          asset_name: ${{ env.FILENAME }}
-          asset_content_type: application/zip
+          tag_name: ${{ env.TAG }}
+          files: ${{ env.FILENAME }}
+          name: ${{ env.TAG }}
+          draft: false
       - id: push-to-public
         name: Push to public remote
         if: ${{ contains(github.repositoryUrl, 'private') }}
@@ -115,15 +116,15 @@ jobs:
             -f target_commitish="$TARGET_COMMITISH" \
             -f name="$TAG" \
             -F 'body=@public-body.md' > public-release.json
-          echo "PUBLIC_UPLOAD_URL=$(cat public-release.json | jq -r .upload_url)" >> $GITHUB_ENV
+          echo "OWNER=$(echo $GITHUB_REPOSITORY | cut -d '/' -f 1)" >> $GITHUB_ENV
       - id: upload-latest-asset-to-public
         name: Upload latest asset to latest release on public remote
-        # TODO this looks like a deprecated & archived action we should upgrade
-        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1
+        uses: softprops/action-gh-release@da05d552573ad5aba039eaac05058a918a7bf631 # v2.2
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
         with:
-          upload_url: ${{ env.PUBLIC_UPLOAD_URL}}
-          asset_path: build.zip
-          asset_name: ${{ env.FILENAME }}
-          asset_content_type: application/zip
+          tag_name: ${{ env.TAG }}
+          files: ${{ env.FILENAME }}
+          name: ${{ env.TAG }}
+          draft: false
+          repository: ${{ env.OWNER }}/${{ env.REMOTE_REPO }}
