@@ -14,6 +14,7 @@ import { currencySymbolMap, formatBalance, type FungibleToken } from '@secretkey
 import { StyledP } from '@ui-library/common.styled';
 import type { CurrencyTypes } from '@utils/constants';
 import { formatSignificantDecimals } from '@utils/tokens';
+import { NumericFormat } from 'react-number-format';
 
 const Container = styled.div`
   display: flex;
@@ -37,6 +38,16 @@ const StatColumn = styled.div`
   flex-direction: column;
   margin-top: ${({ theme }) => theme.space.m};
   gap: ${({ theme }) => theme.space.xxxs};
+  min-width: 0;
+`;
+
+const StatValue = styled(StyledP)`
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+  white-space: normal;
+  width: 100%;
 `;
 
 const InfoContainer = styled.div`
@@ -69,9 +80,9 @@ function Stat({ label, value, additionalContent }: StatProps) {
       <StyledP typography="body_medium_m" color="white_400">
         {label}
       </StyledP>
-      <StyledP typography="body_medium_m" color="white_0">
+      <StatValue typography="body_medium_m" color="white_0">
         {value ?? PLACE_HOLDER}
-      </StyledP>
+      </StatValue>
       {additionalContent}
     </StatColumn>
   );
@@ -167,7 +178,18 @@ function TokenPrice({ currency, fungibleToken }: Props) {
         <Stat
           label={t('HOLDERS')}
           value={
-            holders && <FormattedCurrencyValue value={BigNumber(holders.toString())} currency="" />
+            holders && (
+              <NumericFormat
+                value={holders}
+                displayType="text"
+                thousandSeparator
+                renderText={(value: string) => (
+                  <StyledP typography="body_medium_m" color="white_0">
+                    {value}
+                  </StyledP>
+                )}
+              />
+            )
           }
         />
       </StatsContainer>
@@ -190,7 +212,7 @@ function TokenPrice({ currency, fungibleToken }: Props) {
           )}
         </StatsContainer>
         <StatsContainer>
-          {fungibleToken && fungibleToken.protocol !== 'stacks' && (
+          {mintable && fungibleToken && fungibleToken.protocol !== 'stacks' && (
             <Stat
               label={t('MINT_LIMIT')}
               value={
