@@ -195,7 +195,7 @@ export default function CoinDashboard() {
               isSelected={currentTab === 'second'}
               onClick={() => setCurrentTab('second')}
             >
-              {t('MARKET')}
+              {t('ABOUT')}
             </Button>
           )}
           <Button
@@ -213,7 +213,6 @@ export default function CoinDashboard() {
           <TokenPrice
             currency={currency as CurrencyTypes}
             fungibleToken={selectedFt as FungibleTokenWithStates}
-            chartPriceStats={chartPriceStats}
           />
         )}
 

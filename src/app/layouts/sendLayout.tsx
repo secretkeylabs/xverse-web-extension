@@ -13,6 +13,7 @@ const ScrollContainer = styled.div`
   flex-direction: column;
   justify-content: space-between;
   ${(props) => props.theme.scrollbar}
+  overflow-x: hidden;
 `;
 
 const Container = styled.div`
@@ -26,6 +27,7 @@ const Container = styled.div`
   max-width: ${breakpoints.xs}px;
   max-height: 600px;
   flex: 1;
+  overflow-x: hidden;
 
   @media only screen and ${devices.min.s} {
     max-width: 588px;
@@ -35,9 +37,11 @@ const Container = styled.div`
   }
 `;
 
-const BottomBarContainer = styled.div({
-  marginTop: 'auto',
-});
+const BottomBarContainer = styled.div`
+  margin-top: auto;
+  position: relative;
+  z-index: 1;
+`;
 
 function SendLayout({
   children,

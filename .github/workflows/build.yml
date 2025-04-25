@@ -13,12 +13,12 @@ jobs:
     if: ${{ !startsWith(github.head_ref, 'release/') && !startsWith(github.head_ref, 'e2etest/') && !github.event.pull_request.draft == true }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # actions/checkout@v4
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e #v4.3.0
         with:
           always-auth: true
-          node-version: 22
+          node-version: 23
           registry-url: https://npm.pkg.github.com
           scope: '@secretkeylabs'
           cache: npm
@@ -48,7 +48,7 @@ jobs:
         run: xvfb-run --auto-servernum --server-args="-screen 0 360x360x24" npm run e2etest:smoketest --reporter=html
       - name: Upload Playwright report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # 4.6.2
         with:
           name: playwright-report
           path: playwright-report/
@@ -59,7 +59,7 @@ jobs:
           GIT_SHA_SHORT=$(git rev-parse --short ${{ github.event.pull_request.head.sha }})
           echo "FILENAME=xverse-extension.$BRANCH_NAME.$GIT_SHA_SHORT" >> $GITHUB_ENV
       - name: Upload Archive
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # 4.6.2
         with:
           name: ${{ env.FILENAME }}
           path: ./build
@@ -74,7 +74,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # actions/checkout@v4
       - name: Get artifact URL
         env:
           OWNER: ${{ github.repository_owner }}

@@ -71,7 +71,7 @@ export function requirePermissions(
       sendInternalErrorMessage({
         tabId: getTabIdFromPort(port),
         messageId: message.id,
-        message: 'Failed to get selected account.',
+        message: 'Failed to get selected account while checking permissions.',
       });
       return;
     }

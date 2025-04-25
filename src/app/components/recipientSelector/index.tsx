@@ -9,6 +9,7 @@ import useGetAllAccounts from '@hooks/useGetAllAccounts';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { At, Plus } from '@phosphor-icons/react';
+import { animated, useTransition } from '@react-spring/web';
 import { StyledCallout } from '@screens/createInscription/index.styled';
 import AddressBookItem from '@screens/settings/addressBook/addressBookItem';
 import { validateBtcAddress } from '@secretkeylabs/xverse-core';
@@ -17,7 +18,7 @@ import Button from '@ui-library/button';
 import Input from '@ui-library/input';
 import { InputFeedback, type InputFeedbackProps } from '@ui-library/inputFeedback';
 import Sheet from '@ui-library/sheet';
-import { MAX_ACC_NAME_LENGTH } from '@utils/constants';
+import { ANIMATION_EASING, MAX_ACC_NAME_LENGTH } from '@utils/constants';
 import { type TabType } from '@utils/helper';
 import SendLayout from 'app/layouts/sendLayout';
 import RoutePaths, { RoutePathsSuffixes } from 'app/routes/paths';
@@ -36,8 +37,11 @@ import {
   HeaderButton,
   HeaderContainer,
   HeaderTitle,
+  MainScreenContainer,
+  RecipientLabel,
   SaveAddressButton,
   SaveAddressForm,
+  TransitionWrapper,
 } from './index.styled';
 import SelectedRecipient from './selectedRecipient';
 
@@ -84,6 +88,7 @@ function RecipientSelector({
   const [showSaveAddressSheet, setShowSaveAddressSheet] = useState(false);
   const [showAddressSelector, setShowAddressSelector] = useState(false);
   const [addressSource, setAddressSource] = useState<AddressSource | null>(null);
+  const [transitionDirection, setTransitionDirection] = useState<'forward' | 'back'>('forward');
 
   /* hooks */
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
@@ -164,6 +169,7 @@ function RecipientSelector({
   const handleBackClick = () => {
     if (showAddressSelector) {
       // If address selector is visible, hide it instead of navigating back
+      setTransitionDirection('back');
       setShowAddressSelector(false);
     } else {
       // Otherwise, perform the normal back action
@@ -315,122 +321,214 @@ function RecipientSelector({
     addressBookItem,
     accountListItem,
     addressType,
+    t,
   ]);
 
-  if (showAddressSelector) {
-    return (
-      <SendLayout selectedBottomTab={selectedBottomTab} onClickBack={handleBackClick}>
-        <Container>
-          <SelectAddress setAddress={handleAddressSelect} addressType={addressType} />
-        </Container>
-      </SendLayout>
-    );
-  }
+  const recipientsTransition = useTransition(
+    addressBookItem && (!addressSource || addressSource === 'address_book')
+      ? 'address_book'
+      : accountListItem && (!addressSource || addressSource === 'my_accounts')
+      ? 'account'
+      : 'input',
+    {
+      from: { opacity: 0 },
+      enter: { opacity: 1 },
+      leave: { opacity: 0 },
+      config: { duration: 150, easing: ANIMATION_EASING },
+      exitBeforeEnter: true,
+    },
+  );
+
+  const pageTransition = useTransition(showAddressSelector, {
+    from: () => ({
+      opacity: 0,
+      transform: `translateX(${transitionDirection === 'forward' ? '80px' : '-80px'})`,
+    }),
+    enter: {
+      opacity: 1,
+      transform: 'translateX(0px)',
+    },
+    leave: () => ({
+      opacity: 0,
+      transform: `translateX(${transitionDirection === 'forward' ? '-80px' : '80px'})`,
+    }),
+    config: { duration: 125, easing: ANIMATION_EASING },
+    exitBeforeEnter: true,
+  });
+
+  const saveAddressButtonTransition = useTransition(
+    recipientAddress && !addressBookItem && !accountListItem,
+    {
+      from: { opacity: 0, transform: 'translateY(48px)' },
+      enter: { opacity: 1, transform: 'translateY(0px)' },
+      leave: { opacity: 0, transform: 'translateY(48px)' },
+      config: { duration: 200, easing: ANIMATION_EASING },
+    },
+  );
 
   return (
     <SendLayout selectedBottomTab={selectedBottomTab} onClickBack={handleBackClick}>
-      <Container>
-        <div>
-          <HeaderContainer>
-            <HeaderTitle>{t('SEND_TO')}</HeaderTitle>
-            <HeaderButton
-              title={t('ADDRESS_BOOK')}
-              variant="secondary"
-              onClick={() => setShowAddressSelector(true)}
-              icon={<At size={16} weight="bold" color={Theme.colors.white_0} />}
-            />
-          </HeaderContainer>
-          {addressBookItem && (!addressSource || addressSource === 'address_book') ? (
-            <SelectedRecipient setRecipientAddress={setRecipientAddress}>
-              <AddressBookItem item={addressBookItem} isViewOnly />
-            </SelectedRecipient>
-          ) : accountListItem && (!addressSource || addressSource === 'my_accounts') ? (
-            <SelectedRecipient setRecipientAddress={setRecipientAddress}>
-              <AccountRow account={accountListItem} address={recipientAddress} />
-            </SelectedRecipient>
+      <TransitionWrapper>
+        {pageTransition((pageStyles, showSelector) =>
+          showSelector ? (
+            <MainScreenContainer style={pageStyles}>
+              <Container>
+                <SelectAddress
+                  setAddress={(newAddress, source) => {
+                    setTransitionDirection('forward');
+                    handleAddressSelect(newAddress, source);
+                  }}
+                  addressType={addressType}
+                />
+              </Container>
+            </MainScreenContainer>
           ) : (
-            <Input
-              dataTestID="address-receive"
-              titleElement={t('RECIPIENT')}
-              placeholder={recipientPlaceholder || t('BTC.RECIPIENT_PLACEHOLDER')}
-              value={recipientAddress}
-              onChange={handleAddressChange}
-              variant={addressIsValid ? 'default' : 'danger'}
-              feedback={inputFeedback}
-              autoFocus
-            />
-          )}
-          {accountListItem && inputFeedback && inputFeedback.length > 0 && (
-            // We still show the InputFeedback component even if the Input component is not visible
-            // to show the address validation errors
-            <Feedback>
-              {inputFeedback.map((feedback) => (
-                <InputFeedback key={feedback.message} {...feedback} />
-              ))}
-            </Feedback>
-          )}
-          {recipientAddress && !addressBookItem && !accountListItem && (
-            <SaveAddressButton
-              title={t('SAVE_TO_ADDRESS_BOOK')}
-              variant="secondary"
-              onClick={() => setShowSaveAddressSheet(true)}
-              icon={<Plus size={16} color={Theme.colors.white_0} />}
-            />
-          )}
+            <MainScreenContainer style={pageStyles}>
+              <Container>
+                <div>
+                  <HeaderContainer>
+                    <HeaderTitle>{t('SEND_TO')}</HeaderTitle>
+                    <HeaderButton
+                      title={t('ADDRESS_BOOK')}
+                      variant="secondary"
+                      onClick={() => {
+                        setTransitionDirection('forward');
+                        setShowAddressSelector(true);
+                      }}
+                      icon={<At size={16} weight="bold" color={Theme.colors.white_0} />}
+                    />
+                  </HeaderContainer>
+                  <RecipientLabel typography="body_medium_m" color="white_200">
+                    {t('RECIPIENT')}
+                  </RecipientLabel>
+                  <div>
+                    {recipientsTransition((styles, item) => {
+                      switch (item) {
+                        case 'address_book':
+                          return (
+                            addressBookItem && (
+                              <animated.div style={styles}>
+                                <SelectedRecipient
+                                  setRecipientAddress={setRecipientAddress}
+                                  setToOwnAddress={setToOwnAddress}
+                                >
+                                  <AddressBookItem item={addressBookItem} isViewOnly />
+                                </SelectedRecipient>
+                              </animated.div>
+                            )
+                          );
+                        case 'account':
+                          return (
+                            accountListItem && (
+                              <animated.div style={styles}>
+                                <SelectedRecipient
+                                  setRecipientAddress={setRecipientAddress}
+                                  setToOwnAddress={setToOwnAddress}
+                                >
+                                  <AccountRow
+                                    account={accountListItem}
+                                    address={recipientAddress}
+                                  />
+                                </SelectedRecipient>
+                              </animated.div>
+                            )
+                          );
+                        default:
+                          return (
+                            <animated.div style={styles}>
+                              <Input
+                                dataTestID="address-receive"
+                                placeholder={recipientPlaceholder || t('BTC.RECIPIENT_PLACEHOLDER')}
+                                value={recipientAddress}
+                                onChange={handleAddressChange}
+                                variant={addressIsValid ? 'default' : 'danger'}
+                                feedback={inputFeedback}
+                                autoFocus
+                              />
+                            </animated.div>
+                          );
+                      }
+                    })}
+                  </div>
+                  {accountListItem && inputFeedback && inputFeedback.length > 0 && (
+                    <Feedback>
+                      {inputFeedback.map((feedback) => (
+                        <InputFeedback key={feedback.message} {...feedback} />
+                      ))}
+                    </Feedback>
+                  )}
+                  {saveAddressButtonTransition(
+                    (styles, show) =>
+                      show && (
+                        <animated.div style={styles}>
+                          <SaveAddressButton
+                            title={t('SAVE_TO_ADDRESS_BOOK')}
+                            variant="secondary"
+                            onClick={() => setShowSaveAddressSheet(true)}
+                            icon={<Plus size={16} color={Theme.colors.white_0} />}
+                          />
+                        </animated.div>
+                      ),
+                  )}
 
-          {/* Render custom fields if provided */}
-          {customFields}
-        </div>
-        {calloutText && <StyledCallout bodyText={calloutText} />}
-        <Buttons>
-          <Button
-            title={t('NEXT')}
-            onClick={handleNext}
-            disabled={
-              !recipientAddress || inputFeedback?.some((feedback) => feedback.variant === 'danger')
-            }
-            loading={isLoading}
-          />
-        </Buttons>
+                  {/* Render custom fields if provided */}
+                  {customFields}
+                </div>
+                {calloutText && <StyledCallout bodyText={calloutText} />}
+                <Buttons>
+                  <Button
+                    title={t('NEXT')}
+                    onClick={handleNext}
+                    disabled={
+                      !recipientAddress ||
+                      inputFeedback?.some((feedback) => feedback.variant === 'danger')
+                    }
+                    loading={isLoading}
+                  />
+                </Buttons>
 
-        <Sheet
-          visible={showSaveAddressSheet}
-          title={t('SAVE_ADDRESS')}
-          onClose={() => setShowSaveAddressSheet(false)}
-        >
-          <SaveAddressForm onSubmit={handleSubmit(handleSaveAddress)}>
-            <Input
-              {...register('name')}
-              titleElement={t('NAME')}
-              placeholder={t('NAME_PLACEHOLDER')}
-              autoFocus
-              feedback={
-                errors.name?.message
-                  ? [{ message: errors.name.message, variant: 'danger' }]
-                  : undefined
-              }
-              clearValue={() => setValue('name', '')}
-            />
-            <Input
-              {...register('address')}
-              titleElement={tCommon('ADDRESS')}
-              placeholder={recipientPlaceholder || t('BTC.RECIPIENT_PLACEHOLDER')}
-              feedback={
-                errors.address?.message
-                  ? [{ message: errors.address.message, variant: 'danger' }]
-                  : undefined
-              }
-              clearValue={() => setValue('address', '')}
-            />
-            <Button
-              title={tCommon('SAVE')}
-              disabled={!name || !address || isSaving || isSubmitting}
-              loading={isSaving || isSubmitting}
-              type="submit"
-            />
-          </SaveAddressForm>
-        </Sheet>
-      </Container>
+                <Sheet
+                  visible={showSaveAddressSheet}
+                  title={t('SAVE_ADDRESS')}
+                  onClose={() => setShowSaveAddressSheet(false)}
+                >
+                  <SaveAddressForm onSubmit={handleSubmit(handleSaveAddress)}>
+                    <Input
+                      {...register('name')}
+                      titleElement={t('NAME')}
+                      placeholder={t('NAME_PLACEHOLDER')}
+                      autoFocus
+                      feedback={
+                        errors.name?.message
+                          ? [{ message: errors.name.message, variant: 'danger' }]
+                          : undefined
+                      }
+                      clearValue={() => setValue('name', '')}
+                    />
+                    <Input
+                      {...register('address')}
+                      titleElement={tCommon('ADDRESS')}
+                      placeholder={recipientPlaceholder || t('BTC.RECIPIENT_PLACEHOLDER')}
+                      feedback={
+                        errors.address?.message
+                          ? [{ message: errors.address.message, variant: 'danger' }]
+                          : undefined
+                      }
+                      clearValue={() => setValue('address', '')}
+                    />
+                    <Button
+                      title={tCommon('SAVE')}
+                      disabled={!name || !address || isSaving || isSubmitting}
+                      loading={isSaving || isSubmitting}
+                      type="submit"
+                    />
+                  </SaveAddressForm>
+                </Sheet>
+              </Container>
+            </MainScreenContainer>
+          ),
+        )}
+      </TransitionWrapper>
     </SendLayout>
   );
 }

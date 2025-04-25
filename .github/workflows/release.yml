@@ -23,7 +23,7 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # actions/checkout@v4
       - id: create-latest-release
         name: Create latest release
         env:
@@ -78,7 +78,8 @@ jobs:
             /repos/{owner}/{repo}/releases/assets/$ASSET_ID > build.zip
       - id: upload-latest-asset
         name: Upload latest asset to latest release
-        uses: actions/upload-release-asset@v1
+        # TODO this looks like a deprecated & archived action we should upgrade
+        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -117,7 +118,8 @@ jobs:
           echo "PUBLIC_UPLOAD_URL=$(cat public-release.json | jq -r .upload_url)" >> $GITHUB_ENV
       - id: upload-latest-asset-to-public
         name: Upload latest asset to latest release on public remote
-        uses: actions/upload-release-asset@v1
+        # TODO this looks like a deprecated & archived action we should upgrade
+        uses: actions/upload-release-asset@e8f9f06c4b078e705bd2ea027f0926603fc9b4d5 # v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

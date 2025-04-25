@@ -38,7 +38,7 @@ export async function handleGetAccount(
     sendInternalErrorMessage({
       tabId: getTabIdFromPort(port),
       messageId: message.id,
-      message: 'Failed to get selected account.',
+      message: 'Failed to get selected account to handle `wallet_getAccount` request.',
     });
     return;
   }

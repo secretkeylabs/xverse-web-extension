@@ -107,7 +107,7 @@ function PercentageChange({
 
       if (fungibleToken) {
         if (!fungibleToken.priceChangePercentage24h || !fungibleToken.tokenFiatRate || !currency) {
-          return [BigNumber(0), BigNumber(0)];
+          return [BigNumber(fiatBalance), BigNumber(fiatBalance)];
         }
 
         currentPrice = Number(fungibleToken.currentPrice || '0');
@@ -161,8 +161,8 @@ function PercentageChange({
 
   const formattedBalanceChange = [
     '(',
-    currencySymbolMap[fiatCurrency],
     increase ? '+' : '-',
+    currencySymbolMap[fiatCurrency],
     currentBalance.minus(oldBalance).absoluteValue().toFixed(2),
     ')',
   ].join('');
@@ -208,7 +208,7 @@ function PercentageChange({
         {displayBalanceChange && formattedBalanceChange ? ` ${formattedBalanceChange}` : ''}
       </PercentageChangeText>
       {formattedAmountChange && renderFormattedAmountChange()}
-      {displayTimeInterval && <IntervalText>24h</IntervalText>}
+      {displayTimeInterval && <IntervalText>1D</IntervalText>}
     </RowContainer>
   );
 }

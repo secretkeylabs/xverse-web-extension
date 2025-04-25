@@ -13,7 +13,12 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import type { Account } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
-import { getTruncatedAddress, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
+import {
+  getAccountName,
+  getTruncatedAddress,
+  isKeystoneAccount,
+  isLedgerAccount,
+} from '@utils/helper';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
@@ -29,7 +34,7 @@ type Props = {
 };
 
 function AccountRow({ account, onSelect, address }: Props) {
-  const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
+  const { t: tCommon } = useTranslation('translation', { keyPrefix: 'COMMON' });
   const { avatarIds } = useWalletSelector();
   const selectedAccount = useSelectedAccount();
   const accountAvatar = avatarIds[account?.btcAddresses.taproot.address ?? ''];
@@ -51,9 +56,7 @@ function AccountRow({ account, onSelect, address }: Props) {
           <CustomAccountContainer>
             <CurrentAccountTextContainer>
               <AccountName aria-label="Account Name" $isSelected>
-                {account?.accountName ??
-                  account?.bnsName ??
-                  `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`}
+                {getAccountName(account, tCommon)}
               </AccountName>
               {isLedgerAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
               {isKeystoneAccount(account) && <img src={KeystoneBadge} alt="Keystone icon" />}

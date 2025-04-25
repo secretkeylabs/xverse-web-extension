@@ -27,6 +27,7 @@ export const handleLedgerMessageSigning = async ({
   const signature = await signMessageLedger({
     transport,
     networkType,
+    accountIndex: 0,
     addressIndex,
     address,
     message,

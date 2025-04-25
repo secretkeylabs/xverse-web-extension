@@ -224,6 +224,7 @@ function BalanceCard({ isLoading, isRefetching, combinedFtList }: Props) {
                   <PercentageChange
                     isHidden={balanceHidden}
                     displayTimeInterval
+                    displayBalanceChange
                     ftCurrencyPairs={[
                       [undefined, 'BTC'],
                       [undefined, 'STX'],

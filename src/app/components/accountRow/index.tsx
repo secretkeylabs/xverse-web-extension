@@ -23,6 +23,7 @@ import Spinner from '@ui-library/spinner';
 import { BTC_SYMBOL, EMPTY_LABEL, HIDDEN_BALANCE_LABEL, LoaderSize } from '@utils/constants';
 import {
   getAccountBalanceKey,
+  getAccountName,
   isKeystoneAccount,
   isLedgerAccount,
   validateAccountName,
@@ -72,12 +73,14 @@ function AccountRow({
   isAccountListView = false,
   disabledAccountSelect = false,
 }: Props) {
-  const dispatch = useDispatch();
-  const menuDialog = useOptionsDialog();
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const { t: optionsDialogTranslation } = useTranslation('translation', {
     keyPrefix: 'OPTIONS_DIALOG',
   });
+  const { t: tCommon } = useTranslation('translation', { keyPrefix: 'COMMON' });
+
+  const dispatch = useDispatch();
+  const menuDialog = useOptionsDialog();
   const {
     softwareWallets,
     fiatCurrency,
@@ -254,9 +257,7 @@ function AccountRow({
               <TransparentSpan>
                 <CurrentAccountTextContainer>
                   <AccountName aria-label="Account Name" $isSelected={isSelected}>
-                    {account?.accountName ??
-                      account?.bnsName ??
-                      `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`}
+                    {getAccountName(account, tCommon)}
                   </AccountName>
                   {isLedgerAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
                   {isKeystoneAccount(account) && <img src={KeystoneBadge} alt="Keystone icon" />}

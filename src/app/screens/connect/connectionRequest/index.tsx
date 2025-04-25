@@ -5,14 +5,16 @@ import OrdinalsIcon from '@assets/img/nftDashboard/white_ordinals_icon.svg';
 import { getPopupPayload, type Context } from '@common/utils/popup';
 import {
   AddressPurpose,
+  BitcoinNetworkType,
   connectRequestMessageSchema,
   requestPermissionsRequestMessageSchema,
+  type ChangeNetworkRequestMessage,
   type ConnectRequestMessage,
   type RequestPermissionsRequestMessage,
 } from '@sats-connect/core';
 import Button from '@ui-library/button';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as v from 'valibot';
 import { DappLogo } from './dappLogo';
@@ -30,6 +32,8 @@ import {
 } from './index.styles';
 
 import useSelectedAccount from '@hooks/useSelectedAccount';
+import useWalletSelector from '@hooks/useWalletSelector';
+import ChangeNetworkRequestInner from '@screens/changeNetworkRequest/changeNetworkRequestInner';
 import { getAppIconFromWebManifest, safePromise } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 import AddressPurposeBox from '../addressPurposeBox';
@@ -44,6 +48,21 @@ type ConnectionRequestInnerProps = {
 function ConnectionRequestInner({ data, context }: ConnectionRequestInnerProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'AUTH_REQUEST_SCREEN' });
   const selectedAccount = useSelectedAccount();
+  const { network } = useWalletSelector();
+  const [networkChanged, setNetworkChanged] = useState(false);
+
+  const desiredNetwork = (data as ConnectRequestMessage).params?.network;
+  const networkMismatch = desiredNetwork && desiredNetwork !== network.type;
+
+  const changeNetworkRequest: ChangeNetworkRequestMessage = {
+    method: 'wallet_changeNetwork',
+    params: {
+      name: desiredNetwork as BitcoinNetworkType,
+    },
+    id: data.id,
+    jsonrpc: data.jsonrpc,
+  };
+
   const handleCancel = useCallback(() => {
     window.close();
   }, []);
@@ -99,6 +118,18 @@ function ConnectionRequestInner({ data, context }: ConnectionRequestInnerProps) 
     },
     [selectedAccount, t],
   );
+
+  if (networkMismatch && !networkChanged) {
+    return (
+      <ChangeNetworkRequestInner
+        context={context}
+        data={changeNetworkRequest}
+        onNetworkChange={() => {
+          setNetworkChanged(true);
+        }}
+      />
+    );
+  }
 
   return (
     <Container>

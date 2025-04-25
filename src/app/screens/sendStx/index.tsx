@@ -1,4 +1,3 @@
-import TokenImage from '@components/tokenImage';
 import useXverseApi from '@hooks/apiClients/useXverseApi';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
 import { useBnsResolver } from '@hooks/queries/useBnsName';
@@ -25,7 +24,6 @@ import SendLayout from 'app/layouts/sendLayout';
 import RoutePaths from 'app/routes/paths';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { getNextStep, getPreviousStep, Step } from './stepResolver';
@@ -39,22 +37,8 @@ const Container = styled.div`
   min-height: 370px;
 `;
 
-const TitleContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 0 0;
-`;
-
-const Title = styled.div`
-  ${(props) => props.theme.typography.headline_xs}
-  margin-top: ${(props) => props.theme.space.s};
-  margin-bottom: ${(props) => props.theme.space.l};
-`;
-
 function SendStxScreen() {
   const navigate = useNavigate();
-  const { t } = useTranslation('translation');
 
   useResetUserFlow(RoutePaths.SendStx);
 
@@ -269,15 +253,6 @@ function SendStxScreen() {
         <SendLayout selectedBottomTab="dashboard" onClickBack={handleBackButtonClick}>
           <Container>
             <Step2SelectAmount
-              header={
-                <TitleContainer>
-                  <TokenImage
-                    currency={fungibleToken ? 'FT' : 'STX'}
-                    fungibleToken={fungibleToken}
-                  />
-                  <Title>{t('SEND.SEND')}</Title>
-                </TitleContainer>
-              }
               amount={amount}
               setAmount={setAmount}
               fee={fee}
@@ -290,6 +265,7 @@ function SendStxScreen() {
               onNext={() => setCurrentStep(getNextStep(Step.SelectAmount, true))}
               isLoading={isLoadingTx || amount !== debouncedAmount}
               fungibleToken={fungibleToken}
+              recipientAddress={recipientAddress}
             />
           </Container>
         </SendLayout>

@@ -111,6 +111,7 @@ function StepDisplay({
         <SendLayout selectedBottomTab="dashboard" onClickBack={onBack}>
           <Container>
             <AmountSelector
+              recipientAddress={recipientAddress}
               amountSats={amountSats}
               overridePaymentType={overridePaymentType}
               setAmountSats={setAmountSats}
