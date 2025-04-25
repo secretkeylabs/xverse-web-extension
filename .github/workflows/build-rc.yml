@@ -148,8 +148,8 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     outputs:
-      upload_url: ${{ steps.publish-prerelease.outputs.UPLOAD_URL }}
       filename: ${{ steps.publish-prerelease.outputs.FILENAME }}
+      tag_name: ${{ steps.publish-prerelease.outputs.NEXT_TAG }}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # actions/checkout@v4
       - id: publish-prerelease
@@ -182,7 +182,7 @@ jobs:
             -F generate_release_notes=true > release.json
           # save output for upload
           echo "FILENAME=xverse-web-extension.$NEXT_TAG.zip" >> $GITHUB_OUTPUT
-          echo "UPLOAD_URL=$(cat release.json | jq -r .upload_url)" >> $GITHUB_OUTPUT
+          echo "NEXT_TAG=$NEXT_TAG" >> $GITHUB_OUTPUT
       - id: update-description
         name: Update PR description with release notes
         env:
@@ -212,14 +212,15 @@ jobs:
       - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e #v4.3.0
       - name: zip
         run: zip -rj build.zip ./build
+      - name: Rename asset to match filename
+        run: |
+          cp build.zip "${{needs.publish-rc.outputs.filename}}"
       - name: Upload release asset
-        uses: actions/upload-release-asset@v1 # TODO: use softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          UPLOAD_URL: ${{needs.publish-rc.outputs.upload_url}}
-          FILENAME: ${{needs.publish-rc.outputs.filename}}
         with:
-          upload_url: ${{ env.UPLOAD_URL}}
-          asset_path: build.zip
-          asset_name: ${{ env.FILENAME }}
-          asset_content_type: application/zip
+          tag_name: ${{ needs.publish-rc.outputs.tag_name }}
+          files: ${{needs.publish-rc.outputs.filename}}
+          prerelease: true
+          draft: false
