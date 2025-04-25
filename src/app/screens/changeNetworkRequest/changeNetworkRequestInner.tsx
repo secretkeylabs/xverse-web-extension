@@ -39,9 +39,14 @@ import Theme from 'theme';
 type ChangeNetworkRequestInnerProps = {
   context: Context;
   data: ChangeNetworkRequestMessage;
+  onNetworkChange?: () => void;
 };
 
-function ChangeNetworkRequestInner({ context, data }: ChangeNetworkRequestInnerProps) {
+function ChangeNetworkRequestInner({
+  context,
+  data,
+  onNetworkChange,
+}: ChangeNetworkRequestInnerProps) {
   const { network } = useWalletSelector();
   const { setPermission, getClientPermissions, addResource } = usePermissions();
   const currentAccount = useSelectedAccount();
@@ -81,6 +86,12 @@ function ChangeNetworkRequestInner({ context, data }: ChangeNetworkRequestInnerP
         name: 'ClientIdError',
         message: 'Failed to create client ID during permissions check.',
       });
+    }
+
+    if (onNetworkChange) {
+      await changeNetwork(toNetwork);
+      onNetworkChange?.();
+      return;
     }
 
     const currentAccountId = permissions.utils.account.makeAccountId({

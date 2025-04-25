@@ -20,6 +20,7 @@ const extensions = {
 const outputDir = path.resolve(import.meta.dirname, 'build');
 
 export default defineConfig({
+  devtool: isDev ? undefined : false,
   devServer: {
     // Pointing to a non-existent dir avoids the dev server performing a full
     // page reload when a static asset changes. rspack issues new versions of

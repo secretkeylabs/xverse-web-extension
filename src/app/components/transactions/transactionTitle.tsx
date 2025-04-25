@@ -12,9 +12,9 @@ import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-const TransactionTitleText = styled.p((props) => ({
+const TransactionTitleText = styled.p<{ isPending: boolean }>((props) => ({
   ...props.theme.typography.body_medium_m,
-  color: props.theme.colors.white_0,
+  color: props.theme.colors[props.isPending ? 'caution' : 'white_0'],
   textAlign: 'left',
 }));
 
@@ -145,5 +145,11 @@ export default function TransactionTitle({ transaction }: Props) {
         return t('TRANSACTION_STATUS_UNKNOWN');
     }
   };
-  return <TransactionTitleText>{getTransactionTitle(transaction)}</TransactionTitleText>;
+
+  const isPending = 'txStatus' in transaction && transaction.txStatus === 'pending';
+  return (
+    <TransactionTitleText isPending={isPending}>
+      {getTransactionTitle(transaction)}
+    </TransactionTitleText>
+  );
 }

@@ -14,6 +14,7 @@ import { currencySymbolMap, formatBalance, type FungibleToken } from '@secretkey
 import { StyledP } from '@ui-library/common.styled';
 import type { CurrencyTypes } from '@utils/constants';
 import { formatSignificantDecimals } from '@utils/tokens';
+import { NumericFormat } from 'react-number-format';
 
 const Container = styled.div`
   display: flex;
@@ -32,10 +33,21 @@ const StatsContainer = styled.div`
 
 const StatColumn = styled.div`
   flex: 1;
+  display: flex;
   align-items: flex-start;
   flex-direction: column;
   margin-top: ${({ theme }) => theme.space.m};
   gap: ${({ theme }) => theme.space.xxxs};
+  min-width: 0;
+`;
+
+const StatValue = styled(StyledP)`
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+  white-space: normal;
+  width: 100%;
 `;
 
 const InfoContainer = styled.div`
@@ -68,9 +80,9 @@ function Stat({ label, value, additionalContent }: StatProps) {
       <StyledP typography="body_medium_m" color="white_400">
         {label}
       </StyledP>
-      <StyledP typography="body_medium_m" color="white_0">
+      <StatValue typography="body_medium_m" color="white_0">
         {value ?? PLACE_HOLDER}
-      </StyledP>
+      </StatValue>
       {additionalContent}
     </StatColumn>
   );
@@ -78,11 +90,11 @@ function Stat({ label, value, additionalContent }: StatProps) {
 
 function FormattedCurrencyValue({ value, currency }: { value: BigNumber; currency: string }) {
   if (value.isGreaterThan(1)) {
-    return `${currencySymbolMap[currency]}${value.toFormat(2)} ${currency}`;
+    return `${currency === '' ? '' : currencySymbolMap[currency]}${value.toFormat(2)} ${currency}`;
   }
   return (
     <>
-      {currencySymbolMap[currency]}
+      {currency === '' ? '' : currencySymbolMap[currency]}
       <FormattedNumber number={formatBalance(formatSignificantDecimals(value.toFixed(12)))} />
     </>
   );
@@ -118,13 +130,17 @@ function TokenPrice({ currency, fungibleToken }: Props) {
   const tokenName =
     currency === 'BTC' ? btcFt.name : currency === 'STX' ? stxFt.name : fungibleToken?.name;
   const tokenSymbol =
-    currency === 'BTC' || currency === 'STX' ? currency : fungibleToken?.runeSymbol;
+    currency === 'BTC' || currency === 'STX'
+      ? currency
+      : fungibleToken?.protocol === 'runes'
+      ? fungibleToken?.runeSymbol
+      : fungibleToken?.ticker;
   const tokenDivisibility =
     currency === 'BTC' ? btcFt.decimals : currency === 'STX' ? stxFt.decimals : divisibility;
 
   return (
     <Container>
-      <StyledP typography="headline_xs" color="white_200">
+      <StyledP typography="body_medium_m" color="white_200">
         {t('STATS')}
       </StyledP>
       <StatsContainer>
@@ -162,13 +178,24 @@ function TokenPrice({ currency, fungibleToken }: Props) {
         <Stat
           label={t('HOLDERS')}
           value={
-            holders && <FormattedCurrencyValue value={BigNumber(holders.toString())} currency="" />
+            holders && (
+              <NumericFormat
+                value={holders}
+                displayType="text"
+                thousandSeparator
+                renderText={(value: string) => (
+                  <StyledP typography="body_medium_m" color="white_0">
+                    {value}
+                  </StyledP>
+                )}
+              />
+            )
           }
         />
       </StatsContainer>
 
       <InfoContainer>
-        <StyledP typography="headline_xs" color="white_200">
+        <StyledP typography="body_medium_m" color="white_200">
           {t('INFO')}
         </StyledP>
         <StatsContainer>
@@ -177,10 +204,15 @@ function TokenPrice({ currency, fungibleToken }: Props) {
         </StatsContainer>
         <StatsContainer>
           <Stat label={t('DIVISIBILITY')} value={tokenDivisibility} />
-          {fungibleToken && <Stat label={t('MINTABLE')} value={mintable ? 'Yes' : 'No'} />}
+          {fungibleToken && fungibleToken.protocol !== 'stacks' && (
+            <Stat
+              label={t('MINTABLE')}
+              value={mintable === undefined ? null : mintable ? 'Yes' : 'No'}
+            />
+          )}
         </StatsContainer>
         <StatsContainer>
-          {fungibleToken && (
+          {mintable && fungibleToken && fungibleToken.protocol !== 'stacks' && (
             <Stat
               label={t('MINT_LIMIT')}
               value={
