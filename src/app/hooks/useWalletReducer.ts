@@ -614,34 +614,42 @@ const useWalletReducer = () => {
 
       dispatch(selectAccount(nextAccount.id, nextAccount.accountType, nextAccount.walletId));
 
-      const accountId = permissions.utils.account.makeAccountId({
+      const targetAccountId = permissions.utils.account.makeAccountId({
         accountId: nextAccount.id,
         networkType: network.type,
         masterPubKey: nextAccount.masterPubKey,
       });
-      const changeEventPermissions: Omit<Permissions.Store.Permission, 'clientId'>[] = [
-        {
-          type: 'account',
-          resourceId: permissions.resources.account.makeAccountResourceId(accountId),
-          actions: { read: true },
-        },
-      ];
+
       if (currentlySelectedAccount) {
         const currentAccountId = permissions.utils.account.makeAccountId({
           accountId: currentlySelectedAccount.id,
           networkType: network.type,
           masterPubKey: currentlySelectedAccount.masterPubKey,
         });
-        changeEventPermissions.push({
-          type: 'account',
-          resourceId: permissions.resources.account.makeAccountResourceId(currentAccountId),
-          actions: { read: true },
+        const currentAccountEventPermissions: Omit<Permissions.Store.Permission, 'clientId'>[] = [
+          {
+            type: 'account',
+            resourceId: permissions.resources.account.makeAccountResourceId(currentAccountId),
+            actions: { read: true },
+          },
+        ];
+        dispatchEventAuthorizedConnectedClients(currentAccountEventPermissions, {
+          type: 'accountChange',
+          addresses: [],
         });
       }
 
+      const targetAccountEventPermissions: Omit<Permissions.Store.Permission, 'clientId'>[] = [
+        {
+          type: 'account',
+          resourceId: permissions.resources.account.makeAccountResourceId(targetAccountId),
+          actions: { read: true },
+        },
+      ];
+
       const embellishedAccount = embellishAccountWithDetails(nextAccount, btcPaymentAddressType);
 
-      dispatchEventAuthorizedConnectedClients(changeEventPermissions, {
+      dispatchEventAuthorizedConnectedClients(targetAccountEventPermissions, {
         type: 'accountChange',
         addresses: accountPurposeAddresses(embellishedAccount, { type: 'all' }),
       });
