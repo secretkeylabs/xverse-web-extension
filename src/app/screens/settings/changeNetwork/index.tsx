@@ -11,13 +11,13 @@ import {
   type SettingsNetwork,
 } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
+import Input from '@ui-library/input';
 import { isValidBtcApi, isValidStacksApi } from '@utils/helper';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import NetworkRow from './networkRow';
-import NodeInput from './nodeInput';
 
 const Container = styled.div`
   ${(props) => props.theme.typography.body_medium_m}
@@ -46,8 +46,14 @@ const ButtonContainer = styled.div`
 const NodeInputsContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${(props) => props.theme.space.s};
-  margin-top: ${(props) => props.theme.space.s};
+  gap: ${(props) => props.theme.space.xl};
+  margin-top: ${(props) => props.theme.space.l};
+`;
+
+const NodeResetButton = styled.button`
+  ${(props) => props.theme.typography.body_medium_m}
+  background: none;
+  color: ${(props) => props.theme.colors.tangerine};
 `;
 
 type NodeInputKey = keyof Pick<SettingsNetwork, 'address' | 'btcApiUrl' | 'fallbackBtcApiUrl'>;
@@ -94,17 +100,6 @@ function ChangeNetworkScreen() {
     setFormInputs((prevInputs) => ({
       ...prevInputs,
       [key]: event.target.value,
-    }));
-  };
-
-  const onClearCreator = (key: NodeInputKey) => () => {
-    setFormErrors((prevErrors) => ({
-      ...prevErrors,
-      [key]: '',
-    }));
-    setFormInputs((prevInputs) => ({
-      ...prevInputs,
-      [key]: '',
     }));
   };
 
@@ -216,15 +211,19 @@ function ChangeNetworkScreen() {
         />
         <NodeInputsContainer>
           {nodeInputs.map(({ key, labelKey }) => (
-            <NodeInput
+            <Input
               key={key}
-              label={t(labelKey)}
+              titleElement={t(labelKey)}
+              data-testid={t(labelKey)}
               onChange={onChangeCreator(key)}
               value={formInputs[key]}
-              onClear={onClearCreator(key)}
-              onReset={onResetCreator(key)}
-              error={formErrors[key]}
               disabled={isChangingNetwork}
+              feedback={formErrors[key] ? [{ message: formErrors[key], variant: 'danger' }] : []}
+              infoPanel={
+                <NodeResetButton onClick={onResetCreator(key)} disabled={isChangingNetwork}>
+                  {t('RESET_TO_DEFAULT')}
+                </NodeResetButton>
+              }
             />
           ))}
         </NodeInputsContainer>
