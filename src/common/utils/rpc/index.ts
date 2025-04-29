@@ -28,7 +28,8 @@ async function handleRPCRequest(message: RpcRequestMessage, port: chrome.runtime
   }
 
   const [handlerError] = await safePromise(handler(message, port));
-  if (handlerError)
+  if (handlerError) {
+    console.error(handlerError);
     return sendRpcResponse(
       getTabIdFromPort(port),
       makeRPCError(message.id as string, {
@@ -37,6 +38,7 @@ async function handleRPCRequest(message: RpcRequestMessage, port: chrome.runtime
         data: handlerError.data,
       }),
     );
+  }
 }
 
 export default handleRPCRequest;
