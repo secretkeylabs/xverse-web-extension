@@ -3,9 +3,10 @@ import { getDeviceAccountIndex } from '@common/utils/ledger';
 import { dispatchEventAuthorizedConnectedClients } from '@common/utils/messages/extensionToContentScript/dispatchEvent';
 import { delay } from '@common/utils/promises';
 import { accountPurposeAddresses } from '@common/utils/rpc/btc/getAddresses/utils';
-import { getBitcoinNetworkType } from '@common/utils/rpc/helpers';
+import { getBitcoinNetworkType, getStacksNetworkType } from '@common/utils/rpc/helpers';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
+import type { WalletEvent } from '@sats-connect/core';
 import type { HDKey } from '@scure/bip32';
 import {
   AnalyticsEvents,
@@ -633,6 +634,7 @@ const useWalletReducer = () => {
             actions: { read: true },
           },
         ];
+
         dispatchEventAuthorizedConnectedClients(currentAccountEventPermissions, {
           type: 'accountChange',
           addresses: [],
@@ -664,29 +666,6 @@ const useWalletReducer = () => {
 
     dispatch(ChangeNetworkAction(changedNetwork));
 
-    if (currentlySelectedAccount) {
-      dispatchEventAuthorizedConnectedClients(
-        [
-          {
-            type: 'wallet',
-            actions: {
-              readNetwork: true,
-            },
-            resourceId: 'wallet',
-          },
-        ],
-        {
-          type: 'networkChange',
-          bitcoin: {
-            name: getBitcoinNetworkType(changedNetwork.type),
-          },
-          stacks: {
-            name: changedNetwork.type,
-          },
-        },
-      );
-    }
-
     const changedStacksNetwork: StacksNetwork =
       changedNetwork.type === 'Mainnet'
         ? {
@@ -705,8 +684,61 @@ const useWalletReducer = () => {
     return new Promise<void>((resolve, reject) => {
       loadSoftwareAccounts(changedNetwork, changedStacksNetwork, {
         resetIndex: true,
-        accountLoadCallback: () => {
+        accountLoadCallback: async (loadedAccounts) => {
           resolve();
+          const selectedAccountId = currentlySelectedAccount?.id;
+          const selectedAccountFromLoadedAccounts = loadedAccounts.find(
+            (account) => account.id === selectedAccountId,
+          );
+
+          const baseNetworkChangeEvent: WalletEvent = {
+            type: 'networkChange',
+            bitcoin: {
+              name: getBitcoinNetworkType(changedNetwork.type),
+            },
+            stacks: {
+              name: getStacksNetworkType(changedNetwork.type),
+            },
+            addresses: [],
+          };
+
+          const networkPermission: Omit<Permissions.Store.Permission, 'clientId'>[] = [
+            {
+              type: 'wallet',
+              actions: {
+                readNetwork: true,
+              },
+              resourceId: 'wallet',
+            },
+          ];
+          dispatchEventAuthorizedConnectedClients(networkPermission, baseNetworkChangeEvent);
+          if (selectedAccountFromLoadedAccounts) {
+            const targetAccountId = permissions.utils.account.makeAccountId({
+              accountId: selectedAccountFromLoadedAccounts.id,
+              networkType: network.type,
+              masterPubKey: selectedAccountFromLoadedAccounts.masterPubKey,
+            });
+            const targetAccountEventPermissions: Omit<Permissions.Store.Permission, 'clientId'>[] =
+              [
+                {
+                  type: 'account',
+                  resourceId: permissions.resources.account.makeAccountResourceId(targetAccountId),
+                  actions: { read: true },
+                },
+              ];
+            const networkAndAccountPermission = [
+              ...networkPermission,
+              ...targetAccountEventPermissions,
+            ];
+            const embellishedAccount = embellishAccountWithDetails(
+              selectedAccountFromLoadedAccounts,
+              btcPaymentAddressType,
+            );
+            dispatchEventAuthorizedConnectedClients(networkAndAccountPermission, {
+              ...baseNetworkChangeEvent,
+              addresses: accountPurposeAddresses(embellishedAccount, { type: 'all' }),
+            });
+          }
         },
       }).catch(reject);
     });
