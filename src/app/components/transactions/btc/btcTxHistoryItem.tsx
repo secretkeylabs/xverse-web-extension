@@ -1,5 +1,6 @@
 import useWalletSelector from '@hooks/useWalletSelector';
 import { type EnhancedTx, type NetworkType } from '@secretkeylabs/xverse-core';
+import { Row } from '@ui-library/common.styled';
 import { getBtcTxStatusUrl } from '@utils/helper';
 import { useCallback } from 'react';
 import styled from 'styled-components';
@@ -11,6 +12,7 @@ import { TransactionTitle } from './transactionTitle';
 const TransactionContainer = styled.button((props) => ({
   display: 'flex',
   alignItems: 'center',
+  flexDirection: 'row',
   width: '100%',
   padding: props.theme.spacing(5),
   paddingLeft: props.theme.space.m,
@@ -24,14 +26,6 @@ const TransactionContainer = styled.button((props) => ({
   },
 }));
 
-const TransactionAmountContainer = styled.div({
-  display: 'flex',
-  flex: 1,
-  width: '100%',
-  flexDirection: 'column',
-  alignItems: 'flex-end',
-});
-
 const TransactionInfoContainer = styled.div((props) => ({
   display: 'flex',
   flex: 1,
@@ -39,12 +33,13 @@ const TransactionInfoContainer = styled.div((props) => ({
   marginLeft: props.theme.space.s,
 }));
 
-const TransactionRow = styled.div((props) => ({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  ...props.theme.typography.body_bold_m,
-}));
+const RowContainer = styled(Row)`
+  gap: ${(props) => props.theme.space.m};
+`;
+
+const TextRight = styled.div`
+  text-align: right;
+`;
 
 interface TransactionHistoryItemProps {
   tx: EnhancedTx;
@@ -66,16 +61,18 @@ export default function BtcTxHistoryItem({
     <TransactionContainer data-testid="transaction-container" onClick={openBtcTxStatusLink}>
       <TransactionStatusIcon tx={tx} networkType={networkType} />
       <TransactionInfoContainer>
-        <TransactionRow>
-          <div>
-            <TransactionTitle tx={tx} />
-            <TransactionRecipient tx={tx} walletAddressesDictionary={walletAddressesDictionary} />
-          </div>
-          <TransactionAmountContainer data-testid="transaction-amount">
+        <RowContainer>
+          <TransactionTitle tx={tx} />
+          <TextRight>
             <TransactionAmount tx={tx} />
+          </TextRight>
+        </RowContainer>
+        <RowContainer>
+          <TransactionRecipient tx={tx} walletAddressesDictionary={walletAddressesDictionary} />
+          <TextRight>
             <TransactionAuxiliaryAmount tx={tx} />
-          </TransactionAmountContainer>
-        </TransactionRow>
+          </TextRight>
+        </RowContainer>
       </TransactionInfoContainer>
     </TransactionContainer>
   );

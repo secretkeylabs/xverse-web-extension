@@ -1,33 +1,30 @@
 import { StyledP } from '@ui-library/common.styled';
 import styled from 'styled-components';
 
+export const ScrollContainer = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  ${(props) => props.theme.scrollbar}
+`;
+
 export const TokenContainer = styled.div`
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  &::-webkit-scrollbar {
-    display: none;
-  }
-
   margin-bottom: ${(props) => props.theme.space.xl};
   > *:not(:last-child) {
     border-bottom: 1px solid ${(props) => props.theme.colors.elevation3};
   }
 `;
 
-export const Container = styled.div({
+export const Container = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
-  overflow: 'hidden',
-  paddingLeft: 16,
-  paddingRight: 16,
+  paddingLeft: props.theme.space.m,
+  paddingRight: props.theme.space.m,
   height: '100%',
-});
-
-export const ScrollableContainer = styled.div`
-  flex: 1;
-  overflow-y: auto;
-`;
+}));
 
 export const FtInfoContainer = styled.div((props) => ({
   display: 'flex',

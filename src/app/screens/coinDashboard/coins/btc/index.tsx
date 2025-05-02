@@ -15,7 +15,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import CoinHeader from '../../coinHeader';
-import { ChartContainer, Container, FtInfoContainer } from '../../index.styled';
+import { ChartContainer, Container, FtInfoContainer, ScrollContainer } from '../../index.styled';
 import BalanceBreakdown from './balanceBreakdown';
 
 export default function CoinDashboard() {
@@ -63,26 +63,28 @@ export default function CoinDashboard() {
   return (
     <>
       <TopRow onClick={handleGoBack} onSettingsClick={handleChangeAddressTypeClick} />
-      <Container>
-        <CoinHeader currency="BTC" chartPriceStats={chartPriceStats} />
-        <ChartContainer>
-          <TokenHistoricalData
-            currency="BTC"
-            fungibleToken={undefined}
-            setChartPriceStats={setChartPriceStats}
-          />
-        </ChartContainer>
-        <FtInfoContainer>
-          <Tabs
-            tabs={tabs}
-            activeTab={currentTab}
-            onTabClick={(tabClicked: Tab) => setCurrentTab(tabClicked)}
-          />
-        </FtInfoContainer>
-        {currentTab === 'first' && <BtcTxHistoryList />}
-        {currentTab === 'second' && <TokenPrice currency="BTC" fungibleToken={undefined} />}
-        {currentTab === 'third' && <BalanceBreakdown />}
-      </Container>
+      <ScrollContainer>
+        <Container>
+          <CoinHeader currency="BTC" chartPriceStats={chartPriceStats} />
+          <ChartContainer>
+            <TokenHistoricalData
+              currency="BTC"
+              fungibleToken={undefined}
+              setChartPriceStats={setChartPriceStats}
+            />
+          </ChartContainer>
+          <FtInfoContainer>
+            <Tabs
+              tabs={tabs}
+              activeTab={currentTab}
+              onTabClick={(tabClicked: Tab) => setCurrentTab(tabClicked)}
+            />
+          </FtInfoContainer>
+          {currentTab === 'first' && <BtcTxHistoryList />}
+          {currentTab === 'second' && <TokenPrice currency="BTC" fungibleToken={undefined} />}
+          {currentTab === 'third' && <BalanceBreakdown />}
+        </Container>
+      </ScrollContainer>
       <BottomBar tab="dashboard" />
       <GlobalPreferredBtcAddressSheet
         onHide={onCancelAddressType}

@@ -19,12 +19,19 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import NetworkRow from './networkRow';
 
+const ScrollContainer = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  ${(props) => props.theme.scrollbar}
+`;
+
 const Container = styled.div`
   ${(props) => props.theme.typography.body_medium_m}
   display: flex;
   flex-direction: column;
   flex: 1;
-  overflow-y: auto;
   padding-left: 16px;
   padding-right: 16px;
   padding-bottom: 16px;
@@ -172,62 +179,64 @@ function ChangeNetworkScreen() {
   return (
     <>
       <TopRow onClick={handleBackButtonClick} showBackButton={!isChangingNetwork} />
-      <Container>
-        <Title>{t('NETWORK')}</Title>
-        <NetworkRow
-          network={savedMainnet || defaultMainnet}
-          isSelected={formInputs.type === 'Mainnet'}
-          onNetworkSelected={onNetworkSelected}
-          disabled={isChangingNetwork}
-          showDivider
-        />
-        <NetworkRow
-          network={savedTestnet || defaultTestnet}
-          isSelected={formInputs.type === 'Testnet'}
-          onNetworkSelected={onNetworkSelected}
-          disabled={isChangingNetwork}
-          showDivider
-        />
-        <NetworkRow
-          network={savedTestnet4 || defaultTestnet4}
-          isSelected={formInputs.type === 'Testnet4'}
-          onNetworkSelected={onNetworkSelected}
-          disabled={isChangingNetwork}
-          showDivider
-        />
-        <NetworkRow
-          network={savedSignet || defaultSignet}
-          isSelected={formInputs.type === 'Signet'}
-          onNetworkSelected={onNetworkSelected}
-          disabled={isChangingNetwork}
-          showDivider
-        />
-        <NetworkRow
-          network={savedRegtest || defaultRegtest}
-          isSelected={formInputs.type === 'Regtest'}
-          onNetworkSelected={onNetworkSelected}
-          disabled={isChangingNetwork}
-          showDivider={false}
-        />
-        <NodeInputsContainer>
-          {nodeInputs.map(({ key, labelKey }) => (
-            <Input
-              key={key}
-              titleElement={t(labelKey)}
-              data-testid={t(labelKey)}
-              onChange={onChangeCreator(key)}
-              value={formInputs[key]}
-              disabled={isChangingNetwork}
-              feedback={formErrors[key] ? [{ message: formErrors[key], variant: 'danger' }] : []}
-              infoPanel={
-                <NodeResetButton onClick={onResetCreator(key)} disabled={isChangingNetwork}>
-                  {t('RESET_TO_DEFAULT')}
-                </NodeResetButton>
-              }
-            />
-          ))}
-        </NodeInputsContainer>
-      </Container>
+      <ScrollContainer>
+        <Container>
+          <Title>{t('NETWORK')}</Title>
+          <NetworkRow
+            network={savedMainnet || defaultMainnet}
+            isSelected={formInputs.type === 'Mainnet'}
+            onNetworkSelected={onNetworkSelected}
+            disabled={isChangingNetwork}
+            showDivider
+          />
+          <NetworkRow
+            network={savedTestnet || defaultTestnet}
+            isSelected={formInputs.type === 'Testnet'}
+            onNetworkSelected={onNetworkSelected}
+            disabled={isChangingNetwork}
+            showDivider
+          />
+          <NetworkRow
+            network={savedTestnet4 || defaultTestnet4}
+            isSelected={formInputs.type === 'Testnet4'}
+            onNetworkSelected={onNetworkSelected}
+            disabled={isChangingNetwork}
+            showDivider
+          />
+          <NetworkRow
+            network={savedSignet || defaultSignet}
+            isSelected={formInputs.type === 'Signet'}
+            onNetworkSelected={onNetworkSelected}
+            disabled={isChangingNetwork}
+            showDivider
+          />
+          <NetworkRow
+            network={savedRegtest || defaultRegtest}
+            isSelected={formInputs.type === 'Regtest'}
+            onNetworkSelected={onNetworkSelected}
+            disabled={isChangingNetwork}
+            showDivider={false}
+          />
+          <NodeInputsContainer>
+            {nodeInputs.map(({ key, labelKey }) => (
+              <Input
+                key={key}
+                titleElement={t(labelKey)}
+                data-testid={t(labelKey)}
+                onChange={onChangeCreator(key)}
+                value={formInputs[key]}
+                disabled={isChangingNetwork}
+                feedback={formErrors[key] ? [{ message: formErrors[key], variant: 'danger' }] : []}
+                infoPanel={
+                  <NodeResetButton onClick={onResetCreator(key)} disabled={isChangingNetwork}>
+                    {t('RESET_TO_DEFAULT')}
+                  </NodeResetButton>
+                }
+              />
+            ))}
+          </NodeInputsContainer>
+        </Container>
+      </ScrollContainer>
       <ButtonContainer>
         <Button
           title={t('SAVE')}

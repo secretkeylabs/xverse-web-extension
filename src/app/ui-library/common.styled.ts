@@ -68,3 +68,11 @@ export const StyledTabList = styled(TabList)`
   gap: ${(props) => props.theme.space.xxs};
   list-style: none;
 `;
+
+export const Row = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+`;
