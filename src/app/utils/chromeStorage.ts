@@ -36,6 +36,18 @@ class ChromeStorage {
     });
   }
 
+  getItems<T extends string>(...keys: T[]): Promise<{ [key in T]?: string }> {
+    return new Promise((resolve, reject) => {
+      this.driver.get(keys, (response: any) => {
+        const error = this.getError();
+        if (error) {
+          return reject(error);
+        }
+        return resolve(response);
+      });
+    });
+  }
+
   removeItem(key: string): Promise<void> {
     return new Promise((resolve, reject) => {
       this.driver.remove(key, () => {
@@ -44,6 +56,28 @@ class ChromeStorage {
           return reject(error);
         }
         return resolve();
+      });
+    });
+  }
+
+  addListener(
+    callback: (changes: { [key: string]: chrome.storage.StorageChange }) => void,
+  ): () => void {
+    this.driver.onChanged.addListener(callback);
+
+    return () => {
+      this.driver.onChanged.removeListener(callback);
+    };
+  }
+
+  getAllKeys(): Promise<string[]> {
+    return new Promise((resolve, reject) => {
+      this.driver.get((response: any) => {
+        const error = this.getError();
+        if (error) {
+          return reject(error);
+        }
+        return resolve(Object.keys(response));
       });
     });
   }

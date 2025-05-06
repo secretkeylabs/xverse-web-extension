@@ -172,6 +172,7 @@ export default defineConfig({
     }),
     new rspack.DefinePlugin({
       VERSION: JSON.stringify(require('./package.json').version),
+      global: undefined,
     }),
     isDev ? new RefreshPlugin({ overlay: false }) : null,
   ].filter(Boolean),

@@ -5,6 +5,7 @@ import OptionsDialog from '@components/optionsDialog/optionsDialog';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useGetAllAccounts from '@hooks/useGetAllAccounts';
 import useOptionsDialog from '@hooks/useOptionsDialog';
+import { useStore } from '@hooks/useStore';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CaretDown, DotsThreeVertical } from '@phosphor-icons/react';
@@ -22,7 +23,6 @@ import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
 import { BTC_SYMBOL, EMPTY_LABEL, HIDDEN_BALANCE_LABEL, LoaderSize } from '@utils/constants';
 import {
-  getAccountBalanceKey,
   getAccountName,
   isKeystoneAccount,
   isLedgerAccount,
@@ -81,18 +81,9 @@ function AccountRow({
 
   const dispatch = useDispatch();
   const menuDialog = useOptionsDialog();
-  const {
-    softwareWallets,
-    fiatCurrency,
-    accountBalances,
-    avatarIds,
-    balanceHidden,
-    showBalanceInBtc,
-    network,
-  } = useWalletSelector();
+  const { softwareWallets, fiatCurrency, avatarIds, balanceHidden, showBalanceInBtc, network } =
+    useWalletSelector();
   const accountAvatar = avatarIds[account?.btcAddresses.taproot.address ?? ''];
-  // TODO: refactor this into a hook
-  const totalBalance = accountBalances[getAccountBalanceKey(account)];
   const btcCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
   const stxCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
   const [showRemoveAccountModal, setShowRemoveAccountModal] = useState(false);
@@ -109,6 +100,13 @@ function AccountRow({
     updateKeystoneAccounts,
   } = useWalletReducer();
   const { btcFiatRate } = useSupportedCoinRates();
+
+  const accountBalanceStore = useStore(
+    'accountBalances',
+    (store, utils) =>
+      store[utils.getAccountStorageKey(account, network.type)] as string | undefined,
+  );
+  const totalBalance = accountBalanceStore.data;
 
   useEffect(
     () => () => {

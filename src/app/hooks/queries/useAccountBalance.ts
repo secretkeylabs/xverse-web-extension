@@ -3,6 +3,7 @@ import useRunesApi from '@hooks/apiClients/useRunesApi';
 import useXverseApi from '@hooks/apiClients/useXverseApi';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useNetworkSelector from '@hooks/useNetwork';
+import { useStore } from '@hooks/useStore';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   API_TIMEOUT_MILLI,
@@ -13,12 +14,10 @@ import {
   type FungibleTokenWithStates,
   type TokensResponse,
 } from '@secretkeylabs/xverse-core';
-import { setAccountBalanceAction } from '@stores/wallet/actions/actionCreators';
-import { calculateTotalBalance, getAccountBalanceKey } from '@utils/helper';
+import { calculateTotalBalance } from '@utils/helper';
 import axios from 'axios';
 import BigNumber from 'bignumber.js';
 import { useEffect, useRef, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import { fetchBrc20FungibleTokens } from './ordinals/useGetBrc20FungibleTokens';
 import { fetchRuneBalances } from './runes/useRuneFungibleTokensQuery';
 import { fetchSip10FungibleTokens } from './stx/useGetSip10FungibleTokens';
@@ -31,10 +30,11 @@ const useAccountBalance = () => {
     useWalletSelector();
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const runesApi = useRunesApi();
-  const dispatch = useDispatch();
   const queue = useRef<Account[]>([]);
   const [isProcessingQueue, setIsProcessingQueue] = useState(false);
   const [queueLength, setQueueLength] = useState(0);
+
+  const accountBalanceStore = useStore('accountBalances');
 
   const withDerivedState = (ft: FungibleToken) =>
     ({
@@ -129,8 +129,7 @@ const useAccountBalance = () => {
       hideStx,
     });
 
-    dispatch(setAccountBalanceAction(getAccountBalanceKey(account), totalBalance));
-    return totalBalance;
+    await accountBalanceStore.actions.setAccountBalance(account, network.type, totalBalance);
   };
 
   const processQueue = async () => {
@@ -166,13 +165,7 @@ const useAccountBalance = () => {
     }
   };
 
-  const setAccountBalance = (account: Account | null, balance: string) => {
-    if (account) {
-      dispatch(setAccountBalanceAction(getAccountBalanceKey(account), balance));
-    }
-  };
-
-  return { enqueueFetchBalances, setAccountBalance };
+  return { enqueueFetchBalances };
 };
 
 export default useAccountBalance;

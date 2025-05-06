@@ -56,6 +56,7 @@ import { Mutex } from 'async-mutex';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import useXverseApi from './apiClients/useXverseApi';
+import { useStore } from './useStore';
 import useVault from './useVault';
 import useWalletSession from './useWalletSession';
 
@@ -120,6 +121,9 @@ const useWalletReducer = () => {
   const { setSessionStartTime, clearSessionTime, setSessionStartTimeAndMigrate } =
     useWalletSession();
   const queryClient = useQueryClient();
+
+  // we use an undefined selector so that we avoid re-rendering as we only use the store for actions
+  const accountBalanceStore = useStore('accountBalances', () => undefined);
 
   /*
    * ensures that the active account is valid by regenerating it and comparing to what's in the store
@@ -663,6 +667,7 @@ const useWalletReducer = () => {
     // we clear the query cache to prevent data from the other account potentially being displayed
     await queryClient.cancelQueries();
     queryClient.clear();
+    await accountBalanceStore.actions.reset();
 
     dispatch(ChangeNetworkAction(changedNetwork));
 

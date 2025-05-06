@@ -7,15 +7,15 @@
     "src/pages/Options/index.tsx",
     "src/pages/Popup/index.tsx"
   ],
-  "project": ["src/**/*.{ts,tsx}"],
+  "project": [
+    "src/**/*.{ts,tsx}"
+  ],
   "ignoreDependencies": [
     // Used by the extension, yet not explicitly imported anywhere in the
     // project.
     "@types/chrome",
-
     // Used by rspack yet not detected by knip. Used to provide Buffer polyfill.
     "process",
-
     // Package `path` is needed to satisfy Argon2,
     //
     // ```

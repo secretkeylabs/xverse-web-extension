@@ -2,10 +2,11 @@
 import { defaultMainnet, type SettingsNetwork } from '@secretkeylabs/xverse-core';
 import { markAlertsForShow } from '@utils/alertTracker';
 import chromeStorage from '@utils/chromeStorage';
-import { applyMiddleware, combineReducers, createStore } from 'redux';
+import { applyMiddleware, combineReducers, createStore, type Middleware } from 'redux';
 import { createMigrate, persistReducer, persistStore, type PersistConfig } from 'redux-persist';
 import { createStateSyncMiddleware, initMessageListener } from 'redux-state-sync';
 import NftDataStateReducer from './nftData/reducer';
+import { globalStoreManager } from './persistentStoreManager';
 import type {
   AccountBtcAddressesV5,
   AccountV1,
@@ -287,11 +288,29 @@ const persistedReducer = persistReducer(rootPersistConfig, rootReducer);
 
 export type StoreState = ReturnType<typeof rootReducer>;
 
+const migrateToPersistentStoreMiddleware: Middleware = (store) => (next) => async (action) => {
+  if (action.type === 'persist/REHYDRATE' && action.key === 'walletState' && action.payload) {
+    // we need to rehydrate the wallet state first
+    const walletState = action.payload as WalletState;
+
+    const { accountBalances } = walletState;
+
+    if ((await globalStoreManager.isStoreBootstrapped('accountBalances')) === false) {
+      await globalStoreManager.setStoreValue('accountBalances', accountBalances);
+    }
+
+    await globalStoreManager.initialise();
+  }
+
+  return next(action);
+};
+
 const storeMiddleware = [
   createStateSyncMiddleware({
     // We don't want to sync the redux-persist actions
     blacklist: ['persist/PERSIST', 'persist/REHYDRATE'],
   }),
+  migrateToPersistentStoreMiddleware,
 ];
 const store = createStore(persistedReducer, applyMiddleware(...storeMiddleware));
 const persistor = persistStore(store);
