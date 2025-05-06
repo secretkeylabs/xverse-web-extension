@@ -24,7 +24,7 @@ export function SigningTransactions({
   onError,
 }: SigningTransactionsProps) {
   const [currentTransactionIndex, setCurrentTransactionIndex] = useState(0);
-  const signTransactionsMutation = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: async ({ transport }: { transport: Transport }) => {
       const signedTransactions: StacksTransactionWire[] = [];
       for (const [index, transaction] of transactions.entries()) {
@@ -43,9 +43,9 @@ export function SigningTransactions({
     onError,
   });
   useEffect(() => {
-    if (signTransactionsMutation.isLoading) return;
-    signTransactionsMutation.mutate({ transport });
-  }, [signTransactionsMutation, transport]);
+    if (isPending) return;
+    mutate({ transport });
+  }, [mutate, isPending, transport]);
   const { t } = useTranslation();
 
   const totalTransactions = transactions.length;

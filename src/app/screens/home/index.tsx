@@ -84,8 +84,7 @@ function Home() {
   });
   const selectedAccount = useSelectedAccount();
   const { stxAddress, btcAddress } = selectedAccount;
-  const { showDataCollectionAlert, hideStx, spamToken, notificationBanners, balanceHidden } =
-    useWalletSelector();
+  const { showDataCollectionAlert, hideStx, spamToken, notificationBanners } = useWalletSelector();
   const theme = useTheme();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -93,7 +92,7 @@ function Home() {
   const [openSendModal, setOpenSendModal] = useState(false);
   const [openBuyModal, setOpenBuyModal] = useState(false);
   const {
-    isLoading: isInitialLoadingBtc,
+    isLoading: isLoadingBtc,
     isRefetching: refetchingBtcWalletData,
     failureCount: failureCountBtc,
     errorUpdateCount: errorUpdateCountBtc,
@@ -107,42 +106,36 @@ function Home() {
   const { data: fullBrc20CoinsList } = useGetBrc20FungibleTokens();
   const { data: fullRunesCoinsList } = useRuneFungibleTokensQuery();
   const {
-    isInitialLoading: isInitialLoadingStx,
+    isLoading: isLoadingStx,
     isRefetching: refetchingStxWalletData,
     failureCount: failureCountStx,
     errorUpdateCount: errorUpdateCountStx,
   } = useStxWalletData();
   const {
     data: sip10CoinsList,
-    isInitialLoading: isInitialLoadingSip10,
+    isLoading: isLoadingSip10,
     isRefetching: refetchingStxCoinData,
     failureCount: failureCountSip10,
     errorUpdateCount: errorUpdateCountSip10,
   } = useVisibleSip10FungibleTokens();
   const {
     data: brc20CoinsList,
-    isInitialLoading: isInitialLoadingBrc20,
+    isLoading: isLoadingBrc20,
     isRefetching: refetchingBrcCoinData,
     failureCount: failureCountBrc20,
     errorUpdateCount: errorUpdateCountBrc20,
   } = useVisibleBrc20FungibleTokens();
   const {
     data: runesCoinsList,
-    isInitialLoading: isInitialLoadingRunes,
+    isLoading: isLoadingRunes,
     isRefetching: refetchingRunesData,
     errorUpdateCount: errorUpdateCountRunes,
     failureCount: failureCountRunes,
   } = useVisibleRuneFungibleTokens();
 
-  const isInitialLoadingTokens =
-    (isInitialLoadingSip10 && failureCountSip10 === 0 && errorUpdateCountSip10 === 0) ||
-    (isInitialLoadingBrc20 && failureCountBrc20 === 0 && errorUpdateCountBrc20 === 0) ||
-    (isInitialLoadingRunes && failureCountRunes === 0 && errorUpdateCountRunes === 0);
+  const isLoadingTokens = isLoadingSip10 || isLoadingBrc20 || isLoadingRunes;
 
-  const isInitialLoading =
-    (isInitialLoadingBtc && failureCountBtc === 0 && errorUpdateCountBtc === 0) ||
-    (isInitialLoadingStx && failureCountStx === 0 && errorUpdateCountStx === 0) ||
-    isInitialLoadingTokens;
+  const isLoading = isLoadingBtc || isLoadingStx || isLoadingTokens;
 
   const isRefetching =
     refetchingBtcWalletData ||
@@ -401,7 +394,7 @@ function Home() {
   const isCrossChainSwapsEnabled = useHasFeature(FeatureId.CROSS_CHAIN_SWAPS);
   const showSwaps = isCrossChainSwapsEnabled;
 
-  const loaderTransitions = useTransition(isInitialLoading, {
+  const loaderTransitions = useTransition(isLoading, {
     from: { opacity: isInitialMount.current ? 1 : 0 },
     enter: { opacity: 1 },
     leave: { opacity: 0 },
@@ -412,7 +405,7 @@ function Home() {
     exitBeforeEnter: true, // This ensures the leave animation completes before the enter animation starts
   });
 
-  const bannerTransitions = useTransition(showBannerCarousel && !isInitialLoading, {
+  const bannerTransitions = useTransition(showBannerCarousel && !isLoading, {
     from: { maxHeight: '102px', opacity: isInitialMount.current ? 1 : 0 },
     enter: { maxHeight: '102px', opacity: 1 },
     leave: { maxHeight: '0px', opacity: 0 },
@@ -428,7 +421,7 @@ function Home() {
       <AccountHeaderComponent />
       <Container>
         <BalanceCard
-          isLoading={isInitialLoading}
+          isLoading={isLoading}
           isRefetching={isRefetching}
           combinedFtList={combinedFtList}
         />
@@ -437,27 +430,27 @@ function Home() {
             icon={<ArrowUp weight="regular" size="20" />}
             text={t('SEND')}
             onPress={onSendModalOpen}
-            disabled={isInitialLoading}
+            disabled={isLoading}
           />
           <SquareButton
             icon={<ArrowDown weight="regular" size="20" />}
             text={t('RECEIVE')}
             onPress={onReceiveModalOpen}
-            disabled={isInitialLoading}
+            disabled={isLoading}
           />
           {showSwaps && (
             <SquareButton
               src={ArrowSwap}
               text={t('SWAP')}
               onPress={onSwapPressed}
-              disabled={isInitialLoading}
+              disabled={isLoading}
             />
           )}
           <SquareButton
             icon={<Plus weight="regular" size="20" />}
             text={t('BUY')}
             onPress={onBuyModalOpen}
-            disabled={isInitialLoading}
+            disabled={isLoading}
           />
         </RowButtonContainer>
 
@@ -494,7 +487,7 @@ function Home() {
                   <StyledTokenTile
                     title={t('BITCOIN')}
                     currency="BTC"
-                    loading={isInitialLoadingBtc}
+                    loading={isLoadingBtc}
                     onPress={handleTokenPressed}
                   />
                 )}
@@ -502,7 +495,7 @@ function Home() {
                   <StyledTokenTile
                     title={t('STACKS')}
                     currency="STX"
-                    loading={isInitialLoadingStx}
+                    loading={isLoadingStx}
                     onPress={handleTokenPressed}
                   />
                 )}
@@ -511,7 +504,7 @@ function Home() {
                     key={coin.principal}
                     title={coin.name}
                     currency="FT"
-                    loading={isInitialLoadingTokens}
+                    loading={isLoadingTokens}
                     fungibleToken={coin}
                     onPress={handleTokenPressed}
                   />
@@ -537,7 +530,7 @@ function Home() {
           visible={openSendModal}
           coins={combinedFtList}
           title={t('SEND')}
-          loadingWalletData={isInitialLoadingStx || isInitialLoadingBtc}
+          loadingWalletData={isLoadingStx || isLoadingBtc}
         />
         <CoinSelectModal
           onSelectBitcoin={onBuyBtcClick}
@@ -547,7 +540,7 @@ function Home() {
           visible={openBuyModal}
           coins={[]}
           title={t('BUY')}
-          loadingWalletData={isInitialLoadingStx || isInitialLoadingBtc}
+          loadingWalletData={isLoadingStx || isLoadingBtc}
         />
         <AnnouncementModal />
       </Container>

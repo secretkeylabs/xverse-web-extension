@@ -92,7 +92,7 @@ function ConfirmNftTransaction() {
   const { refetch } = useStxWalletData();
   const selectedNetwork = useNetworkSelector();
   const {
-    isLoading,
+    isPending,
     error: txError,
     data: stxTxBroadcastData,
     mutate,
@@ -195,7 +195,7 @@ function ConfirmNftTransaction() {
         {!isGalleryOpen && <TopRow title={t('CONFIRM_TX')} onClick={handleBackButtonClick} />}
         <ConfirmStxTransactionComponent
           initialStxTransactions={initialStxTransactions}
-          loading={isLoading}
+          loading={isPending}
           onConfirmClick={handleOnConfirmClick}
           onCancelClick={handleOnCancelClick}
           isAsset

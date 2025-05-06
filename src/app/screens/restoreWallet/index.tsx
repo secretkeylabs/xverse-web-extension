@@ -75,9 +75,15 @@ function RestoreWallet(): JSX.Element {
 
   const {
     data: walletSummaryData,
-    isLoading: walletSummaryIsLoading,
+    isPending: walletSummaryIsLoading,
     refetch: fetchWalletSummaryData,
   } = useQuery({
+    // Some dependencies are missing, which is not ideal, although they are not
+    // JSON-serializable or are sensitive (private key). Hopefully when the App
+    // API gets implemented, this entire block of logic can be moved there.
+    //
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: ['wallet-summary'],
     queryFn: async () => {
       const mnemonic = cleanMnemonic(seedPhrase);
       if (!bip39.validateMnemonic(mnemonic, wordlist)) {
@@ -109,6 +115,7 @@ function RestoreWallet(): JSX.Element {
     },
     // this is disabled because we only want to fire it once there is a seed is set
     enabled: false,
+    gcTime: 0,
   });
 
   const {
@@ -116,6 +123,12 @@ function RestoreWallet(): JSX.Element {
     isLoading: derivationSummaryIsLoading,
     refetch: fetchDerivationSummaryData,
   } = useQuery({
+    // Some dependencies are missing, which is not ideal, although they are not
+    // JSON-serializable or are sensitive (private key). Hopefully when the App
+    // API gets implemented, this entire block of logic can be moved there.
+    //
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: ['derivation-summary'],
     queryFn: async () => {
       const mnemonic = cleanMnemonic(seedPhrase);
       if (!bip39.validateMnemonic(mnemonic, wordlist)) {
@@ -137,6 +150,7 @@ function RestoreWallet(): JSX.Element {
     },
     // this is disabled because we only want to fire it once there is a seed is set
     enabled: false,
+    gcTime: 0,
   });
 
   const onConfirmPasswordContinue = (validatedPassword: string) => {

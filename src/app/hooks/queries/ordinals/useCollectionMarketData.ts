@@ -11,11 +11,12 @@ const useInscriptionCollectionMarketData = (collectionId?: string | null) => {
   const xverseApiClient = useXverseApi();
   const { network } = useWalletSelector();
 
-  const collectionMarketData = async (): Promise<CollectionMarketDataResponse | undefined> => {
+  const collectionMarketData = async (): Promise<CollectionMarketDataResponse | null> => {
     if (!collectionId) {
       throw new InvalidParamsError('collectionId is required');
     }
-    return xverseApiClient.getCollectionMarketData(collectionId);
+    const res = await xverseApiClient.getCollectionMarketData(collectionId);
+    return res ?? null;
   };
 
   return useQuery({

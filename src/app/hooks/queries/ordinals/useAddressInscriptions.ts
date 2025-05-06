@@ -15,7 +15,7 @@ const useAddressInscriptions = (showHiddenOnly?: boolean) => {
   const { hiddenCollectibleIds, starredCollectibleIds } = useWalletSelector();
   const starredIds = starredCollectibleIds[ordinalsAddress]?.map(({ id }) => id);
 
-  const getCollectionsByAddress = async ({ pageParam = 0 }) => {
+  const getCollectionsByAddress = async ({ pageParam }: { pageParam: number }) => {
     if (!ordinalsAddress) {
       throw new InvalidParamsError('ordinalsAddress is required');
     }
@@ -26,31 +26,31 @@ const useAddressInscriptions = (showHiddenOnly?: boolean) => {
     });
   };
 
-  return useInfiniteQuery(
-    [
+  return useInfiniteQuery({
+    queryKey: [
       'address-inscriptions',
       ordinalsAddress,
       Object.keys(hiddenCollectibleIds[ordinalsAddress] ?? {}),
       starredIds,
       showHiddenOnly,
     ],
-    getCollectionsByAddress,
-    {
-      enabled: !!ordinalsAddress,
-      retry: handleRetries,
-      getNextPageParam: (lastpage, pages) => {
-        const currentLength = pages
-          .map((page) => page.results)
-          .filter(Boolean)
-          .flat().length;
-        if (currentLength < lastpage.total) {
-          return currentLength;
-        }
-        return false;
-      },
-      staleTime: 60 * 1000, // 1 min
+    queryFn: getCollectionsByAddress,
+
+    enabled: !!ordinalsAddress,
+    retry: handleRetries,
+    getNextPageParam: (lastpage, pages) => {
+      const currentLength = pages
+        .map((page) => page.results)
+        .filter(Boolean)
+        .flat().length;
+      if (currentLength < lastpage.total) {
+        return currentLength;
+      }
+      return null;
     },
-  );
+    initialPageParam: 0,
+    staleTime: 60 * 1000, // 1 min
+  });
 };
 
 export default useAddressInscriptions;

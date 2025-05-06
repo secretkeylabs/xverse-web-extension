@@ -57,7 +57,7 @@ export default function VerifySeed({
   const [error, setError] = useState('');
   const [currentChallengeIndex, setCurrentChallengeIndex] = useState(0);
 
-  const { data, isLoading, mutate, isSuccess } = useMutation({
+  const { data, isPending, mutate, isSuccess } = useMutation({
     mutationFn: async () => {
       if (!mnemonic) throw new Error("Couldn't retrieve mnemonic from vault.");
 
@@ -116,7 +116,7 @@ export default function VerifySeed({
     setCurrentChallengeIndex(currentChallengeIndex + 1);
   };
 
-  if (isLoading)
+  if (isPending)
     return (
       <Wrapper>
         <LoadingContainer>

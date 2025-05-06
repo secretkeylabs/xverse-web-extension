@@ -9,7 +9,7 @@ export default function useTransaction(id?: string) {
 
   const fetchTransaction = async () => {
     if (!selectedAccount || !id) {
-      return;
+      return null;
     }
 
     const transaction = await fetchBtcTransaction(

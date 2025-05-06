@@ -27,9 +27,10 @@ function Preferences() {
   const { t } = useTranslation('translation', { keyPrefix: 'SETTING_SCREEN' });
   const { fiatCurrency, walletLockPeriod } = useWalletSelector();
   const navigate = useNavigate();
-  const [isPriorityWallet, setIsPriorityWallet, isLoading] = useChromeLocalStorage<
-    boolean | undefined
-  >(chromeLocalStorageKeys.isPriorityWallet, true);
+  const [isPriorityWallet, setIsPriorityWallet, isLoading] = useChromeLocalStorage<boolean | null>(
+    chromeLocalStorageKeys.isPriorityWallet,
+    true,
+  );
 
   const switchIsPriorityWallet = () => {
     setIsPriorityWallet(!isPriorityWallet);
@@ -78,7 +79,7 @@ function Preferences() {
           description={t('XVERSE_DEFAULT_DESCRIPTION')}
           toggle
           toggleFunction={switchIsPriorityWallet}
-          toggleValue={isPriorityWallet}
+          toggleValue={isPriorityWallet ?? undefined}
           isLoading={isLoading}
         />
       </Container>

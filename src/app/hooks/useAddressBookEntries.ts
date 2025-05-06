@@ -1,6 +1,7 @@
 import { CoreError } from '@secretkeylabs/xverse-core';
 import type { AddressBookEntry } from '@secretkeylabs/xverse-core/addressBook/types';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { handleAddressBookError } from '../utils/handleAddressBookError';
@@ -20,7 +21,7 @@ const useAddressBookEntries = () => {
   const queryKey = ['addressBookEntries', network.type];
 
   const {
-    data: entries = [],
+    data: entries,
     isLoading,
     error,
     refetch,
@@ -28,10 +29,14 @@ const useAddressBookEntries = () => {
     queryKey,
     queryFn: async () => addressBook.getEntries(),
     refetchOnMount: true,
-    onError: (err) => {
-      toast.error(t('FETCH_FAILED'));
-    },
+    initialData: [],
   });
+
+  useEffect(() => {
+    if (error) {
+      toast.error(t('FETCH_FAILED'));
+    }
+  }, [error, t]);
 
   const addEntryMutation = useMutation({
     mutationFn: async (data: { address: string; name: string }) => {
@@ -64,9 +69,9 @@ const useAddressBookEntries = () => {
     addEntry: addEntryMutation.mutate,
     removeEntry: removeEntryMutation.mutate,
     editEntry: editEntryMutation.mutate,
-    isAddingEntry: addEntryMutation.isLoading,
-    isRemovingEntry: removeEntryMutation.isLoading,
-    isEditingEntry: editEntryMutation.isLoading,
+    isAddingEntry: addEntryMutation.isPending,
+    isRemovingEntry: removeEntryMutation.isPending,
+    isEditingEntry: editEntryMutation.isPending,
   };
 };
 

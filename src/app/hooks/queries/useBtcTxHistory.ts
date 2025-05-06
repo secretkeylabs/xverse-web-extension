@@ -27,7 +27,7 @@ const useBtcTxHistory = () => {
     });
   });
 
-  const getPastBtcTransactions = ({ pageParam = 0 }) =>
+  const getPastBtcTransactions = ({ pageParam }: { pageParam: number }) =>
     fetchPastBtcTransactions({
       account: selectedAccount,
       xverseApiClient,
@@ -37,22 +37,21 @@ const useBtcTxHistory = () => {
       limit: PAGE_SIZE,
     });
 
-  return useInfiniteQuery(
-    ['btc-tx-history', network.type, selectedAccount.btcAddresses.taproot.address],
-    getPastBtcTransactions,
-    {
-      enabled: !isRunesLoading,
-      retry: handleRetries,
-      getNextPageParam: (lastpage, pages) => {
-        const offset = pages.map((page) => page.transactions).flat().length;
-        if (lastpage.transactions.length < PAGE_SIZE) {
-          return false;
-        }
-        return offset;
-      },
-      staleTime: 10 * 1000, // 10 secs
+  return useInfiniteQuery({
+    queryKey: ['btc-tx-history', network.type, selectedAccount.btcAddresses.taproot.address],
+    queryFn: getPastBtcTransactions,
+    enabled: !isRunesLoading,
+    retry: handleRetries,
+    getNextPageParam: (lastpage, pages) => {
+      const offset = pages.map((page) => page.transactions).flat().length;
+      if (lastpage.transactions.length < PAGE_SIZE) {
+        return null;
+      }
+      return offset;
     },
-  );
+    staleTime: 10 * 1000, // 10 secs
+    initialPageParam: 0,
+  });
 };
 
 export default useBtcTxHistory;

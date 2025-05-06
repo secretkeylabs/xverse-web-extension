@@ -1,22 +1,20 @@
-import type { StructuredDataSignaturePayload } from '@stacks/connect';
+import { hexToBytes } from '@noble/hashes/utils';
 import { deserializeCV } from '@stacks/transactions';
 import { useTranslation } from 'react-i18next';
 import ClarityMessageView from './clarityMessageView';
 import CollapsableContainer from './collapsableContainer';
 
 interface SignatureRequestStructuredDataProps {
-  payload: StructuredDataSignaturePayload;
+  /** Hex-encoded clarity value. */
+  message: string;
 }
 
 export default function SignatureRequestStructuredData(props: SignatureRequestStructuredDataProps) {
   const { t } = useTranslation('translation', { keyPrefix: 'SIGNATURE_REQUEST' });
-  const { payload } = props;
+  const { message } = props;
   return (
     <CollapsableContainer text="" title={t('MESSAGE_HEADER')}>
-      <ClarityMessageView
-        val={deserializeCV(Buffer.from(payload.message as any, 'hex'))} // TODO: fix type error
-        encoding="tryAscii"
-      />
+      <ClarityMessageView val={deserializeCV(hexToBytes(message))} encoding="tryAscii" />
     </CollapsableContainer>
   );
 }

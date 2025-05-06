@@ -42,7 +42,7 @@ function SendNft() {
   const [searchParams] = useSearchParams();
   const xverseApiClient = useXverseApi();
 
-  const { isLoading, data, mutate } = useMutation<
+  const { isPending, data, mutate } = useMutation<
     StacksTransactionWire,
     Error,
     { tokenId: string; address: string }
@@ -110,7 +110,7 @@ function SendNft() {
       recipientError={recipientError}
       setRecipientAddress={setRecipientAddress}
       onNext={onPressNext}
-      isLoading={isLoading}
+      isLoading={isPending}
       recipientPlaceholder={t('RECIPIENT_PLACEHOLDER')}
       onBack={handleBackButtonClick}
       selectedBottomTab="nft"

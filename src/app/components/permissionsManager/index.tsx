@@ -11,7 +11,7 @@ const PermissionsUtilsContext = createContext<TPermissionsUtilsContext | undefin
 export function PermissionsProvider({ children }: PropsWithChildren) {
   const {
     mutate,
-    isLoading,
+    isPending,
     data: isStoreInitializationComplete,
   } = useMutation({
     async mutationFn() {
@@ -35,10 +35,10 @@ export function PermissionsProvider({ children }: PropsWithChildren) {
     if (isStoreInitializationComplete) return;
 
     // If it's already running, don't run it again.
-    if (isLoading) return;
+    if (isPending) return;
 
     mutate();
-  }, [isLoading, isStoreInitializationComplete, mutate]);
+  }, [isPending, isStoreInitializationComplete, mutate]);
 
   const render = useRender();
   const renderCallback = useCallback(

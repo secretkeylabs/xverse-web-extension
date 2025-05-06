@@ -1,7 +1,7 @@
 import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import type { BtcAddressData } from '@secretkeylabs/xverse-core';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 const useBtcWalletData = () => {
   const { btcAddress } = useSelectedAccount();
@@ -17,7 +17,7 @@ const useBtcWalletData = () => {
     queryFn: fetchBtcWalletData,
     enabled: !!btcAddress,
     staleTime: 10 * 1000, // 10 secs
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 };
 

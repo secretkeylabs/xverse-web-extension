@@ -9,7 +9,7 @@ import {
   type FungibleTokenWithStates,
   type SettingsNetwork,
 } from '@secretkeylabs/xverse-core';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { selectWithDerivedState } from '@utils/tokens';
 
 const brc20TokenToFungibleToken = (coin: Brc20Token): FungibleToken => ({
@@ -75,7 +75,7 @@ export const useGetBrc20FungibleTokens = (select?: (data: FungibleTokenWithState
     queryKey: ['brc20-fungible-tokens', ordinalsAddress, network.type, fiatCurrency],
     queryFn,
     enabled: Boolean(network && ordinalsAddress),
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     select: selectWithDerivedState({
       manageTokens: brc20ManageTokens,
       spamTokens,
