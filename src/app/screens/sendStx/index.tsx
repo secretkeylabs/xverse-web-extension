@@ -215,7 +215,12 @@ function SendStxScreen() {
         });
 
         if (!fee || Number(fee) <= 0) {
-          setFee(Number(microstacksToStx(new BigNumber(stxFees.medium))).toString());
+          const newFee =
+            feeMultipliers?.thresholdHighStacksFee &&
+            stxFees.medium > feeMultipliers?.thresholdHighStacksFee
+              ? feeMultipliers?.thresholdHighStacksFee
+              : stxFees.medium;
+          setFee(microstacksToStx(new BigNumber(newFee)).toString());
         }
       } catch (e) {
         console.error(e);
@@ -260,7 +265,7 @@ function SendStxScreen() {
               sendMax={sendMax}
               setSendMax={setSendMax}
               feeRates={feeRates}
-              getFeeForFeeRate={(feeRate) => Promise.resolve(feeRate)}
+              getFeeForFeeRate={async (feeRate) => feeRate}
               dustFiltered={false}
               onNext={() => setCurrentStep(getNextStep(Step.SelectAmount, true))}
               isLoading={isLoadingTx || amount !== debouncedAmount}
