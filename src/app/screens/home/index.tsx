@@ -273,14 +273,6 @@ function Home() {
     setOpenSendModal(false);
   };
 
-  const onBuyModalOpen = () => {
-    setOpenBuyModal(true);
-  };
-
-  const onBuyModalClose = () => {
-    setOpenBuyModal(false);
-  };
-
   const handleManageTokenListOnClick = () => {
     navigate('/manage-tokens');
   };
@@ -342,22 +334,6 @@ function Home() {
     } else {
       navigate(route);
     }
-  };
-
-  const onBuyStxClick = () => {
-    trackMixPanel(AnalyticsEvents.InitiateBuyFlow, {
-      selectedToken: 'STX',
-      source: 'dashboard',
-    });
-    navigate('/buy/STX');
-  };
-
-  const onBuyBtcClick = () => {
-    trackMixPanel(AnalyticsEvents.InitiateBuyFlow, {
-      selectedToken: 'BTC',
-      source: 'dashboard',
-    });
-    navigate('/buy/BTC');
   };
 
   const handleTokenPressed = (currency: CurrencyTypes, fungibleToken?: FungibleToken) => {
@@ -449,7 +425,9 @@ function Home() {
           <SquareButton
             icon={<Plus weight="regular" size="20" />}
             text={t('BUY')}
-            onPress={onBuyModalOpen}
+            onPress={() => {
+              navigate('/buy/BTC');
+            }}
             disabled={isLoading}
           />
         </RowButtonContainer>
@@ -530,16 +508,6 @@ function Home() {
           visible={openSendModal}
           coins={combinedFtList}
           title={t('SEND')}
-          loadingWalletData={isLoadingStx || isLoadingBtc}
-        />
-        <CoinSelectModal
-          onSelectBitcoin={onBuyBtcClick}
-          onSelectStacks={onBuyStxClick}
-          onClose={onBuyModalClose}
-          onSelectCoin={onBuyModalClose}
-          visible={openBuyModal}
-          coins={[]}
-          title={t('BUY')}
           loadingWalletData={isLoadingStx || isLoadingBtc}
         />
         <AnnouncementModal />

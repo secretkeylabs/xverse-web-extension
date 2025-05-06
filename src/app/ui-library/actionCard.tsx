@@ -28,21 +28,24 @@ const ContentWrapper = styled.div`
   display: flex;
   align-items: center;
   gap: ${({ theme }) => theme.space.m};
+  width: 100%;
 `;
 
 const TextContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: ${({ theme }) => theme.space.xxxs};
+  width: 100%;
 `;
 
 type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   icon?: React.ReactNode;
-  label: string;
-  description: string;
+  label: React.ReactNode;
+  description?: string;
   withArrow?: boolean;
 };
 
+// TODO: Check if width 100% broke something
 function ActionCard({ icon, label, description, withArrow = false, ...props }: Props) {
   return (
     <CardButton {...props}>
