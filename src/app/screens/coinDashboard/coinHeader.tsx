@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import ArrowDown from '@assets/img/dashboard/arrow_down.svg';
 import ArrowUp from '@assets/img/dashboard/arrow_up.svg';
 import Buy from '@assets/img/dashboard/black_plus.svg';
@@ -20,14 +21,19 @@ import { getTrackingIdentifier, isMotherToken } from '@screens/swap/utils';
 import {
   AnalyticsEvents,
   FeatureId,
+  STRK_TOKEN_ADDRESS,
+  balanceOf,
+  contractType,
   currencySymbolMap,
+  format,
   getFiatBtcEquivalent,
   getFiatEquivalent,
   microstacksToStx,
   type FungibleToken,
 } from '@secretkeylabs/xverse-core';
+import { useQuery } from '@tanstack/react-query';
 import type { CurrencyTypes } from '@utils/constants';
-import { BTC_SYMBOL, HIDDEN_BALANCE_LABEL } from '@utils/constants';
+import { BTC_SYMBOL, HIDDEN_BALANCE_LABEL, isStarknetActive } from '@utils/constants';
 import { isInOptions, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { getBalanceAmount, getFtTicker } from '@utils/tokens';
@@ -68,6 +74,29 @@ type Props = {
 export default function CoinHeader({ currency, fungibleToken, chartPriceStats }: Props) {
   const selectedAccount = useSelectedAccount();
   const { fiatCurrency, network, balanceHidden } = useWalletSelector();
+
+  const starknetAddress = (() => {
+    if (selectedAccount.accountType !== 'software') return null;
+
+    // Support undefined strkAddresses during PoC period.
+    if (!selectedAccount.strkAddresses) return null;
+
+    return selectedAccount.strkAddresses[contractType.AX040W0G].address;
+  })();
+  const {
+    isLoading,
+    isError,
+    error,
+    data: strkBalance,
+  } = useQuery({
+    queryKey: ['strk-balance', { address: starknetAddress }],
+    queryFn: async () =>
+      balanceOf({
+        tokenAddress: STRK_TOKEN_ADDRESS,
+        address: starknetAddress || '',
+      }),
+    enabled: !!starknetAddress,
+  });
 
   // TODO: this should be a dumb component, move the logic to the parent
   // TODO: currently, we get btc and stx balances here for all currencies and FTs, but we should get them in
@@ -161,7 +190,7 @@ export default function CoinHeader({ currency, fungibleToken, chartPriceStats }:
 
   const goToSendScreen = async () => {
     let route = '';
-    if (currency === 'BTC' || currency === 'STX') {
+    if (currency === 'BTC' || currency === 'STX' || currency === 'STRK') {
       route = `/send-${currency}`;
     } else {
       switch (fungibleToken?.protocol) {
@@ -273,16 +302,43 @@ export default function CoinHeader({ currency, fungibleToken, chartPriceStats }:
           )}
         </RowContainer>
         <BalanceValuesContainer>
-          <NumericFormat
-            value={getBalanceAmount(currency, fungibleToken, stxData, btcBalance)}
-            displayType="text"
-            thousandSeparator
-            renderText={(value: string) => (
-              <CoinBalanceText data-testid="coin-balance" onClick={toggleBalanceView}>
-                {balanceHidden ? HIDDEN_BALANCE_LABEL : `${value} ${getTokenTicker()}`}
-              </CoinBalanceText>
-            )}
-          />
+          {(() => {
+            const isStrk = currency === 'STRK' && isStarknetActive;
+            if (isStrk) {
+              if (isLoading) return null;
+              if (isError) {
+                console.error('Error loading STRK balance.');
+                console.error(error);
+                return;
+              }
+
+              const balance = balanceHidden
+                ? HIDDEN_BALANCE_LABEL
+                : format({
+                    currency: 'crypto/starknet/starknet',
+                    amount: strkBalance ?? 0,
+                  });
+
+              return (
+                <CoinBalanceText data-testid="coin-balance" onClick={toggleBalanceView}>
+                  {balance}
+                </CoinBalanceText>
+              );
+            }
+
+            return (
+              <NumericFormat
+                value={getBalanceAmount(currency, fungibleToken, stxData, btcBalance)}
+                displayType="text"
+                thousandSeparator
+                renderText={(value: string) => (
+                  <CoinBalanceText data-testid="coin-balance" onClick={toggleBalanceView}>
+                    {balanceHidden ? HIDDEN_BALANCE_LABEL : `${value} ${getTokenTicker()}`}
+                  </CoinBalanceText>
+                )}
+              />
+            );
+          })()}
           {balanceDisplayState === 'btc' && btcValue && (
             <NumericFormat
               value={btcValue}

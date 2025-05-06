@@ -1,4 +1,5 @@
 import type {
+  AccountStrkAddresses,
   AccountType,
   AppInfo,
   BtcPaymentType,
@@ -203,9 +204,40 @@ export type SoftwareWalletV10 = {
 
 type NetworkTypeV10 = 'Mainnet' | 'Testnet' | 'Testnet4' | 'Signet' | 'Regtest';
 
-// should be exported and used when we add next migration
-type WalletStateV10 = Omit<WalletStateV9, 'accountsList' | 'savedNames'> & {
+export type WalletStateV10 = Omit<WalletStateV9, 'accountsList' | 'savedNames'> & {
   softwareWallets: {
     [network in NetworkTypeV10]: SoftwareWalletV10[];
   };
+};
+
+type AccountV11 = AccountV10 &
+  (
+    | {
+        accountType: 'software';
+        walletId: WalletId;
+        strkAddresses: AccountStrkAddresses;
+      }
+    | {
+        accountType: Exclude<AccountType, 'software'>;
+        walletId?: never;
+        strkAddresses: never;
+      }
+  );
+
+type SoftwareWalletV11 = {
+  walletId: WalletId;
+  derivationType: DerivationType;
+  accounts: AccountV11[];
+};
+
+/**
+ * Should be used when we add next migration.
+ * @public
+ */
+export type WalletStateV11 = WalletStateV10 & {
+  softwareWallets: {
+    [network in NetworkTypeV10]: SoftwareWalletV11[];
+  };
+  ledgerAccountsList: AccountV11[];
+  keystoneAccountsList: AccountV11[];
 };

@@ -357,6 +357,8 @@
     "ORDINALS_RECEIVE_MESSAGE": "Only use this address to receive Ordinals, Runes, and BRC-20 tokens.",
     "STX_RECEIVE_MESSAGE": "Only use this address to receive STX, SIP-10 tokens & Stacks NFTs",
     "BTC_RECEIVE_MESSAGE": "Only use this address to receive Bitcoin.",
+    "STARKNET_ADDRESS": "Starknet address",
+    "STARKNET_ADDRESS_MESSAGE": "Only use this address to receive Starknet assets.",
     "CALLOUTS": {
       "NATIVE_SEGWIT": {
         "TITLE": "Now using Native SegWit!",
@@ -381,6 +383,14 @@
     },
     "STX": {
       "BUY_STX": "Buy Stacks"
+    },
+    "STRK": {
+      "RECIPIENT_PLACEHOLDER": "Enter address",
+      "AMOUNT": "STRK amount",
+      "INVALID_ADDRESS": "Invalid Starknet address",
+      "INVALID_LENGTH": "Invalid address length. Ensure it's 66 characters long, including the leading \"0x\".",
+      "ACCOUNT_NOT_DEPLOYED_TITLE": "Recipient account not deployed",
+      "ACCOUNT_NOT_DEPLOYED_WARNING": "There is no account deployed on this address. Confirm to send funds to this address."
     },
     "MAX": "MAX",
     "ADDRESS_BOOK": "Address book",

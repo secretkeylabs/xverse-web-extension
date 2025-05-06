@@ -22,7 +22,8 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx --quiet"
   },
   "overrides": {
-    "buffer": "6.0.3"
+    "buffer": "6.0.3",
+    "parse-asn1": "5.1.6"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -49,7 +50,7 @@
     "@scure/bip32": "1.6.2",
     "@scure/bip39": "1.5.4",
     "@scure/btc-signer": "1.6.0",
-    "@secretkeylabs/xverse-core": "45.1.0",
+    "@secretkeylabs/xverse-core": "45.1.1",
     "@stacks/auth": "7.0.6",
     "@stacks/connect": "7.9.0",
     "@stacks/encryption": "7.0.6",
@@ -57,18 +58,18 @@
     "@stacks/stacking": "7.0.6",
     "@stacks/stacks-blockchain-api-types": "7.14.1",
     "@stacks/storage": "7.0.6",
-    "@stacks/transactions": "7.0.6",
     "@stacks/wallet-sdk": "7.0.6",
     "@tanstack/query-sync-storage-persister": "5.74.6",
     "@tanstack/react-query-devtools": "5.74.6",
     "@tanstack/react-query-persist-client": "5.74.6",
     "@tanstack/react-query": "5.74.4",
+    "@stacks/transactions": "7.0.6",
     "argon2-browser": "1.18.0",
     "async-mutex": "0.5.0",
     "axios": "1.8.4",
     "bignumber.js": "9.1.2",
     "classnames": "2.3.2",
-    "crypto-browserify": "3.12.0",
+    "crypto-browserify": "3.12.1",
     "date-fns": "2.30.0",
     "dotenv": "16.4.7",
     "i18next": "21.10.0",
@@ -98,6 +99,7 @@
     "redux": "4.2.1",
     "redux-persist": "6.0.0",
     "redux-state-sync": "3.1.4",
+    "starknet": "7.1.0",
     "stream-browserify": "3.0.0",
     "string-to-color": "2.2.2",
     "styled-components": "5.3.11",
@@ -141,7 +143,7 @@
     "eslint-plugin-react": "7.33.1",
     "eslint-plugin-react-hooks": "4.6.0",
     "husky": "8.0.3",
-    "knip": "5.50.2",
+    "knip": "5.50.5",
     "lint-staged": "13.2.3",
     "prettier": "2.8.8",
     "prettier-plugin-organize-imports": "3.2.3",

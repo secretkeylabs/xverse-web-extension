@@ -46,7 +46,7 @@ import {
 } from '@stores/wallet/actions/actionCreators';
 import Button from '@ui-library/button';
 import SnackBar from '@ui-library/snackBar';
-import { ANIMATION_EASING, type CurrencyTypes } from '@utils/constants';
+import { ANIMATION_EASING, isStarknetActive, type CurrencyTypes } from '@utils/constants';
 import { isInOptions, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import { optInMixPanel, optOutMixPanel, trackMixPanel } from '@utils/mixpanel';
 import { sortFtByFiatBalance } from '@utils/tokens';
@@ -77,6 +77,7 @@ import {
   TokenListButtonContainer,
 } from './index.styled';
 import ReceiveSheet from './receiveSheet';
+import { StarknetTokenTile } from './StarknetTokenTile';
 
 function Home() {
   const { t } = useTranslation('translation', {
@@ -461,6 +462,7 @@ function Home() {
               </animated.div>
             ) : (
               <animated.div style={style}>
+                {isStarknetActive && <StarknetTokenTile />}
                 {btcAddress && (
                   <StyledTokenTile
                     title={t('BITCOIN')}

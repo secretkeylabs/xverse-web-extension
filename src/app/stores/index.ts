@@ -14,6 +14,7 @@ import type {
   AccountV5,
   SoftwareWalletV10,
   WalletStateV1,
+  WalletStateV10,
   WalletStateV2,
   WalletStateV3,
   WalletStateV4,
@@ -208,7 +209,7 @@ const migrations = {
       keystoneAccountsList: [],
     };
   },
-  10: (state: WalletStateV9): WalletState => {
+  10: (state: WalletStateV9): WalletStateV10 => {
     const { accountsList, savedNames, ledgerAccountsList, keystoneAccountsList, ...migratedState } =
       state;
 
@@ -236,6 +237,9 @@ const migrations = {
       },
     };
   },
+
+  // No sync state changes. Starknet accounts added in TODO
+  11: (state: WalletStateV10): WalletState => state as WalletState,
 
   /* *
    * When adding a new migration, add the new wallet state type to the migrationTypes file

@@ -13,7 +13,6 @@ import { Provider } from 'react-redux';
 import { RouterProvider } from 'react-router-dom';
 import { PersistGate } from 'redux-persist/integration/react';
 import styled, { ThemeProvider } from 'styled-components';
-import '../locales';
 import Theme from '../theme';
 import GlobalStyle from '../theme/global';
 import SessionGuard from './components/guards/session';

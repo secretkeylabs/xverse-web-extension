@@ -1,3 +1,4 @@
+import StarknetIcon from '@assets/img/dashboard/strk_icon.png';
 import StxIcon from '@assets/img/dashboard/stx_icon.svg';
 import BtcIcon from '@assets/img/receive_btc_image.svg';
 import OrdinalIcon from '@assets/img/receive_ordinals_image.svg';
@@ -10,6 +11,7 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Check, Copy } from '@phosphor-icons/react';
 import QrCode from '@screens/receive/qrCode';
+import { contractType } from '@secretkeylabs/xverse-core';
 import { markAlertSeen, shouldShowAlert } from '@utils/alertTracker';
 import { useRef, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -31,8 +33,8 @@ import {
   TopTitleText,
 } from './index.styled';
 
-type SupportedAddresses = 'BTC' | 'STX' | 'ORD';
-const validAddresses: SupportedAddresses[] = ['BTC', 'STX', 'ORD'];
+type SupportedAddresses = 'BTC' | 'STX' | 'ORD' | 'STRK';
+const validAddresses: SupportedAddresses[] = ['BTC', 'STX', 'ORD', 'STRK'];
 
 function Receive() {
   const navigate = useNavigate();
@@ -40,6 +42,15 @@ function Receive() {
   const { stxAddress, btcAddress, ordinalsAddress } = selectedAccount;
   const { network, btcPaymentAddressType, hasBackedUpWallet } = useWalletSelector();
   const userCanSwitchPaymentType = useCanUserSwitchPaymentType();
+
+  const starknetAddress = (() => {
+    if (selectedAccount.accountType !== 'software') return '';
+
+    // Support undefined strkAddresses during PoC period.
+    if (!selectedAccount.strkAddresses) return '';
+
+    return selectedAccount.strkAddresses[contractType.AX040W0G].address;
+  })();
 
   const { t } = useTranslation('translation', { keyPrefix: 'RECEIVE' });
   const { t: commonT } = useTranslation('translation', { keyPrefix: 'COMMON' });
@@ -81,6 +92,13 @@ function Receive() {
       icon: OrdinalIcon,
       gradient: '#61FF8D',
     },
+    STRK: {
+      address: starknetAddress,
+      title: t('STARKNET_ADDRESS'),
+      desc: t('STARKNET_ADDRESS_MESSAGE'),
+      icon: StarknetIcon,
+      gradient: '#2a2a73',
+    },
   };
 
   const showBnsName = currency === 'STX' && !!selectedAccount?.bnsName;
@@ -90,7 +108,8 @@ function Receive() {
   const handleOnClick = () => {
     if (!currency) return;
 
-    navigator.clipboard.writeText(renderData[currency].address);
+    // eslint-disable-next-line no-console
+    navigator.clipboard.writeText(renderData[currency].address).catch(console.error);
 
     setAddressCopied(true);
     toast(commonT('COPIED_TO_CLIPBOARD'));

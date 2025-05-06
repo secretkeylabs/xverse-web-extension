@@ -46,6 +46,7 @@ import SendInscriptionsRequest from '@screens/sendInscriptionsRequest';
 import SendNft from '@screens/sendNft';
 import SendOrdinal from '@screens/sendOrdinal';
 import SendRuneScreen from '@screens/sendRune';
+import { SendStrkScreen } from '@screens/sendStrk';
 import SendStxScreen from '@screens/sendStx';
 import Setting from '@screens/settings';
 import About from '@screens/settings/about';
@@ -81,6 +82,7 @@ import MultipleMarketplaceListingResult from '@screens/transactionStatus/multipl
 import TransferRunesRequest from '@screens/transferRunesRequest';
 import UnlistRuneScreen from '@screens/unlistRune';
 import UnlistRuneUtxoScreen from '@screens/unlistRuneUtxo';
+import { isStarknetActive } from '@utils/constants';
 import BtcSendRequest from 'app/screens/btcSendRequest';
 import ListRuneScreen from 'app/screens/listRune';
 import RoutePaths from './paths';
@@ -405,6 +407,10 @@ const authedRoutesWithSidebar: RouteObject = {
     {
       path: RoutePaths.SendBtc,
       element: <SendBtcScreen />,
+    },
+    {
+      path: 'send-strk',
+      element: isStarknetActive ? <SendStrkScreen /> : <div />,
     },
     {
       path: RoutePaths.SendStx,
