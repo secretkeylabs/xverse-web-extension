@@ -13,11 +13,12 @@ import {
   generateUnsignedSip10TransferTransaction,
   generateUnsignedTx,
   microstacksToStx,
+  modifyRecommendedStxFees,
   nextBestNonce,
   stxToMicrostacks,
 } from '@secretkeylabs/xverse-core';
 import { TransactionTypes } from '@stacks/connect';
-import { deserializeTransaction, StacksTransactionWire } from '@stacks/transactions';
+import { deserializeTransaction, PayloadType, StacksTransactionWire } from '@stacks/transactions';
 import type { FeeRates } from '@ui-components/selectFeeRate';
 import { convertAmountToFtDecimalPlaces } from '@utils/helper';
 import SendLayout from 'app/layouts/sendLayout';
@@ -202,11 +203,15 @@ function SendStxScreen() {
           selectedNetwork,
         );
 
-        const stxFees = {
-          low: low.fee,
-          medium: medium.fee,
-          high: high.fee,
-        };
+        const stxFees = modifyRecommendedStxFees(
+          {
+            low: low.fee,
+            medium: medium.fee,
+            high: high.fee,
+          },
+          feeMultipliers,
+          PayloadType.TokenTransfer,
+        );
 
         setFeeRates({
           low: Number(microstacksToStx(new BigNumber(stxFees.low))),
@@ -215,12 +220,7 @@ function SendStxScreen() {
         });
 
         if (!fee || Number(fee) <= 0) {
-          const newFee =
-            feeMultipliers?.thresholdHighStacksFee &&
-            stxFees.medium > feeMultipliers?.thresholdHighStacksFee
-              ? feeMultipliers?.thresholdHighStacksFee
-              : stxFees.medium;
-          setFee(microstacksToStx(new BigNumber(newFee)).toString());
+          setFee(microstacksToStx(new BigNumber(stxFees.medium)).toString());
         }
       } catch (e) {
         console.error(e);
