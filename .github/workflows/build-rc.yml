@@ -36,13 +36,11 @@ jobs:
           npx tsc --noEmit
       - name: Build
         env:
-          TRANSAC_API_KEY: ${{ secrets.TRANSAC_API_KEY }}
-          MOON_PAY_API_KEY: ${{ secrets.MOON_PAY_API_KEY }}
           MIX_PANEL_TOKEN: ${{ secrets.MIX_PANEL_TOKEN }}
           MIX_PANEL_EXPLORE_APP_TOKEN: ${{ secrets.MIX_PANEL_EXPLORE_APP_TOKEN }}
           ONRAMPER_API_KEY: ${{ secrets.ONRAMPER_API_KEY }}
           SKIP_ANIMATION_WALLET_STARTUP: 'false'
-
+          IS_STARKNET_ACTIVE: 'false'
         run: npm run build
       - name: Upload Archive
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # 4.6.2
