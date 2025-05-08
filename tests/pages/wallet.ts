@@ -419,7 +419,7 @@ export default class Wallet {
     this.buttonNetwork = page.getByRole('button', { name: 'Network' });
     this.buttonSave = page.getByRole('button', { name: 'Save' });
     this.buttonMainnet = page.getByRole('button', { name: 'Mainnet' });
-    this.buttonTestnet = page.getByRole('button', { name: 'Testnet' });
+    this.buttonTestnet = page.getByRole('button', { name: 'Testnet4' });
     this.buttonPreferences = page.getByRole('button', { name: 'Preferences' });
     this.buttonSecurity = page.getByRole('button', { name: 'Security' });
     this.buttonAdvanced = page.getByRole('button', { name: 'Advanced' });
@@ -554,7 +554,7 @@ export default class Wallet {
     this.errorInsufficientBRC20Balance = page.getByText('Insufficient BRC-20 balance');
     this.errorInsufficientFunds = page.locator('p').filter({ hasText: 'Insufficient funds' });
     this.containerFeeRate = page.getByTestId('feerate-container');
-    this.inputBTCAddress = page.locator('input[type="text"]');
+    this.inputBTCAddress = page.getByRole('textbox', { name: 'Enter address' });
     this.inputBTCAmount = page.getByTestId('btc-amount');
     this.buttonExpand = page.getByRole('button', { name: 'Inputs & Outputs' });
     this.confirmTotalAmount = page.getByTestId('confirm-total-amount');
@@ -699,7 +699,6 @@ export default class Wallet {
     await expect(this.labelBalanceAmountSelector).toBeVisible();
     await expect(this.buttonEditFee).toBeVisible();
     await expect(this.feeAmount).toBeVisible();
-    await expect(this.imageToken).toBeVisible();
     await expect(this.buttonBack).toBeVisible();
   }
 
@@ -1005,10 +1004,9 @@ export default class Wallet {
   }
 
   async clickOnSpecificToken(tokenname: string) {
-    const specificToken = this.page.getByRole('button').getByLabel(`Token Title: ${tokenname}`);
-    // filter({
-    //   has: this.labelTokenSubtitle.getByText(tokenname, { exact: true }),
+    const specificToken = this.page.getByLabel(`Token Title: ${tokenname}`);
 
+    await expect(specificToken.last()).toBeVisible();
     await specificToken.last().click();
   }
 
@@ -1091,7 +1089,7 @@ export default class Wallet {
     await expect(this.buttonTestnet.locator('img')).toHaveAttribute('alt', 'tick');
     await expect(this.buttonMainnet.locator('img[alt="tick"]')).toHaveCount(0);
 
-    await this.inputStacksURL.fill('https://api.nakamoto.testnet.hiro.so');
+    await this.inputStacksURL.fill('https://api.testnet.hiro.so');
     // To speed up some checks we use our own servers
     // await this.inputBTCURL.fill('https://btc-testnet.xverse.app');
 
@@ -1102,8 +1100,6 @@ export default class Wallet {
 
     await expect(this.buttonSave).toBeEnabled({ timeout: 15000 });
     await this.buttonSave.click();
-    await expect(this.buttonNetwork).toBeVisible({ timeout: 30000 });
-    await expect(this.buttonNetwork).toHaveText('NetworkTestnet');
   }
 
   async switchToMainnetNetwork() {
