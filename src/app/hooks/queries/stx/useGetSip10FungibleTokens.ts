@@ -9,7 +9,7 @@ import {
   type SettingsNetwork,
   type StacksNetwork,
 } from '@secretkeylabs/xverse-core';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { selectWithDerivedState } from '@utils/tokens';
 
 export const fetchSip10FungibleTokens =
@@ -60,7 +60,7 @@ export const useGetSip10FungibleTokens = (select?: (data: FungibleTokenWithState
     queryKey: ['sip10-fungible-tokens', network.type, stxAddress, fiatCurrency],
     queryFn,
     enabled: Boolean(network && stxAddress),
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     select: selectWithDerivedState({
       manageTokens: sip10ManageTokens,
       spamTokens,

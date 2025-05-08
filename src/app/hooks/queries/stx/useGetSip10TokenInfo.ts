@@ -21,8 +21,9 @@ const useGetSip10TokenInfo = ({
         fiatCurrency ?? defaultFiatCurrency,
       );
       const tokenInfo = coinsInfo.find((coin) => coin.contract === principal);
-      return tokenInfo;
+      return tokenInfo ?? null;
     }
+    return null;
   };
 
   const {

@@ -100,3 +100,6 @@ export const getBitcoinNetworkType = (networkType: NetworkType): BitcoinNetworkT
 
   return networkTypeMap[networkType] ?? BitcoinNetworkType.Mainnet;
 };
+
+export const getStacksNetworkType = (networkType: NetworkType) =>
+  networkType === 'Mainnet' ? 'Mainnet' : 'Testnet';

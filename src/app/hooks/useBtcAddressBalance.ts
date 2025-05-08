@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import BigNumber from 'bignumber.js';
 import useBtcClient from './apiClients/useBtcClient';
 
@@ -25,6 +25,6 @@ export default function useBtcAddressBalance(address: string) {
     queryKey: ['btc-address-balance', address],
     queryFn: fetchBalance,
     staleTime: 10 * 1000, // 10 secs
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 }

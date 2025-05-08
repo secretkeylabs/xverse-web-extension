@@ -23,7 +23,7 @@ export function useFunctionInterface({
         contractPrincipal.split('.')[1],
         selectedNetwork,
       ),
-    cacheTime: Infinity,
+    gcTime: Infinity,
   });
 
   const functionInterface = useMemo(

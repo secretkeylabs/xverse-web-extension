@@ -1,3 +1,4 @@
+import { PersistedStorageGuard } from '@components/guards/persistedStorageGuard';
 import { PermissionsProvider } from '@components/permissionsManager';
 import StartupLoadingScreen from '@components/startupLoadingScreen';
 import Toaster from '@components/toaster';
@@ -12,7 +13,6 @@ import { Provider } from 'react-redux';
 import { RouterProvider } from 'react-router-dom';
 import { PersistGate } from 'redux-persist/integration/react';
 import styled, { ThemeProvider } from 'styled-components';
-import '../locales';
 import Theme from '../theme';
 import GlobalStyle from '../theme/global';
 import SessionGuard from './components/guards/session';
@@ -48,49 +48,51 @@ function App(): React.ReactNode {
             <ReactQueryDevtools initialIsOpen={false} />
             <Provider store={rootStore.store}>
               <PersistGate persistor={rootStore.persistor} loading={<StartupLoadingScreen />}>
-                <SessionGuard>
-                  <PermissionsProvider>
-                    <RouterProvider router={router} />
-                    <Toaster
-                      max={1}
-                      position="bottom-center"
-                      toastOptions={{
-                        duration: 2000,
-                        success: {
-                          icon: (
-                            <StyledIcon>
-                              <CheckCircle size={20} weight="bold" />
-                            </StyledIcon>
-                          ),
-                          style: {
-                            ...commonToastStyles,
-                            backgroundColor: Theme.colors.success_medium,
-                            color: Theme.colors.elevation0,
+                <PersistedStorageGuard>
+                  <SessionGuard>
+                    <PermissionsProvider>
+                      <RouterProvider router={router} />
+                      <Toaster
+                        max={1}
+                        position="bottom-center"
+                        toastOptions={{
+                          duration: 2000,
+                          success: {
+                            icon: (
+                              <StyledIcon>
+                                <CheckCircle size={20} weight="bold" />
+                              </StyledIcon>
+                            ),
+                            style: {
+                              ...commonToastStyles,
+                              backgroundColor: Theme.colors.success_medium,
+                              color: Theme.colors.elevation0,
+                            },
                           },
-                        },
-                        error: {
-                          icon: (
-                            <StyledIcon>
-                              <XCircle size={20} weight="bold" />
-                            </StyledIcon>
-                          ),
-                          style: {
-                            ...commonToastStyles,
-                            backgroundColor: Theme.colors.danger_dark,
-                            color: Theme.colors.white_0,
+                          error: {
+                            icon: (
+                              <StyledIcon>
+                                <XCircle size={20} weight="bold" />
+                              </StyledIcon>
+                            ),
+                            style: {
+                              ...commonToastStyles,
+                              backgroundColor: Theme.colors.danger_dark,
+                              color: Theme.colors.white_0,
+                            },
                           },
-                        },
-                        blank: {
-                          style: {
-                            ...commonToastStyles,
-                            backgroundColor: Theme.colors.white_0,
-                            color: Theme.colors.elevation0,
+                          blank: {
+                            style: {
+                              ...commonToastStyles,
+                              backgroundColor: Theme.colors.white_0,
+                              color: Theme.colors.elevation0,
+                            },
                           },
-                        },
-                      }}
-                    />
-                  </PermissionsProvider>
-                </SessionGuard>
+                        }}
+                      />
+                    </PermissionsProvider>
+                  </SessionGuard>
+                </PersistedStorageGuard>
               </PersistGate>
             </Provider>
           </QueryClientProvider>

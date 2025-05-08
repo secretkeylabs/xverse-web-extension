@@ -1,7 +1,7 @@
 import useStacksAPI from '@hooks/apiClients/useStacksApi';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import type { StxAddressData } from '@secretkeylabs/xverse-core';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 const useStxWalletData = () => {
   const { stxAddress } = useSelectedAccount();
@@ -25,7 +25,7 @@ const useStxWalletData = () => {
     queryFn: fetchStxWalletData,
     enabled: !!stxAddress,
     staleTime: 10 * 1000, // 10 secs
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 };
 

@@ -11,20 +11,27 @@ import {
   type SettingsNetwork,
 } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
+import Input from '@ui-library/input';
 import { isValidBtcApi, isValidStacksApi } from '@utils/helper';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import NetworkRow from './networkRow';
-import NodeInput from './nodeInput';
+
+const ScrollContainer = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  ${(props) => props.theme.scrollbar}
+`;
 
 const Container = styled.div`
   ${(props) => props.theme.typography.body_medium_m}
   display: flex;
   flex-direction: column;
   flex: 1;
-  overflow-y: auto;
   padding-left: 16px;
   padding-right: 16px;
   padding-bottom: 16px;
@@ -46,8 +53,14 @@ const ButtonContainer = styled.div`
 const NodeInputsContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${(props) => props.theme.space.s};
-  margin-top: ${(props) => props.theme.space.s};
+  gap: ${(props) => props.theme.space.xl};
+  margin-top: ${(props) => props.theme.space.l};
+`;
+
+const NodeResetButton = styled.button`
+  ${(props) => props.theme.typography.body_medium_m}
+  background: none;
+  color: ${(props) => props.theme.colors.tangerine};
 `;
 
 type NodeInputKey = keyof Pick<SettingsNetwork, 'address' | 'btcApiUrl' | 'fallbackBtcApiUrl'>;
@@ -94,17 +107,6 @@ function ChangeNetworkScreen() {
     setFormInputs((prevInputs) => ({
       ...prevInputs,
       [key]: event.target.value,
-    }));
-  };
-
-  const onClearCreator = (key: NodeInputKey) => () => {
-    setFormErrors((prevErrors) => ({
-      ...prevErrors,
-      [key]: '',
-    }));
-    setFormInputs((prevInputs) => ({
-      ...prevInputs,
-      [key]: '',
     }));
   };
 
@@ -177,58 +179,64 @@ function ChangeNetworkScreen() {
   return (
     <>
       <TopRow onClick={handleBackButtonClick} showBackButton={!isChangingNetwork} />
-      <Container>
-        <Title>{t('NETWORK')}</Title>
-        <NetworkRow
-          network={savedMainnet || defaultMainnet}
-          isSelected={formInputs.type === 'Mainnet'}
-          onNetworkSelected={onNetworkSelected}
-          disabled={isChangingNetwork}
-          showDivider
-        />
-        <NetworkRow
-          network={savedTestnet || defaultTestnet}
-          isSelected={formInputs.type === 'Testnet'}
-          onNetworkSelected={onNetworkSelected}
-          disabled={isChangingNetwork}
-          showDivider
-        />
-        <NetworkRow
-          network={savedTestnet4 || defaultTestnet4}
-          isSelected={formInputs.type === 'Testnet4'}
-          onNetworkSelected={onNetworkSelected}
-          disabled={isChangingNetwork}
-          showDivider
-        />
-        <NetworkRow
-          network={savedSignet || defaultSignet}
-          isSelected={formInputs.type === 'Signet'}
-          onNetworkSelected={onNetworkSelected}
-          disabled={isChangingNetwork}
-          showDivider
-        />
-        <NetworkRow
-          network={savedRegtest || defaultRegtest}
-          isSelected={formInputs.type === 'Regtest'}
-          onNetworkSelected={onNetworkSelected}
-          disabled={isChangingNetwork}
-          showDivider={false}
-        />
-        <NodeInputsContainer>
-          {nodeInputs.map(({ key, labelKey }) => (
-            <NodeInput
-              key={key}
-              label={t(labelKey)}
-              onChange={onChangeCreator(key)}
-              value={formInputs[key]}
-              onClear={onClearCreator(key)}
-              onReset={onResetCreator(key)}
-              error={formErrors[key]}
-              disabled={isChangingNetwork}
-            />
-          ))}
-        </NodeInputsContainer>
-      </Container>
+      <ScrollContainer>
+        <Container>
+          <Title>{t('NETWORK')}</Title>
+          <NetworkRow
+            network={savedMainnet || defaultMainnet}
+            isSelected={formInputs.type === 'Mainnet'}
+            onNetworkSelected={onNetworkSelected}
+            disabled={isChangingNetwork}
+            showDivider
+          />
+          <NetworkRow
+            network={savedTestnet || defaultTestnet}
+            isSelected={formInputs.type === 'Testnet'}
+            onNetworkSelected={onNetworkSelected}
+            disabled={isChangingNetwork}
+            showDivider
+          />
+          <NetworkRow
+            network={savedTestnet4 || defaultTestnet4}
+            isSelected={formInputs.type === 'Testnet4'}
+            onNetworkSelected={onNetworkSelected}
+            disabled={isChangingNetwork}
+            showDivider
+          />
+          <NetworkRow
+            network={savedSignet || defaultSignet}
+            isSelected={formInputs.type === 'Signet'}
+            onNetworkSelected={onNetworkSelected}
+            disabled={isChangingNetwork}
+            showDivider
+          />
+          <NetworkRow
+            network={savedRegtest || defaultRegtest}
+            isSelected={formInputs.type === 'Regtest'}
+            onNetworkSelected={onNetworkSelected}
+            disabled={isChangingNetwork}
+            showDivider={false}
+          />
+          <NodeInputsContainer>
+            {nodeInputs.map(({ key, labelKey }) => (
+              <Input
+                key={key}
+                titleElement={t(labelKey)}
+                data-testid={t(labelKey)}
+                onChange={onChangeCreator(key)}
+                value={formInputs[key]}
+                disabled={isChangingNetwork}
+                feedback={formErrors[key] ? [{ message: formErrors[key], variant: 'danger' }] : []}
+                infoPanel={
+                  <NodeResetButton onClick={onResetCreator(key)} disabled={isChangingNetwork}>
+                    {t('RESET_TO_DEFAULT')}
+                  </NodeResetButton>
+                }
+              />
+            ))}
+          </NodeInputsContainer>
+        </Container>
+      </ScrollContainer>
       <ButtonContainer>
         <Button
           title={t('SAVE')}

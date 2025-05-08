@@ -41,7 +41,7 @@ export default function UnlistRuneScreen() {
 
   const {
     data,
-    isInitialLoading: isFetchingListedItems,
+    isLoading: isFetchingListedItems,
     isRefetching: isRefetchingListedItems,
     refetch,
   } = useRuneUtxosQueryPerMarketplace(selectedRune, false);

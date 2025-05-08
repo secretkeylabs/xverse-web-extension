@@ -19,9 +19,10 @@ import useTrackMixPanelPageViewed from '@hooks/useTrackMixPanelPageViewed';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import Transport from '@ledgerhq/hw-transport-webusb';
+import { bytesToHex } from '@noble/hashes/utils';
 import type { Return } from '@sats-connect/core';
-import { buf2hex, hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
-import type { SignaturePayload, StructuredDataSignaturePayload } from '@stacks/connect';
+import { hashMessage, signStxMessage } from '@secretkeylabs/xverse-core';
+import type { SignaturePayload } from '@stacks/connect';
 import {
   getNetworkType,
   getStxNetworkForBtcNetwork,
@@ -245,7 +246,7 @@ function SignatureRequest(): JSX.Element {
   };
 
   const getMessageHash = useCallback(
-    () => buf2hex(hashMessage(payload.message)),
+    () => bytesToHex(hashMessage(payload.message)),
     [payload.message],
   );
 
@@ -310,9 +311,7 @@ function SignatureRequest(): JSX.Element {
                 <SignatureRequestMessage message={(payload as SignaturePayload).message} />
               )}
               {isStructuredMessage(messageType) && (
-                <SignatureRequestStructuredData
-                  payload={payload as StructuredDataSignaturePayload}
-                />
+                <SignatureRequestStructuredData message={payload.message} />
               )}
               <CollapsableContainer
                 text={getMessageHash()}

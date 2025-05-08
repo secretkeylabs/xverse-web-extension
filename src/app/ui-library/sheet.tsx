@@ -110,7 +110,7 @@ function Sheet({
         {logo}
         <Title>{title}</Title>
       </HeaderContainer>
-      <BodyContainer>{children}</BodyContainer>
+      <BodyContainer className="body-container">{children}</BodyContainer>
     </CustomisedModal>
   );
 }

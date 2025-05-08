@@ -45,7 +45,7 @@ function ConfirmFtTransaction() {
   const { network } = useWalletSelector();
 
   const {
-    isLoading,
+    isPending,
     error: txError,
     data: stxTxBroadcastData,
     mutate,
@@ -124,7 +124,7 @@ function ConfirmFtTransaction() {
       <TopRow title={t('CONFIRM_TX')} onClick={handleBackButtonClick} />
       <ConfirmStxTransactionComponent
         initialStxTransactions={[unsignedTx]}
-        loading={isLoading}
+        loading={isPending}
         onConfirmClick={handleOnConfirmClick}
         onCancelClick={handleCancelClick}
         skipModal={isLedgerAccount(selectedAccount)}

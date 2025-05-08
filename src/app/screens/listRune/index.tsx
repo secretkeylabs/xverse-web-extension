@@ -94,7 +94,7 @@ export default function ListRuneScreen() {
 
   const {
     data,
-    isInitialLoading: listItemsLoading,
+    isLoading: listItemsLoading,
     isRefetching: listItemsRefetching,
     refetch,
   } = useRuneUtxosQueryPerMarketplace(selectedRune as FungibleToken, false);
@@ -103,7 +103,7 @@ export default function ListRuneScreen() {
   const supportedMarketplaces: Marketplace[] = ['Unisat', 'Magic Eden', 'OKX'];
   const {
     data: floorPriceData,
-    isInitialLoading: floorPriceLoading,
+    isLoading: floorPriceLoading,
     isRefetching: floorPriceRefetching,
   } = useRuneFloorPricePerMarketplaceQuery(
     {

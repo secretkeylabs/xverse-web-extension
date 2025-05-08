@@ -210,7 +210,7 @@ function NftDashboardHidden() {
               <TabPanel>
                 <div>
                   <div>
-                    {hiddenInscriptionsQuery.isInitialLoading ? (
+                    {hiddenInscriptionsQuery.isLoading ? (
                       <SkeletonLoader isGalleryOpen={isGalleryOpen} />
                     ) : (
                       <>
@@ -237,7 +237,7 @@ function NftDashboardHidden() {
               </TabPanel>
             )}
             <TabPanel>
-              {hiddenStacksNftsQuery.isInitialLoading ? (
+              {hiddenStacksNftsQuery.isLoading ? (
                 <SkeletonLoader isGalleryOpen={isGalleryOpen} />
               ) : (
                 <>

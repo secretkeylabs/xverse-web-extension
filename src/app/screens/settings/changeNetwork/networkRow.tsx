@@ -1,39 +1,34 @@
 import TickIcon from '@assets/img/settings/tick.svg';
 import type { SettingsNetwork } from '@secretkeylabs/xverse-core';
+import { StyledP } from '@ui-library/common.styled';
 import styled, { useTheme } from 'styled-components';
 
-interface TitleProps {
-  isActive: boolean;
-  variant: React.CSSProperties;
-}
-
-interface ButtonProps {
+const Button = styled.button<{
   border: string;
-}
-
-const Button = styled.button<ButtonProps>((props) => ({
+}>((props) => ({
   display: 'flex',
   flexDirection: 'row',
   background: 'transparent',
-  paddingBottom: props.theme.spacing(10),
-  paddingTop: props.theme.spacing(10),
+  padding: `${props.theme.space.m} 0px`,
   borderBottom: props.border,
+  transition: 'color 0.1s ease',
+  '&:hover > p': {
+    color: props.theme.colors.white_0,
+  },
 }));
 
-const Text = styled.h1<TitleProps>((props) => ({
-  ...props.variant,
-  color: props.isActive ? props.theme.colors.white_0 : props.theme.colors.white_0,
+const Text = styled(StyledP)((_) => ({
   flex: 1,
   textAlign: 'left',
 }));
 
-interface Props {
+type Props = {
   network: SettingsNetwork;
   isSelected: boolean;
   onNetworkSelected: (network: SettingsNetwork) => void;
   showDivider: boolean;
   disabled?: boolean;
-}
+};
 
 function NetworkRow({ network, isSelected, onNetworkSelected, showDivider, disabled }: Props) {
   const theme = useTheme();
@@ -48,8 +43,8 @@ function NetworkRow({ network, isSelected, onNetworkSelected, showDivider, disab
       disabled={disabled}
     >
       <Text
-        isActive={isSelected}
-        variant={isSelected ? theme.typography.body_bold_m : theme.typography.body_m}
+        typography={isSelected ? 'body_bold_m' : 'body_m'}
+        color={isSelected ? 'white_0' : 'white_400'}
       >
         {network.type === 'Testnet' ? 'Testnet3' : network.type}
       </Text>

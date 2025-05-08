@@ -2,7 +2,7 @@ import useNetworkSelector from '@hooks/useNetwork';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getNftCollections, type StacksCollectionList } from '@secretkeylabs/xverse-core';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { handleRetries } from '@utils/query';
 
 const useStacksCollectibles = (showHiddenOnly?: boolean) => {
@@ -25,7 +25,7 @@ const useStacksCollectibles = (showHiddenOnly?: boolean) => {
     queryKey: ['nft-collection-data', stxAddress, hiddenIds, starredIds, showHiddenOnly],
     queryFn: fetchNftCollections,
     staleTime: 5 * 60 * 1000, // 5mins
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 };
 

@@ -12,8 +12,8 @@ const useTextOrdinalContent = (ordinal?: Inscription | CondensedInscription) => 
     enabled: !!ordinal?.id,
     queryKey: ['ordinal-text', ordinal?.id, network.type],
     queryFn: async () => {
-      if (!ordinal?.id) return;
-      return queue.add(() => getTextOrdinalContent(network.type, ordinal?.id));
+      if (!ordinal?.id) return null;
+      return (await queue.add(() => getTextOrdinalContent(network.type, ordinal?.id))) ?? null;
     },
     staleTime: 5 * 60 * 1000, // 5 min
   });

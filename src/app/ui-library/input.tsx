@@ -223,7 +223,7 @@ const Input = React.forwardRef(
     }: Props,
     ref,
   ) => {
-    const [hasValue, setHasValue] = useState(false);
+    const [hasValue, setHasValue] = useState((value || '').length > 0);
     const inputRef = useRef<HTMLInputElement | null>(null);
     const complicationsRef = useRef<HTMLDivElement>(null);
 

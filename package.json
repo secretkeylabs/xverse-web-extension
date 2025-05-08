@@ -1,7 +1,7 @@
 {
   "name": "xverse-web-extension",
   "description": "The Bitcoin Wallet for everyone",
-  "version": "0.53.2",
+  "version": "0.54.0",
   "private": true,
   "engines": {
     "node": ">=23.6.0"
@@ -22,7 +22,8 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx --quiet"
   },
   "overrides": {
-    "buffer": "6.0.3"
+    "buffer": "6.0.3",
+    "parse-asn1": "5.1.6"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -44,26 +45,31 @@
     "@phosphor-icons/react": "2.1.7",
     "@playwright/test": "1.46.1",
     "@react-spring/web": "9.7.3",
-    "@sats-connect/core": "0.6.5",
+    "@sats-connect/core": "0.6.6",
     "@scure/base": "1.2.4",
     "@scure/bip32": "1.6.2",
     "@scure/bip39": "1.5.4",
     "@scure/btc-signer": "1.6.0",
-    "@secretkeylabs/xverse-core": "44.0.0",
+    "@secretkeylabs/xverse-core": "45.1.1",
+    "@stacks/auth": "7.0.6",
     "@stacks/connect": "7.9.0",
-    "@stacks/encryption": "7.0.2",
+    "@stacks/encryption": "7.0.6",
+    "@stacks/network": "7.0.2",
+    "@stacks/stacking": "7.0.6",
     "@stacks/stacks-blockchain-api-types": "7.14.1",
-    "@stacks/transactions": "7.0.2",
-    "@tanstack/query-sync-storage-persister": "4.32.1",
-    "@tanstack/react-query": "4.32.1",
-    "@tanstack/react-query-devtools": "4.32.1",
-    "@tanstack/react-query-persist-client": "4.32.1",
+    "@stacks/storage": "7.0.6",
+    "@stacks/wallet-sdk": "7.0.6",
+    "@tanstack/query-sync-storage-persister": "5.74.6",
+    "@tanstack/react-query-devtools": "5.74.6",
+    "@tanstack/react-query-persist-client": "5.74.6",
+    "@tanstack/react-query": "5.74.4",
+    "@stacks/transactions": "7.0.6",
     "argon2-browser": "1.18.0",
     "async-mutex": "0.5.0",
     "axios": "1.8.4",
     "bignumber.js": "9.1.2",
     "classnames": "2.3.2",
-    "crypto-browserify": "3.12.0",
+    "crypto-browserify": "3.12.1",
     "date-fns": "2.30.0",
     "dotenv": "16.4.7",
     "i18next": "21.10.0",
@@ -93,6 +99,7 @@
     "redux": "4.2.1",
     "redux-persist": "6.0.0",
     "redux-state-sync": "3.1.4",
+    "starknet": "7.1.0",
     "stream-browserify": "3.0.0",
     "string-to-color": "2.2.2",
     "styled-components": "5.3.11",
@@ -108,7 +115,7 @@
     "@rspack/core": "1.3.4",
     "@rspack/plugin-react-refresh": "1.2.0",
     "@swc/helpers": "0.5.15",
-    "@tanstack/eslint-plugin-query": "4.32.1",
+    "@tanstack/eslint-plugin-query": "5.73.3",
     "@types/argon2-browser": "1.18.1",
     "@types/chrome": "0.0.237",
     "@types/mixpanel-browser": "2.49.0",
@@ -124,7 +131,7 @@
     "@typescript-eslint/parser": "5.62.0",
     "base64-loader": "1.0.0",
     "dotenv-webpack": "8.1.0",
-    "eslint": "8.40.0",
+    "eslint": "8.57.0",
     "eslint-config-airbnb": "19.0.4",
     "eslint-config-airbnb-typescript": "17.1.0",
     "eslint-config-prettier": "8.10.0",
@@ -136,7 +143,7 @@
     "eslint-plugin-react": "7.33.1",
     "eslint-plugin-react-hooks": "4.6.0",
     "husky": "8.0.3",
-    "knip": "5.50.2",
+    "knip": "5.50.5",
     "lint-staged": "13.2.3",
     "prettier": "2.8.8",
     "prettier-plugin-organize-imports": "3.2.3",
@@ -145,7 +152,7 @@
     "rimraf": "3.0.2",
     "ts-checker-rspack-plugin": "1.1.1",
     "tsc-files": "1.1.4",
-    "typescript": "5.5.4"
+    "typescript": "5.8.3"
   },
   "optionalDependencies": {
     "@rspack/binding": "1.3.4",

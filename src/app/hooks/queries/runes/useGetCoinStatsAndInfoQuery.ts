@@ -20,7 +20,7 @@ export default function useGetCoinStatsAndInfoQuery(
   return useQuery({
     refetchOnWindowFocus: backgroundRefetch,
     refetchOnReconnect: backgroundRefetch,
-    cacheTime: 12 * 60 * 60 * 1000, // 12 hours
+    gcTime: 12 * 60 * 60 * 1000, // 12 hours
     queryKey: ['get-coin-stats-and-info', id, protocol],
     queryFn,
   });

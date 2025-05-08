@@ -41,6 +41,10 @@ chrome.runtime.onInstalled.addListener((details) => {
   });
 });
 
+chrome.runtime.setUninstallURL(
+  'https://docs.google.com/forms/d/e/1FAIpQLSe2byONVfL2rgWYo-iYePFMGiXRDMk4ZbMBCyK1RFIxLwZyog/viewform?usp=dialog',
+);
+
 if (process.env.WALLET_LABEL) {
   chrome.action.setBadgeText({ text: process.env.WALLET_LABEL });
 } else if (process.env.NODE_ENV === 'development') {

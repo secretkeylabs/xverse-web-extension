@@ -30,16 +30,21 @@ const ordiViewSuffixMap: Record<NetworkType, string> = {
 export const XVERSE_ORDIVIEW_URL = (network: NetworkType) =>
   `https://ord${ordiViewSuffixMap[network]}.xverse.app`;
 
-export const TRANSAC_URL = 'https://global.transak.com';
-export const TRANSAC_API_KEY = process.env.TRANSAC_API_KEY;
-export const MOON_PAY_URL = 'https://buy.moonpay.com';
-export const MOON_PAY_API_KEY = process.env.MOON_PAY_API_KEY;
 export const MIX_PANEL_TOKEN = process.env.MIX_PANEL_TOKEN;
 export const MIX_PANEL_EXPLORE_APP_TOKEN = process.env.MIX_PANEL_EXPLORE_APP_TOKEN;
+export const ONRAMPER_API_KEY = process.env.ONRAMPER_API_KEY;
 
 export const MAGIC_EDEN_RUNES_URL = 'https://magiceden.io/runes';
 
-export type CurrencyTypes = 'STX' | 'BTC' | 'FT' | 'NFT' | 'Ordinal' | 'brc20-Ordinal' | 'RareSat';
+export type CurrencyTypes =
+  | 'STX'
+  | 'BTC'
+  | 'FT'
+  | 'NFT'
+  | 'Ordinal'
+  | 'brc20-Ordinal'
+  | 'RareSat'
+  | 'STRK';
 export enum LoaderSize {
   SMALLEST,
   SMALL,
@@ -104,3 +109,7 @@ export const XverseProviderInfo: Provider = {
     'stx_transferStx',
   ],
 };
+
+// Comparing with the string `'true'` instead of the boolean value `true`
+// because env variables only support strings.
+export const isStarknetActive = process.env.IS_STARKNET_ACTIVE === 'true';

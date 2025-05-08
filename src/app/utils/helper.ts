@@ -340,11 +340,6 @@ export const getRecipientName = (
   return '';
 };
 
-export const getAccountBalanceKey = (account: Account | null) => {
-  if (!account) return '';
-  return `${account.accountType}-${account.id}`;
-};
-
 export const calculateTotalBalance = ({
   stxBalance,
   btcBalance,

@@ -195,17 +195,6 @@ export function setWalletUnlockedAction(isUnlocked: boolean): actions.SetWalletU
   };
 }
 
-export function setAccountBalanceAction(
-  accountKey: string,
-  totalBalance: string,
-): actions.SetAccountBalance {
-  return {
-    type: actions.SetAccountBalanceKey,
-    accountKey,
-    totalBalance,
-  };
-}
-
 export function setWalletHideStxAction(hideStx: boolean): actions.SetWalletHideStx {
   return {
     type: actions.SetWalletHideStxKey,

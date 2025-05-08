@@ -18,7 +18,6 @@ import {
   ResetWalletKey,
   SelectAccountKey,
   SetAccountAvatarKey,
-  SetAccountBalanceKey,
   SetAddingAccountKey,
   SetBalanceHiddenToggleKey,
   SetBrc20ManageTokensKey,
@@ -97,7 +96,6 @@ export const initialWalletState: WalletState = {
   walletLockPeriod: WalletSessionPeriods.STANDARD,
   isUnlocked: false,
   hideStx: false,
-  accountBalances: {},
   spamToken: null,
   spamTokens: [],
   showSpamTokens: false,
@@ -107,6 +105,7 @@ export const initialWalletState: WalletState = {
   balanceHidden: false,
   showBalanceInBtc: false,
   hasBackedUpWallet: true,
+  accountBalances: {},
 };
 
 /**
@@ -178,7 +177,6 @@ const walletReducer = (
       return {
         ...state,
         fiatCurrency: action.fiatCurrency,
-        accountBalances: {},
       };
     case ChangeNetworkKey:
       return {
@@ -188,7 +186,6 @@ const walletReducer = (
           ...state.savedNetworks.filter((n) => n.type !== action.network.type),
           action.network,
         ],
-        accountBalances: {},
       };
     case ChangeBtcPaymentAddressTypeKey:
       return {
@@ -261,14 +258,6 @@ const walletReducer = (
       return {
         ...state,
         isUnlocked: action.isUnlocked,
-      };
-    case SetAccountBalanceKey:
-      return {
-        ...state,
-        accountBalances: {
-          ...state.accountBalances,
-          [action.accountKey]: action.totalBalance,
-        },
       };
     case SetWalletHideStxKey:
       return {

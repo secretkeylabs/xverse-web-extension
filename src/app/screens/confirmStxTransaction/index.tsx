@@ -146,7 +146,7 @@ function ConfirmStxTransaction() {
   });
 
   const {
-    isLoading,
+    isPending,
     error: txError,
     data: stxTxBroadcastData,
     mutate: broadcastTransaction,
@@ -344,7 +344,7 @@ function ConfirmStxTransaction() {
       )}
       <ConfirmStxTransactionComponent
         initialStxTransactions={[unsignedTx]} // TODO: Refactor this to pass a single element instead of an array?
-        loading={isLoading}
+        loading={isPending}
         onConfirmClick={handleConfirmClick}
         onCancelClick={handleCancelClick}
         isSponsored={sponsored}
