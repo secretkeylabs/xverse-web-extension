@@ -37,12 +37,13 @@ test.describe('Transaction BRC20', () => {
     // Insufficient BRC20 balance Check
     await wallet.inputField.fill(`1000`);
     await expect(wallet.errorInsufficientBRC20Balance).toBeVisible();
-    await expect(wallet.buttonNext).toBeDisabled();
 
-    await page.getByRole('button', { name: 'Clear input' }).click();
+    await expect(page.getByRole('textbox', { name: '0' })).toHaveValue('1000');
 
     await wallet.inputField.fill(sendAmount.toString());
+    await expect(wallet.buttonNext).toBeEnabled();
     await wallet.buttonNext.click();
+    await expect(wallet.page.url()).toContain('send-brc20-one-step');
 
     await expect(wallet.receiveAddress).toBeVisible();
     await expect(wallet.page.url()).toContain('confirm-brc20-tx');
