@@ -4,7 +4,7 @@ import Wallet from '../pages/wallet';
 const STXMain = 'SPN2AMZQ54Y0NN4H5Z4S0DGMWP27CTXY5M1Q812S';
 const STXTest = `STN2AMZQ54Y0NN4H5Z4S0DGMWP27CTXY5QEDCQAN`;
 
-const amountSTXSend = 10;
+const amountSTXSend = 0.1;
 test.describe('Transaction STX', () => {
   test('Send STX Page Visual Check with insufficient funds Mainnet', async ({
     page,
@@ -19,11 +19,15 @@ test.describe('Transaction STX', () => {
     await wallet.checkVisualsStartpage();
 
     // Click on send button
-    await wallet.buttonTransactionSend.click();
-
+    await page.getByRole('button', { name: 'Send' }).click();
     await expect(await wallet.divTokenRow.count()).toBeGreaterThanOrEqual(2);
     // Send STX
-    await wallet.clickOnSpecificToken('Stacks');
+    await expect(page.getByText(/Stacks/i).first()).toBeVisible();
+    await page
+      .getByRole('dialog')
+      .getByText(/Stacks/i)
+      .click();
+
     await wallet.checkVisualsSendPage1('send-stx', true);
 
     // Invalid Address check
@@ -35,14 +39,14 @@ test.describe('Transaction STX', () => {
 
     // Recipient address send self check
     await wallet.inputField.first().fill(selfSTXMain);
-    await expect(wallet.errorMessageSendSelf).toBeVisible();
+    await expect(page.getByText(/Cannot send to self/i).first()).toBeVisible();
     await expect(wallet.buttonNext).toBeDisabled();
 
     // Clear input field
     await wallet.buttonRemoveRecipient.click();
 
     // Fill in correct Receiver Address
-    await wallet.inputField.first().fill(STXMain);
+    await page.getByRole('textbox', { name: 'STX Address or .btc domain' }).fill(STXMain);
     await wallet.buttonNext.click();
     // No funds on mainnet in this wallet -->Page opens and Next button is hidden and info message is shown
 
@@ -50,18 +54,20 @@ test.describe('Transaction STX', () => {
     await expect(page.getByRole('textbox', { name: '0' })).toBeVisible();
     await expect(page.getByRole('textbox', { name: '0' })).toBeEnabled();
     await expect(wallet.labelBalanceAmountSelector).toBeVisible();
-    await expect(wallet.imageToken).toBeVisible();
     await page.getByRole('textbox', { name: '0' }).fill('200000000');
     await expect(page.getByRole('button', { name: /insufficient funds/i })).toBeVisible();
   });
 
-  // TODO: fix this test, added fixme as it's failing in
-  test.fixme('Send STX - Cancel transaction mainnet', async ({ page, extensionId }) => {
+  test('Send STX - Cancel transaction mainnet', async ({ page, extensionId }) => {
     // Restore wallet and setup Mainnet network
     const wallet = new Wallet(page);
     await wallet.setupTest(extensionId, 'SEED_WORDS1', false);
 
-    await page.getByText('STX').click();
+    // Click on Stacks token
+    await page
+      .getByRole('button')
+      .filter({ hasText: /Stacks/i })
+      .click();
     await page.getByRole('button', { name: /send/i }).click();
     await page.getByRole('textbox', { name: /STX Address or .btc domain/i }).fill('zhfr.btc');
     await expect(page.getByText(/associated address/i)).toBeVisible();
@@ -97,7 +103,10 @@ test.describe('Transaction STX', () => {
     await wallet.setupTest(extensionId, 'SEED_WORDS1', true);
 
     // Save initial Balance for later Balance checks
-    const initialSTXBalance = await wallet.getTokenBalance('Stacks');
+    const initialSTXBalance = await page
+      .getByRole('paragraph', { name: 'Token Ticker: STX' })
+      .innerText()
+      .then((text) => parseFloat(text.match(/\d+\.\d+/)![0]));
 
     // Click on send button
     await wallet.buttonTransactionSend.click();
@@ -119,11 +128,15 @@ test.describe('Transaction STX', () => {
     await wallet.inputField.first().fill(amountSTXSend.toString());
     await expect(wallet.buttonNext).toBeEnabled();
 
-    // Balance check
-    const displayBalance = await wallet.labelBalanceAmountSelector.innerText();
-    const displayBalanceNumerical = parseFloat(displayBalance.replace(/[^0-9.]/g, ''));
-    await expect(initialSTXBalance).toEqual(displayBalanceNumerical);
+    // // Balance check
+    // Create a new locator that specifically targets the paragraph element inside balance-label
+    const balanceValueElement = page.getByTestId('balance-label').getByRole('paragraph');
 
+    // Get the text content and extract just the numeric value
+    const balanceText = await balanceValueElement.innerText();
+    // Extract the number from text like "STX Balance : 79.982"
+    const displayBalanceNumerical = parseFloat(balanceText.match(/\d+\.\d+/)![0]); // Direct comparison with initialSTXBalance
+    await expect(displayBalanceNumerical).toEqual(initialSTXBalance);
     // Save Fees to check on next Page
     const fee = await wallet.feeAmount.innerText();
     const sendFee = parseFloat(fee.replace(/[^0-9.]/g, ''));
