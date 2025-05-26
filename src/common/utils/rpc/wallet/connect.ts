@@ -52,6 +52,9 @@ export const handleConnect = async (message: ConnectRequestMessage, port: chrome
     network: network.type,
   });
 
+  const isNetworkChangeRequired =
+    message.params?.network && message.params?.network !== network.type;
+
   if (!account) {
     sendInternalErrorMessage({
       tabId: getTabIdFromPort(port),
@@ -94,7 +97,7 @@ export const handleConnect = async (message: ConnectRequestMessage, port: chrome
     actions: { readNetwork: true },
   });
 
-  if (!hasAccountReadPermissions || !hasNetworkReadPermissions) {
+  if (isNetworkChangeRequired || !hasAccountReadPermissions || !hasNetworkReadPermissions) {
     await openPopup({
       path: RequestsRoutes.ConnectionRequest,
       data: message,
