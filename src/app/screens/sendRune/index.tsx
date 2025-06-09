@@ -14,6 +14,7 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { trackMixPanel } from '@utils/mixpanel';
 import { getFtBalance } from '@utils/tokens';
+import RoutePaths from 'app/routes/paths';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -25,18 +26,14 @@ import { Step, getPreviousStep } from './steps';
 function SendRuneScreen() {
   const navigate = useNavigate();
 
-  useResetUserFlow('/send-rune');
+  useResetUserFlow(RoutePaths.SendRune);
 
   const location = useLocation();
   const { t } = useTranslation('translation');
   const { data: btcFeeRate, isLoading: feeRatesLoading } = useBtcFeeRate();
   const selectedAccount = useSelectedAccount();
   const { data: runesCoinsList } = useRuneFungibleTokensQuery();
-  // TODO: can we remove location.state here?
-  const [recipientAddress, setRecipientAddress] = useState<string>(
-    location.state?.recipientAddress,
-  );
-  const [amountError, setAmountError] = useState('');
+  const [recipientAddress, setRecipientAddress] = useState('');
   const [amountToSend, setAmountToSend] = useState<string>(location.state?.amount || '');
   const [useTokenValue, setUseTokenValue] = useState(true);
   const [feeRate, setFeeRate] = useState('');
@@ -61,6 +58,13 @@ function SendRuneScreen() {
     }
   }, [btcFeeRate, feeRatesLoading]);
 
+  useEffect(() => {
+    const recipient = searchParams.get('address');
+    if (recipient) {
+      setRecipientAddress(recipient);
+    }
+  }, [searchParams]);
+
   const generateTransactionAndSummary = async (feeRateOverride?: number) => {
     if (!fungibleToken) {
       return;
@@ -72,11 +76,6 @@ function SendRuneScreen() {
     const realBalance = balance.multipliedBy(decimalsToBase);
     const realAmountToSend = BigNumber(amountToSend || 0).multipliedBy(decimalsToBase);
 
-    if (realBalance.isLessThan(realAmountToSend)) {
-      setAmountError(t('SEND.ERRORS.INSUFFICIENT_BALANCE'));
-    } else {
-      setAmountError('');
-    }
     return generateTransaction(
       transactionContext,
       fungibleToken.name,
@@ -226,7 +225,6 @@ function SendRuneScreen() {
       setAmountToSend={setAmount}
       useTokenValue={useTokenValue}
       setUseTokenValue={setUseTokenValue}
-      amountError={amountError}
       currentStep={currentStep}
       setCurrentStep={setCurrentStep}
       recipientAddress={recipientAddress}

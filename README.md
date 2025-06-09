@@ -4,7 +4,7 @@
 
 ### Procedures
 
-1. Check if your [Node.js](https://nodejs.org/) version is >= **18**.
+1. Ensure your [Node.js](https://nodejs.org/) version is compatible the version specified in the `engines` field in [`package.json`](./package.json).
 2. Clone this repository.
 3. Make sure you're logged in to the @secretkeylabs scope on the GitHub NPM package registry. See the [Guide](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#authenticating-with-a-personal-access-token)
    1. Create a GitHub personal access token (classic)

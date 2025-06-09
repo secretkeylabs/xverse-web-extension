@@ -52,16 +52,22 @@ export const handleConnect = async (message: ConnectRequestMessage, port: chrome
     network: network.type,
   });
 
+  const isNetworkChangeRequired =
+    message.params?.network && message.params?.network !== network.type;
+
   if (!account) {
     sendInternalErrorMessage({
       tabId: getTabIdFromPort(port),
       messageId: message.id,
-      message: 'Failed to get selected account.',
+      message: 'Failed to get selected account to handle `wallet_connect` request.',
     });
     return;
   }
 
-  const [clientIdError, clientId] = permissions.utils.store.makeClientId({ origin });
+  const context = makeContext(port);
+  const [clientIdError, clientId] = permissions.utils.store.makeClientId({
+    origin: context.origin,
+  });
   if (clientIdError) {
     sendInternalErrorMessage({
       tabId: getTabIdFromPort(port),
@@ -91,11 +97,11 @@ export const handleConnect = async (message: ConnectRequestMessage, port: chrome
     actions: { readNetwork: true },
   });
 
-  if (!hasAccountReadPermissions || !hasNetworkReadPermissions) {
-    openPopup({
+  if (isNetworkChangeRequired || !hasAccountReadPermissions || !hasNetworkReadPermissions) {
+    await openPopup({
       path: RequestsRoutes.ConnectionRequest,
       data: message,
-      context: makeContext(port),
+      context,
       onClose: makeSendPopupClosedUserRejectionMessage({
         tabId: getTabIdFromPort(port),
         messageId: message.id,

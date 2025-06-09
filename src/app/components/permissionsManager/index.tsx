@@ -11,7 +11,7 @@ const PermissionsUtilsContext = createContext<TPermissionsUtilsContext | undefin
 export function PermissionsProvider({ children }: PropsWithChildren) {
   const {
     mutate,
-    isLoading,
+    isPending,
     data: isStoreInitializationComplete,
   } = useMutation({
     async mutationFn() {
@@ -35,10 +35,10 @@ export function PermissionsProvider({ children }: PropsWithChildren) {
     if (isStoreInitializationComplete) return;
 
     // If it's already running, don't run it again.
-    if (isLoading) return;
+    if (isPending) return;
 
     mutate();
-  }, [isLoading, isStoreInitializationComplete, mutate]);
+  }, [isPending, isStoreInitializationComplete, mutate]);
 
   const render = useRender();
   const renderCallback = useCallback(
@@ -68,6 +68,14 @@ export function PermissionsProvider({ children }: PropsWithChildren) {
   const getStore = useCallback(() => getStoreGlobal(), []);
 
   // Queries
+
+  const getClient = useCallback(
+    (clientId: Permissions.Store.Client['id']) => {
+      const store = getStore();
+      return permissions.utils.store.getClient(store, clientId);
+    },
+    [getStore],
+  );
 
   const getClients = useCallback(() => {
     const store = getStore();
@@ -190,6 +198,7 @@ export function PermissionsProvider({ children }: PropsWithChildren) {
   //
   // eslint-disable-next-line react/jsx-no-constructed-context-values
   const contextValue = {
+    getClient,
     getClients,
     addClient,
     addResource,

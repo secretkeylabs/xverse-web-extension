@@ -16,12 +16,12 @@ jobs:
     if: ${{ startsWith(github.head_ref, 'release/') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # actions/checkout@v4
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e #v4.3.0
         with:
           always-auth: true
-          node-version: 22
+          node-version: 23
           registry-url: https://npm.pkg.github.com
           scope: '@secretkeylabs'
           cache: npm
@@ -36,15 +36,14 @@ jobs:
           npx tsc --noEmit
       - name: Build
         env:
-          TRANSAC_API_KEY: ${{ secrets.TRANSAC_API_KEY }}
-          MOON_PAY_API_KEY: ${{ secrets.MOON_PAY_API_KEY }}
           MIX_PANEL_TOKEN: ${{ secrets.MIX_PANEL_TOKEN }}
           MIX_PANEL_EXPLORE_APP_TOKEN: ${{ secrets.MIX_PANEL_EXPLORE_APP_TOKEN }}
+          ONRAMPER_API_KEY: ${{ secrets.ONRAMPER_API_KEY }}
           SKIP_ANIMATION_WALLET_STARTUP: 'false'
-
+          IS_STARKNET_ACTIVE: 'false'
         run: npm run build
       - name: Upload Archive
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # 4.6.2
         with:
           name: web-extension1
           path: ./build
@@ -55,24 +54,24 @@ jobs:
     needs: [build]
     name: E2E Test ${{ matrix.shardIndex }} of ${{ matrix.shardTotal }}
     timeout-minutes: 10
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         shardIndex: [1, 2, 3, 4, 5, 6]
         shardTotal: [6]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # actions/checkout@v4
       - name: Download build artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # 4.2.1@v4
         with:
           name: web-extension1
           path: ./build
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e #v4.3.0
         with:
           always-auth: true
-          node-version: 22
+          node-version: 23
           registry-url: https://npm.pkg.github.com
           scope: '@secretkeylabs'
           cache: npm
@@ -89,7 +88,7 @@ jobs:
         run: xvfb-run --auto-servernum --server-args="-screen 0 360x360x24" npx playwright test --grep-invert "#localexecution" --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
       - name: Upload Playwright report
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # 4.6.2
         with:
           name: blob-report-${{ matrix.shardIndex }}-of-${{ matrix.shardTotal }}
           path: blob-report
@@ -105,11 +104,11 @@ jobs:
     needs: [UItest]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # actions/checkout@v4
+      - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e #v4.3.0
         with:
           always-auth: true
-          node-version: 22
+          node-version: 23
           registry-url: https://npm.pkg.github.com
           scope: '@secretkeylabs'
           cache: npm
@@ -119,7 +118,7 @@ jobs:
         run: npm install playwright
 
       - name: Download blob reports from GitHub Actions Artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # 4.2.1@v4
         with:
           pattern: blob-report-*
           path: all-blob-reports
@@ -129,7 +128,7 @@ jobs:
         run: npx playwright merge-reports --reporter html ./all-blob-reports
 
       - name: Upload HTML report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # 4.6.2
         with:
           name: html-report--attempt-${{ github.run_attempt }}
           path: playwright-report
@@ -148,10 +147,10 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     outputs:
-      upload_url: ${{ steps.publish-prerelease.outputs.UPLOAD_URL }}
       filename: ${{ steps.publish-prerelease.outputs.FILENAME }}
+      tag_name: ${{ steps.publish-prerelease.outputs.NEXT_TAG }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # actions/checkout@v4
       - id: publish-prerelease
         name: Publish release candidate as prerelease
         env:
@@ -182,7 +181,7 @@ jobs:
             -F generate_release_notes=true > release.json
           # save output for upload
           echo "FILENAME=xverse-web-extension.$NEXT_TAG.zip" >> $GITHUB_OUTPUT
-          echo "UPLOAD_URL=$(cat release.json | jq -r .upload_url)" >> $GITHUB_OUTPUT
+          echo "NEXT_TAG=$NEXT_TAG" >> $GITHUB_OUTPUT
       - id: update-description
         name: Update PR description with release notes
         env:
@@ -203,23 +202,24 @@ jobs:
     needs: publish-rc
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # actions/checkout@v4
       - name: Download build artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # 4.2.1@v4
         with:
           name: web-extension1
           path: ./build
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@cdca7365b2dadb8aad0a33bc7601856ffabcc48e #v4.3.0
       - name: zip
         run: zip -rj build.zip ./build
+      - name: Rename asset to match filename
+        run: |
+          cp build.zip "${{needs.publish-rc.outputs.filename}}"
       - name: Upload release asset
-        uses: actions/upload-release-asset@v1 # TODO: use softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          UPLOAD_URL: ${{needs.publish-rc.outputs.upload_url}}
-          FILENAME: ${{needs.publish-rc.outputs.filename}}
         with:
-          upload_url: ${{ env.UPLOAD_URL}}
-          asset_path: build.zip
-          asset_name: ${{ env.FILENAME }}
-          asset_content_type: application/zip
+          tag_name: ${{ needs.publish-rc.outputs.tag_name }}
+          files: ${{needs.publish-rc.outputs.filename}}
+          prerelease: true
+          draft: false

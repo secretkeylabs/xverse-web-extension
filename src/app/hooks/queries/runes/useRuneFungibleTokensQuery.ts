@@ -2,7 +2,7 @@ import useRunesApi from '@hooks/apiClients/useRunesApi';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { type FungibleToken, type FungibleTokenWithStates } from '@secretkeylabs/xverse-core';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { selectWithDerivedState } from '@utils/tokens';
 
 export const fetchRuneBalances =
@@ -56,7 +56,7 @@ export const useRuneFungibleTokensQuery = (
     }),
     refetchOnWindowFocus: !!backgroundRefetch,
     refetchOnReconnect: !!backgroundRefetch,
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 };
 

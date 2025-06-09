@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 
-const Container = styled.div<{ hasError: boolean }>`
+const Container = styled.div<{ $hasError: boolean }>`
   display: flex;
   flex-direction: column;
   background-color: ${(props) => props.theme.colors.elevation_n1};
@@ -20,22 +20,22 @@ const Container = styled.div<{ hasError: boolean }>`
   padding: ${(props) => props.theme.space.m};
   border: 1px solid
     ${(props) =>
-      props.hasError ? props.theme.colors.danger_dark_200 : props.theme.colors.white_800};
+      props.$hasError ? props.theme.colors.danger_dark_200 : props.theme.colors.white_800};
   border-radius: ${(props) => props.theme.space.s};
   &:focus-within {
     border-color: ${(props) =>
-      props.hasError ? props.theme.colors.danger_dark_200 : props.theme.colors.white_600};
+      props.$hasError ? props.theme.colors.danger_dark_200 : props.theme.colors.white_600};
   }
 `;
 
-const InputField = styled.input<{ $bgColor?: string; hasError: boolean }>`
+const InputField = styled.input<{ $hasError: boolean }>`
   ${(props) => props.theme.typography.body_medium_l}
   background-color: transparent;
   border: none;
   width: 100%;
   margin-bottom: ${(props) => props.theme.space.xxs};
   color: ${(props) =>
-    props.hasError ? props.theme.colors.danger_light : props.theme.colors.white_0};
+    props.$hasError ? props.theme.colors.danger_light : props.theme.colors.white_0};
   caret-color: ${(props) => props.theme.colors.tangerine};
   ::selection {
     background-color: ${(props) => props.theme.colors.tangerine};
@@ -119,14 +119,14 @@ export default function AmountInput({ max, input, balance }: Props) {
         {t('SWAP_CONFIRM_SCREEN.AMOUNT')}{' '}
         {`${input.unit ? `${t('COMMON.IN').toLowerCase()} ${input.unit}` : ''}`}
       </StyledP>
-      <Container onClick={handleClick} hasError={error}>
+      <Container onClick={handleClick} $hasError={error}>
         <InputField
           data-testid="swap-amount"
           ref={inputRef}
           value={input.value}
           onChange={handleOnChange}
           placeholder={input.placeholder ?? '0'}
-          hasError={error}
+          $hasError={error}
         />
         <NumericFormat
           value={input.fiatValue}
@@ -162,7 +162,7 @@ export default function AmountInput({ max, input, balance }: Props) {
             disabled={max.isDisabled || new BigNumber(balance ?? 0).eq(0)}
             onClick={max.onClick}
           >
-            MAX
+            {t('SEND.MAX')}
           </MaxButton>
         )}
       </RowCenter>

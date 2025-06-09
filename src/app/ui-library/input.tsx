@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, type ChangeEvent } from 'react';
+import React, { useLayoutEffect, useRef, useState, type ChangeEvent } from 'react';
 import styled from 'styled-components';
 import { InputFeedback, type FeedbackVariant } from './inputFeedback';
 
@@ -180,168 +180,144 @@ const Feedback = styled.div`
   margin-top: ${(props) => props.theme.space.xs};
 `;
 
-type Props = {
-  id?: string;
-  title?: string;
-  placeholder?: string;
-  value: string;
+type Props = React.InputHTMLAttributes<HTMLInputElement> & {
+  titleElement?: string | React.ReactNode;
+  value?: string;
   dataTestID?: string;
+  className?: string;
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
-  onBlur?: (event: ChangeEvent<HTMLInputElement>) => void;
-  type?: 'text' | 'number' | 'password';
   hideClear?: boolean;
   infoPanel?: React.ReactNode;
   complications?: React.ReactNode;
   variant?: InputVariant;
   subText?: string;
-  className?: string;
-  disabled?: boolean;
   feedback?: {
     message: string;
     variant?: FeedbackVariant;
   }[];
-  autoFocus?: boolean;
   bgColor?: string;
   leftAccessory?: {
     icon: React.ReactNode;
   };
+  clearValue?: () => void;
 };
 
-function Input({
-  id,
-  title,
-  placeholder,
-  value,
-  dataTestID,
-  onChange,
-  onBlur,
-  type = 'text',
-  hideClear = false,
-  infoPanel,
-  complications,
-  variant = 'default',
-  subText,
-  className,
-  feedback,
-  disabled = false,
-  autoFocus = false,
-  bgColor,
-  leftAccessory,
-}: Props) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const complicationsRef = useRef<HTMLDivElement>(null);
+const Input = React.forwardRef(
+  (
+    {
+      titleElement,
+      dataTestID,
+      value,
+      onChange,
+      hideClear = false,
+      infoPanel,
+      complications,
+      variant = 'default',
+      subText,
+      className,
+      feedback,
+      bgColor,
+      leftAccessory,
+      clearValue,
+      ...props
+    }: Props,
+    ref,
+  ) => {
+    const [hasValue, setHasValue] = useState((value || '').length > 0);
+    const inputRef = useRef<HTMLInputElement | null>(null);
+    const complicationsRef = useRef<HTMLDivElement>(null);
 
-  const handleChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    onChange(e);
-  };
+    const handleChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+      setHasValue(e.target.value !== '');
+      onChange(e);
+    };
 
-  useLayoutEffect(() => {
-    // This ensures that the complications don't overlap the text input
-    const stickyComplicationsRef = complicationsRef.current;
-    const stickyInputRef = inputRef.current;
+    useLayoutEffect(() => {
+      // This ensures that the complications don't overlap the text input
+      const stickyComplicationsRef = complicationsRef.current;
+      const stickyInputRef = inputRef.current;
 
-    if (stickyComplicationsRef && stickyInputRef) {
-      const padInput = () => {
-        const complicationsWidth = stickyComplicationsRef.clientWidth;
-        stickyInputRef.style.paddingRight = `${complicationsWidth + 16}px`;
-      };
+      if (stickyComplicationsRef && stickyInputRef) {
+        const padInput = () => {
+          const complicationsWidth = stickyComplicationsRef.clientWidth;
+          stickyInputRef.style.paddingRight = `${complicationsWidth + 16}px`;
+        };
 
-      padInput();
+        padInput();
 
-      const resizeObserver = new ResizeObserver(padInput);
-      resizeObserver.observe(stickyComplicationsRef);
+        const resizeObserver = new ResizeObserver(padInput);
+        resizeObserver.observe(stickyComplicationsRef);
 
-      return () => {
-        resizeObserver.disconnect();
-      };
-    }
-  }, []);
+        return () => {
+          resizeObserver.disconnect();
+        };
+      }
+    }, []);
 
-  const handleClear = () => {
-    onChange({ target: { value: '' } } as ChangeEvent<HTMLInputElement>);
-    inputRef.current?.focus();
-  };
+    const handleClear = () => {
+      onChange({ target: { value: '' } } as ChangeEvent<HTMLInputElement>);
+      clearValue?.();
+      setHasValue(false);
+      inputRef.current?.focus();
+    };
 
-  const displayVariant = feedback?.some((f) => f.variant === 'danger') ? 'danger' : variant;
+    const displayVariant = feedback?.some((f) => f.variant === 'danger') ? 'danger' : variant;
 
-  return (
-    <Container className={className}>
-      {(title || infoPanel) && (
-        <TitleContainer>
-          <Title>{title}</Title>
-          {infoPanel && <InfoText>{infoPanel}</InfoText>}
-        </TitleContainer>
-      )}
-      <InputContainer>
-        {leftAccessory && <LeftAccessoryContainer>{leftAccessory.icon}</LeftAccessoryContainer>}
-        <InputField
-          id={id}
-          className={displayVariant}
-          ref={inputRef}
-          type={type}
-          value={value}
-          data-testid={dataTestID}
-          onChange={handleChange}
-          onBlur={onBlur}
-          placeholder={placeholder}
-          disabled={disabled}
-          autoFocus={autoFocus}
-          $bgColor={bgColor}
-          $hasLeftAccessory={!!leftAccessory}
-        />
-        <ComplicationsContainer ref={complicationsRef}>
-          {!hideClear && value && (
-            <ClearButtonContainer onClick={handleClear}>
-              <ClearButton $hasSiblings={!!complications} />
-            </ClearButtonContainer>
-          )}
-          {complications}
-        </ComplicationsContainer>
-      </InputContainer>
-      {subText && <SubText>{subText}</SubText>}
-      {!!feedback?.length && (
-        <Feedback>
-          {feedback?.map((f) => (
-            <InputFeedback key={f.message} message={f.message} variant={f.variant} />
-          ))}
-        </Feedback>
-      )}
-    </Container>
-  );
-}
+    return (
+      <Container className={className}>
+        {(titleElement || infoPanel) && typeof titleElement === 'string' && (
+          <TitleContainer>
+            <Title>{titleElement}</Title>
+            {infoPanel && <InfoText>{infoPanel}</InfoText>}
+          </TitleContainer>
+        )}
+        {titleElement && typeof titleElement !== 'string' && titleElement}
+        <InputContainer>
+          {leftAccessory && <LeftAccessoryContainer>{leftAccessory.icon}</LeftAccessoryContainer>}
+          <InputField
+            className={displayVariant}
+            ref={(inputEl) => {
+              inputRef.current = inputEl;
+
+              if (ref === null) return;
+
+              if (typeof ref === 'function') {
+                ref(inputEl);
+                return;
+              }
+
+              ref.current = inputEl;
+            }}
+            data-testid={dataTestID}
+            onChange={handleChange}
+            $bgColor={bgColor}
+            $hasLeftAccessory={!!leftAccessory}
+            value={value}
+            {...props}
+          />
+          <ComplicationsContainer ref={complicationsRef}>
+            {!hideClear && hasValue && (
+              <ClearButtonContainer type="button" onClick={handleClear} aria-label="Clear input">
+                <ClearButton $hasSiblings={!!complications} />
+              </ClearButtonContainer>
+            )}
+            {complications}
+          </ComplicationsContainer>
+        </InputContainer>
+        {subText && <SubText>{subText}</SubText>}
+        {!!feedback?.length && (
+          <Feedback>
+            {feedback?.map((f) => (
+              <InputFeedback key={f.message} message={f.message} variant={f.variant} />
+            ))}
+          </Feedback>
+        )}
+      </Container>
+    );
+  },
+);
 
 export default Input;
-
-// some complications that can be used with the input
-export const ConvertComplication = styled.button`
-  ${(props) => props.theme.typography.body_medium_s}
-  user-select: none;
-
-  display: flex;
-  align-items: center;
-  gap: ${(props) => props.theme.space.xs};
-
-  cursor: pointer;
-  background-color: transparent;
-  color: ${(props) => props.theme.colors.white_200};
-  transition: opacity 0.1s ease;
-
-  &:hover:enabled {
-    opacity: 0.8;
-  }
-
-  &:disabled {
-    color: ${(props) => props.theme.colors.white_600};
-    cursor: not-allowed;
-  }
-`;
-
-export const VertRule = styled.div`
-  width: 1px;
-  height: 16px;
-  background-color: ${(props) => props.theme.colors.white_800};
-  margin: 0 8px;
-`;
 
 export const MaxButton = styled.button`
   ${(props) => props.theme.typography.body_medium_m}

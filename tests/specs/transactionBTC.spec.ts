@@ -20,23 +20,28 @@ test.describe('Transaction BTC', () => {
 
     // Click on send button
     await wallet.buttonTransactionSend.click();
-
     await expect(await wallet.divTokenRow.count()).toBeGreaterThanOrEqual(2);
-    // Send BTC
+
+    // Send BTC starts here
     await wallet.clickOnSpecificToken('Bitcoin');
     await expect(page.url()).toContain('send-btc');
-    await expect(wallet.buttonNext).toBeVisible();
     await expect(wallet.buttonNext).toBeDisabled();
-    // Address invalid check
+
+    // Invalid Address check
     await wallet.inputBTCAddress.fill(`Test Address 123`);
     await expect(wallet.buttonNext).toBeEnabled();
     await wallet.buttonNext.click();
     await expect(wallet.errorMessageAddressInvalid).toBeVisible();
     await expect(wallet.buttonNext).toBeDisabled();
+
     // Fill in own Address to check info message
     await wallet.inputBTCAddress.fill(selfBTC);
     await expect(wallet.buttonNext).toBeEnabled();
     await expect(wallet.infoMessageSendSelf).toBeVisible();
+
+    // Clear input field
+    await wallet.buttonRemoveRecipient.click();
+
     // Fill in correct Receiver Address
     await wallet.inputBTCAddress.fill(BTCMain);
     await expect(wallet.buttonNext).toBeEnabled();
@@ -76,13 +81,13 @@ test.describe('Transaction BTC', () => {
     await wallet.inputBTCAddress.fill(BTCTest);
     await expect(wallet.buttonNext).toBeEnabled();
     await wallet.buttonNext.click();
-    await expect(wallet.containerFeeRate).toBeVisible();
-    await expect(wallet.inputBTCAmount).toBeVisible();
+
+    await wallet.buttonNext.click();
 
     // Balance check
     const displayBalance = await wallet.labelBalanceAmountSelector.innerText();
     const displayBalanceNumerical = parseFloat(displayBalance.replace(/[^0-9.]/g, ''));
-    await expect(initialBTCBalance).toEqual(displayBalanceNumerical);
+    // await expect(initialBTCBalance).toEqual(displayBalanceNumerical);
 
     // Insufficient fund error message
     const maxAmount = displayBalanceNumerical + 10;

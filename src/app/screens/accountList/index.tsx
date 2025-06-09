@@ -18,12 +18,21 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
+const ScrollContainer = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  ${(props) => props.theme.scrollbar}
+`;
+
 const Container = styled.div({
   height: '100%',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'space-between',
-  overflowY: 'auto',
+  flex: 1,
+  borderRadius: 'inherit',
   '&::-webkit-scrollbar': {
     display: 'none',
   },
@@ -48,6 +57,8 @@ const ButtonsWrapper = styled.div(
   padding: ${props.theme.space.m};
   padding-top: ${props.theme.space.l};
   padding-bottom: ${props.theme.space.xxl};
+  border-bottom-left-radius: inherit;
+  border-bottom-right-radius: inherit;
 `,
 );
 
@@ -105,49 +116,51 @@ function AccountList(): JSX.Element {
   return (
     <>
       <TopRow onClick={handleBackButtonClick} />
-      <Container>
-        <div>
-          <AccountContainer>
-            <Title>{t('TITLE')}</Title>
-            {displayedAccountsList.map((account) => (
-              <div
-                key={`${account.accountType}:${account.masterPubKey}:${account.id}:${account.deviceAccountIndex}`}
-              >
-                <LazyAccountRow
-                  walletId={account.walletId}
-                  account={account}
-                  isSelected={isAccountSelected(account)}
-                  onAccountSelected={handleAccountSelect}
-                  fetchBalance={enqueueFetchBalances}
-                  isAccountListView
-                />
-                <Separator />
-              </div>
-            ))}
-          </AccountContainer>
-        </div>
-        {!hideListActions ? (
-          <ButtonsWrapper>
-            <Button
-              icon={<Plus size={16} fill="white" />}
-              onClick={onCreateAccount}
-              title={t('NEW_ACCOUNT')}
-              variant="secondary"
-              loading={addingAccount}
-              disabled={addingAccount}
-            />
-            <Button
-              icon={
-                <img src={connectHwIcon} width={16} height={16} alt="hardware wallet connection" />
-              }
-              onClick={() => navigate('/connect-hardware-wallet')}
-              title={t('NEW_HARDWARE_WALLET')}
-              variant="secondary"
-              disabled={addingAccount}
-            />
-          </ButtonsWrapper>
-        ) : null}
-      </Container>
+      <ScrollContainer>
+        <Container>
+          <div>
+            <AccountContainer>
+              <Title>{t('TITLE')}</Title>
+              {displayedAccountsList.map((account) => (
+                <div
+                  key={`${account.accountType}:${account.masterPubKey}:${account.id}:${account.deviceAccountIndex}`}
+                >
+                  <LazyAccountRow
+                    walletId={account.walletId}
+                    account={account}
+                    isSelected={isAccountSelected(account)}
+                    onAccountSelected={handleAccountSelect}
+                    fetchBalance={enqueueFetchBalances}
+                    isAccountListView
+                  />
+                  <Separator />
+                </div>
+              ))}
+            </AccountContainer>
+          </div>
+        </Container>
+      </ScrollContainer>
+      {!hideListActions ? (
+        <ButtonsWrapper>
+          <Button
+            icon={<Plus size={16} fill="white" />}
+            onClick={onCreateAccount}
+            title={t('NEW_ACCOUNT')}
+            variant="secondary"
+            loading={addingAccount}
+            disabled={addingAccount}
+          />
+          <Button
+            icon={
+              <img src={connectHwIcon} width={16} height={16} alt="hardware wallet connection" />
+            }
+            onClick={() => navigate('/connect-hardware-wallet')}
+            title={t('NEW_HARDWARE_WALLET')}
+            variant="secondary"
+            disabled={addingAccount}
+          />
+        </ButtonsWrapper>
+      ) : null}
     </>
   );
 }

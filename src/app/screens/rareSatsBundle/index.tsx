@@ -12,6 +12,7 @@ import BundleContent from '@screens/rareSatsBundle/bundleContent';
 import type { Bundle } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
 import { StyledHeading } from '@ui-library/common.styled';
+import { POPUP_WIDTH } from '@utils/constants';
 import {
   getBtcTxStatusUrl,
   getTruncatedAddress,
@@ -47,11 +48,14 @@ function RareSatsBundle() {
   const [searchParams] = useSearchParams();
   const { network } = useWalletSelector();
   const { selectedSatBundle: bundle } = useNftDataSelector();
-  const { isPending, pendingTxHash } = usePendingOrdinalTxs(bundle?.txid);
+  const { isPending, pendingTxId } = usePendingOrdinalTxs(bundle ?? undefined);
   const [showSendOrdinalsAlert, setShowSendOrdinalsAlert] = useState(false);
   const { setSelectedSatBundleDetails } = useSatBundleDataReducer();
 
-  const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
+  const isGalleryOpen: boolean = useMemo(
+    () => document.documentElement.clientWidth > POPUP_WIDTH,
+    [],
+  );
   const fromRunes = !!searchParams.get('fromRune') || source === 'RuneBundlesTab';
   const fromOrdinals = source === 'OrdinalDetail';
   const isEmpty = !bundle?.satRanges?.length;
@@ -106,8 +110,8 @@ function RareSatsBundle() {
   };
 
   const handleRedirectToTx = () => {
-    if (pendingTxHash) {
-      window.open(getBtcTxStatusUrl(pendingTxHash, network), '_blank', 'noopener,noreferrer');
+    if (pendingTxId) {
+      window.open(getBtcTxStatusUrl(pendingTxId, network), '_blank', 'noopener,noreferrer');
     }
   };
 

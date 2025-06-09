@@ -1,13 +1,19 @@
 import { animated } from '@react-spring/web';
+import { StyledP } from '@ui-library/common.styled';
 import styled from 'styled-components';
 
 export const Logo = styled.img({
-  width: 57,
-  height: 57,
+  width: 140,
+  height: 26,
 });
 
-export const IconButton = styled.button({
+export const StyledButton = styled.button({
   background: 'none',
+  display: 'flex',
+  transition: 'opacity 0.1s ease',
+  '&:hover': {
+    opacity: 0.8,
+  },
 });
 
 export const ScreenContainer = styled(animated.div)((props) => ({
@@ -40,62 +46,25 @@ export const TopSectionContainer = styled.div((props) => ({
   flexDirection: 'column',
   justifyContent: 'center',
   alignItems: 'center',
-  marginTop: props.theme.spacing(60),
-  marginBottom: props.theme.spacing(30),
+  marginTop: 142,
+  marginBottom: props.theme.space.xxl,
 }));
 
-export const PasswordInputLabel = styled.h2((props) => ({
-  ...props.theme.typography.body_medium_m,
-  textAlign: 'left',
-  marginTop: props.theme.spacing(15.5),
-}));
-
-export const PasswordInputContainer = styled.div((props) => ({
-  display: 'flex',
-  alignItems: 'center',
-  width: '100%',
-  border: `1px solid ${props.theme.colors.elevation3}`,
-  paddingLeft: props.theme.space.m,
-  paddingRight: props.theme.space.m,
-  borderRadius: props.theme.radius(1),
-  marginTop: props.theme.space.xs,
-}));
-
-export const PasswordInput = styled.input((props) => ({
-  ...props.theme.typography.body_medium_m,
-  height: 44,
-  backgroundColor: props.theme.colors.elevation0,
-  color: props.theme.colors.white_0,
-  width: '100%',
-  border: 'none',
-}));
-
-export const LandingTitle = styled.h1((props) => ({
-  ...props.theme.tile_text,
-  paddingTop: props.theme.spacing(15),
-  paddingLeft: props.theme.spacing(34),
-  paddingRight: props.theme.spacing(34),
-  color: props.theme.colors.white_200,
-  textAlign: 'center',
+export const LandingTitle = styled(StyledP)((props) => ({
+  marginTop: props.theme.space.m,
 }));
 
 export const ButtonContainer = styled.div((props) => ({
-  marginTop: props.theme.space.m,
+  marginTop: props.theme.space.l,
   width: '100%',
-}));
-
-export const ErrorMessage = styled.h2((props) => ({
-  ...props.theme.typography.body_medium_m,
-  textAlign: 'left',
-  color: props.theme.colors.danger_medium,
-  marginTop: props.theme.space.xs,
 }));
 
 export const ForgotPasswordButton = styled.button((props) => ({
   ...props.theme.typography.body_m,
+  width: '100%',
   textAlign: 'center',
   marginTop: props.theme.space.l,
-  color: props.theme.colors.white_0,
+  color: props.theme.colors.white_200,
   textDecoration: 'underline',
   backgroundColor: 'transparent',
   ':hover': {

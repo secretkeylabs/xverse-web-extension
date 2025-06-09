@@ -1,7 +1,7 @@
 import useIntersectionObserver from '@hooks/useIntersectionObserver';
+import { useStore } from '@hooks/useStore';
 import useWalletSelector from '@hooks/useWalletSelector';
 import type { Account, WalletId } from '@secretkeylabs/xverse-core';
-import { getAccountBalanceKey } from '@utils/helper';
 import { useEffect, useRef, useState } from 'react';
 import AccountRow from '.';
 
@@ -17,19 +17,24 @@ type Props = {
 
 function LazyAccountRow(props: Props) {
   const { fetchBalance, account } = props;
-  const { accountBalances } = useWalletSelector();
   const [shouldFetch, setShouldFetch] = useState(false);
   const ref = useRef(null);
+  const { network } = useWalletSelector();
+  const accountBalanceStore = useStore(
+    'accountBalances',
+    (store, utils) =>
+      store[utils.getAccountStorageKey(account, network.type)] as string | undefined,
+  );
 
   useIntersectionObserver(ref, () => setShouldFetch(true), {});
 
   useEffect(() => {
-    if (!shouldFetch || !fetchBalance || getAccountBalanceKey(account) in accountBalances) {
+    if (!shouldFetch || !fetchBalance || accountBalanceStore.data) {
       return;
     }
 
     fetchBalance(account);
-  }, [account, shouldFetch]);
+  }, [account, shouldFetch, accountBalanceStore.data]);
 
   return (
     <div ref={ref}>

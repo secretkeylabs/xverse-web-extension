@@ -1,4 +1,5 @@
 import { XCircle } from '@phosphor-icons/react';
+import { POPUP_WIDTH } from '@utils/constants';
 import Modal from 'react-modal';
 import styled, { useTheme } from 'styled-components';
 
@@ -48,12 +49,12 @@ function BottomModal({
   className,
 }: Props) {
   const theme = useTheme();
-  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+  const isGalleryOpen: boolean = document.documentElement.clientWidth > POPUP_WIDTH;
   const customStyles = {
     overlay: {
       backgroundColor: isGalleryOpen ? 'transparent' : theme.colors.background.modalBackdrop,
       height: '100%',
-      width: 360,
+      width: POPUP_WIDTH,
       margin: 'auto',
       zIndex: 15000,
       ...overlayStylesOverriding,
@@ -61,7 +62,7 @@ function BottomModal({
     content: {
       inset: 'auto auto 0px auto',
       width: '100%',
-      maxWidth: 360,
+      maxWidth: POPUP_WIDTH,
       maxHeight: '90%',
       border: 'transparent',
       background: theme.colors.elevation2,

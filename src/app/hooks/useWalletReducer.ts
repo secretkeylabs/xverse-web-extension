@@ -1,10 +1,12 @@
-import getSelectedAccount from '@common/utils/getSelectedAccount';
+import getSelectedAccount, { embellishAccountWithDetails } from '@common/utils/getSelectedAccount';
 import { getDeviceAccountIndex } from '@common/utils/ledger';
 import { dispatchEventAuthorizedConnectedClients } from '@common/utils/messages/extensionToContentScript/dispatchEvent';
 import { delay } from '@common/utils/promises';
-import { getBitcoinNetworkType } from '@common/utils/rpc/helpers';
+import { accountPurposeAddresses } from '@common/utils/rpc/btc/getAddresses/utils';
+import { getBitcoinNetworkType, getStacksNetworkType } from '@common/utils/rpc/helpers';
 import useNetworkSelector from '@hooks/useNetwork';
 import useWalletSelector from '@hooks/useWalletSelector';
+import type { WalletEvent } from '@sats-connect/core';
 import type { HDKey } from '@scure/bip32';
 import {
   AnalyticsEvents,
@@ -53,6 +55,8 @@ import {
 import { Mutex } from 'async-mutex';
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
+import useXverseApi from './apiClients/useXverseApi';
+import { useStore } from './useStore';
 import useVault from './useVault';
 import useWalletSession from './useWalletSession';
 
@@ -96,9 +100,9 @@ const useWalletReducer = () => {
     softwareWallets,
     ledgerAccountsList,
     keystoneAccountsList,
-    showDataCollectionAlert,
     hideStx,
     selectedWalletId,
+    btcPaymentAddressType,
   } = useWalletSelector();
   const vault = useVault();
   const stacksNetwork = useNetworkSelector();
@@ -111,11 +115,15 @@ const useWalletReducer = () => {
     keystoneAccountsList,
     network: network.type,
   });
+  const xverseApiClient = useXverseApi();
 
   const dispatch = useDispatch();
   const { setSessionStartTime, clearSessionTime, setSessionStartTimeAndMigrate } =
     useWalletSession();
   const queryClient = useQueryClient();
+
+  // we use an undefined selector so that we avoid re-rendering as we only use the store for actions
+  const accountBalanceStore = useStore('accountBalances', () => undefined);
 
   /*
    * ensures that the active account is valid by regenerating it and comparing to what's in the store
@@ -131,6 +139,20 @@ const useWalletReducer = () => {
     ): Promise<boolean> => {
       if (selectedAccountTypeLocal !== 'software') {
         // these accounts are created by ledger or keystone, so we cannot regenerate them
+        // we do ensure that they are in the auth scope though
+        const selectedAccount = getSelectedAccount({
+          selectedAccountIndex: selectedAccountIndexLocal,
+          selectedAccountType: selectedAccountTypeLocal,
+          selectedWalletId: selectedWalletIdLocal,
+          softwareWallets,
+          ledgerAccountsList,
+          keystoneAccountsList,
+          network: network.type,
+        });
+
+        if (selectedAccount) {
+          xverseApiClient.auth.ensureAccountRegistered(selectedAccount);
+        }
         return true;
       }
 
@@ -173,6 +195,8 @@ const useWalletReducer = () => {
         stacksNetwork,
         accountName: selectedAccount.accountName,
       });
+
+      xverseApiClient.auth.ensureAccountRegistered(recreatedAccount);
 
       const accountsMatch = Object.keys(recreatedAccount).every(
         (key) => JSON.stringify(selectedAccount[key]) === JSON.stringify(recreatedAccount[key]),
@@ -595,32 +619,46 @@ const useWalletReducer = () => {
 
       dispatch(selectAccount(nextAccount.id, nextAccount.accountType, nextAccount.walletId));
 
-      const accountId = permissions.utils.account.makeAccountId({
+      const targetAccountId = permissions.utils.account.makeAccountId({
         accountId: nextAccount.id,
         networkType: network.type,
         masterPubKey: nextAccount.masterPubKey,
       });
-      const changeEventPermissions: Omit<Permissions.Store.Permission, 'clientId'>[] = [
-        {
-          type: 'account',
-          resourceId: permissions.resources.account.makeAccountResourceId(accountId),
-          actions: { read: true },
-        },
-      ];
+
       if (currentlySelectedAccount) {
         const currentAccountId = permissions.utils.account.makeAccountId({
           accountId: currentlySelectedAccount.id,
           networkType: network.type,
           masterPubKey: currentlySelectedAccount.masterPubKey,
         });
-        changeEventPermissions.push({
-          type: 'account',
-          resourceId: permissions.resources.account.makeAccountResourceId(currentAccountId),
-          actions: { read: true },
+        const currentAccountEventPermissions: Omit<Permissions.Store.Permission, 'clientId'>[] = [
+          {
+            type: 'account',
+            resourceId: permissions.resources.account.makeAccountResourceId(currentAccountId),
+            actions: { read: true },
+          },
+        ];
+
+        dispatchEventAuthorizedConnectedClients(currentAccountEventPermissions, {
+          type: 'accountChange',
+          addresses: [],
         });
       }
 
-      dispatchEventAuthorizedConnectedClients(changeEventPermissions, { type: 'accountChange' });
+      const targetAccountEventPermissions: Omit<Permissions.Store.Permission, 'clientId'>[] = [
+        {
+          type: 'account',
+          resourceId: permissions.resources.account.makeAccountResourceId(targetAccountId),
+          actions: { read: true },
+        },
+      ];
+
+      const embellishedAccount = embellishAccountWithDetails(nextAccount, btcPaymentAddressType);
+
+      dispatchEventAuthorizedConnectedClients(targetAccountEventPermissions, {
+        type: 'accountChange',
+        addresses: accountPurposeAddresses(embellishedAccount, { type: 'all' }),
+      });
     },
     [dispatch, ensureSelectedAccountValid, network.type, queryClient, currentlySelectedAccount],
   );
@@ -629,31 +667,9 @@ const useWalletReducer = () => {
     // we clear the query cache to prevent data from the other account potentially being displayed
     await queryClient.cancelQueries();
     queryClient.clear();
+    await accountBalanceStore.actions.reset();
 
     dispatch(ChangeNetworkAction(changedNetwork));
-
-    if (currentlySelectedAccount) {
-      dispatchEventAuthorizedConnectedClients(
-        [
-          {
-            type: 'wallet',
-            actions: {
-              readNetwork: true,
-            },
-            resourceId: 'wallet',
-          },
-        ],
-        {
-          type: 'networkChange',
-          bitcoin: {
-            name: getBitcoinNetworkType(changedNetwork.type),
-          },
-          stacks: {
-            name: changedNetwork.type,
-          },
-        },
-      );
-    }
 
     const changedStacksNetwork: StacksNetwork =
       changedNetwork.type === 'Mainnet'
@@ -673,8 +689,61 @@ const useWalletReducer = () => {
     return new Promise<void>((resolve, reject) => {
       loadSoftwareAccounts(changedNetwork, changedStacksNetwork, {
         resetIndex: true,
-        accountLoadCallback: () => {
+        accountLoadCallback: async (loadedAccounts) => {
           resolve();
+          const selectedAccountId = currentlySelectedAccount?.id;
+          const selectedAccountFromLoadedAccounts = loadedAccounts.find(
+            (account) => account.id === selectedAccountId,
+          );
+
+          const baseNetworkChangeEvent: WalletEvent = {
+            type: 'networkChange',
+            bitcoin: {
+              name: getBitcoinNetworkType(changedNetwork.type),
+            },
+            stacks: {
+              name: getStacksNetworkType(changedNetwork.type),
+            },
+            addresses: [],
+          };
+
+          const networkPermission: Omit<Permissions.Store.Permission, 'clientId'>[] = [
+            {
+              type: 'wallet',
+              actions: {
+                readNetwork: true,
+              },
+              resourceId: 'wallet',
+            },
+          ];
+          dispatchEventAuthorizedConnectedClients(networkPermission, baseNetworkChangeEvent);
+          if (selectedAccountFromLoadedAccounts) {
+            const targetAccountId = permissions.utils.account.makeAccountId({
+              accountId: selectedAccountFromLoadedAccounts.id,
+              networkType: network.type,
+              masterPubKey: selectedAccountFromLoadedAccounts.masterPubKey,
+            });
+            const targetAccountEventPermissions: Omit<Permissions.Store.Permission, 'clientId'>[] =
+              [
+                {
+                  type: 'account',
+                  resourceId: permissions.resources.account.makeAccountResourceId(targetAccountId),
+                  actions: { read: true },
+                },
+              ];
+            const networkAndAccountPermission = [
+              ...networkPermission,
+              ...targetAccountEventPermissions,
+            ];
+            const embellishedAccount = embellishAccountWithDetails(
+              selectedAccountFromLoadedAccounts,
+              btcPaymentAddressType,
+            );
+            dispatchEventAuthorizedConnectedClients(networkAndAccountPermission, {
+              ...baseNetworkChangeEvent,
+              addresses: accountPurposeAddresses(embellishedAccount, { type: 'all' }),
+            });
+          }
         },
       }).catch(reject);
     });
@@ -728,10 +797,13 @@ const useWalletReducer = () => {
     dispatch(updateKeystoneAccountsAction(newKeystoneAccountsList));
   };
 
-  const changeBtcPaymentAddressType = async (btcPaymentAddressType: 'native' | 'nested') => {
-    dispatch(ChangeBtcPaymentAddressType(btcPaymentAddressType));
-
+  const changeBtcPaymentAddressType = async (newBtcPaymentAddressType: 'native' | 'nested') => {
+    dispatch(ChangeBtcPaymentAddressType(newBtcPaymentAddressType));
     if (currentlySelectedAccount) {
+      const embellishedAccount = embellishAccountWithDetails(
+        currentlySelectedAccount,
+        newBtcPaymentAddressType,
+      );
       dispatchEventAuthorizedConnectedClients(
         [
           {
@@ -746,7 +818,10 @@ const useWalletReducer = () => {
             actions: { read: true },
           },
         ],
-        { type: 'accountChange' },
+        {
+          type: 'accountChange',
+          addresses: accountPurposeAddresses(embellishedAccount, { type: 'all' }),
+        },
       );
     }
   };

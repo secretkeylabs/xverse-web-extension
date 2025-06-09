@@ -10,7 +10,10 @@ import {
   getBtcFiatEquivalent,
   getFiatBtcEquivalent,
 } from '@secretkeylabs/xverse-core';
-import Input, { ConvertComplication, MaxButton, VertRule } from '@ui-library/input';
+import Button from '@ui-library/button';
+import { StyledP } from '@ui-library/common.styled';
+import { MaxButton } from '@ui-library/input';
+import TextArea from '@ui-library/textarea';
 import { HIDDEN_BALANCE_LABEL } from '@utils/constants';
 import { satsToBtcString } from '@utils/helper';
 import BigNumber from 'bignumber.js';
@@ -19,26 +22,26 @@ import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
 
-const BalanceText = styled.span`
-  ${(props) => props.theme.typography.body_medium_m}
-  color: ${(props) => props.theme.colors.white_200};
-`;
-
-const BalanceDiv = styled.div`
-  word-break: break-all;
-  text-align: end;
+const BalanceContainer = styled.div`
+  display: flex;
+  gap: ${(props) => props.theme.space.xs};
 `;
 
 const ConvertedAmountWrapper = styled.div`
-  max-width: 120px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  width: 100%;
+  word-break: break-all;
 `;
 
+const ConvertButton = styled(Button)`
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+`;
+
+// @TODO: Add e2e tests for these regex validators
 const inputValidator = /^[0-9.]*$/;
-const btcInputExtractor = /[0-9]+[.]?[0-9]{0,8}/;
-const btcInputValidator = /^[0-9]+[.]?[0-9]{0,8}$/;
+const btcInputExtractor = /(?:[0-9]{1,8}(?:\.[0-9]{0,8})?|\.[0-9]{1,8}|)/;
+const btcInputValidator = /^(?:[0-9]{1,8}(?:\.[0-9]{0,8})?|\.[0-9]{1,8}|)$/;
 const fiatInputExtractor = /[0-9]+[.]?[0-9]{0,2}/;
 const fiatInputValidator = /^[0-9]+[.]?[0-9]{0,2}$/;
 
@@ -60,6 +63,7 @@ function AmountSelector({
   disabled = false,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
+
   const { fiatCurrency, balanceHidden } = useWalletSelector();
   const { btcFiatRate } = useSupportedCoinRates();
   const selectedAccount = useSelectedAccount(overridePaymentType);
@@ -90,21 +94,37 @@ function AmountSelector({
     ? satsToBtcString(btcBalance)
     : getBtcFiatEquivalent(btcBalance, new BigNumber(btcFiatRate)).toFixed(2);
 
-  const sendAmountConverted = useBtcValue
-    ? getBtcFiatEquivalent(new BigNumber(amountSats), BigNumber(btcFiatRate)).toFixed(2)
-    : satsToBtcString(new BigNumber(amountSats));
+  const getSendAmountConverted = () => {
+    if (!amountSats) return '0.00';
+
+    if (useBtcValue) {
+      return getBtcFiatEquivalent(new BigNumber(amountSats), BigNumber(btcFiatRate)).toFixed(2);
+    }
+
+    return satsToBtcString(new BigNumber(amountSats));
+  };
 
   const handleAmountChange = (newAmount: string) => {
-    const isValidInput = inputValidator.test(newAmount);
-    if (!isValidInput) return;
-
-    setAmountDisplay(newAmount);
-
     if (!newAmount) {
+      setAmountDisplay(newAmount);
       setAmountSats('0');
       setSendMax(false);
       return;
     }
+
+    // If user starts with a decimal point, prepend a zero
+    if (newAmount.startsWith('.')) {
+      newAmount = `0${newAmount}`;
+    }
+
+    // If user enters a number after a leading zero, replace the zero
+    if (newAmount.length > 1 && newAmount.startsWith('0') && newAmount[1] !== '.') {
+      newAmount = newAmount.slice(1);
+    }
+
+    // Basic input validation (for both fiat and btc)
+    const isValidInput = inputValidator.test(newAmount);
+    if (!isValidInput) return;
 
     const isValidAmount = useBtcValue
       ? btcInputValidator.test(newAmount)
@@ -112,6 +132,7 @@ function AmountSelector({
 
     if (!isValidAmount) return;
 
+    setAmountDisplay(newAmount);
     setSendMax(false);
 
     if (useBtcValue) {
@@ -165,54 +186,52 @@ function AmountSelector({
   };
 
   return (
-    <Input
-      title={t('BTC.AMOUNT', { currency: useBtcValue ? 'BTC' : fiatCurrency })}
-      value={amountDisplay}
-      dataTestID="btc-amount"
-      onChange={(e) => handleAmountChange(e.target.value)}
-      onBlur={handleBlur}
-      placeholder="0"
-      infoPanel={
+    <>
+      <TextArea
+        titleElement={
+          <BalanceContainer data-testid="balance-label">
+            <StyledP typography="body_medium_m" color="white_200">
+              {useBtcValue ? 'BTC' : fiatCurrency} {t('BALANCE')}:{' '}
+              {balanceHidden ? HIDDEN_BALANCE_LABEL : balance}
+            </StyledP>
+            <MaxButton disabled={sendMax || disabled} onClick={handleMaxClick}>
+              {t('MAX')}
+            </MaxButton>
+          </BalanceContainer>
+        }
+        value={amountDisplay}
+        dataTestID="btc-amount"
+        onChange={(e) => handleAmountChange(e.target.value)}
+        onBlur={handleBlur}
+        placeholder="0"
+        rows={1}
+        complications={
+          <ConvertButton
+            variant="secondary"
+            title=""
+            icon={<ArrowsDownUp size={20} />}
+            disabled={disabled}
+            onClick={handleUseBtcValueChange}
+          />
+        }
+        disabled={disabled}
+        hideClear
+        autoFocus
+      />
+      <ConvertedAmountWrapper>
         <NumericFormat
-          value={balance}
+          value={getSendAmountConverted()}
           displayType="text"
           thousandSeparator
-          prefix={useBtcValue ? '' : `~${currencySymbolMap[fiatCurrency]}`}
+          prefix={useBtcValue ? `~${currencySymbolMap[fiatCurrency]}` : ''}
           renderText={(value: string) => (
-            <BalanceDiv data-testid="balance-label">
-              <BalanceText>{t('BALANCE')}</BalanceText>
-              {balanceHidden && ` ${HIDDEN_BALANCE_LABEL}`}
-              {!balanceHidden && ` ${value} ${useBtcValue ? 'BTC' : fiatCurrency}`}
-            </BalanceDiv>
+            <StyledP typography="body_medium_m" color="white_200">
+              {value} {useBtcValue ? fiatCurrency : 'BTC'}
+            </StyledP>
           )}
         />
-      }
-      complications={
-        <>
-          <ConvertComplication disabled={disabled} onClick={handleUseBtcValueChange}>
-            <NumericFormat
-              value={sendAmountConverted}
-              displayType="text"
-              thousandSeparator
-              prefix={useBtcValue ? `~${currencySymbolMap[fiatCurrency]}` : ''}
-              renderText={(value: string) => (
-                <ConvertedAmountWrapper>
-                  {value} {useBtcValue ? fiatCurrency : 'BTC'}
-                </ConvertedAmountWrapper>
-              )}
-            />
-            <ArrowsDownUp size={16} weight="fill" />
-          </ConvertComplication>
-          <VertRule />
-          <MaxButton disabled={sendMax || disabled} onClick={handleMaxClick}>
-            MAX
-          </MaxButton>
-        </>
-      }
-      disabled={disabled}
-      hideClear
-      autoFocus
-    />
+      </ConvertedAmountWrapper>
+    </>
   );
 }
 

@@ -18,6 +18,7 @@ const useTransactionContext = (overridePayAddressType?: BtcPaymentType) => {
       cacheStorageController: {
         getAllKeys: async () => Object.keys(localStorage),
         get: async () => null,
+        getMany: async () => ({}),
         set: async () => {},
         remove: async (key: string) => {
           localStorage.removeItem(key);
@@ -40,6 +41,10 @@ const useTransactionContext = (overridePayAddressType?: BtcPaymentType) => {
           get: async (key: string) => {
             const value = await chrome.storage.local.get(key);
             return value[key];
+          },
+          getMany: async <T extends string>(...keys: T[]) => {
+            const value = await chrome.storage.local.get(keys);
+            return value as Record<T, string | undefined>;
           },
           set: async (key: string, value: string) => {
             await chrome.storage.local.set({

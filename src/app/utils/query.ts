@@ -18,15 +18,9 @@ export function handleRetries(failureCount: number, error: unknown): boolean {
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // time before garbage collection of query data
-      cacheTime: 5 * 60 * 1000, // 5 min
-
       // increase this for specific queries to reduce refetches
       staleTime: 0,
 
-      // at least one of these are required to refetch stale queries
-      // refetchInterval
-      // refetchIntervalInBackground
       refetchOnMount: true,
       refetchOnWindowFocus: true,
       refetchOnReconnect: true,

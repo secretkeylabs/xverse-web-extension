@@ -16,13 +16,18 @@ import {
 
 import { sendUserRejectionMessage } from '@common/utils/rpc/responseMessages/errors';
 import { sendChangeNetworkSuccessResponseMessage } from '@common/utils/rpc/responseMessages/wallet';
+import { usePermissions } from '@components/permissionsManager';
+import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Link, LinkBreak } from '@phosphor-icons/react';
 import { ArrowRight } from '@phosphor-icons/react/dist/ssr';
 import {
+  error,
   getAppIconFromWebManifest,
   initialNetworksList,
+  permissions,
+  type Permissions,
   safePromise,
 } from '@secretkeylabs/xverse-core';
 import Button from '@ui-library/button';
@@ -34,26 +39,125 @@ import Theme from 'theme';
 type ChangeNetworkRequestInnerProps = {
   context: Context;
   data: ChangeNetworkRequestMessage;
+  onNetworkChange?: () => void;
 };
 
-function ChangeNetworkRequestInner({ context, data }: ChangeNetworkRequestInnerProps) {
+function ChangeNetworkRequestInner({
+  context,
+  data,
+  onNetworkChange,
+}: ChangeNetworkRequestInnerProps) {
   const { network } = useWalletSelector();
+  const { setPermission, getClientPermissions, addResource } = usePermissions();
+  const currentAccount = useSelectedAccount();
   const { t } = useTranslation('translation', { keyPrefix: 'CHANGE_NETWORK_REQUEST' });
   const { changeNetwork } = useWalletReducer();
   const { data: appIconSrc } = useQuery({
     queryKey: ['appIcon', context.origin],
     queryFn: async () => {
-      const [error, icon] = await safePromise(getAppIconFromWebManifest(context.origin));
+      const [iconError, icon] = await safePromise(getAppIconFromWebManifest(context.origin));
 
-      if (error) return null;
+      if (iconError) return null;
 
       return icon;
     },
   });
 
+  const isAccountPermission = (
+    permission: Permissions.Store.Permission,
+  ): permission is Permissions.Resources.Account.AccountPermission => permission.type === 'account';
+
   const handleAccept = async () => {
-    const toNetwork = initialNetworksList.filter((n) => n.type === data.params?.name);
-    await changeNetwork(toNetwork[0]);
+    const toNetwork = initialNetworksList.find((n) => n.type === data.params?.name);
+
+    if (!toNetwork) {
+      return error({
+        name: 'NetworkError',
+        message: 'No Network specified',
+      });
+    }
+
+    const [clientIdError, clientId] = permissions.utils.store.makeClientId({
+      origin: context.origin,
+    });
+
+    if (clientIdError) {
+      return error({
+        name: 'ClientIdError',
+        message: 'Failed to create client ID during permissions check.',
+      });
+    }
+
+    if (onNetworkChange) {
+      await changeNetwork(toNetwork);
+      onNetworkChange?.();
+      return;
+    }
+
+    const currentAccountId = permissions.utils.account.makeAccountId({
+      accountId: currentAccount.id,
+      networkType: network.type,
+      masterPubKey: currentAccount.masterPubKey,
+    });
+
+    const currentResourceId = permissions.resources.account.makeAccountResourceId(currentAccountId);
+
+    const targetAccountId = permissions.utils.account.makeAccountId({
+      accountId: 0,
+      networkType: toNetwork.type,
+      masterPubKey: currentAccount.masterPubKey,
+    });
+
+    const targetResource = permissions.resources.account.makeAccountResource({
+      accountId: targetAccountId,
+      masterPubKey: currentAccount.masterPubKey,
+      networkType: toNetwork.type,
+    });
+
+    const clientPermissions = getClientPermissions(clientId);
+
+    const currentAccountPermissions = clientPermissions.find(
+      (permission) => permission.resourceId === currentResourceId,
+    );
+
+    if (!currentAccountPermissions) {
+      return error({
+        name: 'ClientPermissionsError',
+        message: 'No Client Permissions Found',
+      });
+    }
+
+    if (!isAccountPermission(currentAccountPermissions)) {
+      return error({
+        name: 'ClientPermissionsError',
+        message: 'Permission type invalid',
+      });
+    }
+
+    const targetAccountPermissions = clientPermissions.find(
+      (permission) => permission.resourceId === targetResource.id,
+    );
+
+    if (!targetAccountPermissions) {
+      addResource(targetResource);
+      const targetPermission: Permissions.Store.Permission = {
+        type: 'account',
+        clientId,
+        resourceId: targetResource.id,
+        actions: currentAccountPermissions.actions,
+      };
+      setPermission(targetPermission);
+    } else if (isAccountPermission(targetAccountPermissions)) {
+      setPermission({
+        ...targetAccountPermissions,
+        actions: {
+          ...currentAccountPermissions.actions,
+          ...targetAccountPermissions.actions,
+        },
+      });
+    }
+
+    await changeNetwork(toNetwork);
     sendChangeNetworkSuccessResponseMessage({
       tabId: context.tabId,
       messageId: data.id,

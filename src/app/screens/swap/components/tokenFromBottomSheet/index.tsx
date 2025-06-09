@@ -50,6 +50,7 @@ export default function TokenFromBottomSheet({ visible, title, onSelectCoin, onC
                   });
                   onClose();
                 }}
+                hidePriceChange
               />
             );
           }
@@ -67,6 +68,7 @@ export default function TokenFromBottomSheet({ visible, title, onSelectCoin, onC
                   });
                   onClose();
                 }}
+                hidePriceChange
               />
             );
           }
@@ -85,6 +87,7 @@ export default function TokenFromBottomSheet({ visible, title, onSelectCoin, onC
                   onClose();
                 }}
                 fungibleToken={token}
+                hidePriceChange
               />
             );
           }

@@ -47,14 +47,26 @@ const handleGetRunesBalance = async (
   try {
     const runesBalances = await runesApi.getRuneBalances(
       existingAccount.btcAddresses.taproot.address,
+      true,
     );
+    const runesSpendableBalances = await runesApi.getRuneBalances(
+      existingAccount.btcAddresses.taproot.address,
+    );
+    const balances = runesBalances.map((runeBalance) => {
+      const spendableRunes = runesSpendableBalances.find(
+        (spendable) => spendable.id === runeBalance.id,
+      );
+
+      return {
+        ...runeBalance,
+        amount: runeBalance.amount.toString(),
+        spendableBalance: spendableRunes?.amount.toString() ?? '0',
+      };
+    });
     sendRpcResponse(
       tabId,
       makeRpcSuccessResponse<'runes_getBalance'>(message.id, {
-        balances: runesBalances.map((runeBalance) => ({
-          ...runeBalance,
-          amount: runeBalance.amount.toString(),
-        })),
+        balances,
       }),
     );
   } catch (error) {

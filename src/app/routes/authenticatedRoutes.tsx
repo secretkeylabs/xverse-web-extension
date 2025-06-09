@@ -46,9 +46,12 @@ import SendInscriptionsRequest from '@screens/sendInscriptionsRequest';
 import SendNft from '@screens/sendNft';
 import SendOrdinal from '@screens/sendOrdinal';
 import SendRuneScreen from '@screens/sendRune';
+import { SendStrkScreen } from '@screens/sendStrk';
 import SendStxScreen from '@screens/sendStx';
 import Setting from '@screens/settings';
 import About from '@screens/settings/about';
+import AddressBook from '@screens/settings/addressBook';
+import AddEditAddress from '@screens/settings/addressBook/addEditAddress';
 import AdvancedSettings from '@screens/settings/advanced';
 import PaymentAddressTypeSelector from '@screens/settings/advanced/paymentAddressTypeSelector';
 import RecoverFunds from '@screens/settings/advanced/recoverFunds';
@@ -79,6 +82,7 @@ import MultipleMarketplaceListingResult from '@screens/transactionStatus/multipl
 import TransferRunesRequest from '@screens/transferRunesRequest';
 import UnlistRuneScreen from '@screens/unlistRune';
 import UnlistRuneUtxoScreen from '@screens/unlistRuneUtxo';
+import { isStarknetActive } from '@utils/constants';
 import BtcSendRequest from 'app/screens/btcSendRequest';
 import ListRuneScreen from 'app/screens/listRune';
 import RoutePaths from './paths';
@@ -261,6 +265,18 @@ const authedRoutesWithSidebar: RouteObject = {
       element: <Security />,
     },
     {
+      path: RoutePaths.AddressBook,
+      element: <AddressBook />,
+    },
+    {
+      path: RoutePaths.AddAddress,
+      element: <AddEditAddress mode="add" />,
+    },
+    {
+      path: RoutePaths.EditAddress(':id'),
+      element: <AddEditAddress mode="edit" />,
+    },
+    {
       path: RoutePaths.AdvancedSettings,
       element: <AdvancedSettings />,
     },
@@ -361,7 +377,7 @@ const authedRoutesWithSidebar: RouteObject = {
       element: <TransferRunesRequest />,
     },
     {
-      path: 'send-brc20-one-step',
+      path: RoutePaths.SendBrc20OneStep,
       element: <SendBrc20OneStepScreen />,
     },
     {
@@ -389,15 +405,19 @@ const authedRoutesWithSidebar: RouteObject = {
       element: <NftDashboard />,
     },
     {
-      path: 'send-btc',
+      path: RoutePaths.SendBtc,
       element: <SendBtcScreen />,
     },
     {
-      path: 'send-stx',
+      path: 'send-strk',
+      element: isStarknetActive ? <SendStrkScreen /> : <div />,
+    },
+    {
+      path: RoutePaths.SendStx,
       element: <SendStxScreen />,
     },
     {
-      path: 'send-rune',
+      path: RoutePaths.SendRune,
       element: <SendRuneScreen />,
     },
     {

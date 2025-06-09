@@ -1,14 +1,15 @@
+import useXverseApi from '@hooks/apiClients/useXverseApi';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
-  getBrc20Tokens,
   getOrdinalsFtBalance,
+  XverseApi,
   type Brc20Token,
   type FungibleToken,
   type FungibleTokenWithStates,
   type SettingsNetwork,
 } from '@secretkeylabs/xverse-core';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { selectWithDerivedState } from '@utils/tokens';
 
 const brc20TokenToFungibleToken = (coin: Brc20Token): FungibleToken => ({
@@ -24,7 +25,13 @@ const brc20TokenToFungibleToken = (coin: Brc20Token): FungibleToken => ({
 });
 
 export const fetchBrc20FungibleTokens =
-  (ordinalsAddress: string, fiatCurrency: string, network: SettingsNetwork) => async () => {
+  (
+    ordinalsAddress: string,
+    fiatCurrency: string,
+    network: SettingsNetwork,
+    xverseApiClient: XverseApi,
+  ) =>
+  async () => {
     // get brc20 balances for the ordinalsAddress
     const ordinalsFtBalance: FungibleToken[] = (
       await getOrdinalsFtBalance(network.type, ordinalsAddress)
@@ -32,7 +39,7 @@ export const fetchBrc20FungibleTokens =
 
     // get extra metadata (tokenFiatRate) including supported tokens without balance
     const tickers = ordinalsFtBalance.filter((ft) => ft.ticker).map((ft) => ft.ticker!) ?? [];
-    const brc20Tokens = (await getBrc20Tokens(network.type, tickers, fiatCurrency)) || [];
+    const brc20Tokens = (await xverseApiClient.getBrc20Tokens(tickers, fiatCurrency)) || [];
 
     // combine the two, into a unique list of fungible tokens
     return ordinalsFtBalance
@@ -60,14 +67,15 @@ export const useGetBrc20FungibleTokens = (select?: (data: FungibleTokenWithState
   const { ordinalsAddress } = useSelectedAccount();
   const { brc20ManageTokens, fiatCurrency, network, spamTokens, showSpamTokens } =
     useWalletSelector();
+  const xverseApiClient = useXverseApi();
 
-  const queryFn = fetchBrc20FungibleTokens(ordinalsAddress, fiatCurrency, network);
+  const queryFn = fetchBrc20FungibleTokens(ordinalsAddress, fiatCurrency, network, xverseApiClient);
 
   return useQuery({
     queryKey: ['brc20-fungible-tokens', ordinalsAddress, network.type, fiatCurrency],
     queryFn,
     enabled: Boolean(network && ordinalsAddress),
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     select: selectWithDerivedState({
       manageTokens: brc20ManageTokens,
       spamTokens,

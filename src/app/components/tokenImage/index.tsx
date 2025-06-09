@@ -1,4 +1,5 @@
 import IconBitcoin from '@assets/img/dashboard/bitcoin_icon.svg';
+import IconStarknet from '@assets/img/dashboard/strk_icon.png';
 import IconStacks from '@assets/img/dashboard/stx_icon.svg';
 import OrdinalIcon from '@assets/img/transactions/ordinal.svg';
 import RunesIcon from '@assets/img/transactions/runes.svg';
@@ -95,6 +96,9 @@ export default function TokenImage({
     }
     if (currency === 'BTC' || fungibleToken?.principal === 'BTC') {
       return IconBitcoin;
+    }
+    if (currency === 'STRK' || fungibleToken?.principal === 'STRK') {
+      return IconStarknet;
     }
   }, [currency, fungibleToken]);
 

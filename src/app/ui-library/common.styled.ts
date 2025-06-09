@@ -14,7 +14,7 @@ import type { Color, Typography } from 'theme';
 type TypographyProps = { typography: Typography; color?: Color };
 
 export const StyledP = styled.p<TypographyProps>`
-  ${(props) => props.theme[props.typography]}
+  ${(props) => props.theme.typography[props.typography]}
   color: ${(props) => (props.color ? props.theme.colors[props.color] : 'inherit')}
 `;
 
@@ -67,4 +67,12 @@ export const StyledTabList = styled(TabList)`
   display: flex;
   gap: ${(props) => props.theme.space.xxs};
   list-style: none;
+`;
+
+export const Row = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
 `;

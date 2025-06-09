@@ -22,6 +22,7 @@ import {
 import { deserializeTransaction, StacksTransactionWire } from '@stacks/transactions';
 import { removeAccountAvatarAction } from '@stores/wallet/actions/actionCreators';
 import { useMutation } from '@tanstack/react-query';
+import { POPUP_WIDTH } from '@utils/constants';
 import { isLedgerAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import BigNumber from 'bignumber.js';
@@ -40,7 +41,7 @@ const ScrollContainer = styled.div`
     display: none;
   }
   height: 600px;
-  width: 360px;
+  width: ${POPUP_WIDTH}px;
   margin: auto;
 `;
 
@@ -61,20 +62,20 @@ const NftContainer = styled.div((props) => ({
   alignItems: 'center',
   borderRadius: props.theme.radius(1),
   padding: props.theme.spacing(5),
-  marginBottom: props.theme.spacing(6),
+  marginBottom: props.theme.space.s,
 }));
 
 const ReviewTransactionText = styled.h1((props) => ({
   ...props.theme.typography.headline_s,
   color: props.theme.colors.white_0,
-  marginBottom: props.theme.spacing(16),
+  marginBottom: props.theme.space.xl,
   textAlign: 'center',
 }));
 
 function ConfirmNftTransaction() {
   const dispatch = useDispatch();
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
-  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+  const isGalleryOpen: boolean = document.documentElement.clientWidth > POPUP_WIDTH;
   const selectedAccount = useSelectedAccount();
   const { avatarIds, network } = useWalletSelector();
   const selectedAvatar = avatarIds[selectedAccount.ordinalsAddress];
@@ -91,7 +92,7 @@ function ConfirmNftTransaction() {
   const { refetch } = useStxWalletData();
   const selectedNetwork = useNetworkSelector();
   const {
-    isLoading,
+    isPending,
     error: txError,
     data: stxTxBroadcastData,
     mutate,
@@ -177,8 +178,12 @@ function ConfirmNftTransaction() {
 
   useResetUserFlow('/confirm-nft-tx');
 
-  const handleOnCancelClick = () => {
+  const handleBackButtonClick = () => {
     navigate(-1);
+  };
+
+  const handleOnCancelClick = () => {
+    navigate(`/nft-dashboard/nft-detail/${id}`);
   };
 
   return (
@@ -187,10 +192,10 @@ function ConfirmNftTransaction() {
         <AccountHeaderComponent disableMenuOption={isGalleryOpen} disableAccountSwitch />
       )}
       <ScrollContainer>
-        {!isGalleryOpen && <TopRow title={t('CONFIRM_TX')} onClick={handleOnCancelClick} />}
+        {!isGalleryOpen && <TopRow title={t('CONFIRM_TX')} onClick={handleBackButtonClick} />}
         <ConfirmStxTransactionComponent
           initialStxTransactions={initialStxTransactions}
-          loading={isLoading}
+          loading={isPending}
           onConfirmClick={handleOnConfirmClick}
           onCancelClick={handleOnCancelClick}
           isAsset
@@ -220,4 +225,5 @@ function ConfirmNftTransaction() {
     </>
   );
 }
+
 export default ConfirmNftTransaction;

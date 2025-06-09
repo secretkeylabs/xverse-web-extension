@@ -12,12 +12,12 @@ a {
 
 #app {
   height: 600px;
-  width: 360px;
+  width: 375px;
   display: flex;
   flex-direction: column;
   justify-content: safe center;
   align-items: safe center;
-  @media only screen and (min-width: 360px) {
+  @media only screen and (min-width: 375px) {
     height: 100vh;
     width: 100vw;
   }

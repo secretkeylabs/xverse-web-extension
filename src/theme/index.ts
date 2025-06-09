@@ -1,5 +1,5 @@
 export const breakpoints = {
-  xs: '361',
+  xs: '376',
   s: '480',
   md: '768',
   lg: '920',
@@ -239,12 +239,12 @@ const Theme = {
     grey: '#24252C',
 
     /**
-     * @deprecated use lilac
+     * @deprecated use `lilac`
      */
     purple_main: '#5E41C5',
 
     /**
-     * @deprecated use lilac
+     * @deprecated use `tangerine`
      */
     orange_main: '#EE7A30',
   },

@@ -1,5 +1,6 @@
-import TokenImage from '@components/tokenImage';
+import useXverseApi from '@hooks/apiClients/useXverseApi';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
+import { useBnsResolver } from '@hooks/queries/useBnsName';
 import useStxPendingTxData from '@hooks/queries/useStxPendingTxData';
 import useCancellableEffect from '@hooks/useCancellableEffect';
 import useDebounce from '@hooks/useDebounce';
@@ -12,21 +13,22 @@ import {
   generateUnsignedSip10TransferTransaction,
   generateUnsignedTx,
   microstacksToStx,
+  modifyRecommendedStxFees,
   nextBestNonce,
   stxToMicrostacks,
 } from '@secretkeylabs/xverse-core';
 import { TransactionTypes } from '@stacks/connect';
-import { deserializeTransaction, StacksTransactionWire } from '@stacks/transactions';
+import { deserializeTransaction, PayloadType, StacksTransactionWire } from '@stacks/transactions';
 import type { FeeRates } from '@ui-components/selectFeeRate';
 import { convertAmountToFtDecimalPlaces } from '@utils/helper';
 import SendLayout from 'app/layouts/sendLayout';
+import RoutePaths from 'app/routes/paths';
 import BigNumber from 'bignumber.js';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { getNextStep, getPreviousStep, Step } from './stepResolver';
-import Step1SelectRecipientAndMemo from './steps/Step1SelectRecipient';
+import Step1SelectRecipientAndMemo from './steps/Step1SelectRecipientAndMemo';
 import Step2SelectAmount from './steps/Step2SelectAmount';
 import Step3Confirm from './steps/Step3Confirm';
 
@@ -36,24 +38,12 @@ const Container = styled.div`
   min-height: 370px;
 `;
 
-const TitleContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 0 0;
-`;
-
-const Title = styled.div`
-  ${(props) => props.theme.typography.headline_xs}
-  margin-top: ${(props) => props.theme.space.s};
-  margin-bottom: ${(props) => props.theme.space.l};
-`;
-
 function SendStxScreen() {
   const navigate = useNavigate();
-  const { t } = useTranslation('translation');
 
-  useResetUserFlow('/send-stx');
+  useResetUserFlow(RoutePaths.SendStx);
+
+  const xverseApiClient = useXverseApi();
 
   const location = useLocation();
   const {
@@ -78,8 +68,6 @@ function SendStxScreen() {
 
   // Step 1 states
   const [recipientAddress, setRecipientAddress] = useState(stateAddress ?? '');
-  // Will be used in the future when the summary screen is refactored
-  const [, setRecipientDomain] = useState('');
   const [memo, setMemo] = useState(stxMemo ?? '');
   const { data: sip10CoinsList } = useVisibleSip10FungibleTokens();
   const [searchParams] = useSearchParams();
@@ -107,6 +95,7 @@ function SendStxScreen() {
   // Debounced values
   const debouncedRecipient = useDebounce(recipientAddress, 300);
   const debouncedAmount = useDebounce(amount, 300, true);
+  const { data: associatedAddress } = useBnsResolver(debouncedRecipient, stxAddress, 'STX');
 
   const handleCancel = () => {
     if (fungibleToken) {
@@ -128,6 +117,8 @@ function SendStxScreen() {
 
   useCancellableEffect(
     async (isEffectActive) => {
+      const recipient = associatedAddress || debouncedRecipient;
+
       try {
         setIsLoadingTx(true);
         if (fungibleToken) {
@@ -141,13 +132,14 @@ function SendStxScreen() {
           const rawUnsignedSendFtTx = await generateUnsignedSip10TransferTransaction({
             amount: convertedAmount,
             senderAddress: stxAddress,
-            recipientAddress: debouncedRecipient,
+            recipientAddress: recipient,
             contractAddress: fungibleToken.principal.split('.')[0],
             contractName: fungibleToken.principal.split('.')[1],
             assetName: fungibleToken?.assetName ?? '',
             publicKey: stxPublicKey,
             network: selectedNetwork,
             memo,
+            xverseApiClient,
           });
 
           if (isEffectActive()) {
@@ -162,7 +154,7 @@ function SendStxScreen() {
           publicKey: stxPublicKey,
           payload: {
             txType: TransactionTypes.STXTransfer,
-            recipient: debouncedRecipient,
+            recipient,
             memo,
             amount: debouncedAmount,
             network: selectedNetwork,
@@ -170,6 +162,7 @@ function SendStxScreen() {
           },
           fee: feeInMicrostacks,
           nonce,
+          xverseApiClient,
         });
         if (isEffectActive()) {
           setUnsignedSendStxTx(rawUnsignedSendStxTx.serialize());
@@ -182,6 +175,7 @@ function SendStxScreen() {
     },
     [
       debouncedRecipient,
+      associatedAddress,
       debouncedAmount,
       memo,
       stxPendingTxData?.pendingTransactions,
@@ -209,11 +203,15 @@ function SendStxScreen() {
           selectedNetwork,
         );
 
-        const stxFees = {
-          low: low.fee,
-          medium: medium.fee,
-          high: high.fee,
-        };
+        const stxFees = modifyRecommendedStxFees(
+          {
+            low: low.fee,
+            medium: medium.fee,
+            high: high.fee,
+          },
+          feeMultipliers,
+          PayloadType.TokenTransfer,
+        );
 
         setFeeRates({
           low: Number(microstacksToStx(new BigNumber(stxFees.low))),
@@ -222,7 +220,7 @@ function SendStxScreen() {
         });
 
         if (!fee || Number(fee) <= 0) {
-          setFee(Number(microstacksToStx(new BigNumber(stxFees.medium))).toString());
+          setFee(microstacksToStx(new BigNumber(stxFees.medium)).toString());
         }
       } catch (e) {
         console.error(e);
@@ -234,38 +232,32 @@ function SendStxScreen() {
     }
   }, [fee, feeMultipliers, selectedNetwork, unsignedSendStxTx]);
 
-  const header = (
-    <TitleContainer>
-      <TokenImage currency={fungibleToken ? 'FT' : 'STX'} fungibleToken={fungibleToken} />
-      <Title>{t('SEND.SEND')}</Title>
-    </TitleContainer>
-  );
+  useEffect(() => {
+    const recipientAddr = searchParams.get('address');
+    if (recipientAddr) {
+      setRecipientAddress(recipientAddr);
+    }
+  }, [searchParams]);
 
   switch (currentStep) {
     case Step.SelectRecipient:
       return (
-        <SendLayout selectedBottomTab="dashboard" onClickBack={handleBackButtonClick}>
-          <Container>
-            <Step1SelectRecipientAndMemo
-              dataTestID="address-receive"
-              header={header}
-              recipientAddress={recipientAddress}
-              setRecipientAddress={setRecipientAddress}
-              setRecipientDomain={setRecipientDomain}
-              memo={memo}
-              setMemo={setMemo}
-              onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient, true))}
-              isLoading={isLoadingTx || recipientAddress !== debouncedRecipient}
-            />
-          </Container>
-        </SendLayout>
+        <Step1SelectRecipientAndMemo
+          recipientAddress={recipientAddress}
+          setRecipientAddress={setRecipientAddress}
+          memo={memo}
+          setMemo={setMemo}
+          onNext={() => setCurrentStep(getNextStep(Step.SelectRecipient, true))}
+          isLoading={isLoadingTx || recipientAddress !== debouncedRecipient}
+          selectedBottomTab="dashboard"
+          onBack={handleBackButtonClick}
+        />
       );
     case Step.SelectAmount:
       return (
         <SendLayout selectedBottomTab="dashboard" onClickBack={handleBackButtonClick}>
           <Container>
             <Step2SelectAmount
-              header={header}
               amount={amount}
               setAmount={setAmount}
               fee={fee}
@@ -273,11 +265,12 @@ function SendStxScreen() {
               sendMax={sendMax}
               setSendMax={setSendMax}
               feeRates={feeRates}
-              getFeeForFeeRate={(feeRate) => Promise.resolve(feeRate)}
+              getFeeForFeeRate={async (feeRate) => feeRate}
               dustFiltered={false}
               onNext={() => setCurrentStep(getNextStep(Step.SelectAmount, true))}
               isLoading={isLoadingTx || amount !== debouncedAmount}
               fungibleToken={fungibleToken}
+              recipientAddress={recipientAddress}
             />
           </Container>
         </SendLayout>
@@ -294,7 +287,7 @@ function SendStxScreen() {
                   amount: debouncedAmount,
                   fungibleToken,
                   memo,
-                  recipientAddress: debouncedRecipient,
+                  recipientAddress: associatedAddress || debouncedRecipient,
                   selectedFee: stxToMicrostacks(new BigNumber(fee)).toString(),
                 }
               : undefined

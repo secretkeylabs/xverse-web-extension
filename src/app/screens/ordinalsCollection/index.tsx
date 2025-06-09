@@ -26,7 +26,7 @@ import Button from '@ui-library/button';
 import { StyledHeading, StyledP } from '@ui-library/common.styled';
 import Sheet from '@ui-library/sheet';
 import SnackBar from '@ui-library/snackBar';
-import { EMPTY_LABEL, LONG_TOAST_DURATION } from '@utils/constants';
+import { EMPTY_LABEL, LONG_TOAST_DURATION, POPUP_WIDTH } from '@utils/constants';
 import {
   getInscriptionsCollectionGridItemId,
   getInscriptionsCollectionGridItemSubText,
@@ -80,7 +80,10 @@ function OrdinalsCollection() {
     ? `${collectionMarketData?.floor_price?.toFixed(8)} BTC`
     : EMPTY_LABEL;
 
-  const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
+  const isGalleryOpen: boolean = useMemo(
+    () => document.documentElement.clientWidth > POPUP_WIDTH,
+    [],
+  );
   const collectionStarred: boolean = useMemo(
     () => starredCollectibleIds[ordinalsAddress]?.some(({ id }) => id === collectionId),
     [collectionId, ordinalsAddress, starredCollectibleIds],

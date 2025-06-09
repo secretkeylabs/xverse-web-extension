@@ -12,9 +12,9 @@ import BigNumber from 'bignumber.js';
 import { useTranslation } from 'react-i18next';
 import styled from 'styled-components';
 
-const TransactionTitleText = styled.p((props) => ({
-  ...props.theme.typography.body_bold_m,
-  color: props.theme.colors.white_0,
+const TransactionTitleText = styled.p<{ isPending: boolean }>((props) => ({
+  ...props.theme.typography.body_medium_m,
+  color: props.theme.colors[props.isPending ? 'caution' : 'white_0'],
   textAlign: 'left',
 }));
 
@@ -36,7 +36,7 @@ export default function TransactionTitle({ transaction }: Props) {
     if (tx.txStatus === 'pending') {
       return tx.incoming ? t('TRANSACTION_PENDING_RECEIVING') : t('TRANSACTION_PENDING_SENDING');
     }
-    return tx.incoming ? t('TRANSACTION_RECEIVED') : t('TRANSACTION_SENT');
+    return tx.incoming ? t('RECEIVE') : t('SEND');
   };
 
   const getBrc20TokenTitle = (tx: Brc20HistoryTransactionData): string => {
@@ -44,7 +44,7 @@ export default function TransactionTitle({ transaction }: Props) {
       return tx.incoming ? t('TRANSACTION_PENDING_RECEIVING') : t('TRANSACTION_PENDING_SENDING');
     }
     if (tx.operation === 'transfer_send') {
-      return tx.incoming ? t('TRANSACTION_RECEIVED') : t('TRANSACTION_SENT');
+      return tx.incoming ? t('RECEIVE') : t('SEND');
     }
     if (tx.operation === 'mint') {
       return t('MINT');
@@ -57,16 +57,16 @@ export default function TransactionTitle({ transaction }: Props) {
 
   const getRuneTokenTitle = (tx: GetRunesActivityForAddressEvent): string => {
     if (tx.burned) {
-      return t('BURNED');
+      return t('BURN');
     }
     if (tx.amount === '0') {
-      return t('TRANSACTION_RUNE_RESTRUCTURED');
+      return t('CONSOLIDATE');
     }
     if (BigNumber(tx.amount).gt(0)) {
-      return t('TRANSACTION_RECEIVED');
+      return t('RECEIVE');
     }
     if (BigNumber(tx.amount).lt(0)) {
-      return t('TRANSACTION_SENT');
+      return t('SEND');
     }
     return t('TRANSACTION_STATUS_UNKNOWN');
   };
@@ -80,7 +80,7 @@ export default function TransactionTitle({ transaction }: Props) {
       }
       return tx.incoming ? t('TRANSACTION_PENDING_RECEIVING') : t('TRANSACTION_PENDING_SENDING');
     }
-    return tx.incoming ? t('TRANSACTION_RECEIVED') : t('TRANSACTION_SENT');
+    return tx.incoming ? t('RECEIVE') : t('SEND');
   };
 
   const getFtName = (tx: TransactionData): string => {
@@ -145,5 +145,11 @@ export default function TransactionTitle({ transaction }: Props) {
         return t('TRANSACTION_STATUS_UNKNOWN');
     }
   };
-  return <TransactionTitleText>{getTransactionTitle(transaction)}</TransactionTitleText>;
+
+  const isPending = 'txStatus' in transaction && transaction.txStatus === 'pending';
+  return (
+    <TransactionTitleText isPending={isPending}>
+      {getTransactionTitle(transaction)}
+    </TransactionTitleText>
+  );
 }

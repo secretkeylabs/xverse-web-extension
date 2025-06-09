@@ -5,6 +5,7 @@ import OptionsDialog from '@components/optionsDialog/optionsDialog';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useGetAllAccounts from '@hooks/useGetAllAccounts';
 import useOptionsDialog from '@hooks/useOptionsDialog';
+import { useStore } from '@hooks/useStore';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { CaretDown, DotsThreeVertical } from '@phosphor-icons/react';
@@ -16,12 +17,13 @@ import {
 } from '@secretkeylabs/xverse-core';
 import { removeAccountAvatarAction } from '@stores/wallet/actions/actionCreators';
 import Button from '@ui-library/button';
+import Dialog from '@ui-library/dialog';
 import Input from '@ui-library/input';
 import Sheet from '@ui-library/sheet';
 import Spinner from '@ui-library/spinner';
 import { BTC_SYMBOL, EMPTY_LABEL, HIDDEN_BALANCE_LABEL, LoaderSize } from '@utils/constants';
 import {
-  getAccountBalanceKey,
+  getAccountName,
   isKeystoneAccount,
   isLedgerAccount,
   validateAccountName,
@@ -54,6 +56,15 @@ import {
   TransparentSpan,
 } from './index.styled';
 
+type Props = {
+  walletId?: WalletId;
+  account: Account;
+  isSelected: boolean;
+  onAccountSelected: (account: Account, goBack?: boolean) => void;
+  isAccountListView?: boolean;
+  disabledAccountSelect?: boolean;
+};
+
 function AccountRow({
   walletId,
   account,
@@ -61,37 +72,24 @@ function AccountRow({
   onAccountSelected,
   isAccountListView = false,
   disabledAccountSelect = false,
-}: {
-  walletId?: WalletId;
-  account: Account;
-  isSelected: boolean;
-  onAccountSelected: (account: Account, goBack?: boolean) => void;
-  isAccountListView?: boolean;
-  disabledAccountSelect?: boolean;
-}) {
-  const dispatch = useDispatch();
-  const menuDialog = useOptionsDialog();
+}: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const { t: optionsDialogTranslation } = useTranslation('translation', {
     keyPrefix: 'OPTIONS_DIALOG',
   });
-  const {
-    softwareWallets,
-    fiatCurrency,
-    accountBalances,
-    avatarIds,
-    balanceHidden,
-    showBalanceInBtc,
-    network,
-  } = useWalletSelector();
+  const { t: tCommon } = useTranslation('translation', { keyPrefix: 'COMMON' });
+
+  const dispatch = useDispatch();
+  const menuDialog = useOptionsDialog();
+  const { softwareWallets, fiatCurrency, avatarIds, balanceHidden, showBalanceInBtc, network } =
+    useWalletSelector();
   const accountAvatar = avatarIds[account?.btcAddresses.taproot.address ?? ''];
-  // TODO: refactor this into a hook
-  const totalBalance = accountBalances[getAccountBalanceKey(account)];
   const btcCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
   const stxCopiedTooltipTimeoutRef = useRef<NodeJS.Timeout | undefined>();
   const [showRemoveAccountModal, setShowRemoveAccountModal] = useState(false);
   const [showRenameAccountModal, setShowRenameAccountModal] = useState(false);
-  const [accountName, setAccountName] = useState('');
+  const initialAccountName = account?.accountName ?? '';
+  const [accountName, setAccountName] = useState(initialAccountName);
   const [accountNameError, setAccountNameError] = useState<string | null>(null);
   const [isAccountNameChangeLoading, setIsAccountNameChangeLoading] = useState(false);
   const {
@@ -102,6 +100,13 @@ function AccountRow({
     updateKeystoneAccounts,
   } = useWalletReducer();
   const { btcFiatRate } = useSupportedCoinRates();
+
+  const accountBalanceStore = useStore(
+    'accountBalances',
+    (store, utils) =>
+      store[utils.getAccountStorageKey(account, network.type)] as string | undefined,
+  );
+  const totalBalance = accountBalanceStore.data;
 
   useEffect(
     () => () => {
@@ -114,13 +119,17 @@ function AccountRow({
   const allAccounts = useGetAllAccounts();
 
   useEffect(() => {
+    if (accountName === initialAccountName) {
+      return;
+    }
+
     const validationError = validateAccountName(accountName, optionsDialogTranslation, allAccounts);
     if (validationError) {
       setAccountNameError(validationError);
     } else {
       setAccountNameError(null);
     }
-  }, [accountName, allAccounts, optionsDialogTranslation]);
+  }, [accountName, allAccounts, optionsDialogTranslation, initialAccountName]);
 
   const handleClick = () => {
     onAccountSelected(account);
@@ -229,126 +238,103 @@ function AccountRow({
   };
 
   return (
-    <Container>
-      <AccountInfoContainer $disableClick={disabledAccountSelect} onClick={handleClick}>
-        <AccountAvatar
-          account={account}
-          avatar={accountAvatar}
-          isSelected={isSelected}
-          isAccountListView={isAccountListView}
-        />
-        <CurrentAccountContainer>
-          {account && (
-            <TransparentSpan>
-              <CurrentAccountTextContainer>
-                <AccountName aria-label="Account Name" $isSelected={isSelected}>
-                  {account?.accountName ??
-                    account?.bnsName ??
-                    `${t('ACCOUNT_NAME')} ${`${(account?.id ?? 0) + 1}`}`}
-                </AccountName>
-                {isLedgerAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
-                {isKeystoneAccount(account) && <img src={KeystoneBadge} alt="Keystone icon" />}
-                {isSelected && !disabledAccountSelect && !isAccountListView && (
-                  <CaretDown color={Theme.colors.white_0} weight="bold" size={16} />
-                )}
-              </CurrentAccountTextContainer>
-              {showBalanceInBtc && isAccountListView && totalBalance && (
-                <NumericFormat
-                  value={getFiatBtcEquivalent(
-                    BigNumber(totalBalance),
-                    BigNumber(btcFiatRate),
-                  ).toString()}
-                  displayType="text"
-                  prefix={BTC_SYMBOL}
-                  thousandSeparator
-                  renderText={(value: string) => (
-                    <Balance data-testid="account-balance" $isSelected={isSelected}>
-                      {value}
-                    </Balance>
-                  )}
-                />
-              )}
-              {!showBalanceInBtc && isAccountListView && totalBalance && (
-                <NumericFormat
-                  value={totalBalance}
-                  displayType="text"
-                  prefix={`${currencySymbolMap[fiatCurrency]}`}
-                  thousandSeparator
-                  renderText={(value: string) => (
-                    <Balance data-testid="account-balance" $isSelected={isSelected}>
-                      {!showBalanceInBtc && balanceHidden && HIDDEN_BALANCE_LABEL}
-                      {!showBalanceInBtc && !balanceHidden && value}
-                    </Balance>
-                  )}
-                />
-              )}
-              {isAccountListView && !totalBalance && (
-                <Balance $isSelected={isSelected}>
-                  {EMPTY_LABEL}
-                  <Spinner color="white" size={12} />
-                </Balance>
-              )}
-            </TransparentSpan>
-          )}
-
-          {!account && (
-            <BarLoaderContainer>
-              <BarLoader loaderSize={LoaderSize.LARGE} />
-              <BarLoader loaderSize={LoaderSize.MEDIUM} />
-            </BarLoaderContainer>
-          )}
-        </CurrentAccountContainer>
-      </AccountInfoContainer>
-
-      {isAccountListView && (
-        <OptionsButton aria-label="Open Account Options" onClick={menuDialog.open}>
-          <DotsThreeVertical size={20} fill="white" />
-        </OptionsButton>
-      )}
-
-      {menuDialog.isVisible && (
-        <OptionsDialog closeDialog={menuDialog.close} optionsDialogIndents={menuDialog.indents}>
-          <ButtonRow onClick={handleRenameAccountModalOpen}>
-            {optionsDialogTranslation('RENAME_ACCOUNT')}
-          </ButtonRow>
-          {accountAvatar?.type && (
-            <ButtonRow onClick={handleRemoveAvatar}>
-              {optionsDialogTranslation('NFT_AVATAR.REMOVE_ACTION')}
-            </ButtonRow>
-          )}
-          {(isLedgerAccount(account) || isKeystoneAccount(account)) && (
-            <ButtonRow onClick={handleRemoveAccountModalOpen}>
-              {optionsDialogTranslation('REMOVE_FROM_LIST')}
-            </ButtonRow>
-          )}
-        </OptionsDialog>
-      )}
-
-      {showRemoveAccountModal && (
-        <Sheet
-          visible={showRemoveAccountModal}
-          title={t('REMOVE_FROM_LIST_TITLE')}
-          onClose={handleRemoveAccountModalClose}
+    <>
+      <Container>
+        <AccountInfoContainer
+          $cursor={disabledAccountSelect ? 'initial' : 'pointer'}
+          onClick={handleClick}
         >
-          <ModalContent>
-            <ModalDescription>{t('REMOVE_FROM_LIST_DESCRIPTION')}</ModalDescription>
-            <ModalControlsContainer $bigSpacing>
-              <ModalButtonContainer>
-                <Button
-                  variant="secondary"
-                  title={t('CANCEL')}
-                  onClick={handleRemoveAccountModalClose}
-                />
-              </ModalButtonContainer>
-              <ModalButtonContainer>
-                <Button variant="danger" title={t('REMOVE_WALLET')} onClick={handleRemoveAccount} />
-              </ModalButtonContainer>
-            </ModalControlsContainer>
-          </ModalContent>
-        </Sheet>
-      )}
+          <AccountAvatar
+            account={account}
+            avatar={accountAvatar}
+            isSelected={isSelected}
+            isAccountListView={isAccountListView}
+          />
+          <CurrentAccountContainer>
+            {account && (
+              <TransparentSpan>
+                <CurrentAccountTextContainer>
+                  <AccountName aria-label="Account Name" $isSelected={isSelected}>
+                    {getAccountName(account, tCommon)}
+                  </AccountName>
+                  {isLedgerAccount(account) && <img src={LedgerBadge} alt="Ledger icon" />}
+                  {isKeystoneAccount(account) && <img src={KeystoneBadge} alt="Keystone icon" />}
+                  {isSelected && !disabledAccountSelect && !isAccountListView && (
+                    <CaretDown color={Theme.colors.white_0} weight="bold" size={16} />
+                  )}
+                </CurrentAccountTextContainer>
+                {showBalanceInBtc && isAccountListView && totalBalance && (
+                  <NumericFormat
+                    value={getFiatBtcEquivalent(
+                      BigNumber(totalBalance),
+                      BigNumber(btcFiatRate),
+                    ).toString()}
+                    displayType="text"
+                    prefix={BTC_SYMBOL}
+                    thousandSeparator
+                    renderText={(value: string) => (
+                      <Balance data-testid="account-balance" $isSelected={isSelected}>
+                        {value}
+                      </Balance>
+                    )}
+                  />
+                )}
+                {!showBalanceInBtc && isAccountListView && totalBalance && (
+                  <NumericFormat
+                    value={totalBalance}
+                    displayType="text"
+                    prefix={`${currencySymbolMap[fiatCurrency]}`}
+                    thousandSeparator
+                    renderText={(value: string) => (
+                      <Balance data-testid="account-balance" $isSelected={isSelected}>
+                        {!showBalanceInBtc && balanceHidden && HIDDEN_BALANCE_LABEL}
+                        {!showBalanceInBtc && !balanceHidden && value}
+                      </Balance>
+                    )}
+                  />
+                )}
+                {isAccountListView && !totalBalance && (
+                  <Balance $isSelected={isSelected}>
+                    {EMPTY_LABEL}
+                    <Spinner color="white" size={12} />
+                  </Balance>
+                )}
+              </TransparentSpan>
+            )}
 
-      {showRenameAccountModal && (
+            {!account && (
+              <BarLoaderContainer>
+                <BarLoader loaderSize={LoaderSize.LARGE} />
+                <BarLoader loaderSize={LoaderSize.MEDIUM} />
+              </BarLoaderContainer>
+            )}
+          </CurrentAccountContainer>
+        </AccountInfoContainer>
+
+        {isAccountListView && (
+          <OptionsButton aria-label="Open Account Options" onClick={menuDialog.open}>
+            <DotsThreeVertical size={20} fill="white" />
+          </OptionsButton>
+        )}
+
+        {menuDialog.isVisible && (
+          <OptionsDialog closeDialog={menuDialog.close} optionsDialogIndents={menuDialog.indents}>
+            <ButtonRow onClick={handleRenameAccountModalOpen}>
+              {optionsDialogTranslation('RENAME_ACCOUNT')}
+            </ButtonRow>
+            {accountAvatar?.type && (
+              <ButtonRow onClick={handleRemoveAvatar}>
+                {optionsDialogTranslation('NFT_AVATAR.REMOVE_ACTION')}
+              </ButtonRow>
+            )}
+            {(isLedgerAccount(account) || isKeystoneAccount(account)) && (
+              <ButtonRow onClick={handleRemoveAccountModalOpen}>
+                {optionsDialogTranslation('REMOVE_FROM_LIST')}
+              </ButtonRow>
+            )}
+          </OptionsDialog>
+        )}
+
         <Sheet
           visible={showRenameAccountModal}
           title={optionsDialogTranslation('RENAME_ACCOUNT')}
@@ -383,15 +369,29 @@ function AccountRow({
                 <Button
                   title={t('CONFIRM')}
                   onClick={handleRenameAccount}
-                  disabled={!accountName || !!accountNameError}
+                  disabled={
+                    !accountName || !!accountNameError || accountName === initialAccountName
+                  }
                   loading={isAccountNameChangeLoading}
                 />
               </ModalButtonContainer>
             </ModalControlsContainer>
           </ModalContent>
         </Sheet>
-      )}
-    </Container>
+      </Container>
+
+      <Dialog
+        visible={showRemoveAccountModal}
+        title={t('REMOVE_FROM_LIST_TITLE')}
+        description={t('REMOVE_FROM_LIST_DESCRIPTION')}
+        leftButtonText={t('CANCEL')}
+        rightButtonText={t('REMOVE_WALLET')}
+        onLeftButtonClick={handleRemoveAccountModalClose}
+        onRightButtonClick={handleRemoveAccount}
+        onClose={handleRemoveAccountModalClose}
+        type="default"
+      />
+    </>
   );
 }
 

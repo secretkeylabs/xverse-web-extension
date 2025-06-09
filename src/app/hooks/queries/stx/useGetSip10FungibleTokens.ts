@@ -1,15 +1,15 @@
+import useXverseApi from '@hooks/apiClients/useXverseApi';
 import useNetworkSelector from '@hooks/useNetwork';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   getFtData,
-  getXverseApiClient,
   type FungibleToken,
   type FungibleTokenWithStates,
   type SettingsNetwork,
   type StacksNetwork,
 } from '@secretkeylabs/xverse-core';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { selectWithDerivedState } from '@utils/tokens';
 
 export const fetchSip10FungibleTokens =
@@ -18,11 +18,12 @@ export const fetchSip10FungibleTokens =
     fiatCurrency: string,
     network: SettingsNetwork,
     currentNetworkInstance: StacksNetwork,
+    xverseApiClient,
   ): (() => Promise<FungibleToken[]>) =>
   async () => {
     const sip10Balances = await getFtData(stxAddress, currentNetworkInstance);
     const sip10ContractInfos =
-      (await getXverseApiClient(network.type).getSip10Tokens(
+      (await xverseApiClient.getSip10Tokens(
         sip10Balances.map((ft) => ft.principal),
         fiatCurrency,
       )) || [];
@@ -45,19 +46,21 @@ export const useGetSip10FungibleTokens = (select?: (data: FungibleTokenWithState
   const { sip10ManageTokens, fiatCurrency, network, spamTokens, showSpamTokens } =
     useWalletSelector();
   const currentNetworkInstance = useNetworkSelector();
+  const xverseApiClient = useXverseApi();
 
   const queryFn = fetchSip10FungibleTokens(
     stxAddress,
     fiatCurrency,
     network,
     currentNetworkInstance,
+    xverseApiClient,
   );
 
   return useQuery({
     queryKey: ['sip10-fungible-tokens', network.type, stxAddress, fiatCurrency],
     queryFn,
     enabled: Boolean(network && stxAddress),
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     select: selectWithDerivedState({
       manageTokens: sip10ManageTokens,
       spamTokens,

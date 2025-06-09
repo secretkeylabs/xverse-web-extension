@@ -1,13 +1,11 @@
+import useXverseApi from '@hooks/apiClients/useXverseApi';
 import useWalletSelector from '@hooks/useWalletSelector';
-import {
-  getXverseApiClient,
-  type GetUtxosRequest,
-  type GetUtxosResponse,
-} from '@secretkeylabs/xverse-core';
+import { type GetUtxosRequest, type GetUtxosResponse } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 
 const useGetUtxos = (body: GetUtxosRequest | null) => {
   const { network } = useWalletSelector();
+  const xverseApiClient = useXverseApi();
 
   return useQuery<GetUtxosResponse, Error>({
     queryKey: ['getUtxos', body, network.type],
@@ -15,8 +13,7 @@ const useGetUtxos = (body: GetUtxosRequest | null) => {
       if (!body) {
         throw new Error('Request body is null');
       }
-      const client = getXverseApiClient(network.type);
-      const response = await client.swaps.getUtxos(body);
+      const response = await xverseApiClient.swaps.getUtxos(body);
       return response;
     },
     enabled: !!body,

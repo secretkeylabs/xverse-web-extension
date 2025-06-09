@@ -1,15 +1,19 @@
 import { StyledP } from '@ui-library/common.styled';
 import styled from 'styled-components';
 
+export const ScrollContainer = styled.div`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  ${(props) => props.theme.scrollbar}
+`;
+
 export const Container = styled.div((props) => ({
   display: 'flex',
   flex: 1,
   marginTop: props.theme.space.xs,
   flexDirection: 'column',
-  overflowY: 'auto',
-  '&::-webkit-scrollbar': {
-    display: 'none',
-  },
   paddingBottom: props.theme.space.xl,
 }));
 

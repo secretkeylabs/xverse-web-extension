@@ -1,6 +1,5 @@
 import {
   getStacksApiClient,
-  getXverseApiClient,
   isNftOwnedByAccount,
   isOrdinalOwnedByAccount,
   type Account,
@@ -9,6 +8,7 @@ import { removeAccountAvatarAction } from '@stores/wallet/actions/actionCreators
 import type { AvatarInfo } from '@stores/wallet/actions/types';
 import { useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
+import useXverseApi from './apiClients/useXverseApi';
 import useGetAllAccounts from './useGetAllAccounts';
 import useWalletSelector from './useWalletSelector';
 
@@ -16,7 +16,7 @@ import useWalletSelector from './useWalletSelector';
 export default function useAvatarCleanup() {
   const dispatch = useDispatch();
   const { avatarIds, network } = useWalletSelector();
-  const xverseApi = getXverseApiClient(network.type);
+  const xverseApi = useXverseApi();
   const stacksApiClient = getStacksApiClient(network.type);
   const allAccounts = useGetAllAccounts();
 

@@ -17,6 +17,7 @@
     "NEXT": "Next",
     "CANCEL": "Cancel",
     "CONFIRM": "Confirm",
+    "DELETE": "Delete",
     "APPLY": "Apply",
     "IN": "In",
     "TO": "To",
@@ -30,7 +31,17 @@
     "SETTINGS": "Settings",
     "COPIED_TO_CLIPBOARD": "Copied to clipboard",
     "TRANSACTION": "Transaction",
-    "LEARN_MORE": "Learn more"
+    "LEARN_MORE": "Learn more",
+    "SAVE": "Save",
+    "SOMETHING_WENT_WRONG": "Something went wrong",
+    "ACCOUNT_NAME": "Account",
+    "FIELD_REQUIRED": "This field is required",
+    "ADDRESS": "Address"
+  },
+  "SELECT_ADDRESS": {
+    "TITLE": "Select Address",
+    "MY_ACCOUNTS": "My accounts",
+    "ADDRESS_BOOK": "Address book"
   },
   "INFORMATION": {
     "ORDINALS_ADDRESS_TOOLTIP": "These sats are used for your ordinals and runes. They cannot be spent with Xverse wallet.",
@@ -272,7 +283,6 @@
     "SHOW_BALANCE": "Show balance",
     "BITCOIN": "Bitcoin",
     "STACKS": "Stacks",
-    "ACCOUNT_NAME": "Account",
     "RECEIVE": "Receive",
     "CANCEL": "Cancel",
     "REMOVE_WALLET": "Remove",
@@ -291,7 +301,7 @@
     "REMOVE_FROM_LIST_DESCRIPTION": "This will remove this wallet from this list. You can import it again by connecting your device.",
     "DATA_COLLECTION_POPUP": {
       "TITLE": "Help us improve Xverse!",
-      "DESCRIPTION": "Help improve the app experience, by allowing Xverse to collect anonymized usage data. This data cannot be used to identify your wallet individually.",
+      "DESCRIPTION": "Help improve the app experience, by allowing Xverse to collect anonymized usage data. This data cannot be used to identify you or your wallet.",
       "DENY": "Deny",
       "ALLOW": "Allow"
     },
@@ -347,6 +357,8 @@
     "ORDINALS_RECEIVE_MESSAGE": "Only use this address to receive Ordinals, Runes, and BRC-20 tokens.",
     "STX_RECEIVE_MESSAGE": "Only use this address to receive STX, SIP-10 tokens & Stacks NFTs",
     "BTC_RECEIVE_MESSAGE": "Only use this address to receive Bitcoin.",
+    "STARKNET_ADDRESS": "Starknet address",
+    "STARKNET_ADDRESS_MESSAGE": "Only use this address to receive Starknet assets.",
     "CALLOUTS": {
       "NATIVE_SEGWIT": {
         "TITLE": "Now using Native SegWit!",
@@ -372,12 +384,28 @@
     "STX": {
       "BUY_STX": "Buy Stacks"
     },
-    "SEND_TO": "Send to",
+    "STRK": {
+      "RECIPIENT_PLACEHOLDER": "Enter address",
+      "AMOUNT": "STRK amount",
+      "INVALID_ADDRESS": "Invalid Starknet address",
+      "INVALID_LENGTH": "Invalid address length. Ensure it's 66 characters long, including the leading \"0x\".",
+      "ACCOUNT_NOT_DEPLOYED_TITLE": "Recipient account not deployed",
+      "ACCOUNT_NOT_DEPLOYED_WARNING": "There is no account deployed on this address. Confirm to send funds to this address."
+    },
+    "MAX": "MAX",
+    "ADDRESS_BOOK": "Address book",
+    "SAVE_ADDRESS": "Save address",
+    "ADDRESS_ADDED": "Address added",
+    "SAVE_TO_ADDRESS_BOOK": "Save to address book",
+    "SEND_TO": "Send To",
     "SEND": "Send",
+    "NAME": "Name",
+    "NAME_PLACEHOLDER": "Enter custom address name",
     "AMOUNT": "Amount",
     "BALANCE": "Balance",
     "RECIPIENT": "Recipient",
     "RECIPIENT_PLACEHOLDER": "STX Address or .btc domain",
+    "REMOVE_RECIPIENT": "Remove recipient",
     "ORDINAL_RECIPIENT_PLACEHOLDER": "Enter address",
     "MEMO": "Memo (optional)",
     "MEMO_PLACEHOLDER": "Memo",
@@ -757,12 +785,11 @@
   },
   "LOGIN_SCREEN": {
     "BETA_VERSION": "Beta",
-    "WELCOME_MESSAGE_FIRST_LOGIN": "Welcome!",
-    "WELCOME_MESSAGE": "Welcome back!",
+    "SCREEN_TITLE": "The Bitcoin wallet for everyone",
     "PASSWORD_INPUT_LABEL": "Password",
     "PASSWORD_INPUT_PLACEHOLDER": "Enter your password",
     "VERIFY_PASSWORD_BUTTON": "Unlock",
-    "VERIFY_PASSWORD_ERROR": "Incorrect Password",
+    "VERIFY_PASSWORD_ERROR": "Incorrect password",
     "FORGOT_PASSWORD_BUTTON": "Forgot your password?"
   },
   "FORGOT_PASSWORD_SCREEN": {
@@ -1018,6 +1045,7 @@
     "CATEGORIES": {
       "ABOUT": "About",
       "PREFERENCES": "Preferences",
+      "ADDRESS_BOOK": "Address Book",
       "ADVANCED": "Advanced",
       "SECURITY": "Security",
       "CONNECTED_APPS": "Connected Apps"
@@ -1026,7 +1054,7 @@
     "CURRENCY": "Fiat Currency",
     "PRIVACY_PREFERENCES": {
       "TITLE": "Privacy Preferences",
-      "DESCRIPTION": "Help improve the app experience, by allowing Xverse to collect anonymized usage data. This data cannot be used to identify your wallet individually.",
+      "DESCRIPTION": "Help improve the app experience, by allowing Xverse to collect anonymized usage data. This data cannot be used to identify you or your wallet.",
       "AUTHORIZE_DATA_COLLECTION": "Authorize data collection"
     },
     "BTC_URL": "BTC URL",
@@ -1086,6 +1114,50 @@
       "NATIVE_SEGWIT": "Native SegWit",
       "SUCCESS": "Preferred Bitcoin address changed"
     },
+    "ADDRESS_BOOK": {
+      "TITLE": "Address Book",
+      "ADD_ADDRESS": {
+        "TITLE": "Add Address",
+        "NAME": "Name",
+        "NAME_PLACEHOLDER": "Enter custom address name",
+        "ADDRESS": "Address",
+        "ADDRESS_PLACEHOLDER": "Enter address",
+        "PASTE_FROM_CLIPBOARD": "Paste from clipboard",
+        "ADD_BUTTON": "Add address",
+        "INVALID_ADDRESS": "Invalid address",
+        "ADDRESS_ADDED": "Address added"
+      },
+      "EDIT_ADDRESS": {
+        "TITLE": "Edit Address",
+        "SAVE_CHANGES": "Save changes",
+        "CHANGES_SAVED": "Changes saved"
+      },
+      "COPY_ADDRESS": "Copy address",
+      "DELETE_ADDRESS": "Delete address",
+      "ADDRESS_DELETED": "Address deleted",
+      "ADDRESS_RESTORED": "Address restored",
+      "ADDRESS_COPIED": "Address copied to clipboard",
+      "DELETE_ADDRESS_DIALOG": {
+        "TITLE": "Delete address \"{{name}}\"?",
+        "CONFIRMATION": "Are you sure you want to delete this address?"
+      },
+      "NO_ADDRESSES": {
+        "TITLE": "No saved address yet",
+        "DESCRIPTION": "Your saved addresses will be displayed here after you add them."
+      },
+      "ERROR": {
+        "FETCH_FAILED": "Could not fetch address book entries",
+        "ADDRESS_ALREADY_EXISTS": "Address already exists in your address book",
+        "ENTRY_NOT_FOUND": "Address entry not found",
+        "INVALID_ADDRESS": "Invalid address format",
+        "NAME_ALREADY_EXISTS": "Name already exists in your address book",
+        "INVALID_NAME": "Invalid name format",
+        "NAME_TOO_LONG": "Name must not be longer than {{maxLength}} characters",
+        "PROHIBITED_SYMBOLS": "Name can only contain alphanumeric characters and spaces",
+        "INVALID_CHAIN": "Invalid blockchain selected",
+        "GENERIC_ERROR": "Something went wrong with the address book operation"
+      }
+    },
     "ADVANCED": "Advanced",
     "XVERSE_DEFAULT": "Use Xverse as default wallet",
     "XVERSE_DEFAULT_DESCRIPTION": "Allow apps to prioritize Xverse when looking for a wallet with which to connect."
@@ -1115,7 +1187,6 @@
     "RESET_WALLET": "Reset Wallet",
     "REMOVE_FROM_LIST": "Remove from list",
     "RENAME_ACCOUNT": "Rename account",
-    "ACCOUNT_NAME": "Account",
     "RENAME_ACCOUNT_MODAL": {
       "LABEL": "Account name",
       "MAX_SYMBOLS_ERR": "Account name cannot be more than {{maxLength}} characters",
@@ -1143,7 +1214,55 @@
     "PAYPAL": "PayPal via Moonpay",
     "US_UK_EU_ONLY": "US, UK or EU Citizens only",
     "DISCLAIMER": "Disclaimer",
-    "THIRD_PARTY_WARNING": "You will be redirected to a third-party service provider to complete the purchase. If you encounter any issues during the process please contact the provider."
+    "THIRD_PARTY_WARNING": "You will be redirected to a third-party service provider to complete the purchase. If you encounter any issues during the process please contact the provider.",
+    "AVAILABLE_TOKENS": "Available tokens",
+    "PAYMENT_METHOD": "Payment method",
+    "SELECT_CRYPTO_LABEL": "You want to buy",
+    "SELECT_PAYMENT_METHOD_LABEL": "Pay with",
+    "CURRENCY": "Currency",
+    "QUOTES": "Quotes",
+    "RECOMMENDED_QUOTES": "RECOMMENDED",
+    "OTHER_QUOTES": "OTHER",
+    "GET_QUOTES": "Get quotes",
+    "COMPARE_RATES": "Compare rates from these providers.",
+    "NEW_QUOTE_IN": "New quote in:",
+    "TRY_AGAIN": "Try again",
+    "FETCHING_BEST_PRICES": "Fetching best price...",
+    "FETCHING_QUOTES": "Fetching quotes...",
+    "RECOMMENDED_CHIP": "Recommended",
+    "APPLE_PAY_CHIP": "Available on Safari",
+    "NO_PAYMENT_METHOD": "No payment method",
+    "ONRAMP_LABELS": {
+      "BestPrice": "Best price",
+      "SuccessRate": "Highest success",
+      "SuccessfullyCompleted": "Previously used",
+      "LowKYC": "No signup required",
+      "ClientPreference": "Custom routing rules"
+    },
+    "PAY_WITH_CRYPTO": {
+      "ALT_OPTION": "Alternative option:",
+      "TITLE": "Pay with crypto",
+      "NEW_CHIP": "New",
+      "STACKS": "Stacks",
+      "STX": "STX",
+      "ETHEREUM": "Ethereum",
+      "ETH": "ETH",
+      "SOLANA": "Solana",
+      "SOL": "SOL"
+    },
+    "ERRORS": {
+      "AMOUNT_REQUIRED": "Amount is required",
+      "AMOUNT_INVALID": "Amount is invalid",
+      "MINIMUM_AMOUNT": "Minimum purchase is {{minAmount}}",
+      "MAXIMUM_AMOUNT": "Maximum purchase is {{maxAmount}}",
+      "FETCHING_QUOTES": "Error fetching quotes",
+      "NO_QUOTES_FOR_PARAMS": "No quotes available for the selected parameters",
+      "INITIATE_TRANSACTION": "Something went wrong with initiating the transaction. Please try again later.",
+      "NO_QUOTES": "Can’t find quote at the price",
+      "NO_QUOTES_BETWEEN": "Could not fetch quote. Please try again with amount between {{minBuyAmount}} and {{maxBuyAmount}}",
+      "NO_PAYMENT_METHODS_TITLE": "No payment methods available",
+      "NO_PAYMENT_METHODS_CONTENT": "Please choose a different currency and try again."
+    }
   },
   "LIST_RUNE_SCREEN": {
     "LISTING_STATUS": "Listing status",
@@ -1214,15 +1333,41 @@
     "TRANSACTION_HISTORY_TITLE": "Transactions",
     "TRANSACTIONS_LIST_EMPTY": "No transactions found.",
     "TRANSACTIONS_LIST_ERROR": "Error fetching transaction history for this token",
-    "TRANSACTION_SENT": "Sent",
-    "TRANSACTION_RECEIVED": "Received",
-    "TRANSACTION_RUNE_RESTRUCTURED": "Restructured",
     "MINT": "Mint",
-    "BURNED": "Burned",
+    "BURN": "Burn",
     "SPEED_UP": "Speed up",
     "INSCRIBE_TRANSFER": "Inscribe Transfer",
-    "TRANSACTION_PENDING_RECEIVING": "Receiving",
-    "TRANSACTION_PENDING_SENDING": "Sending",
+    "INSCRIBE": "Inscribe",
+    "CONSOLIDATE": "Consolidate",
+    "ETCH": "Etch Rune",
+    "MINT_BURN": "Mint & Burn",
+    "MINT_one": "Mint Rune",
+    "MINT_other": "Mint Runes",
+    "BURN_RUNE_one": "Burn Rune",
+    "BURN_RUNE_other": "Burn Runes",
+    "BURN_INSCRIPTION_one": "Burn Inscription",
+    "BURN_INSCRIPTION_other": "Burn Inscriptions",
+    "CONSOLIDATE_RUNE_one": "Consolidate Rune",
+    "CONSOLIDATE_RUNE_other": "Consolidate Runes",
+    "TO_MY_PAYMENT_ADDRESS": "to my payment address",
+    "TO_MY_ORDINALS_ADDRESS": "to my ordinals address",
+    "FROM_MULTIPLE_ADDRESSES": "from multiple addresses",
+    "TO_MULTIPLE_ADDRESSES": "to multiple addresses",
+    "FROM_ADDRESSES": "from {{count}} addresses",
+    "TO_ADDRESSES": "to {{count}} addresses",
+    "INSCRIPTION_one": "1 Inscription",
+    "INSCRIPTION_other": "{{count}} Inscriptions",
+    "RUNES": "{{count}} Runes",
+    "MULTIPLE_ASSET_TRANSFERS": "Multiple asset transfers",
+    "MULTIPLE_RUNE_TRANSFERS": "Multiple rune transfers",
+    "MULTIPLE_INSCRIPTION_TRANSFERS": "Multiple inscription transfers",
+    "TRADE": "Trade",
+    "COUNTERPARTIES": "{{count}} counterparties",
+    "MULTIPLE_COUNTERPARTIES": "Multiple counterparties",
+    "ASSETS": "{{count}} assets",
+    "MY_ADDRESSES": "my addresses",
+    "TRANSACTION_PENDING_RECEIVING": "Receiving...",
+    "TRANSACTION_PENDING_SENDING": "Sending...",
     "ORDINAL_TRANSACTION_PENDING_RECEIVING": "Receiving Ordinal",
     "ORDINAL_TRANSACTION_PENDING_SENDING": "Sending Ordinal",
     "TRANSACTION_STATUS_UNKNOWN": "Unknown",
@@ -1253,7 +1398,20 @@
     "HIDE_AND_REPORT": "Hide & Report",
     "DATA": "DATA",
     "MARKET": "MARKET",
-    "PRICE": "Price"
+    "PRICE": "Price",
+    "ABOUT": "ABOUT",
+    "STATS": "STATS",
+    "INFO": "INFO",
+    "CURRENT_PRICE": "Current Price",
+    "DIVISIBILITY": "Divisibility",
+    "MINTABLE": "Mintable",
+    "MINT_LIMIT": "Mint Limit",
+    "MINT_AMOUNT": "Mint Amount",
+    "VOLUME_24H": "Volume (24h)",
+    "MARKET_CAP": "Market Cap",
+    "HOLDERS": "Holders",
+    "NAME": "Name",
+    "TICKER": "Ticker"
   },
   "SPEED_UP_TRANSACTION": {
     "TITLE": "Speed up transaction",
@@ -1529,7 +1687,6 @@
   },
   "SELECT_BTC_ADDRESS_SCREEN": {
     "TITLE": "Connection Request",
-    "ACCOUNT_NAME": "Account",
     "CONNECT_BUTTON": "Connect",
     "CANCEL_BUTTON": "Cancel",
     "BITCOIN_ADDRESS": "Payments address",
@@ -1680,7 +1837,7 @@
     "LIST_YOUR_RUNES": "List your Runes on a marketplace",
     "SLIPPAGE_WARNING": "Your transaction may be frontrun and result in an unfavorable trade",
     "BAD_QUOTE_WARNING_TITLE": "The quote you are receiving may result in significant value loss.",
-    "BAD_QUOTE_WARNING_DESC": "The minimum amount you will receive will result in a loss of over {{percentage}}% of your trade’s value. This could be due to low liquidity in the pool or other provider issues. Please review the details carefully before proceeding with the swap.",
+    "BAD_QUOTE_WARNING_DESC": "The minimum amount you will receive will result in a loss of over {{percentage}}% of your trade's value. This could be due to low liquidity in the pool or other provider issues. Please review the details carefully before proceeding with the swap.",
     "UNKNOWN_QUOTE_VALUE_WARNING_DESC": "The market value of the token you will receive is unknown. Review details carefully before proceeding with the swap.",
     "UTXO_PROVIDER_DISCLAIMER": "Based on floor price / lot availability of your order."
   },
@@ -1826,8 +1983,9 @@
     "PSBT_CANT_PARSE_ERROR_DESCRIPTION": "The requested transaction is invalid and cannot be processed. Please contact the developer of the requesting app for support."
   },
   "CHANGE_NETWORK_REQUEST": {
+    "ERROR_WITH_REQUEST_PAYLOAD": "Error processing network change request.",
     "TITLE": "Allow this app to switch the network?",
-    "INFO_MESSAGE": "This will switch the selected network within Xverse.",
+    "INFO_MESSAGE": "This will switch the selected network in Xverse and connect the app to the new network.",
     "CALLOUT": "Make sure you trust the app requesting the network change.",
     "CANCEL_BUTTON": "Cancel",
     "SWITCH_NETWORK_BUTTON": "Switch Network"

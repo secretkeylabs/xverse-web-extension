@@ -1,3 +1,4 @@
+import { POPUP_WIDTH } from '@utils/constants';
 import { isInOptions } from '@utils/helper';
 import Modal from 'react-modal';
 import styled, { useTheme } from 'styled-components';
@@ -69,7 +70,7 @@ function Sheet({
   const customStyles = {
     overlay: {
       backgroundColor: theme.colors.background.modalBackdrop,
-      zIndex: 15000,
+      zIndex: 100,
       display: 'flex',
       alignItems: isGalleryOpen ? 'center' : 'flex-end',
       justifyContent: 'center',
@@ -77,7 +78,7 @@ function Sheet({
     },
     content: {
       width: '100vw',
-      maxWidth: 360,
+      maxWidth: POPUP_WIDTH,
       maxHeight: '90vh',
       border: 'transparent',
       background: theme.colors.elevation6_600,
@@ -109,7 +110,7 @@ function Sheet({
         {logo}
         <Title>{title}</Title>
       </HeaderContainer>
-      <BodyContainer>{children}</BodyContainer>
+      <BodyContainer className="body-container">{children}</BodyContainer>
     </CustomisedModal>
   );
 }

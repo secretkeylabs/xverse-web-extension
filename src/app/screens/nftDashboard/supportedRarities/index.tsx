@@ -2,7 +2,7 @@ import TopRow from '@components/topRow';
 import { ArrowUpRight } from '@phosphor-icons/react';
 import { RodarmorRareSats, Satributes } from '@secretkeylabs/xverse-core';
 import { StyledP } from '@ui-library/common.styled';
-import { BLOG_LINK } from '@utils/constants';
+import { BLOG_LINK, POPUP_WIDTH } from '@utils/constants';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -60,7 +60,7 @@ function SupportedRarities() {
   const navigate = useNavigate();
   const { t } = useTranslation('translation', { keyPrefix: 'RARE_SATS' });
 
-  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+  const isGalleryOpen: boolean = document.documentElement.clientWidth > POPUP_WIDTH;
 
   const openLearnMoreLink = () =>
     window.open(`${BLOG_LINK}/rare-satoshis`, '_blank', 'noopener,noreferrer');

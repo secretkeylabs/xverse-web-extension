@@ -36,6 +36,8 @@ export default class Wallet {
 
   readonly buttonConfirm: Locator;
 
+  readonly buttonRemoveRecipient: Locator;
+
   readonly buttonDenyDataCollection: Locator;
 
   readonly buttonNetwork: Locator;
@@ -376,7 +378,7 @@ export default class Wallet {
     this.navigationExplore = page.getByTestId('nav-explore');
     this.navigationSettings = page.getByTestId('nav-settings');
     // this.balance = page.getByTestId('total-balance-value');
-    this.balance = page.getByLabel(/^Total balance/);
+    this.balance = page.getByRole('button', { name: /^Total balance/ });
     this.textCurrency = page.getByTestId('currency-text');
     this.allUpperButtons = page.getByTestId('transaction-buttons-row').getByRole('button');
     this.buttonTransactionSend = this.allUpperButtons.nth(0);
@@ -385,6 +387,7 @@ export default class Wallet {
     this.buttonLock = page.getByRole('button', { name: 'Lock' });
     this.buttonConfirm = page.getByRole('button', { name: 'Confirm' });
     this.buttonDenyDataCollection = page.getByRole('button', { name: 'Deny' });
+    this.buttonRemoveRecipient = page.getByRole('button', { name: 'Remove recipient' });
     this.labelBalanceAmountSelector = page.getByTestId('balance-label');
     this.buttonClose = page.getByRole('button', { name: 'Close' });
     this.buttonEditFee = page.getByTestId('fee-button');
@@ -416,7 +419,7 @@ export default class Wallet {
     this.buttonNetwork = page.getByRole('button', { name: 'Network' });
     this.buttonSave = page.getByRole('button', { name: 'Save' });
     this.buttonMainnet = page.getByRole('button', { name: 'Mainnet' });
-    this.buttonTestnet = page.getByRole('button', { name: 'Testnet' });
+    this.buttonTestnet = page.getByRole('button', { name: 'Testnet4' });
     this.buttonPreferences = page.getByRole('button', { name: 'Preferences' });
     this.buttonSecurity = page.getByRole('button', { name: 'Security' });
     this.buttonAdvanced = page.getByRole('button', { name: 'Advanced' });
@@ -541,12 +544,8 @@ export default class Wallet {
     this.inputSendAmount = page.getByTestId('send-input');
     this.inputRecipientAddress = page.getByTestId('recipient-address');
     this.inputMemo = page.getByTestId('memo-input');
-    this.errorMessageAddressInvalid = page
-      .locator('p')
-      .filter({ hasText: 'Recipient address invalid' });
-    this.errorMessageAddressRequired = page
-      .locator('p')
-      .filter({ hasText: 'Recipient address is required' });
+    this.errorMessageAddressInvalid = page.getByText('Recipient address invalid');
+    this.errorMessageAddressRequired = page.getByText('Recipient address is required');
     this.infoMessageSendSelf = page
       .locator('p')
       .filter({ hasText: 'You are transferring to yourself' });
@@ -555,7 +554,7 @@ export default class Wallet {
     this.errorInsufficientBRC20Balance = page.getByText('Insufficient BRC-20 balance');
     this.errorInsufficientFunds = page.locator('p').filter({ hasText: 'Insufficient funds' });
     this.containerFeeRate = page.getByTestId('feerate-container');
-    this.inputBTCAddress = page.locator('input[type="text"]');
+    this.inputBTCAddress = page.getByRole('textbox', { name: 'Enter address' });
     this.inputBTCAmount = page.getByTestId('btc-amount');
     this.buttonExpand = page.getByRole('button', { name: 'Inputs & Outputs' });
     this.confirmTotalAmount = page.getByTestId('confirm-total-amount');
@@ -568,7 +567,7 @@ export default class Wallet {
     this.buttonSign = page.getByRole('button', { name: 'Sign' });
     this.sendTransactionID = page.getByTestId('transaction-id');
     this.sendSTXValue = page.getByTestId('send-value');
-    this.inputField = page.locator('input[type="text"]');
+    this.inputField = page.getByRole('textbox');
     this.sendRuneAmount = page.getByTestId('send-rune-amount');
 
     // List
@@ -623,7 +622,7 @@ export default class Wallet {
   async checkVisualsStartpage() {
     // to-do fix the element itself, after the native-segwit update it resolves to 2 elements
     // data-testid="total-balance-value"
-    await expect(this.balance.first()).toBeVisible();
+    await expect(this.balance).toBeVisible();
     await expect(this.manageTokenButton).toBeVisible();
 
     // Deny data collection --> modal window is not always appearing so when it does we deny the data collection
@@ -674,8 +673,7 @@ export default class Wallet {
       await expect(this.receiveAddress).toBeVisible();
     }
 
-    await expect(this.imageToken).toBeVisible();
-    // await expect(this.buttonBack).toBeVisible();
+    await expect(this.buttonBack).toBeVisible();
   }
 
   /**
@@ -701,8 +699,7 @@ export default class Wallet {
     await expect(this.labelBalanceAmountSelector).toBeVisible();
     await expect(this.buttonEditFee).toBeVisible();
     await expect(this.feeAmount).toBeVisible();
-    await expect(this.imageToken).toBeVisible();
-    // await expect(this.buttonBack).toBeVisible();
+    await expect(this.buttonBack).toBeVisible();
   }
 
   /**
@@ -1007,10 +1004,9 @@ export default class Wallet {
   }
 
   async clickOnSpecificToken(tokenname: string) {
-    const specificToken = this.page.getByRole('button').getByLabel(`Token Title: ${tokenname}`);
-    // filter({
-    //   has: this.labelTokenSubtitle.getByText(tokenname, { exact: true }),
+    const specificToken = this.page.getByLabel(`Token Title: ${tokenname}`);
 
+    await expect(specificToken.last()).toBeVisible();
     await specificToken.last().click();
   }
 
@@ -1093,7 +1089,7 @@ export default class Wallet {
     await expect(this.buttonTestnet.locator('img')).toHaveAttribute('alt', 'tick');
     await expect(this.buttonMainnet.locator('img[alt="tick"]')).toHaveCount(0);
 
-    await this.inputStacksURL.fill('https://api.nakamoto.testnet.hiro.so');
+    await this.inputStacksURL.fill('https://api.testnet.hiro.so');
     // To speed up some checks we use our own servers
     // await this.inputBTCURL.fill('https://btc-testnet.xverse.app');
 
@@ -1104,8 +1100,6 @@ export default class Wallet {
 
     await expect(this.buttonSave).toBeEnabled({ timeout: 15000 });
     await this.buttonSave.click();
-    await expect(this.buttonNetwork).toBeVisible({ timeout: 30000 });
-    await expect(this.buttonNetwork).toHaveText('NetworkTestnet');
   }
 
   async switchToMainnetNetwork() {

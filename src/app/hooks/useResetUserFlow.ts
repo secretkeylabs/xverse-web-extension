@@ -10,22 +10,23 @@ const resetUserFlowChannel = 'resetUserFlow';
  * resetTo: should be a valid route
  */
 const userFlowConfig: Record<string, { resetTo: string }> = {
-  '/send-btc': { resetTo: '/send-btc' },
-  '/send-brc20-one-step': { resetTo: '/' },
+  '/add-stx-address-ledger': { resetTo: '/add-stx-address-ledger?mismatch=true' },
+  '/coinDashboard': { resetTo: '/' },
   '/confirm-brc20-tx': { resetTo: '/' },
-  '/ordinals-collection': { resetTo: '/nft-dashboard?tab=inscriptions' },
-  '/ordinal-detail': { resetTo: '/nft-dashboard?tab=inscriptions' },
-  [RoutePaths.SendOrdinal]: { resetTo: '/nft-dashboard?tab=inscriptions' },
+  '/confirm-nft-tx': { resetTo: '/nft-dashboard?tab=nfts' },
   '/nft-collection': { resetTo: '/nft-dashboard?tab=nfts' },
   '/nft-detail': { resetTo: '/nft-dashboard?tab=nfts' },
-  '/send-nft': { resetTo: '/nft-dashboard?tab=nfts' },
-  '/confirm-nft-tx': { resetTo: '/nft-dashboard?tab=nfts' },
-  '/rare-sats-detail': { resetTo: '/nft-dashboard?tab=rareSats' },
+  '/ordinal-detail': { resetTo: '/nft-dashboard?tab=inscriptions' },
+  '/ordinals-collection': { resetTo: '/nft-dashboard?tab=inscriptions' },
   '/rare-sats-bundle': { resetTo: '/nft-dashboard?tab=rareSats' },
+  '/rare-sats-detail': { resetTo: '/nft-dashboard?tab=rareSats' },
+  '/send-brc20-one-step': { resetTo: '/' },
+  '/send-btc': { resetTo: '/send-btc' },
+  '/send-nft': { resetTo: '/nft-dashboard?tab=nfts' },
+  '/send-strk': { resetTo: '/' },
   '/verify-ledger': { resetTo: '/verify-ledger?mismatch=true' },
-  '/add-stx-address-ledger': { resetTo: '/add-stx-address-ledger?mismatch=true' },
-  '/send-rune': { resetTo: '/' },
-  '/coinDashboard': { resetTo: '/' },
+  [RoutePaths.SendOrdinal]: { resetTo: '/nft-dashboard?tab=inscriptions' },
+  [RoutePaths.SendRune]: { resetTo: '/' },
 };
 type UserFlowConfigKey = keyof typeof userFlowConfig;
 

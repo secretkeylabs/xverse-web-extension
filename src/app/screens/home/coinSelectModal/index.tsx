@@ -63,6 +63,7 @@ function CoinSelectModal({
             currency="BTC"
             loading={loadingWalletData}
             onPress={handleOnBitcoinPress}
+            hidePriceChange
           />
         )}
         {stxAddress && !hideStx && (
@@ -71,6 +72,7 @@ function CoinSelectModal({
             currency="STX"
             loading={loadingWalletData}
             onPress={handleOnStackPress}
+            hidePriceChange
           />
         )}
         {coins.map((coin) => (
@@ -85,6 +87,7 @@ function CoinSelectModal({
             }}
             fungibleToken={coin}
             showProtocolIcon={false}
+            hidePriceChange
           />
         ))}
       </Container>

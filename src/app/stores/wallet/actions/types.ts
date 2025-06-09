@@ -34,7 +34,6 @@ export const SetRunesManageTokensKey = 'SetRunesManageTokens';
 export const SetNotificationBannersKey = 'SetNotificationBanners';
 export const SetWalletLockPeriodKey = 'SetWalletLockPeriod';
 export const SetWalletUnlockedKey = 'SetWalletUnlocked';
-export const SetAccountBalanceKey = 'SetAccountBalanceKey';
 export const SetWalletHideStxKey = 'SetWalletHideStx';
 export const SetSpamTokenKey = 'SetSpamTokenKey';
 export const SetSpamTokensKey = 'SetSpamTokensKey';
@@ -93,9 +92,6 @@ export interface WalletState {
   showDataCollectionAlert: boolean | null;
   walletLockPeriod: WalletSessionPeriods;
   isUnlocked: boolean;
-  accountBalances: {
-    [key: string]: string;
-  };
   hideStx: boolean;
   showSpamTokens: boolean;
   spamToken: FungibleToken | null;
@@ -107,6 +103,11 @@ export interface WalletState {
   showBalanceInBtc: boolean;
   hasBackedUpWallet: boolean;
   addingAccount?: boolean;
+
+  // TODO: remove in future migration once we use persistent store manager fully
+  accountBalances: {
+    [key: string]: string;
+  };
 }
 
 export interface StoreEncryptedSeed {
@@ -213,12 +214,6 @@ export interface SetWalletLockPeriod {
 export interface SetWalletUnlocked {
   type: typeof SetWalletUnlockedKey;
   isUnlocked: boolean;
-}
-
-export interface SetAccountBalance {
-  type: typeof SetAccountBalanceKey;
-  accountKey: string;
-  totalBalance: string;
 }
 
 export interface SetWalletHideStx {
@@ -340,7 +335,6 @@ export type WalletActions =
   | SetWalletLockPeriod
   | SetRareSatsNoticeDismissed
   | SetWalletUnlocked
-  | SetAccountBalance
   | SetWalletHideStx
   | SetSpamToken
   | SetSpamTokens

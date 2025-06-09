@@ -30,8 +30,10 @@ const useGetSupportedRates = (fiatCurrency: SupportedCurrency) => {
   });
 };
 
-const useSupportedCoinRates = () => {
-  const { fiatCurrency } = useWalletSelector();
+const useSupportedCoinRates = (overrideFiatCurrency?: SupportedCurrency) => {
+  // If an override is provided, use it. Otherwise, fall back to the wallet selector.
+  const { fiatCurrency: walletFiatCurrency } = useWalletSelector();
+  const fiatCurrency = overrideFiatCurrency || walletFiatCurrency;
   const { data } = useGetSupportedRates(fiatCurrency);
   const stxBtcRate = data?.stxBtcRate.toString() || '0';
   const btcFiatRate = data?.btcFiatRate.toString() || '0';

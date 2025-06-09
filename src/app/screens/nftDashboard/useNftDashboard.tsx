@@ -6,6 +6,7 @@ import { Wrench } from '@phosphor-icons/react';
 import type { InscriptionCollectionsData, StacksCollectionData } from '@secretkeylabs/xverse-core';
 import { SetRareSatsNoticeDismissedAction } from '@stores/wallet/actions/actionCreators';
 import Button from '@ui-library/button';
+import { POPUP_WIDTH } from '@utils/constants';
 import { getCollectionKey } from '@utils/inscriptions';
 import { InvalidParamsError } from '@utils/query';
 import { useCallback, useEffect, useMemo, useRef, useState, type PropsWithChildren } from 'react';
@@ -110,7 +111,10 @@ const useNftDashboard = (): NftDashboardState => {
   const totalNfts = stacksNftsQuery.data?.total_nfts ?? 0;
   const totalHiddenNfts = hiddenStacksNftsQuery.data?.total_nfts ?? 0;
 
-  const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
+  const isGalleryOpen: boolean = useMemo(
+    () => document.documentElement.clientWidth > POPUP_WIDTH,
+    [],
+  );
 
   useEffect(() => {
     setShowNoticeAlert(rareSatsNoticeDismissed === undefined);

@@ -1,6 +1,7 @@
 import { BetterBarLoader } from '@components/barLoader';
 import { SquareLogo } from '@phosphor-icons/react';
 import type { TokenMetaData } from '@secretkeylabs/xverse-core';
+import { POPUP_WIDTH } from '@utils/constants';
 import { getFetchableUrl } from '@utils/helper';
 import Image from 'rc-image';
 import { Suspense, useState } from 'react';
@@ -63,7 +64,7 @@ function ErrorStateImg() {
 
 function NftImage({ metadata, isInCollage = false }: Props) {
   const [error, setError] = useState(false);
-  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+  const isGalleryOpen: boolean = document.documentElement.clientWidth > POPUP_WIDTH;
 
   if (metadata?.image_protocol) {
     return (

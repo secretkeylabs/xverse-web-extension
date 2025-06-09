@@ -1,20 +1,21 @@
 import Button from '@ui-library/button';
 import styled from 'styled-components';
 
-export const Container = styled.div({
+export const Container = styled.div<{ $disableClick?: boolean }>((props) => ({
   position: 'relative',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
   backgroundColor: 'transparent',
-});
+  opacity: props.$disableClick ? 0.5 : 1,
+}));
 
-export const AccountInfoContainer = styled.button<{ $disableClick?: boolean }>((props) => ({
+export const AccountInfoContainer = styled.button<{ $cursor?: string }>((props) => ({
   width: '100%',
   display: 'flex',
   alignItems: 'center',
   backgroundColor: 'transparent',
-  cursor: props.$disableClick ? 'initial' : 'pointer',
+  cursor: props.$cursor,
 }));
 
 export const GradientCircle = styled.div<{
@@ -46,6 +47,7 @@ export const CurrentAccountContainer = styled.div((props) => ({
   display: 'flex',
   flexDirection: 'column',
   paddingLeft: props.theme.space.s,
+  gap: props.theme.space.xxxs,
 }));
 
 export const CurrentAccountTextContainer = styled.div((props) => ({
@@ -63,6 +65,7 @@ export const AccountName = styled.span<{ $isSelected: boolean }>((props) => ({
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
+  minHeight: 19,
 }));
 
 export const BarLoaderContainer = styled.div((props) => ({
@@ -103,7 +106,8 @@ export const ModalButtonContainer = styled.div({
   width: '100%',
 });
 
-export const ButtonRow = styled.button`
+export const ButtonRow = styled.button<{ $color?: string }>`
+  ${(props) => props.theme.typography.body_medium_m};
   display: flex;
   align-items: center;
   background-color: transparent;
@@ -112,7 +116,7 @@ export const ButtonRow = styled.button`
   padding-top: ${(props) => props.theme.space.s};
   padding-bottom: ${(props) => props.theme.space.s};
   font: ${(props) => props.theme.typography.body_medium_m};
-  color: ${(props) => props.theme.colors.white_0};
+  color: ${(props) => props.$color || props.theme.colors.white_0};
   transition: background-color 0.2s ease;
   :hover {
     background-color: ${(props) => props.theme.colors.elevation3};

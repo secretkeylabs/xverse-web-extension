@@ -13,4 +13,11 @@ const Divider = styled.div<{
     : props.theme.colors.white_900,
   margin: props.$verticalMargin ? `${props.theme.space[props.$verticalMargin]} 0` : 0,
 }));
+
+export const FullWidthDivider = styled(Divider)`
+  width: calc(100% + 32px);
+  margin-left: -16px;
+  margin-right: -16px;
+`;
+
 export default Divider;

@@ -9,7 +9,10 @@ const useChromeLocalStorage = <T extends unknown>(key: string, defaultValue?: T)
     queryKey: ['chromeLocalStorage', key],
     queryFn: async () => {
       const result = await chromeStorage.local.getItem<T>(key);
-      return result === undefined ? defaultValue : result;
+
+      if (result === undefined) return defaultValue ?? null;
+
+      return result;
     },
     refetchOnWindowFocus: false,
     refetchOnMount: false,

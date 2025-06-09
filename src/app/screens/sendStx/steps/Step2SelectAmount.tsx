@@ -1,5 +1,7 @@
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
+import useAddressBookEntries from '@hooks/useAddressBookEntries';
+import useGetAllAccounts from '@hooks/useGetAllAccounts';
 import useWalletSelector from '@hooks/useWalletSelector';
 import {
   AnalyticsEvents,
@@ -11,6 +13,9 @@ import {
 import SelectFeeRate, { type FeeRates } from '@ui-components/selectFeeRate';
 import Button from '@ui-library/button';
 import Callout from '@ui-library/callout';
+import { StyledP } from '@ui-library/common.styled';
+import { FullWidthDivider } from '@ui-library/divider';
+import { getRecipientName, getTruncatedAddress } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import { getFtBalance } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
@@ -28,6 +33,13 @@ const Container = styled.div`
   justify-content: space-between;
 `;
 
+const ContentWrapper = styled.div`
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+`;
+
 const FeeRateContainer = styled.div`
   margin-top: ${(props) => props.theme.space.l};
   margin-bottom: ${(props) => props.theme.space.m};
@@ -35,6 +47,10 @@ const FeeRateContainer = styled.div`
 
 const Buttons = styled.div`
   margin: ${(props) => props.theme.space.l} 0;
+`;
+
+const RecipientAccountName = styled.span`
+  color: ${(props) => props.theme.colors.white_0};
 `;
 
 type Props = {
@@ -49,8 +65,8 @@ type Props = {
   onNext: () => void;
   dustFiltered: boolean;
   isLoading?: boolean;
-  header?: React.ReactNode;
   fungibleToken?: FungibleToken;
+  recipientAddress: string;
 };
 
 function Step2SelectAmount({
@@ -65,17 +81,20 @@ function Step2SelectAmount({
   onNext,
   isLoading,
   dustFiltered,
-  header,
   fungibleToken,
+  recipientAddress,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
+  const { t: tCommon } = useTranslation('translation', { keyPrefix: 'COMMON' });
   const navigate = useNavigate();
 
+  const allAccounts = useGetAllAccounts();
   const { fiatCurrency, feeMultipliers } = useWalletSelector();
   const { data: stxData } = useStxWalletData();
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
   const stxBalance = stxData?.availableBalance.toString() ?? '0';
   const ftBalance = fungibleToken ? getFtBalance(fungibleToken) : '0';
+  const { entries: addressBook } = useAddressBookEntries();
 
   const stxToFiat = (stx: string) =>
     getStxFiatEquivalent(
@@ -112,48 +131,59 @@ function Step2SelectAmount({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sendMax, fee]);
 
+  const recipientName = getRecipientName(recipientAddress, allAccounts, addressBook, tCommon);
+
   return (
     <Container>
-      <div>
-        {header}
-        {fungibleToken ? (
-          <FtAmountSelector
-            amount={amount}
-            setAmount={setAmount}
-            sendMax={sendMax}
-            setSendMax={setSendMax}
-            disabled={!hasStx}
-            fungibleToken={fungibleToken}
-          />
-        ) : (
-          <StxAmountSelector
-            amount={amount}
-            setAmount={setAmount}
-            sendMax={sendMax}
-            setSendMax={setSendMax}
-            disabled={!hasStx}
-          />
-        )}
-        {hasStx && (
-          <FeeRateContainer>
-            <SelectFeeRate
-              fee={fee}
-              feeRate={fee}
-              feeUnits="STX"
-              setFeeRate={setFee}
-              baseToFiat={stxToFiat}
-              fiatUnit={fiatCurrency}
-              getFeeForFeeRate={getFeeForFeeRate}
-              feeRates={feeRates}
-              feeRateLimits={{ min: 0.000001, max: feeMultipliers?.thresholdHighStacksFee }}
-              isLoading={isLoading}
-              absoluteBalance={Number(microstacksToStx(new BigNumber(stxBalance)))}
-              amount={Number(amount)}
+      <ContentWrapper>
+        <div>
+          <StyledP typography="body_medium_m" color="white_400">
+            {tCommon('TO')}: <RecipientAccountName>{recipientName}</RecipientAccountName>{' '}
+            {getTruncatedAddress(recipientAddress, 6)}
+          </StyledP>
+          <FullWidthDivider $verticalMargin="m" />
+          {fungibleToken ? (
+            <FtAmountSelector
+              amount={amount}
+              setAmount={setAmount}
+              sendMax={sendMax}
+              setSendMax={setSendMax}
+              disabled={!hasStx}
+              fungibleToken={fungibleToken}
             />
-          </FeeRateContainer>
+          ) : (
+            <StxAmountSelector
+              amount={amount}
+              setAmount={setAmount}
+              sendMax={sendMax}
+              setSendMax={setSendMax}
+              disabled={!hasStx}
+            />
+          )}
+        </div>
+        {hasStx && (
+          <div>
+            <FullWidthDivider $verticalMargin="m" />
+            <FeeRateContainer>
+              <SelectFeeRate
+                fee={fee}
+                feeRate={fee}
+                feeUnits="STX"
+                setFeeRate={setFee}
+                baseToFiat={stxToFiat}
+                fiatUnit={fiatCurrency}
+                getFeeForFeeRate={getFeeForFeeRate}
+                feeRates={feeRates}
+                feeRateLimits={{ min: 0.000001, max: feeMultipliers?.thresholdHighStacksFee }}
+                isLoading={isLoading}
+                absoluteBalance={Number(microstacksToStx(new BigNumber(stxBalance)))}
+                amount={Number(amount)}
+              />
+            </FeeRateContainer>
+          </div>
         )}
         {sendMax && dustFiltered && <Callout bodyText={t('BTC.MAX_IGNORING_DUST_UTXO_MSG')} />}
-      </div>
+      </ContentWrapper>
       <Buttons>
         {hasStx && (
           <Button

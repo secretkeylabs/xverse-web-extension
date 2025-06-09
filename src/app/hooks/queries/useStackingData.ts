@@ -1,6 +1,8 @@
+/* eslint-disable no-console */
+import useXverseApi from '@hooks/apiClients/useXverseApi';
 import useSelectedAccount from '@hooks/useSelectedAccount';
-import { getStacksInfo, getXverseApiClient, type StackingData } from '@secretkeylabs/xverse-core';
-import { useQueries } from '@tanstack/react-query';
+import { getStacksInfo, type StackingData } from '@secretkeylabs/xverse-core';
+import { useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import useWalletSelector from '../useWalletSelector';
 import useDelegationState from './useDelegationState';
@@ -8,35 +10,48 @@ import useDelegationState from './useDelegationState';
 const useStackingData = () => {
   const { stxAddress } = useSelectedAccount();
   const { network } = useWalletSelector();
-  const { data: delegationStateData, isLoading: delegateStateIsLoading } = useDelegationState();
+  const { data: delegationStateData, isPending: isPendingDelegateState } = useDelegationState();
 
-  const xverseApiClient = getXverseApiClient(network.type);
+  const xverseApiClient = useXverseApi();
 
-  const results = useQueries({
-    queries: [
-      {
-        queryKey: ['stacking-core-info', network],
-        queryFn: () => getStacksInfo(network.address),
-      },
-      {
-        queryKey: ['stacking-pool-info', network.type],
-        queryFn: () => xverseApiClient.fetchStackingPoolInfo(),
-      },
-      {
-        queryKey: ['pool-stacker-info', stxAddress, network.type],
-        queryFn: () => xverseApiClient.fetchPoolStackerInfo(stxAddress),
-      },
-    ],
+  const {
+    data: coreInfoData,
+    refetch: refetchGetStacksInfo,
+    isPending: isPendingGetStacksInfo,
+  } = useQuery({
+    queryKey: ['stacking-core-info', network],
+    queryFn: async () => (await getStacksInfo(network.address)) ?? null,
   });
 
-  const coreInfoData = results[0].data;
-  const poolInfoData = results[1].data;
-  const stackerInfoData = results[2].data;
+  const {
+    data: poolInfoData,
+    refetch: refetchFetchStackingPoolInfo,
+    isPending: isPendingFetchStackingPoolInfo,
+  } = useQuery({
+    queryKey: ['stacking-pool-info', network.type],
+    queryFn: () => xverseApiClient.fetchStackingPoolInfo(),
+  });
 
-  const isStackingLoading = results.some((result) => result.isLoading) || delegateStateIsLoading;
+  const {
+    data: stackerInfoData,
+    refetch: refetchFetchPoolStackerInfo,
+    isPending: isPendingFetchPoolStackerInfo,
+  } = useQuery({
+    queryKey: ['pool-stacker-info', stxAddress, network.type],
+    queryFn: () => xverseApiClient.fetchPoolStackerInfo(stxAddress),
+  });
+
+  const isStackingLoading =
+    isPendingGetStacksInfo ||
+    isPendingFetchStackingPoolInfo ||
+    isPendingFetchPoolStackerInfo ||
+    isPendingDelegateState;
+
   const refetchStackingData = useCallback(() => {
-    results.forEach((result) => result.refetch());
-  }, [results]);
+    refetchGetStacksInfo().catch(console.log);
+    refetchFetchStackingPoolInfo().catch(console.log);
+    refetchFetchPoolStackerInfo().catch(console.log);
+  }, [refetchFetchPoolStackerInfo, refetchFetchStackingPoolInfo, refetchGetStacksInfo]);
 
   // Warning: the non-null assertions here are dangerous, as they assume
   // consumers will check the `isStackingLoading` prop returned below before

@@ -14,7 +14,7 @@ export const useAddressRareSats = () => {
   const { ordinalsAddress } = useSelectedAccount();
   const { network } = useWalletSelector();
 
-  const getRareSatsByAddress = async ({ pageParam = 0 }) => {
+  const getRareSatsByAddress = async ({ pageParam }: { pageParam: number }) => {
     if (!ordinalsAddress) {
       throw new InvalidParamsError('ordinalsAddress is required');
     }
@@ -32,7 +32,9 @@ export const useAddressRareSats = () => {
     return bundleResponse;
   };
 
-  return useInfiniteQuery(['rare-sats', ordinalsAddress], getRareSatsByAddress, {
+  return useInfiniteQuery({
+    queryKey: ['rare-sats', ordinalsAddress],
+    queryFn: getRareSatsByAddress,
     retry: handleRetries,
     getNextPageParam: (lastPage, allPages) => {
       const currentLength = allPages.map((page) => page.results).flat().length;
@@ -40,7 +42,9 @@ export const useAddressRareSats = () => {
         return currentLength;
       }
     },
+
     staleTime: 1 * 60 * 1000, // 1 min
+    initialPageParam: 0,
   });
 };
 

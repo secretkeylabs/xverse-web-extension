@@ -250,7 +250,13 @@ function FeeSelectPopup({
             <Button
               title={t('COMMON.APPLY')}
               onClick={onApply}
-              disabled={!hasSufficientFunds || !customValue || rateTooLow || rateTooHigh}
+              disabled={
+                !hasSufficientFunds ||
+                !customValue ||
+                rateTooLow ||
+                rateTooHigh ||
+                inputFeedback.some((i) => i.variant === 'danger')
+              }
             />
           </Buttons>
         </>

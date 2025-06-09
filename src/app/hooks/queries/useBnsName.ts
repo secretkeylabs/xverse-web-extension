@@ -1,52 +1,63 @@
 import { fetchAddressOfBnsName, getBnsName, validateStxAddress } from '@secretkeylabs/xverse-core';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import useNetworkSelector from '../useNetwork';
 import useWalletSelector from '../useWalletSelector';
 
-export const useBnsName = (walletAddress: string) => {
+type UseBnsNameOptions = {
+  enabled?: boolean;
+};
+
+export const useBnsName = (walletAddress: string, options: UseBnsNameOptions = {}) => {
   const network = useNetworkSelector();
-  const [bnsName, setBnsName] = useState('');
 
-  useEffect(() => {
-    (async () => {
-      if (walletAddress) {
-        const name = await getBnsName(walletAddress, network);
-        setBnsName(name ?? '');
-      } else {
-        setBnsName('');
-      }
-    })();
-  }, [walletAddress, network]);
+  return useQuery({
+    queryKey: ['bns-name', walletAddress, network],
+    queryFn: async () => {
+      if (!walletAddress) return '';
+      const name = await getBnsName(walletAddress, network);
+      return name ?? '';
+    },
+    enabled: !!walletAddress && options.enabled !== false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
 
-  return bnsName;
+type UseBnsResolverOptions = {
+  enabled?: boolean;
 };
 
 export const useBnsResolver = (
   recipientAddress: string,
   walletAddress: string,
   currencyType?: string,
+  options: UseBnsResolverOptions = {},
 ) => {
   const { network } = useWalletSelector();
   const selectedNetwork = useNetworkSelector();
-  const [associatedAddress, setAssociatedAddress] = useState('');
 
-  useEffect(() => {
-    (async () => {
-      if (currencyType !== 'BTC') {
-        if (!validateStxAddress({ stxAddress: recipientAddress, network: network.type })) {
-          const address = await fetchAddressOfBnsName(
-            recipientAddress.toLocaleLowerCase(),
-            selectedNetwork,
-          );
-          setAssociatedAddress(address ?? '');
-        } else {
-          setAssociatedAddress('');
-        }
-      } else {
-        setAssociatedAddress('');
+  return useQuery({
+    queryKey: [
+      'bns-resolver',
+      recipientAddress,
+      network,
+      currencyType,
+      selectedNetwork,
+      walletAddress,
+    ],
+    queryFn: async () => {
+      if (currencyType === 'BTC') return '';
+
+      if (!validateStxAddress({ stxAddress: recipientAddress, network: network.type })) {
+        const address = await fetchAddressOfBnsName(
+          recipientAddress.toLocaleLowerCase(),
+          selectedNetwork,
+        );
+        return address ?? '';
       }
-    })();
-  }, [recipientAddress, network, currencyType, selectedNetwork, walletAddress]);
 
-  return associatedAddress;
+      return '';
+    },
+    enabled: !!recipientAddress && options.enabled !== false,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 };

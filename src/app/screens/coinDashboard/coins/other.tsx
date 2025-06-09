@@ -42,6 +42,7 @@ import {
   CopyButtonContainer,
   FtInfoContainer,
   RuneBundlesContainer,
+  ScrollContainer,
   SecondaryContainer,
   ShareIcon,
   TokenContractAddress,
@@ -166,117 +167,121 @@ export default function CoinDashboard() {
           </ButtonRow>
         </OptionsDialog>
       )}
-      <Container>
-        <CoinHeader
-          currency={currency as CurrencyTypes}
-          fungibleToken={selectedFt}
-          chartPriceStats={chartPriceStats}
-        />
-        <ChartContainer>
-          <TokenHistoricalData
+      <ScrollContainer>
+        <Container>
+          <CoinHeader
             currency={currency as CurrencyTypes}
             fungibleToken={selectedFt}
-            setChartPriceStats={setChartPriceStats}
-          />
-        </ChartContainer>
-        {/* TODO: import { Tabs } from ui-library/tabs.tsx */}
-
-        <FtInfoContainer>
-          <Button
-            disabled={currentTab === 'first'}
-            isSelected={currentTab === 'first'}
-            onClick={() => setCurrentTab('first')}
-          >
-            {t('TRANSACTIONS')}
-          </Button>
-          {showDataTab && (
-            <Button
-              disabled={currentTab === 'second'}
-              isSelected={currentTab === 'second'}
-              onClick={() => setCurrentTab('second')}
-            >
-              {t('MARKET')}
-            </Button>
-          )}
-          <Button
-            data-testid="coin-secondary-button"
-            disabled={currentTab === 'third'}
-            isSelected={currentTab === 'third'}
-            onClick={() => setCurrentTab('third')}
-          >
-            {protocol === 'stacks' && t('CONTRACT')}
-            {protocol === 'runes' && t('BUNDLES')}
-          </Button>
-        </FtInfoContainer>
-
-        {showData && (
-          <TokenPrice
-            currency={currency as CurrencyTypes}
-            fungibleToken={selectedFt as FungibleTokenWithStates}
             chartPriceStats={chartPriceStats}
           />
-        )}
+          <ChartContainer>
+            <TokenHistoricalData
+              currency={currency as CurrencyTypes}
+              fungibleToken={selectedFt}
+              setChartPriceStats={setChartPriceStats}
+            />
+          </ChartContainer>
+          {/* TODO: import { Tabs } from ui-library/tabs.tsx */}
 
-        {showTxHistory && (
-          <TransactionsHistoryList
-            coin={currency as CurrencyTypes}
-            stxTxFilter={
-              selectedFt?.protocol === 'runes'
-                ? selectedFt?.name
-                : `${selectedFt?.principal}::${selectedFt?.assetName}`
-            }
-            brc20Token={protocol === 'brc-20' ? selectedFt?.principal || null : null}
-            runeToken={protocol === 'runes' ? selectedFt?.name || null : null}
-            runeSymbol={protocol === 'runes' ? selectedFt?.runeSymbol || null : null}
-            withTitle={false}
-          />
-        )}
-        {showStxContract && (
-          <SecondaryContainer data-testid="coin-secondary-container">
-            <h1>{t('FT_CONTRACT_PREFIX')}</h1>
-            <ContractAddressCopyButton
-              onClick={() => navigator.clipboard.writeText(selectedFt?.principal as string)}
+          <FtInfoContainer>
+            <Button
+              disabled={currentTab === 'first'}
+              isSelected={currentTab === 'first'}
+              onClick={() => setCurrentTab('first')}
             >
-              <TokenContractAddress data-testid="coin-contract-address">
-                {getTruncatedAddress(selectedFt?.principal as string, 20)}
-              </TokenContractAddress>
-              <CopyButtonContainer>
-                <CopyButton text={selectedFt?.principal as string} />
-              </CopyButtonContainer>
-            </ContractAddressCopyButton>
-            <ContractDeploymentButton
-              onClick={() => window.open(getExplorerUrl(selectedFt?.principal as string), '_blank')}
+              {t('TRANSACTIONS')}
+            </Button>
+            {showDataTab && (
+              <Button
+                disabled={currentTab === 'second'}
+                isSelected={currentTab === 'second'}
+                onClick={() => setCurrentTab('second')}
+              >
+                {t('ABOUT')}
+              </Button>
+            )}
+            <Button
+              data-testid="coin-secondary-button"
+              disabled={currentTab === 'third'}
+              isSelected={currentTab === 'third'}
+              onClick={() => setCurrentTab('third')}
             >
-              {t('OPEN_FT_CONTRACT_DEPLOYMENT')}
-              <span>{t('STACKS_EXPLORER')}</span>
-              <ShareIcon src={linkIcon} alt="link" />
-            </ContractDeploymentButton>
-          </SecondaryContainer>
-        )}
-        {showRuneBundles && (
-          <SecondaryContainer data-testid="coin-secondary-container">
-            <RuneBundlesContainer>
-              {runeUtxos?.map((utxo) => {
-                const fullTxId = getFullTxId(utxo);
-                const runeAmount = utxo.runes?.filter((rune) => rune[0] === selectedFt?.name)[0][1]
-                  .amount;
-                return (
-                  <RuneBundleRow
-                    key={fullTxId}
-                    txId={getTxIdFromFullTxId(fullTxId)}
-                    vout={getVoutFromFullTxId(fullTxId)}
-                    runeAmount={String(ftDecimals(runeAmount ?? 0, selectedFt?.decimals ?? 0))}
-                    runeId={selectedFt?.principal ?? ''}
-                    runeSymbol={selectedFt?.runeSymbol ?? ''}
-                    satAmount={BigNumber(utxo.value).toNumber()}
-                    bundle={mapRareSatsAPIResponseToBundle(utxo)}
-                  />
-                );
-              })}
-            </RuneBundlesContainer>
-          </SecondaryContainer>
-        )}
-      </Container>
+              {protocol === 'stacks' && t('CONTRACT')}
+              {protocol === 'runes' && t('BUNDLES')}
+            </Button>
+          </FtInfoContainer>
+
+          {showData && (
+            <TokenPrice
+              currency={currency as CurrencyTypes}
+              fungibleToken={selectedFt as FungibleTokenWithStates}
+            />
+          )}
+
+          {showTxHistory && (
+            <TransactionsHistoryList
+              coin={currency as CurrencyTypes}
+              stxTxFilter={
+                selectedFt?.protocol === 'runes'
+                  ? selectedFt?.name
+                  : `${selectedFt?.principal}::${selectedFt?.assetName}`
+              }
+              brc20Token={protocol === 'brc-20' ? selectedFt?.principal || null : null}
+              runeToken={protocol === 'runes' ? selectedFt?.name || null : null}
+              runeSymbol={protocol === 'runes' ? selectedFt?.runeSymbol || null : null}
+              withTitle={false}
+            />
+          )}
+          {showStxContract && (
+            <SecondaryContainer data-testid="coin-secondary-container">
+              <h1>{t('FT_CONTRACT_PREFIX')}</h1>
+              <ContractAddressCopyButton
+                onClick={() => navigator.clipboard.writeText(selectedFt?.principal as string)}
+              >
+                <TokenContractAddress data-testid="coin-contract-address">
+                  {getTruncatedAddress(selectedFt?.principal as string, 20)}
+                </TokenContractAddress>
+                <CopyButtonContainer>
+                  <CopyButton text={selectedFt?.principal as string} />
+                </CopyButtonContainer>
+              </ContractAddressCopyButton>
+              <ContractDeploymentButton
+                onClick={() =>
+                  window.open(getExplorerUrl(selectedFt?.principal as string), '_blank')
+                }
+              >
+                {t('OPEN_FT_CONTRACT_DEPLOYMENT')}
+                <span>{t('STACKS_EXPLORER')}</span>
+                <ShareIcon src={linkIcon} alt="link" />
+              </ContractDeploymentButton>
+            </SecondaryContainer>
+          )}
+          {showRuneBundles && (
+            <SecondaryContainer data-testid="coin-secondary-container">
+              <RuneBundlesContainer>
+                {runeUtxos?.map((utxo) => {
+                  const fullTxId = getFullTxId(utxo);
+                  const runeAmount = utxo.runes?.filter(
+                    (rune) => rune[0] === selectedFt?.name,
+                  )[0][1].amount;
+                  return (
+                    <RuneBundleRow
+                      key={fullTxId}
+                      txId={getTxIdFromFullTxId(fullTxId)}
+                      vout={getVoutFromFullTxId(fullTxId)}
+                      runeAmount={String(ftDecimals(runeAmount ?? 0, selectedFt?.decimals ?? 0))}
+                      runeId={selectedFt?.principal ?? ''}
+                      runeSymbol={selectedFt?.runeSymbol ?? ''}
+                      satAmount={BigNumber(utxo.value).toNumber()}
+                      bundle={mapRareSatsAPIResponseToBundle(utxo)}
+                    />
+                  );
+                })}
+              </RuneBundlesContainer>
+            </SecondaryContainer>
+          )}
+        </Container>
+      </ScrollContainer>
       <BottomBar tab="dashboard" />
     </>
   );

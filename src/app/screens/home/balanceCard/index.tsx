@@ -3,11 +3,11 @@ import PercentageChange from '@components/percentageChange';
 import { useVisibleBrc20FungibleTokens } from '@hooks/queries/ordinals/useGetBrc20FungibleTokens';
 import { useVisibleRuneFungibleTokens } from '@hooks/queries/runes/useRuneFungibleTokensQuery';
 import { useVisibleSip10FungibleTokens } from '@hooks/queries/stx/useGetSip10FungibleTokens';
-import useAccountBalance from '@hooks/queries/useAccountBalance';
 import useSelectedAccountBtcBalance from '@hooks/queries/useSelectedAccountBtcBalance';
 import useStxWalletData from '@hooks/queries/useStxWalletData';
 import useSupportedCoinRates from '@hooks/queries/useSupportedCoinRates';
 import useSelectedAccount from '@hooks/useSelectedAccount';
+import { useStore } from '@hooks/useStore';
 import useToggleBalanceView from '@hooks/useToggleBalanceView';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { Eye } from '@phosphor-icons/react';
@@ -24,7 +24,7 @@ import {
   HIDDEN_BALANCE_LABEL,
   type CurrencyTypes,
 } from '@utils/constants';
-import { calculateTotalBalance, getAccountBalanceKey } from '@utils/helper';
+import { calculateTotalBalance } from '@utils/helper';
 import BigNumber from 'bignumber.js';
 import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -52,15 +52,16 @@ function BalanceCard({ isLoading, isRefetching, combinedFtList }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'DASHBOARD_SCREEN' });
   const { t: commonT } = useTranslation('translation', { keyPrefix: 'COMMON' });
   const selectedAccount = useSelectedAccount();
-  const { fiatCurrency, hideStx, accountBalances, balanceHidden, showBalanceInBtc } =
-    useWalletSelector();
+  const { fiatCurrency, hideStx, balanceHidden, showBalanceInBtc, network } = useWalletSelector();
   const { confirmedPaymentBalance: btcBalance, isLoading: btcBalanceLoading } =
     useSelectedAccountBtcBalance();
-  const { data: stxData } = useStxWalletData();
+  const accountBalanceStore = useStore(
+    'accountBalances',
+    (store, utils) => store[utils.getAccountStorageKey(selectedAccount, network.type)],
+  );
+
+  const { data: stxData, isLoading: stxLoading } = useStxWalletData();
   const { btcFiatRate, stxBtcRate } = useSupportedCoinRates();
-  const { setAccountBalance } = useAccountBalance();
-  // TODO: refactor this into a hook
-  const oldTotalBalance = accountBalances[getAccountBalanceKey(selectedAccount)];
   const { data: sip10CoinsList = [] } = useVisibleSip10FungibleTokens();
   const { data: brc20CoinsList = [] } = useVisibleBrc20FungibleTokens();
   const { data: runesCoinList = [] } = useVisibleRuneFungibleTokens();
@@ -78,14 +79,31 @@ function BalanceCard({ isLoading, isRefetching, combinedFtList }: Props) {
   });
 
   useEffect(() => {
-    if (!balance || !selectedAccount || isLoading || btcBalanceLoading || isRefetching) {
+    if (
+      !balance ||
+      !selectedAccount ||
+      isLoading ||
+      btcBalanceLoading ||
+      stxLoading ||
+      isRefetching
+    ) {
       return;
     }
 
-    if (oldTotalBalance !== balance) {
-      setAccountBalance(selectedAccount, balance);
+    if (accountBalanceStore.data !== balance) {
+      accountBalanceStore.actions.setAccountBalance(selectedAccount, network.type, balance);
     }
-  }, [balance, oldTotalBalance, selectedAccount, isLoading, isRefetching, btcBalanceLoading]);
+  }, [
+    balance,
+    accountBalanceStore.data,
+    accountBalanceStore.actions,
+    selectedAccount,
+    isLoading,
+    isRefetching,
+    btcBalanceLoading,
+    stxLoading,
+    network.type,
+  ]);
 
   useEffect(() => {
     (() => {
@@ -224,6 +242,7 @@ function BalanceCard({ isLoading, isRefetching, combinedFtList }: Props) {
                   <PercentageChange
                     isHidden={balanceHidden}
                     displayTimeInterval
+                    displayBalanceChange
                     ftCurrencyPairs={[
                       [undefined, 'BTC'],
                       [undefined, 'STX'],

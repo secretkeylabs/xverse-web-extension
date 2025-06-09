@@ -1,12 +1,11 @@
-import { getXverseApiClient } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
-import useWalletSelector from './useWalletSelector';
+import useXverseApi from './apiClients/useXverseApi';
 
 function useNotificationBanners() {
-  const { network } = useWalletSelector();
+  const xverseApiClient = useXverseApi();
 
   const fetchNotificationBanners = async () => {
-    const response = await getXverseApiClient(network.type).getNotificationBanners();
+    const response = await xverseApiClient.getNotificationBanners();
 
     return response;
   };

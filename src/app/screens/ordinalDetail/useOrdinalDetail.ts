@@ -7,7 +7,7 @@ import useSelectedAccount from '@hooks/useSelectedAccount';
 import useTextOrdinalContent from '@hooks/useTextOrdinalContent';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { getBrc20Details } from '@secretkeylabs/xverse-core';
-import { XVERSE_ORDIVIEW_URL } from '@utils/constants';
+import { POPUP_WIDTH, XVERSE_ORDIVIEW_URL } from '@utils/constants';
 import { getBtcTxStatusUrl, isInOptions, isKeystoneAccount, isLedgerAccount } from '@utils/helper';
 import {
   getInscriptionsCollectionGridItemSubText,
@@ -28,7 +28,7 @@ export default function useOrdinalDetail() {
   const { data: collectionMarketData } = useInscriptionCollectionMarketData(
     ordinalData?.collection_id,
   );
-  const { isPending, pendingTxHash } = usePendingOrdinalTxs(ordinalData?.tx_id);
+  const { isPending, pendingTxId } = usePendingOrdinalTxs(ordinalData);
   const textContent = useTextOrdinalContent(ordinalData!);
   const { setSelectedSatBundleDetails } = useSatBundleDataReducer();
   const { bundle, isPartOfABundle, ordinalSatributes } = useGetUtxoOrdinalBundle(
@@ -44,9 +44,12 @@ export default function useOrdinalDetail() {
 
   const comesFromHidden = from === 'hidden';
 
-  const [showSendOridnalsAlert, setshowSendOridnalsAlert] = useState(false);
+  const [showSendOrdinalsAlert, setShowSendOrdinalsAlert] = useState(false);
 
-  const isGalleryOpen: boolean = useMemo(() => document.documentElement.clientWidth > 360, []);
+  const isGalleryOpen: boolean = useMemo(
+    () => document.documentElement.clientWidth > POPUP_WIDTH,
+    [],
+  );
 
   const brc20InscriptionStatus = getInscriptionsCollectionGridItemSubText(ordinalData);
   const brc20InscriptionStatusColor =
@@ -84,11 +87,11 @@ export default function useOrdinalDetail() {
   };
 
   const showAlert = () => {
-    setshowSendOridnalsAlert(true);
+    setShowSendOrdinalsAlert(true);
   };
 
   const onCloseAlert = () => {
-    setshowSendOridnalsAlert(false);
+    setShowSendOrdinalsAlert(false);
   };
 
   const handleSendOrdinal = async () => {
@@ -110,8 +113,8 @@ export default function useOrdinalDetail() {
   };
 
   const handleRedirectToTx = () => {
-    if (pendingTxHash) {
-      window.open(getBtcTxStatusUrl(pendingTxHash, network), '_blank', 'noopener,noreferrer');
+    if (pendingTxId) {
+      window.open(getBtcTxStatusUrl(pendingTxId, network), '_blank', 'noopener,noreferrer');
     }
   };
 
@@ -144,7 +147,7 @@ export default function useOrdinalDetail() {
     collectionMarketData,
     isLoading,
     ordinalsAddress: selectedAccount.ordinalsAddress,
-    showSendOridnalsAlert,
+    showSendOrdinalsAlert,
     brc20Details,
     isPartOfABundle: isPartOfABundle && hasActivatedRareSatsKey,
     ordinalSatributes: hasActivatedRareSatsKey ? ordinalSatributes : [],

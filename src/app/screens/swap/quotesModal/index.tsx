@@ -81,10 +81,10 @@ function QuotesModal({
   const { tokenInfo: toTokenInfo } = useGetSip10TokenInfo({ principal: toToken?.principal });
 
   const sortQuotesByReceiveAmount = <T extends StxQuote | Quote>(quotes: T[]): T[] =>
-    [...quotes].sort((a, b) => BigNumber(b.receiveAmount).comparedTo(a.receiveAmount));
+    [...quotes].sort((a, b) => BigNumber(b.receiveAmount).comparedTo(a.receiveAmount) ?? 1);
 
   const sortQuotesByFloorPrice = <T extends UtxoQuote>(quotes: T[]): T[] =>
-    [...quotes].sort((a, b) => BigNumber(a.floorRate).comparedTo(b.floorRate));
+    [...quotes].sort((a, b) => BigNumber(a.floorRate).comparedTo(b.floorRate) ?? 1);
 
   const sortedAmmQuotes = sortQuotesByReceiveAmount<Quote>(ammProviders);
   const sortedStxQuotes = sortQuotesByReceiveAmount<StxQuote>(stxProviders);

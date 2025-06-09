@@ -1,5 +1,6 @@
+import useXverseApi from '@hooks/apiClients/useXverseApi';
 import useWalletSelector from '@hooks/useWalletSelector';
-import { getXverseApiClient, type SupportedCurrency } from '@secretkeylabs/xverse-core';
+import { type SupportedCurrency } from '@secretkeylabs/xverse-core';
 import { useQuery } from '@tanstack/react-query';
 
 const useGetSip10TokenInfo = ({
@@ -11,7 +12,7 @@ const useGetSip10TokenInfo = ({
 }) => {
   const { network, fiatCurrency: defaultFiatCurrency } = useWalletSelector();
 
-  const xverseApiClient = getXverseApiClient(network.type);
+  const xverseApiClient = useXverseApi();
 
   const fetchTokensInfo = async () => {
     if (principal) {
@@ -20,8 +21,9 @@ const useGetSip10TokenInfo = ({
         fiatCurrency ?? defaultFiatCurrency,
       );
       const tokenInfo = coinsInfo.find((coin) => coin.contract === principal);
-      return tokenInfo;
+      return tokenInfo ?? null;
     }
+    return null;
   };
 
   const {

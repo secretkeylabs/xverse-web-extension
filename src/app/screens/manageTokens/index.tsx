@@ -35,7 +35,7 @@ import {
   ErrorsText,
   FtInfoContainer,
   Header,
-  ScrollableContainer,
+  ScrollContainer,
   TokenContainer,
   TokenText,
 } from './index.styled';
@@ -168,8 +168,8 @@ function ManageTokens() {
           </ButtonRow>
         </OptionsDialog>
       )}
-      <Container>
-        <ScrollableContainer>
+      <ScrollContainer>
+        <Container>
           <Header>{t('ADD_COINS')}</Header>
           <Description>{t('DESCRIPTION')}</Description>
           <FtInfoContainer>
@@ -195,8 +195,8 @@ function ManageTokens() {
             )}
           </FtInfoContainer>
           <TokenContainer>{getCoinsList()}</TokenContainer>
-        </ScrollableContainer>
-      </Container>
+        </Container>
+      </ScrollContainer>
       <BottomBar tab="dashboard" />
     </>
   );

@@ -1,6 +1,7 @@
 import ExoticSatsRow from '@components/exoticSatsRow/exoticSatsRow';
 import RareSatIcon from '@components/rareSatIcon/rareSatIcon';
 import type { BundleSatRange } from '@secretkeylabs/xverse-core';
+import { POPUP_WIDTH } from '@utils/constants';
 import { getSatLabel } from '@utils/rareSats';
 import styled from 'styled-components';
 
@@ -24,7 +25,7 @@ const Container = styled.div<{ isGalleryOpen?: boolean }>((props) => ({
 }));
 
 export default function RareSatsBundleGridItem({ item }: { item: BundleSatRange }) {
-  const isGalleryOpen: boolean = document.documentElement.clientWidth > 360;
+  const isGalleryOpen: boolean = document.documentElement.clientWidth > POPUP_WIDTH;
   return (
     <Container isGalleryOpen={isGalleryOpen}>
       <ExoticSatsRow

@@ -1,9 +1,10 @@
-import FiatAmountText from '@components/fiatAmountText';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { ArrowsDownUp } from '@phosphor-icons/react';
 import { currencySymbolMap, type FungibleToken } from '@secretkeylabs/xverse-core';
+import Button from '@ui-library/button';
 import { StyledP } from '@ui-library/common.styled';
-import Input, { ConvertComplication, MaxButton, VertRule } from '@ui-library/input';
+import { MaxButton } from '@ui-library/input';
+import TextArea from '@ui-library/textarea';
 import { HIDDEN_BALANCE_LABEL } from '@utils/constants';
 import { ftDecimals } from '@utils/helper';
 import { getFtTicker } from '@utils/tokens';
@@ -12,24 +13,21 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
 import styled from 'styled-components';
-import Theme from 'theme';
 
-const BalanceTextWrapper = styled.div`
-  text-align: right;
+const BalanceContainer = styled.div`
+  display: flex;
+  gap: ${(props) => props.theme.space.xs};
 `;
 
-const BalanceText = styled.span`
-  ${(props) => props.theme.typography.body_medium_m}
-  color: ${(props) => props.theme.colors.white_200};
+const ConvertedAmountWrapper = styled.div`
+  width: 100%;
+  word-break: break-all;
 `;
 
-const AmountText = styled(StyledP)`
-  margin-right: ${(props) => props.theme.space.xxs};
-`;
-
-const StyledFiatAmountText = styled(FiatAmountText)`
-  ${(props) => props.theme.typography.body_medium_s}
-  color: ${(props) => props.theme.colors.white_200};
+const ConvertButton = styled(Button)`
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
 `;
 
 const fiatInputValidator = /^[0-9]+[.]?[0-9]{0,2}$/;
@@ -56,7 +54,6 @@ type Props = {
   setUseTokenValue: (toggle: boolean) => void;
   sendMax: boolean;
   setSendMax: (sendMax: boolean) => void;
-  amountError: string;
 };
 
 function RuneAmountSelector({
@@ -67,9 +64,9 @@ function RuneAmountSelector({
   setUseTokenValue,
   sendMax,
   setSendMax,
-  amountError,
 }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'SEND' });
+
   const { fiatCurrency, balanceHidden } = useWalletSelector();
   const [displayAmount, setDisplayAmount] = useState(amountToSend);
   const tokenDecimals = Number(token.decimals ?? 0);
@@ -89,20 +86,34 @@ function RuneAmountSelector({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sendMax]);
 
-  const handleAmountChange = (newAmount: string) => {
+  const handleAmountChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    let newAmount = e.target.value;
     if (!newAmount) {
       setAmountToSend('0');
       setDisplayAmount('');
       setSendMax(false);
       return;
     }
+
+    // If user starts with a decimal point, prepend a zero
+    if (newAmount.startsWith('.')) {
+      newAmount = `0${newAmount}`;
+    }
+
+    // If user enters a number after a leading zero, replace the zero
+    if (newAmount.length > 1 && newAmount.startsWith('0') && newAmount[1] !== '.') {
+      newAmount = newAmount.slice(1);
+    }
+
+    // Basic input validation (for both fiat and btc)
     const isValidInput = useTokenValue
       ? tokenInputValidator(tokenDecimals).test(newAmount)
       : fiatInputValidator.test(newAmount);
-
     if (!isValidInput) return;
+
     setDisplayAmount(newAmount);
     setSendMax(false);
+
     if (useTokenValue) {
       setAmountToSend(BigNumber(newAmount).toString());
     } else {
@@ -130,64 +141,60 @@ function RuneAmountSelector({
 
   const handleMaxClick = () => setSendMax(!sendMax);
 
+  const getSendAmountConverted = () => {
+    if (!amountToSend || Number(amountToSend) === 0) return '0.00';
+
+    if (useTokenValue) {
+      return getTokenFiatEquivalent(BigNumber(amountToSend), token).toNumber().toFixed(2);
+    }
+
+    return amountToSend;
+  };
+
   return (
-    <Input
-      title={t('BTC.AMOUNT', { currency: useTokenValue ? getFtTicker(token) : fiatCurrency })}
-      value={displayAmount}
-      dataTestID="send-input"
-      onChange={(e) => handleAmountChange(e.target.value)}
-      placeholder="0"
-      infoPanel={
+    <>
+      <TextArea
+        titleElement={
+          <BalanceContainer data-testid="balance-label">
+            <StyledP typography="body_medium_m" color="white_200">
+              {useTokenValue ? getFtTicker(token) : fiatCurrency} {t('BALANCE')}:{' '}
+              {balanceHidden ? HIDDEN_BALANCE_LABEL : displayBalance}
+            </StyledP>
+            <MaxButton disabled={sendMax} onClick={handleMaxClick}>
+              {t('MAX')}
+            </MaxButton>
+          </BalanceContainer>
+        }
+        value={displayAmount}
+        dataTestID="send-input"
+        onChange={handleAmountChange}
+        placeholder="0"
+        rows={1}
+        complications={
+          <ConvertButton
+            variant="secondary"
+            title=""
+            icon={<ArrowsDownUp size={20} />}
+            onClick={handleUseTokenValueChange}
+          />
+        }
+        hideClear
+        autoFocus
+      />
+      <ConvertedAmountWrapper>
         <NumericFormat
-          value={displayBalance}
+          value={getSendAmountConverted()}
           displayType="text"
           thousandSeparator
-          prefix={useTokenValue ? '' : `~ ${currencySymbolMap[fiatCurrency]}`}
+          prefix={useTokenValue ? `~${currencySymbolMap[fiatCurrency]}` : ''}
           renderText={(value: string) => (
-            <BalanceTextWrapper data-testid="balance-label">
-              <BalanceText>{t('BALANCE')}</BalanceText>
-              {balanceHidden && ` ${HIDDEN_BALANCE_LABEL}`}
-              {!balanceHidden && ` ${value} ${useTokenValue ? getFtTicker(token) : fiatCurrency}`}
-            </BalanceTextWrapper>
+            <StyledP typography="body_medium_m" color="white_200">
+              {value} {useTokenValue ? fiatCurrency : getFtTicker(token)}
+            </StyledP>
           )}
         />
-      }
-      complications={
-        <>
-          {token.tokenFiatRate && (
-            <ConvertComplication onClick={handleUseTokenValueChange}>
-              {useTokenValue ? (
-                <StyledFiatAmountText
-                  fiatAmount={getTokenFiatEquivalent(BigNumber(amountToSend), token)}
-                  fiatCurrency={fiatCurrency}
-                />
-              ) : (
-                <NumericFormat
-                  value={Number(amountToSend)}
-                  displayType="text"
-                  thousandSeparator
-                  renderText={(value: string) => (
-                    <div>
-                      <AmountText typography="body_medium_s" color="white_200">
-                        {value} {getFtTicker(token)}
-                      </AmountText>
-                    </div>
-                  )}
-                />
-              )}
-              <ArrowsDownUp size={16} color={Theme.colors.white_200} />
-            </ConvertComplication>
-          )}
-          <VertRule />
-          <MaxButton disabled={sendMax} onClick={handleMaxClick}>
-            MAX
-          </MaxButton>
-        </>
-      }
-      feedback={amountError !== '' ? [{ message: amountError, variant: 'danger' }] : []}
-      hideClear
-      autoFocus
-    />
+      </ConvertedAmountWrapper>
+    </>
   );
 }
 
