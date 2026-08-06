@@ -135,7 +135,7 @@ function ConfirmBtcTransaction({
   }
 
   if (extractedTxSummary) {
-    const { hasSigHashNone, runes } = extractedTxSummary;
+    const { hasSigHashNone, hasSigHashSingle, hasAnyoneCanPay = false, runes } = extractedTxSummary;
     const { hasInsufficientBalance, hasInvalidMint } = runes;
     return (
       <TxSummaryContext.Provider value={parsedTxSummaryContextValue}>
@@ -149,13 +149,29 @@ function ConfirmBtcTransaction({
           <ReviewTransactionText typography="headline_s">
             {title || t('REVIEW_TRANSACTION')}
           </ReviewTransactionText>
-          {/* TODO: add sighash single warning */}
           {hasSigHashNone && (
             <SpacedCallout
               variant="danger"
               titleText={t('PSBT_SIG_HASH_NONE_DISCLAIMER_TITLE')}
               bodyText={t('PSBT_SIG_HASH_NONE_DISCLAIMER')}
             />
+          )}
+          {hasSigHashSingle && (
+            <SpacedCallout
+              variant="danger"
+              titleText={t('PSBT_SIG_HASH_SINGLE_DISCLAIMER_TITLE')}
+              bodyText={t('PSBT_SIG_HASH_SINGLE_DISCLAIMER')}
+            />
+          )}
+          {hasAnyoneCanPay && (
+            <SpacedCallout
+              variant="danger"
+              titleText={t('PSBT_SIG_HASH_ANYONECANPAY_DISCLAIMER_TITLE')}
+              bodyText={t('PSBT_SIG_HASH_ANYONECANPAY_DISCLAIMER')}
+            />
+          )}
+          {hasInsufficientBalance && (
+            <SpacedCallout variant="warning" bodyText={t('PSBT_INSUFFICIENT_RUNES')} />
           )}
           {!isBroadcast && <SpacedCallout bodyText={t('PSBT_NO_BROADCAST_DISCLAIMER')} />}
           {customCallout && <Callout {...customCallout} />}

@@ -42,6 +42,7 @@ function ConfirmBatchBtcTransactions({ summaries }: Props) {
         isFinal: summaries.every((curr) => curr.extractedSummary.isFinal),
         hasSigHashNone: summaries.some((psbt) => psbt.extractedSummary.hasSigHashNone),
         hasSigHashSingle: summaries.some((psbt) => psbt.extractedSummary.hasSigHashSingle),
+        hasAnyoneCanPay: summaries.some((psbt) => psbt.extractedSummary.hasAnyoneCanPay),
       };
       const runeSummary = await parseSummaryForRunes(txnContext, summary, network.type);
       const base: BaseSummary = {
@@ -60,6 +61,7 @@ function ConfirmBatchBtcTransactions({ summaries }: Props) {
         isFinal: summary.isFinal,
         hasSigHashNone: summary.hasSigHashNone,
         hasSigHashSingle: summary.hasSigHashSingle,
+        hasAnyoneCanPay: summary.hasAnyoneCanPay,
         hasExternalInputs: summaries.some((psbt) => psbt.extractedSummary.hasExternalInputs),
         hasOutputScript: summaries.some((psbt) => psbt.extractedSummary.hasOutputScript),
         hasUnconfirmedInputs: summaries.some((psbt) => psbt.extractedSummary.hasUnconfirmedInputs),
@@ -75,16 +77,33 @@ function ConfirmBatchBtcTransactions({ summaries }: Props) {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
 
   if (aggregatedParsedTxSummaryContext?.extractedTxSummary) {
-    const { hasSigHashNone } = aggregatedParsedTxSummaryContext.extractedTxSummary;
+    const {
+      hasSigHashNone,
+      hasSigHashSingle,
+      hasAnyoneCanPay = false,
+    } = aggregatedParsedTxSummaryContext.extractedTxSummary;
 
     return (
       <TxSummaryContext.Provider value={aggregatedParsedTxSummaryContext}>
-        {/* TODO: add sighash single warning */}
         {hasSigHashNone && (
           <SpacedCallout
             variant="danger"
             titleText={t('PSBT_SIG_HASH_NONE_DISCLAIMER_TITLE')}
             bodyText={t('PSBT_SIG_HASH_NONE_DISCLAIMER')}
+          />
+        )}
+        {hasSigHashSingle && (
+          <SpacedCallout
+            variant="danger"
+            titleText={t('PSBT_SIG_HASH_SINGLE_DISCLAIMER_TITLE')}
+            bodyText={t('PSBT_SIG_HASH_SINGLE_DISCLAIMER')}
+          />
+        )}
+        {hasAnyoneCanPay && (
+          <SpacedCallout
+            variant="danger"
+            titleText={t('PSBT_SIG_HASH_ANYONECANPAY_DISCLAIMER_TITLE')}
+            bodyText={t('PSBT_SIG_HASH_ANYONECANPAY_DISCLAIMER')}
           />
         )}
         <TransactionSummary isSubmitting={false} hideDetails />
