@@ -19,13 +19,41 @@ import {
   type LegacyMessageFromContentScript,
   type SatsConnectMessageFromContentScript,
 } from '@common/types/message-types';
+import { classifyExtensionToPageMessage } from '@common/utils/contentScriptPageMessageAllowlist';
 import getEventSourceWindow from '@common/utils/getEventSourceWindow';
-import { contentScriptWalletEventMessageSchema } from '@common/utils/messages/extensionToContentScript/schemas';
+import {
+  PAGE_BRIDGE_INIT_METHOD,
+  PAGE_BRIDGE_INIT_SOURCE,
+  buildPageBridgeBootstrapScript,
+} from '@common/utils/pageMessageBridge';
 
 import RequestsRoutes from '@common/utils/route-urls';
 import { walletEventName } from '@common/walletEvents';
 import { getIsPriorityWallet } from '@utils/chromeLocalStorage';
-import * as v from 'valibot';
+
+// PR7 / M-02: MessagePort bridge so inpage does not trust forgeable window.postMessage
+// envelopes with source: 'xverse-wallet'. Established at document_start before page scripts.
+const pageBridge = new MessageChannel();
+pageBridge.port1.start();
+
+function installPageBridge() {
+  const bootstrap = document.createElement('script');
+  bootstrap.textContent = buildPageBridgeBootstrapScript();
+  const root = document.documentElement;
+  root.appendChild(bootstrap);
+  bootstrap.remove();
+  window.postMessage(
+    { source: PAGE_BRIDGE_INIT_SOURCE, method: PAGE_BRIDGE_INIT_METHOD },
+    window.location.origin,
+    [pageBridge.port2],
+  );
+}
+
+installPageBridge();
+
+function postAllowlistedMessageToPage(message: unknown) {
+  pageBridge.port1.postMessage(message);
+}
 
 // Legacy messaging to work with older versions of Connect
 window.addEventListener('message', (event) => {
@@ -66,23 +94,26 @@ function sendMessageToBackground(
 }
 
 // Process messages received from the extension.
+// Fail-closed allowlist (M-01): never reflect arbitrary objects to the page.
 chrome.runtime.onMessage.addListener((message: unknown) => {
-  if (v.is(contentScriptWalletEventMessageSchema, message)) {
+  const decision = classifyExtensionToPageMessage(message);
+
+  if (decision.action === 'wallet-event') {
     window.dispatchEvent(
       new CustomEvent(walletEventName, {
-        detail: message.data,
+        detail: decision.data,
       }),
     );
     return;
   }
 
-  // Default to posting the message to `window` for unrecognized messages. Some
-  // functionality, such as RPC response messages, rely on the responses being
-  // posted to `window`.
-  //
-  // Ideally, all message types would be handled explicitly and warnings/errors
-  // would be logged when unrecognized messages are received.
-  window.postMessage(message, window.location.origin);
+  if (decision.action === 'postMessage') {
+    postAllowlistedMessageToPage(decision.message);
+    return;
+  }
+
+  // eslint-disable-next-line no-console
+  console.warn('[xverse] Dropped unrecognized extension→page message:', decision.reason, message);
 });
 
 interface ForwardDomEventToBackgroundArgs {
