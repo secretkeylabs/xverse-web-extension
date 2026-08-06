@@ -1,9 +1,9 @@
+import { useApprovalSearchParams } from '@common/utils/popup/useApprovalSearchParams';
 import { getStxAddressKeyChain, signStacksMessage } from '@secretkeylabs/xverse-core';
 import type { SignaturePayload, StructuredDataSignatureRequestOptions } from '@stacks/connect';
 import { deserializeCV, hexToCV, signStructuredData, type TupleCV } from '@stacks/transactions';
 import { decodeToken } from 'jsontokens';
 import { useCallback, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
 import useNetworkSelector from './useNetwork';
 import useSeedVault from './useSeedVault';
 import useSelectedAccount from './useSelectedAccount';
@@ -20,14 +20,23 @@ export function isUtf8Message(messageType: SignatureMessageType): messageType is
 }
 
 function useSignatureRequest() {
-  const { search } = useLocation();
-  const params = useMemo(() => new URLSearchParams(search), [search]);
+  const approvalParams = useApprovalSearchParams();
+  const params = approvalParams.status === 'ready' ? approvalParams.params : new URLSearchParams();
   const tabId = params.get('tabId') ?? '0';
   const requestId = params.get('messageId') ?? '';
   const { stxPublicKey, stxAddress } = useSelectedAccount();
   const selectedNetwork = useNetworkSelector();
 
   const { payload, domain, messageType, requestToken } = useMemo(() => {
+    if (approvalParams.status !== 'ready') {
+      return {
+        payload: null,
+        requestToken: null,
+        messageType: 'utf8' as SignatureMessageType,
+        domain: null,
+      };
+    }
+
     const token = params.get('request') || params.get('signMessageRequest');
     if (token) {
       const request = decodeToken(token as string);
@@ -59,9 +68,11 @@ function useSignatureRequest() {
       requestToken: null,
       domain: innerDomain,
     };
-  }, [params, stxAddress, stxPublicKey, selectedNetwork]);
+  }, [approvalParams.status, params, stxAddress, stxPublicKey, selectedNetwork]);
 
   return {
+    loading: approvalParams.status === 'loading',
+    error: approvalParams.status === 'error' ? approvalParams.error : undefined,
     tabId,
     requestId,
     requestToken,

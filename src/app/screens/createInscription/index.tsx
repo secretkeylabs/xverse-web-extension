@@ -4,8 +4,6 @@ import { decodeToken } from 'jsontokens';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NumericFormat } from 'react-number-format';
-import { useLocation } from 'react-router-dom';
-
 import type { CreateInscriptionPayload, CreateRepeatInscriptionsPayload } from '@sats-connect/core';
 import {
   AnalyticsEvents,
@@ -23,6 +21,7 @@ import {
 
 import SettingIcon from '@assets/img/dashboard/faders_horizontal.svg';
 import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types';
+import { useApprovalSearchParams } from '@common/utils/popup/useApprovalSearchParams';
 import AccountHeaderComponent from '@components/accountHeader';
 import ConfirmScreen from '@components/confirmScreen';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -70,22 +69,28 @@ function CreateInscription() {
   const { t } = useTranslation('translation', { keyPrefix: 'INSCRIPTION_REQUEST' });
   const { t: tUnits } = useTranslation('translation', { keyPrefix: 'UNITS' });
 
-  const { search } = useLocation();
+  const approvalParams = useApprovalSearchParams();
 
   const [payload, requestToken, tabId, origin] = useMemo(() => {
-    const params = new URLSearchParams(search);
+    if (approvalParams.status !== 'ready') {
+      return [undefined, undefined, 0, ''] as const;
+    }
+    const params = approvalParams.params;
     const requestEncoded =
       params.get('createInscription') ?? params.get('createRepeatInscriptions');
+    if (!requestEncoded) {
+      return [undefined, undefined, Number(params.get('tabId') ?? '0'), params.get('origin') ?? ''] as const;
+    }
     const requestBody = decodeToken(requestEncoded as string);
     return [
       requestBody.payload as unknown,
       requestEncoded,
-      Number(params.get('tabId')),
-      params.get('origin'),
-    ];
-  }, [search]);
+      Number(params.get('tabId') ?? '0'),
+      params.get('origin') ?? '',
+    ] as const;
+  }, [approvalParams]);
 
-  const appName = new URL(origin || '')?.host;
+  const appName = origin ? new URL(origin)?.host : '';
 
   const {
     contentType,
@@ -95,9 +100,9 @@ function CreateInscription() {
     appFeeAddress,
     appFee,
     suggestedMinerFeeRate,
-  } = payload as CreateInscriptionPayload | CreateRepeatInscriptionsPayload;
+  } = (payload ?? {}) as CreateInscriptionPayload | CreateRepeatInscriptionsPayload;
 
-  const { repeat } = payload as CreateRepeatInscriptionsPayload;
+  const { repeat } = (payload ?? {}) as CreateRepeatInscriptionsPayload;
   const showOver24RepeatsError = !Number.isNaN(repeat) && repeat > MAX_REPEATS;
 
   const [utxos, setUtxos] = useState<UTXO[] | undefined>();
@@ -115,10 +120,12 @@ function CreateInscription() {
   const transactionContext = useTransactionContext();
 
   useEffect(() => {
+    if (!requestedNetwork?.type) return;
     getNonOrdinalUtxo(btcAddress, btcClient, requestedNetwork.type).then(setUtxos);
-  }, [btcAddress, requestedNetwork]);
+  }, [btcAddress, requestedNetwork, btcClient]);
 
   useEffect(() => {
+    if (!payload) return;
     fetchBtcFeeRate(network.type).then((feeRatesResponse: BtcFeeResponse) => {
       setFeeRates(feeRatesResponse);
       if (suggestedMinerFeeRate === undefined) {
@@ -130,10 +137,11 @@ function CreateInscription() {
       }
     });
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- we only want to run this once on load
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once payload is available
+  }, [payload]);
 
   const contentIsInvalidJson = useMemo(() => {
+    if (!contentType || content == null) return false;
     let stringContent = content;
     if (payloadType === 'BASE_64') {
       stringContent = atob(content as string);
@@ -366,6 +374,18 @@ function CreateInscription() {
   const canHardwareConnectRetry =
     executeErrorCode === InscriptionErrorCode.USER_REJECTED ||
     executeErrorCode === InscriptionErrorCode.GENERAL_HARDWARE_WALLET_ERROR;
+
+  if (approvalParams.status === 'loading') {
+    return <Spinner color="white" size={50} />;
+  }
+
+  if (approvalParams.status === 'error' || !payload) {
+    return (
+      <div>
+        {approvalParams.status === 'error' ? approvalParams.error : 'Invalid inscription request'}
+      </div>
+    );
+  }
 
   return (
     <ConfirmScreen

@@ -36,8 +36,14 @@ function StxSelectAddressScreen() {
   const { network } = useWalletSelector();
   const [appIcon, setAppIcon] = useState('');
   const [isLoadingIcon, setIsLoadingIcon] = useState(false);
-  const { payload, origin, approveStxAddressRequest, cancelAddressRequest } =
-    useStxAddressRequest();
+  const {
+    loading: requestLoading,
+    error: requestError,
+    payload,
+    origin,
+    approveStxAddressRequest,
+    cancelAddressRequest,
+  } = useStxAddressRequest();
   const appUrl = useMemo(() => origin.replace(/(^\w+:|^)\/\//, ''), [origin]);
 
   const transition = useTransition(isLoadingIcon, {
@@ -90,12 +96,16 @@ function StxSelectAddressScreen() {
     navigate(`${RoutePaths.AccountList}?hideListActions=true`);
   };
 
-  if (isLoadingIcon) {
+  if (requestLoading || isLoadingIcon) {
     return (
       <LoaderContainer>
         <Spinner color="white" size={50} />
       </LoaderContainer>
     );
+  }
+
+  if (requestError) {
+    return <div>{requestError}</div>;
   }
 
   return (

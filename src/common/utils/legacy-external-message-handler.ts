@@ -13,6 +13,8 @@ import {
   type SignatureResponseMessage,
 } from '../types/message-types';
 import { sendMessage } from '../types/messages';
+import { createApprovalRequest, deleteApprovalRequest } from './approvalRequestStore';
+import { popupRequestIdParamName } from './popup';
 import popupCenter from './popup-center';
 import RequestsRoutes from './route-urls';
 
@@ -20,13 +22,21 @@ type ParamsObject = Record<string, string | null | undefined>;
 export type ParamsKeyValueArray = [string, string | null | undefined][];
 
 type Params = ParamsObject | ParamsKeyValueArray;
+
+/**
+ * Build popup URL params for legacy approval flows.
+ *
+ * Sensitive fields (psbt, tokens, etc.) are stored in the SW approval store;
+ * the URL only carries an opaque {@linkcode popupRequestIdParamName}.
+ */
 export function makeSearchParamsWithDefaults(port: chrome.runtime.Port, additionalParams?: Params) {
-  const urlParams = new URLSearchParams();
-  // All actions must have a corresponding `origin` and `tabId`
   const origin = getOriginFromPort(port);
   const tabId = getTabIdFromPort(port);
-  urlParams.set('origin', origin ?? '');
-  urlParams.set('tabId', tabId?.toString() ?? '');
+
+  const legacyParams: Record<string, string> = {
+    origin: origin ?? '',
+    tabId: tabId?.toString() ?? '',
+  };
 
   let additionalParamsEntries: ParamsKeyValueArray = [];
   if (Array.isArray(additionalParams)) {
@@ -35,11 +45,26 @@ export function makeSearchParamsWithDefaults(port: chrome.runtime.Port, addition
     additionalParamsEntries = Object.entries(additionalParams);
   }
 
-  additionalParamsEntries.forEach(
-    ([key, value]) => typeof value === 'string' && urlParams.set(key, value),
-  );
+  additionalParamsEntries.forEach(([key, value]) => {
+    if (typeof value === 'string') {
+      legacyParams[key] = value;
+    }
+  });
 
-  return { urlParams, origin, tabId };
+  const requestId = createApprovalRequest({
+    kind: 'legacy',
+    legacyParams,
+  });
+
+  const urlParams = new URLSearchParams();
+  urlParams.set(popupRequestIdParamName, requestId);
+  // Non-sensitive routing metadata stays in the URL so unmigrated screens that
+  // only read tabId/origin keep working. Secrets (psbt, tokens, …) live only in
+  // the SW store under requestId.
+  urlParams.set('origin', origin ?? '');
+  urlParams.set('tabId', tabId?.toString() ?? '');
+
+  return { urlParams, origin, tabId, requestId };
 }
 
 interface ListenForPopupCloseArgs {
@@ -83,7 +108,23 @@ export function listenForOriginTabClose({ tabId }: ListenForOriginTabCloseArgs) 
 }
 
 export async function triggerRequestWindowOpen(path: RequestsRoutes, urlParams: URLSearchParams) {
-  return popupCenter({ url: `/popup.html#${path}?${urlParams.toString()}` });
+  const requestId = urlParams.get(popupRequestIdParamName);
+  const popupWindow = await popupCenter({
+    url: `/popup.html#${path}?${urlParams.toString()}`,
+  });
+
+  // Drop SW-stored secrets when the approval window closes (TTL is a backstop).
+  if (requestId && popupWindow?.id != null) {
+    const popupId = popupWindow.id;
+    const cleanup = (id: number) => {
+      if (id !== popupId) return;
+      deleteApprovalRequest(requestId);
+      chrome.windows.onRemoved.removeListener(cleanup);
+    };
+    chrome.windows.onRemoved.addListener(cleanup);
+  }
+
+  return popupWindow;
 }
 
 export async function handleLegacyExternalMethodFormat(

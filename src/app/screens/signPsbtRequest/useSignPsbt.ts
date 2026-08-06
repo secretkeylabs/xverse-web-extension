@@ -1,4 +1,5 @@
 import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types';
+import { getLegacyApprovalParams } from '@common/utils/popup';
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import useTransactionContext from '@hooks/useTransactionContext';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -13,61 +14,153 @@ import { base64 } from '@scure/base';
 import * as btc from '@scure/btc-signer';
 import { btcTransaction, type InputToSign, type SettingsNetwork } from '@secretkeylabs/xverse-core';
 import { decodeToken } from 'jsontokens';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import useBtcClient from '../../hooks/apiClients/useBtcClient';
 
-const useSignPsbtParams = (network: SettingsNetwork) => {
-  const { search } = useLocation();
-  const params = new URLSearchParams(search);
-  const tabId = params.get('tabId') ?? '0';
-  const requestId = params.get('requestId') ?? '';
-  const location = useLocation();
+type SignPsbtParamsState = {
+  loading: boolean;
+  tabId: string;
+  requestId: string;
+  payload?: SignTransactionPayload;
+  requestToken: string | null;
+  error?: string;
+};
 
-  const { requestToken, payload } = useMemo(() => {
-    const token = params.get('signPsbtRequest') ?? '';
-    const magicEdenPsbt = params.get('magicEdenPsbt') ?? '';
-    if (token) {
-      const request = decodeToken(token) as any as SignTransactionOptions;
-      return {
-        payload: request.payload,
-        requestToken: token,
-      };
-    }
-    if (magicEdenPsbt) {
-      const { payload: magicEdenPayload } = location.state;
-      return {
-        payload: magicEdenPayload,
-        requestToken: null,
-      };
-    }
-    const signInputs = JSON.parse(params.get('signInputs')!) as Record<string, number[]>;
-    const inputsToSign: InputToSign[] = Object.keys(signInputs).map((address) => ({
-      address,
-      signingIndexes: signInputs[address],
-    }));
-    const rpcPayload: SignTransactionPayload = {
-      psbtBase64: params.get('psbt') ?? '',
-      inputsToSign,
-      broadcast: Boolean(params.get('broadcast')) ?? false,
-      message: params.get('message') ?? '',
-      network: {
-        type: BitcoinNetworkType[network.type],
-      },
-    };
+const buildPayloadFromParams = (
+  params: Record<string, string>,
+  network: SettingsNetwork,
+  locationState: unknown,
+): Pick<SignPsbtParamsState, 'payload' | 'requestToken' | 'tabId' | 'requestId'> => {
+  const tabId = params.tabId ?? '0';
+  const requestId = params.requestId ?? '';
+  const token = params.signPsbtRequest ?? '';
+  const magicEdenPsbt = params.magicEdenPsbt ?? '';
+
+  if (token) {
+    const request = decodeToken(token) as any as SignTransactionOptions;
     return {
-      payload: rpcPayload,
-      requestToken: null,
+      payload: request.payload,
+      requestToken: token,
+      tabId,
+      requestId,
     };
-  }, []);
+  }
 
-  return { payload, tabId, requestToken, requestId };
+  if (magicEdenPsbt) {
+    const { payload: magicEdenPayload } = (locationState ?? {}) as { payload?: SignTransactionPayload };
+    return {
+      payload: magicEdenPayload,
+      requestToken: null,
+      tabId,
+      requestId,
+    };
+  }
+
+  const signInputs = JSON.parse(params.signInputs ?? '{}') as Record<string, number[]>;
+  const inputsToSign: InputToSign[] = Object.keys(signInputs).map((address) => ({
+    address,
+    signingIndexes: signInputs[address],
+  }));
+  const rpcPayload: SignTransactionPayload = {
+    psbtBase64: params.psbt ?? '',
+    inputsToSign,
+    // Strict parse — Boolean("false") === true was a footgun (L-01).
+    broadcast: params.broadcast === 'true',
+    message: params.message ?? '',
+    network: {
+      type: BitcoinNetworkType[network.type],
+    },
+  };
+  return {
+    payload: rpcPayload,
+    requestToken: null,
+    tabId,
+    requestId,
+  };
+};
+
+const useSignPsbtParams = (network: SettingsNetwork): SignPsbtParamsState => {
+  const { search } = useLocation();
+  const location = useLocation();
+  const [state, setState] = useState<SignPsbtParamsState>({
+    loading: true,
+    tabId: '0',
+    requestId: '',
+    requestToken: null,
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      const urlParams = new URLSearchParams(search);
+      const hasOpaqueId = urlParams.has('requestId');
+
+      // Modern path: opaque requestId → SW store (no psbt in URL).
+      if (hasOpaqueId) {
+        const [err, legacyParams] = await getLegacyApprovalParams();
+        if (cancelled) return;
+        if (err || !legacyParams) {
+          setState({
+            loading: false,
+            tabId: '0',
+            requestId: '',
+            requestToken: null,
+            error: err?.message ?? 'Missing approval params',
+          });
+          return;
+        }
+        try {
+          const built = buildPayloadFromParams(legacyParams, network, location.state);
+          setState({ loading: false, ...built });
+        } catch (e: any) {
+          setState({
+            loading: false,
+            tabId: legacyParams.tabId ?? '0',
+            requestId: legacyParams.requestId ?? '',
+            requestToken: null,
+            error: e?.message ?? 'Failed to parse approval params',
+          });
+        }
+        return;
+      }
+
+      // Legacy in-flight fallback: params still embedded in the hash query.
+      try {
+        const embedded: Record<string, string> = {};
+        urlParams.forEach((value, key) => {
+          embedded[key] = value;
+        });
+        const built = buildPayloadFromParams(embedded, network, location.state);
+        if (!cancelled) {
+          setState({ loading: false, ...built });
+        }
+      } catch (e: any) {
+        if (!cancelled) {
+          setState({
+            loading: false,
+            tabId: '0',
+            requestId: '',
+            requestToken: null,
+            error: e?.message ?? 'Failed to parse approval params',
+          });
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [search, network, location.state]);
+
+  return state;
 };
 
 const useSignPsbt = () => {
   const { network } = useWalletSelector();
   const btcClient = useBtcClient();
-  const { payload, tabId, requestToken, requestId } = useSignPsbtParams(network);
+  const { payload, tabId, requestToken, requestId, loading, error } = useSignPsbtParams(network);
 
   const txnContext = useTransactionContext();
 
@@ -81,7 +174,7 @@ const useSignPsbt = () => {
   }, [txnContext, payload]);
 
   const confirmSignPsbt = async (signingResponse: string) => {
-    if (!signingResponse) return;
+    if (!signingResponse || !payload) return;
 
     let txId: string = '';
 
@@ -143,10 +236,10 @@ const useSignPsbt = () => {
   /**
    * User closes request validation error
    */
-  const onCloseError = (error: string) => {
+  const onCloseError = (errorMessage: string) => {
     const requestError = makeRPCError(requestId, {
       code: RpcErrorCode.INTERNAL_ERROR,
-      message: error,
+      message: errorMessage,
     });
     sendRpcResponse(+tabId, requestError);
   };
@@ -167,6 +260,8 @@ const useSignPsbt = () => {
     tabId,
     requestId,
     requestToken,
+    loading,
+    error,
     getSigningAddresses,
     confirmSignPsbt,
     cancelSignPsbt,

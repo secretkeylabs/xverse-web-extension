@@ -6,7 +6,7 @@ import {
   type LedgerTransport,
 } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -23,6 +23,8 @@ function MintRune() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const navigate = useNavigate();
   const {
+    loading: paramsLoading,
+    error: paramsError,
     mintRequest,
     runeInfo,
     orderTx,
@@ -34,13 +36,13 @@ function MintRune() {
     cancelMintRequest,
   } = useMintRequest();
 
-  const createAndLoadOrder = useCallback(async () => {
-    await handleMint();
-  }, []);
-
   useEffect(() => {
-    createAndLoadOrder();
-  }, [createAndLoadOrder]);
+    if (paramsLoading || paramsError || !mintRequest) {
+      return;
+    }
+    handleMint();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paramsLoading, paramsError, mintRequest]);
 
   const onClickCancel = async () => {
     await cancelMintRequest();
@@ -64,10 +66,14 @@ function MintRune() {
     }
   };
 
+  if (paramsError) {
+    return <RequestError error={paramsError} onClose={onClickCancel} />;
+  }
+
   return (
     <>
       {mintError && <RequestError error={mintError.message} onClose={onClickCancel} />}
-      {!orderTx && !mintError && (
+      {(paramsLoading || (!orderTx && !mintError)) && (
         <LoaderContainer>
           <Spinner size={50} />
         </LoaderContainer>

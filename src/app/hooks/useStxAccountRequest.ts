@@ -1,5 +1,6 @@
 import { MESSAGE_SOURCE } from '@common/types/message-types';
 
+import { useApprovalSearchParams } from '@common/utils/popup/useApprovalSearchParams';
 import { sendUserRejectionMessage } from '@common/utils/rpc/responseMessages/errors';
 import { sendGetAccountsSuccessResponseMessage } from '@common/utils/rpc/responseMessages/stacks';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -8,16 +9,14 @@ import { base58 } from '@scure/base';
 import { bip32, bip39 } from '@secretkeylabs/xverse-core';
 import { decodeToken } from 'jsontokens';
 import { useCallback, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
 import useSeedVault from './useSeedVault';
 import useSelectedAccount from './useSelectedAccount';
 
 const GAIA_HUB_URL = 'https://hub.hiro.so';
 
 const useStxAccountRequest = () => {
-  // Params
-  const { search } = useLocation();
-  const params = new URLSearchParams(search);
+  const approvalParams = useApprovalSearchParams();
+  const params = approvalParams.status === 'ready' ? approvalParams.params : new URLSearchParams();
 
   // Utils
   const { stxAddress, stxPublicKey } = useSelectedAccount();
@@ -33,8 +32,11 @@ const useStxAccountRequest = () => {
   const origin = params.get('origin') ?? '';
   const requestToken = params.get('addressRequest') ?? '';
   const request = useMemo(
-    () => (requestToken ? (decodeToken(requestToken) as any as GetAddressOptions) : (null as any)),
-    [requestToken],
+    () =>
+      approvalParams.status === 'ready' && requestToken
+        ? (decodeToken(requestToken) as any as GetAddressOptions)
+        : (null as any),
+    [approvalParams.status, requestToken],
   );
 
   // Actions
@@ -86,10 +88,15 @@ const useStxAccountRequest = () => {
       payload: { addressRequest: requestToken, addressResponse: 'cancel' },
     };
     chrome.tabs.sendMessage(+tabId, addressMessage);
-  }, [requestToken, tabId]);
+  }, [requestToken, tabId, rpcMethod, messageId]);
+
+  const loading = approvalParams.status === 'loading';
+  const error = approvalParams.status === 'error' ? approvalParams.error : undefined;
 
   if (rpcMethod === 'stx_getAccounts') {
     return {
+      loading,
+      error,
       payload: { network },
       tabId,
       origin,
@@ -100,7 +107,9 @@ const useStxAccountRequest = () => {
   }
 
   return {
-    payload: request.payload,
+    loading,
+    error,
+    payload: request?.payload,
     tabId,
     origin,
     requestToken,

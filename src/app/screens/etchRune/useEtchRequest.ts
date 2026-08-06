@@ -1,3 +1,4 @@
+import { useApprovalSearchParams } from '@common/utils/popup/useApprovalSearchParams';
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import useOrdinalsServiceApi from '@hooks/apiClients/useOrdinalsServiceApi';
 import useSelectedAccount from '@hooks/useSelectedAccount';
@@ -5,28 +6,46 @@ import useTransactionContext from '@hooks/useTransactionContext';
 import { RpcErrorCode, type Params } from '@sats-connect/core';
 import { generateTransaction, type TransactionBuildPayload } from '@screens/sendBtc/helpers';
 import type { KeystoneTransport, LedgerTransport } from '@secretkeylabs/xverse-core';
-import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useMemo, useState } from 'react';
 import SuperJSON from 'superjson';
 
 const useEtchRequestRequestParams = () => {
-  const { search } = useLocation();
-  const params = new URLSearchParams(search);
+  const approvalParams = useApprovalSearchParams();
+  const params = approvalParams.status === 'ready' ? approvalParams.params : new URLSearchParams();
   const tabId = params.get('tabId') ?? '0';
   const requestId = params.get('requestId') ?? '';
   const payloadToken = params.get('payload') ?? '';
 
-  const payload = SuperJSON.parse<Params<'runes_etch'>>(payloadToken);
-  const etchRequest = payload;
-  // network is not needed in the etch request and the api will use the current network
-  // we need to remove it because the api will throw an error if it's present
-  delete etchRequest.network;
+  const { etchRequest, network } = useMemo(() => {
+    if (approvalParams.status !== 'ready' || !payloadToken) {
+      return { etchRequest: undefined as any, network: undefined };
+    }
+    const payload = SuperJSON.parse<Params<'runes_etch'>>(payloadToken);
+    const networkValue = payload.network;
+    // network is not needed in the etch request and the api will use the current network
+    // we need to remove it because the api will throw an error if it's present
+    delete payload.network;
+    return { etchRequest: payload, network: networkValue };
+  }, [approvalParams.status, payloadToken]);
 
-  return { etchRequest, tabId, requestId, network: payload.network };
+  return {
+    loading: approvalParams.status === 'loading',
+    error: approvalParams.status === 'error' ? approvalParams.error : undefined,
+    etchRequest,
+    tabId,
+    requestId,
+    network,
+  };
 };
 
 const useEtchRequest = () => {
-  const { etchRequest, requestId, tabId } = useEtchRequestRequestParams();
+  const {
+    loading: paramsLoading,
+    error: paramsError,
+    etchRequest,
+    requestId,
+    tabId,
+  } = useEtchRequestRequestParams();
   const selectedAccount = useSelectedAccount();
   const txContext = useTransactionContext();
   const ordinalsServiceApi = useOrdinalsServiceApi();
@@ -151,6 +170,8 @@ const useEtchRequest = () => {
   };
 
   return {
+    loading: paramsLoading,
+    error: paramsError,
     etchRequest,
     orderTx,
     etchError,

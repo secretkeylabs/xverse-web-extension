@@ -66,7 +66,16 @@ function SignatureRequest(): JSX.Element {
   const { accountsList, network } = useWalletSelector();
   const [addressType, setAddressType] = useState('');
   const { switchAccount } = useWalletReducer();
-  const { messageType, requestToken, payload, tabId, domain, requestId } = useSignatureRequest();
+  const {
+    loading: signatureRequestLoading,
+    error: signatureRequestError,
+    messageType,
+    requestToken,
+    payload,
+    tabId,
+    domain,
+    requestId,
+  } = useSignatureRequest();
   const navigate = useNavigate();
   const isMessageSigningDisabled =
     isHardwareAccount(selectedAccount) && !selectedAccount?.stxAddress;
@@ -77,6 +86,9 @@ function SignatureRequest(): JSX.Element {
   });
 
   const checkAddressAvailability = () => {
+    if (!payload) {
+      return undefined;
+    }
     const account = accountsList.filter((acc) => {
       if (acc.stxAddress === payload.stxAddress) {
         setAddressType(t('SIGNATURE_REQUEST.SIGNING_ADDRESS_STX'));
@@ -88,6 +100,9 @@ function SignatureRequest(): JSX.Element {
   };
 
   const switchAccountBasedOnRequest = () => {
+    if (!payload) {
+      return;
+    }
     if (getNetworkType(payload.network) !== getStxNetworkForBtcNetwork(network.type)) {
       navigate('/tx-status', {
         state: {
@@ -117,8 +132,12 @@ function SignatureRequest(): JSX.Element {
   };
 
   useEffect(() => {
+    if (signatureRequestLoading || !payload) {
+      return;
+    }
     switchAccountBasedOnRequest();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signatureRequestLoading, payload]);
 
   const handleMessageSigning = useSignMessage(messageType);
 
@@ -247,8 +266,8 @@ function SignatureRequest(): JSX.Element {
   };
 
   const getMessageHash = useCallback(
-    () => buf2hex(hashMessage(payload.message)),
-    [payload.message],
+    () => (payload ? buf2hex(hashMessage(payload.message)) : ''),
+    [payload],
   );
 
   const getConfirmationError = (type: 'title' | 'subtitle') => {
@@ -274,6 +293,14 @@ function SignatureRequest(): JSX.Element {
 
     return t('SIGNATURE_REQUEST.LEDGER.CONFIRM.ERROR_SUBTITLE');
   };
+
+  if (signatureRequestLoading) {
+    return <div />;
+  }
+
+  if (signatureRequestError || !payload) {
+    return <div>{signatureRequestError ?? 'Invalid signature request'}</div>;
+  }
 
   return (
     <ConfirmScreen

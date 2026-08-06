@@ -12,7 +12,14 @@ import { useSignMessageRequestParams, useSignMessageValidation } from './useSign
 
 function SignMessageRequest() {
   const { t } = useTranslation('translation');
-  const { payload, tabId, requestToken, requestId } = useSignMessageRequestParams();
+  const {
+    loading: requestLoading,
+    error: requestError,
+    payload,
+    tabId,
+    requestToken,
+    requestId,
+  } = useSignMessageRequestParams();
   const { validationError, setValidationError } = useSignMessageValidation(payload);
 
   const cancelCallback = () => {
@@ -74,6 +81,14 @@ function SignMessageRequest() {
 
     setValidationError({ error: msg });
   };
+
+  if (requestLoading) {
+    return null;
+  }
+
+  if (requestError || !payload) {
+    return <RequestError error={requestError ?? 'Invalid sign message request'} onClose={cancelCallback} />;
+  }
 
   if (validationError) {
     return <RequestError error={validationError.error} onClose={cancelCallback} />;

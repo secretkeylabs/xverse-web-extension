@@ -1,16 +1,15 @@
 import { MESSAGE_SOURCE } from '@common/types/message-types';
+import { useApprovalSearchParams } from '@common/utils/popup/useApprovalSearchParams';
 import { sendGetAddressesSuccessResponseMessage } from '@common/utils/rpc/responseMessages/stacks';
 import useWalletSelector from '@hooks/useWalletSelector';
 import { AddressPurpose, AddressType, type GetAddressOptions } from '@sats-connect/core';
 import { decodeToken } from 'jsontokens';
 import { useCallback, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
 import useSelectedAccount from './useSelectedAccount';
 
 const useStxAddressRequest = () => {
-  // Params
-  const { search } = useLocation();
-  const params = new URLSearchParams(search);
+  const approvalParams = useApprovalSearchParams();
+  const params = approvalParams.status === 'ready' ? approvalParams.params : new URLSearchParams();
 
   // Utils
   const { stxAddress, stxPublicKey } = useSelectedAccount();
@@ -25,8 +24,11 @@ const useStxAddressRequest = () => {
   const origin = params.get('origin') ?? '';
   const requestToken = params.get('addressRequest') ?? '';
   const request = useMemo(
-    () => (requestToken ? (decodeToken(requestToken) as any as GetAddressOptions) : (null as any)),
-    [requestToken],
+    () =>
+      approvalParams.status === 'ready' && requestToken
+        ? (decodeToken(requestToken) as any as GetAddressOptions)
+        : (null as any),
+    [approvalParams.status, requestToken],
   );
 
   const approveStxAddressRequest = useCallback(() => {
@@ -58,7 +60,7 @@ const useStxAddressRequest = () => {
     }
 
     chrome.tabs.sendMessage(+tabId, addressMessage);
-  }, [stxAddress, stxPublicKey, requestToken, tabId]);
+  }, [stxAddress, stxPublicKey, requestToken, tabId, messageId, rpcMethod]);
   const cancelAddressRequest = useCallback(() => {
     const addressMessage = {
       source: MESSAGE_SOURCE,
@@ -68,8 +70,13 @@ const useStxAddressRequest = () => {
     chrome.tabs.sendMessage(+tabId, addressMessage);
   }, [requestToken, tabId]);
 
+  const loading = approvalParams.status === 'loading';
+  const error = approvalParams.status === 'error' ? approvalParams.error : undefined;
+
   if (rpcMethod === 'stx_getAddresses') {
     return {
+      loading,
+      error,
       payload: { network },
       tabId,
       origin,
@@ -80,7 +87,9 @@ const useStxAddressRequest = () => {
   }
 
   return {
-    payload: request.payload,
+    loading,
+    error,
+    payload: request?.payload,
     tabId,
     origin,
     requestToken,

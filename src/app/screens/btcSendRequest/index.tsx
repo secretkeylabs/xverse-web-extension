@@ -37,10 +37,13 @@ function BtcSendRequest() {
   const { network } = useWalletSelector();
   const navigate = useNavigate();
   const selectedAccount = useSelectedAccount();
-  const { payload, tabId, requestId } = useBtcSendRequestPayload(
-    selectedAccount.btcAddress,
-    network,
-  );
+  const {
+    loading: payloadLoading,
+    error: payloadError,
+    payload,
+    tabId,
+    requestId,
+  } = useBtcSendRequestPayload(selectedAccount.btcAddress, network);
   const transactionContext = useTransactionContext();
   const { data: btcFeeRate, isLoading: feeRatesLoading } = useBtcFeeRate();
   const { t } = useTranslation('translation');
@@ -50,8 +53,11 @@ function BtcSendRequest() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const generateTx = (desiredFeeRate: number): Promise<btcTransaction.EnhancedTransaction> =>
-    btcTransaction.sendBtc(
+  const generateTx = (desiredFeeRate: number): Promise<btcTransaction.EnhancedTransaction> => {
+    if (!payload) {
+      return Promise.reject(new Error('Missing send request payload'));
+    }
+    return btcTransaction.sendBtc(
       transactionContext,
       payload.recipients.map((value) => ({
         toAddress: value.address,
@@ -59,6 +65,7 @@ function BtcSendRequest() {
       })),
       +desiredFeeRate,
     );
+  };
 
   useEffect(() => {
     if (!feeRate && btcFeeRate && !feeRatesLoading) {
@@ -230,8 +237,12 @@ function BtcSendRequest() {
     return undefined;
   };
 
-  if (feeRatesLoading || !payload || !summary) {
-    return <OuterContainer>{isLoading && <Spinner color="white" size={50} />}</OuterContainer>;
+  if (payloadError) {
+    return <OuterContainer>{payloadError}</OuterContainer>;
+  }
+
+  if (payloadLoading || feeRatesLoading || !payload || !summary) {
+    return <OuterContainer>{(payloadLoading || isLoading) && <Spinner color="white" size={50} />}</OuterContainer>;
   }
 
   return (

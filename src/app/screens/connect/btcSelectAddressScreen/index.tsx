@@ -42,6 +42,8 @@ function BtcSelectAddressScreen() {
   const [isLoadingIcon, setIsLoadingIcon] = useState(false);
 
   const {
+    loading: requestLoading,
+    error: requestError,
     legacyRequestNetworkType,
     purposes,
     origin,
@@ -78,6 +80,9 @@ function BtcSelectAddressScreen() {
   };
 
   useEffect(() => {
+    if (requestLoading || requestError) {
+      return;
+    }
     // Handle address requests to a network that's not currently active
     if (legacyRequestNetworkType && legacyRequestNetworkType !== network.type) {
       navigate('/tx-status', {
@@ -108,7 +113,15 @@ function BtcSelectAddressScreen() {
         });
       }
     });
-  }, [legacyRequestNetworkType, navigate, network.type, purposes, t]);
+  }, [
+    legacyRequestNetworkType,
+    navigate,
+    network.type,
+    purposes,
+    requestError,
+    requestLoading,
+    t,
+  ]);
 
   useEffect(() => {
     if (origin === '') {
@@ -169,12 +182,16 @@ function BtcSelectAddressScreen() {
     navigate(`${RoutePaths.AccountList}?hideListActions=true`);
   };
 
-  if (isLoadingIcon) {
+  if (requestLoading || isLoadingIcon) {
     return (
       <LoaderContainer>
         <Spinner color="white" size={50} />
       </LoaderContainer>
     );
+  }
+
+  if (requestError) {
+    return <div>{requestError}</div>;
   }
 
   return (

@@ -1,5 +1,6 @@
 import { MESSAGE_SOURCE, SatsConnectMethods } from '@common/types/message-types';
 import { getPopupPayload, type Context } from '@common/utils/popup';
+import { useApprovalSearchParams } from '@common/utils/popup/useApprovalSearchParams';
 import { accountPurposeAddresses } from '@common/utils/rpc/btc/getAddresses/utils';
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import { usePermissions } from '@components/permissionsManager';
@@ -17,11 +18,12 @@ import {
 } from '@sats-connect/core';
 import { permissions, type Permissions } from '@secretkeylabs/xverse-core';
 import { decodeToken } from 'jsontokens';
-import { useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useCallback, useEffect, useState } from 'react';
 import * as v from 'valibot';
 
 interface UseRequestHelperReturn {
+  loading: boolean;
+  error?: string;
   legacyRequestNetworkType: BitcoinNetworkType | undefined;
   message: string | undefined;
   purposes: AddressPurpose[];
@@ -82,122 +84,157 @@ function useMakeTransitionalGrantAccountReadPermissions() {
   );
 }
 
+const emptyHandlers = {
+  loading: true as const,
+  legacyRequestNetworkType: undefined,
+  message: undefined,
+  purposes: [] as AddressPurpose[],
+  origin: '',
+  async sendApprovedResponse() {},
+  sendCancelledResponse() {},
+};
+
 export default function useRequestHelper(): UseRequestHelperReturn {
   const account = useSelectedAccount();
   const transitionalGrantReadPermissions = useMakeTransitionalGrantAccountReadPermissions();
+  const approvalParams = useApprovalSearchParams();
+  const [state, setState] = useState<UseRequestHelperReturn>(emptyHandlers);
 
-  // Used for handling a legacy request at the end of this function. Although
-  // its use is discouraged (see its docstring), it was part of the initial
-  // implementation for handling a legacy request, and is used to avoid changing
-  // how legacy requests are handled.
-  const { search } = useLocation();
+  useEffect(() => {
+    let cancelled = false;
 
-  const [errorGetAddresses, popupPayloadGetAddresses] = getPopupPayload((data) =>
-    v.parse(getAddressesRequestMessageSchema, data),
-  );
-  if (!errorGetAddresses) {
-    const { context, data } = popupPayloadGetAddresses;
-    return {
-      message: data.params.message,
-      origin: context.origin,
-      legacyRequestNetworkType: undefined,
-      purposes: data.params.purposes,
-      async sendApprovedResponse() {
-        const addresses = accountPurposeAddresses(account, {
-          type: 'select',
-          purposes: popupPayloadGetAddresses.data.params.purposes,
+    (async () => {
+      const [errorGetAddresses, popupPayloadGetAddresses] = await getPopupPayload((data) =>
+        v.parse(getAddressesRequestMessageSchema, data),
+      );
+      if (!cancelled && !errorGetAddresses && popupPayloadGetAddresses) {
+        const { context, data } = popupPayloadGetAddresses;
+        setState({
+          loading: false,
+          message: data.params.message,
+          origin: context.origin,
+          legacyRequestNetworkType: undefined,
+          purposes: data.params.purposes,
+          async sendApprovedResponse() {
+            const addresses = accountPurposeAddresses(account, {
+              type: 'select',
+              purposes: popupPayloadGetAddresses.data.params.purposes,
+            });
+
+            sendRpcResponse(context.tabId, makeRpcSuccessResponse(data.id, { addresses }));
+          },
+          sendCancelledResponse() {
+            sendRpcResponse(
+              context.tabId,
+              makeRPCError(data.id, {
+                code: RpcErrorCode.USER_REJECTION,
+                message: `User rejected ${data.method} request.`,
+              }),
+            );
+          },
         });
+        return;
+      }
 
-        sendRpcResponse(context.tabId, makeRpcSuccessResponse(data.id, { addresses }));
-      },
-      sendCancelledResponse() {
-        sendRpcResponse(
-          context.tabId,
-          makeRPCError(data.id, {
-            code: RpcErrorCode.USER_REJECTION,
-            message: `User rejected ${data.method} request.`,
-          }),
-        );
-      },
-    };
-  }
+      const [errorGetAccounts, popupPayloadGetAccounts] = await getPopupPayload((data) =>
+        v.parse(getAccountsRequestMessageSchema, data),
+      );
+      if (!cancelled && !errorGetAccounts && popupPayloadGetAccounts) {
+        const { context, data } = popupPayloadGetAccounts;
+        setState({
+          loading: false,
+          message: data.params.message,
+          origin: context.origin,
+          legacyRequestNetworkType: undefined,
+          purposes: data.params.purposes,
+          async sendApprovedResponse() {
+            await transitionalGrantReadPermissions(context);
+            const addresses: GetAccountsResult = accountPurposeAddresses(account, {
+              type: 'select',
+              purposes: popupPayloadGetAccounts.data.params.purposes,
+            }).map((address) => ({
+              ...address,
+              walletType: account.accountType ?? 'software',
+            }));
+            sendRpcResponse(context.tabId, makeRpcSuccessResponse(data.id, addresses));
+          },
+          sendCancelledResponse() {
+            sendRpcResponse(
+              context.tabId,
+              makeRPCError(data.id, {
+                code: RpcErrorCode.USER_REJECTION,
+                message: `User rejected ${data.method} request.`,
+              }),
+            );
+          },
+        });
+        return;
+      }
 
-  const [errorGetAccounts, popupPayloadGetAccounts] = getPopupPayload((data) =>
-    v.parse(getAccountsRequestMessageSchema, data),
-  );
-  if (!errorGetAccounts) {
-    const { context, data } = popupPayloadGetAccounts;
-    return {
-      message: data.params.message,
-      origin: context.origin,
-      legacyRequestNetworkType: undefined,
-      purposes: data.params.purposes,
-      async sendApprovedResponse() {
-        await transitionalGrantReadPermissions(context);
-        const addresses: GetAccountsResult = accountPurposeAddresses(account, {
-          type: 'select',
-          purposes: popupPayloadGetAccounts.data.params.purposes,
-        }).map((address) => ({
-          ...address,
-          walletType: account.accountType ?? 'software',
-        }));
-        sendRpcResponse(context.tabId, makeRpcSuccessResponse(data.id, addresses));
-      },
-      sendCancelledResponse() {
-        sendRpcResponse(
-          context.tabId,
-          makeRPCError(data.id, {
-            code: RpcErrorCode.USER_REJECTION,
-            message: `User rejected ${data.method} request.`,
-          }),
-        );
-      },
-    };
-  }
+      // Legacy sats-connect getAddress (params via SW store or embedded URL).
+      if (approvalParams.status === 'loading') {
+        return;
+      }
+      if (approvalParams.status === 'error') {
+        if (!cancelled) {
+          setState({
+            ...emptyHandlers,
+            loading: false,
+            error: approvalParams.error,
+          });
+        }
+        return;
+      }
 
-  // When none of the above succeed in processing a request, assume it's a legacy request.
-  {
-    const params = new URLSearchParams(search);
-    const token = params.get('addressRequest') ?? '';
-    const origin = params.get('origin') ?? '';
-    let legacyRequestNetworkType;
-    let request: GetAddressOptions | undefined;
-    if (token) {
-      request = decodeToken(token) as any as GetAddressOptions;
-      legacyRequestNetworkType = request.payload.network.type;
-    }
-    const message = request?.payload.message ?? params.get('message') ?? '';
-    const pArray = params.get('purposes');
-    const purposes = request?.payload.purposes ?? (pArray?.split(',') as AddressPurpose[]);
-    const addresses = accountPurposeAddresses(account, { type: 'select', purposes });
-    const tabId = Number(params.get('tabId') ?? '0');
-    const sendApprovedResponse = async () => {
-      const response: GetAddressResponse = {
-        addresses,
-      };
-      const addressMessage = {
-        source: MESSAGE_SOURCE,
-        method: SatsConnectMethods.getAddressResponse,
-        payload: { addressRequest: token, addressResponse: response },
-      };
-      chrome.tabs.sendMessage(tabId, addressMessage);
-    };
-    const sendCancelledResponse = () => {
-      const addressMessage = {
-        source: MESSAGE_SOURCE,
-        method: SatsConnectMethods.getAddressResponse,
-        payload: { addressRequest: token, addressResponse: 'cancel' },
-      };
-      chrome.tabs.sendMessage(tabId, addressMessage);
-    };
+      const params = approvalParams.params;
+      const token = params.get('addressRequest') ?? '';
+      const origin = params.get('origin') ?? '';
+      let legacyRequestNetworkType: BitcoinNetworkType | undefined;
+      let request: GetAddressOptions | undefined;
+      if (token) {
+        request = decodeToken(token) as any as GetAddressOptions;
+        legacyRequestNetworkType = request.payload.network.type;
+      }
+      const message = request?.payload.message ?? params.get('message') ?? '';
+      const pArray = params.get('purposes');
+      const purposes = request?.payload.purposes ?? (pArray?.split(',') as AddressPurpose[]);
+      const addresses = accountPurposeAddresses(account, { type: 'select', purposes });
+      const tabId = Number(params.get('tabId') ?? '0');
 
-    return {
-      legacyRequestNetworkType,
-      message,
-      origin,
-      purposes,
-      sendApprovedResponse,
-      sendCancelledResponse,
+      if (!cancelled) {
+        setState({
+          loading: false,
+          legacyRequestNetworkType,
+          message,
+          origin,
+          purposes: purposes ?? [],
+          async sendApprovedResponse() {
+            const response: GetAddressResponse = {
+              addresses,
+            };
+            const addressMessage = {
+              source: MESSAGE_SOURCE,
+              method: SatsConnectMethods.getAddressResponse,
+              payload: { addressRequest: token, addressResponse: response },
+            };
+            chrome.tabs.sendMessage(tabId, addressMessage);
+          },
+          sendCancelledResponse() {
+            const addressMessage = {
+              source: MESSAGE_SOURCE,
+              method: SatsConnectMethods.getAddressResponse,
+              payload: { addressRequest: token, addressResponse: 'cancel' },
+            };
+            chrome.tabs.sendMessage(tabId, addressMessage);
+          },
+        });
+      }
+    })();
+
+    return () => {
+      cancelled = true;
     };
-  }
+  }, [account, approvalParams, transitionalGrantReadPermissions]);
+
+  return state;
 }

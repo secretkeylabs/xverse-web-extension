@@ -12,7 +12,7 @@ import {
 } from '@sats-connect/core';
 import Button from '@ui-library/button';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import * as v from 'valibot';
 import { DappLogo } from './dappLogo';
@@ -153,6 +153,15 @@ function ConnectionRequestInner({ data, context }: ConnectionRequestInnerProps) 
   );
 }
 
+type PayloadState =
+  | { status: 'loading' }
+  | { status: 'error' }
+  | {
+      status: 'ready';
+      context: Context;
+      data: ConnectRequestMessage | RequestPermissionsRequestMessage;
+    };
+
 export function ConnectionRequest() {
   // Requests to `"wallet_connect"` are for granting read permissions to the
   // current account. Requests to `"wallet_requestPermissions"` allow requesting
@@ -163,14 +172,53 @@ export function ConnectionRequest() {
   // requesting arbitrary permissions, this feature is not yet implemented. For
   // the time being, any granular permissions requested using these methods are
   // ignored and only account read permissions may be granted.
-  const [, permsRequestPayload] = getPopupPayload(v.parser(requestPermissionsRequestMessageSchema));
-  const [, connectRequestPayload] = getPopupPayload(v.parser(connectRequestMessageSchema));
+  const [state, setState] = useState<PayloadState>({ status: 'loading' });
 
-  const payload = permsRequestPayload ?? connectRequestPayload;
+  useEffect(() => {
+    let cancelled = false;
 
-  if (!payload) {
+    (async () => {
+      const [permsError, permsPayload] = await getPopupPayload(
+        v.parser(requestPermissionsRequestMessageSchema),
+      );
+      if (!cancelled && !permsError && permsPayload) {
+        setState({
+          status: 'ready',
+          context: permsPayload.context,
+          data: permsPayload.data,
+        });
+        return;
+      }
+
+      const [connectError, connectPayload] = await getPopupPayload(
+        v.parser(connectRequestMessageSchema),
+      );
+      if (!cancelled && !connectError && connectPayload) {
+        setState({
+          status: 'ready',
+          context: connectPayload.context,
+          data: connectPayload.data,
+        });
+        return;
+      }
+
+      if (!cancelled) {
+        setState({ status: 'error' });
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (state.status === 'loading') {
+    return null;
+  }
+
+  if (state.status === 'error') {
     return <div>Error processing connection request.</div>;
   }
 
-  return <ConnectionRequestInner data={payload.data} context={payload.context} />;
+  return <ConnectionRequestInner data={state.data} context={state.context} />;
 }

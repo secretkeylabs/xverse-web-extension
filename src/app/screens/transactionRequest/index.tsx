@@ -56,14 +56,17 @@ function TransactionRequest() {
   const [contractName, setContractName] = useState<string | undefined>(undefined);
   const [attachment, setAttachment] = useState<Buffer | undefined>(undefined);
   const { t } = useTranslation('translation', { keyPrefix: 'REQUEST_ERRORS' });
-  const { payload, tabId, requestToken, transaction } = txReq;
+  const { payload, tabId, requestToken, transaction, loading: txReqLoading, error: txReqError } =
+    txReq;
   const { messageId, rpcMethod } = 'rpcMethod' in txReq ? txReq : { messageId: '', rpcMethod: '' };
 
   let action: 'token_transfer' | 'contract_call' | 'smart_contract' | 'transfer' = 'transfer';
   if (
-    payload.txType === 'token_transfer' ||
-    payload.txType === 'contract_call' ||
-    payload.txType === 'smart_contract'
+    !txReqLoading &&
+    payload &&
+    (payload.txType === 'token_transfer' ||
+      payload.txType === 'contract_call' ||
+      payload.txType === 'smart_contract')
   ) {
     action = payload.txType;
   }
@@ -247,12 +250,21 @@ function TransactionRequest() {
   };
 
   useEffect(() => {
+    if (txReqLoading || txReqError) {
+      return;
+    }
     handleRequest();
-  }, []);
+    // Intentionally once payload is ready (mirrors prior mount-only behavior).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [txReqLoading, txReqError]);
+
+  if (txReqError) {
+    return <div>{txReqError}</div>;
+  }
 
   return (
     <>
-      {!unsignedTx ? (
+      {txReqLoading || !unsignedTx ? (
         <LoaderContainer>
           <Spinner color="white" size={50} />
         </LoaderContainer>

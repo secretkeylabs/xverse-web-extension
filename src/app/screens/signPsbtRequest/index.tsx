@@ -31,8 +31,17 @@ function SignPsbtRequest() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSigning, setIsSigning] = useState(false);
   const [summary, setSummary] = useState<PSBTSummary | undefined>();
-  const { payload, parsedPsbt, confirmSignPsbt, cancelSignPsbt, onCloseError, requestId, tabId } =
-    useSignPsbt();
+  const {
+    payload,
+    parsedPsbt,
+    confirmSignPsbt,
+    cancelSignPsbt,
+    onCloseError,
+    requestId,
+    tabId,
+    loading: payloadLoading,
+    error: payloadError,
+  } = useSignPsbt();
   const { validationError, setValidationError } = useSignPsbtValidationGate({
     payload,
     parsedPsbt,
@@ -45,7 +54,7 @@ function SignPsbtRequest() {
   const { submitRuneSellPsbt } = useSubmitRuneSellPsbt();
 
   useEffect(() => {
-    if (!parsedPsbt) return;
+    if (!parsedPsbt || !payload) return;
 
     parsedPsbt
       .getSummary()
@@ -154,6 +163,16 @@ function SignPsbtRequest() {
     window.close();
   };
 
+  if (payloadError) {
+    return (
+      <RequestError
+        error={payloadError}
+        errorTitle={t('PSBT_CANT_PARSE_ERROR_TITLE')}
+        onClose={() => window.close()}
+      />
+    );
+  }
+
   if (validationError) {
     return (
       <RequestError
@@ -161,6 +180,23 @@ function SignPsbtRequest() {
         errorTitle={validationError.errorTitle}
         onClose={onCloseClick}
         textAlignment={validationError.alignment}
+      />
+    );
+  }
+
+  if (payloadLoading || !payload) {
+    return (
+      <ConfirmBtcTransaction
+        summary={undefined}
+        isLoading
+        isSubmitting={false}
+        isBroadcast={false}
+        confirmText={t('CONFIRM')}
+        cancelText={t('CANCEL')}
+        onCancel={onCancel}
+        onConfirm={async () => {}}
+        hideBottomBar
+        showAccountHeader={!isInAppPsbt}
       />
     );
   }

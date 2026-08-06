@@ -1,3 +1,4 @@
+import { useApprovalSearchParams } from '@common/utils/popup/useApprovalSearchParams';
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import useBtcClient from '@hooks/apiClients/useBtcClient';
 import useOrdinalsServiceApi from '@hooks/apiClients/useOrdinalsServiceApi';
@@ -11,27 +12,41 @@ import {
   type LedgerTransport,
   type Rune,
 } from '@secretkeylabs/xverse-core';
-import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useMemo, useState } from 'react';
 import SuperJSON from 'superjson';
 
 const useRuneMintRequestParams = () => {
-  const { search } = useLocation();
-  const params = new URLSearchParams(search);
+  const approvalParams = useApprovalSearchParams();
+  const params = approvalParams.status === 'ready' ? approvalParams.params : new URLSearchParams();
   const tabId = params.get('tabId') ?? '0';
   const requestId = params.get('requestId') ?? '';
   const payloadToken = params.get('payload') ?? '';
 
-  const payload = SuperJSON.parse<Params<'runes_mint'>>(payloadToken);
-  const mintRequest = payload;
-  // network is not needed in the mint request and the api will use the current network
-  // we need to remove it because the api will throw an error if it's present
-  delete mintRequest.network;
+  const { mintRequest, network } = useMemo(() => {
+    if (approvalParams.status !== 'ready' || !payloadToken) {
+      return { mintRequest: undefined as unknown as RunesMintParams, network: undefined };
+    }
+    const payload = SuperJSON.parse<Params<'runes_mint'>>(payloadToken);
+    const networkValue = payload.network;
+    // network is not needed in the mint request and the api will use the current network
+    // we need to remove it because the api will throw an error if it's present
+    delete payload.network;
+    return { mintRequest: payload, network: networkValue };
+  }, [approvalParams.status, payloadToken]);
 
-  return { mintRequest, tabId, requestId, network: payload.network };
+  return {
+    loading: approvalParams.status === 'loading',
+    error: approvalParams.status === 'error' ? approvalParams.error : undefined,
+    mintRequest,
+    tabId,
+    requestId,
+    network,
+  };
 };
 
 const useMintRequest = (): {
+  loading: boolean;
+  error?: string;
   runeInfo: Rune | null;
   mintRequest: RunesMintParams;
   orderTx: TransactionBuildPayload | null;
@@ -45,7 +60,13 @@ const useMintRequest = (): {
   }) => Promise<any>;
   cancelMintRequest: () => Promise<void>;
 } => {
-  const { mintRequest, requestId, tabId } = useRuneMintRequestParams();
+  const {
+    loading: paramsLoading,
+    error: paramsError,
+    mintRequest,
+    requestId,
+    tabId,
+  } = useRuneMintRequestParams();
   const selectedAccount = useSelectedAccount();
   const txContext = useTransactionContext();
   const ordinalsServiceApi = useOrdinalsServiceApi();
@@ -206,6 +227,8 @@ const useMintRequest = (): {
   };
 
   return {
+    loading: paramsLoading,
+    error: paramsError,
     runeInfo,
     mintRequest,
     orderTx,

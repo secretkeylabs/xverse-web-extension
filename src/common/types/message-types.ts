@@ -31,6 +31,10 @@ enum RpcMethods {
 
 export enum InternalMethods {
   OriginatingTabClosed = 'OriginatingTabClosed',
+  /** Popup → SW: fetch opaque approval payload by requestId (extension pages only). */
+  GetApprovalRequest = 'GetApprovalRequest',
+  /** Popup → SW: drop approval payload after resolve/cancel (optional cleanup). */
+  DeleteApprovalRequest = 'DeleteApprovalRequest',
 }
 
 export type ExtensionMethods =

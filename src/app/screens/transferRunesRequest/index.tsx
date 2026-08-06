@@ -1,4 +1,5 @@
-import { getPopupPayload, type Context } from '@common/utils/popup';
+import { type Context } from '@common/utils/popup';
+import { usePopupPayload } from '@common/utils/popup/usePopupPayload';
 import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RequestError from '@components/requests/requestError';
 import {
@@ -96,12 +97,21 @@ function TransferRunesRequestInner({ data, context }: TransferRunesRequestInnerP
 }
 
 function TransferRunesRequest() {
-  const [error, data] = getPopupPayload(v.parser(runesTransferRequestMessageSchema));
-  if (error) {
+  const payloadState = usePopupPayload(v.parser(runesTransferRequestMessageSchema));
+
+  if (payloadState.status === 'loading') {
+    return (
+      <LoaderContainer>
+        <Spinner size={50} />
+      </LoaderContainer>
+    );
+  }
+
+  if (payloadState.status === 'error') {
     throw new Error('Invalid payload');
   }
 
-  return <TransferRunesRequestInner data={data.data} context={data.context} />;
+  return <TransferRunesRequestInner data={payloadState.data} context={payloadState.context} />;
 }
 
 export default TransferRunesRequest;

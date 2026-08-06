@@ -3,6 +3,7 @@ import stxIcon from '@assets/img/dashboard/stx_icon.svg';
 import ledgerConnectDefaultIcon from '@assets/img/hw/ledger/ledger_connect_default.svg';
 import ledgerConnectStxIcon from '@assets/img/hw/ledger/ledger_import_connect_stx.svg';
 import { MESSAGE_SOURCE } from '@common/types/message-types';
+import { useApprovalSearchParams } from '@common/utils/popup/useApprovalSearchParams';
 import { delay } from '@common/utils/promises';
 import BottomModal from '@components/bottomModal';
 import ActionButton from '@components/button';
@@ -22,13 +23,14 @@ import {
 import { Address } from '@stacks/transactions';
 import Callout from '@ui-library/callout';
 import { StickyHorizontalSplitButtonContainer } from '@ui-library/common.styled';
+import Spinner from '@ui-library/spinner';
 import { isHardwareAccount } from '@utils/helper';
 import { trackMixPanel } from '@utils/mixpanel';
 import RoutePaths from 'app/routes/paths';
 import { decodeToken } from 'jsontokens';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import validUrl from 'valid-url';
 import AddressPurposeBox from '../addressPurposeBox';
@@ -106,10 +108,15 @@ function AuthenticationRequest() {
   const [isTxRejected, setIsTxRejected] = useState(false);
   const { t } = useTranslation('translation', { keyPrefix: 'AUTH_REQUEST_SCREEN' });
   const navigate = useNavigate();
-  const { search } = useLocation();
-  const params = new URLSearchParams(search);
+  const approvalParams = useApprovalSearchParams();
+  const params = approvalParams.status === 'ready' ? approvalParams.params : new URLSearchParams();
   const authRequestToken = params.get('authRequest') ?? '';
-  const authRequest = decodeToken(authRequestToken) as unknown as AuthRequest;
+  const authRequest = useMemo(() => {
+    if (approvalParams.status !== 'ready' || !authRequestToken) {
+      return undefined;
+    }
+    return decodeToken(authRequestToken) as unknown as AuthRequest;
+  }, [approvalParams.status, authRequestToken]);
   const selectedAccount = useSelectedAccount();
   const { btcAddress, stxAddress } = selectedAccount;
   const { getSeed } = useSeedVault();
@@ -129,6 +136,9 @@ function AuthenticationRequest() {
   const confirmCallback = async () => {
     setLoading(true);
     try {
+      if (!authRequest) {
+        return;
+      }
       if (isHardwareAccount(selectedAccount) && !isDisabled) {
         setIsModalVisible(true);
         return;
@@ -275,6 +285,24 @@ function AuthenticationRequest() {
 
     window.close();
   };
+
+  if (approvalParams.status === 'loading') {
+    return (
+      <MainContainer style={styles}>
+        <Spinner color="white" size={50} />
+      </MainContainer>
+    );
+  }
+
+  if (approvalParams.status === 'error' || !authRequest) {
+    return (
+      <MainContainer style={styles}>
+        <div>
+          {approvalParams.status === 'error' ? approvalParams.error : 'Invalid auth request'}
+        </div>
+      </MainContainer>
+    );
+  }
 
   return (
     <MainContainer style={styles}>

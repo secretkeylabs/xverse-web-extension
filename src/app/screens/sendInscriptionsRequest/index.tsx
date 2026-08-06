@@ -28,6 +28,7 @@ function SendInscriptionsRequest() {
     transaction,
     summary,
     txError,
+    payloadError,
   } = useSendInscriptions();
 
   const onClickCancel = async () => {
@@ -51,6 +52,10 @@ function SendInscriptionsRequest() {
       });
     }
   };
+
+  if (payloadError) {
+    return <RequestError error={payloadError} onClose={onClickCancel} />;
+  }
 
   return (
     <>

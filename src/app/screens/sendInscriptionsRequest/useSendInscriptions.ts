@@ -1,4 +1,4 @@
-import { getPopupPayload } from '@common/utils/popup';
+import { usePopupPayload } from '@common/utils/popup/usePopupPayload';
 import { makeRPCError, makeRpcSuccessResponse, sendRpcResponse } from '@common/utils/rpc/helpers';
 import { sendUserRejectionMessage } from '@common/utils/rpc/responseMessages/errors';
 import useBtcFeeRate from '@hooks/useBtcFeeRate';
@@ -14,17 +14,6 @@ import {
 import { useEffect, useState } from 'react';
 import * as v from 'valibot';
 
-const useSendInscriptionsRequest = () => {
-  const [error, popupPayloadSendInscriptions] = getPopupPayload(
-    v.parser(sendInscriptionsRequestMessageSchema),
-  );
-  if (!popupPayloadSendInscriptions) {
-    throw new Error('Invalid payload');
-  }
-
-  return { popupPayloadSendInscriptions, error };
-};
-
 const useSendInscriptions = () => {
   const [txError, setTxError] = useState<{
     code: number | undefined;
@@ -37,19 +26,21 @@ const useSendInscriptions = () => {
   const [isExecuting, setIsExecuting] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const selectedAccount = useSelectedAccount();
-  const {
-    popupPayloadSendInscriptions: {
-      context: { tabId },
-      data: {
-        params: { transfers },
-        id,
-      },
-    },
-  } = useSendInscriptionsRequest();
+  const payloadState = usePopupPayload(v.parser(sendInscriptionsRequestMessageSchema));
+  const tabId = payloadState.status === 'ready' ? payloadState.context.tabId : 0;
+  const transfers =
+    payloadState.status === 'ready' ? payloadState.data.params.transfers : undefined;
+  const id = payloadState.status === 'ready' ? payloadState.data.id : '';
+  const payloadError =
+    payloadState.status === 'error' ? payloadState.error.message : undefined;
+  const payloadLoading = payloadState.status === 'loading';
   const { data: btcFeeRates } = useBtcFeeRate();
   const txContext = useTransactionContext();
 
   const generateTransferTxAndSummary = async (desiredFeeRate: number) => {
+    if (!transfers?.length) {
+      throw new Error('Missing inscription transfers');
+    }
     const tx = await btcTransaction.sendOrdinalsWithSplit(
       txContext,
       transfers.map((transfer) => ({
@@ -90,6 +81,8 @@ const useSendInscriptions = () => {
   };
 
   useEffect(() => {
+    if (!transfers?.length) return;
+
     let initialFeeRate: number | undefined = Number.parseInt(feeRate, 10);
     if (Number.isNaN(initialFeeRate)) {
       initialFeeRate = btcFeeRates?.priority;
@@ -97,7 +90,7 @@ const useSendInscriptions = () => {
 
     buildTx(initialFeeRate);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [feeRate, btcFeeRates?.priority]);
+  }, [feeRate, btcFeeRates?.priority, transfers]);
 
   const confirmOrdinalsTransferRequest = async (options?: {
     ledgerTransport?: LedgerTransport;
@@ -139,11 +132,13 @@ const useSendInscriptions = () => {
   };
 
   return {
+    payloadLoading,
+    payloadError,
     transaction,
     summary,
     txError,
     feeRate,
-    isLoading,
+    isLoading: payloadLoading || isLoading,
     isExecuting,
     setFeeRate,
     getFeeForFeeRate,

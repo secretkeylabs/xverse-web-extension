@@ -1,3 +1,4 @@
+import { useApprovalSearchParams } from '@common/utils/popup/useApprovalSearchParams';
 import useSelectedAccount from '@hooks/useSelectedAccount';
 import useWalletReducer from '@hooks/useWalletReducer';
 import useWalletSelector from '@hooks/useWalletSelector';
@@ -11,18 +12,22 @@ import { isHardwareAccount } from '@utils/helper';
 import { decodeToken } from 'jsontokens';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
 import SuperJSON from 'superjson';
 
 export const useSignMessageRequestParams = () => {
-  const { search } = useLocation();
   const { network } = useWalletSelector();
-  const params = useMemo(() => new URLSearchParams(search), [search]);
+  const approvalParams = useApprovalSearchParams();
+  const params = approvalParams.status === 'ready' ? approvalParams.params : new URLSearchParams();
   const tabId = params.get('tabId') ?? '0';
+  // RPC message id — stored in legacyParams, not the opaque URL requestId.
   const requestId = params.get('requestId') ?? '';
   const payloadToken = params.get('payload') ?? '';
 
   const { payload, requestToken } = useMemo(() => {
+    if (approvalParams.status !== 'ready') {
+      return { payload: undefined, requestToken: null };
+    }
+
     const token = params.get('signMessageRequest') ?? '';
     if (token) {
       const request = decodeToken(token) as any as SignMessageOptions;
@@ -30,6 +35,9 @@ export const useSignMessageRequestParams = () => {
         payload: request.payload,
         requestToken: token,
       };
+    }
+    if (!payloadToken) {
+      return { payload: undefined, requestToken: null };
     }
     const rpcPayload: SignMessagePayload = {
       ...SuperJSON.parse<Params<'signMessage'>>(payloadToken),
@@ -42,9 +50,16 @@ export const useSignMessageRequestParams = () => {
       payload: rpcPayload,
       requestToken: null,
     };
-  }, [params, payloadToken, network.type]);
+  }, [approvalParams.status, params, payloadToken, network.type]);
 
-  return { tabId, payload, requestToken, requestId };
+  return {
+    loading: approvalParams.status === 'loading',
+    error: approvalParams.status === 'error' ? approvalParams.error : undefined,
+    tabId,
+    payload,
+    requestToken,
+    requestId,
+  };
 };
 
 type ValidationError = {

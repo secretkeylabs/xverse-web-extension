@@ -1,37 +1,50 @@
 # Popup
 
-This module contains helpers that facilitate sending arbitrary data when opening a wallet popup, and reading the sent data within the popup. The concept of "sending data" to a popup is not native extension feature, and therefore need to establish a convention for it.
+Helpers for opening the wallet approval popup and recovering the request payload
+inside it.
 
-The chosen convention is to send data in the querystring. The helpers ensure data is written to and read from the query string in a consistent way.
+## Opaque request store (current)
 
-Using the querystring to pass data introduces a type assertion boundary. Type information is lost when data is read on the popup side, and must be asserted to be of the expected type.
+Approval payloads (PSBTs, auth tokens, SuperJSON blobs, etc.) are **not** placed
+in the popup URL. Instead:
 
-A type assertion function can be used in conjunction with the helpers provided to restore types and ensure data is of the expected type at runtime. See the example below:
+1. Background calls `createApprovalRequest` (in-memory SW map) and opens the
+   popup with only an opaque `?requestId=` (or `#/path?requestId=`).
+2. Popup pages call `getPopupPayload` / `usePopupPayload` (modern `openPopup`
+   path) or `useApprovalSearchParams` / `getLegacyApprovalParams` (legacy RPC
+   hash-query path).
+3. The SW answers `GetApprovalRequest` only for trusted
+   `chrome-extension://<id>/…` pages — never content scripts.
+4. Entries are deleted when the popup window closes (and pruned by TTL).
 
 ```ts
-// In background script code.
-openPopup({
+// Background
+await openPopup({
   path: '/page/to/open/in/popup',
-  data: {
-    /* Arbitrary data sent to the popup. Any JS value. */
-  },
-  // Contains extension connection data the popup often needs to interact with
-  // the tab that requested.
+  data: { /* arbitrary */ },
   context: makeContext(port),
 });
 
-// In popup code.
-const [error, payload] = getPopupPayload(dataTypeAsserter);
-if (error) {
-  // Handle error.
-}
-
-const { context, data } = payload; // `data` is typed as per `dataTypeAsserter`.
+// Popup
+const state = usePopupPayload(dataTypeAsserter);
+if (state.status !== 'ready') return null;
+const { context, data } = state;
 ```
 
-The `dataTypeAsserter` used above is any function that asserts `data` is of the desired type, and throws an error otherwise. Asserters for requests by Sats Connect can be found in [`sats-connect-core`](https://github.com/secretkeylabs/sats-connect-core/tree/main/src/request/types).
+Legacy RPC helpers still use `makeSearchParamsWithDefaults`, which stores the
+full param map under `kind: 'legacy'` and puts only `requestId` (+ non-sensitive
+`origin` / `tabId`) in the URL. Screens should read via
+`useApprovalSearchParams`.
 
-Notably, the `openPopup` helper
+## Legacy fallback
 
-- notifies the popup when the origin tab is closed, and
-- cleans up event handlers.
+`getPopupPayload` still accepts the old `?p=` superqs blob for any in-flight
+popups opened before upgrade. New opens never write `p=`.
+
+## Notes
+
+- Get ≠ consume: React remounts may fetch the same `requestId` multiple times.
+- Do **not** put PSBTs in `chrome.storage.session` — content scripts hold the
+  `storage` permission and could read them.
+- Type assertion: parsers (e.g. valibot schemas from sats-connect) restore types
+  at the popup boundary.

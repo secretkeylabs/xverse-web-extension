@@ -2,7 +2,7 @@ import ConfirmBtcTransaction from '@components/confirmBtcTransaction';
 import RequestError from '@components/requests/requestError';
 import type { KeystoneTransport, LedgerTransport } from '@secretkeylabs/xverse-core';
 import Spinner from '@ui-library/spinner';
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -19,6 +19,8 @@ function EtchRune() {
   const { t } = useTranslation('translation', { keyPrefix: 'CONFIRM_TRANSACTION' });
   const navigate = useNavigate();
   const {
+    loading: paramsLoading,
+    error: paramsError,
     etchRequest,
     orderTx,
     feeRate,
@@ -29,13 +31,13 @@ function EtchRune() {
     cancelEtchRequest,
   } = useEtchRequest();
 
-  const createAndLoadOrder = useCallback(async () => {
-    await handleEtch();
-  }, []);
-
   useEffect(() => {
-    createAndLoadOrder();
-  }, [createAndLoadOrder]);
+    if (paramsLoading || paramsError || !etchRequest) {
+      return;
+    }
+    handleEtch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [paramsLoading, paramsError, etchRequest]);
 
   const onClickCancel = async () => {
     await cancelEtchRequest();
@@ -57,15 +59,19 @@ function EtchRune() {
     });
   };
 
+  if (paramsError) {
+    return <RequestError error={paramsError} onClose={onClickCancel} />;
+  }
+
   return (
     <>
       {etchError && <RequestError error={etchError.message} onClose={onClickCancel} />}
-      {!orderTx && !etchError && (
+      {(paramsLoading || (!orderTx && !etchError)) && (
         <LoaderContainer>
           <Spinner size={50} />
         </LoaderContainer>
       )}
-      {orderTx && orderTx.summary && !etchError && (
+      {orderTx && orderTx.summary && etchRequest && !etchError && (
         <ConfirmBtcTransaction
           summary={orderTx.summary}
           runeEtchDetails={etchRequest}
