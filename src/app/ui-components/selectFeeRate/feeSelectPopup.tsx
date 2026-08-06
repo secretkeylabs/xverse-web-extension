@@ -172,26 +172,29 @@ function FeeSelectPopup({
 
       const onApply = () => {
         if (!hasSufficientFunds) return;
+        const rate = Number(customValue);
+        if (!customValue || !Number.isFinite(rate) || rate <= 0) return;
 
         setSelected('custom');
-        setFeeRate(`${+customValue}`);
+        setFeeRate(`${rate}`);
         onClose();
       };
 
-      const rateTooLow = !!feeRateLimits?.min && Number(customValue) < feeRateLimits.min;
-      const rateTooHigh = !!feeRateLimits?.max && Number(customValue) > feeRateLimits.max;
+      const numericCustomValue = Number(customValue);
+      const rateZeroOrInvalid =
+        !!customValue && (!Number.isFinite(numericCustomValue) || numericCustomValue <= 0);
+      const rateTooLow = !!feeRateLimits?.min && numericCustomValue < feeRateLimits.min;
+      const rateTooHigh = !!feeRateLimits?.max && numericCustomValue > feeRateLimits.max;
 
-      const errorText =
-        // eslint-disable-next-line eqeqeq
-        +customValue == 0
-          ? undefined
-          : !hasSufficientFunds
-          ? t('SEND.INSUFFICIENT_FUNDS')
-          : rateTooLow
-          ? t('SEND.RATE_TOO_LOW', { minFee: feeRateLimits?.min })
-          : rateTooHigh
-          ? t('SEND.RATE_TOO_HIGH', { maxFee: feeRateLimits?.max })
-          : undefined;
+      const errorText = rateZeroOrInvalid
+        ? t('SEND.INVALID_FEE_RATE')
+        : !hasSufficientFunds
+        ? t('SEND.INSUFFICIENT_FUNDS')
+        : rateTooLow
+        ? t('SEND.RATE_TOO_LOW', { minFee: feeRateLimits?.min })
+        : rateTooHigh
+        ? t('SEND.RATE_TOO_HIGH', { maxFee: feeRateLimits?.max })
+        : undefined;
 
       const inputFeedback: {
         message: string;
@@ -250,7 +253,7 @@ function FeeSelectPopup({
             <Button
               title={t('COMMON.APPLY')}
               onClick={onApply}
-              disabled={!hasSufficientFunds || !customValue || rateTooLow || rateTooHigh}
+              disabled={!hasSufficientFunds || !customValue || rateZeroOrInvalid || rateTooLow || rateTooHigh || !isCustomValueValid}
             />
           </Buttons>
         </>

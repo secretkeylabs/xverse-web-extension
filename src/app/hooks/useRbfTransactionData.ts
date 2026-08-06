@@ -20,6 +20,7 @@ import { useNavigate } from 'react-router-dom';
 import useBtcClient from './apiClients/useBtcClient';
 import useNetworkSelector from './useNetwork';
 import useSelectedAccount from './useSelectedAccount';
+import useTransactionContext from './useTransactionContext';
 import useWalletSelector from './useWalletSelector';
 
 // TODO: move the types and helper functions below to xverse-core
@@ -121,6 +122,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
   const { data: stxData } = useStxWalletData();
   const btcClient = useBtcClient();
   const selectedNetwork = useNetworkSelector();
+  const transactionContext = useTransactionContext();
   const { t } = useTranslation('translation', { keyPrefix: 'SPEED_UP_TRANSACTION' });
   const navigate = useNavigate();
 
@@ -228,6 +230,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
             : selectedAccount.id,
         network: network.type,
         esploraProvider: btcClient,
+        transactionContext,
       });
 
       const mempoolFees = await mempoolApi.getRecommendedFees(network.type);
@@ -254,6 +257,7 @@ const useRbfTransactionData = (transaction?: BtcTransactionData | StxTransaction
     selectedAccountType,
     network.type,
     btcClient,
+    transactionContext,
     fetchStxData,
     t,
     navigate,
