@@ -11,7 +11,12 @@ import {
   type TransactionResponseMessage,
 } from '@common/types/message-types';
 import type { StacksProvider } from '@stacks/connect';
-import { callAndReceive, isValidLegacyEvent } from './utils';
+import {
+  addTrustedWalletMessageListener,
+  callAndReceive,
+  isValidLegacyEvent,
+  removeTrustedWalletMessageListener,
+} from './utils';
 
 declare const VERSION: string;
 
@@ -32,7 +37,7 @@ const StacksMethodsProvider: Partial<StacksProvider> = {
       const handleMessage = (eventMessage: MessageEvent<SignatureResponseMessage>) => {
         if (!isValidLegacyEvent(eventMessage, StacksLegacyMethods.signatureResponse)) return;
         if (eventMessage.data.payload?.signatureRequest !== signatureRequest) return;
-        window.removeEventListener('message', handleMessage);
+        removeTrustedWalletMessageListener(handleMessage);
         if (eventMessage.data.payload.signatureResponse === 'cancel') {
           reject(eventMessage.data.payload.signatureResponse);
           return;
@@ -41,7 +46,7 @@ const StacksMethodsProvider: Partial<StacksProvider> = {
           resolve(eventMessage.data.payload.signatureResponse);
         }
       };
-      window.addEventListener('message', handleMessage);
+      addTrustedWalletMessageListener(handleMessage);
     });
   },
   signatureRequest: async (signatureRequest) => {
@@ -53,7 +58,7 @@ const StacksMethodsProvider: Partial<StacksProvider> = {
       const handleMessage = (eventMessage: MessageEvent<SignatureResponseMessage>) => {
         if (!isValidLegacyEvent(eventMessage, StacksLegacyMethods.signatureResponse)) return;
         if (eventMessage.data.payload?.signatureRequest !== signatureRequest) return;
-        window.removeEventListener('message', handleMessage);
+        removeTrustedWalletMessageListener(handleMessage);
         if (eventMessage.data.payload.signatureResponse === 'cancel') {
           reject(eventMessage.data.payload.signatureResponse);
           return;
@@ -62,7 +67,7 @@ const StacksMethodsProvider: Partial<StacksProvider> = {
           resolve(eventMessage.data.payload.signatureResponse);
         }
       };
-      window.addEventListener('message', handleMessage);
+      addTrustedWalletMessageListener(handleMessage);
     });
   },
   authenticationRequest: async (authenticationRequest) => {
@@ -77,14 +82,14 @@ const StacksMethodsProvider: Partial<StacksProvider> = {
       const handleMessage = (eventMessage: MessageEvent<AuthenticationResponseMessage>) => {
         if (!isValidLegacyEvent(eventMessage, StacksLegacyMethods.authenticationResponse)) return;
         if (eventMessage.data.payload?.authenticationRequest !== authenticationRequest) return;
-        window.removeEventListener('message', handleMessage);
+        removeTrustedWalletMessageListener(handleMessage);
         if (eventMessage.data.payload.authenticationResponse === 'cancel') {
           reject(eventMessage.data.payload.authenticationResponse);
           return;
         }
         resolve(eventMessage.data.payload.authenticationResponse);
       };
-      window.addEventListener('message', handleMessage);
+      addTrustedWalletMessageListener(handleMessage);
     });
   },
   transactionRequest: async (transactionRequest) => {
@@ -96,7 +101,7 @@ const StacksMethodsProvider: Partial<StacksProvider> = {
       const handleMessage = (eventMessage: MessageEvent<TransactionResponseMessage>) => {
         if (!isValidLegacyEvent(eventMessage, StacksLegacyMethods.transactionResponse)) return;
         if (eventMessage.data.payload?.transactionRequest !== transactionRequest) return;
-        window.removeEventListener('message', handleMessage);
+        removeTrustedWalletMessageListener(handleMessage);
         if (eventMessage.data.payload.transactionResponse === 'cancel') {
           reject(eventMessage.data.payload.transactionResponse);
           return;
@@ -105,7 +110,7 @@ const StacksMethodsProvider: Partial<StacksProvider> = {
           resolve(eventMessage.data.payload.transactionResponse);
         }
       };
-      window.addEventListener('message', handleMessage);
+      addTrustedWalletMessageListener(handleMessage);
     });
   },
   getProductInfo() {

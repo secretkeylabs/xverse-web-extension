@@ -34,7 +34,12 @@ import {
 import { nanoid } from 'nanoid';
 import * as v from 'valibot';
 import { addListener } from './eventHandlers';
-import { isValidLegacyEvent } from './utils';
+import {
+  addTrustedWalletMessageListener,
+  isTrustedWalletMessageEvent,
+  isValidLegacyEvent,
+  removeTrustedWalletMessageListener,
+} from './utils';
 
 const SatsMethodsProvider: BitcoinProvider = {
   connect: async (btcAddressRequest): Promise<GetAddressResponse> => {
@@ -46,7 +51,7 @@ const SatsMethodsProvider: BitcoinProvider = {
       const handleMessage = (eventMessage: MessageEvent<GetAddressResponseMessage>) => {
         if (!isValidLegacyEvent(eventMessage, SatsConnectMethods.getAddressResponse)) return;
         if (eventMessage.data.payload?.addressRequest !== btcAddressRequest) return;
-        window.removeEventListener('message', handleMessage);
+        removeTrustedWalletMessageListener(handleMessage);
         if (eventMessage.data.payload.addressResponse === 'cancel') {
           reject(eventMessage.data.payload.addressResponse);
           return;
@@ -55,7 +60,7 @@ const SatsMethodsProvider: BitcoinProvider = {
           resolve(eventMessage.data.payload.addressResponse);
         }
       };
-      window.addEventListener('message', handleMessage);
+      addTrustedWalletMessageListener(handleMessage);
     });
   },
   signTransaction: async (signPsbtRequest: string): Promise<SignTransactionResponse> => {
@@ -67,7 +72,7 @@ const SatsMethodsProvider: BitcoinProvider = {
       const handleMessage = (eventMessage: MessageEvent<SignPsbtResponseMessage>) => {
         if (!isValidLegacyEvent(eventMessage, SatsConnectMethods.signPsbtResponse)) return;
         if (eventMessage.data.payload?.signPsbtRequest !== signPsbtRequest) return;
-        window.removeEventListener('message', handleMessage);
+        removeTrustedWalletMessageListener(handleMessage);
         if (eventMessage.data.payload.signPsbtResponse === 'cancel') {
           reject(eventMessage.data.payload.signPsbtResponse);
           return;
@@ -76,7 +81,7 @@ const SatsMethodsProvider: BitcoinProvider = {
           resolve(eventMessage.data.payload.signPsbtResponse);
         }
       };
-      window.addEventListener('message', handleMessage);
+      addTrustedWalletMessageListener(handleMessage);
     });
   },
   signMultipleTransactions: async (
@@ -93,7 +98,7 @@ const SatsMethodsProvider: BitcoinProvider = {
       const handleMessage = (eventMessage: MessageEvent<SignBatchPsbtResponseMessage>) => {
         if (!isValidLegacyEvent(eventMessage, SatsConnectMethods.signBatchPsbtResponse)) return;
         if (eventMessage.data.payload?.signBatchPsbtRequest !== signBatchPsbtRequest) return;
-        window.removeEventListener('message', handleMessage);
+        removeTrustedWalletMessageListener(handleMessage);
         if (eventMessage.data.payload.signBatchPsbtResponse === 'cancel') {
           reject(eventMessage.data.payload.signBatchPsbtResponse);
           return;
@@ -102,7 +107,7 @@ const SatsMethodsProvider: BitcoinProvider = {
           resolve(eventMessage.data.payload.signBatchPsbtResponse);
         }
       };
-      window.addEventListener('message', handleMessage);
+      addTrustedWalletMessageListener(handleMessage);
     });
   },
   signMessage: async (signMessageRequest: string): Promise<string> => {
@@ -114,7 +119,7 @@ const SatsMethodsProvider: BitcoinProvider = {
       const handleMessage = (eventMessage: MessageEvent<SignMessageResponseMessage>) => {
         if (!isValidLegacyEvent(eventMessage, SatsConnectMethods.signMessageResponse)) return;
         if (eventMessage.data.payload?.signMessageRequest !== signMessageRequest) return;
-        window.removeEventListener('message', handleMessage);
+        removeTrustedWalletMessageListener(handleMessage);
         if (eventMessage.data.payload.signMessageResponse === 'cancel') {
           reject(eventMessage.data.payload.signMessageResponse);
           return;
@@ -123,7 +128,7 @@ const SatsMethodsProvider: BitcoinProvider = {
           resolve(eventMessage.data.payload.signMessageResponse);
         }
       };
-      window.addEventListener('message', handleMessage);
+      addTrustedWalletMessageListener(handleMessage);
     });
   },
   sendBtcTransaction: async (sendBtcRequest: string): Promise<string> => {
@@ -135,7 +140,7 @@ const SatsMethodsProvider: BitcoinProvider = {
       const handleMessage = (eventMessage: MessageEvent<SendBtcResponseMessage>) => {
         if (!isValidLegacyEvent(eventMessage, SatsConnectMethods.sendBtcResponse)) return;
         if (eventMessage.data.payload?.sendBtcRequest !== sendBtcRequest) return;
-        window.removeEventListener('message', handleMessage);
+        removeTrustedWalletMessageListener(handleMessage);
         if (eventMessage.data.payload.sendBtcResponse === 'cancel') {
           reject(eventMessage.data.payload.sendBtcResponse);
           return;
@@ -144,7 +149,7 @@ const SatsMethodsProvider: BitcoinProvider = {
           resolve(eventMessage.data.payload.sendBtcResponse);
         }
       };
-      window.addEventListener('message', handleMessage);
+      addTrustedWalletMessageListener(handleMessage);
     });
   },
   createInscription: async (
@@ -162,7 +167,7 @@ const SatsMethodsProvider: BitcoinProvider = {
         if (!isValidLegacyEvent(eventMessage, SatsConnectMethods.createInscriptionResponse)) return;
         if (eventMessage.data.payload?.createInscriptionRequest !== createInscriptionRequest)
           return;
-        window.removeEventListener('message', handleMessage);
+        removeTrustedWalletMessageListener(handleMessage);
         if (eventMessage.data.payload.createInscriptionResponse === 'cancel') {
           reject(eventMessage.data.payload.createInscriptionResponse);
           return;
@@ -171,7 +176,7 @@ const SatsMethodsProvider: BitcoinProvider = {
           resolve(eventMessage.data.payload.createInscriptionResponse);
         }
       };
-      window.addEventListener('message', handleMessage);
+      addTrustedWalletMessageListener(handleMessage);
     });
   },
   createRepeatInscriptions: async (
@@ -195,7 +200,7 @@ const SatsMethodsProvider: BitcoinProvider = {
           createRepeatInscriptionsRequest
         )
           return;
-        window.removeEventListener('message', handleMessage);
+        removeTrustedWalletMessageListener(handleMessage);
         if (eventMessage.data.payload.createRepeatInscriptionsResponse === 'cancel') {
           reject(eventMessage.data.payload.createRepeatInscriptionsResponse);
           return;
@@ -204,7 +209,7 @@ const SatsMethodsProvider: BitcoinProvider = {
           resolve(eventMessage.data.payload.createRepeatInscriptionsResponse);
         }
       };
-      window.addEventListener('message', handleMessage);
+      addTrustedWalletMessageListener(handleMessage);
     });
   },
   request: async <Method extends keyof Requests>(
@@ -222,6 +227,11 @@ const SatsMethodsProvider: BitcoinProvider = {
     document.dispatchEvent(rpcRequestEvent);
     return new Promise((resolve) => {
       function handleRpcResponseEvent(message: MessageEvent<unknown>) {
+        // Only CS MessagePort delivery (PR7); ignore forgeable window.postMessage.
+        if (!isTrustedWalletMessageEvent(message)) {
+          return;
+        }
+
         const parseResult = v.safeParse(rpcResponseMessageSchema, message.data);
 
         if (!parseResult.success) {
@@ -236,7 +246,7 @@ const SatsMethodsProvider: BitcoinProvider = {
           return;
         }
 
-        window.removeEventListener('message', handleRpcResponseEvent);
+        removeTrustedWalletMessageListener(handleRpcResponseEvent);
 
         // NOTE: Ideally the response would be runtime type-checked before the
         // promise is resolved since the message crosses a type assertion
@@ -244,7 +254,7 @@ const SatsMethodsProvider: BitcoinProvider = {
         // safe to assume that the message will conform to the expected type.
         return resolve(rpcResponseMessage as RpcResponse<Method>);
       }
-      window.addEventListener('message', handleRpcResponseEvent);
+      addTrustedWalletMessageListener(handleRpcResponseEvent);
     });
   },
   addListener,

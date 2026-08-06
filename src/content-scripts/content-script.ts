@@ -20,11 +20,36 @@ import {
   type SatsConnectMessageFromContentScript,
 } from '@common/types/message-types';
 import { classifyExtensionToPageMessage } from '@common/utils/contentScriptPageMessageAllowlist';
+import {
+  PAGE_BRIDGE_INIT_METHOD,
+  PAGE_BRIDGE_INIT_SOURCE,
+} from '@common/utils/pageMessageBridge';
 import getEventSourceWindow from '@common/utils/getEventSourceWindow';
 
 import RequestsRoutes from '@common/utils/route-urls';
 import { walletEventName } from '@common/walletEvents';
 import { getIsPriorityWallet } from '@utils/chromeLocalStorage';
+
+
+// Authenticated extension→page channel. Port is transferred after inpage.js loads
+// (web-accessible), so page CSP cannot block an inline bootstrap script.
+const pageBridge = new MessageChannel();
+pageBridge.port1.start();
+let pageBridgeTransferred = false;
+
+function transferPageBridgePort() {
+  if (pageBridgeTransferred) return;
+  pageBridgeTransferred = true;
+  window.postMessage(
+    { source: PAGE_BRIDGE_INIT_SOURCE, method: PAGE_BRIDGE_INIT_METHOD },
+    window.location.origin,
+    [pageBridge.port2],
+  );
+}
+
+function postAllowlistedMessageToPage(message: unknown) {
+  pageBridge.port1.postMessage(message);
+}
 
 // Legacy messaging to work with older versions of Connect
 window.addEventListener('message', (event) => {
@@ -78,7 +103,7 @@ chrome.runtime.onMessage.addListener((message: unknown) => {
   }
 
   if (decision.action === 'postMessage') {
-    window.postMessage(decision.message, window.location.origin);
+    postAllowlistedMessageToPage(decision.message);
     return;
   }
 
@@ -232,7 +257,10 @@ const injectInPageScript = (isPriority) => {
   inpage.src = chrome.runtime.getURL('inpage.js');
   inpage.id = 'xverse-wallet-provider';
   inpage.setAttribute('data-is-priority', isPriority ? 'true' : '');
-  document.head.appendChild(inpage);
+  inpage.addEventListener('load', transferPageBridgePort);
+  (document.head || document.documentElement).appendChild(inpage);
+  // Cached scripts may not fire load; transfer once either way.
+  setTimeout(transferPageBridgePort, 0);
 };
 
 getIsPriorityWallet()
