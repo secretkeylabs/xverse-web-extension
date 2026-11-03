@@ -43,7 +43,7 @@
     "@ledgerhq/hw-transport-webusb": "6.29.4",
     "@noble/hashes": "1.7.1",
     "@phosphor-icons/react": "2.1.7",
-    "@playwright/test": "1.46.1",
+    "@playwright/test": "1.64.1",
     "@react-spring/web": "9.7.3",
     "@sats-connect/core": "0.6.6",
     "@scure/base": "1.2.4",
