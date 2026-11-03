@@ -21,7 +21,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           always-auth: true
-          node-version: 18
+          node-version: 22
           registry-url: https://npm.pkg.github.com
           scope: '@secretkeylabs'
           cache: npm
@@ -72,7 +72,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           always-auth: true
-          node-version: 18
+          node-version: 22
           registry-url: https://npm.pkg.github.com
           scope: '@secretkeylabs'
           cache: npm
@@ -109,7 +109,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           always-auth: true
-          node-version: 18
+          node-version: 22
           registry-url: https://npm.pkg.github.com
           scope: '@secretkeylabs'
           cache: npm
